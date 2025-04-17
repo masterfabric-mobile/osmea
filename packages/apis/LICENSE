@@ -675,7 +675,7 @@ of this license document, but changing it is not allowed.
 
 [Standard AGPL v3.0 terms and conditions]
 
-## Additional Terms for https://github.com/masterfabric-mobile/osmea
+## Additional Terms for https://github.com/masterfabric-mobile/osmea/packages/apis
 
 1. Ownership and Copyright:
    This work is owned and copyrighted by MASTERFABRIC Bilişim Teknolojileri A.Ş. (MASTERFABRIC Information Technologies Inc.)
@@ -697,11 +697,11 @@ of this license document, but changing it is not allowed.
 
 5. Mobile Application Requirements:
    If any software covered by this license is published as a mobile application:
-   a. The application must include references to the repository (https://github.com/masterfabric-mobile/osmea) and work information as declared by MasterFabric.
+   a. The application must include references to the repository (https://github.com/masterfabric-mobile/osmea/packages/apis) and work information as declared by MasterFabric.
    b. The company owner, Gürkan Fikret Günak, is obligated to include this information in the application.
 
 6. Code Content:
-   All code contents within the https://github.com/masterfabric-mobile/osmea repository are covered by these terms.
+   All code contents within the https://github.com/masterfabric-mobile/osmea/packages/apis repository are covered by these terms.
 
 7. Non-Profit Organization Exception:
    If an organization proves to be non-profit, they must use the free-license code defined by MASTERFABRIC as follows:

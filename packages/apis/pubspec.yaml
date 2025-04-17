@@ -1,0 +1,43 @@
+name: apis
+description: "This package serves as the API network layer for the Storefront and Storefront Admin applications. It is responsible for handling all RESTful API requests and responses, providing a centralized and reusable solution for network communication."
+
+version: 0.0.1
+# homepage:
+
+environment:
+  sdk: ^3.5.2
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Dependency Injection
+  injectable: 2.5.0
+  get_it: 7.7.0
+
+  # Networking
+  retrofit: 4.1.0
+  dio: 5.4.3+1
+  dio_cookie_manager: 2.1.4
+
+  # File Management
+  path_provider: 2.1.5
+
+  # Logging
+  logger: 1.4.0
+
+  # JSON
+  json_annotation: 4.9.0
+  freezed_annotation: 2.4.4
+  json_serializable: 6.9.0
+  freezed: 2.5.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 2.0.3
+  build_runner: 2.4.13
+  injectable_generator: 2.6.2
+  retrofit_generator: 8.1.2
+
