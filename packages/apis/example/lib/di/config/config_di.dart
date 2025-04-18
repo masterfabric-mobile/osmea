@@ -9,8 +9,8 @@ GetIt getIt = GetIt.instance;
 Future<GetIt> configureDependencies() async {
   getIt = ApiNetwork.init(
     getIt,
-    storeName:'<store_name>',
-    shopifyAccessToken: '<shopify_access_token>',
+    storeName:'f2rtrh-vq',
+    shopifyAccessToken: 'ccc',
   );
 
   return getIt.init();

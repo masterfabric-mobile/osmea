@@ -1,8 +1,9 @@
-import 'package:apis/di/config/config_di.dart';
 import 'package:apis/network/remote/access/access_scope/abstract/access_scope_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'dart:convert';
+
+import 'di/config/config_di.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
