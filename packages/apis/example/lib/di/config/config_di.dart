@@ -8,6 +8,7 @@ GetIt getIt = GetIt.instance;
 
 @InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies() async {
-  getIt = await ApiNetwork.init(getIt);
+  // Use initFromConfig to load values from config.json instead of passing empty string
+  getIt = await ApiNetwork.initFromConfig(getIt);
   return getIt.init();
 }
