@@ -33,28 +33,56 @@ class ApiNetwork {
   // 🔑 Shopify Access Token (optional, for authentication)
   static String shopifyAccessToken = '';
 
+  /// 📦 API Version (used to build the interceptor URL)
+  static String apiVersion = '';
+
   // 🕵️‍♂️ Interceptor for requests (custom logic before each request)
   static Future<void> Function() onRequestInterceptor = () async {};
 
   /// 🏁 Initializes the API network layer.
   /// 
   /// [getIt]: The GetIt instance for dependency injection.
-  static Future<GetIt> init(GetIt getIt) async {
-    // 📦 Load the configuration file
-    final configHelper = await JsonConfigHelper.load('assets/config.json');
-    // 🏬 Retrieve store name and access token
-    final storeName = configHelper.get('root.storeName');
-    final shopifyAccessToken = configHelper.get('root.shopifyAccessToken');
-
-    // ⚠️ Do not make requests before setting storeName and shopifyAccessToken!
+  /// [storeName]: Your Shopify store name (e.g., 'examplestore').
+  /// [proxyIp]: Optional proxy IP for debugging or routing.
+  /// [shopifyAccessToken]: Optional Shopify access token for authentication.
+  static GetIt init(
+    GetIt getIt,
+    {
+    required String storeName,
+    String? proxyIp,
+    String? shopifyAccessToken,
+    String? apiVersion,
+    }
+  ) {
+    // ⚠️ Make sure to set storeName and shopifyAccessToken before making requests!
     ApiNetwork.getIt = getIt;
     ApiNetwork.storeName = storeName;
     ApiNetwork.proxyIp = proxyIp ?? '';
     ApiNetwork.shopifyAccessToken = shopifyAccessToken ?? '';
+    ApiNetwork.apiVersion = apiVersion ?? '';
 
     // 🧩 Register dependencies (see /di/config/config_di.dart)
     configureDependencies(); // This function should be defined in config_di.dart.
     return getIt;
+  }
+
+  /// 🏁 Alternative initialization using configuration file
+  static Future<GetIt> initFromConfig(GetIt getIt) async {
+    // 📦 Load the configuration file
+    final configHelper = await JsonConfigHelper.load('assets/config.json');
+    
+    // 🏬 Retrieve store name, access token, and API version
+    final storeName = configHelper.get('root.storeName');
+    final shopifyAccessToken = configHelper.get('root.shopifyAccessToken');
+    final apiVersion = configHelper.get('root.apiVersion');
+
+    // Initialize with values from config
+    return init(
+      getIt,
+      storeName: storeName,
+      shopifyAccessToken: shopifyAccessToken,
+      apiVersion: apiVersion,
+    );
   }
 
   /// 🌍 Computed Shopify Admin API base URL.
@@ -83,6 +111,11 @@ class ApiNetwork {
   /// 🔄 Updates the Shopify Access Token at runtime.
   static void updateShopifyAccessToken(String token) {
     ApiNetwork.shopifyAccessToken = token;
+  }
+
+  /// 🔄 Update the API version at runtime.
+  static void updateApiVersion(String version) {
+    ApiNetwork.apiVersion = version;
   }
 
   /// 🛡️ Set a custom interceptor for API requests.
