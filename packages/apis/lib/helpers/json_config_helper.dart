@@ -1,29 +1,48 @@
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart';
 
+/// Helper class for loading and accessing JSON configuration
 class JsonConfigHelper {
-  final Map<String, dynamic> _config;
+  /// The loaded JSON data
+  final Map<String, dynamic> _data;
 
-  JsonConfigHelper._(this._config);
+  JsonConfigHelper(this._data);
 
-  /// Asset içindeki [assetPath] dosyasını yükler ve bir helper döner.
-  static Future<JsonConfigHelper> load(String assetPath) async {
-    final jsonString = await rootBundle.loadString(assetPath);
-    final config = jsonDecode(jsonString) as Map<String, dynamic>;
-    return JsonConfigHelper._(config);
-  }
-
-  /// Nokta ile ayrılmış key-path ile değer döndürür.
-  dynamic get(String keyPath) {
-    final keys = keyPath.split('.');
-    dynamic value = _config;
-    for (final key in keys) {
-      if (value is Map && value.containsKey(key)) {
-        value = value[key];
-      } else {
-        return null;
-      }
+  /// Load configuration from a JSON file
+  static Future<JsonConfigHelper> load(String path) async {
+    try {
+      final jsonString = await rootBundle.loadString(path);
+      final jsonData = json.decode(jsonString);
+      return JsonConfigHelper(jsonData);
+    } catch (e) {
+      // Return empty config if file not found or invalid
+      print('Error loading config file: $e');
+      return JsonConfigHelper({});
     }
-    return value;
   }
+
+  /// Get a value from the JSON by dot path
+  /// Example: get('root.storeName')
+  String get(String path) {
+    final parts = path.split('.');
+    dynamic current = _data;
+
+    for (final part in parts) {
+      if (current is! Map || !current.containsKey(part)) {
+        return '';
+      }
+      current = current[part];
+    }
+
+    return current?.toString() ?? '';
+  }
+
+  /// Sample config.json structure:
+  /// {
+  ///   "root": {
+  ///     "storeName": "your-store-name",
+  ///     "shopifyAccessToken": "your-access-token",
+  ///     "apiVersion": "2023-07"
+  ///   }
+  /// }
 }
