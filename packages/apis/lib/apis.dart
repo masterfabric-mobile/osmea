@@ -71,10 +71,10 @@ class ApiNetwork {
     // 📦 Load the configuration file
     final configHelper = await JsonConfigHelper.load('assets/config.json');
     
-    // 🏬 Retrieve store name, access token, and API version
-    final storeName = configHelper.get('root.storeName');
-    final shopifyAccessToken = configHelper.get('root.shopifyAccessToken');
-    final apiVersion = configHelper.get('root.apiVersion');
+    // 🏬 Retrieve store name, access token, and API version from new structure
+    final storeName = configHelper.get('root.shopify.storeName');
+    final shopifyAccessToken = configHelper.get('root.shopify.shopifyAccessToken');
+    final apiVersion = configHelper.get('root.shopify.apiVersion');
 
     // Initialize with values from config
     return init(
