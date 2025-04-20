@@ -8,6 +8,8 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:flutter/material.dart';
 // 💻 Import for checking if the platform is web
 import 'package:flutter/foundation.dart' show kIsWeb;
+// 📝 Import for API service registry
+import 'package:example/services/api_service_registry.dart';
 
 // 🛠️ Import for dependency injection configuration
 import 'di/config/config_di.dart';
@@ -16,6 +18,16 @@ import 'di/config/config_di.dart';
 Future<void> main() async {
   // 🪄 Ensures Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ⚠️ Initialize API services before dependency injection
+  // This ensures handlers are properly registered
+  try {
+    ApiServiceRegistry.initialize();
+  } catch (e) {
+    debugPrint('Error initializing API services: $e');
+    // Continue anyway - we'll handle errors in the UI
+  }
+
   // 🔗 Set up dependency injection
   configureDependencies();
   // 🍪 Prepare cookies storage if not running on web

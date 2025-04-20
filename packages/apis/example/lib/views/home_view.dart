@@ -4,6 +4,8 @@ import 'package:example/widgets/control_panel.dart';
 import 'package:example/widgets/response_panel.dart';
 import 'package:example/widgets/layout_widgets.dart';
 
+/// 🏠 Main view for the API Explorer application
+/// Provides UI for selecting and testing API endpoints
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -12,16 +14,30 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // State for API selection
+  // 🔄 State variables for API selection flow
+
+  /// 🔖 Currently selected API category
   ApiCategory? _selectedCategory;
+
+  /// 🏷️ Currently selected API subcategory within the category
+  String? _selectedSubcategory;
+
+  /// 🔌 Currently selected API service
   ApiService? _selectedService;
+
+  /// 📋 Currently selected API method (GET, POST, etc.)
   String? _selectedMethod;
 
-  // Response state
+  // 📊 Response handling state
+
+  /// 📦 Data returned from API request
   Map<String, dynamic>? _responseData;
+
+  /// ⏳ Loading state during API request
   bool _loading = false;
 
-  // Controllers for text fields
+  /// 🎛️ Text field controllers for parameter input
+  /// Maps field names to their respective controllers
   final Map<String, TextEditingController> _controllers = {};
 
   @override
@@ -34,10 +50,38 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  /// 🔄 Sets the selected category and updates dependent selections
+  /// Updates subcategory, service, and method based on available options
   void _setCategory(ApiCategory category) {
     setState(() {
       _selectedCategory = category;
-      final services = ApiServiceRegistry.getByCategory(category);
+      _selectedSubcategory = null;
+
+      // 📂 Check if there are subcategories
+      final subcategories =
+          ApiServiceRegistry.getSubcategoriesByCategory(category);
+      if (subcategories.isNotEmpty) {
+        _setSubcategory(subcategories.first);
+      } else {
+        // 📝 No subcategories, directly select first service in category
+        final services = ApiServiceRegistry.getByCategory(category);
+        if (services.isNotEmpty) {
+          _setService(services.first);
+        } else {
+          _selectedService = null;
+          _selectedMethod = null;
+        }
+      }
+    });
+  }
+
+  /// 🏷️ Sets the selected subcategory and updates service selection
+  void _setSubcategory(String subcategory) {
+    setState(() {
+      _selectedSubcategory = subcategory;
+      // 🔍 Get services for this subcategory
+      final services =
+          ApiServiceRegistry.getBySubcategory(_selectedCategory!, subcategory);
       if (services.isNotEmpty) {
         _setService(services.first);
       } else {
@@ -47,6 +91,7 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  /// 🔌 Sets the selected service and updates available methods
   void _setService(ApiService service) {
     setState(() {
       _selectedService = service;
@@ -58,6 +103,7 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  /// 📋 Sets the selected method and clears input fields
   void _setMethod(String method) {
     setState(() {
       _selectedMethod = method;
@@ -75,23 +121,28 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    // 📐 Responsive layout handling
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 1200;
-    final isMediumScreen = screenWidth > 800 && screenWidth <= 1200;
+    final isWideScreen = screenWidth > 1200; // 🖥️ Desktop layout
+    final isMediumScreen =
+        screenWidth > 800 && screenWidth <= 1200; // 💻 Tablet layout
 
-    // Create control and response panels
+    // 🎛️ Create control panel for API selection and parameters
     final controlPanel = ControlPanel(
       selectedCategory: _selectedCategory,
+      selectedSubcategory: _selectedSubcategory,
       selectedService: _selectedService,
       selectedMethod: _selectedMethod,
       loading: _loading,
       onCategorySelected: _setCategory,
+      onSubcategorySelected: _setSubcategory,
       onServiceSelected: _setService,
       onMethodSelected: _setMethod,
       onExecute: _sendRequest,
       controllers: _controllers,
     );
 
+    // 📊 Create response panel for displaying API results
     final responsePanel = ResponsePanel(
       responseData: _responseData,
       loading: _loading,
@@ -127,6 +178,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+  /// 🧹 Clears input fields and response data
   void _clearFields() {
     _responseData = null;
 
@@ -136,6 +188,8 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  /// 🚀 Executes API request with current selections and parameters
+  /// Updates the response data and loading state
   Future<void> _sendRequest() async {
     if (_selectedService == null || _selectedMethod == null) return;
 
@@ -145,7 +199,7 @@ class _HomeViewState extends State<HomeView> {
     });
 
     try {
-      // Gather parameters from input fields
+      // 📝 Gather parameters from input fields
       final Map<String, String> params = {};
       if (_selectedService!.requiredFields.containsKey(_selectedMethod)) {
         for (final field
@@ -154,12 +208,13 @@ class _HomeViewState extends State<HomeView> {
         }
       }
 
-      // Handle the request using the service's handler and get structured data
+      // 🔄 Handle the request using the service's handler and get structured data
       _responseData = await _selectedService!.handler.handleRequest(
         _selectedMethod!,
         params,
       );
     } catch (e) {
+      // ⚠️ Handle errors and display in response panel
       _responseData = {"error": e.toString()};
     }
 

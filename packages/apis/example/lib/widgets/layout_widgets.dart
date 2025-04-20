@@ -12,6 +12,8 @@ class WideLayoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -19,9 +21,9 @@ class WideLayoutView extends StatelessWidget {
           width: 340,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             border: Border(
-              right: BorderSide(color: Colors.grey.shade200),
+              right: BorderSide(color: theme.dividerColor),
             ),
           ),
           child: controlPanel,
@@ -44,6 +46,8 @@ class MediumLayoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,9 +55,9 @@ class MediumLayoutView extends StatelessWidget {
           flex: 5,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               border: Border(
-                right: BorderSide(color: Colors.grey.shade200),
+                right: BorderSide(color: theme.dividerColor),
               ),
             ),
             child: controlPanel,
@@ -80,12 +84,15 @@ class NarrowLayoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         Card(
           margin: const EdgeInsets.all(8),
+          color: theme.colorScheme.surface,
           child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            data: theme.copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
               title: const Text('API Configuration'),
               initiallyExpanded: true,

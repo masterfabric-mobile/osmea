@@ -3,10 +3,13 @@ import 'package:example/services/api_service_registry.dart';
 
 class ControlPanel extends StatelessWidget {
   final ApiCategory? selectedCategory;
+  final String? selectedSubcategory; // Add subcategory selection
   final ApiService? selectedService;
   final String? selectedMethod;
   final bool loading;
   final Function(ApiCategory) onCategorySelected;
+  final Function(String)
+      onSubcategorySelected; // Add callback for subcategory selection
   final Function(ApiService) onServiceSelected;
   final Function(String) onMethodSelected;
   final Function() onExecute;
@@ -15,10 +18,12 @@ class ControlPanel extends StatelessWidget {
   const ControlPanel({
     super.key,
     required this.selectedCategory,
+    this.selectedSubcategory, // Make it optional or provide a default
     required this.selectedService,
     required this.selectedMethod,
     required this.loading,
     required this.onCategorySelected,
+    required this.onSubcategorySelected, // Add this parameter
     required this.onServiceSelected,
     required this.onMethodSelected,
     required this.onExecute,
@@ -34,6 +39,10 @@ class ControlPanel extends StatelessWidget {
         children: [
           _buildCategorySelector(context),
           if (selectedCategory != null) ...[
+            const SizedBox(height: 24),
+            _buildSubcategorySelector(context), 
+          ],
+          if (selectedCategory != null && selectedSubcategory != null) ...[
             const SizedBox(height: 24),
             _buildServiceSelector(context),
           ],
@@ -66,32 +75,103 @@ class ControlPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<ApiCategory>(
-          value: selectedCategory,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.category),
-            hintText: 'Select API Category',
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
           ),
-          items: ApiServiceRegistry.categories.map((category) {
-            return DropdownMenuItem<ApiCategory>(
-              value: category,
-              child: Text(category.displayName),
-            );
-          }).toList(),
-          onChanged: (value) {
-            if (value != null) onCategorySelected(value);
-          },
+          child: DropdownButtonFormField<ApiCategory>(
+            value: selectedCategory,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.category),
+              hintText: 'Select API Category',
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            ),
+            items: ApiServiceRegistry.categories.map((category) {
+              return DropdownMenuItem<ApiCategory>(
+                value: category,
+                child: Text(
+                  category.displayName,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) onCategorySelected(value);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Updated method to build the subcategory selector as a dropdown
+  Widget _buildSubcategorySelector(BuildContext context) {
+    final categoryName = ApiServiceRegistry.getCategoryName(selectedCategory!);
+    final subcategories =
+        ApiServiceRegistry.getSubcategoriesByCategory(selectedCategory!);
+
+    if (subcategories.isEmpty) {
+      return const SizedBox.shrink(); // No subcategories, don't show selector
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$categoryName Subcategories',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonFormField<String>(
+            value: selectedSubcategory,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.subdirectory_arrow_right),
+              hintText: 'Select Subcategory',
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            ),
+            items: subcategories.map((subcategory) {
+              return DropdownMenuItem<String>(
+                value: subcategory,
+                child: Text(
+                  subcategory,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) onSubcategorySelected(value);
+            },
+          ),
         ),
       ],
     );
   }
 
   Widget _buildServiceSelector(BuildContext context) {
+    // Update to filter by both category and subcategory
+    final services = selectedSubcategory != null
+        ? ApiServiceRegistry.getBySubcategory(
+            selectedCategory!, selectedSubcategory!)
+        : ApiServiceRegistry.getByCategory(selectedCategory!);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${selectedCategory?.displayName ?? ""} Services',
+          '${selectedSubcategory ?? selectedCategory?.displayName ?? ""} Services',
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -106,13 +186,11 @@ class ControlPanel extends StatelessWidget {
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount:
-                ApiServiceRegistry.getByCategory(selectedCategory!).length,
+            itemCount: services.length,
             separatorBuilder: (_, __) =>
                 Divider(height: 1, color: Colors.grey.shade200),
             itemBuilder: (context, index) {
-              final service =
-                  ApiServiceRegistry.getByCategory(selectedCategory!)[index];
+              final service = services[index];
               final isSelected = service == selectedService;
 
               return ListTile(
@@ -210,7 +288,7 @@ class ControlPanel extends StatelessWidget {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
