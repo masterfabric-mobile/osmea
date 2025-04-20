@@ -17,7 +17,6 @@ class AppTheme {
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         surface: Colors.white,
-        background: backgroundColor,
       ),
       useMaterial3: true,
 

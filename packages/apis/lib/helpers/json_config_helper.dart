@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// Helper class for loading and accessing JSON configuration
@@ -16,7 +17,9 @@ class JsonConfigHelper {
       return JsonConfigHelper(jsonData);
     } catch (e) {
       // Return empty config if file not found or invalid
-      print('Error loading config file: $e');
+      if (kDebugMode) {
+        print('Error loading config file: $e');
+      }
       return JsonConfigHelper({});
     }
   }

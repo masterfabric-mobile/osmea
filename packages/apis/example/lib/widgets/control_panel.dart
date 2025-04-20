@@ -13,7 +13,7 @@ class ControlPanel extends StatelessWidget {
   final Map<String, TextEditingController> controllers;
 
   const ControlPanel({
-    Key? key,
+    super.key,
     required this.selectedCategory,
     required this.selectedService,
     required this.selectedMethod,
@@ -23,7 +23,7 @@ class ControlPanel extends StatelessWidget {
     required this.onMethodSelected,
     required this.onExecute,
     required this.controllers,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

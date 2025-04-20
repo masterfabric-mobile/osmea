@@ -1,0 +1,99 @@
+import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:flutter/foundation.dart'; // FlutterError için
+
+/// 🧩 Base class for all ViewModel Blocs.
+/// Provides logging and state management utilities.
+abstract class BaseViewModelBloc<E, S> extends Bloc<E, S> {
+  /// 📝 Logger instance for logging state changes.
+  final ICommonLogger logger;
+
+  /// 🏗️ Constructor with optional logger for testability.
+  /// 
+  /// Throws assertion error if logger is null.
+  BaseViewModelBloc(
+    S state, {
+    ICommonLogger? logger,
+  })  : logger = logger ?? GetIt.I.get<ICommonLogger>(),
+        assert(logger != null, 'Logger must not be null! 🚨'),
+        super(state);
+
+  /// 📦 Getter for current state.
+  S get currentState => state;
+
+  /// 🔄 Updates the state and emits the new value.
+  void updateState(S newState) {
+    // ignore: invalid_use_of_visible_for_testing_member
+    emit(newState);
+  }
+
+  @override
+  void onChange(Change<S> change) {
+    // 🔔 State change detected!
+    try {
+      logger.printBaseViewModelLogs(
+        [
+          '🔄 State changed!',
+          'Current: ${change.currentState}',
+          'Next: ${change.nextState}'
+        ],
+      );
+    } catch (e, stack) {
+      // ⚠️ Logging failed, report to FlutterError
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: e,
+        stack: stack,
+        library: 'base_view_model.dart',
+        context: ErrorDescription('Error while logging onChange'),
+      ));
+    }
+    super.onChange(change);
+  }
+
+  @override
+  void onTransition(Transition<E, S> transition) {
+    // 🔁 Bloc transition detected!
+    try {
+      logger.printBaseViewModelLogs(
+        [
+          '🔁 Transition!',
+          'Event: ${transition.event}',
+          'CurrentState: ${transition.currentState}',
+          'NextState: ${transition.nextState}'
+        ],
+      );
+    } catch (e, stack) {
+      // ⚠️ Logging failed, report to FlutterError
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: e,
+        stack: stack,
+        library: 'base_view_model.dart',
+        context: ErrorDescription('Error while logging onTransition'),
+      ));
+    }
+    super.onTransition(transition);
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    // ❌ Error detected in Bloc!
+    try {
+      logger.printBaseViewModelLogs(
+        [
+          '❌ Error: $error',
+          '🧵 StackTrace: $stackTrace',
+        ],
+      );
+    } catch (e) {
+      // ⚠️ Logging failed, report to FlutterError
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: e,
+        stack: stackTrace,
+        library: 'base_view_model.dart',
+        context: ErrorDescription('Error while logging onError'),
+      ));
+    }
+    super.onError(error, stackTrace);
+  }
+}
