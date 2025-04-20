@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
+/// 🎨 Main application theme configuration
+/// Defines colors, styles, and component appearances
 class AppTheme {
-  // Theme colors
-  static const primaryColor = Color(0xFF5468FF); // Blue
-  static const secondaryColor = Color(0xFF22C55E); // Green
-  static const backgroundColor = Color(0xFFF8FAFC);
-  static const textColor = Color(0xFF0F172A);
+  // 🌈 Theme colors
+  static const primaryColor = Color(0xFF5468FF); // 🔵 Blue
+  static const secondaryColor = Color(0xFF22C55E); // 💚 Green
+  static const backgroundColor = Color(0xFFF8FAFC); // ⚪ Light background
+  static const textColor = Color(0xFF0F172A); // 🖤 Dark text
 
-  // Get the theme data
+  // 🏗️ Get the theme data
   static ThemeData getTheme() {
     return ThemeData(
-      // Base theme with Material 3
+      // 🧩 Base theme with Material 3
       colorScheme: const ColorScheme.light(
         primary: primaryColor,
         secondary: secondaryColor,
@@ -20,7 +22,7 @@ class AppTheme {
       ),
       useMaterial3: true,
 
-      // Basic component themes
+      // 🧱 Basic component themes
       appBarTheme: const AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -28,6 +30,7 @@ class AppTheme {
         foregroundColor: textColor,
       ),
 
+      // 🃏 Card styling
       cardTheme: CardTheme(
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -36,6 +39,7 @@ class AppTheme {
         ),
       ),
 
+      // 🔘 Button styling
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
@@ -48,6 +52,7 @@ class AppTheme {
         ),
       ),
 
+      // 📝 Input field styling
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.grey.shade50,
