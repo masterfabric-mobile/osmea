@@ -1,4 +1,3 @@
-
 import 'package:apis/network/remote/access/storefront_access_token/freezed_model/request/create_new_storefront_access_token_request.dart';
 import 'package:apis/network/remote/access/storefront_access_token/freezed_model/response/create_new_storefront_access_token_response.dart';
 import 'package:apis/network/remote/access/storefront_access_token/freezed_model/response/storefront_access_token_response.dart';
@@ -12,15 +11,14 @@ abstract class StorefrontAccessTokenService {
   });
 
   /// 🚀 Creates a new storefront access token.
-  Future<CreateNewStorefrontAccessTokenResponse> createNewStorefrontAccessToken({
+  Future<CreateNewStorefrontAccessTokenResponse>
+      createNewStorefrontAccessToken({
     required String apiVersion,
     required CreateNewStorefrontAccessTokenRequest model,
   });
 
-  /// 🚀 Deletes a storefront access token.
-  Future<CreateNewStorefrontAccessTokenResponse> deleteStorefrontAccessToken({
+  Future<void> deleteStorefrontAccessToken({
     required String apiVersion,
     required String storefrontAccessTokenId,
   });
-
 }

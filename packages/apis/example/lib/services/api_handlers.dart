@@ -103,7 +103,6 @@ class AccessScopeHandler implements ApiRequestHandler {
 ///*************** 🔑 STOREFRONT ACCESS TOKEN API 🔑 ****************
 ///*******************************************************************
 
-
 class StorefrontAccessTokenHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
@@ -246,12 +245,72 @@ class StorefrontAccessTokenHandler implements ApiRequestHandler {
 
       case 'DELETE':
         final id = params['id'] ?? '';
-        // 🗑️ Example implementation for DELETE - return Map instead of String
-        return {
-          "status": "success",
-          "message": "Token with ID $id deleted",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
+        if (id.isEmpty) {
+          return {
+            "status": "error",
+            "message": "Token ID is required",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
+
+        try {
+          // 🔗 Construct the API URL for reference
+          final apiUrl =
+              '${ApiNetwork.baseUrl}/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
+
+          // 🗑️ Attempt to delete the token
+          await GetIt.I
+              .get<StorefrontAccessTokenService>()
+              .deleteStorefrontAccessToken(
+                apiVersion: ApiNetwork.apiVersion,
+                storefrontAccessTokenId: id,
+              );
+
+          return {
+            "status": "success",
+            "message": "Token with ID $id has been deleted",
+            "url": apiUrl,
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        } catch (e) {
+          // 🔗 Construct the API URL for debugging
+          final apiUrl =
+              '${ApiNetwork.baseUrl}/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
+
+          // 🔍 Check if this is a 404 error (token not found)
+          if (e.toString().contains('404')) {
+            return {
+              "status": "warning",
+              "message":
+                  "Token with ID $id was not found. It may have already been deleted or never existed.",
+              "url": apiUrl,
+              "timestamp": DateTime.now().toIso8601String(),
+            };
+          }
+
+          // ✅ Check for "Unexpected null value" error which may indicate successful deletion
+          if (e.toString().contains('Unexpected null value')) {
+            // This error often occurs when the DELETE was successful but returned an empty body
+            // The API typically returns a 200 OK with no content, which Retrofit has trouble parsing
+            return {
+              "status": "success",
+              "message":
+                  "Token with ID $id was likely deleted successfully (server returned empty response).",
+              "url": apiUrl,
+              "note":
+                  "The API returned an empty response, which is normal for successful DELETE operations.",
+              "timestamp": DateTime.now().toIso8601String(),
+            };
+          }
+
+          // ⚠️ Return other error types as usual
+          return {
+            "status": "error",
+            "message": "Failed to delete token: ${e.toString()}",
+            "url": apiUrl,
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
 
       default:
         // ⚠️ Return Map instead of String

@@ -40,7 +40,7 @@ abstract class StorefrontAccessTokenClient
 
   @override
   @DELETE('/api/{api_version}/storefront_access_tokens/{storefront_access_token_id}.json')
-  Future<CreateNewStorefrontAccessTokenResponse> deleteStorefrontAccessToken({
+  Future<void> deleteStorefrontAccessToken({
     @Path('api_version') required String apiVersion,
     @Path('storefront_access_token_id') required String storefrontAccessTokenId,
   });
