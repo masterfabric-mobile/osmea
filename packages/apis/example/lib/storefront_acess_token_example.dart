@@ -1,3 +1,4 @@
+// 📦 Core packages
 import 'package:apis/apis.dart';
 import 'package:apis/network/remote/access/storefront_access_token/abstract/storefront_access_token.dart';
 import 'package:apis/network/remote/access/storefront_access_token/freezed_model/request/create_new_storefront_access_token_request.dart';
@@ -5,20 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'dart:convert';
 
+// 🔄 Dependency injection
 import 'di/config/config_di.dart';
 
+/// 🚀 Application entry point
+/// Initializes dependencies and starts the application
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
   runApp(const MyApp());
 }
 
+/// 📱 Root application widget
+/// Sets up theme and navigation structure
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Simple, clean, modern theme
+    // 🎨 Simple, clean, modern theme
     return MaterialApp(
       title: 'Storefront API',
       debugShowCheckedModeBanner: false,
@@ -38,6 +44,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// 🏠 Main view for the Storefront Token API example
+/// Demonstrates how to interact with the Storefront Access Token API
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -46,21 +54,33 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  /// 🔄 Currently selected HTTP request method (GET, POST, etc.)
   String _requestType = "GET";
+
+  /// 📄 JSON response from the API call
   String? _responseJson;
+
+  /// ⏳ Loading state indicator during API requests
   bool _loading = false;
+
+  /// 🔤 Controller for token title input field
   final TextEditingController _tokenController = TextEditingController();
 
-  // Define method options and their colors
+  /// 🎨 HTTP methods with their visual representation colors
+  /// Different colors help distinguish between request types
   final List<Map<String, dynamic>> _methods = [
-    {'name': 'GET', 'color': const Color(0xFF10B981)}, // Green
-    {'name': 'POST', 'color': const Color(0xFF3B82F6)}, // Blue 
-    {'name': 'PUT', 'color': const Color(0xFFF59E0B)}, // Amber
-    {'name': 'DELETE', 'color': const Color(0xFFEF4444)}, // Red
+    {
+      'name': 'GET',
+      'color': const Color(0xFF10B981)
+    }, // 💚 Green for safe retrieval
+    {'name': 'POST', 'color': const Color(0xFF3B82F6)}, // 💙 Blue for creation
+    {'name': 'PUT', 'color': const Color(0xFFF59E0B)}, // 🟠 Amber for updates
+    {'name': 'DELETE', 'color': const Color(0xFFEF4444)}, // ❤️ Red for deletion
   ];
 
   @override
   void dispose() {
+    /// 🧹 Clean up resources when widget is removed
     _tokenController.dispose();
     super.dispose();
   }
@@ -76,7 +96,7 @@ class _HomeViewState extends State<HomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // HTTP Method Selection
+            /// 📋 HTTP Method Selection section
             const Text(
               'HTTP Method',
               style: TextStyle(
@@ -85,8 +105,9 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             const SizedBox(height: 8),
-            
-            // Method selection pills
+
+            /// 🎛️ Method selection pills - horizontal scrollable list of method options
+            /// Each pill changes color based on selection state
             SizedBox(
               height: 40,
               child: ListView.separated(
@@ -96,7 +117,7 @@ class _HomeViewState extends State<HomeView> {
                 itemBuilder: (context, index) {
                   final method = _methods[index];
                   final isSelected = _requestType == method['name'];
-                  
+
                   return GestureDetector(
                     onTap: () {
                       setState(() => _requestType = method['name']);
@@ -104,7 +125,8 @@ class _HomeViewState extends State<HomeView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: isSelected ? method['color'] : Colors.grey.shade200,
+                        color:
+                            isSelected ? method['color'] : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
@@ -121,10 +143,11 @@ class _HomeViewState extends State<HomeView> {
                 },
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
-            // Parameters (only for non-GET methods)
+
+            /// 📝 Parameters section - dynamically shown only for POST requests
+            /// Collects input data required for creating new tokens
             if (_requestType == "POST") ...[
               const Text(
                 'Parameters',
@@ -144,8 +167,10 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 20),
             ],
-            
-            // Execute button
+
+            /// 🚀 Execute button - triggers the API request
+            /// Button color changes based on selected request method
+            /// Shows loading indicator when request is in progress
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -167,10 +192,11 @@ class _HomeViewState extends State<HomeView> {
                     : Text("Execute $_requestType Request"),
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
-            // Response section
+
+            /// 📊 Response section - displays API response or loading state
+            /// Dark-themed container with formatted JSON output
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -191,12 +217,16 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                     const Divider(color: Colors.white24),
+
+                    /// ⏳ Show loading indicator while waiting for response
                     if (_loading)
                       const Expanded(
                         child: Center(
                           child: CircularProgressIndicator(color: Colors.white),
                         ),
                       )
+
+                    /// 📭 Show empty state message when no response is available
                     else if (_responseJson == null)
                       const Expanded(
                         child: Center(
@@ -206,6 +236,8 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                       )
+
+                    /// 📄 Display formatted JSON response in a scrollable container
                     else
                       Expanded(
                         child: SingleChildScrollView(
@@ -228,7 +260,9 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-  
+
+  /// 🎨 Helper method to get the color for the selected request method
+  /// Returns the appropriate color based on the current _requestType
   Color _getMethodColor() {
     for (final method in _methods) {
       if (method['name'] == _requestType) {
@@ -238,6 +272,8 @@ class _HomeViewState extends State<HomeView> {
     return Colors.grey;
   }
 
+  /// 🔄 Sends the API request based on the selected method
+  /// Updates state for loading and handles the response
   Future<void> _sendRequest() async {
     setState(() {
       _loading = true;
@@ -248,6 +284,7 @@ class _HomeViewState extends State<HomeView> {
     dynamic response;
 
     try {
+      /// 📥 GET request - retrieve existing tokens
       if (requestType == "GET") {
         response = await GetIt.I
             .get<StorefrontAccessTokenService>()
@@ -256,20 +293,33 @@ class _HomeViewState extends State<HomeView> {
             );
         _responseJson =
             const JsonEncoder.withIndent('  ').convert(response.toJson());
-      } else if (requestType == "POST") {
-        
+      }
+
+      /// 📤 POST request - create a new token
+      else if (requestType == "POST") {
+        // Get token title from input field
+        final title = _tokenController.text.isNotEmpty
+            ? _tokenController.text
+            : 'Default Token';
+
         response = await GetIt.I
             .get<StorefrontAccessTokenService>()
             .createNewStorefrontAccessToken(
               apiVersion: ApiNetwork.apiVersion,
               model: CreateNewStorefrontAccessTokenRequest(
-                
+                storefrontAccessToken:
+                    CreateNewStorefrontAccessTokenRequestBody(
+                  title: title,
+                ),
               ),
             );
         _responseJson =
             const JsonEncoder.withIndent('  ').convert(response.toJson());
       }
-    } catch (e) {
+    }
+
+    /// ⚠️ Error handling - display error message
+    catch (e) {
       _responseJson = "Error: $e";
     }
 
