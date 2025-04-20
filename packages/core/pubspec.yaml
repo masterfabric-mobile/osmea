@@ -1,6 +1,6 @@
 # Package Info
 name: core
-description: "A new Flutter package project."
+description: "Core utilities, base classes, and shared logic for the OSMEA Flutter project."
 version: 0.0.1
 
 # Environment Constraints
