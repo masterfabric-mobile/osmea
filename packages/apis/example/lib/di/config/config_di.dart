@@ -3,15 +3,11 @@ import 'package:example/di/config/config_di.config.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
+
 GetIt getIt = GetIt.instance;
 
 @InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies() async {
-  getIt = ApiNetwork.init(
-    getIt,
-    storeName:'f2rtrh-vq',
-    shopifyAccessToken: 'ccc',
-  );
-
+  getIt = await ApiNetwork.init(getIt);
   return getIt.init();
 }

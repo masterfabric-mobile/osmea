@@ -1,0 +1,6 @@
+{
+  "root": {
+    "storeName": "<STORE_NAME>",
+    "shopifyAccessToken": "<SHOPIFY_ACCESS_TOKEN>"
+  }
+}

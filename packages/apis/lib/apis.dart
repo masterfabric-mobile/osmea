@@ -5,8 +5,9 @@ import 'package:apis/di/config/config_di.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
+import 'package:apis/helpers/json_config_helper.dart';
 
-/// 🛠️ Provides a singleton [Logger] instance for the whole app.
+/// 🛠️ Provides a singleton [Logger] instance for the entire app.
 /// 
 /// Use this logger for consistent logging across your project!
 @module
@@ -35,26 +36,24 @@ class ApiNetwork {
   // 🕵️‍♂️ Interceptor for requests (custom logic before each request)
   static Future<void> Function() onRequestInterceptor = () async {};
 
-  /// 🏁 Initialize the API network layer.
+  /// 🏁 Initializes the API network layer.
   /// 
   /// [getIt]: The GetIt instance for dependency injection.
-  /// [storeName]: Your Shopify store name (e.g., 'examplestore').
-  /// [proxyIp]: Optional proxy IP for debugging or routing.
-  /// [shopifyAccessToken]: Optional Shopify access token for authentication.
-  static GetIt init(
-    GetIt getIt,
-    { required String storeName,
-    String? proxyIp,
-    String? shopifyAccessToken,
-  }) {
-    // ⚠️ Make sure to set storeName and shopifyAccessToken before making requests!
+  static Future<GetIt> init(GetIt getIt) async {
+    // 📦 Load the configuration file
+    final configHelper = await JsonConfigHelper.load('assets/config.json');
+    // 🏬 Retrieve store name and access token
+    final storeName = configHelper.get('root.storeName');
+    final shopifyAccessToken = configHelper.get('root.shopifyAccessToken');
+
+    // ⚠️ Do not make requests before setting storeName and shopifyAccessToken!
     ApiNetwork.getIt = getIt;
     ApiNetwork.storeName = storeName;
     ApiNetwork.proxyIp = proxyIp ?? '';
     ApiNetwork.shopifyAccessToken = shopifyAccessToken ?? '';
 
     // 🧩 Register dependencies (see /di/config/config_di.dart)
-    configureDependencies();
+    configureDependencies(); // This function should be defined in config_di.dart.
     return getIt;
   }
 
@@ -69,19 +68,19 @@ class ApiNetwork {
     return 'https://${ApiNetwork.storeName}.myshopify.com/admin';
   }
 
-  /// 🔄 Update the Shopify Store Name at runtime.
+  /// 🔄 Updates the Shopify Store Name at runtime.
   /// 
-  /// Useful if you want to switch stores without restarting the app.
+  /// Useful for switching stores without restarting the app.
   static void updateStoreName(String storeName) {
     ApiNetwork.storeName = storeName;
   }
 
-  /// 🔄 Update the proxy IP at runtime.
+  /// 🔄 Updates the Proxy IP at runtime.
   static void updateProxyIp(String proxyIp) {
     ApiNetwork.proxyIp = proxyIp;
   }
 
-  /// 🔄 Update the Shopify Access Token at runtime.
+  /// 🔄 Updates the Shopify Access Token at runtime.
   static void updateShopifyAccessToken(String token) {
     ApiNetwork.shopifyAccessToken = token;
   }
