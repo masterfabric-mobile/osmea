@@ -1,6 +1,7 @@
 {
   "root": {
     "storeName": "<STORE_NAME>",
-    "shopifyAccessToken": "<SHOPIFY_ACCESS_TOKEN>"
+    "shopifyAccessToken": "<SHOPIFY_ACCESS_TOKEN>",
+    "apiVersion": "<API_VERSION>"
   }
 }
