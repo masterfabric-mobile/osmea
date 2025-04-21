@@ -1,0 +1,66 @@
+import 'package:apis/apis.dart';
+import 'package:apis/dio_config/api_dio_client.dart';
+import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/count_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
+import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
+import 'package:retrofit/http.dart';
+
+part 'api_customer_service.g.dart';
+
+@RestApi()
+@Injectable(as: CustomerService)
+abstract class CustomerServiceClient implements CustomerService {
+  /// 🏭 Factory for dependency injection
+  @factoryMethod
+  factory CustomerServiceClient(Dio dio) => _CustomerServiceClient(
+        ApiDioClient.starter(),
+        baseUrl: ApiNetwork.baseUrl,
+      );
+
+  /// 🔓 Get access scopes from API
+  @override
+  @GET('/api/{api_version}//customers.json')
+  Future<CustomerResponse> customer({
+    @Path('api_version') required String apiVersion,
+  });
+
+  @override
+  @GET('/api/{api_version}/customers/{customer_id}.json')
+  Future<SingleCustomerResponse> singleCustomer({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+  });
+
+  @override
+  @GET('/api/{api_version}/customers/{customer_id}/orders.json')
+  Future<OrdersBelongingToCustomerResponse> customerOrders({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+  });
+
+  @override
+  @GET('/api/{api_version}/customers/{customer_id}.json')
+  Future<CountCustomerResponse> customerCounts({
+    @Path('api_version') required String apiVersion,
+  });
+
+  @override
+  @GET('/api/{api_version}/customers/search.json')
+  Future<CustomerMatchSuppliedQueryResponse> customerMatchQuery({
+    @Path('api_version') required String apiVersion,
+  });
+
+  @override
+  @POST('/api/{api_version}//customers.json')
+  Future<CreateCustomerResponse> createCustomer({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateCustomerRequest model,
+  });
+}
