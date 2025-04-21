@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:example/services/api_service_registry.dart';
+import 'package:example/widgets/http_method_selector.dart';
+import 'package:example/widgets/section_title_widget.dart';
+import 'package:example/widgets/service_selector_widget.dart';
+import 'package:example/widgets/execute_button_widget.dart';
 
 class ControlPanel extends StatelessWidget {
   final ApiCategory? selectedCategory;
-  final String? selectedSubcategory; // Add subcategory selection
+  final String? selectedSubcategory;
   final ApiService? selectedService;
   final String? selectedMethod;
   final bool loading;
   final Function(ApiCategory) onCategorySelected;
-  final Function(String)
-      onSubcategorySelected; // Add callback for subcategory selection
+  final Function(String) onSubcategorySelected;
   final Function(ApiService) onServiceSelected;
   final Function(String) onMethodSelected;
   final Function() onExecute;
@@ -18,12 +21,12 @@ class ControlPanel extends StatelessWidget {
   const ControlPanel({
     super.key,
     required this.selectedCategory,
-    this.selectedSubcategory, // Make it optional or provide a default
+    this.selectedSubcategory,
     required this.selectedService,
     required this.selectedMethod,
     required this.loading,
     required this.onCategorySelected,
-    required this.onSubcategorySelected, // Add this parameter
+    required this.onSubcategorySelected,
     required this.onServiceSelected,
     required this.onMethodSelected,
     required this.onExecute,
@@ -32,69 +35,111 @@ class ControlPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size to adapt layout
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 500;
+
+    // Adjust padding based on screen size
+    final padding = isSmallScreen ? 12.0 : 20.0;
+    final spacing = isSmallScreen ? 16.0 : 24.0;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(padding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SectionTitleWidget(
+            title: 'API Configuration',
+            icon: Icons.category_rounded,
+          ),
+          SizedBox(height: isSmallScreen ? 12 : 20),
           _buildCategorySelector(context),
           if (selectedCategory != null) ...[
-            const SizedBox(height: 24),
-            _buildSubcategorySelector(context), 
+            SizedBox(height: spacing),
+            _buildSubcategorySelector(context),
           ],
           if (selectedCategory != null && selectedSubcategory != null) ...[
-            const SizedBox(height: 24),
-            _buildServiceSelector(context),
+            SizedBox(height: spacing),
+            ServiceSelectorWidget(
+              category: selectedCategory!,
+              subcategory: selectedSubcategory,
+              selectedService: selectedService,
+              onServiceSelected: onServiceSelected,
+            ),
           ],
           if (selectedService != null) ...[
-            const SizedBox(height: 24),
+            SizedBox(height: spacing),
             _buildMethodSelector(context),
           ],
           if (selectedService != null &&
               selectedMethod != null &&
               selectedService!.requiredFields.containsKey(selectedMethod)) ...[
-            const SizedBox(height: 24),
+            SizedBox(height: spacing),
             _buildParameterFields(context),
           ],
-          const SizedBox(height: 24),
-          _buildExecuteButton(context),
+          SizedBox(height: spacing),
+          ExecuteButtonWidget(
+            selectedMethod: selectedMethod,
+            loading: loading,
+            canExecute:
+                selectedService != null && selectedMethod != null && !loading,
+            onExecute: onExecute,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildCategorySelector(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 500;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'API Category',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+        Text(
+          'Category',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontSize: isSmallScreen ? 13 : null,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: isSmallScreen ? 6 : 8),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            border: Border.all(
+              color: colorScheme.outline.withValues(alpha: 0.3),
+            ),
           ),
           child: DropdownButtonFormField<ApiCategory>(
             value: selectedCategory,
             isExpanded: true,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.category),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.folder_rounded,
+                color: colorScheme.primary,
+              ),
               hintText: 'Select API Category',
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             ),
+            menuMaxHeight: 350, // Limit menu height for small screens
+            dropdownColor: colorScheme.surface,
+            isDense: isSmallScreen, // Compact on small screens
+            borderRadius: BorderRadius.circular(12),
             items: ApiServiceRegistry.categories.map((category) {
               return DropdownMenuItem<ApiCategory>(
                 value: category,
                 child: Text(
                   category.displayName,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               );
             }).toList(),
@@ -107,47 +152,58 @@ class ControlPanel extends StatelessWidget {
     );
   }
 
-  // Updated method to build the subcategory selector as a dropdown
   Widget _buildSubcategorySelector(BuildContext context) {
-    final categoryName = ApiServiceRegistry.getCategoryName(selectedCategory!);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    ApiServiceRegistry.getCategoryName(selectedCategory!);
     final subcategories =
         ApiServiceRegistry.getSubcategoriesByCategory(selectedCategory!);
 
     if (subcategories.isEmpty) {
-      return const SizedBox.shrink(); // No subcategories, don't show selector
+      return const SizedBox.shrink();
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$categoryName Subcategories',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+          'Subcategory',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            border: Border.all(
+              color: colorScheme.outline.withValues(alpha: 0.3),
+            ),
           ),
           child: DropdownButtonFormField<String>(
             value: selectedSubcategory,
             isExpanded: true,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.subdirectory_arrow_right),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.subdirectory_arrow_right_rounded,
+                color: colorScheme.primary,
+              ),
               hintText: 'Select Subcategory',
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             ),
+            dropdownColor: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
             items: subcategories.map((subcategory) {
               return DropdownMenuItem<String>(
                 value: subcategory,
                 child: Text(
                   subcategory,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               );
             }).toList(),
@@ -160,118 +216,44 @@ class ControlPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceSelector(BuildContext context) {
-    // Update to filter by both category and subcategory
-    final services = selectedSubcategory != null
-        ? ApiServiceRegistry.getBySubcategory(
-            selectedCategory!, selectedSubcategory!)
-        : ApiServiceRegistry.getByCategory(selectedCategory!);
+  Widget _buildMethodSelector(BuildContext context) {
+    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${selectedSubcategory ?? selectedCategory?.displayName ?? ""} Services',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade200),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: services.length,
-            separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.grey.shade200),
-            itemBuilder: (context, index) {
-              final service = services[index];
-              final isSelected = service == selectedService;
-
-              return ListTile(
-                selected: isSelected,
-                selectedTileColor:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                title: Text(service.name),
-                subtitle: Text(
-                  service.supportedMethods.join(', '),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                onTap: () => onServiceSelected(service),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMethodSelector(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
           'HTTP Method',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: theme.textTheme.labelLarge,
         ),
-        const SizedBox(height: 8),
-        Row(
-          children: selectedService!.supportedMethods.map((method) {
-            final isSelected = method == selectedMethod;
-            final methodColors = {
-              'GET': Colors.green.shade700,
-              'POST': Colors.blue.shade700,
-              'PUT': Colors.amber.shade700,
-              'DELETE': Colors.red.shade700,
-            };
-            final color = methodColors[method] ?? colorScheme.primary;
-
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ChoiceChip(
-                label: Text(method),
-                selected: isSelected,
-                onSelected: (_) => onMethodSelected(method),
-                selectedColor: color,
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : color,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            );
-          }).toList(),
+        const SizedBox(height: 12),
+        HttpMethodSelector(
+          methods: selectedService!.supportedMethods,
+          selectedMethod: selectedMethod,
+          onMethodSelected: onMethodSelected,
         ),
       ],
     );
   }
 
   Widget _buildParameterFields(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final fields = selectedService!.requiredFields[selectedMethod!] ?? [];
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 500;
+
+    // Smaller spacing on small screens
+    final bottomSpacing = isSmallScreen ? 12.0 : 16.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Parameters',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+        SectionTitleWidget(
+          title: 'Parameters',
+          icon: Icons.input_rounded,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: isSmallScreen ? 12 : 16),
         ...fields.map((field) {
           // Create controller if it doesn't exist
           if (!controllers.containsKey(field.name)) {
@@ -279,46 +261,30 @@ class ControlPanel extends StatelessWidget {
           }
 
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
+            padding: EdgeInsets.only(bottom: bottomSpacing),
             child: TextField(
               controller: controllers[field.name],
               decoration: InputDecoration(
                 labelText: field.label,
                 hintText: field.hint,
+                prefixIcon: Icon(
+                  Icons.text_fields_rounded,
+                  color: colorScheme.primary.withValues(alpha: 0.7),
+                  size: isSmallScreen ? 16 : 18,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: isSmallScreen
+                    ? EdgeInsets.symmetric(horizontal: 12, vertical: 10)
+                    : null,
               ),
+              // Use smaller font on smaller screens
+              style: isSmallScreen ? TextStyle(fontSize: 14) : null,
             ),
           );
         }),
       ],
-    );
-  }
-
-  Widget _buildExecuteButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed:
-            (selectedService != null && selectedMethod != null && !loading)
-                ? onExecute
-                : null,
-        child: loading
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text('Processing...'),
-                ],
-              )
-            : const Text('Execute Request'),
-      ),
     );
   }
 }
