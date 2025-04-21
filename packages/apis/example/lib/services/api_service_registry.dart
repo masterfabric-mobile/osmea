@@ -1,4 +1,10 @@
+import 'package:example/services/api_request_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer_match_query.dart';
+import 'package:example/services/handlers/customers_handlers/sigle_customer_handler.dart';
 import 'api_handlers.dart';
+// Import other needed files
+import 'handlers/customers_handlers/customer_handler.dart';
+import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart'; // Added import
 
 /// 🔖 API service categories
 enum ApiCategory {
@@ -6,6 +12,7 @@ enum ApiCategory {
   storefront,
   admin,
   catalog,
+  customer,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -20,6 +27,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Admin APIs';
       case ApiCategory.catalog:
         return 'Catalog APIs';
+      case ApiCategory.customer:
+        return 'Customer APIs';
     }
   }
 }
@@ -43,14 +52,14 @@ class ApiService {
   final String endpoint;
   final ApiCategory category;
   final ApiRequestHandler handler;
-  final String subcategory; 
+  final String subcategory;
 
   const ApiService({
     required this.name,
     required this.endpoint,
     required this.category,
     required this.handler,
-    required this.subcategory, 
+    required this.subcategory,
   });
 
   /// 📋 Get supported methods from the handler
@@ -67,8 +76,8 @@ class ApiServiceRegistry {
     ApiService(
       name: 'Access Scope',
       endpoint: '/accessScope',
-      category: ApiCategory.access, // ➡️ Keep in Access category
-      subcategory: 'Access Scope', // 🏷️ Subcategory
+      category: ApiCategory.access,
+      subcategory: 'Access Scope',
       handler: ApiHandlerFactory.getHandler('Access Scope')!,
     ),
 
@@ -76,9 +85,45 @@ class ApiServiceRegistry {
     ApiService(
       name: 'Storefront Access Token',
       endpoint: '/storefrontAccessToken',
-      category: ApiCategory.access, // ↩️ Changed from storefront to access
-      subcategory: 'Storefront Access', // 🏷️ Subcategory name
+      category: ApiCategory.access,
+      subcategory: 'Storefront Access',
       handler: ApiHandlerFactory.getHandler('Storefront Access Token')!,
+    ),
+
+    // 👥 Customer API - Get all customers with single GET endpoint
+    ApiService(
+      name: 'Customers',
+      endpoint: '/customers',
+      category: ApiCategory.customer,
+      subcategory: 'All Customers',
+      handler: CustomerHandler(),
+    ),
+
+    // 👤 Single Customer API - get customer by ID
+    ApiService(
+      name: 'Single Customer',
+      endpoint: '/customers/:id',
+      category: ApiCategory.customer,
+      subcategory: 'Single Customer',
+      handler: SingleCustomerHandler(),
+    ),
+
+    // 🛒 Customer Orders API - Get orders belonging to a customer
+    ApiService(
+      name: 'Customer Orders',
+      endpoint: '/customers/:id/orders',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Orders',
+      handler: OrdersBelongingToCustomerHandler(),
+    ),
+
+    // 🔍 Customer Match Query API
+    ApiService(
+      name: 'Customer Match Query',
+      endpoint: '/customers/search',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Match Query',
+      handler: CustomerMatchQueryHandler(),
     ),
 
     // ➕ Add more services here, organized by category
@@ -131,6 +176,8 @@ class ApiServiceRegistry {
         return 'Admin';
       case ApiCategory.catalog:
         return 'Catalog';
+      case ApiCategory.customer:
+        return 'Customer';
     }
   }
 }
