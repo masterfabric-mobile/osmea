@@ -27,7 +27,7 @@ class CustomerHandler implements ApiRequestHandler {
           final customers = response.customers;
 
           // 🧮 Process each customer in the response
-          for (final customer in customers) {
+          for (final customer in customers!) {
             // 🗓️ Use creation date as category, default to "Other" if not available
             String category = "Other";
             final date = DateTime.tryParse(customer.createdAt as String);
@@ -60,7 +60,7 @@ class CustomerHandler implements ApiRequestHandler {
           // 🚨 Fall back to simpler format if categorization fails
           return {
             "status": "success",
-            "customers": response.customers.map((c) => c.toJson()).toList(),
+            "customers": response.customers?.map((c) => c.toJson()).toList(),
             "timestamp": DateTime.now().toIso8601String(),
           };
         }
