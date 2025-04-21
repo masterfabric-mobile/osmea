@@ -16,9 +16,7 @@ String singleCustomerResponseToJson(SingleCustomerResponse data) => json.encode(
 class SingleCustomerResponse with _$SingleCustomerResponse {
     const factory SingleCustomerResponse({
         @JsonKey(name: "customer")
-        required Customer customer,
-        @JsonKey(name: "errors")
-        required Errors errors,
+        Customer? customer,
     }) = _SingleCustomerResponse;
 
     factory SingleCustomerResponse.fromJson(Map<String, dynamic> json) => _$SingleCustomerResponseFromJson(json);
@@ -28,59 +26,45 @@ class SingleCustomerResponse with _$SingleCustomerResponse {
 class Customer with _$Customer {
     const factory Customer({
         @JsonKey(name: "id")
-        required int id,
-        @JsonKey(name: "email")
-        required String email,
-        @JsonKey(name: "accepts_marketing")
-        required bool acceptsMarketing,
+        int? id,
         @JsonKey(name: "created_at")
-        required DateTime createdAt,
+        String? createdAt,
         @JsonKey(name: "updated_at")
-        required DateTime updatedAt,
-        @JsonKey(name: "first_name")
-        required String firstName,
-        @JsonKey(name: "last_name")
-        required String lastName,
+        String? updatedAt,
         @JsonKey(name: "orders_count")
-        required int ordersCount,
+        int? ordersCount,
         @JsonKey(name: "state")
-        required String state,
+        String? state,
         @JsonKey(name: "total_spent")
-        required String totalSpent,
+        String? totalSpent,
         @JsonKey(name: "last_order_id")
-        required dynamic lastOrderId,
+        dynamic lastOrderId,
         @JsonKey(name: "note")
-        required dynamic note,
+        dynamic note,
         @JsonKey(name: "verified_email")
-        required bool verifiedEmail,
+        bool? verifiedEmail,
         @JsonKey(name: "multipass_identifier")
-        required dynamic multipassIdentifier,
+        dynamic multipassIdentifier,
         @JsonKey(name: "tax_exempt")
-        required bool taxExempt,
+        bool? taxExempt,
         @JsonKey(name: "tags")
-        required String tags,
+        String? tags,
         @JsonKey(name: "last_order_name")
-        required dynamic lastOrderName,
+        dynamic lastOrderName,
         @JsonKey(name: "currency")
-        required String currency,
-        @JsonKey(name: "phone")
-        required String phone,
+        String? currency,
         @JsonKey(name: "addresses")
-        required List<Address> addresses,
-        @JsonKey(name: "accepts_marketing_updated_at")
-        required DateTime acceptsMarketingUpdatedAt,
-        @JsonKey(name: "marketing_opt_in_level")
-        required dynamic marketingOptInLevel,
+        List<Address>? addresses,
         @JsonKey(name: "tax_exemptions")
-        required List<dynamic> taxExemptions,
+        List<dynamic>? taxExemptions,
         @JsonKey(name: "email_marketing_consent")
-        required MarketingConsent emailMarketingConsent,
+        EmailMarketingConsent? emailMarketingConsent,
         @JsonKey(name: "sms_marketing_consent")
-        required MarketingConsent smsMarketingConsent,
+        SmsMarketingConsent? smsMarketingConsent,
         @JsonKey(name: "admin_graphql_api_id")
-        required String adminGraphqlApiId,
+        String? adminGraphqlApiId,
         @JsonKey(name: "default_address")
-        required Address defaultAddress,
+        Address? defaultAddress,
     }) = _Customer;
 
     factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
@@ -90,66 +74,54 @@ class Customer with _$Customer {
 class Address with _$Address {
     const factory Address({
         @JsonKey(name: "id")
-        required int id,
+        int? id,
         @JsonKey(name: "customer_id")
-        required int customerId,
-        @JsonKey(name: "first_name")
-        required String firstName,
-        @JsonKey(name: "last_name")
-        required String lastName,
+        int? customerId,
         @JsonKey(name: "company")
-        required dynamic company,
-        @JsonKey(name: "address1")
-        required String address1,
-        @JsonKey(name: "address2")
-        required dynamic address2,
-        @JsonKey(name: "city")
-        required String city,
+        dynamic company,
         @JsonKey(name: "province")
-        required String province,
+        String? province,
         @JsonKey(name: "country")
-        required String country,
-        @JsonKey(name: "zip")
-        required String zip,
-        @JsonKey(name: "phone")
-        required String phone,
-        @JsonKey(name: "name")
-        required String name,
+        String? country,
         @JsonKey(name: "province_code")
-        required String provinceCode,
+        String? provinceCode,
         @JsonKey(name: "country_code")
-        required String countryCode,
+        String? countryCode,
         @JsonKey(name: "country_name")
-        required String countryName,
+        String? countryName,
         @JsonKey(name: "default")
-        required bool addressDefault,
+        bool? addressDefault,
     }) = _Address;
 
     factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
 }
 
 @freezed
-class MarketingConsent with _$MarketingConsent {
-    const factory MarketingConsent({
+class EmailMarketingConsent with _$EmailMarketingConsent {
+    const factory EmailMarketingConsent({
         @JsonKey(name: "state")
-        required String state,
+        String? state,
         @JsonKey(name: "opt_in_level")
-        required String optInLevel,
+        String? optInLevel,
         @JsonKey(name: "consent_updated_at")
-        required dynamic consentUpdatedAt,
-        @JsonKey(name: "consent_collected_from")
-        String? consentCollectedFrom,
-    }) = _MarketingConsent;
+        dynamic consentUpdatedAt,
+    }) = _EmailMarketingConsent;
 
-    factory MarketingConsent.fromJson(Map<String, dynamic> json) => _$MarketingConsentFromJson(json);
+    factory EmailMarketingConsent.fromJson(Map<String, dynamic> json) => _$EmailMarketingConsentFromJson(json);
 }
 
 @freezed
-class Errors with _$Errors {
-    const factory Errors({
-        @JsonKey(name: "base")
-        required List<String> base,
-    }) = _Errors;
+class SmsMarketingConsent with _$SmsMarketingConsent {
+    const factory SmsMarketingConsent({
+        @JsonKey(name: "state")
+        String? state,
+        @JsonKey(name: "opt_in_level")
+        String? optInLevel,
+        @JsonKey(name: "consent_updated_at")
+        dynamic consentUpdatedAt,
+        @JsonKey(name: "consent_collected_from")
+        String? consentCollectedFrom,
+    }) = _SmsMarketingConsent;
 
-    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
+    factory SmsMarketingConsent.fromJson(Map<String, dynamic> json) => _$SmsMarketingConsentFromJson(json);
 }

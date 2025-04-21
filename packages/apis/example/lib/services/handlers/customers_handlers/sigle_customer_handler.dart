@@ -34,7 +34,7 @@ class SingleCustomerHandler implements ApiRequestHandler {
         // 📋 Return the customer data
         return {
           "status": "success",
-          "customer": response.customer.toJson(),
+          "customer": response.customer?.toJson(),
           "timestamp": DateTime.now().toIso8601String(),
         };
       } catch (e) {
