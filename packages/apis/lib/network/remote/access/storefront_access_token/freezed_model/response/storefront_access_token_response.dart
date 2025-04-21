@@ -15,7 +15,6 @@ String storefrontAccessTokenResponseToJson(StorefrontAccessTokenResponse data) =
 @freezed
 class StorefrontAccessTokenResponse with _$StorefrontAccessTokenResponse {
     const factory StorefrontAccessTokenResponse({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "storefront_access_tokens")
         required List<StorefrontAccessToken> storefrontAccessTokens,
     }) = _StorefrontAccessTokenResponse;
@@ -26,22 +25,16 @@ class StorefrontAccessTokenResponse with _$StorefrontAccessTokenResponse {
 @freezed
 class StorefrontAccessToken with _$StorefrontAccessToken {
     const factory StorefrontAccessToken({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "access_token")
         required String accessToken,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "access_scope")
         required String accessScope,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "created_at")
         required DateTime createdAt,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "id")
         required int id,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "admin_graphql_api_id")
         required String adminGraphqlApiId,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "title")
         required String title,
     }) = _StorefrontAccessToken;

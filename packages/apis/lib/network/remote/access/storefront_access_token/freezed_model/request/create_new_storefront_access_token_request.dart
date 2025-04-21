@@ -15,14 +15,12 @@ String createNewStorefrontAccessTokenRequestToJson(CreateNewStorefrontAccessToke
 @freezed
 class CreateNewStorefrontAccessTokenRequest with _$CreateNewStorefrontAccessTokenRequest {
     const factory CreateNewStorefrontAccessTokenRequest({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "storefront_access_token")
         CreateNewStorefrontAccessTokenRequestBody? storefrontAccessToken,
     }) = _CreateNewStorefrontAccessTokenRequest;
 
     factory CreateNewStorefrontAccessTokenRequest.fromJson(Map<String, dynamic> json) => _$CreateNewStorefrontAccessTokenRequestFromJson(json);
     
-    // Fix: Use the correct approach for Freezed
     @override
     Map<String, dynamic> toJson();
 }
@@ -30,14 +28,12 @@ class CreateNewStorefrontAccessTokenRequest with _$CreateNewStorefrontAccessToke
 @freezed
 class CreateNewStorefrontAccessTokenRequestBody with _$CreateNewStorefrontAccessTokenRequestBody {
     const factory CreateNewStorefrontAccessTokenRequestBody({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "title")
         String? title,
     }) = _CreateNewStorefrontAccessTokenRequestBody;
 
     factory CreateNewStorefrontAccessTokenRequestBody.fromJson(Map<String, dynamic> json) => _$CreateNewStorefrontAccessTokenRequestBodyFromJson(json);
     
-    // Fix: Use the correct approach for Freezed
     @override
     Map<String, dynamic> toJson();
 }

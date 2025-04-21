@@ -15,7 +15,6 @@ String accessScopeResponseToJson(AccessScopeResponse data) => json.encode(data.t
 @freezed
 class AccessScopeResponse with _$AccessScopeResponse {
     const factory AccessScopeResponse({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "access_scopes")
         required List<AccessScope> accessScopes,
     }) = _AccessScopeResponse;
@@ -26,7 +25,6 @@ class AccessScopeResponse with _$AccessScopeResponse {
 @freezed
 class AccessScope with _$AccessScope {
     const factory AccessScope({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "handle")
         required String handle,
     }) = _AccessScope;

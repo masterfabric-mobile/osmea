@@ -13,10 +13,8 @@ String createNewStorefrontAccessTokenResponseToJson(CreateNewStorefrontAccessTok
 @freezed
 class CreateNewStorefrontAccessTokenResponse with _$CreateNewStorefrontAccessTokenResponse {
     const factory CreateNewStorefrontAccessTokenResponse({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "storefront_access_token")
         StorefrontAccessToken? storefrontAccessToken,
-        // ignore: invalid_annotation_target
         @JsonKey(name: "errors")
         dynamic errors,
     }) = _CreateNewStorefrontAccessTokenResponse;
@@ -27,7 +25,6 @@ class CreateNewStorefrontAccessTokenResponse with _$CreateNewStorefrontAccessTok
 @freezed
 class StorefrontAccessToken with _$StorefrontAccessToken {
     const factory StorefrontAccessToken({
-        // ignore: invalid_annotation_target
         @JsonKey(name: "access_token")
         String? accessToken,
         @JsonKey(name: "access_scope")
