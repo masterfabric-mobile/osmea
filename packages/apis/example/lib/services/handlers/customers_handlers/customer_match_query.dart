@@ -26,7 +26,7 @@ class CustomerMatchQueryHandler implements ApiRequestHandler {
           // 🔄 Extract customers from the response
           final customers = response.customers;
 
-          if (customers.isNotEmpty) {
+          if (customers!.isNotEmpty) {
             // 📋 Categorize customers by first letter of their email (more reliable than address)
             final Map<String, List<Map<String, dynamic>>> customersByCategory =
                 {};
@@ -71,7 +71,7 @@ class CustomerMatchQueryHandler implements ApiRequestHandler {
           // ⚠️ Fallback to simpler format if parsing fails
           return {
             "status": "success",
-            "customers": response.customers.map((c) => c.toJson()).toList(),
+            "customers": response.customers?.map((c) => c.toJson()).toList(),
             "rawResponse": response.toString(),
             "timestamp": DateTime.now().toIso8601String(),
           };
