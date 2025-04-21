@@ -3,6 +3,9 @@ import 'package:example/services/api_service_registry.dart';
 import 'package:example/widgets/control_panel.dart';
 import 'package:example/widgets/response_panel.dart';
 import 'package:example/widgets/layout_widgets.dart';
+import 'package:apis/apis.dart';
+import 'package:example/widgets/app_header.dart';
+import 'package:example/theme/app_theme.dart';
 
 /// 🏠 Main view for the API Explorer application
 /// Provides UI for selecting and testing API endpoints
@@ -35,6 +38,9 @@ class _HomeViewState extends State<HomeView> {
 
   /// ⏳ Loading state during API request
   bool _loading = false;
+
+  /// 🌐 Current API URL being accessed
+  String _currentApiUrl = '';
 
   /// 🎛️ Text field controllers for parameter input
   /// Maps field names to their respective controllers
@@ -148,33 +154,47 @@ class _HomeViewState extends State<HomeView> {
       loading: _loading,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('APIS Package'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () {
-              // Show help or documentation
-            },
-            tooltip: 'Documentation',
-          ),
-        ],
-      ),
-      body: isWideScreen
-          ? WideLayoutView(
-              controlPanel: controlPanel,
-              responsePanel: responsePanel,
-            )
-          : isMediumScreen
-              ? MediumLayoutView(
+    return Theme(
+      data: AppTheme.getTheme(context),
+      child: Scaffold(
+        appBar: AppHeader(
+          title: 'OSMEA Apis',
+          apiUrl: _currentApiUrl,
+          onUrlCopied: _handleUrlCopy,
+        ),
+        // Remove Container with gradient that might be causing layout issues
+        body: SafeArea(
+          child: isWideScreen
+              ? WideLayoutView(
                   controlPanel: controlPanel,
                   responsePanel: responsePanel,
                 )
-              : NarrowLayoutView(
-                  controlPanel: controlPanel,
-                  responsePanel: responsePanel,
-                ),
+              : isMediumScreen
+                  ? MediumLayoutView(
+                      controlPanel: controlPanel,
+                      responsePanel: responsePanel,
+                    )
+                  : NarrowLayoutView(
+                      controlPanel: controlPanel,
+                      responsePanel: responsePanel,
+                    ),
+        ),
+      ),
+    );
+  }
+
+  /// Handles copying the URL
+  void _handleUrlCopy() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('URL copied to clipboard'),
+        behavior: SnackBarBehavior.floating,
+        width: 200,
+        duration: const Duration(seconds: 1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
     );
   }
 
@@ -208,6 +228,9 @@ class _HomeViewState extends State<HomeView> {
         }
       }
 
+      // 🔗 Generate the API URL based on the service, method and params
+      _updateApiUrl(_selectedService!, _selectedMethod!, params);
+
       // 🔄 Handle the request using the service's handler and get structured data
       _responseData = await _selectedService!.handler.handleRequest(
         _selectedMethod!,
@@ -222,4 +245,55 @@ class _HomeViewState extends State<HomeView> {
       _loading = false;
     });
   }
+
+  /// 🌐 Updates the current API URL based on the selected service, method, and parameters
+  void _updateApiUrl(
+      ApiService service, String method, Map<String, String> params) {
+    String path = '';
+    String queryParams = '';
+
+    // Determine path based on service name and method
+    switch (service.name) {
+      case 'Storefront Access Token':
+        if (method == 'DELETE' &&
+            params.containsKey('id') &&
+            params['id']!.isNotEmpty) {
+          final id = params['id']!;
+          // Use the exact format from ApiNetwork class
+          final apiUrl =
+              '${ApiNetwork.baseUrl}/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
+          setState(() {
+            _currentApiUrl = apiUrl;
+          });
+          return;
+        } else {
+          path =
+              '/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens.json';
+        }
+        break;
+
+      case 'Access Scope':
+        path = '/admin/api/${ApiNetwork.apiVersion}/oauth/access_scopes.json';
+        break;
+
+      // Add other services as needed
+      default:
+        path =
+            '/admin/api/${ApiNetwork.apiVersion}/${service.name.toLowerCase().replaceAll(' ', '_')}';
+        if (method == 'GET') {
+          path += '.json';
+        }
+    }
+
+    // Add query parameters for GET requests if there are any
+    if (method == 'GET' && params.isNotEmpty) {
+      queryParams =
+          '?${params.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&')}';
+    }
+
+    setState(() {
+      _currentApiUrl = ApiNetwork.baseUrl + path + queryParams;
+    });
+  }
+
 }
