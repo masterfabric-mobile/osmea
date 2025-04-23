@@ -261,25 +261,25 @@ class _HomeViewState extends State<HomeView> {
           final id = params['id']!;
           // Use the exact format from ApiNetwork class
           final apiUrl =
-              '${ApiNetwork.baseUrl}/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
+              '${ApiNetwork.baseUrl}/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
           setState(() {
             _currentApiUrl = apiUrl;
           });
           return;
         } else {
           path =
-              '/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens.json';
+              '/api/${ApiNetwork.apiVersion}/storefront_access_tokens.json';
         }
         break;
 
       case 'Access Scope':
-        path = '/admin/api/${ApiNetwork.apiVersion}/oauth/access_scopes.json';
+        path = '/api/${ApiNetwork.apiVersion}/oauth/access_scopes.json';
         break;
 
       // Add other services as needed
       default:
         path =
-            '/admin/api/${ApiNetwork.apiVersion}/${service.name.toLowerCase().replaceAll(' ', '_')}';
+            '/api/${ApiNetwork.apiVersion}/${service.name.toLowerCase().replaceAll(' ', '_')}';
         if (method == 'GET') {
           path += '.json';
         }

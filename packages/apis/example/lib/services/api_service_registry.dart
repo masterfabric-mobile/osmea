@@ -1,5 +1,6 @@
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer_match_query.dart';
+import 'package:example/services/handlers/customers_handlers/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/sigle_customer_handler.dart';
 import 'api_handlers.dart';
 // Import other needed files
@@ -13,6 +14,7 @@ enum ApiCategory {
   admin,
   catalog,
   customer,
+  customers,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -28,6 +30,8 @@ extension ApiCategoryExtension on ApiCategory {
       case ApiCategory.catalog:
         return 'Catalog APIs';
       case ApiCategory.customer:
+        return 'Customer APIs';
+      case ApiCategory.customers:
         return 'Customer APIs';
     }
   }
@@ -126,6 +130,15 @@ class ApiServiceRegistry {
       handler: CustomerMatchQueryHandler(),
     ),
 
+    // In the _services list, add:
+    ApiService(
+      name: 'Customer URL',
+      endpoint: '/customers/:id/account_activation_url',
+      category: ApiCategory.customer,
+      subcategory: 'Customer URL',
+      handler: CustomerUrlHandler(),
+    ),
+
     // ➕ Add more services here, organized by category
   ];
 
@@ -178,6 +191,8 @@ class ApiServiceRegistry {
         return 'Catalog';
       case ApiCategory.customer:
         return 'Customer';
+      case ApiCategory.customers:
+        throw UnimplementedError();
     }
   }
 }

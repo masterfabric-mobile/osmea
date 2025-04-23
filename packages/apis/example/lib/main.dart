@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // 🏷️ App title updated to OSMEA Apis
-      title: 'OSMEA Apis',
+      // 🏷️ App title
+      title: 'OSMEA APIs Package',
       // 🚫 Hide debug banner
       debugShowCheckedModeBanner: false,
       // 🎨 Set the app theme
