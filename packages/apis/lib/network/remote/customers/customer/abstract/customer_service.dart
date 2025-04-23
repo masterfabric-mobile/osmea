@@ -1,7 +1,8 @@
-
 import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/count_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
@@ -39,5 +40,13 @@ abstract class CustomerService {
   Future<CreateCustomerResponse> createCustomer({
     required String apiVersion,
     required CreateCustomerRequest model,
+  });
+
+  /// 🚀 Creates an account activation URL for a customer.
+  Future<CreatesAccountActivationUrlForCustomerResponse>
+      createsAccountActivationUrlForCustomer({
+    required String apiVersion,
+    required String customerId,
+    required CreatesAccountActivationUrlForCustomerRequest model,
   });
 }

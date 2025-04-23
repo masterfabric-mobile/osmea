@@ -2,8 +2,10 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/count_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
@@ -26,7 +28,7 @@ abstract class CustomerServiceClient implements CustomerService {
 
   /// 🔓 Get access scopes from API
   @override
-  @GET('/api/{api_version}//customers.json')
+  @GET('/api/{api_version}/customers.json')
   Future<CustomerResponse> customer({
     @Path('api_version') required String apiVersion,
   });
@@ -58,9 +60,20 @@ abstract class CustomerServiceClient implements CustomerService {
   });
 
   @override
-  @POST('/api/{api_version}//customers.json')
+  @POST(
+      '/api/{api_version}/customers.json')
   Future<CreateCustomerResponse> createCustomer({
     @Path('api_version') required String apiVersion,
     @Body() required CreateCustomerRequest model,
+  });
+
+  @override
+  @POST(
+      '/api/{api_version}/customers/{customer_id}/account_activation_url.json')
+  Future<CreatesAccountActivationUrlForCustomerResponse>
+      createsAccountActivationUrlForCustomer({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+    @Body() required CreatesAccountActivationUrlForCustomerRequest model,
   });
 }
