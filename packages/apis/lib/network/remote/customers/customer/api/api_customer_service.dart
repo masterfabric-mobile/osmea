@@ -48,7 +48,7 @@ abstract class CustomerServiceClient implements CustomerService {
   });
 
   @override
-  @GET('/api/{api_version}/customers/{customer_id}.json')
+  @GET('/api/{api_version}/customers/count.json')
   Future<CountCustomerResponse> customerCounts({
     @Path('api_version') required String apiVersion,
   });

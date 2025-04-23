@@ -2,10 +2,10 @@ import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer_match_query.dart';
 import 'package:example/services/handlers/customers_handlers/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/sigle_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer_count_handler.dart';
 import 'api_handlers.dart';
-// Import other needed files
 import 'handlers/customers_handlers/customer_handler.dart';
-import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart'; // Added import
+import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart'; 
 
 /// 🔖 API service categories
 enum ApiCategory {
@@ -130,7 +130,7 @@ class ApiServiceRegistry {
       handler: CustomerMatchQueryHandler(),
     ),
 
-    // In the _services list, add:
+    // 🔗 Customer URL API - Generate account activation URL
     ApiService(
       name: 'Customer URL',
       endpoint: '/customers/:id/account_activation_url',
@@ -139,7 +139,15 @@ class ApiServiceRegistry {
       handler: CustomerUrlHandler(),
     ),
 
-    // ➕ Add more services here, organized by category
+    // 🔢 Customer Count API
+    ApiService(
+      name: 'Customer Count',
+      endpoint: '/customers/count',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Counts',
+      handler: CustomerCountHandler(),
+    ),
+
   ];
 
   // 🔄 Add the initialize method back for compatibility
