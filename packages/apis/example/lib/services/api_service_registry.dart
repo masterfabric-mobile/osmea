@@ -5,7 +5,8 @@ import 'package:example/services/handlers/customers_handlers/sigle_customer_hand
 import 'package:example/services/handlers/customers_handlers/customer_count_handler.dart';
 import 'api_handlers.dart';
 import 'handlers/customers_handlers/customer_handler.dart';
-import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart'; 
+import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart';
+import 'handlers/customers_handlers/sends_account_invite_to_customer_handler.dart';
 
 /// 🔖 API service categories
 enum ApiCategory {
@@ -146,6 +147,15 @@ class ApiServiceRegistry {
       category: ApiCategory.customer,
       subcategory: 'Customer Counts',
       handler: CustomerCountHandler(),
+    ),
+
+    // 📧 Customer Invite API
+    ApiService(
+      name: 'Send Customer Invite',
+      endpoint: '/customers/:id/send_invite',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Notifications',
+      handler: SendsAccountInviteToCustomerHandler(),
     ),
 
   ];
