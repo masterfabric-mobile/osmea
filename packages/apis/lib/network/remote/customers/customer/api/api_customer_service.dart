@@ -3,13 +3,17 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/sends_account_invite_to_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/updates_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/count_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/sends_account_invite_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -31,6 +35,14 @@ abstract class CustomerServiceClient implements CustomerService {
   @GET('/api/{api_version}/customers.json')
   Future<CustomerResponse> customer({
     @Path('api_version') required String apiVersion,
+    @Query('created_at_max') String? createdAtMax,
+    @Query('created_at_min') String? createdAtMin,
+    @Query('fields') String? fields,
+    @Query('ids') String? ids,
+    @Query('limit') int? limit,
+    @Query('since_id') String? sinceId,
+    @Query('updated_at_max') String? updatedAtMax,
+    @Query('updated_at_min') String? updatedAtMin,
   });
 
   @override
@@ -76,4 +88,22 @@ abstract class CustomerServiceClient implements CustomerService {
     @Path('customer_id') required String customerId,
     @Body() required CreatesAccountActivationUrlForCustomerRequest model,
   });
+
+  @override
+  @POST(
+      '/api/{api_version}/customers/{customer_id}/send_invite.json')
+  Future<SendsAccountInviteToCustomerResponse> sendsAccountInviteToCustomer({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+    @Body() required SendsAccountInviteToCustomerRequest model,
+  });
+
+  @override
+  @PUT('/api/{api_version}/customers/{customer_id}.json')
+  Future<UpdatesCustomerResponse> updatesCustomer({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+    @Body() required UpdatesCustomerRequest model,
+  });
+  
 }

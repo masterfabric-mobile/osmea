@@ -1,5 +1,7 @@
 import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/sends_account_invite_to_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/updates_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/count_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
@@ -7,6 +9,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/cu
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
 
 /// 🔑 Abstract contract for Access Scope Service
 /// Implement this to fetch access scopes from Shopify API! 🌐
@@ -49,4 +52,18 @@ abstract class CustomerService {
     required String customerId,
     required CreatesAccountActivationUrlForCustomerRequest model,
   });
+
+  /// Sends an account invite to a customer
+  Future<void> sendsAccountInviteToCustomer({
+    required String apiVersion,
+    required String customerId,
+    required SendsAccountInviteToCustomerRequest model,
+  });
+
+  Future<UpdatesCustomerResponse> updatesCustomer({
+    required String apiVersion,
+    required String customerId,
+    required UpdatesCustomerRequest model,
+  });
+
 }
