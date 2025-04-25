@@ -42,13 +42,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the theme without passing context
+    final appTheme = AppTheme.getTheme();
+
     return MaterialApp(
       // 🏷️ App title
-      title: 'OSMEA APIs Package',
+      title: 'OSMEA APIs Explorer',
       // 🚫 Hide debug banner
       debugShowCheckedModeBanner: false,
       // 🎨 Set the app theme
-      theme: AppTheme.getTheme(),
+      theme: appTheme,
       // 🏠 Set the home screen
       home: const HomeView(),
     );
