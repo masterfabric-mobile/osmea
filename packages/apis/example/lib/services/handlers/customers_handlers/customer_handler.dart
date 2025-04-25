@@ -21,19 +21,19 @@ class CustomerHandler implements ApiRequestHandler {
         // 📌 GET request with optional query parameters
         try {
           // Extract query parameters
-          
+
           // 📞 Call the customer service API with extended query parameters support
           final response = await GetIt.I.get<CustomerService>().customer(
-            apiVersion: ApiNetwork.apiVersion,
-            sinceId: params['since_id'],
-            createdAtMin: params['created_at_min'],
-            createdAtMax: params['created_at_max'],
-            updatedAtMin: params['updated_at_min'],
-            updatedAtMax: params['updated_at_max'],
-            limit: int.tryParse(params['limit'] ?? ''),
-            fields: params['fields'],
-            ids: params['ids'],
-          );
+                apiVersion: ApiNetwork.apiVersion,
+                sinceId: params['since_id'],
+                createdAtMin: params['created_at_min'],
+                createdAtMax: params['created_at_max'],
+                updatedAtMin: params['updated_at_min'],
+                updatedAtMax: params['updated_at_max'],
+                limit: int.tryParse(params['limit'] ?? ''),
+                fields: params['fields'],
+                ids: params['ids'],
+              );
 
           // 📊 Organize customers by creation date
           try {
@@ -136,8 +136,10 @@ class CustomerHandler implements ApiRequestHandler {
               e.toString().contains('login?errorHint=no_identity_session')) {
             return {
               "status": "auth_error",
-              "message": "Your authentication session has expired. Please log in again to continue.",
-              "details": "This occurs when your admin authentication token is no longer valid.",
+              "message":
+                  "Your authentication session has expired. Please log in again to continue.",
+              "details":
+                  "This occurs when your admin authentication token is no longer valid.",
               "timestamp": DateTime.now().toIso8601String(),
             };
           }
@@ -206,6 +208,54 @@ class CustomerHandler implements ApiRequestHandler {
           "timestamp": DateTime.now().toIso8601String(),
         };
 
+      case 'DELETE':
+        // 🗑️ Delete a customer
+        try {
+          // Check if customer ID is provided - required parameter
+          final customerId = params['customer_id'] ?? '';
+          if (customerId.isEmpty) {
+            return {
+              "status": "error",
+              "message": "Customer ID is required",
+              "timestamp": DateTime.now().toIso8601String(),
+            };
+          }
+
+          // Call the customer service API to delete customer
+          await GetIt.I.get<CustomerService>().deleteCustomer(
+                apiVersion: ApiNetwork.apiVersion,
+                customerId: customerId,
+              );
+
+          // Return success response
+          return {
+            "status": "success",
+            "message": "Customer deleted successfully",
+            "deletedCustomerId": customerId,
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        } catch (e) {
+          // Handle authentication errors specially
+          if (e.toString().contains('session has expired') ||
+              e.toString().contains('login?errorHint=no_identity_session')) {
+            return {
+              "status": "auth_error",
+              "message":
+                  "Your authentication session has expired. Please log in again to continue.",
+              "details":
+                  "This occurs when your admin authentication token is no longer valid.",
+              "timestamp": DateTime.now().toIso8601String(),
+            };
+          }
+
+          // Handle other errors
+          return {
+            "status": "error",
+            "message": "Failed to delete customer: ${e.toString()}",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
+
       default:
         // ⚠️ Return error for unsupported methods
         return {
@@ -215,8 +265,8 @@ class CustomerHandler implements ApiRequestHandler {
   }
 
   @override
-  // 🔍 Support GET, POST, and PUT methods
-  List<String> get supportedMethods => ['GET', 'POST', 'PUT'];
+  // 🔍 Support GET, POST, PUT, and DELETE methods
+  List<String> get supportedMethods => ['GET', 'POST', 'PUT', 'DELETE'];
 
   @override
   // 📝 Define required fields for each method
@@ -315,6 +365,13 @@ class CustomerHandler implements ApiRequestHandler {
             name: 'namespace',
             label: 'Namespace',
             hint: 'Namespace for the metafield (default: global)',
+          ),
+        ],
+        'DELETE': [
+          const ApiField(
+            name: 'customer_id',
+            label: 'Customer ID',
+            hint: 'Enter customer ID to delete',
           ),
         ],
       };

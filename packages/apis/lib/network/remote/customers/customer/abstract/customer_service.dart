@@ -74,4 +74,10 @@ abstract class CustomerService {
     required UpdatesCustomerRequest model,
   });
 
+  /// 🚀 Deletes a customer from the API.
+  Future<void> deleteCustomer({
+    required String apiVersion,
+    required String customerId,
+  });
+
 }

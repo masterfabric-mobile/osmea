@@ -105,5 +105,11 @@ abstract class CustomerServiceClient implements CustomerService {
     @Path('customer_id') required String customerId,
     @Body() required UpdatesCustomerRequest model,
   });
+
+  @DELETE('/api/{api_version}/customers/{customer_id}.json')
+  Future<void> deleteCustomer({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+  });
   
 }
