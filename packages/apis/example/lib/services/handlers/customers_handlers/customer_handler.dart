@@ -18,12 +18,22 @@ class CustomerHandler implements ApiRequestHandler {
       String method, Map<String, String> params) async {
     switch (method) {
       case 'GET':
-        // 📌 Simple GET request without parameters
+        // 📌 GET request with optional query parameters
         try {
-          // 📞 Call the customer service API - no parameters needed
+          // Extract query parameters
+          
+          // 📞 Call the customer service API with extended query parameters support
           final response = await GetIt.I.get<CustomerService>().customer(
-                apiVersion: ApiNetwork.apiVersion,
-              );
+            apiVersion: ApiNetwork.apiVersion,
+            sinceId: params['since_id'],
+            createdAtMin: params['created_at_min'],
+            createdAtMax: params['created_at_max'],
+            updatedAtMin: params['updated_at_min'],
+            updatedAtMax: params['updated_at_max'],
+            limit: int.tryParse(params['limit'] ?? ''),
+            fields: params['fields'],
+            ids: params['ids'],
+          );
 
           // 📊 Organize customers by creation date
           try {
@@ -126,10 +136,8 @@ class CustomerHandler implements ApiRequestHandler {
               e.toString().contains('login?errorHint=no_identity_session')) {
             return {
               "status": "auth_error",
-              "message":
-                  "Your authentication session has expired. Please log in again to continue.",
-              "details":
-                  "This occurs when your admin authentication token is no longer valid.",
+              "message": "Your authentication session has expired. Please log in again to continue.",
+              "details": "This occurs when your admin authentication token is no longer valid.",
               "timestamp": DateTime.now().toIso8601String(),
             };
           }
@@ -153,61 +161,50 @@ class CustomerHandler implements ApiRequestHandler {
           };
         }
 
-        try {
-          // Extract metadata parameters
-          final metafieldKey = params['metafield_key'];
-          final metafieldValue = params['metafield_value'];
-
-          if (metafieldKey == null ||
-              metafieldValue == null ||
-              metafieldValue.trim().isEmpty) {
-            return {
-              "status": "error",
-              "message": "Metafield key and non-empty value are required",
-              "timestamp": DateTime.now().toIso8601String(),
-            };
-          }
-
-          // 🔄 Create request model for customer update focusing on metadata
-          final request = update.UpdatesCustomerRequest(
-            customer: update.Customer(
-              id: int.tryParse(customerId),
-              metafields: [
-                update.Metafield(
-                  key: metafieldKey,
-                  value: metafieldValue,
-                  type: params['metafield_type'] ?? 'single_line_text_field',
-                  namespace: params['namespace'] ?? 'global',
-                ),
-              ],
-            ),
-          );
-
-          // 📞 Call the customer service API to update customer
-          final updatedCustomer =
-              await GetIt.I.get<CustomerService>().updatesCustomer(
-                    apiVersion: ApiNetwork.apiVersion,
-                    customerId: customerId,
-                    model: request,
-                  );
-
-          // 📋 Return the updated customer data
-          return {
-            "status": "success",
-            "message": "Customer updated successfully",
-            "customerId": customerId,
-            "customer": updatedCustomer.toJson(),
-            "timestamp": DateTime.now().toIso8601String(),
-          };
-        } catch (e) {
-          // ❌ Generic error handling
+        // Extract metadata parameters
+        final metafieldKey = params['metafield_key'];
+        final metafieldValue = params['metafield_value'];
+        if (metafieldKey == null ||
+            metafieldValue == null ||
+            metafieldValue.trim().isEmpty) {
           return {
             "status": "error",
-            "message": "Failed to update customer: ${e.toString()}",
-            "customerId": customerId,
+            "message": "Metafield key and non-empty value are required",
             "timestamp": DateTime.now().toIso8601String(),
           };
         }
+
+        // 🔄 Create request model for customer update focusing on metadata
+        final request = update.UpdatesCustomerRequest(
+          customer: update.Customer(
+            id: int.tryParse(customerId),
+            metafields: [
+              update.Metafield(
+                key: metafieldKey,
+                value: metafieldValue,
+                type: params['metafield_type'] ?? 'single_line_text_field',
+                namespace: params['namespace'] ?? 'global',
+              ),
+            ],
+          ),
+        );
+
+        // 📞 Call the customer service API to update customer
+        final updatedCustomer =
+            await GetIt.I.get<CustomerService>().updatesCustomer(
+                  apiVersion: ApiNetwork.apiVersion,
+                  customerId: customerId,
+                  model: request,
+                );
+
+        // 📋 Return the updated customer data
+        return {
+          "status": "success",
+          "message": "Customer updated successfully",
+          "customerId": customerId,
+          "customer": updatedCustomer.toJson(),
+          "timestamp": DateTime.now().toIso8601String(),
+        };
 
       default:
         // ⚠️ Return error for unsupported methods
@@ -224,7 +221,48 @@ class CustomerHandler implements ApiRequestHandler {
   @override
   // 📝 Define required fields for each method
   Map<String, List<ApiField>> get requiredFields => {
-        'GET': [], // Empty list as no fields are required for GET
+        'GET': [
+          const ApiField(
+            name: 'since_id',
+            label: 'Since ID',
+            hint: 'Show customers created after this ID',
+          ),
+          const ApiField(
+            name: 'created_at_min',
+            label: 'Created After',
+            hint: 'Show customers created after this date (ISO format)',
+          ),
+          const ApiField(
+            name: 'created_at_max',
+            label: 'Created Before',
+            hint: 'Show customers created before this date (ISO format)',
+          ),
+          const ApiField(
+            name: 'updated_at_min',
+            label: 'Updated After',
+            hint: 'Show customers updated after this date (ISO format)',
+          ),
+          const ApiField(
+            name: 'updated_at_max',
+            label: 'Updated Before',
+            hint: 'Show customers updated before this date (ISO format)',
+          ),
+          const ApiField(
+            name: 'limit',
+            label: 'Limit',
+            hint: 'Maximum number of customers to return',
+          ),
+          const ApiField(
+            name: 'fields',
+            label: 'Fields',
+            hint: 'Comma-separated list of fields to include in the response',
+          ),
+          const ApiField(
+            name: 'ids',
+            label: 'IDs',
+            hint: 'Comma-separated list of customer IDs to retrieve',
+          ),
+        ],
         'POST': [
           const ApiField(
             name: 'email',
