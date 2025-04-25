@@ -17,6 +17,14 @@ abstract class CustomerService {
   /// 🚀 Fetches the access scope from the API.
   Future<CustomerResponse> customer({
     required String apiVersion,
+    String? createdAtMax,
+    String? createdAtMin,
+    String? fields,
+    String? ids,
+    int? limit,
+    String? sinceId,
+    String? updatedAtMax,
+    String? updatedAtMin,
   });
 
   /// 🚀 Fetches a single customer from the API.
