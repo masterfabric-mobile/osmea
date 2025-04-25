@@ -3,10 +3,10 @@ import 'package:example/services/api_request_handler.dart';
 // 📁 Import handlers from their new locations
 import 'handlers/access_handlers/access_scope_handler.dart';
 import 'handlers/access_handlers/storefront_access_token_handler.dart';
-import 'handlers/customers_handlers/customer_handler.dart'; // Import customer handler
-import 'handlers/customers_handlers/sigle_customer_handler.dart'; // Import the new handler
-import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart'; // Added import
-import 'handlers/customers_handlers/customer_match_query.dart'; // Import customer match query handler
+import 'handlers/customers_handlers/customer/customer_handler.dart'; // Import customer handler
+import 'handlers/customers_handlers/customer/sigle_customer_handler.dart'; // Import the new handler
+import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart'; // Added import
+import 'handlers/customers_handlers/customer/customer_match_query.dart'; // Import customer match query handler
 
 // ♻️ Re-export types for backward compatibility
 export 'handlers/access_handlers/access_scope_handler.dart';

@@ -1,19 +1,19 @@
 import 'package:apis/apis.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/request/sends_account_invite_to_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:get_it/get_it.dart';
-import '../../api_service_registry.dart';
+import '../../../api_service_registry.dart';
 
 ///*******************************************************************
-///************** 📧 CUSTOMER INVITE API HANDLER 📧 ****************
+///************** 🔗 CUSTOMER URL API HANDLER 🔗 *******************
 ///*******************************************************************
 
-class SendsAccountInviteToCustomerHandler implements ApiRequestHandler {
+class CustomerUrlHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
-    // 🔒 Only handle POST requests for sending customer invites
+    // 🔒 Only handle POST requests for customer URL generation
     if (method == 'POST') {
       // 🔍 Check if customer ID is provided - required parameter
       final customerId = params['customer_id'] ?? '';
@@ -26,37 +26,27 @@ class SendsAccountInviteToCustomerHandler implements ApiRequestHandler {
       }
 
       try {
-        // Extract optional parameters
-        final subject = params['subject'];
-        final customMessage = params['custom_message'];
-
-        // 🔄 Create request model for account invite with optional parameters
-        final request = SendsAccountInviteToCustomerRequest(
-          customerInvite: CustomerInvite(
-            subject: subject,
-            customMessage: customMessage,
-          ),
-        );
-
-        // 📞 Call the customer service API to send invite
-        await GetIt.I.get<CustomerService>().sendsAccountInviteToCustomer(
+        // 📞 Call the customer service API to generate URL
+        final response = await GetIt.I
+            .get<CustomerService>()
+            .createsAccountActivationUrlForCustomer(
               apiVersion: ApiNetwork.apiVersion,
               customerId: customerId,
-              model: request,
+              model: CreatesAccountActivationUrlForCustomerRequest(),
             );
 
-        // 📋 Return success response
+        // 📋 Return the activation URL data
         return {
           "status": "success",
-          "message": "Account invitation sent successfully",
           "customerId": customerId,
+          "accountActivationUrl": response.accountActivationUrl,
           "timestamp": DateTime.now().toIso8601String(),
         };
       } catch (e) {
         // ❌ Generic error handling
         return {
           "status": "error",
-          "message": "Failed to send account invitation: ${e.toString()}",
+          "message": "Failed to generate customer URL: ${e.toString()}",
           "customerId": customerId,
           "timestamp": DateTime.now().toIso8601String(),
         };
@@ -65,7 +55,7 @@ class SendsAccountInviteToCustomerHandler implements ApiRequestHandler {
 
     // ⛔ Unsupported method error
     return {
-      "error": "Method $method not supported for Customer Invite API",
+      "error": "Method $method not supported for Customer URL API",
     };
   }
 
@@ -78,17 +68,7 @@ class SendsAccountInviteToCustomerHandler implements ApiRequestHandler {
           const ApiField(
             name: 'customer_id',
             label: 'Customer ID',
-            hint: 'Enter customer ID to send account invitation',
-          ),
-          const ApiField(
-            name: 'subject',
-            label: 'Email Subject',
-            hint: 'Optional custom subject for invitation email',
-          ),
-          const ApiField(
-            name: 'custom_message',
-            label: 'Custom Message',
-            hint: 'Optional custom message for invitation email',
+            hint: 'Enter customer ID to generate account activation URL',
           ),
         ],
       };

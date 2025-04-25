@@ -1,12 +1,12 @@
 import 'package:example/services/api_request_handler.dart';
-import 'package:example/services/handlers/customers_handlers/customer_match_query.dart';
-import 'package:example/services/handlers/customers_handlers/customer_url_handler.dart';
-import 'package:example/services/handlers/customers_handlers/sigle_customer_handler.dart';
-import 'package:example/services/handlers/customers_handlers/customer_count_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
+import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer/sigle_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
 import 'api_handlers.dart';
-import 'handlers/customers_handlers/customer_handler.dart';
-import 'handlers/customers_handlers/orders_belonging_to_customer_handler.dart';
-import 'handlers/customers_handlers/sends_account_invite_to_customer_handler.dart';
+import 'handlers/customers_handlers/customer/customer_handler.dart';
+import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
+import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
 
 /// 🔖 API service categories
 enum ApiCategory {

@@ -3,7 +3,7 @@ import 'package:apis/network/remote/customers/customer/abstract/customer_service
 import 'package:apis/network/remote/customers/customer/freezed_model/request/updates_customer_request.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:get_it/get_it.dart';
-import '../../api_service_registry.dart';
+import '../../../api_service_registry.dart';
 
 ///*******************************************************************
 ///************** ✏️ UPDATE CUSTOMER API HANDLER ✏️ ***************

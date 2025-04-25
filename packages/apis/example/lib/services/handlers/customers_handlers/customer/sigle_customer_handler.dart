@@ -2,7 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:get_it/get_it.dart';
-import '../../api_service_registry.dart';
+import '../../../api_service_registry.dart';
 
 ///*******************************************************************
 ///******************* 👤 SINGLE CUSTOMER API HANDLER 👤 ************
