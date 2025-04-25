@@ -1,219 +1,260 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
-class AppTheme {
-  // Modern color palette with better contrast
-  static const _primaryLight = Color(0xFF0055D3);
-  static const _primaryDark = Color(0xFF4580FF);
-
-  static const _successLight = Color(0xFF09925E);
-  static const _successDark = Color(0xFF30CF8D);
-
-  static const _warningLight = Color(0xFFFF9500);
-  static const _warningDark = Color(0xFFFFB340);
-
-  static const _errorLight = Color(0xFFE53935);
-  static const _errorDark = Color(0xFFFF6B6B);
-
-  static const _neutralLight = Color(0xFF42464A);
-  static const _neutralDark = Color(0xFFAFB4BB);
-
-  // Method colors mapping
-  static Color getMethodColor(String method, bool isDark) {
-    switch (method.toUpperCase()) {
-      case 'GET':
-        return isDark ? _successDark : _successLight;
-      case 'POST':
-        return isDark ? _primaryDark : _primaryLight;
-      case 'PUT':
-        return isDark ? _warningDark : _warningLight;
-      case 'DELETE':
-        return isDark ? _errorDark : _errorLight;
-      default:
-        return isDark ? _neutralDark : _neutralLight;
-    }
-  }
-
-  static ThemeData getTheme([bool darkMode = false]) {
-    final brightness = darkMode ? Brightness.dark : Brightness.light;
-
-    // Create color scheme based on brightness
-    final colorScheme = brightness == Brightness.dark
-        ? const ColorScheme.dark(
-            primary: _primaryDark,
-            secondary: _successDark,
-            error: _errorDark,
-            surface: Color(0xFF1C1C1C),
-            onPrimary: Colors.white,
-            onSecondary: Colors.white,
-            onSurface: Colors.white,
-            onError: Colors.white,
-          )
-        : const ColorScheme.light(
-            primary: _primaryLight,
-            secondary: _successLight,
-            error: _errorLight,
-            surface: Colors.white,
-            onPrimary: Colors.white,
-            onSecondary: Colors.white,
-            onSurface: Color(0xFF121212),
-            onError: Colors.white,
-          );
-
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: colorScheme,
-      fontFamily: 'Inter',
-
-      // App Bar Theme
-      appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        elevation: 0,
-        centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: brightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark,
-        ),
-      ),
-
-      // Card Theme with modern rounded corners
-      cardTheme: CardTheme(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        clipBehavior: Clip.antiAlias,
-      ),
-
-      // Elevated Button - Modern style
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-
-      // Input decoration - Clean modern look
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: brightness == Brightness.dark
-            ? const Color(0xFF2A2A2A)
-            : const Color(0xFFF5F5F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.primary),
-        ),
-        contentPadding: const EdgeInsets.all(16),
-      ),
-
-      // Chip theme for HTTP method selectors
-      chipTheme: ChipThemeData(
-        backgroundColor: brightness == Brightness.dark
-            ? const Color(0xFF2A2A2A)
-            : const Color(0xFFF5F5F5),
-        selectedColor: colorScheme.primary.withValues(alpha: 0.2),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        labelStyle: TextStyle(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
-        secondaryLabelStyle: TextStyle(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w600,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-
-      // Text Theme - Modern typography
-      textTheme: TextTheme(
-        titleLarge: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 22,
-          color: colorScheme.onSurface,
-        ),
-        titleMedium: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
-          color: colorScheme.onSurface,
-        ),
-        bodyLarge: TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 16,
-          color: colorScheme.onSurface,
-        ),
-        bodyMedium: TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 14,
-          color: colorScheme.onSurface,
-        ),
-        labelLarge: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-          color: colorScheme.onSurface,
-        ),
-      ),
-    );
-  }
-
-  // HTTP Method styling - returns style based on method type
-  static MethodStyle getMethodStyle(String method, BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final color = getMethodColor(method, isDark);
-
-    return MethodStyle(
-      backgroundColor: color.withValues(alpha: 0.1),
-      textColor: color,
-      borderColor: color,
-      iconData: getMethodIcon(method),
-    );
-  }
-
-  // Icons for different HTTP methods
-  static IconData getMethodIcon(String method) {
-    switch (method.toUpperCase()) {
-      case 'GET':
-        return Icons.download_rounded;
-      case 'POST':
-        return Icons.add_circle_outline_rounded;
-      case 'PUT':
-        return Icons.edit_outlined;
-      case 'DELETE':
-        return Icons.delete_outline_rounded;
-      default:
-        return Icons.http_rounded;
-    }
-  }
-}
-
-/// Style configuration for HTTP method chips/buttons
+/// Style definition for HTTP methods
 class MethodStyle {
-  final Color backgroundColor;
   final Color textColor;
+  final Color backgroundColor;
   final Color borderColor;
   final IconData iconData;
 
   const MethodStyle({
-    required this.backgroundColor,
     required this.textColor,
+    required this.backgroundColor,
     required this.borderColor,
     required this.iconData,
   });
+}
+
+/// Modern theme configuration for the API Explorer app
+class AppTheme {
+  /// Returns the app's theme configuration
+  static ThemeData getTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: _purpleDarkScheme,
+      fontFamily: 'Inter',
+
+      // Card theme with subtle styling
+      cardTheme: CardTheme(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        color: _purpleDarkScheme.surface,
+      ),
+
+      // Modern button styling with better contrast
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(_purpleDarkScheme.primary),
+          foregroundColor: const WidgetStatePropertyAll(
+              Colors.white), // White text for better contrast
+          elevation: const WidgetStatePropertyAll(0),
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      ),
+
+      // Input styling
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: _purpleDarkScheme.surfaceContainerLow,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _purpleDarkScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _purpleDarkScheme.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _purpleDarkScheme.primary, width: 1.5),
+        ),
+        labelStyle: TextStyle(color: _purpleDarkScheme.onSurfaceVariant),
+      ),
+
+      // App bar
+      appBarTheme: AppBarTheme(
+        backgroundColor: _purpleDarkScheme.surface,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: _purpleDarkScheme.onSurface,
+        ),
+      ),
+
+      // Text theme
+      textTheme: TextTheme(
+        bodyLarge: TextStyle(fontSize: 16, color: _purpleDarkScheme.onSurface),
+        bodyMedium: TextStyle(fontSize: 14, color: _purpleDarkScheme.onSurface),
+        labelLarge: TextStyle(fontSize: 14, color: _purpleDarkScheme.primary),
+      ),
+
+      dividerTheme: DividerThemeData(
+        color: _purpleDarkScheme.outlineVariant,
+        thickness: 1,
+      ),
+
+      // API-specific styling
+      extensions: [
+        ApiExplorerThemeExtension(
+          methodGet: const Color(0xFF66BB6A), // Green 400
+          methodPost: const Color(0xFF9C27B0), // Purple 500
+          methodPut: const Color(0xFFFFB74D), // Orange 300
+          methodDelete: const Color(0xFFEF5350), // Red 400
+          methodPatch: const Color(0xFF78909C), // Blue Grey 400
+          codeBackground: const Color(0xFF1A1A1A),
+          codeText: const Color(0xFFF5F5F5),
+        ),
+      ],
+    );
+  }
+
+  /// Returns style information for different HTTP methods
+  static MethodStyle getMethodStyle(String method, BuildContext context) {
+    final theme = Theme.of(context);
+    final apiTheme = theme.extension<ApiExplorerThemeExtension>();
+
+    Color methodColor;
+    IconData methodIcon;
+
+    switch (method.toUpperCase()) {
+      case 'GET':
+        methodColor =
+            apiTheme?.methodGet ?? const Color(0xFF4CAF50); // Brighter green
+        methodIcon = Icons.download_rounded;
+        break;
+      case 'POST':
+        methodColor =
+            apiTheme?.methodPost ?? const Color(0xFFAB47BC); // Brighter purple
+        methodIcon = Icons.add_rounded;
+        break;
+      case 'PUT':
+        methodColor =
+            apiTheme?.methodPut ?? const Color(0xFFFFA726); // Brighter orange
+        methodIcon = Icons.edit_rounded;
+        break;
+      case 'DELETE':
+        methodColor =
+            apiTheme?.methodDelete ?? const Color(0xFFF44336); // Brighter red
+        methodIcon = Icons.delete_outlined;
+        break;
+      case 'PATCH':
+        methodColor = apiTheme?.methodPatch ??
+            const Color(0xFF78909C); // Brighter blue-grey
+        methodIcon = Icons.build_rounded;
+        break;
+      default:
+        methodColor = Colors.grey;
+        methodIcon = Icons.api_rounded;
+    }
+
+    return MethodStyle(
+      textColor: Colors.black, // Changed to black text
+      backgroundColor: methodColor,
+      borderColor: methodColor.withOpacity(0.3),
+      iconData: methodIcon,
+    );
+  }
+
+  /// Purple dark scheme
+  static final ColorScheme _purpleDarkScheme = ColorScheme(
+    // Primary - Different Purple tone
+    primary:
+        const Color.fromARGB(255, 212, 59, 254), // Purple 600 - rich purple
+    onPrimary: Colors.white,
+    primaryContainer:
+        const Color.fromARGB(255, 85, 22, 125), // Purple 800 - deeper purple
+    onPrimaryContainer: Colors.white,
+
+    // Secondary - Complementary color
+    secondary:
+        const Color.fromARGB(255, 145, 57, 161), // Purple 400 - lighter purple
+    onSecondary: Colors.white,
+    secondaryContainer:
+        const Color(0xFF4A148C), // Purple 900 - very deep purple
+    onSecondaryContainer: Colors.white, // Near-white for text
+    surface: const Color(0xFF1E1E1E), // Slightly lighter than background
+    onSurface: const Color(0xFFEEEEEE), // Near-white for text
+    surfaceContainerHigh: const Color(0xFF2C2C2C),
+    surfaceContainerLow: const Color(0xFF1F1F1F),
+    surfaceContainerLowest: const Color(0xFF1A1A1A),
+    surfaceContainerHighest: const Color(0xFF323232),
+    onSurfaceVariant: const Color(0xFFBDBDBD), // Light gray for secondary text
+
+    // Error colors
+    error: const Color(0xFFE57373), // Red 300 - lighter for visibility
+    onError: Colors.black,
+    errorContainer: const Color(0xFFD32F2F), // Red 700
+    onErrorContainer: Colors.white,
+
+    // Outline colors
+    outline: const Color(0xFF484848), // Medium dark gray
+    outlineVariant: const Color(0xFF2E2E2E), // Darker gray for subtle outlines
+
+    brightness: Brightness.dark,
+  );
+}
+
+/// Extension to the theme for API-specific visual elements
+class ApiExplorerThemeExtension
+    extends ThemeExtension<ApiExplorerThemeExtension> {
+  /// API Method colors
+  final Color methodGet;
+  final Color methodPost;
+  final Color methodPut;
+  final Color methodDelete;
+  final Color methodPatch;
+
+  /// Code highlighting colors
+  final Color codeBackground;
+  final Color codeText;
+
+  ApiExplorerThemeExtension({
+    required this.methodGet,
+    required this.methodPost,
+    required this.methodPut,
+    required this.methodDelete,
+    required this.methodPatch,
+    required this.codeBackground,
+    required this.codeText,
+  });
+
+  @override
+  ApiExplorerThemeExtension copyWith({
+    Color? methodGet,
+    Color? methodPost,
+    Color? methodPut,
+    Color? methodDelete,
+    Color? methodPatch,
+    Color? codeBackground,
+    Color? codeText,
+  }) {
+    return ApiExplorerThemeExtension(
+      methodGet: methodGet ?? this.methodGet,
+      methodPost: methodPost ?? this.methodPost,
+      methodPut: methodPut ?? this.methodPut,
+      methodDelete: methodDelete ?? this.methodDelete,
+      methodPatch: methodPatch ?? this.methodPatch,
+      codeBackground: codeBackground ?? this.codeBackground,
+      codeText: codeText ?? this.codeText,
+    );
+  }
+
+  @override
+  ApiExplorerThemeExtension lerp(
+      ThemeExtension<ApiExplorerThemeExtension>? other, double t) {
+    if (other is! ApiExplorerThemeExtension) {
+      return this;
+    }
+    return ApiExplorerThemeExtension(
+      methodGet: Color.lerp(methodGet, other.methodGet, t)!,
+      methodPost: Color.lerp(methodPost, other.methodPost, t)!,
+      methodPut: Color.lerp(methodPut, other.methodPut, t)!,
+      methodDelete: Color.lerp(methodDelete, other.methodDelete, t)!,
+      methodPatch: Color.lerp(methodPatch, other.methodPatch, t)!,
+      codeBackground: Color.lerp(codeBackground, other.codeBackground, t)!,
+      codeText: Color.lerp(codeText, other.codeText, t)!,
+    );
+  }
 }
