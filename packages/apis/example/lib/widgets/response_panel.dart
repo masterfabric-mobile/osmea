@@ -1,58 +1,136 @@
-// 📚 Core imports - foundational Flutter libraries
-import 'dart:convert'; // 🔄 JSON encoding/decoding utilities
-import 'package:flutter/material.dart'; // 🎨 UI components and Material Design
-import 'package:flutter/services.dart'; // ⌨️ Platform services like clipboard
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:example/styles/app_theme.dart';
 
-// 🔗 Import local widgets
-import 'json_response_widget.dart'; // 📋 JSON formatter and display widget
-import 'placeholder_widget.dart'; // 🖼️ Placeholder content widget
-import 'response_header_widget.dart'; // 🔝 Header component with actions
-
-/// 📱 ResponsePanel Widget
-/// 🔍 Displays API response data with syntax highlighting and loading states
-/// 📊 Features: JSON formatting, copy to clipboard, responsive design
-class ResponsePanel extends StatelessWidget {
-  // 📄 Response data to display (nullable for empty/loading states)
+class ResponsePanel extends StatefulWidget {
   final Map<String, dynamic>? responseData;
-
-  // ⏳ Loading state indicator to show progress animation
   final bool loading;
 
-  // 🏗️ Constructor with required parameters
   const ResponsePanel({
     super.key,
-    required this.responseData,
-    required this.loading,
+    this.responseData,
+    this.loading = false,
   });
 
   @override
+  State<ResponsePanel> createState() => _ResponsePanelState();
+}
+
+class _ResponsePanelState extends State<ResponsePanel> {
+  @override
   Widget build(BuildContext context) {
-    // 📏 Get screen dimensions to adapt layout
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen =
-        screenWidth < 500; // 📱 Check if we're on a small device
+    final theme = Theme.of(context);
+    final apiTheme = theme.extension<ApiExplorerThemeExtension>();
+    final codeBackground = apiTheme?.codeBackground ?? const Color(0xFF141414);
+    final codeText = apiTheme?.codeText ?? const Color(0xFFE0E0E0);
 
-    // ↔️ Adjust padding based on screen size for better spacing
-    final padding = isSmallScreen ? 12.0 : 20.0;
-
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🔝 Use the extracted header widget
-          ResponseHeaderWidget(
-            responseData: responseData,
-            onCopyPressed: () => _copyResponseToClipboard(context),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Response header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           ),
-          SizedBox(height: isSmallScreen ? 8 : 16),
-          // Make sure the content area expands to fill available space
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: responseData != null
-                  ? JsonResponseWidget(responseData: responseData!)
-                  : PlaceholderWidget(loading: loading),
+          child: Row(
+            children: [
+              Icon(
+                Icons.data_object,
+                color: theme.colorScheme.primary,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Response',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (widget.responseData != null) _buildStatusBadge(context),
+              const Spacer(),
+              if (widget.responseData != null)
+                IconButton(
+                  icon: Icon(
+                    Icons.copy,
+                    size: 18,
+                    color: theme.colorScheme.primary,
+                  ),
+                  tooltip: 'Copy Response',
+                  onPressed: () {
+                    // Copy response
+                  },
+                ),
+            ],
+          ),
+        ),
+
+        // Response content
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: codeBackground,
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(8)),
+            ),
+            child: widget.loading
+                ? const Center(child: CircularProgressIndicator())
+                : widget.responseData == null
+                    ? _buildEmptyState(context)
+                    : _buildResponseContent(context, codeText),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusBadge(BuildContext context) {
+    final theme = Theme.of(context);
+    bool hasError = widget.responseData?.containsKey('error') ?? false;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: hasError ? theme.colorScheme.error : theme.colorScheme.primary,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        hasError ? 'Error' : 'Success',
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: hasError
+              ? theme.colorScheme.onError
+              : theme.colorScheme.onPrimary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.code,
+            size: 40,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 60),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Send a request to see the response',
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 180),
+              fontSize: 14,
             ),
           ),
         ],
@@ -60,28 +138,20 @@ class ResponsePanel extends StatelessWidget {
     );
   }
 
-  void _copyResponseToClipboard(BuildContext context) {
-    final jsonString = const JsonEncoder.withIndent('  ').convert(responseData);
-    Clipboard.setData(ClipboardData(text: jsonString));
+  Widget _buildResponseContent(BuildContext context, Color textColor) {
+    final prettyJson =
+        const JsonEncoder.withIndent('  ').convert(widget.responseData ?? {});
 
-    // 📢 Show snackbar with animation
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.check_circle_outline,
-              color: Theme.of(context).colorScheme.onInverseSurface,
-            ),
-            const SizedBox(width: 8),
-            Text('JSON copied to clipboard'),
-          ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: SelectableText(
+        prettyJson,
+        style: TextStyle(
+          fontFamily: 'JetBrains Mono', // Monospace font for code
+          color: textColor,
+          fontSize: 14,
+          height: 1.5, // Improved line height for readability
         ),
-        behavior: SnackBarBehavior.floating,
-        width: 280,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 2),
       ),
     );
   }
