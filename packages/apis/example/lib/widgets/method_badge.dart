@@ -18,7 +18,6 @@ class MethodBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final methodStyle = AppTheme.getMethodStyle(method, context);
 
-    // Use explicit black for text and icons
     final Color textColor = Colors.black;
 
     return Container(
@@ -29,9 +28,8 @@ class MethodBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: methodStyle.backgroundColor,
         borderRadius: BorderRadius.circular(4 * size),
-        // Add a subtle border for better definition
         border: Border.all(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 26),
           width: 1,
         ),
       ),
