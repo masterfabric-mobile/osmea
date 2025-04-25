@@ -130,8 +130,6 @@ class _HomeViewState extends State<HomeView> {
     final isWideScreen = screenWidth > 1200;
     final isMediumScreen = screenWidth > 800 && screenWidth <= 1200;
 
-    final theme = AppTheme.getTheme();
-
     final controlPanel = ControlPanel(
       selectedCategory: _selectedCategory,
       selectedSubcategory: _selectedSubcategory,
@@ -154,7 +152,7 @@ class _HomeViewState extends State<HomeView> {
     return Theme(
       data: AppTheme.getTheme(),
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppHeader(
           title: 'OSMEA API Explorer',
           apiUrl: _currentApiUrl,
