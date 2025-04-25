@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// Style definition for HTTP methods
 class MethodStyle {
@@ -152,7 +151,7 @@ class AppTheme {
     return MethodStyle(
       textColor: Colors.black, // Changed to black text
       backgroundColor: methodColor,
-      borderColor: methodColor.withOpacity(0.3),
+      borderColor: methodColor.withValues(alpha: 26),
       iconData: methodIcon,
     );
   }
