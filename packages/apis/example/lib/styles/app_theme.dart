@@ -174,11 +174,7 @@ class AppTheme {
     onSecondary: Colors.white,
     secondaryContainer:
         const Color(0xFF581C87), // Deep purple for secondary containers
-    onSecondaryContainer: Colors.white,
-
-    // Background and surface colors
-    background: const Color(0xFF131313), // Nearly black background
-    onBackground: const Color(0xFFF9FAFB), // Off-white for text
+    onSecondaryContainer: Colors.white, // Off-white for text
     surface: const Color(0xFF1C1C1E), // Slightly lighter surface
     onSurface: const Color(0xFFF3F4F6), // Light gray for text
 
@@ -187,10 +183,7 @@ class AppTheme {
     surfaceContainerLow: const Color(0xFF202023),
     surfaceContainerLowest: const Color(0xFF18181B),
     surfaceContainerHighest: const Color(0xFF343438),
-    surfaceDim: const Color(0xFF131315), // Dimmed surface
-
-    // Variant colors
-    surfaceVariant: const Color(0xFF232326), // Subtle variant
+    surfaceDim: const Color(0xFF131315), // Subtle variant
     onSurfaceVariant: const Color(0xFFD1D5DB), // Lighter gray for variant text
 
     // Error colors with better visibility
