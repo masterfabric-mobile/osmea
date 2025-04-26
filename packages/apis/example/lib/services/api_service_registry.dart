@@ -5,6 +5,7 @@ import 'package:example/services/handlers/customers_handlers/customer/sigle_cust
 import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/creates_new_address_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'api_handlers.dart';
 import 'handlers/customers_handlers/customer/customer_handler.dart';
 import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
@@ -173,6 +174,15 @@ class ApiServiceRegistry {
       category: ApiCategory.customer,
       subcategory: 'Customer Address',
       handler: RetrievesListOfAddressesForCustomerHandler(),
+    ),
+
+    // 🔍 Customer Address APIs - Get Single Address Details
+    ApiService(
+      name: 'Get Single Address Details',
+      endpoint: '/customers/:id/addresses/:address_id',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Address',
+      handler: RetrievesDetailsForSingleCustomerAddressHandler(),
     ),
   ];
 
