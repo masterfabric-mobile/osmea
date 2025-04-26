@@ -3,6 +3,7 @@ import 'package:example/services/handlers/customers_handlers/customer/customer_m
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/sigle_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customers_address/creates_new_address_for_customer_handler.dart';
 import 'api_handlers.dart';
 import 'handlers/customers_handlers/customer/customer_handler.dart';
 import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
@@ -14,8 +15,7 @@ enum ApiCategory {
   storefront,
   admin,
   catalog,
-  customer,
-  customers,
+  customer, 
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -31,8 +31,6 @@ extension ApiCategoryExtension on ApiCategory {
       case ApiCategory.catalog:
         return 'Catalog APIs';
       case ApiCategory.customer:
-        return 'Customer APIs';
-      case ApiCategory.customers:
         return 'Customer APIs';
     }
   }
@@ -100,7 +98,7 @@ class ApiServiceRegistry {
       name: 'Customers',
       endpoint: '/customers',
       category: ApiCategory.customer,
-      subcategory: 'All Customers',
+      subcategory: 'Customers', // Changed subcategory to "Customers"
       handler: CustomerHandler(),
     ),
 
@@ -109,7 +107,7 @@ class ApiServiceRegistry {
       name: 'Single Customer',
       endpoint: '/customers/:id',
       category: ApiCategory.customer,
-      subcategory: 'Single Customer',
+      subcategory: 'Customers', // Changed to "Customers" subcategory
       handler: SingleCustomerHandler(),
     ),
 
@@ -118,7 +116,7 @@ class ApiServiceRegistry {
       name: 'Customer Orders',
       endpoint: '/customers/:id/orders',
       category: ApiCategory.customer,
-      subcategory: 'Customer Orders',
+      subcategory: 'Customers', // Changed to "Customers" subcategory
       handler: OrdersBelongingToCustomerHandler(),
     ),
 
@@ -127,7 +125,7 @@ class ApiServiceRegistry {
       name: 'Customer Match Query',
       endpoint: '/customers/search',
       category: ApiCategory.customer,
-      subcategory: 'Customer Match Query',
+      subcategory: 'Customers', // Changed to "Customers" subcategory
       handler: CustomerMatchQueryHandler(),
     ),
 
@@ -136,7 +134,7 @@ class ApiServiceRegistry {
       name: 'Customer URL',
       endpoint: '/customers/:id/account_activation_url',
       category: ApiCategory.customer,
-      subcategory: 'Customer URL',
+      subcategory: 'Customers', // Changed to "Customers" subcategory
       handler: CustomerUrlHandler(),
     ),
 
@@ -145,7 +143,7 @@ class ApiServiceRegistry {
       name: 'Customer Count',
       endpoint: '/customers/count',
       category: ApiCategory.customer,
-      subcategory: 'Customer Counts',
+      subcategory: 'Customers', // Changed to "Customers" subcategory
       handler: CustomerCountHandler(),
     ),
 
@@ -154,10 +152,19 @@ class ApiServiceRegistry {
       name: 'Send Customer Invite',
       endpoint: '/customers/:id/send_invite',
       category: ApiCategory.customer,
-      subcategory: 'Customer Notifications',
+      subcategory: 'Customers', 
       handler: SendsAccountInviteToCustomerHandler(),
     ),
 
+    // 🏷️ Customer Address APIs
+    ApiService(
+      name: 'Customer Address',
+      endpoint: '/customers/:id/addresses',
+      category: ApiCategory.customer, // Changed to customer category
+      subcategory:
+          'Customer Address', 
+      handler: CreateNewAddressForCustomerHandler(),
+    ),
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -209,8 +216,6 @@ class ApiServiceRegistry {
         return 'Catalog';
       case ApiCategory.customer:
         return 'Customer';
-      case ApiCategory.customers:
-        throw UnimplementedError();
     }
   }
 }
