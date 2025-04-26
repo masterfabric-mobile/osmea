@@ -3,6 +3,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/customers/customer_address/abstract/customer_adress_service.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/request/creates_new_address_for_customer_request.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/creates_new_address_for_customer_response.dart';
+import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_details_for_single_customer_address_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_list_of_addresses_for_customer_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -34,4 +35,13 @@ abstract class CustomerAddressServiceClient implements CustomerAddressService {
     @Path('customer_id') required String customerId,
     @Query('limit') int? limit,
   });
+
+  @GET('/api/{api_version}/customers/{customer_id}/addresses/{address_id}.json')
+  Future<RetrievesDetailsForSingleCustomerAddressResponse>
+      retrieveListOfSingleAddresses({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+    @Path('address_id') required String addressId,
+  });
+
 }
