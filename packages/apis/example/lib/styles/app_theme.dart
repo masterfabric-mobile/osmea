@@ -21,7 +21,7 @@ class AppTheme {
   static ThemeData getTheme() {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: _purpleDarkScheme,
+      colorScheme: _modernPurpleScheme,
       fontFamily: 'Inter',
 
       // Card theme with subtle styling
@@ -30,13 +30,13 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        color: _purpleDarkScheme.surface,
+        color: _modernPurpleScheme.surface,
       ),
 
       // Modern button styling with better contrast
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(_purpleDarkScheme.primary),
+          backgroundColor: WidgetStatePropertyAll(_modernPurpleScheme.primary),
           foregroundColor: const WidgetStatePropertyAll(
               Colors.white), // White text for better contrast
           elevation: const WidgetStatePropertyAll(0),
@@ -52,58 +52,63 @@ class AppTheme {
       // Input styling
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _purpleDarkScheme.surfaceContainerLow,
+        fillColor: _modernPurpleScheme.surfaceContainerLow,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _purpleDarkScheme.outline),
+          borderSide: BorderSide(color: _modernPurpleScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _purpleDarkScheme.outline),
+          borderSide: BorderSide(color: _modernPurpleScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _purpleDarkScheme.primary, width: 1.5),
+          borderSide:
+              BorderSide(color: _modernPurpleScheme.primary, width: 1.5),
         ),
-        labelStyle: TextStyle(color: _purpleDarkScheme.onSurfaceVariant),
+        labelStyle: TextStyle(color: _modernPurpleScheme.onSurfaceVariant),
       ),
 
       // App bar
       appBarTheme: AppBarTheme(
-        backgroundColor: _purpleDarkScheme.surface,
+        backgroundColor: _modernPurpleScheme.surface,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: _purpleDarkScheme.onSurface,
+          color: _modernPurpleScheme.onSurface,
         ),
       ),
 
       // Text theme
       textTheme: TextTheme(
-        bodyLarge: TextStyle(fontSize: 16, color: _purpleDarkScheme.onSurface),
-        bodyMedium: TextStyle(fontSize: 14, color: _purpleDarkScheme.onSurface),
-        labelLarge: TextStyle(fontSize: 14, color: _purpleDarkScheme.primary),
+        bodyLarge:
+            TextStyle(fontSize: 16, color: _modernPurpleScheme.onSurface),
+        bodyMedium:
+            TextStyle(fontSize: 14, color: _modernPurpleScheme.onSurface),
+        labelLarge: TextStyle(fontSize: 14, color: _modernPurpleScheme.primary),
       ),
 
       dividerTheme: DividerThemeData(
-        color: _purpleDarkScheme.outlineVariant,
+        color: _modernPurpleScheme.outlineVariant,
         thickness: 1,
       ),
 
       // API-specific styling
       extensions: [
         ApiExplorerThemeExtension(
-          methodGet: const Color(0xFF66BB6A), // Green 400
-          methodPost: const Color(0xFF9C27B0), // Purple 500
-          methodPut: const Color(0xFFFFB74D), // Orange 300
-          methodDelete: const Color(0xFFEF5350), // Red 400
-          methodPatch: const Color(0xFF78909C), // Blue Grey 400
-          codeBackground: const Color(0xFF1A1A1A),
-          codeText: const Color(0xFFF5F5F5),
+          methodGet: const Color(0xFF43A047), // More modern green
+          methodPost: const Color(0xFF8E24AA), // Vibrant purple
+          methodPut: const Color(0xFFFB8C00), // Warm orange
+          methodDelete: const Color(0xFFE53935), // Vivid red
+          methodPatch: const Color(0xFF546E7A), // Cool blue-gray
+          codeBackground:
+              const Color(0xFF18181B), // Darker, more modern code bg
+          codeText: const Color(0xFFF8F9FA), // Crisp white text
+          accentPurple: const Color(0xFFB39DDB), // Light purple accent
         ),
       ],
     );
@@ -156,40 +161,54 @@ class AppTheme {
     );
   }
 
-  /// Purple dark scheme
-  static final ColorScheme _purpleDarkScheme = ColorScheme(
-    // Primary - Different Purple tone
-    primary:
-        const Color.fromARGB(255, 212, 59, 254), // Purple 600 - rich purple
+  /// Modern Purple dark scheme with contemporary color combinations
+  static final ColorScheme _modernPurpleScheme = ColorScheme(
+    // Primary - More vibrant and modern purple
+    primary: const Color(0xFFA855F7), // Vibrant purple
     onPrimary: Colors.white,
-    primaryContainer:
-        const Color.fromARGB(255, 85, 22, 125), // Purple 800 - deeper purple
+    primaryContainer: const Color(0xFF7E22CE), // Deeper purple for containers
     onPrimaryContainer: Colors.white,
 
     // Secondary - Complementary color
-    secondary:
-        const Color.fromARGB(255, 145, 57, 161), // Purple 400 - lighter purple
+    secondary: const Color(0xFF9333EA), // Secondary purple tone
     onSecondary: Colors.white,
     secondaryContainer:
-        const Color(0xFF4A148C), // Purple 900 - very deep purple
-    onSecondaryContainer: Colors.white, // Near-white for text
-    surface: const Color(0xFF1E1E1E), // Slightly lighter than background
-    onSurface: const Color(0xFFEEEEEE), // Near-white for text
-    surfaceContainerHigh: const Color(0xFF2C2C2C),
-    surfaceContainerLow: const Color(0xFF1F1F1F),
-    surfaceContainerLowest: const Color(0xFF1A1A1A),
-    surfaceContainerHighest: const Color(0xFF323232),
-    onSurfaceVariant: const Color(0xFFBDBDBD), // Light gray for secondary text
+        const Color(0xFF581C87), // Deep purple for secondary containers
+    onSecondaryContainer: Colors.white,
 
-    // Error colors
-    error: const Color(0xFFE57373), // Red 300 - lighter for visibility
-    onError: Colors.black,
-    errorContainer: const Color(0xFFD32F2F), // Red 700
+    // Background and surface colors
+    background: const Color(0xFF131313), // Nearly black background
+    onBackground: const Color(0xFFF9FAFB), // Off-white for text
+    surface: const Color(0xFF1C1C1E), // Slightly lighter surface
+    onSurface: const Color(0xFFF3F4F6), // Light gray for text
+
+    // Surface container variants with modern gray tones
+    surfaceContainerHigh: const Color(0xFF2D2D2F),
+    surfaceContainerLow: const Color(0xFF202023),
+    surfaceContainerLowest: const Color(0xFF18181B),
+    surfaceContainerHighest: const Color(0xFF343438),
+    surfaceDim: const Color(0xFF131315), // Dimmed surface
+
+    // Variant colors
+    surfaceVariant: const Color(0xFF232326), // Subtle variant
+    onSurfaceVariant: const Color(0xFFD1D5DB), // Lighter gray for variant text
+
+    // Error colors with better visibility
+    error: const Color(0xFFFF4C6A), // Vibrant pink for errors
+    onError: Colors.white,
+    errorContainer: const Color(0xFFBF2652), // Deeper error color
     onErrorContainer: Colors.white,
 
     // Outline colors
-    outline: const Color(0xFF484848), // Medium dark gray
-    outlineVariant: const Color(0xFF2E2E2E), // Darker gray for subtle outlines
+    outline: const Color(0xFF525257), // Medium gray for outlines
+    outlineVariant: const Color(0xFF38383C), // Darker subtle outlines
+
+    // Scrim and other colors
+    scrim: const Color(0xAA000000),
+    shadow: const Color(0xFF000000),
+    inverseSurface: const Color(0xFFE5E7EB),
+    onInverseSurface: const Color(0xFF111111),
+    inversePrimary: const Color(0xFF7E22CE),
 
     brightness: Brightness.dark,
   );
@@ -209,6 +228,9 @@ class ApiExplorerThemeExtension
   final Color codeBackground;
   final Color codeText;
 
+  /// Additional color for accents
+  final Color accentPurple;
+
   ApiExplorerThemeExtension({
     required this.methodGet,
     required this.methodPost,
@@ -217,6 +239,7 @@ class ApiExplorerThemeExtension
     required this.methodPatch,
     required this.codeBackground,
     required this.codeText,
+    this.accentPurple = const Color(0xFFB39DDB),
   });
 
   @override
@@ -228,6 +251,7 @@ class ApiExplorerThemeExtension
     Color? methodPatch,
     Color? codeBackground,
     Color? codeText,
+    Color? accentPurple,
   }) {
     return ApiExplorerThemeExtension(
       methodGet: methodGet ?? this.methodGet,
@@ -237,6 +261,7 @@ class ApiExplorerThemeExtension
       methodPatch: methodPatch ?? this.methodPatch,
       codeBackground: codeBackground ?? this.codeBackground,
       codeText: codeText ?? this.codeText,
+      accentPurple: accentPurple ?? this.accentPurple,
     );
   }
 
@@ -254,6 +279,7 @@ class ApiExplorerThemeExtension
       methodPatch: Color.lerp(methodPatch, other.methodPatch, t)!,
       codeBackground: Color.lerp(codeBackground, other.codeBackground, t)!,
       codeText: Color.lerp(codeText, other.codeText, t)!,
+      accentPurple: Color.lerp(accentPurple, other.accentPurple, t)!,
     );
   }
 }
