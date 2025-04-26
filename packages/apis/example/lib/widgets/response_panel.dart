@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:example/styles/app_theme.dart';
 
 class ResponsePanel extends StatefulWidget {
@@ -21,8 +22,11 @@ class _ResponsePanelState extends State<ResponsePanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final apiTheme = theme.extension<ApiExplorerThemeExtension>();
-    final codeBackground = apiTheme?.codeBackground ?? const Color(0xFF141414);
-    final codeText = apiTheme?.codeText ?? const Color(0xFFE0E0E0);
+
+    // Use theme colors instead of hardcoded values
+    final codeBackground =
+        apiTheme?.codeBackground ?? theme.colorScheme.surfaceDim;
+    final codeText = apiTheme?.codeText ?? theme.colorScheme.onSurface;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -62,7 +66,31 @@ class _ResponsePanelState extends State<ResponsePanel> {
                   ),
                   tooltip: 'Copy Response',
                   onPressed: () {
-                    // Copy response
+                    // Format the JSON with proper indentation
+                    final jsonString = const JsonEncoder.withIndent('  ')
+                        .convert(widget.responseData);
+
+                    // Copy to clipboard
+                    Clipboard.setData(ClipboardData(text: jsonString));
+
+                    // Show feedback to user
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Response copied to clipboard',
+                          style: TextStyle(
+                            color: Colors.white, // Set text color to white
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        width: 230,
+                        backgroundColor: apiTheme?.codeBackground ??
+                            theme.colorScheme
+                                .primaryContainer, // Use more modern purple color
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   },
                 ),
             ],
@@ -112,6 +140,8 @@ class _ResponsePanelState extends State<ResponsePanel> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -119,17 +149,17 @@ class _ResponsePanelState extends State<ResponsePanel> {
           Icon(
             Icons.code,
             size: 40,
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 60),
+            // Fix deprecated withOpacity
+            color: theme.colorScheme.onSurface
+                .withValues(alpha: 153), // 0.6 * 255 = 153
           ),
           const SizedBox(height: 16),
           Text(
             'Send a request to see the response',
             style: TextStyle(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 180),
+              // Fix deprecated withOpacity
+              color: theme.colorScheme.onSurface
+                  .withValues(alpha: 179), // 0.7 * 255 = 179
               fontSize: 14,
             ),
           ),
