@@ -4,6 +4,7 @@ import 'package:example/services/handlers/customers_handlers/customer/customer_u
 import 'package:example/services/handlers/customers_handlers/customer/sigle_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/creates_new_address_for_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
 import 'api_handlers.dart';
 import 'handlers/customers_handlers/customer/customer_handler.dart';
 import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
@@ -15,7 +16,7 @@ enum ApiCategory {
   storefront,
   admin,
   catalog,
-  customer, 
+  customer,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -152,18 +153,26 @@ class ApiServiceRegistry {
       name: 'Send Customer Invite',
       endpoint: '/customers/:id/send_invite',
       category: ApiCategory.customer,
-      subcategory: 'Customers', 
+      subcategory: 'Customers',
       handler: SendsAccountInviteToCustomerHandler(),
     ),
 
-    // 🏷️ Customer Address APIs
+    // 🏷️ Customer Address APIs - Create Address
     ApiService(
-      name: 'Customer Address',
+      name: 'Create Customer Address',
       endpoint: '/customers/:id/addresses',
-      category: ApiCategory.customer, // Changed to customer category
-      subcategory:
-          'Customer Address', 
+      category: ApiCategory.customer,
+      subcategory: 'Customer Address',
       handler: CreateNewAddressForCustomerHandler(),
+    ),
+
+    // 🏠 Customer Address APIs - Get Addresses List
+    ApiService(
+      name: 'Get Customer Addresses',
+      endpoint: '/customers/:id/addresses',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Address',
+      handler: RetrievesListOfAddressesForCustomerHandler(),
     ),
   ];
 
