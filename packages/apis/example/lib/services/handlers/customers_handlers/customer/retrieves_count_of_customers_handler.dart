@@ -8,7 +8,7 @@ import '../../../api_service_registry.dart';
 ///************** 🔢 CUSTOMER COUNT API HANDLER 🔢 *****************
 ///*******************************************************************
 
-class CustomerCountHandler implements ApiRequestHandler {
+class RetrievesCountOfCustomersHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
@@ -17,7 +17,7 @@ class CustomerCountHandler implements ApiRequestHandler {
       try {
         // 📞 Call the customer service API to get count
         final customersCount =
-            await GetIt.I.get<CustomerService>().customerCounts(
+            await GetIt.I.get<CustomerService>().RetrievesCountOfCustomers(
                   apiVersion: ApiNetwork.apiVersion,
                 );
 

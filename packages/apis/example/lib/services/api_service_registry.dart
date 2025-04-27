@@ -1,7 +1,7 @@
 import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
-import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/creates_new_address_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/destroy_multiple_customer_addresses_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
@@ -146,7 +146,7 @@ class ApiServiceRegistry {
       endpoint: '/customers/count',
       category: ApiCategory.customer,
       subcategory: 'Customers',
-      handler: CustomerCountHandler(),
+      handler: RetrievesCountOfCustomersHandler(),
     ),
 
     // 📧 Customer Invite API
