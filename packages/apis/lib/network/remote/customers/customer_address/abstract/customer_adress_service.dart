@@ -2,6 +2,7 @@ import 'package:apis/network/remote/customers/customer_address/freezed_model/req
 import 'package:apis/network/remote/customers/customer_address/freezed_model/request/update_postal_code_of_customer_address_request.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/creates_new_address_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/destroy_multiple_customer_addresses_response.dart';
+import 'package:apis/network/remote/customers/customer_address/freezed_model/response/removes_address_from_customers_address_list_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_list_of_addresses_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_details_for_single_customer_address_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/sets_default_address_for_customer_response.dart';
@@ -52,5 +53,12 @@ abstract class CustomerAddressService {
     required String customerId,
     required List<int> addressIds,
     String operation = 'destroy',
+  });
+
+  Future<RemovesAddressFromCustomersAddressListResponse>
+      removesAddressFromCustomersAddressList({
+    required String apiVersion,
+    required String customerId,
+    required String addressId,
   });
 }
