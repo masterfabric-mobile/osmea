@@ -1,4 +1,5 @@
 import 'package:example/services/api_request_handler.dart';
+import 'package:example/services/handlers/access_handlers/access_scope_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/single_customer_handler.dart';
@@ -8,7 +9,7 @@ import 'package:example/services/handlers/customers_handlers/customers_address/d
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
-import 'api_handlers.dart';
+import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/customer_handler.dart';
 import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
@@ -85,7 +86,7 @@ class ApiServiceRegistry {
       endpoint: '/accessScope',
       category: ApiCategory.access,
       subcategory: 'Access Scope',
-      handler: ApiHandlerFactory.getHandler('Access Scope')!,
+      handler: AccessScopeHandler(),
     ),
 
     // 🔑 Move Storefront Access Token to Access category
@@ -94,7 +95,7 @@ class ApiServiceRegistry {
       endpoint: '/storefrontAccessToken',
       category: ApiCategory.access,
       subcategory: 'Storefront Access',
-      handler: ApiHandlerFactory.getHandler('Storefront Access Token')!,
+      handler: StorefrontAccessTokenHandler()
     ),
 
     // 👥 Customer API - Get all customers with single GET endpoint
