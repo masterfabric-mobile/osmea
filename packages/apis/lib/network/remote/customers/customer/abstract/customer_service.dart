@@ -15,7 +15,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/up
 /// Implement this to fetch access scopes from Shopify API! 🌐
 abstract class CustomerService {
   /// 🚀 Fetches the access scope from the API.
-  Future<RetrievesListOfCustomersResponse> customer({
+  Future<RetrievesListOfCustomersResponse> RetrievesListOfCustomers({
     required String apiVersion,
     String? createdAtMax,
     String? createdAtMin,

@@ -33,7 +33,7 @@ abstract class CustomerServiceClient implements CustomerService {
   /// 🔓 Get access scopes from API
   @override
   @GET('/api/{api_version}/customers.json')
-  Future<RetrievesListOfCustomersResponse> customer({
+  Future<RetrievesListOfCustomersResponse> RetrievesListOfCustomers({
     @Path('api_version') required String apiVersion,
     @Query('created_at_max') String? createdAtMax,
     @Query('created_at_min') String? createdAtMin,

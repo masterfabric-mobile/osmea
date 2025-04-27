@@ -23,7 +23,7 @@ class CustomerHandler implements ApiRequestHandler {
           // Extract query parameters
 
           // 📞 Call the customer service API with extended query parameters support
-          final response = await GetIt.I.get<CustomerService>().customer(
+          final response = await GetIt.I.get<CustomerService>().RetrievesListOfCustomers(
                 apiVersion: ApiNetwork.apiVersion,
                 sinceId: params['since_id'],
                 createdAtMin: params['created_at_min'],
