@@ -6,8 +6,8 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/co
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_all_orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
 
@@ -34,7 +34,7 @@ abstract class CustomerService {
   });
 
   /// 🚀 Fetches the orders of a single customer from the API.
-  Future<OrdersBelongingToCustomerResponse> customerOrders({
+  Future<RetrievesAllOrdersBelongingToCustomerResponse> RetrievesAllOrdersBelongingToCustomer({
     required String apiVersion,
     required String customerId,
   });

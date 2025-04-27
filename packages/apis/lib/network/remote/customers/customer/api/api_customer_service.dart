@@ -9,7 +9,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/co
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_all_orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/sends_account_invite_to_customer_response.dart';
@@ -54,7 +54,7 @@ abstract class CustomerServiceClient implements CustomerService {
 
   @override
   @GET('/api/{api_version}/customers/{customer_id}/orders.json')
-  Future<OrdersBelongingToCustomerResponse> customerOrders({
+  Future<RetrievesAllOrdersBelongingToCustomerResponse> RetrievesAllOrdersBelongingToCustomer({
     @Path('api_version') required String apiVersion,
     @Path('customer_id') required String customerId,
   });

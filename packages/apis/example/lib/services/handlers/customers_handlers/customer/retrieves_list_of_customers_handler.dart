@@ -12,7 +12,7 @@ import '../../../api_service_registry.dart';
 ///******************* 👥 CUSTOMER API HANDLER 👥 *******************
 ///*******************************************************************
 
-class CustomerHandler implements ApiRequestHandler {
+class RetrievesListOfCustomersHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
@@ -23,17 +23,18 @@ class CustomerHandler implements ApiRequestHandler {
           // Extract query parameters
 
           // 📞 Call the customer service API with extended query parameters support
-          final response = await GetIt.I.get<CustomerService>().RetrievesListOfCustomers(
-                apiVersion: ApiNetwork.apiVersion,
-                sinceId: params['since_id'],
-                createdAtMin: params['created_at_min'],
-                createdAtMax: params['created_at_max'],
-                updatedAtMin: params['updated_at_min'],
-                updatedAtMax: params['updated_at_max'],
-                limit: int.tryParse(params['limit'] ?? ''),
-                fields: params['fields'],
-                ids: params['ids'],
-              );
+          final response =
+              await GetIt.I.get<CustomerService>().RetrievesListOfCustomers(
+                    apiVersion: ApiNetwork.apiVersion,
+                    sinceId: params['since_id'],
+                    createdAtMin: params['created_at_min'],
+                    createdAtMax: params['created_at_max'],
+                    updatedAtMin: params['updated_at_min'],
+                    updatedAtMax: params['updated_at_max'],
+                    limit: int.tryParse(params['limit'] ?? ''),
+                    fields: params['fields'],
+                    ids: params['ids'],
+                  );
 
           // 📊 Organize customers by creation date
           try {

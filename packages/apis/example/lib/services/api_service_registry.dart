@@ -9,7 +9,7 @@ import 'package:example/services/handlers/customers_handlers/customers_address/r
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
-import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
+import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
 
 /// 🔖 API service categories
@@ -89,20 +89,19 @@ class ApiServiceRegistry {
 
     // 🔑 Move Storefront Access Token to Access category
     ApiService(
-      name: 'Storefront Access Token',
-      endpoint: '/storefrontAccessToken',
-      category: ApiCategory.access,
-      subcategory: 'Storefront Access',
-      handler: StorefrontAccessTokenHandler()
-    ),
+        name: 'Storefront Access Token',
+        endpoint: '/storefrontAccessToken',
+        category: ApiCategory.access,
+        subcategory: 'Storefront Access',
+        handler: StorefrontAccessTokenHandler()),
 
     // 👥 Customer API - Get all customers with single GET endpoint
     ApiService(
       name: 'Customers',
       endpoint: '/customers',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed subcategory to "Customers"
-      handler: CustomerHandler(),
+      subcategory: 'Customers',
+      handler: RetrievesListOfCustomersHandler(),
     ),
 
     // 👤 Single Customer API - get customer by ID
@@ -110,8 +109,8 @@ class ApiServiceRegistry {
       name: 'Single Customer',
       endpoint: '/customers/:id',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed to "Customers" subcategory
-      handler: SingleCustomerHandler(),
+      subcategory: 'Customers',
+      handler: RetrievesSingleCustomerHandler(),
     ),
 
     // 🛒 Customer Orders API - Get orders belonging to a customer
@@ -119,8 +118,8 @@ class ApiServiceRegistry {
       name: 'Customer Orders',
       endpoint: '/customers/:id/orders',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed to "Customers" subcategory
-      handler: OrdersBelongingToCustomerHandler(),
+      subcategory: 'Customers',
+      handler: RetrievesAllOrdersBelongingToCustomerHandler(),
     ),
 
     // 🔍 Customer Match Query API
@@ -128,7 +127,7 @@ class ApiServiceRegistry {
       name: 'Customer Match Query',
       endpoint: '/customers/search',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed to "Customers" subcategory
+      subcategory: 'Customers',
       handler: CustomerMatchQueryHandler(),
     ),
 
@@ -137,7 +136,7 @@ class ApiServiceRegistry {
       name: 'Customer URL',
       endpoint: '/customers/:id/account_activation_url',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed to "Customers" subcategory
+      subcategory: 'Customers',
       handler: CustomerUrlHandler(),
     ),
 
@@ -146,7 +145,7 @@ class ApiServiceRegistry {
       name: 'Customer Count',
       endpoint: '/customers/count',
       category: ApiCategory.customer,
-      subcategory: 'Customers', // Changed to "Customers" subcategory
+      subcategory: 'Customers',
       handler: CustomerCountHandler(),
     ),
 

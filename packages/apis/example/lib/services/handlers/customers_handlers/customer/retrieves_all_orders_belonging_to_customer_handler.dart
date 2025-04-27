@@ -9,7 +9,8 @@ import '../../../api_service_registry.dart';
 ///************** 🛒 CUSTOMER ORDERS API HANDLER 🛒 *****************
 ///*******************************************************************
 
-class OrdersBelongingToCustomerHandler implements ApiRequestHandler {
+class RetrievesAllOrdersBelongingToCustomerHandler
+    implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
@@ -29,7 +30,7 @@ class OrdersBelongingToCustomerHandler implements ApiRequestHandler {
         // Fix: Get the CustomerService, not the response type
         final response = await GetIt.I
             .get<CustomerService>() // Get the service, not the response type
-            .customerOrders(
+            .RetrievesAllOrdersBelongingToCustomer(
               apiVersion: ApiNetwork.apiVersion,
               customerId: customerId,
             );
@@ -39,7 +40,7 @@ class OrdersBelongingToCustomerHandler implements ApiRequestHandler {
           // 🔄 Extract orders from the response - adjust property access as needed
           final orders = response.orders;
 
-          if (orders.isNotEmpty) {
+          if (orders!.isNotEmpty) {
             // 📋 Categorize orders by status
             final Map<String, List<Map<String, dynamic>>> ordersByStatus = {};
 
@@ -92,7 +93,7 @@ class OrdersBelongingToCustomerHandler implements ApiRequestHandler {
           return {
             "status": "success",
             "customerId": customerId,
-            "orders": response.orders.map((o) => o.toJson()).toList(),
+            "orders": response.orders?.map((o) => o.toJson()).toList(),
             "rawResponse": response.toString(),
             "timestamp": DateTime.now().toIso8601String(),
           };

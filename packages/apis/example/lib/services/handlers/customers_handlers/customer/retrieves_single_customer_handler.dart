@@ -8,7 +8,7 @@ import '../../../api_service_registry.dart';
 ///******************* 👤 SINGLE CUSTOMER API HANDLER 👤 ************
 ///*******************************************************************
 
-class SingleCustomerHandler implements ApiRequestHandler {
+class RetrievesSingleCustomerHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
