@@ -1,25 +1,25 @@
 // To parse this JSON data, do
 //
-//     final customerMatchSuppliedQueryResponse = customerMatchSuppliedQueryResponseFromJson(jsonString);
+//     final searchesForCustomersThatMatchSuppliedQueryResponse = searchesForCustomersThatMatchSuppliedQueryResponseFromJson(jsonString);
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 
-part 'customer_match_supplied_query_response.freezed.dart';
-part 'customer_match_supplied_query_response.g.dart';
+part 'searches_for_customers_that_match_supplied_query_response.freezed.dart';
+part 'searches_for_customers_that_match_supplied_query_response.g.dart';
 
-CustomerMatchSuppliedQueryResponse customerMatchSuppliedQueryResponseFromJson(String str) => CustomerMatchSuppliedQueryResponse.fromJson(json.decode(str));
+SearchesForCustomersThatMatchSuppliedQueryResponse searchesForCustomersThatMatchSuppliedQueryResponseFromJson(String str) => SearchesForCustomersThatMatchSuppliedQueryResponse.fromJson(json.decode(str));
 
-String customerMatchSuppliedQueryResponseToJson(CustomerMatchSuppliedQueryResponse data) => json.encode(data.toJson());
+String searchesForCustomersThatMatchSuppliedQueryResponseToJson(SearchesForCustomersThatMatchSuppliedQueryResponse data) => json.encode(data.toJson());
 
 @freezed
-class CustomerMatchSuppliedQueryResponse with _$CustomerMatchSuppliedQueryResponse {
-    const factory CustomerMatchSuppliedQueryResponse({
+class SearchesForCustomersThatMatchSuppliedQueryResponse with _$SearchesForCustomersThatMatchSuppliedQueryResponse {
+    const factory SearchesForCustomersThatMatchSuppliedQueryResponse({
         @JsonKey(name: "customers")
         List<Customer>? customers,
-    }) = _CustomerMatchSuppliedQueryResponse;
+    }) = _SearchesForCustomersThatMatchSuppliedQueryResponse;
 
-    factory CustomerMatchSuppliedQueryResponse.fromJson(Map<String, dynamic> json) => _$CustomerMatchSuppliedQueryResponseFromJson(json);
+    factory SearchesForCustomersThatMatchSuppliedQueryResponse.fromJson(Map<String, dynamic> json) => _$SearchesForCustomersThatMatchSuppliedQueryResponseFromJson(json);
 }
 
 @freezed
@@ -64,7 +64,7 @@ class Customer with _$Customer {
         @JsonKey(name: "admin_graphql_api_id")
         String? adminGraphqlApiId,
         @JsonKey(name: "default_address")
-        Address? defaultAddress,
+        DefaultAddress? defaultAddress,
     }) = _Customer;
 
     factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
@@ -73,6 +73,32 @@ class Customer with _$Customer {
 @freezed
 class Address with _$Address {
     const factory Address({
+        @JsonKey(name: "id")
+        int? id,
+        @JsonKey(name: "customer_id")
+        int? customerId,
+        @JsonKey(name: "company")
+        String? company,
+        @JsonKey(name: "province")
+        String? province,
+        @JsonKey(name: "country")
+        String? country,
+        @JsonKey(name: "province_code")
+        String? provinceCode,
+        @JsonKey(name: "country_code")
+        String? countryCode,
+        @JsonKey(name: "country_name")
+        String? countryName,
+        @JsonKey(name: "default")
+        bool? addressDefault,
+    }) = _Address;
+
+    factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+}
+
+@freezed
+class DefaultAddress with _$DefaultAddress {
+    const factory DefaultAddress({
         @JsonKey(name: "id")
         int? id,
         @JsonKey(name: "customer_id")
@@ -90,10 +116,10 @@ class Address with _$Address {
         @JsonKey(name: "country_name")
         String? countryName,
         @JsonKey(name: "default")
-        bool? addressDefault,
-    }) = _Address;
+        bool? defaultAddressDefault,
+    }) = _DefaultAddress;
 
-    factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+    factory DefaultAddress.fromJson(Map<String, dynamic> json) => _$DefaultAddressFromJson(json);
 }
 
 @freezed

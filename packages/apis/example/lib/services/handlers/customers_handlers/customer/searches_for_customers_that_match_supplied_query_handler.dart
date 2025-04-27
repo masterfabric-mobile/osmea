@@ -8,7 +8,8 @@ import '../../../api_service_registry.dart';
 ///************** 🔍 CUSTOMER MATCH QUERY HANDLER 🔍 ****************
 ///*******************************************************************
 
-class CustomerMatchQueryHandler implements ApiRequestHandler {
+class SearchesForCustomersThatMatchSuppliedQueryHandler
+    implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
@@ -16,10 +17,11 @@ class CustomerMatchQueryHandler implements ApiRequestHandler {
     if (method == 'GET') {
       try {
         // 📦 Fetch all customers (no query parameter needed)
-        final response =
-            await GetIt.I.get<CustomerService>().customerMatchQuery(
-                  apiVersion: ApiNetwork.apiVersion,
-                );
+        final response = await GetIt.I
+            .get<CustomerService>()
+            .SearchesForCustomersThatMatchSuppliedQuery(
+              apiVersion: ApiNetwork.apiVersion,
+            );
 
         // 📊 Process response
         try {

@@ -1,4 +1,4 @@
-import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
+import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -128,7 +128,7 @@ class ApiServiceRegistry {
       endpoint: '/customers/search',
       category: ApiCategory.customer,
       subcategory: 'Customers',
-      handler: CustomerMatchQueryHandler(),
+      handler: SearchesForCustomersThatMatchSuppliedQueryHandler(),
     ),
 
     // 🔗 Customer URL API - Generate account activation URL
