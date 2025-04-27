@@ -6,7 +6,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/co
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
@@ -15,7 +15,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/up
 /// Implement this to fetch access scopes from Shopify API! 🌐
 abstract class CustomerService {
   /// 🚀 Fetches the access scope from the API.
-  Future<CustomerResponse> customer({
+  Future<RetrievesListOfCustomersResponse> customer({
     required String apiVersion,
     String? createdAtMax,
     String? createdAtMin,

@@ -9,8 +9,8 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/co
 import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/sends_account_invite_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
@@ -33,7 +33,7 @@ abstract class CustomerServiceClient implements CustomerService {
   /// 🔓 Get access scopes from API
   @override
   @GET('/api/{api_version}/customers.json')
-  Future<CustomerResponse> customer({
+  Future<RetrievesListOfCustomersResponse> customer({
     @Path('api_version') required String apiVersion,
     @Query('created_at_max') String? createdAtMax,
     @Query('created_at_min') String? createdAtMin,
