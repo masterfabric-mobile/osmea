@@ -26,7 +26,7 @@ class SingleCustomerHandler implements ApiRequestHandler {
 
       // 👤 Get specific customer by ID
       try {
-        final response = await GetIt.I.get<CustomerService>().singleCustomer(
+        final response = await GetIt.I.get<CustomerService>().RetrievesSingleCustomer(
               apiVersion: ApiNetwork.apiVersion,
               customerId: customerId,
             );

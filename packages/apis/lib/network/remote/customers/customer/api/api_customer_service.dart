@@ -11,8 +11,8 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/cr
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/sends_account_invite_to_customer_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -47,7 +47,7 @@ abstract class CustomerServiceClient implements CustomerService {
 
   @override
   @GET('/api/{api_version}/customers/{customer_id}.json')
-  Future<SingleCustomerResponse> singleCustomer({
+  Future<RetrievesSingleCustomerResponse> RetrievesSingleCustomer({
     @Path('api_version') required String apiVersion,
     @Path('customer_id') required String customerId,
   });

@@ -8,7 +8,7 @@ import 'package:apis/network/remote/customers/customer/freezed_model/response/cr
 import 'package:apis/network/remote/customers/customer/freezed_model/response/customer_match_supplied_query_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_list_of_customers_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/orders_belonging_to_customer_response.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/single_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_single_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/updates_customer_response.dart';
 
 /// 🔑 Abstract contract for Access Scope Service
@@ -28,7 +28,7 @@ abstract class CustomerService {
   });
 
   /// 🚀 Fetches a single customer from the API.
-  Future<SingleCustomerResponse> singleCustomer({
+  Future<RetrievesSingleCustomerResponse> RetrievesSingleCustomer({
     required String apiVersion,
     required String customerId,
   });

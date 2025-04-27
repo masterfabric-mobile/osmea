@@ -1,25 +1,25 @@
 // To parse this JSON data, do
 //
-//     final singleCustomerResponse = singleCustomerResponseFromJson(jsonString);
+//     final retrievesSingleCustomerResponse = retrievesSingleCustomerResponseFromJson(jsonString);
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 
-part 'single_customer_response.freezed.dart';
-part 'single_customer_response.g.dart';
+part 'retrieves_single_customer_response.freezed.dart';
+part 'retrieves_single_customer_response.g.dart';
 
-SingleCustomerResponse singleCustomerResponseFromJson(String str) => SingleCustomerResponse.fromJson(json.decode(str));
+RetrievesSingleCustomerResponse retrievesSingleCustomerResponseFromJson(String str) => RetrievesSingleCustomerResponse.fromJson(json.decode(str));
 
-String singleCustomerResponseToJson(SingleCustomerResponse data) => json.encode(data.toJson());
+String retrievesSingleCustomerResponseToJson(RetrievesSingleCustomerResponse data) => json.encode(data.toJson());
 
 @freezed
-class SingleCustomerResponse with _$SingleCustomerResponse {
-    const factory SingleCustomerResponse({
+class RetrievesSingleCustomerResponse with _$RetrievesSingleCustomerResponse {
+    const factory RetrievesSingleCustomerResponse({
         @JsonKey(name: "customer")
         Customer? customer,
-    }) = _SingleCustomerResponse;
+    }) = _RetrievesSingleCustomerResponse;
 
-    factory SingleCustomerResponse.fromJson(Map<String, dynamic> json) => _$SingleCustomerResponseFromJson(json);
+    factory RetrievesSingleCustomerResponse.fromJson(Map<String, dynamic> json) => _$RetrievesSingleCustomerResponseFromJson(json);
 }
 
 @freezed
@@ -64,7 +64,7 @@ class Customer with _$Customer {
         @JsonKey(name: "admin_graphql_api_id")
         String? adminGraphqlApiId,
         @JsonKey(name: "default_address")
-        Address? defaultAddress,
+        DefaultAddress? defaultAddress,
     }) = _Customer;
 
     factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
@@ -73,6 +73,32 @@ class Customer with _$Customer {
 @freezed
 class Address with _$Address {
     const factory Address({
+        @JsonKey(name: "id")
+        int? id,
+        @JsonKey(name: "customer_id")
+        int? customerId,
+        @JsonKey(name: "company")
+        String? company,
+        @JsonKey(name: "province")
+        String? province,
+        @JsonKey(name: "country")
+        String? country,
+        @JsonKey(name: "province_code")
+        String? provinceCode,
+        @JsonKey(name: "country_code")
+        String? countryCode,
+        @JsonKey(name: "country_name")
+        String? countryName,
+        @JsonKey(name: "default")
+        bool? addressDefault,
+    }) = _Address;
+
+    factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+}
+
+@freezed
+class DefaultAddress with _$DefaultAddress {
+    const factory DefaultAddress({
         @JsonKey(name: "id")
         int? id,
         @JsonKey(name: "customer_id")
@@ -90,10 +116,10 @@ class Address with _$Address {
         @JsonKey(name: "country_name")
         String? countryName,
         @JsonKey(name: "default")
-        bool? addressDefault,
-    }) = _Address;
+        bool? defaultAddressDefault,
+    }) = _DefaultAddress;
 
-    factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+    factory DefaultAddress.fromJson(Map<String, dynamic> json) => _$DefaultAddressFromJson(json);
 }
 
 @freezed
