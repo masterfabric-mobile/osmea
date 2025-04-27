@@ -1,5 +1,3 @@
-import 'package:example/services/api_request_handler.dart';
-import 'package:example/services/handlers/access_handlers/access_scope_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/single_customer_handler.dart';
