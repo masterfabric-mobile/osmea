@@ -8,7 +8,7 @@ import 'package:example/services/handlers/customers_handlers/customers_address/r
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
 import 'package:example/services/index.dart';
-import 'handlers/customers_handlers/customer/customer_handler.dart';
+import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
 
