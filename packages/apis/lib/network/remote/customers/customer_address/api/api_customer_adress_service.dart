@@ -4,6 +4,7 @@ import 'package:apis/network/remote/customers/customer_address/abstract/customer
 import 'package:apis/network/remote/customers/customer_address/freezed_model/request/creates_new_address_for_customer_request.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/request/update_postal_code_of_customer_address_request.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/creates_new_address_for_customer_response.dart';
+import 'package:apis/network/remote/customers/customer_address/freezed_model/response/destroy_multiple_customer_addresses_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_details_for_single_customer_address_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/retrieves_list_of_addresses_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer_address/freezed_model/response/sets_default_address_for_customer_response.dart';
@@ -56,11 +57,22 @@ abstract class CustomerAddressServiceClient implements CustomerAddressService {
     @Body() required UpdatePostalCodeOfCustomerAddressRequest model,
   });
 
-  @PUT('/api/{api_version}/customers/{customer_id}/addresses/{address_id}/default.json')
+  @PUT(
+      '/api/{api_version}/customers/{customer_id}/addresses/{address_id}/default.json')
   Future<SetsDefaultAddressForCustomerResponse> setsDefaultAddressForCustomer({
     @Path('api_version') required String apiVersion,
     @Path('customer_id') required String customerId,
     @Path('address_id') required String addressId,
   });
 
+  @PUT(
+      '/api/{api_version}/customers/{customer_id}/addresses/set.json?operation=destroy')
+  Future<DestroyMultipleCustomerAddressesResponse>
+      destroyMultipleCustomerAddresses({
+    @Path('api_version') required String apiVersion,
+    @Path('customer_id') required String customerId,
+    @Query('address_ids[]')
+    required List<int> addressIds,
+    @Query('operation') String operation = 'destroy',
+  });
 }

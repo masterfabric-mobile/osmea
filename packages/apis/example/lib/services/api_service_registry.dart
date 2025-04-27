@@ -1,9 +1,10 @@
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_match_query.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
-import 'package:example/services/handlers/customers_handlers/customer/sigle_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customer/single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_count_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/creates_new_address_for_customer_handler.dart';
+import 'package:example/services/handlers/customers_handlers/customers_address/destroy_multiple_customer_addresses_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
@@ -193,6 +194,15 @@ class ApiServiceRegistry {
       category: ApiCategory.customer,
       subcategory: 'Customer Address',
       handler: SetsDefaultAddressForCustomerHandler(),
+    ),
+
+    // 🗑️ Customer Address APIs - Delete Multiple Addresses
+    ApiService(
+      name: 'Destroy Multiple Addresses',
+      endpoint: '/customers/:id/addresses',
+      category: ApiCategory.customer,
+      subcategory: 'Customer Address',
+      handler: DestroyMultipleCustomerAddressesHandler(),
     ),
   ];
 
