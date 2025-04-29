@@ -21,7 +21,7 @@ class AppTheme {
   static ThemeData getTheme() {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: _modernPurpleScheme,
+      colorScheme: _lightPurpleScheme,
       fontFamily: 'Inter',
 
       // Card theme with subtle styling
@@ -30,15 +30,14 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        color: _modernPurpleScheme.surface,
+        color: _lightPurpleScheme.surface,
       ),
 
       // Modern button styling with better contrast
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(_modernPurpleScheme.primary),
-          foregroundColor: const WidgetStatePropertyAll(
-              Colors.white), // White text for better contrast
+          backgroundColor: WidgetStatePropertyAll(_lightPurpleScheme.primary),
+          foregroundColor: const WidgetStatePropertyAll(Colors.white),
           elevation: const WidgetStatePropertyAll(0),
           padding: const WidgetStatePropertyAll(
             EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -52,62 +51,59 @@ class AppTheme {
       // Input styling
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _modernPurpleScheme.surfaceContainerLow,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        fillColor: _lightPurpleScheme.surfaceVariant.withValues(alpha: 180),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _modernPurpleScheme.outline),
+          borderSide: BorderSide(color: _lightPurpleScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _modernPurpleScheme.outline),
+          borderSide: BorderSide(color: _lightPurpleScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide:
-              BorderSide(color: _modernPurpleScheme.primary, width: 1.5),
+              BorderSide(color: _lightPurpleScheme.primary, width: 1.5),
         ),
-        labelStyle: TextStyle(color: _modernPurpleScheme.onSurfaceVariant),
+        labelStyle: TextStyle(color: _lightPurpleScheme.onSurfaceVariant),
       ),
 
       // App bar
       appBarTheme: AppBarTheme(
-        backgroundColor: _modernPurpleScheme.surface,
+        backgroundColor: _lightPurpleScheme.primary,
+        foregroundColor: _lightPurpleScheme.onPrimary,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: _modernPurpleScheme.onSurface,
+          color: _lightPurpleScheme.onPrimary,
         ),
       ),
 
       // Text theme
       textTheme: TextTheme(
-        bodyLarge:
-            TextStyle(fontSize: 16, color: _modernPurpleScheme.onSurface),
-        bodyMedium:
-            TextStyle(fontSize: 14, color: _modernPurpleScheme.onSurface),
-        labelLarge: TextStyle(fontSize: 14, color: _modernPurpleScheme.primary),
+        bodyLarge: TextStyle(fontSize: 16, color: _lightPurpleScheme.onSurface),
+        bodyMedium: TextStyle(fontSize: 14, color: _lightPurpleScheme.onSurface),
+        labelLarge: TextStyle(fontSize: 14, color: _lightPurpleScheme.primary),
       ),
 
       dividerTheme: DividerThemeData(
-        color: _modernPurpleScheme.outlineVariant,
+        color: _lightPurpleScheme.outlineVariant,
         thickness: 1,
       ),
 
       // API-specific styling
       extensions: [
         ApiExplorerThemeExtension(
-          methodGet: const Color(0xFF43A047), // More modern green
-          methodPost: const Color(0xFF8E24AA), // Vibrant purple
-          methodPut: const Color(0xFFFB8C00), // Warm orange
-          methodDelete: const Color(0xFFE53935), // Vivid red
-          methodPatch: const Color(0xFF546E7A), // Cool blue-gray
-          codeBackground:
-              const Color(0xFF18181B), // Darker, more modern code bg
-          codeText: const Color(0xFFF8F9FA), // Crisp white text
+          methodGet: const Color(0xFF43A047), // Green
+          methodPost: const Color(0xFF8E24AA), // Purple
+          methodPut: const Color(0xFFFB8C00), // Orange
+          methodDelete: const Color(0xFFE53935), // Red
+          methodPatch: const Color(0xFF546E7A), // Blue-gray
+          codeBackground: const Color(0xFFF8F9FC), // Light background for code
+          codeText: const Color(0xFF121212), // Dark text for code
           accentPurple: const Color(0xFFB39DDB), // Light purple accent
         ),
       ],
@@ -161,55 +157,51 @@ class AppTheme {
     );
   }
 
-  /// Modern Purple dark scheme with contemporary color combinations
-  static final ColorScheme _modernPurpleScheme = ColorScheme(
-    // Primary - More vibrant and modern purple
-    primary: const Color(0xFFA855F7), // Vibrant purple
+  /// Modern Purple light scheme with contemporary color combinations
+  static final ColorScheme _lightPurpleScheme = ColorScheme.light(
+    // Primary - Vibrant purple for light mode
+    primary: const Color(0xFF8E24AA),    // Purple 600
     onPrimary: Colors.white,
-    primaryContainer: const Color(0xFF7E22CE), // Deeper purple for containers
-    onPrimaryContainer: Colors.white,
-
+    primaryContainer: const Color(0xFFE1BEE7), // Light purple container
+    onPrimaryContainer: const Color(0xFF4A148C), // Deep purple text
+    
     // Secondary - Complementary color
-    secondary: const Color(0xFF9333EA), // Secondary purple tone
+    secondary: const Color(0xFF7B1FA2),   // Purple 700
     onSecondary: Colors.white,
-    secondaryContainer:
-        const Color(0xFF581C87), // Deep purple for secondary containers
-    onSecondaryContainer: Colors.white, // Off-white for text
-    surface: const Color(0xFF1C1C1E), // Slightly lighter surface
-    onSurface: const Color(0xFFF3F4F6), // Light gray for text
-
-    // Surface container variants with modern gray tones
-    surfaceContainerHigh: const Color(0xFF2D2D2F),
-    surfaceContainerLow: const Color(0xFF202023),
-    surfaceContainerLowest: const Color(0xFF18181B),
-    surfaceContainerHighest: const Color(0xFF343438),
-    surfaceDim: const Color(0xFF131315), // Subtle variant
-    onSurfaceVariant: const Color(0xFFD1D5DB), // Lighter gray for variant text
-
-    // Error colors with better visibility
-    error: const Color(0xFFFF4C6A), // Vibrant pink for errors
+    secondaryContainer: const Color(0xFFF3E5F5), // Very light purple container
+    onSecondaryContainer: const Color(0xFF4A148C), // Deep purple text
+    
+    // Surface colors with light backgrounds
+    background: const Color(0xFFF8F9FA), // Very light gray background
+    onBackground: const Color(0xFF121212), // Near-black text
+    surface: Colors.white,
+    onSurface: const Color(0xFF121212), // Near-black text
+    surfaceVariant: const Color(0xFFF5F0FA), // Very light purple-tinted surface
+    onSurfaceVariant: const Color(0xFF4D4D4D), // Dark gray text
+    
+    // Error colors 
+    error: const Color(0xFFD32F2F), // Red 700
     onError: Colors.white,
-    errorContainer: const Color(0xFFBF2652), // Deeper error color
-    onErrorContainer: Colors.white,
-
+    errorContainer: const Color(0xFFFFEBEE), // Light red background
+    onErrorContainer: const Color(0xFFB71C1C), // Dark red text
+    
     // Outline colors
-    outline: const Color(0xFF525257), // Medium gray for outlines
-    outlineVariant: const Color(0xFF38383C), // Darker subtle outlines
-
-    // Scrim and other colors
-    scrim: const Color(0xAA000000),
-    shadow: const Color(0xFF000000),
-    inverseSurface: const Color(0xFFE5E7EB),
-    onInverseSurface: const Color(0xFF111111),
-    inversePrimary: const Color(0xFF7E22CE),
-
-    brightness: Brightness.dark,
+    outline: const Color(0xFFBDBDBD), // Medium gray for outlines
+    outlineVariant: const Color(0xFFE0E0E0), // Light gray for subtle outlines
+    
+    // Other colors
+    scrim: const Color(0x66000000),
+    shadow: const Color(0x66000000),
+    inverseSurface: const Color(0xFF121212),
+    onInverseSurface: Colors.white,
+    inversePrimary: const Color(0xFFD1C4E9),
+    
+    brightness: Brightness.light,
   );
 }
 
 /// Extension to the theme for API-specific visual elements
-class ApiExplorerThemeExtension
-    extends ThemeExtension<ApiExplorerThemeExtension> {
+class ApiExplorerThemeExtension extends ThemeExtension<ApiExplorerThemeExtension> {
   /// API Method colors
   final Color methodGet;
   final Color methodPost;
