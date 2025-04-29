@@ -1,11 +1,12 @@
 import 'package:apis/apis.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart'
+import 'package:apis/network/remote/customers/customer/freezed_model/request/create_new_customer_record_request.dart'
     as create;
 import 'package:apis/network/remote/customers/customer/freezed_model/request/updates_customer_request.dart'
     as update;
 import 'package:example/services/api_request_handler.dart';
 import 'package:get_it/get_it.dart';
+import 'dart:convert'; // Add this import for jsonDecode
 import '../../../api_service_registry.dart';
 
 ///*******************************************************************
@@ -106,8 +107,22 @@ class RetrievesListOfCustomersHandler implements ApiRequestHandler {
             };
           }
 
+          // Basic phone number validation for common formats
+          if (phone != null && phone.isNotEmpty) {
+            // Simple validation - can be enhanced based on specific requirements
+            final validPhone = phone.replaceAll(RegExp(r'\D'), '');
+            if (validPhone.length < 10 || validPhone.length > 15) {
+              return {
+                "status": "error",
+                "message": "Phone number must be between 10-15 digits",
+                "field": "phone",
+                "timestamp": DateTime.now().toIso8601String(),
+              };
+            }
+          }
+
           // 🔧 Prepare request model
-          final customerRequest = create.CreateCustomerRequest(
+          final customerRequest = create.CreateNewCustomerRecordRequest(
             customer: create.Customer(
               email: email,
               firstName: firstName,
@@ -119,10 +134,11 @@ class RetrievesListOfCustomersHandler implements ApiRequestHandler {
           );
 
           // 📞 Call the API to create customer
-          final response = await GetIt.I.get<CustomerService>().createCustomer(
-                apiVersion: ApiNetwork.apiVersion,
-                model: customerRequest,
-              );
+          final response =
+              await GetIt.I.get<CustomerService>().createNewCustomerRecord(
+                    apiVersion: ApiNetwork.apiVersion,
+                    model: customerRequest,
+                  );
 
           // 🎉 Return successful response
           return {
@@ -132,6 +148,56 @@ class RetrievesListOfCustomersHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
+          // Enhanced error handling with validation error extraction
+          if (e.toString().contains('422') ||
+              e.toString().contains('Unprocessable')) {
+            // Try to extract Shopify validation errors
+            Map<String, dynamic> validationErrors = {};
+            String errorFields = "";
+
+            // Look for error patterns in the error message
+            final regex = RegExp(r'{"errors":(.*?)}');
+            final match = regex.firstMatch(e.toString());
+            if (match != null && match.groupCount >= 1) {
+              try {
+                final errorJson = '{${match.group(0)}}';
+                final decoded = jsonDecode(errorJson);
+                if (decoded != null &&
+                    decoded is Map &&
+                    decoded.containsKey('errors')) {
+                  validationErrors = decoded['errors'];
+                  errorFields = validationErrors.keys.join(', ');
+                }
+              } catch (_) {
+                // JSON parsing failed, continue with generic error
+              }
+            }
+
+            // Special handling for phone number errors
+            if (validationErrors.containsKey('phone')) {
+              return {
+                "status": "validation_error",
+                "message": "Phone number validation failed",
+                "field": "phone",
+                "details":
+                    "Please use a valid phone format such as +1 (555) 555-5555",
+                "errors": validationErrors,
+                "timestamp": DateTime.now().toIso8601String(),
+              };
+            }
+
+            // General validation errors
+            if (errorFields.isNotEmpty) {
+              return {
+                "status": "validation_error",
+                "message":
+                    "Validation failed for the following fields: $errorFields",
+                "errors": validationErrors,
+                "timestamp": DateTime.now().toIso8601String(),
+              };
+            }
+          }
+
           // ❌ Handle authentication errors specially
           if (e.toString().contains('session has expired') ||
               e.toString().contains('login?errorHint=no_identity_session')) {

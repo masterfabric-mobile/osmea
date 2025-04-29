@@ -1,11 +1,11 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/customers/customer/abstract/customer_service.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/request/create_customer_request.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/request/create_new_customer_record_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/creates_account_activation_url_for_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/sends_account_invite_to_customer_request.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/request/updates_customer_request.dart';
-import 'package:apis/network/remote/customers/customer/freezed_model/response/create_customer_response.dart';
+import 'package:apis/network/remote/customers/customer/freezed_model/response/create_new_customer_record_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/creates_account_activation_url_for_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_all_orders_belonging_to_customer_response.dart';
 import 'package:apis/network/remote/customers/customer/freezed_model/response/retrieves_count_of_customers_response.dart';
@@ -74,9 +74,9 @@ abstract class CustomerServiceClient implements CustomerService {
   @override
   @POST(
       '/api/{api_version}/customers.json')
-  Future<CreateCustomerResponse> createCustomer({
+  Future<CreateNewCustomerRecordResponse> createNewCustomerRecord({
     @Path('api_version') required String apiVersion,
-    @Body() required CreateCustomerRequest model,
+    @Body() required CreateNewCustomerRecordRequest model,
   });
 
   @override

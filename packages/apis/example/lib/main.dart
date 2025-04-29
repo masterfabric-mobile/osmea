@@ -1,58 +1,58 @@
-// 🎨 Import for app theme styles
+// 🎨✨ Import for app theme styles
 import 'package:example/styles/app_theme.dart';
-// 🏠 Import for the home view widget
+// 🏠📱 Import for the home view widget
 import 'package:example/views/home_view.dart';
-// 🌐 Import for API client configuration
+// 🌐🔧 Import for API client configuration
 import 'package:apis/dio_config/api_dio_client.dart';
-// 🧩 Import for Flutter material design widgets
+// 🧩🖼️ Import for Flutter material design widgets
 import 'package:flutter/material.dart';
-// 💻 Import for checking if the platform is web
+// 💻🌍 Import for checking if the platform is web
 import 'package:flutter/foundation.dart' show kIsWeb;
-// 📝 Import for API service registry
+// 📝📚 Import for API service registry
 import 'package:example/services/api_service_registry.dart';
 
-// 🛠️ Import for dependency injection configuration
+// 🛠️🧪 Import for dependency injection configuration
 import 'di/config/config_di.dart';
 
-// 🚀 Main entry point of the application
+// 🚀🎯 Main entry point of the application
 Future<void> main() async {
-  // 🪄 Ensures Flutter bindings are initialized
+  // 🪄🧵 Ensures Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ⚠️ Initialize API services before dependency injection
-  // This ensures handlers are properly registered
+  // ⚠️🔁 Initialize API services before dependency injection
+  // 🔐 This ensures handlers are properly registered
   try {
     ApiServiceRegistry.initialize();
   } catch (e) {
-    debugPrint('Error initializing API services: $e');
-    // Continue anyway - we'll handle errors in the UI
+    debugPrint('❌ Error initializing API services: $e');
+    // 🔄 Continue anyway - we'll handle errors in the UI
   }
 
-  // 🔗 Set up dependency injection
+  // 🔗🧬 Set up dependency injection
   configureDependencies();
-  // 🍪 Prepare cookies storage if not running on web
+  // 🍪📦 Prepare cookies storage if not running on web
   if (!kIsWeb) await ApiDioClient.prepareCookiesJar();
-  // 🏁 Start the app
+  // 🏁📲 Start the app
   runApp(const MyApp());
 }
 
-// 🏗️ Root widget of the application
+// 🏗️🧱 Root widget of the application
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Get the theme without passing context
+    // 🎨🎯 Get the theme without passing context
     final appTheme = AppTheme.getTheme();
 
     return MaterialApp(
-      // 🏷️ App title
+      // 🏷️📛 App title
       title: 'OSMEA APIs Explorer',
-      // 🚫 Hide debug banner
+      // 🚫👁️ Hide debug banner
       debugShowCheckedModeBanner: false,
-      // 🎨 Set the app theme
+      // 🎨📐 Set the app theme
       theme: appTheme,
-      // 🏠 Set the home screen
+      // 🏠🖥️ Set the home screen
       home: const HomeView(),
     );
   }

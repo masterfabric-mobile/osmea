@@ -1,25 +1,27 @@
 // To parse this JSON data, do
 //
-//     final createCustomerRequest = createCustomerRequestFromJson(jsonString);
+//     final createNewCustomerRecordRequest = createNewCustomerRecordRequestFromJson(jsonString);
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 
-part 'create_customer_request.freezed.dart';
-part 'create_customer_request.g.dart';
+part 'create_new_customer_record_request.freezed.dart';
+part 'create_new_customer_record_request.g.dart';
 
-CreateCustomerRequest createCustomerRequestFromJson(String str) => CreateCustomerRequest.fromJson(json.decode(str));
+CreateNewCustomerRecordRequest createNewCustomerRecordRequestFromJson(String str) => CreateNewCustomerRecordRequest.fromJson(json.decode(str));
 
-String createCustomerRequestToJson(CreateCustomerRequest data) => json.encode(data.toJson());
+String createNewCustomerRecordRequestToJson(CreateNewCustomerRecordRequest data) => json.encode(data.toJson());
 
 @freezed
-class CreateCustomerRequest with _$CreateCustomerRequest {
-    const factory CreateCustomerRequest({
+class CreateNewCustomerRecordRequest with _$CreateNewCustomerRecordRequest {
+    const factory CreateNewCustomerRecordRequest({
         @JsonKey(name: "customer")
         Customer? customer,
-    }) = _CreateCustomerRequest;
+        @JsonKey(name: "errors")
+        Errors? errors,
+    }) = _CreateNewCustomerRecordRequest;
 
-    factory CreateCustomerRequest.fromJson(Map<String, dynamic> json) => _$CreateCustomerRequestFromJson(json);
+    factory CreateNewCustomerRecordRequest.fromJson(Map<String, dynamic> json) => _$CreateNewCustomerRecordRequestFromJson(json);
 }
 
 @freezed
@@ -37,8 +39,6 @@ class Customer with _$Customer {
         bool? verifiedEmail,
         @JsonKey(name: "addresses")
         List<Address>? addresses,
-        @JsonKey(name: "send_email_invite")
-        bool? sendEmailInvite,
     }) = _Customer;
 
     factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
@@ -66,4 +66,14 @@ class Address with _$Address {
     }) = _Address;
 
     factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+}
+
+@freezed
+class Errors with _$Errors {
+    const factory Errors({
+        @JsonKey(name: "base")
+        List<String>? base,
+    }) = _Errors;
+
+    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
 }

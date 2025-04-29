@@ -1,27 +1,25 @@
 // To parse this JSON data, do
 //
-//     final createCustomerResponse = createCustomerResponseFromJson(jsonString);
+//     final createNewCustomerRecordResponse = createNewCustomerRecordResponseFromJson(jsonString);
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 
-part 'create_customer_response.freezed.dart';
-part 'create_customer_response.g.dart';
+part 'create_new_customer_record_response.freezed.dart';
+part 'create_new_customer_record_response.g.dart';
 
-CreateCustomerResponse createCustomerResponseFromJson(String str) => CreateCustomerResponse.fromJson(json.decode(str));
+CreateNewCustomerRecordResponse createNewCustomerRecordResponseFromJson(String str) => CreateNewCustomerRecordResponse.fromJson(json.decode(str));
 
-String createCustomerResponseToJson(CreateCustomerResponse data) => json.encode(data.toJson());
+String createNewCustomerRecordResponseToJson(CreateNewCustomerRecordResponse data) => json.encode(data.toJson());
 
 @freezed
-class CreateCustomerResponse with _$CreateCustomerResponse {
-    const factory CreateCustomerResponse({
+class CreateNewCustomerRecordResponse with _$CreateNewCustomerRecordResponse {
+    const factory CreateNewCustomerRecordResponse({
         @JsonKey(name: "customer")
         Customer? customer,
-        @JsonKey(name: "errors")
-        Errors? errors,
-    }) = _CreateCustomerResponse;
+    }) = _CreateNewCustomerRecordResponse;
 
-    factory CreateCustomerResponse.fromJson(Map<String, dynamic> json) => _$CreateCustomerResponseFromJson(json);
+    factory CreateNewCustomerRecordResponse.fromJson(Map<String, dynamic> json) => _$CreateNewCustomerRecordResponseFromJson(json);
 }
 
 @freezed
@@ -156,14 +154,4 @@ class SmsMarketingConsent with _$SmsMarketingConsent {
     }) = _SmsMarketingConsent;
 
     factory SmsMarketingConsent.fromJson(Map<String, dynamic> json) => _$SmsMarketingConsentFromJson(json);
-}
-
-@freezed
-class Errors with _$Errors {
-    const factory Errors({
-        @JsonKey(name: "phone")
-        List<String>? phone,
-    }) = _Errors;
-
-    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
 }
