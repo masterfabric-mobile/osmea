@@ -51,7 +51,7 @@ class AppTheme {
       // Input styling
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _lightPurpleScheme.surfaceVariant.withValues(alpha: 180),
+        fillColor: _lightPurpleScheme.surfaceContainerHighest.withValues(alpha: 180),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -169,14 +169,10 @@ class AppTheme {
     secondary: const Color(0xFF7B1FA2),   // Purple 700
     onSecondary: Colors.white,
     secondaryContainer: const Color(0xFFF3E5F5), // Very light purple container
-    onSecondaryContainer: const Color(0xFF4A148C), // Deep purple text
-    
-    // Surface colors with light backgrounds
-    background: const Color(0xFFF8F9FA), // Very light gray background
-    onBackground: const Color(0xFF121212), // Near-black text
+    onSecondaryContainer: const Color(0xFF4A148C), // Near-black text
     surface: Colors.white,
     onSurface: const Color(0xFF121212), // Near-black text
-    surfaceVariant: const Color(0xFFF5F0FA), // Very light purple-tinted surface
+    surfaceContainerHighest: const Color(0xFFF5F0FA), // Very light purple-tinted surface
     onSurfaceVariant: const Color(0xFF4D4D4D), // Dark gray text
     
     // Error colors 
