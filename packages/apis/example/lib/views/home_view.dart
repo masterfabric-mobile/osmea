@@ -5,10 +5,9 @@ import 'package:example/widgets/response_panel.dart';
 import 'package:example/widgets/layout_widgets.dart';
 import 'package:apis/apis.dart';
 import 'package:example/widgets/app_header.dart';
-import 'package:example/theme/app_theme.dart';
+import 'package:example/styles/app_theme.dart';
 
 /// 🏠 Main view for the API Explorer application
-/// Provides UI for selecting and testing API endpoints
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -127,13 +126,10 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    // 📐 Responsive layout handling
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 1200; // 🖥️ Desktop layout
-    final isMediumScreen =
-        screenWidth > 800 && screenWidth <= 1200; // 💻 Tablet layout
+    final isWideScreen = screenWidth > 1200;
+    final isMediumScreen = screenWidth > 800 && screenWidth <= 1200;
 
-    // 🎛️ Create control panel for API selection and parameters
     final controlPanel = ControlPanel(
       selectedCategory: _selectedCategory,
       selectedSubcategory: _selectedSubcategory,
@@ -148,52 +144,54 @@ class _HomeViewState extends State<HomeView> {
       controllers: _controllers,
     );
 
-    // 📊 Create response panel for displaying API results
     final responsePanel = ResponsePanel(
       responseData: _responseData,
       loading: _loading,
     );
 
     return Theme(
-      data: AppTheme.getTheme(context),
+      data: AppTheme.getTheme(),
       child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppHeader(
-          title: 'OSMEA Apis',
+          title: 'OSMEA API Explorer',
           apiUrl: _currentApiUrl,
           onUrlCopied: _handleUrlCopy,
         ),
-        // Remove Container with gradient that might be causing layout issues
         body: SafeArea(
-          child: isWideScreen
-              ? WideLayoutView(
-                  controlPanel: controlPanel,
-                  responsePanel: responsePanel,
-                )
-              : isMediumScreen
-                  ? MediumLayoutView(
-                      controlPanel: controlPanel,
-                      responsePanel: responsePanel,
-                    )
-                  : NarrowLayoutView(
-                      controlPanel: controlPanel,
-                      responsePanel: responsePanel,
-                    ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: isWideScreen
+                ? WideLayoutView(
+                    controlPanel: controlPanel,
+                    responsePanel: responsePanel,
+                  )
+                : isMediumScreen
+                    ? MediumLayoutView(
+                        controlPanel: controlPanel,
+                        responsePanel: responsePanel,
+                      )
+                    : NarrowLayoutView(
+                        controlPanel: controlPanel,
+                        responsePanel: responsePanel,
+                      ),
+          ),
         ),
       ),
     );
   }
 
-  /// Handles copying the URL
   void _handleUrlCopy() {
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('URL copied to clipboard'),
+        content: const Text('URL copied to clipboard'),
         behavior: SnackBarBehavior.floating,
+        backgroundColor: theme.colorScheme.primary,
         width: 200,
         duration: const Duration(seconds: 1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -261,25 +259,24 @@ class _HomeViewState extends State<HomeView> {
           final id = params['id']!;
           // Use the exact format from ApiNetwork class
           final apiUrl =
-              '${ApiNetwork.baseUrl}/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
+              '${ApiNetwork.baseUrl}/api/${ApiNetwork.apiVersion}/storefront_access_tokens/$id.json';
           setState(() {
             _currentApiUrl = apiUrl;
           });
           return;
         } else {
-          path =
-              '/admin/api/${ApiNetwork.apiVersion}/storefront_access_tokens.json';
+          path = '/api/${ApiNetwork.apiVersion}/storefront_access_tokens.json';
         }
         break;
 
       case 'Access Scope':
-        path = '/admin/api/${ApiNetwork.apiVersion}/oauth/access_scopes.json';
+        path = '/api/${ApiNetwork.apiVersion}/oauth/access_scopes.json';
         break;
 
       // Add other services as needed
       default:
         path =
-            '/admin/api/${ApiNetwork.apiVersion}/${service.name.toLowerCase().replaceAll(' ', '_')}';
+            '/api/${ApiNetwork.apiVersion}/${service.name.toLowerCase().replaceAll(' ', '_')}';
         if (method == 'GET') {
           path += '.json';
         }
@@ -295,5 +292,4 @@ class _HomeViewState extends State<HomeView> {
       _currentApiUrl = ApiNetwork.baseUrl + path + queryParams;
     });
   }
-
 }
