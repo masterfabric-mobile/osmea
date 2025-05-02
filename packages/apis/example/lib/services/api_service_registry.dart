@@ -7,6 +7,9 @@ import 'package:example/services/handlers/customers_handlers/customers_address/d
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
+import 'package:example/services/handlers/events_handlers/retrieves_list_of_events_handler.dart';
+import 'package:example/services/handlers/events_handlers/retrieves_single_event_handler.dart';
+import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -19,6 +22,7 @@ enum ApiCategory {
   admin,
   catalog,
   customer,
+  events,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -35,6 +39,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Catalog APIs';
       case ApiCategory.customer:
         return 'Customer APIs';
+      case ApiCategory.events:
+        return 'Events APIs';
     }
   }
 }
@@ -202,6 +208,33 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: DestroyMultipleCustomerAddressesHandler(),
     ),
+
+    // 📅 Events APIs - List all events
+    ApiService(
+      name: 'Events List',
+      endpoint: '/events',
+      category: ApiCategory.events,
+      subcategory: 'Events',
+      handler: RetrievesListOfEventsHandler(),
+    ),
+
+    // 📆 Events APIs - Single event
+    ApiService(
+      name: 'Single Event',
+      endpoint: '/events/:event_id',
+      category: ApiCategory.events,
+      subcategory: 'Events',
+      handler: RetrievesSingleEventHandler(),
+    ),
+
+    // 🔢 Events APIs - Count events
+    ApiService(
+      name: 'Events Count',
+      endpoint: '/events/count',
+      category: ApiCategory.events,
+      subcategory: 'Events',
+      handler: RetrievesCountEventsHandler(),
+    ),
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -253,6 +286,8 @@ class ApiServiceRegistry {
         return 'Catalog';
       case ApiCategory.customer:
         return 'Customer';
+      case ApiCategory.events:
+        return 'Events';
     }
   }
 }
