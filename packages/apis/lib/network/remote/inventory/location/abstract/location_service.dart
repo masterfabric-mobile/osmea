@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/inventory/location/freezed_model/count_all_locations_response.dart';
 import 'package:apis/network/remote/inventory/location/freezed_model/list_all_locations_response.dart';
 import 'package:apis/network/remote/inventory/location/freezed_model/list_inventory_by_location_id_response.dart';
 import 'package:apis/network/remote/inventory/location/freezed_model/single_location_by_id_response.dart';
@@ -23,5 +24,10 @@ abstract class LocationService {
   Future<ListInventoryByLocationIdResponse> listInventoryByLocationId({
     required String apiVersion,
     required int locationId,
+  });
+
+  /// 📊🔍 Retrieves a count of all locations
+  Future<CountAllLocationsResponse> countAllLocations({
+    required String apiVersion,
   });
 }
