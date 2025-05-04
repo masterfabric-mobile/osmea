@@ -3,8 +3,10 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/inventory/inventory_level/abstract/inventory_level_service.dart';
 import 'package:apis/network/remote/inventory/inventory_level/freezed_model/request/inventory_item_at_location_request.dart';
 import 'package:apis/network/remote/inventory/inventory_level/freezed_model/request/inventory_item_to_location_request.dart';
+import 'package:apis/network/remote/inventory/inventory_level/freezed_model/request/set_inventory_location_request.dart';
 import 'package:apis/network/remote/inventory/inventory_level/freezed_model/response/inventory_item_at_location_response.dart';
 import 'package:apis/network/remote/inventory/inventory_level/freezed_model/response/inventory_item_to_location_response.dart';
+import 'package:apis/network/remote/inventory/inventory_level/freezed_model/response/set_inventory_location_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -37,5 +39,12 @@ abstract class InventoryLevelServiceClient implements InventoryLevelService {
   Future<InventoryItemToLocationResponse> inventoryItemToLocation({
     @Path('api_version') required String apiVersion,
     @Body() required InventoryItemToLocationRequest model,
+  });
+
+  /// 🔑 🔍 Sets the inventory level for an inventory item at a location
+  @POST('/api/{api_version}/inventory_levels/set.json')
+  Future<SetInventoryLocationResponse> setInventoryLocation({
+    @Path('api_version') required String apiVersion,
+    @Body() required SetInventoryLocationRequest model,
   });
 }
