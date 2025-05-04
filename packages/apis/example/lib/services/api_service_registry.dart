@@ -244,7 +244,7 @@ class ApiServiceRegistry {
     // 📦 Inventory Item APIs - Get item by ID
     ApiService(
       name: 'Inventory Item By ID',
-      endpoint: '/inventory/items/:item_id',
+      endpoint: '/inventory_items/:id', // Changed to match Shopify API pattern
       category: ApiCategory.inventory,
       subcategory: 'Inventory Items',
       handler: InventoryItemByIdHandler(),
@@ -253,7 +253,8 @@ class ApiServiceRegistry {
     // 🔄 Inventory Item APIs - Update item SKU
     ApiService(
       name: 'Update Inventory Item SKU',
-      endpoint: '/inventory/items/:item_id/update_sku',
+      endpoint:
+          '/inventory_items/:id/update_sku', // Changed to match Shopify API pattern
       category: ApiCategory.inventory,
       subcategory: 'Inventory Items',
       handler: UpdateInventoryItemSkuHandler(),
