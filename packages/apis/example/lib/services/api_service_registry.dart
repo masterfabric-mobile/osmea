@@ -10,6 +10,7 @@ import 'package:example/services/handlers/customers_handlers/customers_address/s
 import 'package:example/services/handlers/events_handlers/retrieves_list_of_events_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_single_event_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
+import 'package:example/services/handlers/inventory_item_handlers/inventory_item_by_id_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -23,6 +24,7 @@ enum ApiCategory {
   catalog,
   customer,
   events,
+  inventory,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -41,6 +43,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Customer APIs';
       case ApiCategory.events:
         return 'Events APIs';
+      case ApiCategory.inventory:
+        return 'Inventory APIs';
     }
   }
 }
@@ -235,6 +239,15 @@ class ApiServiceRegistry {
       subcategory: 'Events',
       handler: RetrievesCountEventsHandler(),
     ),
+
+    // 📦 Inventory Item APIs - Get item by ID
+    ApiService(
+      name: 'Inventory Item By ID',
+      endpoint: '/inventory/items/:item_id',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Items',
+      handler: InventoryItemByIdHandler(),
+    ),
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -288,6 +301,8 @@ class ApiServiceRegistry {
         return 'Customer';
       case ApiCategory.events:
         return 'Events';
+      case ApiCategory.inventory:
+        return 'Inventory';
     }
   }
 }
