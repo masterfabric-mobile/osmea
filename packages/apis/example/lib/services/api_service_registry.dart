@@ -16,6 +16,7 @@ import 'package:example/services/handlers/inventory/inventory_item_handlers/upda
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/set_inventory_location_handler.dart';
+import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -308,6 +309,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Locations',
       handler: ListAllLocationsHandler(),
+    ),
+
+    // 📍 Location APIs - Get single location by ID
+    ApiService(
+      name: 'Get Single Location',
+      endpoint: '/locations/:id',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: SingleLocationByIdHandler(),
     ),
   ];
 
