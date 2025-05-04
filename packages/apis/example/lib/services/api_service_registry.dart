@@ -16,6 +16,7 @@ import 'package:example/services/handlers/inventory/inventory_item_handlers/upda
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/set_inventory_location_handler.dart';
+import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/index.dart';
@@ -328,6 +329,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Locations',
       handler: ListInventoryByLocationIdHandler(),
+    ),
+
+    // 📊 Retrieves a count of all locations
+    ApiService(
+      name: 'Count All Locations',
+      endpoint: '/locations/count',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: CountAllLocationsHandler(),
     ),
 
   ];
