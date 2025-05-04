@@ -13,6 +13,7 @@ import 'package:example/services/handlers/events_handlers/retrieves_count_events
 import 'package:example/services/handlers/inventory/inventory_item_handlers/inventory_item_by_id_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_sku_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_unit_cost_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -268,6 +269,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Inventory Items',
       handler: UpdateInventoryItemUnitCostHandler(),
+    ),
+
+    // 📍 Inventory Level APIs - Get inventory level at location
+    ApiService(
+      name: 'Inventory Level By Item and Location',
+      endpoint: '/inventory_levels/by_item_and_location',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: InventoryItemAtLocationHandler(),
     ),
   ];
 
