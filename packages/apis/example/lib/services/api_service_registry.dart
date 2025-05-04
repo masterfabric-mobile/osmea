@@ -16,6 +16,7 @@ import 'package:example/services/handlers/inventory/inventory_item_handlers/upda
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/set_inventory_location_handler.dart';
+import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
@@ -319,6 +320,16 @@ class ApiServiceRegistry {
       subcategory: 'Locations',
       handler: SingleLocationByIdHandler(),
     ),
+
+    // 📦 Inventory APIs - List inventory by location ID
+    ApiService(
+      name: 'List Inventory By Location ID',
+      endpoint: '/locations/:id/inventory_levels',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: ListInventoryByLocationIdHandler(),
+    ),
+
   ];
 
   // 🔄 Add the initialize method back for compatibility
