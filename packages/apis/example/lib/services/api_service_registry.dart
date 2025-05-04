@@ -14,6 +14,7 @@ import 'package:example/services/handlers/inventory/inventory_item_handlers/inve
 import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_sku_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_unit_cost_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -279,6 +280,15 @@ class ApiServiceRegistry {
       subcategory: 'Inventory Levels',
       handler: InventoryItemAtLocationHandler(),
     ),
+        // Add this to the _services list in ApiServiceRegistry class
+        // 🔗 Inventory Level APIs - Connect item to location
+        ApiService(
+          name: 'Connect Inventory Item to Location',
+          endpoint: '/inventory_levels/connect',
+          category: ApiCategory.inventory,
+          subcategory: 'Inventory Levels',
+          handler: InventoryItemToLocationHandler(),
+        ),
   ];
 
   // 🔄 Add the initialize method back for compatibility
