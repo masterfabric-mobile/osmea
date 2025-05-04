@@ -1,19 +1,20 @@
 import 'package:apis/apis.dart';
 import 'package:apis/network/remote/inventory/inventory_item/abstract/inventory_item_service.dart';
+import 'package:apis/network/remote/inventory/inventory_item/freezed_model/request/update_inventory_item_sku_request.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/api_service_registry.dart';
 import 'package:get_it/get_it.dart';
 
 ///*******************************************************************
-///************** 📦 INVENTORY ITEM BY ID HANDLER 📦 ****************
+///************** 🔄 UPDATE INVENTORY ITEM SKU HANDLER 🔄 **********
 ///*******************************************************************
 
-class InventoryItemByIdHandler implements ApiRequestHandler {
+class UpdateInventoryItemSkuHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
       String method, Map<String, String> params) async {
-    // 🔒 Only handle GET requests for inventory item retrieval
-    if (method == 'GET') {
+    // 🔒 Only handle PUT requests for inventory item SKU updates
+    if (method == 'PUT') {
       // 🔍 Check if inventory item ID is provided - required parameter
       final itemId = params['item_id'] ?? '';
       if (itemId.isEmpty) {
@@ -24,26 +25,45 @@ class InventoryItemByIdHandler implements ApiRequestHandler {
         };
       }
 
+      // 🔍 Check if SKU is provided - required parameter
+      final sku = params['sku'] ?? '';
+      if (sku.isEmpty) {
+        return {
+          "status": "error",
+          "message": "SKU is required",
+          "timestamp": DateTime.now().toIso8601String(),
+        };
+      }
+
       try {
-        // 📞 Call the inventory service API to retrieve the item
+        // 🔄 Create request model with SKU value
+        final request = UpdateInventoryItemSkuRequest(
+          inventoryItem: InventoryItem(
+            sku: sku,
+          ),
+        );
+
+        // 📞 Call the inventory service API to update the item SKU
         final response =
-            await GetIt.I.get<InventoryItemService>().inventoryItemById(
+            await GetIt.I.get<InventoryItemService>().updateInventoryItemSku(
                   apiVersion: ApiNetwork.apiVersion,
                   inventoryItemId: itemId,
+                  model: request,
                 );
 
-        // 📋 Return the inventory item data
+        // 📋 Return the updated inventory item data
         return {
           "status": "success",
           "itemId": itemId,
-          "item": response.toJson(),
+          "updatedItem": response.toJson(),
+          "message": "Inventory item SKU successfully updated",
           "timestamp": DateTime.now().toIso8601String(),
         };
       } catch (e) {
         // ❌ Error handling
         return {
           "status": "error",
-          "message": "Failed to retrieve inventory item: ${e.toString()}",
+          "message": "Failed to update inventory item SKU: ${e.toString()}",
           "itemId": itemId,
           "timestamp": DateTime.now().toIso8601String(),
         };
@@ -52,20 +72,25 @@ class InventoryItemByIdHandler implements ApiRequestHandler {
 
     // ⛔ Unsupported method error
     return {
-      "error": "Method $method not supported for Inventory Item By ID API",
+      "error": "Method $method not supported for Update Inventory Item SKU API",
     };
   }
 
   @override
-  List<String> get supportedMethods => ['GET'];
+  List<String> get supportedMethods => ['PUT'];
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
-        'GET': [
+        'PUT': [
           const ApiField(
             name: 'item_id',
             label: 'Inventory Item ID',
-            hint: 'Enter inventory item ID to retrieve details',
+            hint: 'Enter inventory item ID to update',
+          ),
+          const ApiField(
+            name: 'sku',
+            label: 'Stock Keeping Unit (SKU)',
+            hint: 'Enter the new SKU for the inventory item',
           ),
         ],
       };
