@@ -20,6 +20,7 @@ import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
+import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
 
 /// 🔖 API service categories
 enum ApiCategory {
@@ -298,6 +299,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Inventory Levels',
       handler: SetInventoryLocationHandler(),
+    ),
+
+    // 🗺️ Location APIs - List all locations
+    ApiService(
+      name: 'List All Locations',
+      endpoint: '/locations',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: ListAllLocationsHandler(),
     ),
   ];
 
