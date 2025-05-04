@@ -12,6 +12,7 @@ import 'package:example/services/handlers/events_handlers/retrieves_single_event
 import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
 import 'package:example/services/handlers/inventory_item_handlers/inventory_item_by_id_handler.dart';
 import 'package:example/services/handlers/inventory_item_handlers/update_inventory_item_sku_handler.dart';
+import 'package:example/services/handlers/inventory_item_handlers/update_inventory_item_unit_cost_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -258,6 +259,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Inventory Items',
       handler: UpdateInventoryItemSkuHandler(),
+    ),
+
+    // 💲 Inventory Item APIs - Update item unit cost
+    ApiService(
+      name: 'Update Inventory Item Unit Cost',
+      endpoint: '/inventory_items/:id/update_unit_cost',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Items',
+      handler: UpdateInventoryItemUnitCostHandler(),
     ),
   ];
 
