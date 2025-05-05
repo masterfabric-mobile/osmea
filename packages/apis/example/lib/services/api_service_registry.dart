@@ -15,6 +15,7 @@ import 'package:example/services/handlers/inventory/inventory_item_handlers/upda
 import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_unit_cost_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/list_inventory_levels_single_location_handler.dart';
 import 'package:example/services/handlers/inventory/inventory_level_handlers/set_inventory_location_handler.dart';
 import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
@@ -302,6 +303,15 @@ class ApiServiceRegistry {
       category: ApiCategory.inventory,
       subcategory: 'Inventory Levels',
       handler: SetInventoryLocationHandler(),
+    ),
+
+    // 📦 Retrieves a list of inventory levels for a single location
+    ApiService(
+      name: 'List Inventory Levels By Location',
+      endpoint: '/inventory_levels/:location_id',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: ListInventoryLevelsSingleLocationHandler(),
     ),
 
     // 🗺️ Location APIs - List all locations
