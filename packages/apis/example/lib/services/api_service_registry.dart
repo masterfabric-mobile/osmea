@@ -10,10 +10,22 @@ import 'package:example/services/handlers/customers_handlers/customers_address/s
 import 'package:example/services/handlers/events_handlers/retrieves_list_of_events_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_single_event_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_item_handlers/inventory_item_by_id_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_sku_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_item_handlers/update_inventory_item_unit_cost_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_at_location_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/inventory_item_to_location_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/list_inventory_levels_single_item_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/list_inventory_levels_single_location_handler.dart';
+import 'package:example/services/handlers/inventory/inventory_level_handlers/set_inventory_location_handler.dart';
+import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
+import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
+import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
+import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
 
 /// 🔖 API service categories
 enum ApiCategory {
@@ -23,6 +35,7 @@ enum ApiCategory {
   catalog,
   customer,
   events,
+  inventory,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -41,6 +54,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Customer APIs';
       case ApiCategory.events:
         return 'Events APIs';
+      case ApiCategory.inventory:
+        return 'Inventory APIs';
     }
   }
 }
@@ -235,6 +250,116 @@ class ApiServiceRegistry {
       subcategory: 'Events',
       handler: RetrievesCountEventsHandler(),
     ),
+
+    // 📦 Inventory Item APIs - Get item by ID
+    ApiService(
+      name: 'Inventory Item By ID',
+      endpoint: '/inventory_items/:id', // Changed to match Shopify API pattern
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Items',
+      handler: InventoryItemByIdHandler(),
+    ),
+
+    // 🔄 Inventory Item APIs - Update item SKU
+    ApiService(
+      name: 'Update Inventory Item SKU',
+      endpoint:
+          '/inventory_items/:id/update_sku', // Changed to match Shopify API pattern
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Items',
+      handler: UpdateInventoryItemSkuHandler(),
+    ),
+
+    // 💲 Inventory Item APIs - Update item unit cost
+    ApiService(
+      name: 'Update Inventory Item Unit Cost',
+      endpoint: '/inventory_items/:id/update_unit_cost',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Items',
+      handler: UpdateInventoryItemUnitCostHandler(),
+    ),
+
+    // 📍 Inventory Level APIs - Get inventory level at location
+    ApiService(
+      name: 'Inventory Level By Item and Location',
+      endpoint: '/inventory_levels/by_item_and_location',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: InventoryItemAtLocationHandler(),
+    ),
+
+    // 🔗 Inventory Level APIs - Connect item to location
+    ApiService(
+      name: 'Connect Inventory Item to Location',
+      endpoint: '/inventory_levels/connect',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: InventoryItemToLocationHandler(),
+    ),
+
+    // 📊 Inventory Level APIs - Set inventory level for item at location
+    ApiService(
+      name: 'Set Inventory Level',
+      endpoint: '/inventory_levels/set',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: SetInventoryLocationHandler(),
+    ),
+
+    // 📦 Retrieves a list of inventory levels for a single location
+    ApiService(
+      name: 'List Inventory Levels By Location',
+      endpoint: '/inventory_levels/:location_id',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: ListInventoryLevelsSingleLocationHandler(),
+    ),
+
+    // 🗺️ Location APIs - List all locations
+    ApiService(
+      name: 'List All Locations',
+      endpoint: '/locations',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: ListAllLocationsHandler(),
+    ),
+
+    // 📍 Location APIs - Get single location by ID
+    ApiService(
+      name: 'Get Single Location',
+      endpoint: '/locations/:id',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: SingleLocationByIdHandler(),
+    ),
+
+    // 📦 Inventory APIs - List inventory by location ID
+    ApiService(
+      name: 'List Inventory By Location ID',
+      endpoint: '/locations/:id/inventory_levels',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: ListInventoryByLocationIdHandler(),
+    ),
+
+    // 📊 Retrieves a count of all locations
+    ApiService(
+      name: 'Count All Locations',
+      endpoint: '/locations/count',
+      category: ApiCategory.inventory,
+      subcategory: 'Locations',
+      handler: CountAllLocationsHandler(),
+    ),
+
+    // 📦 Retrieve inventory levels for a single inventory item
+    ApiService(
+      name: 'List Inventory Levels By Item',
+      endpoint: '/inventory_levels/by_item',
+      category: ApiCategory.inventory,
+      subcategory: 'Inventory Levels',
+      handler: ListInventoryLevelsSingleItemHandler(),
+    ),
+
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -288,6 +413,8 @@ class ApiServiceRegistry {
         return 'Customer';
       case ApiCategory.events:
         return 'Events';
+      case ApiCategory.inventory:
+        return 'Inventory';
     }
   }
 }
