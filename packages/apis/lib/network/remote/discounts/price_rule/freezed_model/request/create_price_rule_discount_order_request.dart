@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final createPriceRuleDiscountOrderRequest = createPriceRuleDiscountOrderRequestFromJson(jsonString);
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 

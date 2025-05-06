@@ -26,7 +26,6 @@ class CreatePriceRuleFreeShippingHandler implements ApiRequestHandler {
         final String? prerequisiteSubtotalRangeGreaterThanOrEqualTo =
             params['prerequisite_subtotal_range_greater_than_or_equal_to'];
 
-        // valueType artık zorunlu hale geldi
         if (title == null ||
             title.isEmpty ||
             targetType == null ||
