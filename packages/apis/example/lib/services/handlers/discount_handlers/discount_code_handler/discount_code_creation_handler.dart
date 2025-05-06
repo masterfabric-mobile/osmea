@@ -40,7 +40,6 @@ class DiscountCodeCreationHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching discount code creation: $e");
           return {
             "status": "error",
             "message":
@@ -94,7 +93,6 @@ class DiscountCodeCreationHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating multiple discount codes: $e");
           return {
             "status": "error",
             "message":

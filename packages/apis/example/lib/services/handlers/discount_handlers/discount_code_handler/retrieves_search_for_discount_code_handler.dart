@@ -35,7 +35,6 @@ class SearchDiscountCodeHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error searching for discount code: $e");
           return {
             "status": "error",
             "message": "Failed to search for discount code: ${e.toString()}",

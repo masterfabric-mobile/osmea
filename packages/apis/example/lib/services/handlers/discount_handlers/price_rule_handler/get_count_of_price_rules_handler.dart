@@ -28,7 +28,6 @@ class GetPriceRuleCountHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching price rule count: $e");
           return {
             "status": "error",
             "message": "Failed to fetch price rule count: ${e.toString()}",

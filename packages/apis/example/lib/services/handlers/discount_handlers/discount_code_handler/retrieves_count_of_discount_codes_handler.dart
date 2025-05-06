@@ -32,7 +32,6 @@ class GetDiscountCodesCountHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching discount codes count: $e");
           return {
             "status": "error",
             "message": "Failed to fetch discount codes count: ${e.toString()}",

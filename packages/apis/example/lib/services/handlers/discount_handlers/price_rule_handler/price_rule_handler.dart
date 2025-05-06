@@ -39,7 +39,6 @@ class PriceRuleHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching price rule by ID: $e");
           return {
             "status": "error",
             "message": "Failed to fetch price rule: ${e.toString()}",
@@ -177,7 +176,6 @@ class PriceRuleHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating price rule: $e");
           return {
             "status": "error",
             "message": "Failed to create price rule: ${e.toString()}",
@@ -311,7 +309,6 @@ class PriceRuleHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error updating price rule: $e");
           return {
             "status": "error",
             "message": "Failed to update price rule: ${e.toString()}",
@@ -333,20 +330,22 @@ class PriceRuleHandler implements ApiRequestHandler {
         }
 
         try {
+          await GetIt.I.get<PriceRuleService>().deletePriceRule(
+                apiVersion: apiVersion,
+                priceRuleId: priceRuleId!,
+              );
           return {
             "status": "success",
-            "message": "Price rule delete logic needs implementation",
+            "message": "Price rule deleted successfully",
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error deleting price rule: $e");
           return {
             "status": "error",
             "message": "Failed to delete price rule: ${e.toString()}",
             "timestamp": DateTime.now().toIso8601String(),
           };
         }
-
       default:
         return {
           "error": "Method $method not supported for Price Rule API",

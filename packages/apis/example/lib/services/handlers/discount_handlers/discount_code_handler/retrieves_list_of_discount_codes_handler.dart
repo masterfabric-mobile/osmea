@@ -36,7 +36,6 @@ class GetListDiscountCodesHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching discount codes by price rule: $e");
           return {
             "status": "error",
             "message":

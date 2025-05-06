@@ -54,7 +54,6 @@ class DiscountCodeHandler implements ApiRequestHandler {
             };
           }
         } catch (e) {
-          print("Error fetching single discount code: $e");
           return {
             "status": "error",
             "message": "Failed to fetch discount code: ${e.toString()}",
@@ -91,7 +90,6 @@ class DiscountCodeHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating single discount code: $e");
           return {
             "status": "error",
             "message": "Failed to create single discount code: ${e.toString()}",
@@ -149,7 +147,6 @@ class DiscountCodeHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error updating discount code: $e");
           return {
             "status": "error",
             "message": "Failed to update discount code: ${e.toString()}",
@@ -187,7 +184,6 @@ class DiscountCodeHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error deleting discount code: $e");
           return {
             "status": "error",
             "message": "Failed to delete discount code: ${e.toString()}",

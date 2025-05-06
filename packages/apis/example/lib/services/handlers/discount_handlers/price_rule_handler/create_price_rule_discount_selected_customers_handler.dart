@@ -92,7 +92,6 @@ class CreatePriceRuleDiscountSelectedCustomersHandler
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating price rule for selected customers: $e");
           return {
             "status": "error",
             "message":
