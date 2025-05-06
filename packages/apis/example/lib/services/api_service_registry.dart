@@ -7,6 +7,16 @@ import 'package:example/services/handlers/customers_handlers/customers_address/d
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_list_of_addresses_for_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/retrieves_details_for_single_customer_address_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customers_address/sets_default_address_for_customer_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/discount_code_creation_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/discount_code_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_count_of_discount_codes_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_list_of_discount_code_creation_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_list_of_discount_codes_handler.dart';
+import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_search_for_discount_code_handler.dart';
+import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_discount_collection_handler.dart';
+import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_discount_selected_customers_handler.dart';
+import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_free_shipping_handler.dart';
+
 import 'package:example/services/handlers/events_handlers/retrieves_list_of_events_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_single_event_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
@@ -34,6 +44,7 @@ enum ApiCategory {
   admin,
   catalog,
   customer,
+  discounts,
   events,
   inventory,
 }
@@ -52,6 +63,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Catalog APIs';
       case ApiCategory.customer:
         return 'Customer APIs';
+      case ApiCategory.discounts:
+        return 'Discounts APIs';
       case ApiCategory.events:
         return 'Events APIs';
       case ApiCategory.inventory:
@@ -251,6 +264,71 @@ class ApiServiceRegistry {
       handler: RetrievesCountEventsHandler(),
     ),
 
+    ApiService(
+      name: 'Discount Code',
+      endpoint: '/discountCodes',
+      category: ApiCategory.discounts,
+      handler: DiscountCodeHandler(),
+      subcategory: 'Discount Code',
+    ),
+
+    ApiService(
+      name: 'Count of Discount Codes',
+      endpoint: '/discountCodes',
+      category: ApiCategory.discounts,
+      handler: GetDiscountCodesCountHandler(),
+      subcategory: 'Discount Code',
+    ),
+    ApiService(
+      name: 'Search for Discount Code',
+      endpoint: '/discountCodes/:code',
+      category: ApiCategory.discounts,
+      handler: SearchDiscountCodeHandler(),
+      subcategory: 'Discount Code',
+    ),
+    ApiService(
+      name: 'Discount Code Creation',
+      endpoint: '/discountCodes',
+      category: ApiCategory.discounts,
+      handler: DiscountCodeCreationHandler(),
+      subcategory: 'Discount Code',
+    ),
+    ApiService(
+      name: 'Discount Codes List',
+      endpoint: '/discountCodes',
+      category: ApiCategory.discounts,
+      handler: GetListDiscountCodesHandler(),
+      subcategory: 'Discount Code',
+    ),
+    ApiService(
+      name: 'Discount Code Creation List',
+      endpoint: '/discountCodes',
+      category: ApiCategory.discounts,
+      handler: GetListDiscountCodeCreationHandler(),
+      subcategory: 'Discount Code',
+    ),
+    ApiService(
+      name: 'Price Rule Discount Collection',
+      endpoint: '/priceRules',
+      category: ApiCategory.discounts,
+      handler: CreatePriceRuleDiscountCollectionHandler(),
+      subcategory: 'Price Rule',
+    ),
+    ApiService(
+      name: 'Price Rule Discount Selected Customers',
+      endpoint: '/priceRules',
+      category: ApiCategory.discounts,
+      handler: CreatePriceRuleDiscountSelectedCustomersHandler(),
+      subcategory: 'Price Rule',
+    ),
+    ApiService(
+      name: 'Price Rule Free Shipping',
+      endpoint: '/priceRules',
+      category: ApiCategory.discounts,
+      handler: CreatePriceRuleFreeShippingHandler(),
+      subcategory: 'Price Rule',
+    ),
+
     // 📦 Inventory Item APIs - Get item by ID
     ApiService(
       name: 'Inventory Item By ID',
@@ -359,7 +437,6 @@ class ApiServiceRegistry {
       subcategory: 'Inventory Levels',
       handler: ListInventoryLevelsSingleItemHandler(),
     ),
-
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -411,6 +488,8 @@ class ApiServiceRegistry {
         return 'Catalog';
       case ApiCategory.customer:
         return 'Customer';
+      case ApiCategory.discounts:
+        return 'Discounts';
       case ApiCategory.events:
         return 'Events';
       case ApiCategory.inventory:
