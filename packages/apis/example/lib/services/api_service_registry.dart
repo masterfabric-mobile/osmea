@@ -14,6 +14,7 @@ import 'package:example/services/handlers/discount_handlers/discount_code_handle
 import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_list_of_discount_codes_handler.dart';
 import 'package:example/services/handlers/discount_handlers/discount_code_handler/retrieves_search_for_discount_code_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_discount_collection_handler.dart';
+import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_discount_order_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_discount_selected_customers_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_free_item_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/create_price_rule_free_shipping_handler.dart';
@@ -334,6 +335,13 @@ class ApiServiceRegistry {
       endpoint: '/priceRules',
       category: ApiCategory.discounts,
       handler: CreatePriceRuleFreeItemHandler(),
+      subcategory: 'Price Rule',
+    ),
+    ApiService(
+      name: 'Price Rule Discount Order',
+      endpoint: '/priceRules',
+      category: ApiCategory.discounts,
+      handler: CreatePriceRuleDiscountOrderHandler(),
       subcategory: 'Price Rule',
     ),
 

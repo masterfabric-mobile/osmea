@@ -2,11 +2,13 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/discounts/price_rule/abstract/price_rule.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_discount_collection_request.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_discount_order_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_discount_selected_customers_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_item_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_shipping_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rules_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_collection_response.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_order_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_selected_customers_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_free_item_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_free_shipping_response.dart';
@@ -64,6 +66,13 @@ abstract class PriceRuleServiceClient implements PriceRuleService {
   Future<CreatePriceRuleFreeItemResponse> createPriceRuleFreeItem({
     @Path('api_version') required String apiVersion,
     @Body() required CreatePriceRuleFreeItemRequest model,
+  });
+
+  @override
+  @POST('/api/{api_version}/price_rules.json')
+  Future<CreatePriceRuleDiscountOrderResponse> createPriceRuleDiscountOrder({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreatePriceRuleDiscountOrderRequest model,
   });
 
   @override
