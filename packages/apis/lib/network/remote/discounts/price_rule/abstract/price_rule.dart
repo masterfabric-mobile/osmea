@@ -1,4 +1,8 @@
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_discount_collection_request.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_discount_selected_customers_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rules_request.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_collection_response.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_selected_customers_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/price_rule_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/price_rule_count_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/price_rule_list_response.dart';
@@ -7,6 +11,18 @@ abstract class PriceRuleService {
   Future<PriceRuleResponse> createPriceRule({
     required String apiVersion,
     required CreatePriceRulesRequest model,
+  });
+
+  Future<CreatePriceRuleDiscountCollectionResponse>
+      createPriceRuleDiscountCollection({
+    required String apiVersion,
+    required CreatePriceRuleDiscountCollectionRequest model,
+  });
+
+  Future<CreatePriceRuleDiscountSelectedCustomersResponse>
+      createPriceRuleDiscountSelectedCustomers({
+    required String apiVersion,
+    required CreatePriceRuleDiscountSelectedCustomersRequest model,
   });
 
   /// 🚀 Gets a list of price rules.
