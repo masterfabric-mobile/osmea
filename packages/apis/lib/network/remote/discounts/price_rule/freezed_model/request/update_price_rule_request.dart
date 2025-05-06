@@ -1,23 +1,23 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 
-part 'price_rule_list_response.freezed.dart';
-part 'price_rule_list_response.g.dart';
+part 'update_price_rule_request.freezed.dart';
+part 'update_price_rule_request.g.dart';
 
-PriceRuleListResponse priceRuleListResponseFromJson(String str) =>
-    PriceRuleListResponse.fromJson(json.decode(str));
+UpdatePriceRuleRequest updatePriceRuleRequestFromJson(String str) =>
+    UpdatePriceRuleRequest.fromJson(json.decode(str));
 
-String priceRuleListResponseToJson(PriceRuleListResponse data) =>
+String updatePriceRuleRequestToJson(UpdatePriceRuleRequest data) =>
     json.encode(data.toJson());
 
 @freezed
-class PriceRuleListResponse with _$PriceRuleListResponse {
-  const factory PriceRuleListResponse({
-    @JsonKey(name: "price_rules") List<PriceRule>? priceRules,
-  }) = _PriceRuleListResponse;
+class UpdatePriceRuleRequest with _$UpdatePriceRuleRequest {
+  const factory UpdatePriceRuleRequest({
+    @JsonKey(name: "price_rule") PriceRule? priceRule,
+  }) = _UpdatePriceRuleRequest;
 
-  factory PriceRuleListResponse.fromJson(Map<String, dynamic> json) =>
-      _$PriceRuleListResponseFromJson(json);
+  factory UpdatePriceRuleRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdatePriceRuleRequestFromJson(json);
 }
 
 @freezed

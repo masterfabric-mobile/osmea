@@ -7,6 +7,7 @@ import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/c
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_item_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_shipping_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rules_request.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/update_price_rule_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_collection_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_order_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_selected_customers_response.dart';
@@ -109,7 +110,7 @@ abstract class PriceRuleServiceClient implements PriceRuleService {
   Future<PriceRuleResponse> updatePriceRule({
     @Path('api_version') required String apiVersion,
     @Path('price_rule_id') required String priceRuleId,
-    @Body() required PriceRuleResponse model,
+    @Body() required UpdatePriceRuleRequest model,
   });
 
   @override

@@ -4,6 +4,7 @@ import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/c
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_item_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rule_free_shipping_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/create_price_rules_request.dart';
+import 'package:apis/network/remote/discounts/price_rule/freezed_model/request/update_price_rule_request.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_collection_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_order_response.dart';
 import 'package:apis/network/remote/discounts/price_rule/freezed_model/response/create_price_rule_discount_selected_customers_response.dart';
@@ -72,7 +73,7 @@ abstract class PriceRuleService {
   Future<PriceRuleResponse> updatePriceRule({
     required String apiVersion,
     required String priceRuleId,
-    required PriceRuleResponse model,
+    required UpdatePriceRuleRequest model,
   });
 
   /// 🚀 Gets the count of price rules.
