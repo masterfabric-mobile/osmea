@@ -99,7 +99,6 @@ class CreatePriceRuleFreeShippingHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating price rule: $e");
           return {
             "status": "error",
             "message": "Failed to create price rule: ${e.toString()}",

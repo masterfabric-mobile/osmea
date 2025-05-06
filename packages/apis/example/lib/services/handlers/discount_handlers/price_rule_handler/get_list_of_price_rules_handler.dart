@@ -49,7 +49,6 @@ class GetPriceRuleListHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching price rule list: $e");
           return {
             "status": "error",
             "message": "Failed to fetch price rule list: ${e.toString()}",

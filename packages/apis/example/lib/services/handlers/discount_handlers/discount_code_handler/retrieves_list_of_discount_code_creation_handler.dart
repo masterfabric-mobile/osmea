@@ -43,7 +43,6 @@ class GetListDiscountCodeCreationHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching discount codes for creation: $e");
           return {
             "status": "error",
             "message":

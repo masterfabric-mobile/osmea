@@ -101,7 +101,6 @@ class CreatePriceRuleFreeItemHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating buy X get Y free item price rule: $e");
           return {
             "status": "error",
             "message":

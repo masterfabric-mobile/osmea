@@ -76,7 +76,6 @@ class CreatePriceRuleDiscountOrderHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating price rule for order discount: $e");
           return {
             "status": "error",
             "message":

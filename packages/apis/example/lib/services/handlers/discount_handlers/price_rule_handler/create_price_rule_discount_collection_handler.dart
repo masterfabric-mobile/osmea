@@ -92,7 +92,6 @@ class CreatePriceRuleDiscountCollectionHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating price rule and discount collection: $e");
           return {
             "status": "error",
             "message":
