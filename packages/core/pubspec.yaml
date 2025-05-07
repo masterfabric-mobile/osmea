@@ -8,20 +8,31 @@ environment:
   sdk: ^3.6.1
   flutter: ">=1.17.0"
 
-# Main Dependencies
+# -------------------------------
+# Regular dependencies
+# -------------------------------
 dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0      # State management
+  go_router: ^15.1.1
   injectable: ^2.5.0        # Dependency injection
   logger: ^2.5.0            # Logging utility
+  slang: ^4.7.1
+  flutter_localizations: # add this
+    sdk: flutter
+  intl: any
+  slang_flutter: ^4.7.0
 
-# Development Dependencies
+# -------------------------------
+# Development dependencies
+# -------------------------------
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: 2.4.13           # Code generation
   injectable_generator: 2.6.2    # Injectable code generator
+  slang_build_runner: ^4.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,0 +1,7 @@
+base_locale: en  # Base language is English 🇬🇧
+input_directory: assets/i18n  # Directory for input files 📁
+output_directory: lib/src/resources  # Directory for output files 📦
+translate_var: resources  # Variable for translation resources 🌐
+output_file_name: resources.g.dart  # Name of the output file 📝
+translation_overrides: true  # Enable translation overrides ��
+# Documentation: [Slang Package Documentation](https://pub.dev/packages/slang) 📚

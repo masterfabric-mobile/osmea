@@ -1,25 +1,37 @@
+import 'package:core/core.dart';
 import 'package:example/config/config_di.dart';
-import 'package:example/views/view_home/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+
+// Define the GoRouter
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MasterView();
+      },
+      
+    ),
+  ],
+);
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  
+  MasterApp.runBefore();
+
   configureDependencies();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'OSMEA Core Package',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: HomeView());
-  }
+  
+  runApp(MasterApp(
+    router: _router,
+    shouldSetOrientation: false,
+    preferredOrientations: const [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ],
+    showPerformanceOverlay: false,
+    textDirection: TextDirection.ltr,
+    fontScale: 1.0,
+  ));
 }
