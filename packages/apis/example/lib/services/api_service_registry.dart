@@ -21,7 +21,6 @@ import 'package:example/services/handlers/discount_handlers/price_rule_handler/c
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/get_count_of_price_rules_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/get_list_of_price_rules_handler.dart';
 import 'package:example/services/handlers/discount_handlers/price_rule_handler/price_rule_handler.dart';
-
 import 'package:example/services/handlers/events_handlers/retrieves_list_of_events_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_single_event_handler.dart';
 import 'package:example/services/handlers/events_handlers/retrieves_count_events_handler.dart';
@@ -36,6 +35,8 @@ import 'package:example/services/handlers/inventory/inventory_level_handlers/set
 import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
+import 'package:example/services/handlers/orders/abandoned_checkouts_handlers/retrieves_count_of_checkouts_handler.dart';
+import 'package:example/services/handlers/orders/abandoned_checkouts_handlers/retrieves_list_abandoned_checkouts_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -52,6 +53,7 @@ enum ApiCategory {
   discounts,
   events,
   inventory,
+  orders,
 }
 
 /// 🏷️ Extension methods for ApiCategory
@@ -74,6 +76,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Events APIs';
       case ApiCategory.inventory:
         return 'Inventory APIs';
+      case ApiCategory.orders:
+        return 'Orders APIs';
     }
   }
 }
@@ -477,6 +481,21 @@ class ApiServiceRegistry {
       subcategory: 'Inventory Levels',
       handler: ListInventoryLevelsSingleItemHandler(),
     ),
+
+    ApiService(
+      name: 'Abandoned Checkouts List',
+      endpoint: '/orders',
+      category: ApiCategory.orders,
+      subcategory: 'Abandoned Checkouts',
+      handler: GetAbandonedCheckoutsListHandler(),
+    ),
+    ApiService(
+      name: 'Abandoned Checkouts Count',
+      endpoint: '/orders',
+      category: ApiCategory.orders,
+      subcategory: 'Abandoned Checkouts',
+      handler: GetAbandonedCheckoutsCountHandler(),
+    ),
   ];
 
   // 🔄 Add the initialize method back for compatibility
@@ -534,6 +553,8 @@ class ApiServiceRegistry {
         return 'Events';
       case ApiCategory.inventory:
         return 'Inventory';
+      case ApiCategory.orders:
+        return 'Orders';
     }
   }
 }
