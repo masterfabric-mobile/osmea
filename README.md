@@ -4,11 +4,11 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/masterfabric-mobile/osmea)
 [![Shopify](https://img.shields.io/badge/Shopify-compatible-8DB543.svg)](https://shopify.dev/docs/api)
 
-![OSMEA](https://github.com/user-attachments/assets/e893efe7-ccc8-4995-a7da-956a5e626775)
+<img src = "https://github.com/masterfabric-mobile/osmea/blob/dev/docs/assets/OSMEA_readme_image.png?raw=true">
 
 <p>
 
- OSMEA is an open-source, extensible, and developer-friendly CLI tool for building high-quality, production-ready mobile e-commerce apps. It enables rapid creation, customisation, and deployment of cross-platform (ios & Android) storefronts integrated with leading e-commerce platforms such as Shopify, WooCommerce, and BigCommerce. The project aims to empower businesses and developers to launch, scale, and easily manage mobile commerce solutions.
+ OSMEA is an open-source, extensible, and developer-friendly CLI tool for building high-quality, production-ready mobile e-commerce apps. It enables rapid creation, customisation, and deployment of cross-platform (iOS & Android) storefronts integrated with leading e-commerce platforms such as Shopify, WooCommerce, and BigCommerce. The project aims to empower businesses and developers to launch, scale, and easily manage mobile commerce solutions.
 
  ## 💭Why OSMEA?
 
