@@ -38,6 +38,11 @@ import 'package:example/services/handlers/inventory/inventory_level_handlers/set
 import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/count_metafield_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/get_specific_metafield_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -62,6 +67,7 @@ enum ApiCategory {
   events,
   inventory,
   giftCard,
+  metafield,
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -85,6 +91,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Inventory APIs';
       case ApiCategory.giftCard:
         return 'Gift Card APIs';
+      case ApiCategory.metafield:
+        return 'Metafield APIs';
     }
   }
 }
@@ -520,6 +528,45 @@ class ApiServiceRegistry {
       subcategory: 'Gift Card',
       handler: UpdatesGiftCardHandler(),
     ),
+
+    ApiService(
+      name: 'Create Metafield',
+      endpoint: '/:owner_resource/:owner_id/metafields',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: CreateMetafieldHandler(),
+    ),
+
+    ApiService(
+      name: 'List Metafields',
+      endpoint: '/:owner_resource/:owner_id/metafields',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: ListMetafieldsHandler(),
+    ),
+
+    ApiService(
+      name: 'Get Specific Metafield',
+      endpoint: '/:owner_resource/:owner_id/metafields/:metafield_id',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: GetSpecificMetafieldHandler(),
+    ),
+
+    ApiService(
+      name: 'Count Metafields',
+      endpoint: '/:owner_resource/:owner_id/metafields/count',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: CountMetafieldHandler(),
+    ),
+    ApiService(
+      name: 'List Metafields By Query Parameters',
+      endpoint: '/:owner_resource/:owner_id/metafields',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: ListMetafieldsQueryParametersHandler(),
+    ),
   ];
 
   static void initialize() {}
@@ -566,6 +613,8 @@ class ApiServiceRegistry {
         return 'Inventory';
       case ApiCategory.giftCard:
         return 'Gift Card';
+      case ApiCategory.metafield:
+        return 'Metafield';
     }
   }
 }
