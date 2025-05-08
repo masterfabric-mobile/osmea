@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
@@ -41,8 +43,15 @@ import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/create_new_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/disable_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/retrieves_count_of_gift_cards_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/retrieves_list_of_gift_cards_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/retrieves_single_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/searches_for_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/updates_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/automatically_create_gift_card_handler.dart';
 
-/// 🔖 API service categories
 enum ApiCategory {
   access,
   storefront,
@@ -52,9 +61,9 @@ enum ApiCategory {
   discounts,
   events,
   inventory,
+  giftCard,
 }
 
-/// 🏷️ Extension methods for ApiCategory
 extension ApiCategoryExtension on ApiCategory {
   String get displayName {
     switch (this) {
@@ -74,24 +83,37 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Events APIs';
       case ApiCategory.inventory:
         return 'Inventory APIs';
+      case ApiCategory.giftCard:
+        return 'Gift Card APIs';
     }
   }
 }
 
-/// 📝 Class representing a field in an API request
 class ApiField {
   final String name;
   final String label;
   final String hint;
+  final bool isRequired;
+  final ApiFieldType type;
 
   const ApiField({
     required this.name,
     required this.label,
     required this.hint,
+    this.isRequired = false,
+    this.type = ApiFieldType.text,
   });
 }
 
-/// 🔌 Class representing an API service
+enum ApiFieldType {
+  text,
+  number,
+  boolean,
+  date,
+  select,
+  multiselect,
+}
+
 class ApiService {
   final String name;
   final String endpoint;
@@ -107,17 +129,13 @@ class ApiService {
     required this.subcategory,
   });
 
-  /// 📋 Get supported methods from the handler
   List<String> get supportedMethods => handler.supportedMethods;
 
-  /// 📄 Get required fields for each method
   Map<String, List<ApiField>> get requiredFields => handler.requiredFields;
 }
 
-/// 📚 Registry of all available API services
 class ApiServiceRegistry {
   static final List<ApiService> _services = [
-    // 🔐 Access APIs with subcategories
     ApiService(
       name: 'Access Scope',
       endpoint: '/accessScope',
@@ -125,16 +143,13 @@ class ApiServiceRegistry {
       subcategory: 'Access Scope',
       handler: AccessScopeHandler(),
     ),
-
-    // 🔑 Move Storefront Access Token to Access category
     ApiService(
-        name: 'Storefront Access Token',
-        endpoint: '/storefrontAccessToken',
-        category: ApiCategory.access,
-        subcategory: 'Storefront Access',
-        handler: StorefrontAccessTokenHandler()),
-
-    // 👥 Customer API - Get all customers with single GET endpoint
+      name: 'Storefront Access Token',
+      endpoint: '/storefrontAccessToken',
+      category: ApiCategory.access,
+      subcategory: 'Storefront Access',
+      handler: StorefrontAccessTokenHandler(),
+    ),
     ApiService(
       name: 'Customers',
       endpoint: '/customers',
@@ -142,8 +157,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: RetrievesListOfCustomersHandler(),
     ),
-
-    // 👤 Single Customer API - get customer by ID
     ApiService(
       name: 'Single Customer',
       endpoint: '/customers/:id',
@@ -151,8 +164,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: RetrievesSingleCustomerHandler(),
     ),
-
-    // 🛒 Customer Orders API - Get orders belonging to a customer
     ApiService(
       name: 'Customer Orders',
       endpoint: '/customers/:id/orders',
@@ -160,8 +171,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: RetrievesAllOrdersBelongingToCustomerHandler(),
     ),
-
-    // 🔍 Customer Match Query API
     ApiService(
       name: 'Customer Match Query',
       endpoint: '/customers/search',
@@ -169,8 +178,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: SearchesForCustomersThatMatchSuppliedQueryHandler(),
     ),
-
-    // 🔗 Customer URL API - Generate account activation URL
     ApiService(
       name: 'Customer URL',
       endpoint: '/customers/:id/account_activation_url',
@@ -178,8 +185,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: CustomerUrlHandler(),
     ),
-
-    // 🔢 Customer Count API
     ApiService(
       name: 'Customer Count',
       endpoint: '/customers/count',
@@ -187,8 +192,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: RetrievesCountOfCustomersHandler(),
     ),
-
-    // 📧 Customer Invite API
     ApiService(
       name: 'Send Customer Invite',
       endpoint: '/customers/:id/send_invite',
@@ -196,8 +199,6 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: SendsAccountInviteToCustomerHandler(),
     ),
-
-    // 🏷️ Customer Address APIs - Create Address
     ApiService(
       name: 'Create Customer Address',
       endpoint: '/customers/:id/addresses',
@@ -205,8 +206,6 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: CreateNewAddressForCustomerHandler(),
     ),
-
-    // 🏠 Customer Address APIs - Get Addresses List
     ApiService(
       name: 'Get Customer Addresses',
       endpoint: '/customers/:id/addresses',
@@ -214,8 +213,6 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: RetrievesListOfAddressesForCustomerHandler(),
     ),
-
-    // 🔍 Customer Address APIs - Get Single Address Details
     ApiService(
       name: 'Get Single Address Details',
       endpoint: '/customers/:id/addresses/:address_id',
@@ -223,8 +220,6 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: RetrievesDetailsForSingleCustomerAddressHandler(),
     ),
-
-    // 🏠 Customer Address APIs - Set Default Address
     ApiService(
       name: 'Set Default Address',
       endpoint: '/customers/:id/addresses/:address_id/default',
@@ -232,8 +227,6 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: SetsDefaultAddressForCustomerHandler(),
     ),
-
-    // 🗑️ Customer Address APIs - Delete Multiple Addresses
     ApiService(
       name: 'Destroy Multiple Addresses',
       endpoint: '/customers/:id/addresses',
@@ -241,8 +234,6 @@ class ApiServiceRegistry {
       subcategory: 'Customer Address',
       handler: DestroyMultipleCustomerAddressesHandler(),
     ),
-
-    // 📅 Events APIs - List all events
     ApiService(
       name: 'Events List',
       endpoint: '/events',
@@ -250,8 +241,6 @@ class ApiServiceRegistry {
       subcategory: 'Events',
       handler: RetrievesListOfEventsHandler(),
     ),
-
-    // 📆 Events APIs - Single event
     ApiService(
       name: 'Single Event',
       endpoint: '/events/:event_id',
@@ -259,8 +248,6 @@ class ApiServiceRegistry {
       subcategory: 'Events',
       handler: RetrievesSingleEventHandler(),
     ),
-
-    // 🔢 Events APIs - Count events
     ApiService(
       name: 'Events Count',
       endpoint: '/events/count',
@@ -477,45 +464,88 @@ class ApiServiceRegistry {
       subcategory: 'Inventory Levels',
       handler: ListInventoryLevelsSingleItemHandler(),
     ),
+    ApiService(
+      name: 'Create Gift Card',
+      endpoint: '/gift_cards',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: CreateNewGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'Automatically Create Gift Card',
+      endpoint: '/gift_cards/auto_create',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: AutomaticallyCreateGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'Disable Gift Card',
+      endpoint: '/gift_cards/:id/disable',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: DisableGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'Gift Cards Count',
+      endpoint: '/gift_cards/count',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: RetrievesCountOfGiftCardsHandler(),
+    ),
+    ApiService(
+      name: 'Gift Cards List',
+      endpoint: '/gift_cards',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: RetrievesListOfGiftCardsHandler(),
+    ),
+    ApiService(
+      name: 'Single Gift Card',
+      endpoint: '/gift_cards/:id',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: RetrievesSingleGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'Search Gift Cards',
+      endpoint: '/gift_cards/search',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: SearchesForGiftCardsHandler(),
+    ),
+    ApiService(
+      name: 'Update Gift Card',
+      endpoint: '/gift_cards/:id',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: UpdatesGiftCardHandler(),
+    ),
   ];
 
-  // 🔄 Add the initialize method back for compatibility
-  static void initialize() {
-    // 📝 Services are already initialized statically,
-    // but we keep this method for backward compatibility
-    // with code that expects to call initialize()
-  }
+  static void initialize() {}
 
-  // 📋 Get all services
   static List<ApiService> get all => _services;
 
-  // 🔖 Get all available categories
   static List<ApiCategory> get categories =>
       _services.map((s) => s.category).toSet().toList();
 
-  // 🔍 Get services by category
   static List<ApiService> getByCategory(ApiCategory category) =>
       _services.where((s) => s.category == category).toList();
 
-  // 🏷️ Get subcategory names for a specific category
-  static List<String> getSubcategoriesByCategory(ApiCategory category) {
-    return _services
-        .where((s) => s.category == category)
-        .map((s) => s.subcategory)
-        .toSet()
-        .toList();
-  }
+  static List<String> getSubcategoriesByCategory(ApiCategory category) =>
+      _services
+          .where((s) => s.category == category)
+          .map((s) => s.subcategory)
+          .toSet()
+          .toList();
 
-  // 🔍 Get services by subcategory
   static List<ApiService> getBySubcategory(
-      ApiCategory category, String subcategoryName) {
-    return _services
-        .where(
-            (s) => s.category == category && s.subcategory == subcategoryName)
-        .toList();
-  }
+          ApiCategory category, String subcategoryName) =>
+      _services
+          .where(
+              (s) => s.category == category && s.subcategory == subcategoryName)
+          .toList();
 
-  // 🔄 Helper to convert enum to string
   static String getCategoryName(ApiCategory category) {
     switch (category) {
       case ApiCategory.access:
@@ -534,6 +564,8 @@ class ApiServiceRegistry {
         return 'Events';
       case ApiCategory.inventory:
         return 'Inventory';
+      case ApiCategory.giftCard:
+        return 'Gift Card';
     }
   }
 }
