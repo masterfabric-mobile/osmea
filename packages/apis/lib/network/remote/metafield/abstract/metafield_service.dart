@@ -1,8 +1,11 @@
 import 'package:apis/network/remote/metafield/freezed_model/request/create_metafield_request.dart';
+import 'package:apis/network/remote/metafield/freezed_model/request/update_metafield_request.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/count_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_query_parameters_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/update_metafield_response.dart';
 
 abstract class MetafieldService {
   /// 📦 Retrieves a list of metafields from the API.
@@ -45,4 +48,20 @@ abstract class MetafieldService {
     required String ownerResource,
     required String ownerId,
   });
+
+  /// 📦 Retrieve a list of metafields by using query parameters.
+  Future<ListMetafieldsQueryParametersResponse> listMetafieldsByQueryParameters({
+    required String apiVersion,
+    String? metafieldOwnerId,
+    String? metafieldOwnerResource,
+  });
+
+  Future<UpdateMetafieldResponse> updateMetafield({
+    required String apiVersion,
+    required String ownerResource,
+    required String ownerId,
+    required String metafieldId,
+    required UpdateMetafieldRequest model,
+  });
+
 }
