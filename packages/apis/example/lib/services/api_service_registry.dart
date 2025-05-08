@@ -37,6 +37,11 @@ import 'package:example/services/handlers/inventory/location/list_inventory_by_l
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/handlers/orders/abandoned_checkouts_handlers/retrieves_count_of_checkouts_handler.dart';
 import 'package:example/services/handlers/orders/abandoned_checkouts_handlers/retrieves_list_abandoned_checkouts_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_custom_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_discounted_item_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_percent_discount_item_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_simple_product_variant_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_with_discount_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -496,6 +501,39 @@ class ApiServiceRegistry {
       subcategory: 'Abandoned Checkouts',
       handler: GetAbandonedCheckoutsCountHandler(),
     ),
+    ApiService(
+        name: 'draft order with percent discount',
+        endpoint: '/draft_orders',
+        category: ApiCategory.orders,
+        subcategory: 'Draft Order',
+        handler: CreateDraftOrderPercentDiscountItemHandler()),
+
+    ApiService(
+        name: 'draft drder with simple product variant',
+        endpoint: '/draft_orders',
+        category: ApiCategory.orders,
+        subcategory: 'Draft Order',
+        handler: CreateDraftOrderSimpleProductVariantHandler()),
+
+    ApiService(
+        name: 'draft order with discount',
+        endpoint: '/draft_orders',
+        category: ApiCategory.orders,
+        subcategory: 'Draft Order',
+        handler: CreateDraftOrderWithDiscountHandler()),
+
+    ApiService(
+        name: 'draft order discounted item',
+        endpoint: '/draft_orders',
+        category: ApiCategory.orders,
+        subcategory: 'Draft Order',
+        handler: CreateDraftOrderDiscountedItemHandler()),
+    ApiService(
+        name: 'draft order custom',
+        endpoint: '/draft_orders',
+        category: ApiCategory.orders,
+        subcategory: 'Draft Order',
+        handler: CreateDraftOrderCustomHandler()),
   ];
 
   // 🔄 Add the initialize method back for compatibility
