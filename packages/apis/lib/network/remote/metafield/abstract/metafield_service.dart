@@ -1,4 +1,5 @@
 import 'package:apis/network/remote/metafield/freezed_model/request/create_metafield_request.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/count_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
@@ -36,5 +37,12 @@ abstract class MetafieldService {
     required String ownerId,
     required String metafieldId,
     String? fields,
+  });
+
+  /// 📦 Count metafield from the API.
+  Future<CountMetafieldResponse> countMetafields({
+    required String apiVersion,
+    required String ownerResource,
+    required String ownerId,
   });
 }
