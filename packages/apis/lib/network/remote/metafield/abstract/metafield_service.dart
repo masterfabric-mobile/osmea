@@ -56,12 +56,21 @@ abstract class MetafieldService {
     String? metafieldOwnerResource,
   });
 
+  /// 📦 Updates a metafield in the API.
   Future<UpdateMetafieldResponse> updateMetafield({
     required String apiVersion,
     required String ownerResource,
     required String ownerId,
     required String metafieldId,
     required UpdateMetafieldRequest model,
+  });
+
+  /// 📦 Deletes a metafield in the API.
+  Future<void> deleteMetafield({
+    required String apiVersion,
+    required String ownerResource,
+    required String ownerId,
+    required String metafieldId,
   });
 
 }

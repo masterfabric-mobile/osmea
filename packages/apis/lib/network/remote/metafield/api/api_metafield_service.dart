@@ -92,4 +92,14 @@ abstract class MetafieldServiceClient implements MetafieldService {
     @Path('metafield_id') required String metafieldId,
     @Body() required UpdateMetafieldRequest model,
   });
+
+  /// 📦 Deletes a metafield in the API.
+  @DELETE(
+      '/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
+  Future<void> deleteMetafield({
+    @Path('api_version') required String apiVersion,
+    @Path('owner_resource') required String ownerResource,
+    @Path('owner_id') required String ownerId,
+    @Path('metafield_id') required String metafieldId,
+  });
 }
