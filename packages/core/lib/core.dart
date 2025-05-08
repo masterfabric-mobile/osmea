@@ -6,3 +6,12 @@ export 'package:core/src/base/base_view_bloc.dart';
 
 // 🧠 Exports the base class for View Models
 export 'package:core/src/base/base_view_model.dart';
+
+// 🧩 Exports the base class for Master App
+export 'package:core/src/base/master_view/master_app.dart';
+
+// 🧩 Exports the base class for Master View
+export 'package:core/src/base/master_view/master_view.dart';
+
+// 🧩 Exports the generated resources about translations
+export 'package:core/src/resources/resources.g.dart';
