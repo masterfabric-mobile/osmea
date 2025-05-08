@@ -42,6 +42,7 @@ import 'package:example/services/handlers/metafield_handlers/count_metafield_han
 import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/get_specific_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -558,6 +559,13 @@ class ApiServiceRegistry {
       category: ApiCategory.metafield,
       subcategory: 'Metafield',
       handler: CountMetafieldHandler(),
+    ),
+    ApiService(
+      name: 'List Metafields By Query Parameters',
+      endpoint: '/:owner_resource/:owner_id/metafields',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: ListMetafieldsQueryParametersHandler(),
     ),
   ];
 
