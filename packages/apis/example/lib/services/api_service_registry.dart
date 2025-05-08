@@ -40,6 +40,7 @@ import 'package:example/services/handlers/inventory/location/list_inventory_by_l
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/count_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/delete_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/get_specific_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
@@ -574,6 +575,15 @@ class ApiServiceRegistry {
       category: ApiCategory.metafield,
       subcategory: 'Metafield',
       handler: UpdateMetafieldHandler(),
+    ),
+
+    // 📦 Delete Metafield
+    ApiService(
+      name: 'Delete Metafield',
+      endpoint: '/:owner_resource/:owner_id/metafields/:metafield_id',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: DeleteMetafieldHandler(),
     ),
   ];
 
