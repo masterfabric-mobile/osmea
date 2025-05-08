@@ -5,6 +5,7 @@ import 'package:apis/network/remote/metafield/freezed_model/request/create_metaf
 import 'package:apis/network/remote/metafield/freezed_model/response/count_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_query_parameters_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -19,8 +20,7 @@ part 'api_metafield_service.g.dart';
 abstract class MetafieldServiceClient implements MetafieldService {
   /// 🏭 Factory for dependency injection
   @factoryMethod
-  factory MetafieldServiceClient(Dio dio) =>
-      _MetafieldServiceClient(
+  factory MetafieldServiceClient(Dio dio) => _MetafieldServiceClient(
         ApiDioClient.starter(),
         baseUrl: ApiNetwork.baseUrl,
       );
@@ -53,7 +53,8 @@ abstract class MetafieldServiceClient implements MetafieldService {
   });
 
   /// 📦 Retrieves a specific metafield from the API.
-  @GET('/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
+  @GET(
+      '/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
   Future<GetSpecificMetafieldResponse> getSpecificMetafield({
     @Path('api_version') required String apiVersion,
     @Path('owner_resource') required String ownerResource,
@@ -68,5 +69,14 @@ abstract class MetafieldServiceClient implements MetafieldService {
     @Path('api_version') required String apiVersion,
     @Path('owner_resource') required String ownerResource,
     @Path('owner_id') required String ownerId,
+  });
+
+  /// 📦 Retrieves a list of metafields using query parameters.
+  @GET('/api/{api_version}/metafields.json')
+  Future<ListMetafieldsQueryParametersResponse>
+      listMetafieldsByQueryParameters({
+    @Path('api_version') required String apiVersion,
+    @Query('metafield[owner_id]') String? metafieldOwnerId,
+    @Query('metafield[owner_resource]') String? metafieldOwnerResource,
   });
 }
