@@ -50,6 +50,7 @@ import 'package:example/services/handlers/gift_card_handlers/retrieves_list_of_g
 import 'package:example/services/handlers/gift_card_handlers/retrieves_single_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/searches_for_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/updates_gift_card_handler.dart';
+import 'package:example/services/handlers/gift_card_handlers/automatically_create_gift_card_handler.dart';
 
 enum ApiCategory {
   access,
@@ -469,6 +470,13 @@ class ApiServiceRegistry {
       category: ApiCategory.giftCard,
       subcategory: 'Gift Card',
       handler: CreateNewGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'Automatically Create Gift Card',
+      endpoint: '/gift_cards/auto_create',
+      category: ApiCategory.giftCard,
+      subcategory: 'Gift Card',
+      handler: AutomaticallyCreateGiftCardHandler(),
     ),
     ApiService(
       name: 'Disable Gift Card',
