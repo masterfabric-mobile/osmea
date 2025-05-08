@@ -57,13 +57,37 @@ class ListMetafieldsHandler implements ApiRequestHandler {
             );
 
         // 📋 Return the metafields data
-        return {
-          "status": "success",
-          "metafields": response.toJson(),
-          "count": response.metafields?.length ?? 0,
-          "message": "Metafields successfully retrieved",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
+        if (params['fields'] != null && params['fields']!.isNotEmpty) {
+          // Parse the fields parameter (comma-separated)
+          final requestedFields =
+              params['fields']!.split(',').map((f) => f.trim()).toSet();
+
+          // Filter response to include only requested fields
+          final filteredMetafields = response.metafields?.map((metafield) {
+            final fullJson = metafield.toJson();
+            // Create a new map with only the requested fields
+            return Map<String, dynamic>.fromEntries(fullJson.entries
+                .where((entry) => requestedFields.contains(entry.key)));
+          }).toList();
+
+          return {
+            "status": "success",
+            "metafields": {"metafields": filteredMetafields},
+            "count": response.metafields?.length ?? 0,
+            "message": "Metafields successfully retrieved with filtered fields",
+            "fields_filtered": requestedFields.toList(),
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        } else {
+          // Return full response if no fields filter specified
+          return {
+            "status": "success",
+            "metafields": response.toJson(),
+            "count": response.metafields?.length ?? 0,
+            "message": "Metafields successfully retrieved",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
       } catch (e) {
         // ❌ Enhanced error handling
         String errorMessage = e.toString();
