@@ -1,5 +1,6 @@
 import 'package:apis/network/remote/metafield/freezed_model/request/create_metafield_request.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
 
 abstract class MetafieldService {
@@ -26,5 +27,14 @@ abstract class MetafieldService {
     String? type,
     String? updatedAtMax,
     String? updatedAtMin,
+  });
+
+  /// 📦 Retrieves a specific metafield from the API.
+  Future<GetSpecificMetafieldResponse> getSpecificMetafield({
+    required String apiVersion,
+    required String ownerResource,
+    required String ownerId,
+    required String metafieldId,
+    String? fields,
   });
 }

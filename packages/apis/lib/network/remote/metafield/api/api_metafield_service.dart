@@ -3,6 +3,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/metafield/abstract/metafield_service.dart';
 import 'package:apis/network/remote/metafield/freezed_model/request/create_metafield_request.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -48,5 +49,15 @@ abstract class MetafieldServiceClient implements MetafieldService {
     @Query('type') String? type,
     @Query('updated_at_max') String? updatedAtMax,
     @Query('updated_at_min') String? updatedAtMin,
+  });
+
+  /// 📦 Retrieves a specific metafield from the API.
+  @GET('/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
+  Future<GetSpecificMetafieldResponse> getSpecificMetafield({
+    @Path('api_version') required String apiVersion,
+    @Path('owner_resource') required String ownerResource,
+    @Path('owner_id') required String ownerId,
+    @Path('metafield_id') required String metafieldId,
+    @Query('fields') String? fields,
   });
 }
