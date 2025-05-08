@@ -39,6 +39,7 @@ import 'package:example/services/handlers/inventory/location/count_all_locations
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
+import 'package:example/services/handlers/metafield_handlers/get_specific_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
@@ -540,6 +541,14 @@ class ApiServiceRegistry {
       category: ApiCategory.metafield,
       subcategory: 'Metafield',
       handler: ListMetafieldsHandler(),
+    ),
+
+    ApiService(
+      name: 'Get Specific Metafield',
+      endpoint: '/:owner_resource/:owner_id/metafields/:metafield_id',
+      category: ApiCategory.metafield,
+      subcategory: 'Metafield',
+      handler: GetSpecificMetafieldHandler(),
     ),
   ];
 
