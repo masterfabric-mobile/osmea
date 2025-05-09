@@ -1,4 +1,5 @@
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
 
 /// 🌍 Abstract contract for Country Service
 /// Implement this to interact with Shopify Country API
@@ -8,5 +9,10 @@ abstract class CountryService {
     required String apiVersion,
     String? sinceId,
     String? fields,
+  });
+
+  /// 🔢 Retrieve count of countries
+  Future<RetrievesCountOfCountriesResponse> retrievesCountOfCountries({
+    required String apiVersion,
   });
 }
