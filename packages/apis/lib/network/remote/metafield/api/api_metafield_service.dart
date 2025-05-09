@@ -2,11 +2,13 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/metafield/abstract/metafield_service.dart';
 import 'package:apis/network/remote/metafield/freezed_model/request/create_metafield_request.dart';
+import 'package:apis/network/remote/metafield/freezed_model/request/update_metafield_request.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/count_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/create_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/get_specific_metafield_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_query_parameters_response.dart';
 import 'package:apis/network/remote/metafield/freezed_model/response/list_metafields_response.dart';
+import 'package:apis/network/remote/metafield/freezed_model/response/update_metafield_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -78,5 +80,26 @@ abstract class MetafieldServiceClient implements MetafieldService {
     @Path('api_version') required String apiVersion,
     @Query('metafield[owner_id]') String? metafieldOwnerId,
     @Query('metafield[owner_resource]') String? metafieldOwnerResource,
+  });
+
+  /// 📦 Updates a metafield in the API.
+  @PUT(
+      '/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
+  Future<UpdateMetafieldResponse> updateMetafield({
+    @Path('api_version') required String apiVersion,
+    @Path('owner_resource') required String ownerResource,
+    @Path('owner_id') required String ownerId,
+    @Path('metafield_id') required String metafieldId,
+    @Body() required UpdateMetafieldRequest model,
+  });
+
+  /// 📦 Deletes a metafield in the API.
+  @DELETE(
+      '/api/{api_version}/{owner_resource}/{owner_id}/metafields/{metafield_id}.json')
+  Future<void> deleteMetafield({
+    @Path('api_version') required String apiVersion,
+    @Path('owner_resource') required String ownerResource,
+    @Path('owner_id') required String ownerId,
+    @Path('metafield_id') required String metafieldId,
   });
 }
