@@ -44,6 +44,11 @@ import 'package:example/services/handlers/orders/draft_order_handlers/create_dra
 import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_percent_discount_item_handler.dart';
 import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_simple_product_variant_handler.dart';
 import 'package:example/services/handlers/orders/draft_order_handlers/create_draft_order_with_discount_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_invoice_customized_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/create_invoice_default_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/draft_order_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/get_draft_order_count_handler.dart';
+import 'package:example/services/handlers/orders/draft_order_handlers/update_draft_order_complete_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -576,6 +581,41 @@ class ApiServiceRegistry {
       category: ApiCategory.giftCard,
       subcategory: 'Gift Card',
       handler: UpdatesGiftCardHandler(),
+    ),
+    ApiService(
+      name: 'send invoice customized',
+      endpoint: '/draft_orders/:draft_order_id/invoice',
+      category: ApiCategory.orders,
+      subcategory: 'Draft Order',
+      handler: CreateInvoiceCustomizedHandler(),
+    ),
+    ApiService(
+      name: 'send invoice default',
+      endpoint: '/draft_orders/:draft_order_id/invoice',
+      category: ApiCategory.orders,
+      subcategory: 'Draft Order',
+      handler: CreateInvoiceDefaultHandler(),
+    ),
+    ApiService(
+      name: 'Update Draft Order Modify Existing',
+      endpoint: '/draft_orders/:draft_order_id',
+      category: ApiCategory.orders,
+      subcategory: 'Draft Order',
+      handler: UpdateDraftOrderCompleteHandler(),
+    ),
+    ApiService(
+      name: 'Update Draft Order Complete',
+      endpoint: '/draft_orders/:draft_order_id/complete',
+      category: ApiCategory.orders,
+      subcategory: 'Draft Order',
+      handler: GetDraftOrderCountHandler(),
+    ),
+    ApiService(
+      name: 'Get Draft Order Count',
+      endpoint: '/draft_orders/count',
+      category: ApiCategory.orders,
+      subcategory: 'Draft Order',
+      handler: CreateDraftOrderHandler(),
     ),
   ];
 
