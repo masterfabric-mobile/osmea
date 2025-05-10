@@ -1,11 +1,14 @@
+// ✅ api_country_service.dart
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/store_properties/country/abstract/country_service.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_custom_tax_rate_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_shopify_tax_rate_request.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/updates_existing_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/response/updates_existing_country_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -21,7 +24,6 @@ abstract class CountryServiceClient implements CountryService {
         baseUrl: ApiNetwork.baseUrl,
       );
 
-  /// 🌍 Receive a list of countries and their provinces (with optional filters)
   @override
   @GET('/api/{api_version}/countries.json')
   Future<ReceiveListOfCountriesResponse> receiveListOfCountries({
@@ -30,14 +32,12 @@ abstract class CountryServiceClient implements CountryService {
     @Query('fields') String? fields,
   });
 
-  /// 🔢 Retrieve count of countries
   @override
   @GET('/api/{api_version}/countries/count.json')
   Future<RetrievesCountOfCountriesResponse> retrievesCountOfCountries({
     @Path('api_version') required String apiVersion,
   });
 
-  /// 🏁 Create a new country
   @override
   @POST('/api/{api_version}/countries.json')
   Future<void> createCountry({
@@ -45,7 +45,6 @@ abstract class CountryServiceClient implements CountryService {
     @Body() required CreatesCountryRequest model,
   });
 
-  /// 🧾 Create a new country using custom tax rate
   @override
   @POST('/api/{api_version}/countries.json')
   Future<void> createCountryUsingCustomTaxRate({
@@ -53,11 +52,18 @@ abstract class CountryServiceClient implements CountryService {
     @Body() required CreateCountryUsingCustomTaxRateRequest model,
   });
 
-  /// 🧾 Create a new country using Shopify tax rate
   @override
   @POST('/api/{api_version}/countries.json')
   Future<void> createCountryUsingShopifyTaxRate({
     @Path('api_version') required String apiVersion,
     @Body() required CreateCountryUsingShopifyTaxRateRequest model,
+  });
+
+  @override
+  @PUT('/api/{api_version}/countries/{id}.json')
+  Future<UpdatesExistingCountryResponse> updateCountry({
+    @Path('api_version') required String apiVersion,
+    @Path('id') required String id,
+    @Body() required UpdatesExistingCountryRequest model,
   });
 }

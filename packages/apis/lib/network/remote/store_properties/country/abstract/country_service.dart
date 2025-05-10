@@ -1,8 +1,10 @@
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_custom_tax_rate_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_shopify_tax_rate_request.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/updates_existing_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/response/updates_existing_country_response.dart';
 
 /// 🌍 Abstract contract for Country Service
 /// Implement this to interact with Shopify Country API
@@ -19,21 +21,28 @@ abstract class CountryService {
     required String apiVersion,
   });
 
-  /// 🏋️ Create a new country with default tax rate
+  /// 🏁 Create a new country with default tax rate
   Future<void> createCountry({
     required String apiVersion,
     required CreatesCountryRequest model,
   });
 
-  /// 🏋️ Create a new country using custom tax rate
+  /// 🧾 Create a new country using custom tax rate
   Future<void> createCountryUsingCustomTaxRate({
     required String apiVersion,
     required CreateCountryUsingCustomTaxRateRequest model,
   });
 
-  /// 🏋️ Create a new country using Shopify tax rate
+  /// 🧾 Create a new country using Shopify tax rate
   Future<void> createCountryUsingShopifyTaxRate({
     required String apiVersion,
     required CreateCountryUsingShopifyTaxRateRequest model,
+  });
+
+  /// ✏️ Update an existing country by ID
+  Future<UpdatesExistingCountryResponse> updateCountry({
+    required String apiVersion,
+    required String id,
+    required UpdatesExistingCountryRequest model,
   });
 }
