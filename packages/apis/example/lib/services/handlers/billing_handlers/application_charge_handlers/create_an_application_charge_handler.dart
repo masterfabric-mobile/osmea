@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/network/remote/billing/application_charge/abstract/application_charge_service.dart';
 import 'package:apis/network/remote/billing/application_charge/freezed_model/request/create_application_charge_request.dart';
 import 'package:example/services/api_service_registry.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import '../../../api_request_handler.dart';
 
@@ -15,8 +16,8 @@ class CreateAnApplicationChargeHandler implements ApiRequestHandler {
       String method, Map<String, dynamic> params) async {
     try {
       if (method == 'POST') {
-        // Debug parameters
-        print('🔍 Raw parameters received: $params');
+        // Parse input parameters
+        debugPrint('🔍 Raw parameters received: $params');
         
         // Validate required parameters
         final name = params['name'] as String?;
@@ -58,8 +59,8 @@ class CreateAnApplicationChargeHandler implements ApiRequestHandler {
         bool? test = testStr == null ? true : testStr.toLowerCase() == 'true'; // Default to true for test
         String? currency = params['currency'] as String? ?? 'USD'; // Default to USD
         
-        print('🔧 Processed parameters - name: $name, price: $price, returnUrl: $returnUrl, test: $test, currency: $currency');
-        print('🌐 API Version: ${ApiNetwork.apiVersion}');
+        debugPrint('🔧 Processed parameters - name: $name, price: $price, returnUrl: $returnUrl, test: $test, currency: $currency');
+        debugPrint('🌐 API Version: ${ApiNetwork.apiVersion}');
         
         // Create the request object with only the necessary fields
         final request = CreateApplicationChargeRequest(
@@ -73,9 +74,9 @@ class CreateAnApplicationChargeHandler implements ApiRequestHandler {
         );
 
         
-        // Debug the request JSON - this is critical for troubleshooting!
+        // Convert request to JSON for API call
         final requestJson = createApplicationChargeRequestToJson(request);
-        print('📤 Request JSON: $requestJson');
+        debugPrint('📤 Request JSON: $requestJson');
         
         // Call the API service
         final service = GetIt.I.get<CreateApplicationChargeService>();
@@ -118,7 +119,7 @@ class CreateAnApplicationChargeHandler implements ApiRequestHandler {
         "timestamp": DateTime.now().toIso8601String(),
       };
     } catch (e) {
-      print('❌ Error creating application charge: ${e.toString()}');
+      debugPrint('❌ Error creating application charge: ${e.toString()}');
       return {
         "status": "error",
         "message": "Failed to create application charge: ${e.toString()}",

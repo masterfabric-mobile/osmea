@@ -4,6 +4,7 @@ import 'package:example/services/api_service_registry.dart';
 import 'package:get_it/get_it.dart';
 import '../../../api_request_handler.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
   @override
@@ -20,7 +21,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
           sinceId = null; // Convert empty string to null
         }
 
-        print('🔧 Parameters: fields=$fields, since_id=$sinceId');
+        debugPrint('🔧 Parameters: fields=$fields, since_id=$sinceId');
         
         // APPROACH 1: When fields parameter is provided, make a direct API call
         if (fields != null && fields.isNotEmpty) {
@@ -37,7 +38,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
         "timestamp": DateTime.now().toIso8601String(),
       };
     } catch (e) {
-      print('❌ Error: ${e.toString()}');
+      debugPrint('❌ Error: ${e.toString()}');
       return {
         "status": "error",
         "message": "Failed to fetch application charges: ${e.toString()}",
@@ -50,7 +51,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
   
   // APPROACH 1: Handle field filtering by making a direct API call
   Future<Map<String, dynamic>> _handleFieldFiltering(String fields, String? sinceId) async {
-    print('📌 Using direct API call for field filtering: fields=$fields');
+    debugPrint('📌 Using direct API call for field filtering: fields=$fields');
     
     final baseUrl = ApiNetwork.baseUrl;
     final apiVersion = ApiNetwork.apiVersion;
@@ -64,7 +65,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
       url += '&since_id=$sinceId';
     }
     
-    print('🔗 Making request to: $url');
+    debugPrint('🔗 Making request to: $url');
     
     // Make direct API call
     try {
@@ -79,7 +80,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
         ),
       );
       
-      print('✅ Response status: ${response.statusCode}');
+      debugPrint('✅ Response status: ${response.statusCode}');
       
       if (response.data is Map) {
         final data = Map<String, dynamic>.from(response.data as Map);
@@ -98,14 +99,14 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
         throw Exception('Unexpected response format: ${response.data}');
       }
     } catch (e) {
-      print('❌ Direct API error: $e');
+      debugPrint('❌ Direct API error: $e');
       throw e;  // Re-throw to be caught by the outer handler
     }
   }
   
   // APPROACH 2: Standard request using the model
   Future<Map<String, dynamic>> _handleStandardRequest(String? sinceId) async {
-    print('📌 Using standard model-based approach');
+    debugPrint('📌 Using standard model-based approach');
     
     final service = GetIt.I.get<GetApplicationChargesService>();
     final response = await service.getApplicationCharges(
@@ -113,7 +114,7 @@ class RetrieveListOfApplicationChargesHandler implements ApiRequestHandler {
       sinceId: sinceId,
     );
     
-    print('📊 Received ${response.applicationCharges?.length ?? 0} charges');
+    debugPrint('📊 Received ${response.applicationCharges?.length ?? 0} charges');
     
     return {
       "status": "success",
