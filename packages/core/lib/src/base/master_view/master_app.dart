@@ -1,3 +1,4 @@
+import 'package:core/src/helper/local_storage/local_storage_helper.dart';
 import 'package:core/src/resources/resources.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,13 +33,20 @@ import 'package:go_router/go_router.dart';
 /// ```
 
 class MasterApp extends StatelessWidget {
-  /// Initializes necessary components before the app starts.
-  static void runBefore() {
-    // Ensure that Flutter is properly initialized
-    WidgetsFlutterBinding.ensureInitialized();
 
-    // Set the locale settings to use the device's locale
-    LocaleSettings.useDeviceLocale();
+
+  static Future<void> runBefore() async {
+    // Check: If we are not on the web platform
+    final LocalStorageHelper _localStorageHelper = LocalStorageHelper();
+      await _localStorageHelper.init();
+      
+      // Set the locale settings to use the device's locale
+      LocaleSettings.useDeviceLocale();
+    /// Log the initialization status
+      debugPrint("MasterApp at runBefore Local Storage Initialized");
+      final allItems = await _localStorageHelper.getAllItems();
+      debugPrint("For Run Before All items: $allItems");
+      
   }
 
   static final messengerKey = GlobalKey<ScaffoldMessengerState>();
