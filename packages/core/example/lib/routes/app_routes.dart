@@ -16,7 +16,7 @@ final GoRouter appRouter = GoRouter(
             title: Text("Home View"),
           ),
           arguments: {
-            "title": "Home View",
+            "productTitle": "Products (Encrypted Storage)",
             "cardType": "Content Card",
             "description": "Home View Description"
           },
