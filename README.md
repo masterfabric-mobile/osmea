@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/masterfabric-mobile/osmea)
 [![Shopify](https://img.shields.io/badge/Shopify-compatible-8DB543.svg)](https://shopify.dev/docs/api)
 
-<img src = "https://github.com/masterfabric-mobile/osmea/blob/dev/docs/assets/OSMEA_readme_image.png?raw=true">
+<img src = "https://github.com/masterfabric-mobile/osmea/blob/dev/docs/assets/osmea_banner_v1.png?raw=true">
 
 <p>
 
