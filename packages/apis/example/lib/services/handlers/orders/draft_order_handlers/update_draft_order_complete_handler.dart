@@ -67,7 +67,6 @@ class UpdateDraftOrderCompleteHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error updating draft order: $e");
           return {
             "status": "error",
             "message": "Failed to update draft order: ${e.toString()}",
@@ -186,7 +185,7 @@ class UpdateDraftOrderCompleteHandler implements ApiRequestHandler {
 
   @override
   List<String> get supportedMethods => ['PUT'];
-
+  @override
   Map<String, List<ApiField>> get requiredFields => {
         'PUT': [
           const ApiField(

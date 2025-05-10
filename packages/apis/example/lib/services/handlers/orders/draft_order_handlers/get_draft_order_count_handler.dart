@@ -35,7 +35,6 @@ class GetDraftOrderCountHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error fetching draft order count: $e");
           return {
             "status": "error",
             "message": "Failed to fetch draft order count: ${e.toString()}",

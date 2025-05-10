@@ -511,7 +511,7 @@ class ApiServiceRegistry {
         handler: CreateDraftOrderPercentDiscountItemHandler()),
 
     ApiService(
-        name: 'draft drder with simple product variant',
+        name: 'draft order with simple product variant',
         endpoint: '/draft_orders',
         category: ApiCategory.orders,
         subcategory: 'Draft Order',

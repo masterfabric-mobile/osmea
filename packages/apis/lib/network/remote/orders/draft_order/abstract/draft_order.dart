@@ -99,4 +99,9 @@ abstract class DraftOrderService {
     String? updated_at_max,
     String? updated_at_min,
   });
+
+  Future<void> deleteDraftOrder({
+    required String apiVersion,
+    required String draftOrderId,
+  });
 }

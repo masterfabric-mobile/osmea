@@ -141,4 +141,11 @@ abstract class DraftOrderServiceClient implements DraftOrderService {
     @Query('updated_at_min') String? updated_at_min,
     @Query('updated_at_max') String? updated_at_max,
   });
+
+  @override
+  @DELETE('/api/{api_version}/draft_orders/{draft_order_id}.json')
+  Future<void> deleteDraftOrder({
+    @Path('api_version') required String apiVersion,
+    @Path('draft_order_id') required String draftOrderId,
+  });
 }

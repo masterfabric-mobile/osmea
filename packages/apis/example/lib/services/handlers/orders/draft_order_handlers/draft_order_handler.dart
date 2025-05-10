@@ -2,8 +2,11 @@ import 'package:apis/apis.dart';
 import 'package:apis/network/remote/orders/draft_order/abstract/draft_order.dart';
 import 'package:apis/network/remote/orders/draft_order/freezed_model/request/create_draft_order_request.dart'
     as create_request;
+import 'package:apis/network/remote/orders/draft_order/freezed_model/request/update_draft_order_modify_existing_request.dart'
+    as update_request;
 import 'package:apis/network/remote/orders/draft_order/freezed_model/response/create_draft_order_response.dart';
 import 'package:apis/network/remote/orders/draft_order/freezed_model/response/get_draft_order_list_response.dart';
+import 'package:apis/network/remote/orders/draft_order/freezed_model/response/update_draft_order_modify_existing_response.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/api_service_registry.dart';
 
@@ -58,7 +61,7 @@ class CreateDraftOrderHandler implements ApiRequestHandler {
             return {
               "status": "error",
               "message":
-                  "Taslak sipariş listesi getirilirken bir hata oluştu: ${e.toString()}",
+                  "An error occurred while fetching the draft order list: ${e.toString()}",
               "timestamp": DateTime.now().toIso8601String(),
             };
           }
@@ -123,7 +126,111 @@ class CreateDraftOrderHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         }
+      case 'PUT':
+        final String apiVersion =
+            params['api_version'] ?? ApiNetwork.apiVersion;
+        final int? draftOrderId = params['draft_order_id'] != null
+            ? int.tryParse(params['draft_order_id']!)
+            : null;
+        final String? note = params['note'];
+        final String? email = params['email'];
+        final int? lineItemId = params['line_item_id'] != null
+            ? int.tryParse(params['line_item_id']!)
+            : null;
+        final String? lineItemTitle = params['line_item_title'];
+        final int? lineItemQuantity = params['line_item_quantity'] != null
+            ? int.tryParse(params['line_item_quantity']!)
+            : null;
+        final String? shippingAddressZip = params['shipping_address_zip'];
+        final String? discountDescription = params['discount_description'];
 
+        if (draftOrderId == null) {
+          return {
+            "status": "error",
+            "message": "Draft Order ID is required for updating.",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
+
+        try {
+          final model = update_request.UpdateDraftOrderModifyExistingRequest(
+            draftOrder: update_request.DraftOrder(
+              id: draftOrderId,
+              note: note,
+              email: email,
+              lineItems: lineItemId != null &&
+                      lineItemTitle != null &&
+                      lineItemQuantity != null
+                  ? [
+                      update_request.LineItem(
+                        id: lineItemId,
+                        title: lineItemTitle,
+                        quantity: lineItemQuantity,
+                      ),
+                    ]
+                  : null,
+              shippingAddress: shippingAddressZip != null
+                  ? update_request.ShippingAddress(zip: shippingAddressZip)
+                  : null,
+              appliedDiscount: discountDescription != null
+                  ? update_request.AppliedDiscount(
+                      description: discountDescription)
+                  : null,
+            ),
+          );
+
+          final UpdateDraftOrderModifyExistingResponse response = await GetIt.I
+              .get<DraftOrderService>()
+              .updateDraftOrderModifyExisting(
+                apiVersion: apiVersion,
+                draftOrderId: draftOrderId.toString(),
+                model: model,
+              );
+
+          return {
+            "status": "success",
+            "message": "Draft order updated successfully",
+            "draft_order": response.draftOrder?.toJson(),
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        } catch (e) {
+          return {
+            "status": "error",
+            "message": "Failed to update draft order: ${e.toString()}",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
+      case 'DELETE':
+        final String apiVersion =
+            params['api_version'] ?? ApiNetwork.apiVersion;
+        final String? draftOrderIdToDelete = params['draft_order_id'];
+
+        if (draftOrderIdToDelete == null || draftOrderIdToDelete.isEmpty) {
+          return {
+            "status": "error",
+            "message": "Draft Order ID is required for deleting.",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
+
+        try {
+          await GetIt.I.get<DraftOrderService>().deleteDraftOrder(
+                apiVersion: apiVersion,
+                draftOrderId: draftOrderIdToDelete,
+              );
+
+          return {
+            "status": "success",
+            "message": "Draft order deleted successfully",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        } catch (e) {
+          return {
+            "status": "error",
+            "message": "Failed to delete draft order: ${e.toString()}",
+            "timestamp": DateTime.now().toIso8601String(),
+          };
+        }
       default:
         return {
           "error": "Method $method not supported for Draft Order API",
@@ -132,7 +239,7 @@ class CreateDraftOrderHandler implements ApiRequestHandler {
   }
 
   @override
-  List<String> get supportedMethods => ['POST', 'GET'];
+  List<String> get supportedMethods => ['POST', 'GET', 'PUT', 'DELETE'];
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
@@ -159,6 +266,55 @@ class CreateDraftOrderHandler implements ApiRequestHandler {
           ),
         ],
         'GET': [],
+        'PUT': [
+          const ApiField(
+            name: 'draft_order_id',
+            label: 'Draft Order ID',
+            hint: 'Enter the ID of the draft order to update',
+          ),
+          const ApiField(
+            name: 'note',
+            label: 'Note',
+            hint: 'Enter a note for the draft order',
+          ),
+          const ApiField(
+            name: 'email',
+            label: 'Email',
+            hint: 'Enter the email for the draft order',
+          ),
+          const ApiField(
+            name: 'line_item_id',
+            label: 'Line Item ID',
+            hint: 'Enter the ID of the line item to update',
+          ),
+          const ApiField(
+            name: 'line_item_title',
+            label: 'Line Item Title',
+            hint: 'Enter the updated title of the line item',
+          ),
+          const ApiField(
+            name: 'line_item_quantity',
+            label: 'Line Item Quantity',
+            hint: 'Enter the updated quantity of the line item',
+          ),
+          const ApiField(
+            name: 'shipping_address_zip',
+            label: 'Shipping Address Zip',
+            hint: 'Enter the updated shipping address zip code',
+          ),
+          const ApiField(
+            name: 'discount_description',
+            label: 'Discount Description',
+            hint: 'Enter the updated discount description',
+          ),
+        ],
+        'DELETE': [
+          const ApiField(
+            name: 'draft_order_id',
+            label: 'Draft Order ID',
+            hint: 'Enter the ID of the draft order to delete',
+          ),
+        ],
       };
 
   Map<String, List<ApiField>> get optionalFields => {
@@ -244,6 +400,43 @@ class CreateDraftOrderHandler implements ApiRequestHandler {
             hint: 'Limit the number of results returned',
             type: ApiFieldType.number,
           )
+        ],
+        'PUT': [
+          const ApiField(
+            name: 'note',
+            label: 'Note',
+            hint: 'Enter a note for the draft order',
+          ),
+          const ApiField(
+            name: 'email',
+            label: 'Email',
+            hint: 'Enter the email for the draft order',
+          ),
+          const ApiField(
+            name: 'line_item_id',
+            label: 'Line Item ID',
+            hint: 'Enter the ID of the line item to update',
+          ),
+          const ApiField(
+            name: 'line_item_title',
+            label: 'Line Item Title',
+            hint: 'Enter the updated title of the line item',
+          ),
+          const ApiField(
+            name: 'line_item_quantity',
+            label: 'Line Item Quantity',
+            hint: 'Enter the updated quantity of the line item',
+          ),
+          const ApiField(
+            name: 'shipping_address_zip',
+            label: 'Shipping Address Zip',
+            hint: 'Enter the updated shipping address zip code',
+          ),
+          const ApiField(
+            name: 'discount_description',
+            label: 'Discount Description',
+            hint: 'Enter the updated discount description',
+          ),
         ],
       };
 }
