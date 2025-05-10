@@ -49,7 +49,9 @@ import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
-import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_list_of_application_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_an_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/create_an_application_charge_handler.dart';import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/create_new_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/disable_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/retrieves_count_of_gift_cards_handler.dart';
@@ -64,6 +66,7 @@ enum ApiCategory {
   storefront,
   admin,
   catalog,
+  billing,
   customer,
   discounts,
   events,
@@ -83,6 +86,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Admin APIs';
       case ApiCategory.catalog:
         return 'Catalog APIs';
+      case ApiCategory.billing:
+        return 'Billing APIs';
       case ApiCategory.customer:
         return 'Customer APIs';
       case ApiCategory.discounts:
@@ -209,6 +214,34 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: SendsAccountInviteToCustomerHandler(),
     ),
+
+    // 💰 Billing APIs with subcategories
+    ApiService(
+      name: 'List Application Charges',
+      endpoint: '/application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: RetrieveListOfApplicationChargesHandler(),
+    ),
+
+    // 💰 Single Application Charge API
+    ApiService(
+      name: 'Get Application Charge',
+      endpoint: '/application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: RetrieveAnApplicationChargeHandler(),
+    ),
+
+    ApiService(
+      name: 'Create Application Charge',
+      endpoint: '/application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: CreateAnApplicationChargeHandler(),
+    ),
+
+    // 🏷️ Customer Address APIs - Create Address
     ApiService(
       name: 'Create Customer Address',
       endpoint: '/customers/:id/addresses',
@@ -625,6 +658,8 @@ class ApiServiceRegistry {
         return 'Customer';
       case ApiCategory.discounts:
         return 'Discounts';
+      case ApiCategory.billing:
+        return 'Billing';
       case ApiCategory.events:
         return 'Events';
       case ApiCategory.inventory:
