@@ -19,7 +19,7 @@ class RetrievesListOfGiftCardsHandler implements ApiRequestHandler {
     }
 
     try {
-      // 🔍 Opsiyonel filtreler
+      // 🔍 Optional filters
       final onlyEnabled = params['enabled']?.toLowerCase() == 'true';
       final status = params['status'];
       final limit = int.tryParse(params['limit'] ?? '');
@@ -30,25 +30,25 @@ class RetrievesListOfGiftCardsHandler implements ApiRequestHandler {
           await GetIt.I.get<GiftCardService>().retrievesListOfGiftCards(
                 apiVersion: ApiNetwork.apiVersion,
                 limit: limit,
-                page: null, // sayfa parametresi kullanılmıyor şu an
+                page: null, // page parameter is not being used currently
                 fields: fields,
               );
 
       var cards = response.giftCards ?? [];
 
-      // 🚫 enabled filtrelemesi (disabled_at null ise aktif)
+      // 🚫 enabled filtering (active if disabled_at is null)
       if (onlyEnabled) {
         cards = cards.where((card) => card.disabledAt == null).toList();
       }
 
-      // ✅ status filtresi (örnek: 'enabled', 'disabled')
+      // ✅ status filter (example: 'enabled', 'disabled')
       if (status == 'enabled') {
         cards = cards.where((card) => card.disabledAt == null).toList();
       } else if (status == 'disabled') {
         cards = cards.where((card) => card.disabledAt != null).toList();
       }
 
-      // ⏩ since_id filtresi
+      // ⏩ since_id filter
       if (sinceId != null) {
         cards = cards.where((card) => (card.id ?? 0) > sinceId).toList();
       }
