@@ -56,6 +56,7 @@ class MasterApp extends StatelessWidget {
         false, // Show performance overlay for debugging
     this.textDirection = TextDirection.ltr, // Text direction for localization
     this.fontScale = 1.0, // Scale factor for text size
+    this.themeMode = ThemeMode.light, // Default to light theme
   })  : assert(router != null,
             'Router cannot be null! 🚫'), // Ensure router is provided
         assert(fontScale > 0,
@@ -68,6 +69,7 @@ class MasterApp extends StatelessWidget {
   final bool showPerformanceOverlay; // Flag to show performance overlay
   final TextDirection textDirection; // Text direction for the app
   final double fontScale; // Font scaling factor
+  final ThemeMode themeMode; // Theme mode for the app
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +91,14 @@ class MasterApp extends StatelessWidget {
     return TranslationProvider(
       // Wrap the app in a translation provider for localization
       child: MaterialApp.router(
+        themeMode: themeMode,
+        // Theme for the app our favorite color is blue always
+        // We can change it to any color we want and we can use it in the app
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        debugShowCheckedModeBanner: false,
         title: resources.appTitle,
         scaffoldMessengerKey:
             messengerKey, // Key for showing snackbars and dialogs

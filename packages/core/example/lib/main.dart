@@ -1,38 +1,17 @@
 import 'package:core/core.dart';
 import 'package:example/config/config_di.dart';
+import 'package:example/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-
-// Define the GoRouter
-final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return  SplashView();
-      },
-      
-    ),
-    
-  ],
-);
 
 void main() {
-  
+  // Perform any necessary setup before the app starts
   MasterApp.runBefore();
 
+  // Configure dependency injection for the application
   configureDependencies();
-  
+
+  // Run the main application with the specified router
   runApp(MasterApp(
-    router: _router,
-    shouldSetOrientation: false,
-    preferredOrientations: const [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ],
-    showPerformanceOverlay: false,
-    textDirection: TextDirection.ltr,
-    fontScale: 1.0,
+    router: appRouter, // The router handles navigation within the app
   ));
 }

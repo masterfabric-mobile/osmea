@@ -4,6 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 
+@module
+abstract class CommonLoggerModule {
+  CommonLogger get commonLogger => CommonLogger(logger: Logger());
+}
+
 @Singleton(as: ICommonLogger)
 class CommonLogger extends ICommonLogger {
   CommonLogger({required this.logger});

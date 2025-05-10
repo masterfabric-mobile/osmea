@@ -43,6 +43,15 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get appTitle => TranslationOverrides.string(_root.$meta, 'appTitle', {}) ?? 'OSMEA App';
 	String get emptyText => TranslationOverrides.string(_root.$meta, 'emptyText', {}) ?? '';
 	String get cancel => TranslationOverrides.string(_root.$meta, 'cancel', {}) ?? 'Cancel';
+	String get loading => TranslationOverrides.string(_root.$meta, 'loading', {}) ?? 'Loading...';
+	String get error => TranslationOverrides.string(_root.$meta, 'error', {}) ?? 'An error occurred.';
+	String get maintenance => TranslationOverrides.string(_root.$meta, 'maintenance', {}) ?? 'Maintenance mode.';
+	String get empty => TranslationOverrides.string(_root.$meta, 'empty', {}) ?? 'No data available.';
+	String get unauthorized => TranslationOverrides.string(_root.$meta, 'unauthorized', {}) ?? 'Unauthorized access.';
+	String get timeout => TranslationOverrides.string(_root.$meta, 'timeout', {}) ?? 'Request timed out.';
+	String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo';
+	String get webview => TranslationOverrides.string(_root.$meta, 'webview', {}) ?? 'WebView';
+	String get defaultMessage => TranslationOverrides.string(_root.$meta, 'defaultMessage', {}) ?? 'An unexpected error occurred. Please try again later.';
 }
 
 /// Flat map(s) containing all translations.
@@ -54,6 +63,15 @@ extension on Translations {
 			case 'appTitle': return TranslationOverrides.string(_root.$meta, 'appTitle', {}) ?? 'OSMEA App';
 			case 'emptyText': return TranslationOverrides.string(_root.$meta, 'emptyText', {}) ?? '';
 			case 'cancel': return TranslationOverrides.string(_root.$meta, 'cancel', {}) ?? 'Cancel';
+			case 'loading': return TranslationOverrides.string(_root.$meta, 'loading', {}) ?? 'Loading...';
+			case 'error': return TranslationOverrides.string(_root.$meta, 'error', {}) ?? 'An error occurred.';
+			case 'maintenance': return TranslationOverrides.string(_root.$meta, 'maintenance', {}) ?? 'Maintenance mode.';
+			case 'empty': return TranslationOverrides.string(_root.$meta, 'empty', {}) ?? 'No data available.';
+			case 'unauthorized': return TranslationOverrides.string(_root.$meta, 'unauthorized', {}) ?? 'Unauthorized access.';
+			case 'timeout': return TranslationOverrides.string(_root.$meta, 'timeout', {}) ?? 'Request timed out.';
+			case 'undo': return TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo';
+			case 'webview': return TranslationOverrides.string(_root.$meta, 'webview', {}) ?? 'WebView';
+			case 'defaultMessage': return TranslationOverrides.string(_root.$meta, 'defaultMessage', {}) ?? 'An unexpected error occurred. Please try again later.';
 			default: return null;
 		}
 	}

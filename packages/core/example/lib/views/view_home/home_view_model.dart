@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-
 /// ViewModel for the HomeView.
 class HomeViewModel extends BaseViewModelBloc<HomeViewEvents, HomeViewStates> {
   HomeViewModel() : super(HomeViewInitialState()) {

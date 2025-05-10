@@ -27,8 +27,12 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    final commonLoggerModule = _$CommonLoggerModule();
+    gh.factory<_i674.CommonLogger>(() => commonLoggerModule.commonLogger);
     gh.singleton<_i481.ICommonLogger>(
         () => _i674.CommonLogger(logger: gh<_i974.Logger>()));
     return this;
   }
 }
+
+class _$CommonLoggerModule extends _i674.CommonLoggerModule {}
