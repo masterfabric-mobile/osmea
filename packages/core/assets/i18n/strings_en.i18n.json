@@ -3,5 +3,14 @@
     "localLanguageCode": "en_US",
     "appTitle": "OSMEA App",
     "emptyText": "",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "maintenance": "Maintenance mode.",
+    "empty": "No data available.",
+    "unauthorized": "Unauthorized access.",
+    "timeout": "Request timed out.",
+    "undo": "Undo",
+    "webview": "WebView",
+    "defaultMessage":"An unexpected error occurred. Please try again later."
 }

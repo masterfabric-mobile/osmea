@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 
 /// 🧑‍💻 Type definition for a callback that is called when the ViewModel is ready.
 /// Useful for initializing data or starting listeners.
-typedef OnViewModelReady<V> = void Function(V viewModel);
+typedef OnViewModelReady<V> = void Function(V viewModel, BuildContext context);
 
 /// 🧹 Type definition for a callback that is called when the ViewModel is about to be disposed.
 /// Useful for cleaning up resources.
@@ -128,7 +128,7 @@ class _BaseViewState<V extends BaseViewModelBloc<E, S>, E, S>
           context: ErrorDescription('while initializing BaseView'),
         ));
       } else {
-        widget.onViewModelReady?.call(viewModel);
+        widget.onViewModelReady?.call(viewModel,context);
       }
     } catch (e, stack) {
       FlutterError.reportError(FlutterErrorDetails(
