@@ -1,4 +1,3 @@
-// ✅ api_country_service.dart
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/store_properties/country/abstract/country_service.dart';
@@ -65,5 +64,12 @@ abstract class CountryServiceClient implements CountryService {
     @Path('api_version') required String apiVersion,
     @Path('id') required String id,
     @Body() required UpdatesExistingCountryRequest model,
+  });
+
+  @override
+  @DELETE('/api/{api_version}/countries/{id}.json')
+  Future<void> deleteCountry({
+    @Path('api_version') required String apiVersion,
+    @Path('id') required String id,
   });
 }

@@ -45,4 +45,10 @@ abstract class CountryService {
     required String id,
     required UpdatesExistingCountryRequest model,
   });
+
+  /// ❌ Delete an existing country by ID
+  Future<void> deleteCountry({
+    required String apiVersion,
+    required String id,
+  });
 }

@@ -7,6 +7,7 @@ import 'package:example/services/handlers/store_properties_handlers/country/crea
 import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_custom_tax_rate_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_shopify_tax_rate_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/updates_existing_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country/delete_country_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -636,6 +637,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Country',
       handler: UpdatesExistingCountryHandler(),
+    ),
+    ApiService(
+      name: 'Delete a country',
+      endpoint: '/countries/{id}.json',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Country',
+      handler: DeleteCountryHandler(),
     ),
   ];
 
