@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/store_properties/country/abstract/country_service.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_custom_tax_rate_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
 import 'package:dio/dio.dart';
@@ -41,5 +42,13 @@ abstract class CountryServiceClient implements CountryService {
   Future<void> createCountry({
     @Path('api_version') required String apiVersion,
     @Body() required CreatesCountryRequest model,
+  });
+
+  /// 🧾 Create a new country using custom tax rate
+  @override
+  @POST('/api/{api_version}/countries.json')
+  Future<void> createCountryUsingCustomTaxRate({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateCountryUsingCustomTaxRateRequest model,
   });
 }

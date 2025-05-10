@@ -1,4 +1,5 @@
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_custom_tax_rate_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
 
@@ -17,9 +18,15 @@ abstract class CountryService {
     required String apiVersion,
   });
 
-  /// 🏁 Create a new country with optional provinces
+  /// 🏋️ Create a new country with default tax rate
   Future<void> createCountry({
     required String apiVersion,
     required CreatesCountryRequest model,
+  });
+
+  /// 🏋️ Create a new country using custom tax rate
+  Future<void> createCountryUsingCustomTaxRate({
+    required String apiVersion,
+    required CreateCountryUsingCustomTaxRateRequest model,
   });
 }
