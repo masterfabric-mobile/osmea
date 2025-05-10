@@ -14,17 +14,27 @@ class SplashView extends MasterView<SplashViewModel, SplashEvent, SplashState> {
       super.snackBarFunction});
 
   @override
-  MasterViewTypes get currentView => super.currentView;
-
-
-  @override
-  void initialContent(SplashViewModel viewModel, BuildContext context) async{
-    // Navigate to home view
-    await Future.delayed(Duration(seconds: 2));
-    // ignore: use_build_context_synchronously
-    navigateTo(context, '/home');
-  }
-  
+  void initialContent(SplashViewModel viewModel, BuildContext context) async {
+    final LocalStorageHelper localStorageHelper = LocalStorageHelper();
+    try {
+      debugPrint('Setting item in local storage');
+      localStorageHelper.setItem('SplashViewFirst', 'true');
+      // Set the encrypted item in the local storage
+      localStorageHelper.setEncryptedItem('SplashViewFirstEncrypted', 'I am a secret Hero 🦸‍♂️');
+      // Get the encrypted item from the local storage
+      final encryptedItem = await localStorageHelper.getEncryptedItem('SplashViewFirstEncrypted');
+      // Log the encrypted item
+      debugPrint('Splash View Encrypted item: $encryptedItem');
+      // Navigate to home view
+      await Future.delayed(Duration(seconds: 2));
+      debugPrint('Navigating to home view');
+      // ignore: use_build_context_synchronously
+      navigateTo(context, '/home');
+    } catch (e) {
+      // Handle error
+      debugPrint('Error occurred: $e');
+    }
+  } 
   @override
   Widget viewContent(
       BuildContext context, SplashViewModel viewModel, SplashState state) {
