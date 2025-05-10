@@ -25,6 +25,8 @@ dependencies:
   slang_flutter: ^4.7.0
   sqflite: ^2.4.2
   shared_preferences: ^2.5.3
+  flutter_lints: ^5.0.0
+  
 
 # -------------------------------
 # Development dependencies
