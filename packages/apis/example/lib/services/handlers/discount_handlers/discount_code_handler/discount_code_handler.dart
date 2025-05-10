@@ -32,17 +32,17 @@ class DiscountCodeHandler implements ApiRequestHandler {
         }
 
         try {
-          final DiscountCodeResponse? response =
+          final DiscountCodeResponse response =
               await GetIt.I.get<DiscountCodeService>().getSingleDiscountCode(
                     apiVersion: apiVersion,
                     priceRuleId: priceRuleId,
                     discountCodeId: discountCodeId,
                   );
 
-          if (response?.discountCode != null) {
+          if (response.discountCode != null) {
             return {
               "status": "success",
-              "discount_code": response!.discountCode!.toJson(),
+              "discount_code": response.discountCode!.toJson(),
               "timestamp": DateTime.now().toIso8601String(),
             };
           } else {
