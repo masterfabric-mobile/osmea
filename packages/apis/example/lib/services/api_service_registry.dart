@@ -3,6 +3,7 @@
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/retrieves_count_of_countries_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country/creates_new_country_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -604,6 +605,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Country',
       handler: RetrievesCountOfCountriesHandler(),
+    ),
+    ApiService(
+      name: 'Create Country',
+      endpoint: '/countries',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Country',
+      handler: CreateCountryHandler(),
     ),
   ];
 

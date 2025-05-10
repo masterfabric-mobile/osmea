@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
 
@@ -14,5 +15,11 @@ abstract class CountryService {
   /// 🔢 Retrieve count of countries
   Future<RetrievesCountOfCountriesResponse> retrievesCountOfCountries({
     required String apiVersion,
+  });
+
+  /// 🏁 Create a new country with optional provinces
+  Future<void> createCountry({
+    required String apiVersion,
+    required CreatesCountryRequest model,
   });
 }
