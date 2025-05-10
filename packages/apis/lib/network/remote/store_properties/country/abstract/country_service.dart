@@ -1,5 +1,6 @@
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/creates_country_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_custom_tax_rate_request.dart';
+import 'package:apis/network/remote/store_properties/country/freezed_model/request/create_country_using_shopify_tax_rate_request.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/receive_list_of_countries_response.dart';
 import 'package:apis/network/remote/store_properties/country/freezed_model/response/retrieves_count_of_countries_response.dart';
 
@@ -28,5 +29,11 @@ abstract class CountryService {
   Future<void> createCountryUsingCustomTaxRate({
     required String apiVersion,
     required CreateCountryUsingCustomTaxRateRequest model,
+  });
+
+  /// 🏋️ Create a new country using Shopify tax rate
+  Future<void> createCountryUsingShopifyTaxRate({
+    required String apiVersion,
+    required CreateCountryUsingShopifyTaxRateRequest model,
   });
 }

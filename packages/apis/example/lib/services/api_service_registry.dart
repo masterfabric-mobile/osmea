@@ -5,6 +5,7 @@ import 'package:example/services/handlers/store_properties_handlers/country/rece
 import 'package:example/services/handlers/store_properties_handlers/country/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/creates_new_country_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_custom_tax_rate_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_shopify_tax_rate_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -620,6 +621,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Country',
       handler: CreateCountryWithCustomTaxHandler(),
+    ),
+    ApiService(
+      name: 'Create Country (Shopify Tax Rate)',
+      endpoint: '/countries/create_with_shopify_tax',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Country',
+      handler: CreateCountryUsingShopifyTaxRateHandler(),
     ),
   ];
 
