@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/network/remote/gift_card/abstract/gift_card_service.dart';
 import 'package:apis/network/remote/gift_card/freezed_model/request/create_new_gift_card_request.dart';
 import 'package:example/services/api_request_handler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import './../../api_service_registry.dart';
 
@@ -44,7 +45,7 @@ class CreateNewGiftCardHandler implements ApiRequestHandler {
             expiresOn: expiresOn,
           );
 
-          print(
+          debugPrint(
               '🎯 JSON being sent: ${CreateNewGiftCardRequest(giftCard: giftCardModel).toJson()}');
 
           await GetIt.I.get<GiftCardService>().createNewGiftCard(

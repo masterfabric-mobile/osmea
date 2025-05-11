@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/network/remote/gift_card/abstract/gift_card_service.dart';
 import 'package:apis/network/remote/gift_card/freezed_model/request/disable_gift_card_request.dart';
 import 'package:example/services/api_request_handler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import './../../api_service_registry.dart';
 
@@ -44,7 +45,7 @@ class DisableGiftCardHandler implements ApiRequestHandler {
             ),
           );
 
-          print("📤 Disable Gift Card Payload: ${payload.toJson()}");
+          debugPrint("📤 Disable Gift Card Payload: ${payload.toJson()}");
 
           await GetIt.I.get<GiftCardService>().disableGiftCard(
                 apiVersion: ApiNetwork.apiVersion,

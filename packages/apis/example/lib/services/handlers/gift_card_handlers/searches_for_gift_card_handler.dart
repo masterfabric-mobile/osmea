@@ -4,6 +4,10 @@ import 'package:example/services/api_request_handler.dart';
 import 'package:get_it/get_it.dart';
 import './../../api_service_registry.dart';
 
+///*******************************************************************
+///**************** 🔎 Search Gift Card 🔎 ******************
+///*******************************************************************
+
 class SearchesForGiftCardsHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
