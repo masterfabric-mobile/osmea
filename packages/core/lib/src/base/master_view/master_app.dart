@@ -106,7 +106,7 @@ class MasterApp extends StatelessWidget {
           'osmea_core_package_timezone': await DateTime.now().timeZoneOffset.toString(),
           'osmea_core_package_device_platform': '${Platform.isIOS ? 'iOS' : Platform.isAndroid ? 'Android' : 'Web'}',
         });
-        debugPrint("Initialization event logged successfully.");
+        debugPrint("Initialization event logged successfully to 🔥 Firebase Analytics.");
       } catch (e) {
         // ❌ Handle any exceptions that occur during logging
         debugPrint('Error logging initialization event: $e 📉'); // Log the error
@@ -207,22 +207,28 @@ class MasterApp extends StatelessWidget {
         showPerformanceOverlay:
             showPerformanceOverlay, // Show performance overlay if enabled
         builder: (context, child) {
+          debugPrint("MasterApp at build");
+          
           // Create the MediaQuery data with the specified font scale
           final mediaQueryData = MediaQuery.of(context).copyWith(
             textScaler:
                 TextScaler.linear(fontScale), // Apply linear text scaling
           );
-
           return MediaQuery(
             data: mediaQueryData, // Provide the modified MediaQuery data
             child: Directionality(
               textDirection: textDirection, // Set the text direction
-              child: child!, // Ensure the child is not null
+              child: _safeArea(child), // Ensure the child is not null
             ),
           );
         },
       ),
     );
   }
+
+  SafeArea _safeArea(Widget? child) => SafeArea(child: child!,
+  bottom: true,
+  top: false ,
+  );
 
 }

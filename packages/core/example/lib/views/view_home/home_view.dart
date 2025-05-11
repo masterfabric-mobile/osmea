@@ -30,6 +30,11 @@ class HomeView extends MasterView<HomeViewModel, HomeViewEvent, HomeViewState> {
           title: Text(arguments["productTitle"]),
           actions: [
             IconButton(
+              icon: const Icon(Icons.circle),
+              onPressed: () => navigateTo(context, '/'),
+              tooltip: 'Go to Splash Screen',
+            ),
+            IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => viewModel.loadProducts(),
               tooltip: 'Refresh Products',
