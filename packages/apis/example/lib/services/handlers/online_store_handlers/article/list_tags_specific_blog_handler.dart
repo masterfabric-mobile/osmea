@@ -38,11 +38,19 @@ class ListTagsSpecificBlogHandler implements ApiRequestHandler {
           };
         }
 
+        // Extract optional query parameters
+        final limit = params['limit'];
+        final popular = params['popular'];
+        
         // 📞 Call the article service API to get tags for the specified blog
         final response =
             await GetIt.I.get<ArticleService>().listTagsSpecificBlog(
                   apiVersion: ApiNetwork.apiVersion,
                   blogId: blogIdInt,
+                  limit: limit != null && limit.isNotEmpty
+                      ? int.tryParse(limit)
+                      : null,
+                  popular: popular == 'true',
                 );
 
         // 📋 Return the blog tags data
@@ -97,6 +105,19 @@ class ListTagsSpecificBlogHandler implements ApiRequestHandler {
             name: 'blog_id',
             label: 'Blog ID',
             hint: 'Enter blog ID to retrieve tags',
+          ),
+          // Optional query parameters
+          const ApiField(
+            name: 'limit',
+            label: 'Limit',
+            hint: 'Maximum number of tags to retrieve',
+            isRequired: false,
+          ),
+          const ApiField(
+            name: 'popular',
+            label: 'Popular Only',
+            hint: 'Set to true to retrieve only popular tags',
+            isRequired: false,
           ),
         ],
       };
