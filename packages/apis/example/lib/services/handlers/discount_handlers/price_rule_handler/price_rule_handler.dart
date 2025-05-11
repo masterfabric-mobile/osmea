@@ -57,7 +57,7 @@ class PriceRuleHandler implements ApiRequestHandler {
         final String? targetSelection = params['target_selection'];
         final String? allocationMethod = params['allocation_method'];
         final dynamic allocationLimit = params['allocation_limit'];
-        final bool? oncePerCustomer =
+        final bool oncePerCustomer =
             params['once_per_customer']?.toLowerCase() == 'true';
         final dynamic usageLimit = params['usage_limit'];
         final String? startsAt = params['starts_at'];
@@ -204,7 +204,7 @@ class PriceRuleHandler implements ApiRequestHandler {
         final String? targetSelection = params['target_selection'];
         final String? allocationMethod = params['allocation_method'];
         final dynamic allocationLimit = params['allocation_limit'];
-        final bool? oncePerCustomer =
+        final bool oncePerCustomer =
             params['once_per_customer']?.toLowerCase() == 'true';
         final dynamic usageLimit = params['usage_limit'];
         final String? startsAt = params['starts_at'];
@@ -269,7 +269,7 @@ class PriceRuleHandler implements ApiRequestHandler {
         try {
           final model = update_request.UpdatePriceRuleRequest(
             priceRule: update_request.PriceRule(
-              id: int.tryParse(priceRuleId!),
+              id: int.tryParse(priceRuleId),
               title: title,
               valueType: valueType,
               value: value,
@@ -299,7 +299,7 @@ class PriceRuleHandler implements ApiRequestHandler {
           final PriceRuleResponse response =
               await GetIt.I.get<PriceRuleService>().updatePriceRule(
                     apiVersion: apiVersion,
-                    priceRuleId: priceRuleId!,
+                    priceRuleId: priceRuleId,
                     model: model,
                   );
           return {
@@ -332,7 +332,7 @@ class PriceRuleHandler implements ApiRequestHandler {
         try {
           await GetIt.I.get<PriceRuleService>().deletePriceRule(
                 apiVersion: apiVersion,
-                priceRuleId: priceRuleId!,
+                priceRuleId: priceRuleId,
               );
           return {
             "status": "success",

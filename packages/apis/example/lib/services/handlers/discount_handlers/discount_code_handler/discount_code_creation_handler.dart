@@ -117,13 +117,13 @@ class DiscountCodeCreationHandler implements ApiRequestHandler {
           const ApiField(
             name: 'price_rule_id',
             label: 'Price Rule ID',
-            hint: 'Price Rule ID\'sini girin',
+            hint: 'Enter the Price Rule ID',
           ),
           const ApiField(
             name: 'batch_id',
             label: 'Batch ID',
             hint:
-                'Getirmek istediğiniz çoklu oluşturma işleminin Batch ID\'sini girin',
+                'Enter the Batch ID of the multiple creation operation you want to retrieve',
           ),
         ],
         'POST': [

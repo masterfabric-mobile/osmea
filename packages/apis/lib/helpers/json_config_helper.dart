@@ -18,7 +18,7 @@ class JsonConfigHelper {
     } catch (e) {
       // Return empty config if file not found or invalid
       if (kDebugMode) {
-        print('Error loading config file: $e');
+        debugPrint('Error loading config file: $e');
       }
       return JsonConfigHelper({});
     }

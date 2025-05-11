@@ -53,7 +53,7 @@ class CreatePriceRuleFreeShippingHandler implements ApiRequestHandler {
           value = '-100.0';
         } else {
           value = params[
-              'value']; // Eğer 'free_shipping' değilse 'value' parametresinden al
+              'value']; // If not 'free_shipping', get from the 'value' parameter
           if (value == null || value.isEmpty) {
             return {
               "status": "error",
