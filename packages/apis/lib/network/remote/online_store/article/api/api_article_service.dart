@@ -3,6 +3,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_specific_blog_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -24,5 +25,12 @@ abstract class ArticleServiceClient implements ArticleService {
   @GET('/api/{api_version}/articles/authors.json')
   Future<ListAllArticleAuthorsResponse> listAllArticleAuthors({
     @Path('api_version') required String apiVersion,
+  });
+
+  /// 📦 List tags for a specific blog in the API.
+  @GET('/api/{api_version}/blogs/{blog_id}/articles/tags.json')
+  Future<ListTagsSpecificBlogResponse> listTagsSpecificBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
   });
 }
