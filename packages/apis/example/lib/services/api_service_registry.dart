@@ -47,6 +47,7 @@ import 'package:example/services/handlers/metafield_handlers/list_metafields_que
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_all_article_authors_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_all_articles_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_specific_blog_handler.dart';
 import 'package:example/services/index.dart';
@@ -625,6 +626,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: ListTagsAllArticlesHandler(),
+    ),
+
+   // 🏷️ LIST MOST POPULAR TAGS FOR SPECIFIC BLOG 
+    ApiService(
+      name: 'List Most Popular Tags for Specific Blog',
+      endpoint: '/blogs/:blog_id/tags/popular',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListMostPopularTagsSpecificBlogHandler(),
     ),
     
   ];
