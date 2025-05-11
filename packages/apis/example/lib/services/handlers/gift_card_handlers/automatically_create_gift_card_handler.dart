@@ -44,9 +44,6 @@ class AutomaticallyCreateGiftCardHandler implements ApiRequestHandler {
             ),
           );
 
-          // Şu an API tanımı yoksa sadece loglansın:
-          print("Simulated auto-create request: ${request.toJson()}");
-
           return {
             "status": "success",
             "message": "Auto-created gift card prepared (simulation).",

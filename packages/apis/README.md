@@ -50,7 +50,7 @@ A Dart/Flutter package for robust API integration and network management, design
 
    Future<void> fetchData() async {
      final response = await api.getData();
-     print(response);
+     debugprint(response);
    }
    ```
 
