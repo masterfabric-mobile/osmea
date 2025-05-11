@@ -5,8 +5,10 @@ import 'package:apis/network/remote/store_properties/province/freezed_model/resp
 abstract class ProvinceService {
   /// 📍 Retrieve list of provinces for a specific country
   Future<RetrievesListOfProvincesForCountryResponse>
-      retrieveListOfProvincesForCountry({
+      retrieveProvincesForCountry({
     required String apiVersion,
     required String countryId,
+    String? sinceId,
+    String? fields,
   });
 }

@@ -663,11 +663,11 @@ class ApiServiceRegistry {
       handler: RetrievesShopPoliciesHandler(),
     ),
     ApiService(
-      name: 'Retrieve Provinces',
+      name: 'Retrieve Provinces for Country',
       endpoint: '/countries/{country_id}/provinces.json',
       category: ApiCategory.storeProperties,
       subcategory: 'Province',
-      handler: RetrievesListOfProvincesHandler(),
+      handler: RetrievesListOfProvincesForCountryHandler(),
     ),
   ];
 

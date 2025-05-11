@@ -19,10 +19,12 @@ abstract class ProvinceServiceClient implements ProvinceService {
 
   /// 🗺️ Retrieve list of provinces for a specific country
   @override
-  @GET('/api/{api_version}/countries/{id}/provinces.json')
+  @GET('/api/{api_version}/countries/{country_id}/provinces.json')
   Future<RetrievesListOfProvincesForCountryResponse>
-      retrieveListOfProvincesForCountry({
+      retrieveProvincesForCountry({
     @Path('api_version') required String apiVersion,
-    @Path('id') required String countryId,
+    @Path('country_id') required String countryId,
+    @Query('since_id') String? sinceId,
+    @Query('fields') String? fields,
   });
 }
