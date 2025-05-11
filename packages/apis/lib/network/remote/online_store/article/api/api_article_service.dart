@@ -5,6 +5,7 @@ import 'package:apis/network/remote/online_store/article/abstract/article_servic
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_article_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
@@ -108,5 +109,14 @@ abstract class ArticleServiceClient implements ArticleService {
     @Query('published_at_min') DateTime? publishedAtMin,
     @Query('published_at_max') DateTime? publishedAtMax,
     @Query('published_status') String? publishedStatus,
+  });
+
+  /// 📦 List Article Tags for a specific blog
+  @GET('/api/{api_version}/blogs/{blog_id}/articles/tags.json')
+  Future<ListArticleTagsSpecificBlogResponse> listArticleTagsSpecificBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
+    @Query('limit') int? limit,
+    @Query('popular') bool? popular,
   });
 }

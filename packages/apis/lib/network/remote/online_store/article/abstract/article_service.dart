@@ -1,6 +1,7 @@
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_article_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
@@ -63,7 +64,7 @@ abstract class ArticleService {
     required int blogId,
     String? fields,
   });
-  
+
   /// 📦 Count Blog Articles
   Future<CountBlogArticlesResponse> countBlogArticles({
     required String apiVersion,
@@ -75,5 +76,14 @@ abstract class ArticleService {
     DateTime? publishedAtMin,
     DateTime? publishedAtMax,
     String? publishedStatus,
-  });  
+  }); 
+
+  /// 📦 List Article Tags for a specific blog
+  Future<ListArticleTagsSpecificBlogResponse> listArticleTagsSpecificBlog({
+    required String apiVersion,
+    required int blogId,
+    int? limit,
+    bool? popular
+  });
+
 }
