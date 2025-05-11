@@ -2,6 +2,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
@@ -82,6 +83,15 @@ abstract class ArticleServiceClient implements ArticleService {
     @Query('handle') String? handle,
     @Query('tag') String? tag,
     @Query('author') String? author,
+    @Query('fields') String? fields,
+  });
+
+  /// 📦 Get a single article by its ID in the API.
+  @GET('/api/{api_version}/blogs/{blog_id}/articles/{article_id}.json')
+  Future<GetSingleArticleResponse> getSingleArticle({
+    @Path('api_version') required String apiVersion,
+    @Path('article_id') required int articleId,
+    @Path('blog_id') required int blogId,
     @Query('fields') String? fields,
   });
 }

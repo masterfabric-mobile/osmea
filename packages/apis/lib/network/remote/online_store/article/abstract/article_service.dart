@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
@@ -53,6 +54,15 @@ abstract class ArticleService {
     String? author,
     String? fields,
   });
+
+  /// 📦 Get Single Article 
+  Future<GetSingleArticleResponse> getSingleArticle({
+    required String apiVersion,
+    required int articleId,
+    required int blogId,
+    String? fields,
+  });
+
 
   
 }
