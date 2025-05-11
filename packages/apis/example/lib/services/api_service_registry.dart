@@ -45,6 +45,7 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/get_single_article_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_all_article_authors_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_articles_from_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_handler.dart';
@@ -645,6 +646,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: ListArticlesFromBlogHandler(),
+    ),
+
+    // 📝 GET SINGLE ARTICLE
+    ApiService(
+      name: 'Get Single Article',
+      endpoint: '/blogs/:blogs_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: GetSingleArticleHandler(),
     ),
     
   ];
