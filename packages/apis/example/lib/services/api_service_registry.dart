@@ -45,6 +45,7 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/list_all_article_authors_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -70,6 +71,7 @@ enum ApiCategory {
   inventory,
   giftCard,
   metafield,
+  onlineStore,
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -95,6 +97,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Gift Card APIs';
       case ApiCategory.metafield:
         return 'Metafield APIs';
+      case ApiCategory.onlineStore:
+        return 'Online Store APIs';
     }
   }
 }
@@ -585,6 +589,15 @@ class ApiServiceRegistry {
       subcategory: 'Metafield',
       handler: DeleteMetafieldHandler(),
     ),
+
+    // 📝 LIST ALL ARTICLE AUTHORS
+    ApiService(
+      name: 'List All Article Authors',
+      endpoint: '/article_authors',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListAllArticleAuthorsHandler(),
+    ),
   ];
 
   static void initialize() {}
@@ -633,6 +646,8 @@ class ApiServiceRegistry {
         return 'Gift Card';
       case ApiCategory.metafield:
         return 'Metafield';
+      case ApiCategory.onlineStore:
+        return 'Online Store';
     }
   }
 }
