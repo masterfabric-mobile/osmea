@@ -48,6 +48,7 @@ import 'package:example/services/handlers/metafield_handlers/update_metafield_ha
 import 'package:example/services/handlers/online_store_handlers/article/count_blog_articles_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/get_single_article_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_all_article_authors_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/list_article_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_articles_from_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_specific_blog_handler.dart';
@@ -665,6 +666,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: CountBlogArticlesHandler(),
+    ),
+
+    // 🏷️ LIST ARTICLE TAGS SPECIFIC BLOG 
+    ApiService(
+      name: 'List Article Tags Specific Blog',
+      endpoint: '/blogs/:blog_id/articles/tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListArticleTagsSpecificBlogHandler(),
     ),
     
   ];
