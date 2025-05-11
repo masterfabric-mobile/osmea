@@ -9,7 +9,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Perform any necessary setup before the app starts
-  await MasterApp.runBefore();
+  await MasterApp.runBefore(
+    allowCollectDataTelemetry: true
+  );
   // Configure dependency injection for the application
   configureDependencies();
 

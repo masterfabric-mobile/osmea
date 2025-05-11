@@ -14,8 +14,7 @@ class HomeView extends MasterView<HomeViewModel, HomeViewEvent, HomeViewState> {
     super.snackBarFunction,
   });
 
-  @override
-  MasterViewTypes get currentView => super.currentView;
+  final LocalStorageHelper _localStorageHelper = LocalStorageHelper();
 
   @override
   void initialContent(HomeViewModel viewModel, BuildContext context) {
@@ -45,6 +44,25 @@ class HomeView extends MasterView<HomeViewModel, HomeViewEvent, HomeViewState> {
         Expanded(
           child: Stack(
             children: [
+              FutureBuilder<dynamic>(
+                future: _localStorageHelper.getItem("osmea_package_device_name"),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(snapshot.data!),
+                      ],
+                    );
+                  } else {
+                    return const Center(child: Text('No device name found'));
+                  }
+                },
+              ),
               _buildBody(context, viewModel, state),
               Positioned(
                 right: 16,
