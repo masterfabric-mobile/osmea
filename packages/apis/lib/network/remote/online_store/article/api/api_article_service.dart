@@ -4,6 +4,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_all_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_specific_blog_response.dart';
 import 'package:dio/dio.dart';
@@ -50,6 +51,15 @@ abstract class ArticleServiceClient implements ArticleService {
   @GET('/api/{api_version}/articles/tags.json')
   Future<ListTagsAllArticlesResponse> listTagsAllArticles({
     @Path('api_version') required String apiVersion,
+    @Query('limit') int? limit,
+    @Query('popular') bool? popular,
+  });
+
+  /// 📦 List most popular tags for a specific blog in the API.
+  @GET('/api/{api_version}/blogs/{blog_id}/articles/tags.json')
+  Future<ListMostPopularTagsSpecificBlogResponse> listMostPopularTagsSpecificBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
     @Query('limit') int? limit,
     @Query('popular') bool? popular,
   });
