@@ -1,5 +1,5 @@
-
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_all_articles_response.dart';
@@ -35,4 +35,24 @@ abstract class ArticleService {
     int? limit,
     bool? popular
   });
+
+  Future<ListArticlesFromBlogResponse> listArticlesFromBlog({
+    required String apiVersion,
+    required int blogId,
+    int? limit,
+    int? sinceId,
+    DateTime? createdAtMin,
+    DateTime? createdAtMax,
+    DateTime? updatedAtMin,
+    DateTime? updatedAtMax,
+    DateTime? publishedAtMin,
+    DateTime? publishedAtMax,
+    String? publishedStatus,
+    String? handle,
+    String? tag,
+    String? author,
+    String? fields,
+  });
+
+  
 }

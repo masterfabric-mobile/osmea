@@ -3,6 +3,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_all_articles_response.dart';
@@ -62,5 +63,25 @@ abstract class ArticleServiceClient implements ArticleService {
     @Path('blog_id') required int blogId,
     @Query('limit') int? limit,
     @Query('popular') bool? popular,
+  });
+
+  /// 📦 List articles from a specific blog in the API.
+  @GET('/api/{api_version}/blogs/{blog_id}/articles.json')  
+  Future<ListArticlesFromBlogResponse> listArticlesFromBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
+    @Query('limit') int? limit,
+    @Query('since_id') int? sinceId,
+    @Query('created_at_min') DateTime? createdAtMin,
+    @Query('created_at_max') DateTime? createdAtMax,
+    @Query('updated_at_min') DateTime? updatedAtMin,
+    @Query('updated_at_max') DateTime? updatedAtMax,
+    @Query('published_at_min') DateTime? publishedAtMin,
+    @Query('published_at_max') DateTime? publishedAtMax,
+    @Query('published_status') String? publishedStatus,
+    @Query('handle') String? handle,
+    @Query('tag') String? tag,
+    @Query('author') String? author,
+    @Query('fields') String? fields,
   });
 }
