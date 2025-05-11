@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_articles_from_blog_response.dart';
@@ -62,7 +63,17 @@ abstract class ArticleService {
     required int blogId,
     String? fields,
   });
-
-
   
+  /// 📦 Count Blog Articles
+  Future<CountBlogArticlesResponse> countBlogArticles({
+    required String apiVersion,
+    required int blogId,
+    DateTime? createdAtMin,
+    DateTime? createdAtMax,
+    DateTime? updatedAtMin,
+    DateTime? updatedAtMax,
+    DateTime? publishedAtMin,
+    DateTime? publishedAtMax,
+    String? publishedStatus,
+  });  
 }
