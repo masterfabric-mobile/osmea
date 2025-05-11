@@ -1,4 +1,4 @@
-import 'package:apis/network/remote/orders/draft_order/freezed_model/get_draft_order_count_response.dart';
+import 'package:apis/network/remote/orders/draft_order/freezed_model/response/get_draft_order_count_response.dart';
 import 'package:apis/network/remote/orders/draft_order/freezed_model/request/create_draft_order_custom_request.dart';
 import 'package:apis/network/remote/orders/draft_order/freezed_model/request/create_draft_order_discounted_item_request.dart';
 import 'package:apis/network/remote/orders/draft_order/freezed_model/request/create_draft_order_percent_discount_item_request.dart';
