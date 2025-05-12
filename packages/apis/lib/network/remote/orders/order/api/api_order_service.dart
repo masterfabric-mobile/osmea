@@ -4,6 +4,7 @@ import 'package:apis/network/remote/orders/order/abstract/order.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/update_order_response.dart';
@@ -55,7 +56,7 @@ abstract class OrderServiceClient implements OrderService {
 
   @override
   @GET('/api/{api_version}/orders.json')
-  Future<List<GetListOrderResponse>> getListOrders({
+  Future<GetListOrderResponse> getListOrders({
     @Path('api_version') required String apiVersion,
     @Query('ids') String? ids,
     @Query('name') String? name,
@@ -72,5 +73,22 @@ abstract class OrderServiceClient implements OrderService {
     @Query('financial_status') String? financial_status,
     @Query('fulfillment_status') String? fulfillment_status,
     @Query('fields') String? fields,
+  });
+
+  @override
+  @GET('/api/{api_version}/orders/count.json')
+  Future<GetCountOrderResponse> getCountOrders({
+    @Path('api_version') required String apiVersion,
+    @Query('since_id') String? since_id,
+    @Query('created_at_min') String? created_at_min,
+    @Query('created_at_max') String? created_at_max,
+    @Query('updated_at_min') String? updated_at_min,
+    @Query('updated_at_max') String? updated_at_max,
+    @Query('processed_at_min') String? processed_at_min,
+    @Query('processed_at_max') String? processed_at_max,
+    @Query('attribution_app_id') String? attribution_app_id,
+    @Query('status') String? status,
+    @Query('financial_status') String? financial_status,
+    @Query('fulfillment_status') String? fulfillment_status,
   });
 }
