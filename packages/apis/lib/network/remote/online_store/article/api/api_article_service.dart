@@ -2,6 +2,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/request/update_article_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
@@ -11,6 +12,7 @@ import 'package:apis/network/remote/online_store/article/freezed_model/response/
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_most_popular_tags_specific_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_all_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_tags_specific_blog_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/update_article_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -118,5 +120,14 @@ abstract class ArticleServiceClient implements ArticleService {
     @Path('blog_id') required int blogId,
     @Query('limit') int? limit,
     @Query('popular') bool? popular,
+  });
+
+  /// 📦 Update Article
+  @PUT('/api/{api_version}/blogs/{blog_id}/articles/{article_id}.json')
+  Future<UpdateArticleResponse> updateArticle({
+    @Path('api_version') required String apiVersion,
+    @Path('article_id') required int articleId,
+    @Path('blog_id') required int blogId,
+    @Body() required UpdateArticleRequest model,
   });
 }
