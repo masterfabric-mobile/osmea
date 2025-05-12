@@ -3,6 +3,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/store_properties/province/abstract/province_service.dart';
 import 'package:apis/network/remote/store_properties/province/freezed_model/response/retrieves_list_of_provinces_for_country_response.dart';
 import 'package:apis/network/remote/store_properties/province/freezed_model/response/retrieves_single_province_for_country_response.dart';
+import 'package:apis/network/remote/store_properties/province/freezed_model/response/retrieves_count_of_provinces_for_country_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -36,5 +37,12 @@ abstract class ProvinceServiceClient implements ProvinceService {
     @Path('country_id') required String countryId,
     @Path('province_id') required String provinceId,
     @Query('fields') String? fields,
+  });
+  @override
+  @GET('/api/{api_version}/countries/{country_id}/provinces/count.json')
+  Future<RetrievesCountOfProvincesForCountryResponse>
+      retrieveCountOfProvincesForCountry({
+    @Path('api_version') required String apiVersion,
+    @Path('country_id') required String countryId,
   });
 }

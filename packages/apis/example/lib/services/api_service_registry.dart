@@ -11,6 +11,7 @@ import 'package:example/services/handlers/store_properties_handlers/country/dele
 import 'package:example/services/handlers/store_properties_handlers/currency/retrieves_list_of_currencies_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/policy/retrieves_list_of_shop_policies_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/province/retrieves_list_of_provinces_for_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/province/retrieves_count_of_provinces_for_country_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -675,6 +676,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Province',
       handler: RetrievesListOfProvincesForCountryHandler(),
+    ),
+    ApiService(
+      name: 'Count Provinces for Country',
+      endpoint: '/provinces/count',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Province',
+      handler: RetrievesCountOfProvincesForCountryHandler(),
     ),
   ];
 
