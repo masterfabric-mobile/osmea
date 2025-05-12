@@ -87,4 +87,11 @@ abstract class ArticleService {
     required int blogId,
     required UpdateArticleRequest model,
   });
+
+  /// 📦 Delete Article
+  Future<void> deleteArticle({
+    required String apiVersion,
+    required int articleId,
+    required int blogId,
+  });
 }

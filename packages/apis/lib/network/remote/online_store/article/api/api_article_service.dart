@@ -130,4 +130,12 @@ abstract class ArticleServiceClient implements ArticleService {
     @Path('blog_id') required int blogId,
     @Body() required UpdateArticleRequest model,
   });
+
+  /// 📦 Delete Article
+  @DELETE('/api/{api_version}/blogs/{blog_id}/articles/{article_id}.json')
+  Future<void> deleteArticle({
+    @Path('api_version') required String apiVersion,
+    @Path('article_id') required int articleId,
+    @Path('blog_id') required int blogId,
+  });
 }
