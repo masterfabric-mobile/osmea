@@ -54,6 +54,7 @@ import 'package:example/services/handlers/online_store_handlers/article/list_mos
 import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_all_articles_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/update_article_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -675,6 +676,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: ListArticleTagsSpecificBlogHandler(),
+    ),
+
+    // 📝 UPDATE ARTICLE
+    ApiService(
+      name: 'Update Article',
+      endpoint: '/blogs/:blog_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: UpdateArticleHandler(),
     ),
     
   ];
