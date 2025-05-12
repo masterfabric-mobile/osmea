@@ -669,6 +669,13 @@ class ApiServiceRegistry {
       subcategory: 'Province',
       handler: RetrievesListOfProvincesForCountryHandler(),
     ),
+    ApiService(
+      name: 'Retrieve Single Province for Country',
+      endpoint: '/countries/{country_id}/provinces/{province_id}',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Province',
+      handler: RetrievesListOfProvincesForCountryHandler(),
+    ),
   ];
 
   static void initialize() {}
