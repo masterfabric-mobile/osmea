@@ -1,18 +1,19 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/receive_list_of_countries_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/retrieves_count_of_countries_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/creates_new_country_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_custom_tax_rate_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/creates_country_using_shopify_tax_rate_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/updates_existing_country_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/country/delete_country_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/currency/retrieves_list_of_currencies_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/policy/retrieves_list_of_shop_policies_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/province/retrieves_list_of_provinces_for_country_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/province/retrieves_count_of_provinces_for_country_handler.dart';
-import 'package:example/services/handlers/store_properties_handlers/province/updates_existing_province_for_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_country_using_custom_tax_rate_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_country_using_shopify_tax_rate_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/updates_existing_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/country_handlers/delete_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/currency_handlers/retrieves_list_of_currencies_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/policy_handlers/retrieves_list_of_shop_policies_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/province_handlers/retrieves_list_of_provinces_for_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/province_handlers/retrieves_count_of_provinces_for_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/province_handlers/updates_existing_province_for_country_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/shipping_zone_handlers/receive_list_of_shipping_zones_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -691,6 +692,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Province',
       handler: UpdatesProvinceForCountryHandler(),
+    ),
+    ApiService(
+      name: 'Receive List of Shipping Zones',
+      endpoint: '/shipping_zones',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Shipping Zones',
+      handler: ReceiveListOfShippingZonesHandler(),
     ),
   ];
 
