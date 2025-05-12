@@ -52,6 +52,8 @@ import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_ha
 import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_list_of_application_charges_handler.dart';
 import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_an_application_charge_handler.dart';
 import 'package:example/services/handlers/billing_handlers/application_charge_handlers/create_an_application_charge_handler.dart';import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_credit_handlers/retrieve_list_of_application_credits_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_credit_handlers/retrieve_an_application_credit_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/create_new_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/disable_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/retrieves_count_of_gift_cards_handler.dart';
@@ -239,6 +241,24 @@ class ApiServiceRegistry {
       category: ApiCategory.billing,
       subcategory: 'Application Charge',
       handler: CreateAnApplicationChargeHandler(),
+    ),
+
+    // 💰 Application Credit APIs
+    ApiService(
+      name: 'List Application Credits',
+      endpoint: '/application_credits',
+      category: ApiCategory.billing,
+      subcategory: 'Application Credit',  // New subcategory
+      handler: RetrieveListOfApplicationCreditsHandler(),
+    ),
+
+    // 💰 Single Application Credit API
+    ApiService(
+      name: 'Get Application Credit',
+      endpoint: '/application_credits/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Application Credit',
+      handler: RetrieveAnApplicationCreditHandler(),
     ),
 
     // 🏷️ Customer Address APIs - Create Address
