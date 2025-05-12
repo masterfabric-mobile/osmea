@@ -15,7 +15,7 @@ class RetrievesListOfEventsHandler implements ApiRequestHandler {
     // 🔍 Validate method
     if (method == 'GET') {
       try {
-        // Parametreleri düzgün şekilde alalım
+        // Let's properly get the parameters
         final createdAtMin = params['created_at_min'] as String?;
         final createdAtMax = params['created_at_max'] as String?;
         final limitStr = params['limit'] as String?;

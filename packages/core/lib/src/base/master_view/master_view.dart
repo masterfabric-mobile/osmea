@@ -100,6 +100,8 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
   Widget _scaffold(BuildContext context) {
     return _handleScaffoldErrors(() {
       return Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         key: _scaffoldMessengerKey,
         appBar: appBar, // Set the appBar of the scaffold 
         body: BaseView<V, E, S>(

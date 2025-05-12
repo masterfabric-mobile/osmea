@@ -16,8 +16,8 @@ class CreatePriceRuleFreeItemHandler implements ApiRequestHandler {
         final String apiVersion =
             params['api_version'] ?? ApiNetwork.apiVersion;
         final String? title = params['title'];
-        final String? valueType = 'percentage';
-        final String? value = '-100.0';
+        final String valueType = 'percentage';
+        final String value = '-100.0';
         final String? customerSelection = params['customer_selection'];
         final String? targetType = params['target_type'];
         final String? targetSelection = params['target_selection'];
