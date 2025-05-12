@@ -5,6 +5,7 @@ import 'package:apis/network/remote/orders/draft_order/freezed_model/request/cre
 import 'package:apis/network/remote/orders/draft_order/freezed_model/response/create_draft_order_percent_discount_item_response.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/api_service_registry.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 class CreateDraftOrderPercentDiscountItemHandler implements ApiRequestHandler {
@@ -79,7 +80,8 @@ class CreateDraftOrderPercentDiscountItemHandler implements ApiRequestHandler {
             "timestamp": DateTime.now().toIso8601String(),
           };
         } catch (e) {
-          print("Error creating draft order item with percentage discount: $e");
+          debugPrint(
+              "Error creating draft order item with percentage discount: $e");
           return {
             "status": "error",
             "message":
