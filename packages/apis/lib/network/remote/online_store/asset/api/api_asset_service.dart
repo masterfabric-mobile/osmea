@@ -1,6 +1,8 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/asset/abstract/asset_service.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/request/create_image_asset_base_request.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/response/create_image_asset_base_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/list_all_assets_theme_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -25,5 +27,13 @@ abstract class AssetServiceClient implements AssetService {
     @Path('api_version') required String apiVersion,
     @Path('theme_id') required int themeId,
     @Query('fields') String? fields,
+  });
+
+  /// 📦 Create an image asset in the API.
+  @PUT('/api/{api_version}/themes/{theme_id}/assets.json')
+  Future<CreateImageAssetBaseResponse> createImageAsset({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required int themeId,
+    @Body() required CreateImageAssetBaseRequest model,
   });
 }
