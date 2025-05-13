@@ -16,8 +16,9 @@ class CreateImageAssetBaseHandler implements ApiRequestHandler {
     // 🔒 Only handle PUT requests for creating image assets
     if (method == 'PUT') {
       // 🔍 Check if required parameters are provided
-      final themeId = params['theme_id'] ?? '';
-      final key = params['key'] ?? '';
+      // Try multiple possible parameter names, including URL pattern placeholders
+      final themeId = params['theme_id'] ?? params[':theme_id'] ?? params['id'] ?? params[':id'] ?? '';
+      final key = params['key'] ?? params[':key'] ?? params['asset_key'] ?? params[':asset_key'] ?? '';
 
       // Validate required parameters
       if (themeId.isEmpty) {
