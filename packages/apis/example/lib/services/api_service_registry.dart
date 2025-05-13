@@ -56,6 +56,7 @@ import 'package:example/services/handlers/online_store_handlers/article/list_mos
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_all_articles_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/update_article_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset/change_liquid_template_value_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_base_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_source_url_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/get_liquid_template_handler.dart';
@@ -735,6 +736,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Asset',
       handler: CreateImageAssetSourceUrlHandler(),
+    ),
+
+    // 📝 CHANGE LIQUID TEMPLATE
+    ApiService(
+      name: 'Change Liquid Template',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: ChangeLiquidTemplateValueHandler(),
     ),
     
   ];
