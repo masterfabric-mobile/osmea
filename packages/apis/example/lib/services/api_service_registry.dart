@@ -76,6 +76,13 @@ import 'package:example/services/handlers/gift_card_handlers/retrieves_single_gi
 import 'package:example/services/handlers/gift_card_handlers/searches_for_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/updates_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/automatically_create_gift_card_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/retrieve_list_of_recurring_application_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/retrieve_a_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/customize_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/delete_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_basic_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_trial_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_capped_recurring_application_charge_handler.dart';
 
 enum ApiCategory {
   access,
@@ -277,6 +284,69 @@ class ApiServiceRegistry {
       category: ApiCategory.billing,
       subcategory: 'Application Credit',
       handler: RetrieveAnApplicationCreditHandler(),
+    ),
+
+    // 💰 Recurring Application Charge APIs
+    ApiService(
+      name: 'List Recurring Application Charges',
+      endpoint: '/recurring_application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: RetrieveListOfRecurringApplicationChargesHandler(),
+    ),
+
+    // 💰 Single Recurring Application Charge API
+    ApiService(
+      name: 'Get Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: RetrieveARecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Customize Recurring Application Charge API
+    ApiService(
+      name: 'Customize Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id/customize',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CustomizeRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Delete Recurring Application Charge API
+    ApiService(
+      name: 'Delete Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: DeleteRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Basic Recurring Application Charge API
+    ApiService(
+      name: 'Create Basic Recurring Application Charge',
+      endpoint: '/recurring_application_charges/basic',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CreateBasicRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Trial Recurring Application Charge API
+    ApiService(
+      name: 'Create Trial Recurring Application Charge',
+      endpoint: '/recurring_application_charges/trial',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CreateTrialRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Capped Recurring Application Charge API
+    ApiService(
+      name: 'Create Capped Recurring Application Charge',
+      endpoint: '/recurring_application_charges/capped',
+      category: ApiCategory.billing, 
+      subcategory: 'Recurring Application Charge',
+      handler: CreateCappedRecurringApplicationChargeHandler(),
     ),
 
     // 🏷️ Customer Address APIs - Create Address
