@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
@@ -51,6 +52,13 @@ abstract class OrderService {
     required String orderId,
     required UpdateOrderRequest model,
   });
+
+  Future<CreateCancelOrderRequest> createCancelOrder({
+    required String apiVersion,
+    required String orderId,
+    required CreateCancelOrderRequest model,
+  });
+
   Future<void> deleteOrder({
     required String apiVersion,
     required String orderId,

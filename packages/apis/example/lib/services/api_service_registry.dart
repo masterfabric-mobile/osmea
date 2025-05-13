@@ -56,6 +56,10 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
+import 'package:example/services/handlers/orders/order/create_cancel_order_handler.dart';
+import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
+import 'package:example/services/handlers/orders/order/get_order_list_handler.dart';
+import 'package:example/services/handlers/orders/order/order_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -682,6 +686,33 @@ class ApiServiceRegistry {
       subcategory: 'Draft Order',
       handler: CreateDraftOrderHandler(),
     ),
+
+    ApiService(
+        name: 'Order',
+        endpoint: '/orders',
+        category: ApiCategory.orders,
+        subcategory: 'Order',
+        handler: OrderHandler()),
+
+    ApiService(
+        name: 'Get Order List',
+        endpoint: '/orders/count',
+        category: ApiCategory.orders,
+        subcategory: 'Order',
+        handler: GetOrderListHandler()),
+    ApiService(
+        name: 'Get Order Count',
+        endpoint: '/orders/count',
+        category: ApiCategory.orders,
+        subcategory: 'Order',
+        handler: GetOrderCountHandler()),
+
+    ApiService(
+        name: 'Create Cancel Order',
+        endpoint: '/orders/:order_id/cancel',
+        category: ApiCategory.orders,
+        subcategory: 'Order',
+        handler: CreateCancelOrderHandler()),
   ];
 
   static void initialize() {}

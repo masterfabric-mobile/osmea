@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/orders/order/abstract/order.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
@@ -90,5 +91,13 @@ abstract class OrderServiceClient implements OrderService {
     @Query('status') String? status,
     @Query('financial_status') String? financial_status,
     @Query('fulfillment_status') String? fulfillment_status,
+  });
+
+  @override
+  @POST('/api/{api_version}/orders/{order_id}/cancel.json')
+  Future<CreateCancelOrderRequest> createCancelOrder({
+    @Path('api_version') required String apiVersion,
+    @Path('order_id') required String orderId,
+    @Body() required CreateCancelOrderRequest model,
   });
 }
