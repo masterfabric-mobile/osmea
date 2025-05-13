@@ -127,10 +127,10 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Gift Card APIs';
       case ApiCategory.metafield:
         return 'Metafield APIs';
-      case ApiCategory.onlineStore:
-        return 'Online Store APIs';
       case ApiCategory.storeProperties:
         return 'Store Properties APIs';
+      case ApiCategory.onlineStore:
+        return 'Online Store APIs';
     }
   }
 }
@@ -729,7 +729,7 @@ class ApiServiceRegistry {
       handler: RetrievesShopConfigurationHandler(),
     ),
 
-       // 📝 LIST ALL ARTICLE AUTHORS
+    // 📝 LIST ALL ARTICLE AUTHORS
     ApiService(
       name: 'List All Article Authors',
       endpoint: '/article_authors',
@@ -918,10 +918,10 @@ class ApiServiceRegistry {
         return 'Gift Card';
       case ApiCategory.metafield:
         return 'Metafield';
-      case ApiCategory.onlineStore:
-        return 'Online Store';
       case ApiCategory.storeProperties:
         return 'Store Properties';
+      case ApiCategory.onlineStore:
+        return 'Online Store';
     }
   }
 }
