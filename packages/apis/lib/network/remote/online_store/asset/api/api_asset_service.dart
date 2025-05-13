@@ -5,6 +5,7 @@ import 'package:apis/network/remote/online_store/asset/freezed_model/request/cre
 import 'package:apis/network/remote/online_store/asset/freezed_model/request/create_image_asset_source_url_request.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/create_image_asset_base_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/create_image_asset_source_url_response.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/response/get_liquid_template_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/list_all_assets_theme_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -29,6 +30,14 @@ abstract class AssetServiceClient implements AssetService {
     @Path('api_version') required String apiVersion,
     @Path('theme_id') required int themeId,
     @Query('fields') String? fields,
+  });
+
+  /// 📦 Get a liquid template in the API.
+  @GET('/api/{api_version}/themes/{theme_id}/assets.json')
+  Future<GetLiquidTemplateResponse> getLiquidTemplate({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required int themeId,
+    @Query('asset[key]') required String assetKey,
   });
 
   /// 📦 Create an image asset in the API.
