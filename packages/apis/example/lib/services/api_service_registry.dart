@@ -14,6 +14,7 @@ import 'package:example/services/handlers/store_properties_handlers/province_han
 import 'package:example/services/handlers/store_properties_handlers/province_handlers/retrieves_count_of_provinces_for_country_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/province_handlers/updates_existing_province_for_country_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/shipping_zone_handlers/receive_list_of_shipping_zones_handler.dart';
+import 'package:example/services/handlers/store_properties_handlers/shop_handlers/retrieves_the_shop_configuration_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/customer_url_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_single_customer_handler.dart';
 import 'package:example/services/handlers/customers_handlers/customer/retrieves_count_of_customers_handler.dart';
@@ -699,6 +700,13 @@ class ApiServiceRegistry {
       category: ApiCategory.storeProperties,
       subcategory: 'Shipping Zones',
       handler: ReceiveListOfShippingZonesHandler(),
+    ),
+    ApiService(
+      name: 'Retrieve Shop Configuration',
+      endpoint: '/shop.json',
+      category: ApiCategory.storeProperties,
+      subcategory: 'Shop',
+      handler: RetrievesShopConfigurationHandler(),
     ),
   ];
 
