@@ -1,4 +1,4 @@
-import 'package:apis/network/remote/online_store/asset/freezed_model/list_all_assets_theme_response.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/response/list_all_assets_theme_response.dart';
 
 abstract class AssetService {
   Future<ListAllAssetsThemeResponse> listAllAssetTheme({

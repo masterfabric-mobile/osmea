@@ -1,7 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/asset/abstract/asset_service.dart';
-import 'package:apis/network/remote/online_store/asset/freezed_model/list_all_assets_theme_response.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/response/list_all_assets_theme_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
