@@ -83,6 +83,9 @@ import 'package:example/services/handlers/billing_handlers/recurring_application
 import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_basic_recurring_application_charge_handler.dart';
 import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_trial_recurring_application_charge_handler.dart';
 import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_capped_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_list_of_usage_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_a_usage_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/create_usage_charge_handler.dart';
 
 enum ApiCategory {
   access,
@@ -347,6 +350,31 @@ class ApiServiceRegistry {
       category: ApiCategory.billing, 
       subcategory: 'Recurring Application Charge',
       handler: CreateCappedRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Usage Charge APIs
+    ApiService(
+      name: 'Retrieve List of Usage Charges',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: RetrieveListOfUsageChargesHandler(),
+    ),
+
+    ApiService(
+      name: 'Retrieve a Usage Charge',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: RetrieveAUsageChargeHandler(),
+    ),
+
+    ApiService(
+      name: 'Create Usage Charge',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: CreateUsageChargeHandler(),
     ),
 
     // 🏷️ Customer Address APIs - Create Address
