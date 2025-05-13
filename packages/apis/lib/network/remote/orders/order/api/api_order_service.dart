@@ -2,8 +2,11 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/orders/order/abstract/order.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_close_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
@@ -95,9 +98,17 @@ abstract class OrderServiceClient implements OrderService {
 
   @override
   @POST('/api/{api_version}/orders/{order_id}/cancel.json')
-  Future<CreateCancelOrderRequest> createCancelOrder({
+  Future<CreateCancelOrderResponse> createCancelOrder({
     @Path('api_version') required String apiVersion,
     @Path('order_id') required String orderId,
     @Body() required CreateCancelOrderRequest model,
+  });
+
+  @override
+  @POST('/api/{api_version}/orders/{order_id}/close.json')
+  Future<CreateCloseOrderResponse> createCloseOrder({
+    @Path('api_version') required String apiVersion,
+    @Path('order_id') required String orderId,
+    @Body() required CreateCloseOrderRequest model,
   });
 }
