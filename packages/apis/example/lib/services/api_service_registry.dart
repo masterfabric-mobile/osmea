@@ -57,6 +57,7 @@ import 'package:example/services/handlers/online_store_handlers/article/list_tag
 import 'package:example/services/handlers/online_store_handlers/article/list_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/update_article_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_base_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_source_url_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/list_all_assets_theme_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
@@ -715,6 +716,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Asset',
       handler: CreateImageAssetBaseHandler(),
+    ),
+
+    // 🔗 CREATE IMAGE ASSET FROM URL
+    ApiService(
+      name: 'Create Image Asset From URL',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: CreateImageAssetSourceUrlHandler(),
     ),
     
   ];
