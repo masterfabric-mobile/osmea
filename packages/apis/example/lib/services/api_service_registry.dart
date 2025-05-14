@@ -10,6 +10,7 @@ import 'package:example/services/handlers/online_store_handlers/asset/delete_ima
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_with_metafield.dart';
+import 'package:example/services/handlers/online_store_handlers/blog/get_all_blogs_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -941,6 +942,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Asset',
       handler: DeleteImageFromThemeHandler(),
+    ),
+
+    // 📋 GET ALL BLOGS
+    ApiService(
+      name: 'Get All Blogs',
+      endpoint: '/blogs',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: GetAllBlogsHandler(),
     ),
 
     // 📝 CREATE EMPTY BLOG 
