@@ -6,6 +6,7 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/request/crea
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_single_blog_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -14,6 +15,7 @@ part 'api_blog_service.g.dart';
 
 @RestApi()
 @Injectable(as: BlogService)
+
 /// 🌐 BlogService
 abstract class BlogServiceClient implements BlogService {
   /// 🏭 Factory for dependency injection
@@ -30,7 +32,7 @@ abstract class BlogServiceClient implements BlogService {
     @Body() required CreateEmptyBlogRequest model,
   });
 
-  /// 📦 Create a new empty blog with a metafield 
+  /// 📦 Create a new empty blog with a metafield
   @POST('/api/{api_version}/blogs.json')
   Future<CreateEmptyBlogWithMetafieldResponse> createEmptyBlogWithMetafield({
     @Path('api_version') required String apiVersion,
@@ -44,6 +46,14 @@ abstract class BlogServiceClient implements BlogService {
     @Query('limit') int? limit,
     @Query('since_id') String? sinceId,
     @Query('handle') String? handle,
+    @Query('fields') String? fields,
+  });
+
+  /// 📦 Get Single Blog
+  @GET('/api/{api_version}/blogs/{blog_id}.json')
+  Future<GetSingleBlogResponse> getSingleBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required String blogId,
     @Query('fields') String? fields,
   });
 }
