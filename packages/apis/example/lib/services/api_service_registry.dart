@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
@@ -879,6 +880,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Asset',
       handler: DuplicateAssetSourceKeyHandler(),
+    ),
+
+    // 🗑️ DELETE IMAGE FROM THEME
+    ApiService(
+      name: 'Delete Image From Theme',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: DeleteImageFromThemeHandler(),
     ),
   ];
 
