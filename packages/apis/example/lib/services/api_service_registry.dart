@@ -13,6 +13,7 @@ import 'package:example/services/handlers/online_store_handlers/blog/create_empt
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_with_metafield.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/get_all_blogs_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/get_single_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog/metafield_existing_blog_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -989,6 +990,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Blog',
       handler: CreateEmptyBlogWithMetafieldHandler(),
+    ),
+
+    // 🏷️ METAFIELD TO EXISTING BLOG
+    ApiService(
+      name: 'Metafield To Existing Blog',
+      endpoint: '/blogs/:blog_id/metafields',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: MetafieldExistingBlogHandler(),
     ),
   ];
 
