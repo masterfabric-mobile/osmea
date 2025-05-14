@@ -93,4 +93,11 @@ abstract class BlogServiceClient implements BlogService {
     @Path('blog_id') required String blogId,
     @Body() required UpdateBlogTitleRequest model,
   });
+
+  /// 📦 Remove Blog
+  @DELETE('/api/{api_version}/blogs/{blog_id}.json')
+  Future<void> removeBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required String blogId,
+  });
 }

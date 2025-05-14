@@ -65,4 +65,10 @@ abstract class BlogService {
     required String blogId,
     required UpdateBlogTitleRequest model,
   });
+
+  /// 📦 Remove Blog
+  Future<void> removeBlog({
+    required String apiVersion,
+    required String blogId,
+  });
 }
