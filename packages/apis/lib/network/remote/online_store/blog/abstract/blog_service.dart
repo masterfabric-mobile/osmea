@@ -1,5 +1,6 @@
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
@@ -31,5 +32,10 @@ abstract class BlogService {
     required String apiVersion,
     required String blogId,
     String? fields,
+  });
+
+  /// 📦 Count All Blogs
+  Future<CountAllBlogsResponse> countAllBlogs({
+    required String apiVersion,
   });
 }

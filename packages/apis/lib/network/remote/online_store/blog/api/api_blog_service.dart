@@ -3,6 +3,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/blog/abstract/blog_service.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
@@ -55,5 +56,11 @@ abstract class BlogServiceClient implements BlogService {
     @Path('api_version') required String apiVersion,
     @Path('blog_id') required String blogId,
     @Query('fields') String? fields,
+  });
+
+  /// 📦 Count All Blogs
+  @GET('/api/{api_version}/blogs/count.json')
+  Future<CountAllBlogsResponse> countAllBlogs({
+    @Path('api_version') required String apiVersion,
   });
 }
