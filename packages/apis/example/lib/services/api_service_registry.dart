@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -810,6 +811,15 @@ class ApiServiceRegistry {
       handler: ListArticleTagsSpecificBlogHandler(),
     ),
 
+    // 📝 CREATE ARTICLE WITH METAFIELD 
+    ApiService(
+      name: 'Create Article With Metafield',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleWithMetafieldHandler(),
+    ),
+
     // 📝 UPDATE ARTICLE
     ApiService(
       name: 'Update Article',
@@ -827,6 +837,8 @@ class ApiServiceRegistry {
       subcategory: 'Article',
       handler: DeleteArticleFromBlogHandler(),
     ),
+
+
 
     // 🎨 LIST ALL THEME ASSETS
     ApiService(
