@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/create_article_with_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
@@ -818,6 +819,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: CreateArticleWithMetafieldHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE WITH IMAGE
+    ApiService(
+      name: 'Create Article With Image',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleWithImageHandler(),
     ),
 
     // 📝 UPDATE ARTICLE
