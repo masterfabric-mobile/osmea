@@ -1,6 +1,8 @@
+import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_image_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/update_article_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
@@ -102,5 +104,12 @@ abstract class ArticleService {
     required String apiVersion,
     required int blogId,
     required CreateArticleWithMetafieldRequest model,
+  });
+
+  /// 📦 Create Article With Image
+  Future<CreateArticleWithImageResponse> createArticleWithImage({
+    required String apiVersion,
+    required int blogId,
+    required CreateArticleWithImageRequest model,
   });
 }
