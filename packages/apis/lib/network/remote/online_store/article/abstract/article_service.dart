@@ -1,8 +1,10 @@
+import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_base_image_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_image_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/update_article_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_base_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_metafield_response.dart';
@@ -122,4 +124,10 @@ abstract class ArticleService {
     required CreateArticleHtmlMarkupRequest model,
   });
   
+  /// 📦 Create Article Base Image Response
+  Future<CreateArticleBaseImageResponse> createArticleBaseImage({
+    required String apiVersion,
+    required int blogId,
+    required CreateArticleBaseImageRequest model,
+  });
 }
