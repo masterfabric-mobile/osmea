@@ -2,10 +2,12 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/article/abstract/article_service.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_image_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/update_article_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
@@ -157,5 +159,13 @@ abstract class ArticleServiceClient implements ArticleService {
     @Path('api_version') required String apiVersion,
     @Path('blog_id') required int blogId,
     @Body() required CreateArticleWithImageRequest model,
+  });
+
+  /// 📦 Create Article HTML MARKUP
+  @POST('/api/{api_version}/blogs/{blog_id}/articles.json')
+  Future<CreateArticleHtmlMarkupResponse> createArticleHtmlMarkup({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
+    @Body() required CreateArticleHtmlMarkupRequest model,
   });
 }
