@@ -5,6 +5,7 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/request/crea
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_with_metafield_response.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -34,5 +35,15 @@ abstract class BlogServiceClient implements BlogService {
   Future<CreateEmptyBlogWithMetafieldResponse> createEmptyBlogWithMetafield({
     @Path('api_version') required String apiVersion,
     @Body() required CreateEmptyBlogWithMetafieldRequest model,
+  });
+
+  /// 📦 Get All Blogs
+  @GET('/api/{api_version}/blogs.json')
+  Future<GetAllBlogsResponse> getAllBlogs({
+    @Path('api_version') required String apiVersion,
+    @Query('limit') int? limit,
+    @Query('since_id') String? sinceId,
+    @Query('handle') String? handle,
+    @Query('fields') String? fields,
   });
 }
