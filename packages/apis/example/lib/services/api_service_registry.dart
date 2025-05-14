@@ -5,6 +5,7 @@ import 'package:example/services/handlers/online_store_handlers/article/create_a
 import 'package:example/services/handlers/online_store_handlers/article/create_article_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/create_unpublished_article_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -843,11 +844,20 @@ class ApiServiceRegistry {
 
     // 📝 CREATE ARTICLE WITH BASE64
     ApiService(
-      name: 'Create Article With Base64',
+      name: 'Create Article With Base',
       endpoint: '/blogs/:blog_id/articles',
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: CreateArticleBaseImageHandler(),
+    ),
+
+    // 📝 CREATE UNPUBLISHED ARTICLE
+    ApiService(
+      name: 'Create Unpublished Article',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateUnpublishedArticleBlogHandler(),
     ),
 
     // 📝 UPDATE ARTICLE
