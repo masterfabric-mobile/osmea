@@ -75,4 +75,12 @@ abstract class AssetServiceClient implements AssetService {
     @Path('theme_id') required int themeId,
     @Body() required DuplicateAssetSourceKeyRequest model,
   });
+
+  /// 📦 Delete an image from the theme in the API.
+  @DELETE('/api/{api_version}/themes/{theme_id}/assets.json')
+  Future<void> deleteImageFromTheme({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required int themeId,
+    @Query('asset[key]') required String assetKey,
+  });
 }

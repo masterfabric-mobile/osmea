@@ -45,4 +45,10 @@ abstract class AssetService {
     required int themeId,
     required DuplicateAssetSourceKeyRequest model,
   });
+
+  Future<void> deleteImageFromTheme({
+    required String apiVersion,
+    required int themeId,
+    required String assetKey,
+  });
 }
