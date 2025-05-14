@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/create_article_base_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
@@ -831,15 +832,6 @@ class ApiServiceRegistry {
       handler: CreateArticleWithImageHandler(),
     ),
 
-    // 📝 UPDATE ARTICLE
-    ApiService(
-      name: 'Update Article',
-      endpoint: '/blogs/:blog_id/articles/:article_id',
-      category: ApiCategory.onlineStore,
-      subcategory: 'Article',
-      handler: UpdateArticleHandler(),
-    ),
-
     // 📝 CREATE ARTICLE HTML MARKUP
     ApiService(
       name: 'Create Article HTML Markup',
@@ -847,6 +839,24 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Article',
       handler: CreateArticleHtmlMarkupHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE WITH BASE64
+    ApiService(
+      name: 'Create Article With Base64',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleBaseImageHandler(),
+    ),
+
+    // 📝 UPDATE ARTICLE
+    ApiService(
+      name: 'Update Article',
+      endpoint: '/blogs/:blog_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: UpdateArticleHandler(),
     ),
 
     //🗑️ DELETE ARTICLE
