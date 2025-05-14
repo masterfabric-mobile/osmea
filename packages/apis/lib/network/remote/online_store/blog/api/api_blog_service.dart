@@ -4,6 +4,7 @@ import 'package:apis/network/remote/online_store/blog/abstract/blog_service.dart
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/metafield_existing_blog_request.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/request/update_blog_title_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/update_existing_blog_title_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
@@ -11,6 +12,7 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/response/cre
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_single_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/metafield_existing_blog_response.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/update_blog_title_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/update_existing_blog_title_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -82,5 +84,13 @@ abstract class BlogServiceClient implements BlogService {
     @Path('api_version') required String apiVersion,
     @Path('blog_id') required String blogId,
     @Body() required UpdateExistingBlogTitleRequest model,
+  });
+
+  /// 📦 Update Blog Title
+  @PUT('/api/{api_version}/blogs/{blog_id}.json')
+  Future<UpdateBlogTitleResponse> updateBlogTitle({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required String blogId,
+    @Body() required UpdateBlogTitleRequest model,
   });
 }

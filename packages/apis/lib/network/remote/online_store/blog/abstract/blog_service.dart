@@ -1,6 +1,7 @@
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/create_empty_blog_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/metafield_existing_blog_request.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/request/update_blog_title_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/request/update_existing_blog_title_request.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/create_empty_blog_response.dart';
@@ -8,6 +9,7 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/response/cre
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/get_single_blog_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/metafield_existing_blog_response.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/update_blog_title_response.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/update_existing_blog_title_response.dart';
 
 abstract class BlogService {
@@ -43,7 +45,7 @@ abstract class BlogService {
     required String apiVersion,
   });
 
-  /// 📦 Add a metafield to an existing blog 
+  /// 📦 Add a metafield to an existing blog
   Future<MetafieldExistingBlogResponse> addMetafieldToExistingBlog({
     required String apiVersion,
     required String blogId,
@@ -55,5 +57,12 @@ abstract class BlogService {
     required String apiVersion,
     required String blogId,
     required UpdateExistingBlogTitleRequest model,
+  });
+
+  /// 📦 Update Blog Title
+  Future<UpdateBlogTitleResponse> updateBlogTitle({
+    required String apiVersion,
+    required String blogId,
+    required UpdateBlogTitleRequest model,
   });
 }
