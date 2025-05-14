@@ -8,6 +8,7 @@ import 'package:example/services/handlers/online_store_handlers/article/create_a
 import 'package:example/services/handlers/online_store_handlers/article/create_unpublished_article_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog/count_all_blogs_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_with_metafield.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/get_all_blogs_handler.dart';
@@ -963,7 +964,16 @@ class ApiServiceRegistry {
       handler: GetSingleBlogHandler(),
     ),
 
-    // 📝 CREATE EMPTY BLOG 
+    // 🔢 COUNT ALL BLOGS
+    ApiService(
+      name: 'Count All Blogs',
+      endpoint: '/blogs/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: CountAllBlogsHandler(),
+    ),
+
+    // 📝 CREATE EMPTY BLOG
     ApiService(
       name: 'Create Empty Blog',
       endpoint: '/blogs',
