@@ -4,9 +4,11 @@ import 'package:apis/network/remote/online_store/asset/abstract/asset_service.da
 import 'package:apis/network/remote/online_store/asset/freezed_model/request/change_liquid_template_value_request.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/request/create_image_asset_base_request.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/request/create_image_asset_source_url_request.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/request/duplicate_asset_source_key_request.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/change_liquid_template_value_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/create_image_asset_base_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/create_image_asset_source_url_response.dart';
+import 'package:apis/network/remote/online_store/asset/freezed_model/response/duplicate_asset_source_key_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/get_liquid_template_response.dart';
 import 'package:apis/network/remote/online_store/asset/freezed_model/response/list_all_assets_theme_response.dart';
 import 'package:dio/dio.dart';
@@ -64,5 +66,13 @@ abstract class AssetServiceClient implements AssetService {
     @Path('api_version') required String apiVersion,
     @Path('theme_id') required int themeId,
     @Body() required ChangeLiquidTemplateValueRequest model,
+  });
+
+  /// 📦 Duplicate an asset source key in the API.
+  @PUT('/api/{api_version}/themes/{theme_id}/assets.json')
+  Future<DuplicateAssetSourceKeyResponse> duplicateAssetSourceKey({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required int themeId,
+    @Body() required DuplicateAssetSourceKeyRequest model,
   });
 }
