@@ -17,6 +17,8 @@ class CreateEmptyBlogResponse with _$CreateEmptyBlogResponse {
     const factory CreateEmptyBlogResponse({
         @JsonKey(name: "blog")
         Blog? blog,
+        @JsonKey(name: "errors")
+        Errors? errors,
     }) = _CreateEmptyBlogResponse;
 
     factory CreateEmptyBlogResponse.fromJson(Map<String, dynamic> json) => _$CreateEmptyBlogResponseFromJson(json);
@@ -50,4 +52,14 @@ class Blog with _$Blog {
     }) = _Blog;
 
     factory Blog.fromJson(Map<String, dynamic> json) => _$BlogFromJson(json);
+}
+
+@freezed
+class Errors with _$Errors {
+    const factory Errors({
+        @JsonKey(name: "title")
+        List<String>? title,
+    }) = _Errors;
+
+    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
 }
