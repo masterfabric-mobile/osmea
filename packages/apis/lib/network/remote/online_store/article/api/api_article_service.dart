@@ -6,12 +6,14 @@ import 'package:apis/network/remote/online_store/article/freezed_model/request/c
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_image_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/create_article_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/request/create_unpublished_article_blog_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/request/update_article_request.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/count_blog_articles_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_base_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_image_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/create_article_with_metafield_response.dart';
+import 'package:apis/network/remote/online_store/article/freezed_model/response/create_unpublished_article_blog_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/get_single_article_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_all_article_authors_response.dart';
 import 'package:apis/network/remote/online_store/article/freezed_model/response/list_article_tags_specific_blog_response.dart';
@@ -177,5 +179,13 @@ abstract class ArticleServiceClient implements ArticleService {
     @Path('api_version') required String apiVersion,
     @Path('blog_id') required int blogId,
     @Body() required CreateArticleBaseImageRequest model,
+  });
+
+  /// 📦 Create Unpublished Article Blog
+  @POST('/api/{api_version}/blogs/{blog_id}/articles.json')
+  Future<CreateUnpublishedArticleBlogResponse> createUnpublishedArticleBlog({
+    @Path('api_version') required String apiVersion,
+    @Path('blog_id') required int blogId,
+    @Body() required CreateUnpublishedArticleBlogRequest model,
   });
 }
