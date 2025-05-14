@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article/create_article_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
@@ -812,7 +813,7 @@ class ApiServiceRegistry {
       handler: ListArticleTagsSpecificBlogHandler(),
     ),
 
-    // 📝 CREATE ARTICLE WITH METAFIELD 
+    // 📝 CREATE ARTICLE WITH METAFIELD
     ApiService(
       name: 'Create Article With Metafield',
       endpoint: '/blogs/:blog_id/articles',
@@ -839,6 +840,15 @@ class ApiServiceRegistry {
       handler: UpdateArticleHandler(),
     ),
 
+    // 📝 CREATE ARTICLE HTML MARKUP
+    ApiService(
+      name: 'Create Article HTML Markup',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleHtmlMarkupHandler(),
+    ),
+
     //🗑️ DELETE ARTICLE
     ApiService(
       name: 'Delete Article',
@@ -847,8 +857,6 @@ class ApiServiceRegistry {
       subcategory: 'Article',
       handler: DeleteArticleFromBlogHandler(),
     ),
-
-
 
     // 🎨 LIST ALL THEME ASSETS
     ApiService(
