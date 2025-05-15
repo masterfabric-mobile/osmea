@@ -21,4 +21,10 @@ abstract class CommentService {
       required String apiVersion,
       required String commentId,
     });
+
+    /// 📦 Remove a comment 
+    Future<void> removeComment({
+      required String apiVersion,
+      required String commentId,
+    });
 }

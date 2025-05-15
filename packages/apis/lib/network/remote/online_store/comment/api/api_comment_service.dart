@@ -42,4 +42,11 @@ abstract class CommentServiceClient implements CommentService {
     @Path('api_version') required String apiVersion,
     @Path('comment_id') required String commentId,
   });
+
+  /// 📦 Remove a comment 
+  @POST('/api/{api_version}/comments/{comment_id}/remove.json')
+  Future<void> removeComment({
+    @Path('api_version') required String apiVersion,
+    @Path('comment_id') required String commentId,
+  });
 }
