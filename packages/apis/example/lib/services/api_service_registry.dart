@@ -63,7 +63,12 @@ import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
 import 'handlers/customers_handlers/customer/sends_account_invite_to_customer_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_list_of_application_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/retrieve_an_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_charge_handlers/create_an_application_charge_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_all_locations_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_credit_handlers/retrieve_list_of_application_credits_handler.dart';
+import 'package:example/services/handlers/billing_handlers/application_credit_handlers/retrieve_an_application_credit_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/create_new_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/disable_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/retrieves_count_of_gift_cards_handler.dart';
@@ -72,12 +77,23 @@ import 'package:example/services/handlers/gift_card_handlers/retrieves_single_gi
 import 'package:example/services/handlers/gift_card_handlers/searches_for_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/updates_gift_card_handler.dart';
 import 'package:example/services/handlers/gift_card_handlers/automatically_create_gift_card_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/retrieve_list_of_recurring_application_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/retrieve_a_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/customize_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/delete_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_basic_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_trial_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/recurring_application_charge_handlers/create_capped_recurring_application_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_list_of_usage_charges_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_a_usage_charge_handler.dart';
+import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/create_usage_charge_handler.dart';
 
 enum ApiCategory {
   access,
   storefront,
   admin,
   catalog,
+  billing,
   customer,
   discounts,
   events,
@@ -98,6 +114,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Admin APIs';
       case ApiCategory.catalog:
         return 'Catalog APIs';
+      case ApiCategory.billing:
+        return 'Billing APIs';
       case ApiCategory.customer:
         return 'Customer APIs';
       case ApiCategory.discounts:
@@ -227,6 +245,140 @@ class ApiServiceRegistry {
       subcategory: 'Customers',
       handler: SendsAccountInviteToCustomerHandler(),
     ),
+
+    // 💰 Billing APIs with subcategories
+    ApiService(
+      name: 'List Application Charges',
+      endpoint: '/application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: RetrieveListOfApplicationChargesHandler(),
+    ),
+
+    // 💰 Single Application Charge API
+    ApiService(
+      name: 'Get Application Charge',
+      endpoint: '/application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: RetrieveAnApplicationChargeHandler(),
+    ),
+
+    ApiService(
+      name: 'Create Application Charge',
+      endpoint: '/application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Application Charge',
+      handler: CreateAnApplicationChargeHandler(),
+    ),
+
+    // 💰 Application Credit APIs
+    ApiService(
+      name: 'List Application Credits',
+      endpoint: '/application_credits',
+      category: ApiCategory.billing,
+      subcategory: 'Application Credit',  // New subcategory
+      handler: RetrieveListOfApplicationCreditsHandler(),
+    ),
+
+    // 💰 Single Application Credit API
+    ApiService(
+      name: 'Get Application Credit',
+      endpoint: '/application_credits/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Application Credit',
+      handler: RetrieveAnApplicationCreditHandler(),
+    ),
+
+    // 💰 Recurring Application Charge APIs
+    ApiService(
+      name: 'List Recurring Application Charges',
+      endpoint: '/recurring_application_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: RetrieveListOfRecurringApplicationChargesHandler(),
+    ),
+
+    // 💰 Single Recurring Application Charge API
+    ApiService(
+      name: 'Get Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: RetrieveARecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Customize Recurring Application Charge API
+    ApiService(
+      name: 'Customize Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id/customize',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CustomizeRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Delete Recurring Application Charge API
+    ApiService(
+      name: 'Delete Recurring Application Charge',
+      endpoint: '/recurring_application_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: DeleteRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Basic Recurring Application Charge API
+    ApiService(
+      name: 'Create Basic Recurring Application Charge',
+      endpoint: '/recurring_application_charges/basic',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CreateBasicRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Trial Recurring Application Charge API
+    ApiService(
+      name: 'Create Trial Recurring Application Charge',
+      endpoint: '/recurring_application_charges/trial',
+      category: ApiCategory.billing,
+      subcategory: 'Recurring Application Charge',
+      handler: CreateTrialRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Create Capped Recurring Application Charge API
+    ApiService(
+      name: 'Create Capped Recurring Application Charge',
+      endpoint: '/recurring_application_charges/capped',
+      category: ApiCategory.billing, 
+      subcategory: 'Recurring Application Charge',
+      handler: CreateCappedRecurringApplicationChargeHandler(),
+    ),
+
+    // 💰 Usage Charge APIs
+    ApiService(
+      name: 'Retrieve List of Usage Charges',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: RetrieveListOfUsageChargesHandler(),
+    ),
+
+    ApiService(
+      name: 'Retrieve a Usage Charge',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: RetrieveAUsageChargeHandler(),
+    ),
+
+    ApiService(
+      name: 'Create Usage Charge',
+      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      category: ApiCategory.billing,
+      subcategory: 'Usage Charge',
+      handler: CreateUsageChargeHandler(),
+    ),
+
+    // 🏷️ Customer Address APIs - Create Address
     ApiService(
       name: 'Create Customer Address',
       endpoint: '/customers/:id/addresses',
@@ -748,6 +900,8 @@ class ApiServiceRegistry {
         return 'Customer';
       case ApiCategory.discounts:
         return 'Discounts';
+      case ApiCategory.billing:
+        return 'Billing';
       case ApiCategory.events:
         return 'Events';
       case ApiCategory.inventory:
