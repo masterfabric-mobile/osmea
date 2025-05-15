@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/comment/abstract/comment_service.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -25,5 +26,12 @@ abstract class CommentServiceClient implements CommentService {
   Future<CreateCommentTextileMarkupResponse> createCommentTextileMarkup({
     @Path('api_version') required String apiVersion,
     @Body() required CreateCommentTextileMarkupRequest model,
+  });
+
+  /// 📦 Approve a comment and publish it to the blog 
+  @POST('/api/{api_version}/comments/{comment_id}/approve.json')
+  Future<ApproveAndPublishCommentResponse> approveAndPublishComment({
+    @Path('api_version') required String apiVersion,
+    @Path('comment_id') required String commentId,
   });
 }
