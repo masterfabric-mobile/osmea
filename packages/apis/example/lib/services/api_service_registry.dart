@@ -17,6 +17,7 @@ import 'package:example/services/handlers/online_store_handlers/blog/metafield_e
 import 'package:example/services/handlers/online_store_handlers/blog/remove_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/update_blog_title_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/update_existing_blog_title_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment/create_comment_textile_markup_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1029,6 +1030,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Blog',
       handler: RemoveBlogHandler(),
+    ),
+
+    // 💬 CREATE COMMENT WITH TEXTILE MARKUP
+    ApiService(
+      name: 'Create Comment With Textile Markup',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: CreateCommentTextileMarkupHandler(),
     ),
   ];
 
