@@ -4,11 +4,13 @@ import 'package:apis/network/remote/orders/order/abstract/order.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_close_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_tax_lines_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_tax_lines_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
@@ -36,6 +38,13 @@ abstract class OrderServiceClient implements OrderService {
   Future<CreateOrderResponse> createOrder({
     @Path('api_version') required String apiVersion,
     @Body() required CreateOrderRequest model,
+  });
+
+  @override
+  @POST('/api/{api_version}/orders.json')
+  Future<CreateOrderWithTaxLinesResponse> createOrderWithTaxLines({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateOrderWithTaxLinesRequest model,
   });
 
   @override
