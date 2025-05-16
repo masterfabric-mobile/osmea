@@ -3,6 +3,7 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/comment/abstract/comment_service.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/count_comments_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/get_single_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/list_all_comments_response.dart';
@@ -17,6 +18,7 @@ part 'api_comment_service.g.dart';
 
 @RestApi()
 @Injectable(as: CommentService)
+
 /// 🌐 CommentService
 abstract class CommentServiceClient implements CommentService {
   /// 🏭 Factory for dependency injection
@@ -33,7 +35,7 @@ abstract class CommentServiceClient implements CommentService {
     @Body() required CreateCommentTextileMarkupRequest model,
   });
 
-  /// 📦 Approve a comment and publish it to the blog 
+  /// 📦 Approve a comment and publish it to the blog
   @POST('/api/{api_version}/comments/{comment_id}/approve.json')
   Future<ApproveAndPublishCommentResponse> approveAndPublishComment({
     @Path('api_version') required String apiVersion,
@@ -47,7 +49,7 @@ abstract class CommentServiceClient implements CommentService {
     @Path('comment_id') required String commentId,
   });
 
-  /// 📦 Remove a comment 
+  /// 📦 Remove a comment
   @POST('/api/{api_version}/comments/{comment_id}/remove.json')
   Future<void> removeComment({
     @Path('api_version') required String apiVersion,
@@ -91,5 +93,19 @@ abstract class CommentServiceClient implements CommentService {
     @Path('api_version') required String apiVersion,
     @Path('comment_id') required String commentId,
     @Query('fields') String? fields,
+  });
+
+  /// 📦 Count Comments Response
+  @GET('/api/{api_version}/comments/count.json')
+  Future<CountCommentsResponse> countComments({
+    @Path('api_version') required String apiVersion,
+    @Query('created_at_min') String? createdAtMin,
+    @Query('created_at_max') String? createdAtMax,
+    @Query('updated_at_min') String? updatedAtMin,
+    @Query('updated_at_max') String? updatedAtMax,
+    @Query('published_at_min') String? publishedAtMin,
+    @Query('published_at_max') String? publishedAtMax,
+    @Query('published_status') String? publishedStatus,
+    @Query('status') String? status,
   });
 }
