@@ -19,6 +19,7 @@ import 'package:example/services/handlers/online_store_handlers/blog/update_blog
 import 'package:example/services/handlers/online_store_handlers/blog/update_existing_blog_title_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/approve_and_publish_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/create_comment_textile_markup_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment/mark_comment_as_spam_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/mark_comment_not_spam_restore_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
@@ -1231,6 +1232,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Comment',
       handler: RestoreRemoveCommentHandler(),
+    ),
+
+    /// 🚫 MARK COMMENT AS SPAM
+    ApiService(
+      name: 'Mark Comment As Spam',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id/spam',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: MarkCommentAsSpamHandler(),
     ),
   ];
 
