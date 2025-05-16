@@ -4,6 +4,7 @@ import 'package:apis/network/remote/online_store/comment/abstract/comment_servic
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/list_all_comments_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_as_spam_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
@@ -64,5 +65,22 @@ abstract class CommentServiceClient implements CommentService {
   Future<MarkCommentAsSpamResponse> markCommentAsSpam({
     @Path('api_version') required String apiVersion,
     @Path('comment_id') required String commentId,
+  });
+
+  /// 📦 List All Comments
+  @GET('/api/{api_version}/comments.json')
+  Future<ListAllCommentsResponse> listAllComments({
+    @Path('api_version') required String apiVersion,
+    @Query('limit') int? limit,
+    @Query('since_id') String? sinceId,
+    @Query('created_at_min') String? createdAtMin,
+    @Query('created_at_max') String? createdAtMax,
+    @Query('updated_at_min') String? updatedAtMin,
+    @Query('updated_at_max') String? updatedAtMax,
+    @Query('published_at_min') String? publishedAtMin,
+    @Query('published_at_max') String? publishedAtMax,
+    @Query('fields') String? fields,
+    @Query('published_status') String? publishedStatus,
+    @Query('status') String? status,
   });
 }
