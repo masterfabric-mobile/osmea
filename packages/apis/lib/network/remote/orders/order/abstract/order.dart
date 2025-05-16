@@ -1,11 +1,13 @@
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_close_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_partially_paid_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_tax_lines_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_partially_paid_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_tax_lines_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
@@ -23,6 +25,11 @@ abstract class OrderService {
   Future<CreateOrderWithTaxLinesResponse> createOrderWithTaxLines({
     required String apiVersion,
     required CreateOrderWithTaxLinesRequest model,
+  });
+
+  Future<CreateOrderPartiallyPaidResponse> createOrderPartiallyPaid({
+    required String apiVersion,
+    required CreateOrderPartiallyPaidRequest model,
   });
 
   Future<GetSingleOrderResponse> getSingleOrder({

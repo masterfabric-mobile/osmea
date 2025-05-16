@@ -58,6 +58,7 @@ import 'package:example/services/handlers/metafield_handlers/list_metafields_que
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
 import 'package:example/services/handlers/orders/order/create_cancel_order_handler.dart';
 import 'package:example/services/handlers/orders/order/create_close_order_handler.dart';
+import 'package:example/services/handlers/orders/order/create_order_partially_paid_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_tax_lines_handler.dart';
 import 'package:example/services/handlers/orders/order/create_reopen_order_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
@@ -735,6 +736,13 @@ class ApiServiceRegistry {
         category: ApiCategory.orders,
         subcategory: 'Order',
         handler: CreateOrderWithTaxLinesHandler()),
+    ApiService(
+      name: 'Create Order Partially Paid',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order',
+      handler: CreateOrderPartiallyPaidHandler(),
+    )
   ];
 
   static void initialize() {}
