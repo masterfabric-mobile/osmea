@@ -5,6 +5,7 @@ import 'package:apis/network/remote/online_store/comment/freezed_model/request/c
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -46,6 +47,13 @@ abstract class CommentServiceClient implements CommentService {
   /// 📦 Remove a comment 
   @POST('/api/{api_version}/comments/{comment_id}/remove.json')
   Future<void> removeComment({
+    @Path('api_version') required String apiVersion,
+    @Path('comment_id') required String commentId,
+  });
+
+  /// 📦 Restore Remove Comment Response
+  @POST('/api/{api_version}/comments/{comment_id}/restore.json')
+  Future<RestoreRemovedCommentResponse> restoreRemoveComment({
     @Path('api_version') required String apiVersion,
     @Path('comment_id') required String commentId,
   });

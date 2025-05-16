@@ -2,6 +2,7 @@ import 'package:apis/network/remote/online_store/comment/freezed_model/request/c
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
 
 abstract class CommentService {
     /// 📦 Create a comment with textile markup
@@ -24,6 +25,12 @@ abstract class CommentService {
 
     /// 📦 Remove a comment 
     Future<void> removeComment({
+      required String apiVersion,
+      required String commentId,
+    });
+
+    /// 📦 Restore Remove Comment Response
+    Future<RestoreRemovedCommentResponse> restoreRemoveComment({
       required String apiVersion,
       required String commentId,
     });
