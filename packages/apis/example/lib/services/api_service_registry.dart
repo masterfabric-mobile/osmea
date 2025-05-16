@@ -18,6 +18,7 @@ import 'package:example/services/handlers/online_store_handlers/blog/remove_blog
 import 'package:example/services/handlers/online_store_handlers/blog/update_blog_title_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/update_existing_blog_title_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/approve_and_publish_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment/count_comments_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/create_comment_textile_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/get_single_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/list_all_comments_handler.dart';
@@ -1209,6 +1210,14 @@ class ApiServiceRegistry {
       handler: GetSingleCommentHandler(),
     ),
 
+    // 🔢 COUNT COMMENTS
+    ApiService(
+      name: 'Count Comments',
+      endpoint: 'comments/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: CountCommentsHandler(),
+    ),
 
     
     // 💬 CREATE COMMENT WITH TEXTILE MARKUP
