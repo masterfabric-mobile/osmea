@@ -1,6 +1,7 @@
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/get_single_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/list_all_comments_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_as_spam_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
@@ -57,5 +58,12 @@ abstract class CommentService {
       String? fields,
       String? publishedStatus,
       String? status,
+    });
+
+    /// 📦 Get Single Comment Response
+    Future<GetSingleCommentResponse> getSingleComment({
+      required String apiVersion,
+      required String commentId,
+      String? fields,
     });
 }
