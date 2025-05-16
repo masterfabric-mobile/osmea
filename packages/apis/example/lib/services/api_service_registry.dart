@@ -58,6 +58,7 @@ import 'package:example/services/handlers/metafield_handlers/list_metafields_que
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
 import 'package:example/services/handlers/orders/order/create_cancel_order_handler.dart';
 import 'package:example/services/handlers/orders/order/create_close_order_handler.dart';
+import 'package:example/services/handlers/orders/order/create_reopen_order_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_list_handler.dart';
 import 'package:example/services/handlers/orders/order/order_handler.dart';
@@ -720,6 +721,12 @@ class ApiServiceRegistry {
         category: ApiCategory.orders,
         subcategory: 'Order',
         handler: CreateCloseOrderHandler()),
+    ApiService(
+        name: 'Create Reopen Order',
+        endpoint: '/orders/:order_id/reopen',
+        category: ApiCategory.orders,
+        subcategory: 'Order',
+        handler: CreateReopenOrderHandler()),
   ];
 
   static void initialize() {}

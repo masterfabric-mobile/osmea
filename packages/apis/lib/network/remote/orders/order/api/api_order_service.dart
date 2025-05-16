@@ -4,10 +4,12 @@ import 'package:apis/network/remote/orders/order/abstract/order.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_close_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_response.dart';
@@ -110,5 +112,13 @@ abstract class OrderServiceClient implements OrderService {
     @Path('api_version') required String apiVersion,
     @Path('order_id') required String orderId,
     @Body() required CreateCloseOrderRequest model,
+  });
+
+  @override
+  @POST('/api/{api_version}/orders/{order_id}/open.json')
+  Future<CreateReopenOrderResponse> createReopenOrder({
+    @Path('api_version') required String apiVersion,
+    @Path('order_id') required String orderId,
+    @Body() required CreateReopenOrderRequest model,
   });
 }
