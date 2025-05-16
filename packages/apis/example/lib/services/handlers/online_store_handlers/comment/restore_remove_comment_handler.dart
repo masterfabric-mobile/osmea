@@ -5,16 +5,16 @@ import 'package:example/services/api_service_registry.dart';
 import 'package:get_it/get_it.dart';
 
 ///**************************************************************
-///*************** 🗑️ REMOVE COMMENT ***************************
+///*************** 🔄 RESTORE REMOVE COMMENT ********************
 ///**************************************************************
 
-class RemoveCommentHandler implements ApiRequestHandler {
+class RestoreRemoveCommentHandler implements ApiRequestHandler {
   @override
   Future<Map<String, dynamic>> handleRequest(
     String method,
     Map<String, String> params,
   ) async {
-    // Only handle PUT requests for removing comments
+    // Only handle PUT requests for restoring comments
     if (method != 'PUT') {
       return {
         "status": "error",
@@ -25,7 +25,7 @@ class RemoveCommentHandler implements ApiRequestHandler {
 
     // Extract required parameters
     final commentId = params['comment_id'];
-
+    
     // Validate required parameters
     if (commentId == null || commentId.isEmpty) {
       return {
@@ -37,7 +37,7 @@ class RemoveCommentHandler implements ApiRequestHandler {
 
     try {
       // Call the API method
-      await GetIt.I<CommentService>().removeComment(
+      final response = await GetIt.I<CommentService>().restoreRemoveComment(
         apiVersion: ApiNetwork.apiVersion,
         commentId: commentId,
       );
@@ -45,17 +45,15 @@ class RemoveCommentHandler implements ApiRequestHandler {
       // Return success response
       return {
         "status": "success",
-        "message": "Comment removed successfully",
-        "params": {
-          "comment_id": commentId,
-        },
+        "message": "Comment restored successfully",
+        "comment": response,
         "timestamp": DateTime.now().toIso8601String(),
       };
     } catch (e) {
       // Handle errors
       return {
         "status": "error",
-        "message": "Failed to remove comment: ${e.toString()}",
+        "message": "Failed to restore comment: ${e.toString()}",
         "timestamp": DateTime.now().toIso8601String(),
       };
     }
@@ -66,13 +64,13 @@ class RemoveCommentHandler implements ApiRequestHandler {
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
-        'PUT': [
-          const ApiField(
-            name: 'comment_id',
-            label: 'Comment ID',
-            hint: 'The ID of the comment to remove',
-            isRequired: true,
-          ),
-        ],
-      };
+    'PUT': [
+      const ApiField(
+        name: 'comment_id',
+        label: 'Comment ID',
+        hint: 'The ID of the comment to restore',
+        isRequired: true,
+      ),
+    ],
+  };
 }
