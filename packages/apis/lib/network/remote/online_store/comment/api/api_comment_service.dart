@@ -4,6 +4,7 @@ import 'package:apis/network/remote/online_store/comment/abstract/comment_servic
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_as_spam_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
 import 'package:dio/dio.dart';
@@ -54,6 +55,13 @@ abstract class CommentServiceClient implements CommentService {
   /// 📦 Restore Remove Comment Response
   @POST('/api/{api_version}/comments/{comment_id}/restore.json')
   Future<RestoreRemovedCommentResponse> restoreRemoveComment({
+    @Path('api_version') required String apiVersion,
+    @Path('comment_id') required String commentId,
+  });
+
+  /// 📦 Mark a comment as spam
+  @POST('/api/{api_version}/comments/{comment_id}/spam.json')
+  Future<MarkCommentAsSpamResponse> markCommentAsSpam({
     @Path('api_version') required String apiVersion,
     @Path('comment_id') required String commentId,
   });
