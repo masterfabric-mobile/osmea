@@ -70,6 +70,7 @@ import 'package:example/services/handlers/orders/order/create_reopen_order_handl
 import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_list_handler.dart';
 import 'package:example/services/handlers/orders/order/order_handler.dart';
+import 'package:example/services/handlers/orders/order_risk/create_order_risk_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -791,6 +792,14 @@ class ApiServiceRegistry {
       category: ApiCategory.orders,
       subcategory: 'Order',
       handler: CreateOrderFulfillHandler(),
+    ),
+
+    ApiService(
+      name: 'Create Order Risk',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order Risk',
+      handler: CreateOrderRiskHandler(),
     )
   ];
 

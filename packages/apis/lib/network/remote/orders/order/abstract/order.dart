@@ -4,6 +4,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/create_or
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_fulfill_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_partially_paid_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_risk_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_sending_order_confirmation_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_pending_customer_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_product_id_request.dart';
@@ -17,6 +18,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_o
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_fulfill_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_partially_paid_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_risk_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_sending_order_confirmation_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_pending_customer_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_product_id_response.dart';
@@ -69,6 +71,12 @@ abstract class OrderService {
   Future<CreateOrderFulfillResponse> createOrderFulfill({
     required String apiVersion,
     required CreateOrderFulfillRequest model,
+  });
+
+  Future<CreateOrderRiskResponse> createOrderRisk({
+    required String apiVersion,
+    required String orderId,
+    required CreateOrderRiskRequest model,
   });
 
   Future<CreateOrderWithPendingCustomerResponse>
