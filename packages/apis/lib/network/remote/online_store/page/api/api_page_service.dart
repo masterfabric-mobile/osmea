@@ -5,11 +5,13 @@ import 'package:apis/network/remote/online_store/page/abstract/page_service.dart
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/update_existing_page_completely_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -86,5 +88,13 @@ abstract class PageServiceClient implements PageService {
   Future<CreateUnpublishedPageResponse> createUnpublishedPage({
     @Path('api_version') required String apiVersion,
     @Body() required CreateUnpublishedPageRequest model,
+  });
+
+  /// 📄 Update Existing Page Completely
+  @PUT('/api/{api_version}/pages/{page_id}.json')
+  Future<UpdateExistingPageCompletelyResponse> updateExistingPageCompletely({
+    @Path('api_version') required String apiVersion,
+    @Path('page_id') required String pageId,
+    @Body() required UpdateExistingPageCompletelyRequest model,
   });
 }

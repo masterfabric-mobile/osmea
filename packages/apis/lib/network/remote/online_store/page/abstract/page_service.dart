@@ -2,11 +2,13 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/response/cou
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/update_existing_page_completely_response.dart';
 
 abstract class PageService{
 
@@ -63,5 +65,12 @@ abstract class PageService{
   Future<CreateUnpublishedPageResponse> createUnpublishedPage({
     required String apiVersion,
     required CreateUnpublishedPageRequest model,
+  });
+
+  /// 📄 Update Existing Page Completely
+  Future<UpdateExistingPageCompletelyResponse> updateExistingPageCompletely({
+    required String apiVersion,
+    required String pageId,
+    required UpdateExistingPageCompletelyRequest model,
   });
 }
