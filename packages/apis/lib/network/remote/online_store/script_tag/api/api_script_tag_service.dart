@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/script_tag/abstract/script_tag_service.dart';
+import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/get_single_script_response.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/list_all_script_tags_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -33,5 +34,13 @@ abstract class ScriptTagServiceClient implements ScriptTagService {
     @Query('published_at_min') String? publishedAtMin,
     @Query('published_at_max') String? publishedAtMax,
     @Query('src') String? src,
+  });
+
+  /// 🔄 Get single script tag
+  @GET('/api/{api_version}/script_tags/{script_tag_id}.json')
+  Future<GetSingleScriptResponse> getSingleScript({
+    @Path('api_version') required String apiVersion,
+    @Path('script_tag_id') required String scriptTagId,
+    @Query('fields') String? fields,
   });
 }
