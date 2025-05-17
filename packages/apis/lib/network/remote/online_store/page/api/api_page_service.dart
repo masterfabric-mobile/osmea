@@ -2,10 +2,12 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/page/abstract/page_service.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/add_metafield_to_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/add_metafield_to_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
@@ -96,5 +98,13 @@ abstract class PageServiceClient implements PageService {
     @Path('api_version') required String apiVersion,
     @Path('page_id') required String pageId,
     @Body() required UpdateExistingPageCompletelyRequest model,
+  });
+
+  /// 📄 Add Metafield To Page
+  @PUT('/api/{api_version}/pages/{page_id}.json')
+  Future<AddMetafieldToPageResponse> addMetafieldToPage({
+    @Path('api_version') required String apiVersion,
+    @Path('page_id') required String pageId,
+    @Body() required AddMetafieldToPageRequest model,
   });
 }

@@ -1,8 +1,10 @@
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/add_metafield_to_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/add_metafield_to_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
@@ -72,5 +74,12 @@ abstract class PageService{
     required String apiVersion,
     required String pageId,
     required UpdateExistingPageCompletelyRequest model,
+  });
+
+  /// 📄 Add Metafield To Page
+  Future<AddMetafieldToPageResponse> addMetafieldToPage({
+    required String apiVersion,
+    required String pageId,
+    required AddMetafieldToPageRequest model,
   });
 }
