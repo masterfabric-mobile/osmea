@@ -40,6 +40,7 @@ import 'package:example/services/handlers/online_store_handlers/page_handlers/sh
 import 'package:example/services/handlers/online_store_handlers/page_handlers/update_body_html_of_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page_handlers/update_existing_page_completely_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/count_all_redirects_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/create_redirect_full_url_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/get_single_redirect_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/list_all_redirects_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -1432,6 +1433,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Redirect',
       handler: CountAllRedirectsHandler(),
+    ),
+
+    // 🔀 CREATE REDIRECT WITH FULL URL
+    ApiService(
+      name: 'Create Redirect With Full URL',
+      endpoint: '/redirects',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: CreateRedirectFullUrlHandler(),
     ),
   ];
 
