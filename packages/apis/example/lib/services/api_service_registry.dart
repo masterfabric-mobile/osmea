@@ -49,6 +49,7 @@ import 'package:example/services/handlers/online_store_handlers/redirect_handler
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_uri_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/count_all_script_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/create_script_tag_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/delete_script_tag_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/get_single_script_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/list_all_script_tags_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/update_script_tag_url_handler.dart';
@@ -1532,6 +1533,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Script Tag',
       handler: UpdateScriptTagUrlHandler(),
+    ),
+
+    // 🗑️ DELETE SCRIPT TAG
+    ApiService(
+      name: 'Delete Script Tag',
+      endpoint: '/script_tags/:script_tag_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: DeleteScriptTagHandler(),
     ),
   ];
 
