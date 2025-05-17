@@ -27,6 +27,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/mark_com
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/update_comment_body_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
@@ -1294,6 +1295,14 @@ class ApiServiceRegistry {
       handler: ListAllPagesHandler(),
     ),
 
+    // 📋 GET SINGLE PAGE
+    ApiService(
+      name: 'Get Single Page',
+      endpoint: '/pages/:page_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: GetSinglePageHandler(),
+    ),
     
   ];
 
