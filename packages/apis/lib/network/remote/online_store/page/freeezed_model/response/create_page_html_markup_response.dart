@@ -17,9 +17,21 @@ class CreatePageHtmlMarkupResponse with _$CreatePageHtmlMarkupResponse {
     const factory CreatePageHtmlMarkupResponse({
         @JsonKey(name: "page")
         Page? page,
+        @JsonKey(name: "errors")
+        Errors? errors,
     }) = _CreatePageHtmlMarkupResponse;
 
     factory CreatePageHtmlMarkupResponse.fromJson(Map<String, dynamic> json) => _$CreatePageHtmlMarkupResponseFromJson(json);
+}
+
+@freezed
+class Errors with _$Errors {
+    const factory Errors({
+        @JsonKey(name: "title")
+        List<String>? title,
+    }) = _Errors;
+
+    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
 }
 
 @freezed
