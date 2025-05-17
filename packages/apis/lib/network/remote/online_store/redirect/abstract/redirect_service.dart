@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/online_store/redirect/freezed_model/response/get_single_redirect_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/list_all_redirects_response.dart';
 
 abstract class RedirectService {
@@ -9,6 +10,13 @@ abstract class RedirectService {
     String? sinceId,
     String? path,
     String? target,
+    String? fields,
+  });
+
+  /// 🔄 Get Single Redirect
+  Future<GetSingleRedirectResponse> getSingleRedirect({
+    required String apiVersion,
+    required String redirectId,
     String? fields,
   });
 
