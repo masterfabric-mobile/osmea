@@ -53,6 +53,7 @@ import 'package:example/services/handlers/online_store_handlers/script_tag_handl
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/get_single_script_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/list_all_script_tags_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/update_script_tag_url_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/list_themes_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1542,6 +1543,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Script Tag',
       handler: DeleteScriptTagHandler(),
+    ),
+
+    // 📋 LIST ALL THEMES
+    ApiService(
+      name: 'List All Themes',
+      endpoint: '/themes',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: ListThemesHandler(),
     ),
   ];
 
