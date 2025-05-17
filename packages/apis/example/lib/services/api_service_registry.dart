@@ -33,6 +33,7 @@ import 'package:example/services/handlers/online_store_handlers/page/create_page
 import 'package:example/services/handlers/online_store_handlers/page/create_page_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_unpublished_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/hide_published_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/show_hidden_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/update_body_html_of_page_handler.dart';
@@ -1382,6 +1383,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Page',
       handler: UpdateBodyHtmlOfPageHandler(),
+    ),
+
+    // 🙈 HIDE PUBLISHED PAGE
+    ApiService(
+      name: 'Hide Published Page',
+      endpoint: '/pages/:page_id/hide',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: HidePublishedPageHandler(),
     ),
   ];
 
