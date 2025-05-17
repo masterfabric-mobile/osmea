@@ -147,6 +147,13 @@ abstract class OrderServiceClient implements OrderService {
     @Path('risk_id') required String riskId,
     @Body() required UpdateOrderRiskRequest model,
   });
+
+  @DELETE('/api/{api_version}/orders/{order_id}/risks/{risk_id}.json')
+  Future<void> deleteOrderRisk({
+    @Path('api_version') required String apiVersion,
+    @Path('risk_id') required String riskId,
+    @Path('order_id') required String orderId,
+  });
   @override
   @GET('/api/{api_version}/orders/{order_id}.json')
   Future<GetSingleOrderResponse> getSingleOrder({

@@ -165,6 +165,12 @@ abstract class OrderService {
     required CreateReopenOrderRequest model,
   });
 
+  Future<void> deleteOrderRisk({
+    required String apiVersion,
+    required String orderId,
+    required String riskId,
+  });
+
   Future<void> deleteOrder({
     required String apiVersion,
     required String orderId,

@@ -24,6 +24,8 @@ class OrderRiskHandler implements ApiRequestHandler {
         return _handleGetSingleOrderRisk(apiVersion, params);
       case 'PUT':
         return _handleUpdateOrderRisk(apiVersion, params);
+      case 'DELETE':
+        return _handleDeleteOrderRisk(apiVersion, params);
       default:
         return {
           "error": "Method $method not supported for Order Risk API",
@@ -62,8 +64,8 @@ class OrderRiskHandler implements ApiRequestHandler {
     try {
       final int? orderId = int.tryParse(orderIdStr);
       final double? score = double.tryParse(scoreStr);
-      final bool? causeCancel = causeCancelStr?.toLowerCase() == 'true';
-      final bool? display = displayStr?.toLowerCase() == 'true';
+      final bool causeCancel = causeCancelStr?.toLowerCase() == 'true';
+      final bool display = displayStr?.toLowerCase() == 'true';
 
       if (orderId == null || score == null) {
         return {
@@ -174,7 +176,7 @@ class OrderRiskHandler implements ApiRequestHandler {
 
     try {
       final int? score = int.tryParse(scoreStr);
-      final bool? causeCancel = causeCancelStr?.toLowerCase() == 'true';
+      final bool causeCancel = causeCancelStr?.toLowerCase() == 'true';
 
       if (score == null) {
         return {
@@ -187,12 +189,12 @@ class OrderRiskHandler implements ApiRequestHandler {
       final update_risk.UpdateOrderRiskRequest model =
           update_risk.UpdateOrderRiskRequest(
         risk: update_risk.Risk(
-          id: null, // ID will be in the path
+          id: null,
           message: message,
           recommendation: recommendation,
           source: source,
           causeCancel: causeCancel,
-          score: score.toInt(), // Update'te score int olarak tanımlanmış
+          score: score.toInt(),
         ),
       );
 
@@ -213,8 +215,50 @@ class OrderRiskHandler implements ApiRequestHandler {
     }
   }
 
+  Future<Map<String, dynamic>> _handleDeleteOrderRisk(
+      String apiVersion, Map<String, String> params) async {
+    final String? riskIdStr = params['risk_id'];
+    final String? orderIdStr = params['order_id'];
+
+    if (riskIdStr == null ||
+        riskIdStr.isEmpty ||
+        orderIdStr == null ||
+        orderIdStr.isEmpty) {
+      return {
+        "status": "error",
+        "message": "Risk ID and Order ID are required",
+        "timestamp": DateTime.now().toIso8601String(),
+      };
+    }
+
+    try {
+      final int? riskId = int.tryParse(riskIdStr);
+      final int? orderId = int.tryParse(orderIdStr);
+
+      if (riskId == null || orderId == null) {
+        return {
+          "status": "error",
+          "message": "Invalid number format for Risk ID or Order ID",
+          "timestamp": DateTime.now().toIso8601String(),
+        };
+      }
+
+      return {
+        "status": "success",
+        "message": "Order risk deleted successfully",
+        "timestamp": DateTime.now().toIso8601String(),
+      };
+    } catch (e) {
+      return {
+        "status": "error",
+        "message": "Failed to delete order risk: ${e.toString()}",
+        "timestamp": DateTime.now().toIso8601String(),
+      };
+    }
+  }
+
   @override
-  List<String> get supportedMethods => ['GET', 'POST', 'PUT'];
+  List<String> get supportedMethods => ['GET', 'POST', 'PUT', 'DELETE'];
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
@@ -257,6 +301,10 @@ class OrderRiskHandler implements ApiRequestHandler {
               name: 'cause_cancel',
               label: 'Cause Cancel',
               hint: '(Optional) true or false'),
+        ],
+        'DELETE': [
+          const ApiField(name: 'risk_id', label: 'Risk ID', hint: 'Risk ID'),
+          const ApiField(name: 'order_id', label: 'Order ID', hint: 'Order ID'),
         ],
       };
 }
