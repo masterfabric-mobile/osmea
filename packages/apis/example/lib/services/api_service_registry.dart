@@ -34,6 +34,7 @@ import 'package:example/services/handlers/online_store_handlers/page/create_page
 import 'package:example/services/handlers/online_store_handlers/page/create_unpublished_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/show_hidden_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/update_existing_page_completely_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
@@ -1362,6 +1363,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Page',
       handler: AddMetafieldToPageHandler(),
+    ),
+
+    // 👁️ SHOW HIDDEN PAGE
+    ApiService(
+      name: 'Show Hidden Page',
+      endpoint: '/pages/:page_id/show',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: ShowHiddenPageHandler(),
     ),
   ];
 
