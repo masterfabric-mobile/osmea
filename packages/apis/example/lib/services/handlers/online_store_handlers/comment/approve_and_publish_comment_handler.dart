@@ -14,11 +14,11 @@ class ApproveAndPublishCommentHandler implements ApiRequestHandler {
     String method,
     Map<String, String> params,
   ) async {
-    // Only handle PUT requests for approving comments
-    if (method != 'PUT') {
+    // Only handle POST requests for approving comments
+    if (method != 'POST') {
       return {
         "status": "error",
-        "message": "Method $method not supported. Only PUT is allowed.",
+        "message": "Method $method not supported. Only POST is allowed.",
         "timestamp": DateTime.now().toIso8601String(),
       };
     }
@@ -60,11 +60,11 @@ class ApproveAndPublishCommentHandler implements ApiRequestHandler {
   }
 
   @override
-  List<String> get supportedMethods => ['PUT'];
+  List<String> get supportedMethods => ['POST'];
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
-        'PUT': [
+        'POST': [
           const ApiField(
             name: 'comment_id',
             label: 'Comment ID',
