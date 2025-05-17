@@ -17,9 +17,23 @@ class CreateScriptTagResponse with _$CreateScriptTagResponse {
     const factory CreateScriptTagResponse({
         @JsonKey(name: "script_tag")
         ScriptTag? scriptTag,
+        @JsonKey(name: "errors")
+        Errors? errors,
     }) = _CreateScriptTagResponse;
 
     factory CreateScriptTagResponse.fromJson(Map<String, dynamic> json) => _$CreateScriptTagResponseFromJson(json);
+}
+
+@freezed
+class Errors with _$Errors {
+    const factory Errors({
+        @JsonKey(name: "src")
+        List<String>? src,
+        @JsonKey(name: "event")
+        List<String>? event,
+    }) = _Errors;
+
+    factory Errors.fromJson(Map<String, dynamic> json) => _$ErrorsFromJson(json);
 }
 
 @freezed
