@@ -1,5 +1,7 @@
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
@@ -49,4 +51,9 @@ abstract class PageService{
     required CreatePageWithMetafieldRequest model,
   });
 
+  /// 📄 Create Page with HTML Markup
+  Future<CreatePageHtmlMarkupResponse> createPageHtmlMarkup({
+    required String apiVersion,
+    required CreatePageHtmlMarkupRequest model,
+  });
 }

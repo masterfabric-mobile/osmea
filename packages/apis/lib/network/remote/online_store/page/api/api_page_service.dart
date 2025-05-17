@@ -2,7 +2,9 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/page/abstract/page_service.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
@@ -68,5 +70,12 @@ abstract class PageServiceClient implements PageService {
   Future<CreatePageWithMetafieldResponse> createPageWithMetafield({
     @Path('api_version') required String apiVersion,
     @Body() required CreatePageWithMetafieldRequest model,
+  });
+
+  /// 📦 Create Page Html Markup
+  @POST('/api/{api_version}/pages.json')
+  Future<CreatePageHtmlMarkupResponse> createPageHtmlMarkup({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreatePageHtmlMarkupRequest model,
   });
 }
