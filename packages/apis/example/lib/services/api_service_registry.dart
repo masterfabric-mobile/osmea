@@ -26,6 +26,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/mark_com
 import 'package:example/services/handlers/online_store_handlers/comment/mark_comment_not_spam_restore_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment/update_comment_body_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1217,6 +1218,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Comment',
       handler: CountCommentsHandler(),
+    ),
+
+    // ✏️ UPDATE COMMENT BODY
+    ApiService(
+      name: 'Update Comment Body',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: UpdateCommentBodyHandler(),
     ),
 
     
