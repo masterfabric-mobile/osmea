@@ -47,6 +47,7 @@ import 'package:example/services/handlers/online_store_handlers/redirect_handler
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/list_all_redirects_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_and_target_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_uri_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/list_all_script_tags_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1482,6 +1483,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Redirect',
       handler: DeleteRedirectHandler(),
+    ),
+
+    // 📋 LIST ALL SCRIPT TAGS 
+    ApiService(
+      name: 'List All Script Tags',
+      endpoint: '/script_tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: ListAllScriptTagsHandler(),
     ),
   ];
 
