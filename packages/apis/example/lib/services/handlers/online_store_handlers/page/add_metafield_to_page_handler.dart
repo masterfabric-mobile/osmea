@@ -16,11 +16,11 @@ class AddMetafieldToPageHandler implements ApiRequestHandler {
     String method,
     Map<String, String> params,
   ) async {
-    // Only handle POST requests for adding metafields
-    if (method != 'POST') {
+    // Only handle PUT requests for adding metafields
+    if (method != 'PUT') {
       return {
         "status": "error",
-        "message": "Method $method not supported. Only POST is allowed.",
+        "message": "Method $method not supported. Only PUT is allowed.",
         "timestamp": DateTime.now().toIso8601String(),
       };
     }
@@ -102,11 +102,11 @@ class AddMetafieldToPageHandler implements ApiRequestHandler {
   }
 
   @override
-  List<String> get supportedMethods => ['POST'];
+  List<String> get supportedMethods => ['PUT'];
 
   @override
   Map<String, List<ApiField>> get requiredFields => {
-    'POST': [
+    'PUT': [
       const ApiField(
         name: 'page_id',
         label: 'Page ID',
