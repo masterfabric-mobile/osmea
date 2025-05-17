@@ -1,11 +1,11 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/create_article_base_image_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/create_article_html_markup_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/create_article_with_image_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/create_article_with_metafield_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/create_unpublished_article_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_base_image_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_html_markup_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_with_image_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_with_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/create_unpublished_article_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/count_all_blogs_handler.dart';
@@ -97,17 +97,17 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/count_blog_articles_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/delete_article_from_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/get_single_article_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_all_article_authors_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_article_tags_specific_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_articles_from_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_most_popular_tags_specific_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_tags_all_articles_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/list_tags_specific_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/article/update_article_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/count_blog_articles_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/delete_article_from_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/get_single_article_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_all_article_authors_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_article_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_articles_from_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_most_popular_tags_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_most_popular_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_tags_all_articles_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/list_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handler/update_article_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/change_liquid_template_value_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_base_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_source_url_handler.dart';
