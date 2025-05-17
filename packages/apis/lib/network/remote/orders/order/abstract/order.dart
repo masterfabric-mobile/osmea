@@ -3,6 +3,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/create_cl
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_comprehensive_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_partially_paid_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_product_id_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_tax_lines_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
@@ -11,6 +12,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_c
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_comprehensive_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_partially_paid_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_product_id_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_tax_lines_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
@@ -37,6 +39,11 @@ abstract class OrderService {
   Future<CreateOrderComprehensiveResponse> createOrderComprehensive({
     required String apiVersion,
     required CreateOrderComprehensiveRequest model,
+  });
+
+  Future<CreateOrderWithProductIdResponse> createOrderWithProductId({
+    required String apiVersion,
+    required CreateOrderWithProductIdRequest model,
   });
 
   Future<GetSingleOrderResponse> getSingleOrder({

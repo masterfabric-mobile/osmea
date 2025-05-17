@@ -60,6 +60,7 @@ import 'package:example/services/handlers/orders/order/create_cancel_order_handl
 import 'package:example/services/handlers/orders/order/create_close_order_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_comprehensive_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_partially_paid_handler.dart';
+import 'package:example/services/handlers/orders/order/create_order_with_product_id_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_tax_lines_handler.dart';
 import 'package:example/services/handlers/orders/order/create_reopen_order_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
@@ -752,6 +753,13 @@ class ApiServiceRegistry {
       subcategory: 'Order',
       handler: CreateOrderComprehensiveHandler(),
     ),
+    ApiService(
+      name: 'Create Order with Product ID',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order',
+      handler: CreateOrderWithProductIdHandler(),
+    )
   ];
 
   static void initialize() {}
