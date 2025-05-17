@@ -32,6 +32,7 @@ import 'package:example/services/handlers/online_store_handlers/page/count_all_p
 import 'package:example/services/handlers/online_store_handlers/page/create_page_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_page_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_unpublished_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/delete_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/hide_published_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
@@ -1392,6 +1393,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Page',
       handler: HidePublishedPageHandler(),
+    ),
+
+    // 🗑️ DELETE PAGE
+    ApiService(
+      name: 'Delete Page',
+      endpoint: '/pages/:page_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: DeletePageHandler(),
     ),
   ];
 
