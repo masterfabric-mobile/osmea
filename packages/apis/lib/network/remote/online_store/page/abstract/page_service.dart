@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
 
 abstract class PageService{
@@ -15,5 +16,11 @@ abstract class PageService{
     String? publishedStatus,
     String? title,
     String? handle,
+  });
+
+  Future<GetSinglePageResponse> getSinglePage({
+    required String apiVersion,
+    required String pageId,
+    String? fields,
   });
 }

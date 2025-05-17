@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/page/abstract/page_service.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -35,5 +36,13 @@ abstract class PageServiceClient implements PageService {
     @Query('published_status') String? publishedStatus,
     @Query('title') String? title,
     @Query('handle') String? handle,
+  });
+
+  /// 📄 Get single page
+  @GET('/api/{api_version}/pages/{page_id}.json')
+  Future<GetSinglePageResponse> getSinglePage({
+    @Path('api_version') required String apiVersion,
+    @Path('page_id') required String pageId,
+    @Query('fields') String? fields,
   });
 }
