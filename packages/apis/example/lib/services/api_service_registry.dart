@@ -6,8 +6,8 @@ import 'package:example/services/handlers/online_store_handlers/article_handler/
 import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_with_image_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article_handler/create_article_with_metafield_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article_handler/create_unpublished_article_blog_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/delete_image_from_theme_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/duplicate_asset_source_key_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/delete_image_from_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/duplicate_asset_source_key_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/count_all_blogs_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/blog/create_empty_blog_with_metafield.dart';
@@ -108,11 +108,11 @@ import 'package:example/services/handlers/online_store_handlers/article_handler/
 import 'package:example/services/handlers/online_store_handlers/article_handler/list_tags_all_articles_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article_handler/list_tags_specific_blog_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/article_handler/update_article_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/change_liquid_template_value_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_base_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/create_image_asset_source_url_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/get_liquid_template_handler.dart';
-import 'package:example/services/handlers/online_store_handlers/asset/list_all_assets_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/change_liquid_template_value_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/create_image_asset_base_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/create_image_asset_source_url_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/get_liquid_template_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handler/list_all_assets_theme_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
