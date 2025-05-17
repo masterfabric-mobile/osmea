@@ -27,6 +27,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/mark_com
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/update_comment_body_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1282,6 +1283,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Comment',
       handler: MarkCommentAsSpamHandler(),
+    ),
+
+    // 📋 LIST ALL PAGES
+    ApiService(
+      name: 'List All Pages',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: ListAllPagesHandler(),
     ),
 
     
