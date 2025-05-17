@@ -6,6 +6,7 @@ import 'package:apis/network/remote/online_store/page/freeezed_model/request/add
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/hide_published_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/show_hidden_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_body_html_of_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
@@ -14,6 +15,7 @@ import 'package:apis/network/remote/online_store/page/freeezed_model/response/cr
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/hide_published_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/show_hidden_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/update_body_html_of_page_response.dart';
@@ -126,5 +128,13 @@ abstract class PageServiceClient implements PageService {
     @Path('api_version') required String apiVersion,
     @Path('page_id') required String pageId,
     @Body() required UpdateBodyHtmlOfPageRequest model,
+  });
+
+  /// 📄 Hide Published Page
+  @PUT('/api/{api_version}/pages/{page_id}.json')
+  Future<HidePublishedPageResponse> hidePublishedPage({
+    @Path('api_version') required String apiVersion,
+    @Path('page_id') required String pageId,
+    @Body() required HidePublishedPageRequest model,
   });
 }
