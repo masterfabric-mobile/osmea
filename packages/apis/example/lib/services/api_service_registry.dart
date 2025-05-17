@@ -27,6 +27,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/mark_com
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/update_comment_body_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/count_all_pages_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -1304,6 +1305,14 @@ class ApiServiceRegistry {
       handler: GetSinglePageHandler(),
     ),
     
+    // 🔢 COUNT ALL PAGES
+    ApiService(
+      name: 'Count All Pages',
+      endpoint: '/pages/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CountAllPagesHandler(),
+    ),
   ];
 
   static void initialize() {}
