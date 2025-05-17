@@ -61,4 +61,10 @@ abstract class RedirectService {
     required String redirectId,
     required UpdateRedirectPathAndTargetRequest body,
   });
+
+  /// 🗑️ Delete Redirect
+  Future<void> deleteRedirect({
+    required String apiVersion,
+    required String redirectId,
+  });
 }

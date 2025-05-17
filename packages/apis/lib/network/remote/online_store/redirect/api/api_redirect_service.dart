@@ -85,4 +85,11 @@ abstract class RedirectServiceClient implements RedirectService {
     @Path('redirect_id') required String redirectId,
     @Body() required UpdateRedirectPathAndTargetRequest body,
   });
+
+  /// 🗑️ Delete Redirect
+  @DELETE('/api/{api_version}/redirects/{redirect_id}.json')
+  Future<void> deleteRedirect({
+    @Path('api_version') required String apiVersion,
+    @Path('redirect_id') required String redirectId,
+  });
 } 
