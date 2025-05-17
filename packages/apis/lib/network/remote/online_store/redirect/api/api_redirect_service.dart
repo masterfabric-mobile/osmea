@@ -3,11 +3,13 @@ import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/redirect/abstract/redirect_service.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/request/create_redirect_full_url_request.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/request/create_redirect_request.dart';
+import 'package:apis/network/remote/online_store/redirect/freezed_model/request/update_redirect_path_uri_request.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/count_all_redirects_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/create_redirect_full_url_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/create_redirect_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/get_single_redirect_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/list_all_redirects_response.dart';
+import 'package:apis/network/remote/online_store/redirect/freezed_model/response/update_redirect_path_uri_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -64,5 +66,13 @@ abstract class RedirectServiceClient implements RedirectService {
   Future<CreateRedirectResponse> createRedirect({
     @Path('api_version') required String apiVersion,
     @Body() required CreateRedirectRequest body,
+  });
+
+  /// 🔄 Update Redirect Path Uri
+  @PUT('/api/{api_version}/redirects/{redirect_id}.json')
+  Future<UpdateRedirectPathUriResponse> updateRedirectPathUri({
+    @Path('api_version') required String apiVersion,
+    @Path('redirect_id') required String redirectId,
+    @Body() required UpdateRedirectPathUriRequest body,
   });
 } 
