@@ -54,6 +54,7 @@ import 'package:example/services/handlers/online_store_handlers/script_tag_handl
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/list_all_script_tags_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/script_tag_handler/update_script_tag_url_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/create_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/delete_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/get_single_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/list_themes_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/publish_unpublished_theme_handler.dart';
@@ -1592,6 +1593,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Theme',
       handler: CreateThemeHandler(),
+    ),
+
+    // 🗑️ DELETE THEME
+    ApiService(
+      name: 'Delete Theme',
+      endpoint: '/themes/:theme_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: DeleteThemeHandler(),
     ),
   ];
 
