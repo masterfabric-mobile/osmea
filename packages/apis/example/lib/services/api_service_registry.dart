@@ -30,6 +30,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/update_c
 import 'package:example/services/handlers/online_store_handlers/page/count_all_pages_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_page_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_page_with_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/create_unpublished_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/get_single_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/list_all_pages_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -1332,6 +1333,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Page',
       handler: CreatePageHtmlMarkupHandler(),
+    ),
+
+    // 📝 CREATE UNPUBLISHED PAGE
+    ApiService(
+      name: 'Create Unpublished Page',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CreateUnpublishedPageHandler(),
     ),
   ];
 
