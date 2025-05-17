@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/redirect/abstract/redirect_service.dart';
+import 'package:apis/network/remote/online_store/redirect/freezed_model/response/count_all_redirects_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/get_single_redirect_response.dart';
 import 'package:apis/network/remote/online_store/redirect/freezed_model/response/list_all_redirects_response.dart';
 import 'package:dio/dio.dart';
@@ -37,5 +38,13 @@ abstract class RedirectServiceClient implements RedirectService {
     @Path('api_version') required String apiVersion,
     @Path('redirect_id') required String redirectId,
     @Query('fields') String? fields,
+  });
+
+  /// 🔄 Count All Redirects
+  @GET('/api/{api_version}/redirects/count.json')
+  Future<CountAllRedirectsResponse> countAllRedirects({
+    @Path('api_version') required String apiVersion,
+    @Query('path') String? path,
+    @Query('target') String? target,
   });
 }
