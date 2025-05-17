@@ -12,6 +12,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/create_or
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_without_order_receipt_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_risk_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_comprehensive_response.dart';
@@ -29,7 +30,9 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/get_coun
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_risks_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_risk_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/update_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/update_order_risk_response.dart';
 
 abstract class OrderService {
   Future<CreateOrderResponse> createOrder({
@@ -90,6 +93,20 @@ abstract class OrderService {
     required String apiVersion,
     required String orderId,
   });
+
+  Future<GetSingleOrderRiskResponse> getSingleOrderRisk({
+    required String apiVersion,
+    required String orderId,
+    required String riskId,
+  });
+
+  Future<UpdateOrderRiskResponse> updateOrderRisk({
+    required String apiVersion,
+    required String orderId,
+    required String riskId,
+    required UpdateOrderRiskRequest model,
+  });
+
   Future<GetSingleOrderResponse> getSingleOrder({
     required String apiVersion,
     required String orderId,
