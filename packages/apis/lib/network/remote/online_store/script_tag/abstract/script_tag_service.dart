@@ -48,4 +48,10 @@ abstract class ScriptTagService {
     required String scriptTagId,
     required UpdateScriptTagUrlRequest body,
   });
+
+  /// 🗑️ Delete Script Tag
+  Future<void> deleteScriptTag({
+    required String apiVersion,
+    required String scriptTagId,
+  });
 }

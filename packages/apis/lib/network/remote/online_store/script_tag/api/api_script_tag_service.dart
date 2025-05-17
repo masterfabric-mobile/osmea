@@ -70,4 +70,11 @@ abstract class ScriptTagServiceClient implements ScriptTagService {
     @Path('script_tag_id') required String scriptTagId,
     @Body() required UpdateScriptTagUrlRequest body,
   });
+
+  /// 🗑️ Delete Script Tag
+  @DELETE('/api/{api_version}/script_tags/{script_tag_id}.json')
+  Future<void> deleteScriptTag({
+    @Path('api_version') required String apiVersion,
+    @Path('script_tag_id') required String scriptTagId,
+  });
 }
