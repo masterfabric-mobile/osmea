@@ -4,6 +4,7 @@ import 'package:apis/network/remote/online_store/page/freeezed_model/request/cre
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/show_hidden_page_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_body_html_of_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/update_existing_page_completely_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/add_metafield_to_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
@@ -12,6 +13,7 @@ import 'package:apis/network/remote/online_store/page/freeezed_model/response/cr
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/show_hidden_page_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/update_body_html_of_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/update_existing_page_completely_response.dart';
 
 abstract class PageService{
@@ -90,5 +92,12 @@ abstract class PageService{
     required String apiVersion,
     required String pageId,
     required ShowHiddenPageRequest model,
+  });
+
+  /// 📄 Update Body Html Of Page
+  Future<UpdateBodyHtmlOfPageResponse> updateBodyHtmlOfPage({
+    required String apiVersion,
+    required String pageId,
+    required UpdateBodyHtmlOfPageRequest model,
   });
 }
