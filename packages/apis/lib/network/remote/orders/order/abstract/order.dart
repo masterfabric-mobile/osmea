@@ -5,6 +5,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/create_or
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_product_id_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_tax_lines_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_without_order_receipt_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_reopen_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/update_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
@@ -14,6 +15,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_o
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_product_id_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_tax_lines_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_without_order_receipt_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
@@ -44,6 +46,12 @@ abstract class OrderService {
   Future<CreateOrderWithProductIdResponse> createOrderWithProductId({
     required String apiVersion,
     required CreateOrderWithProductIdRequest model,
+  });
+
+  Future<CreateOrderWithoutOrderReceiptResponse>
+      createOrderWithoutOrderReceipt({
+    required String apiVersion,
+    required CreateOrderWithoutOrderReceiptRequest model,
   });
 
   Future<GetSingleOrderResponse> getSingleOrder({

@@ -62,6 +62,7 @@ import 'package:example/services/handlers/orders/order/create_order_comprehensiv
 import 'package:example/services/handlers/orders/order/create_order_partially_paid_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_product_id_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_tax_lines_handler.dart';
+import 'package:example/services/handlers/orders/order/create_order_without_order_receipt_handler.dart';
 import 'package:example/services/handlers/orders/order/create_reopen_order_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_count_handler.dart';
 import 'package:example/services/handlers/orders/order/get_order_list_handler.dart';
@@ -759,6 +760,13 @@ class ApiServiceRegistry {
       category: ApiCategory.orders,
       subcategory: 'Order',
       handler: CreateOrderWithProductIdHandler(),
+    ),
+    ApiService(
+      name: 'Create Order without Order Receipt',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order',
+      handler: CreateOrderWithoutOrderReceiptHandler(),
     )
   ];
 
