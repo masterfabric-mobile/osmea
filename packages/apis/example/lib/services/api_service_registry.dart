@@ -44,6 +44,7 @@ import 'package:example/services/handlers/online_store_handlers/redirect_handler
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/create_redirect_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/get_single_redirect_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/redirect_handlers/list_all_redirects_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_uri_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1452,6 +1453,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Redirect',
       handler: CreateRedirectHandler(),
+    ),
+
+    // 🔄 UPDATE REDIRECT PATH/URI
+    ApiService(
+      name: 'Update Redirect Path/URI',
+      endpoint: '/redirects/:redirect_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: UpdateRedirectPathUriHandler(),
     ),
   ];
 
