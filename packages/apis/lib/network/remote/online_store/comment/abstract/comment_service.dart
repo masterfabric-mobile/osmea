@@ -1,4 +1,5 @@
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/request/update_comment_body_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/count_comments_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
@@ -7,6 +8,7 @@ import 'package:apis/network/remote/online_store/comment/freezed_model/response/
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_as_spam_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/update_comment_body_response.dart';
 
 abstract class CommentService {
     /// 📦 Create a comment with textile markup
@@ -79,5 +81,12 @@ abstract class CommentService {
       String? publishedAtMax,
       String? publishedStatus,
       String? status,
+    });
+
+    /// 📦 Update Comment Body Response
+    Future<UpdateCommentBodyResponse> updateCommentBody({
+      required String apiVersion,
+      required String commentId,
+      required UpdateCommentBodyRequest model,
     });
 }

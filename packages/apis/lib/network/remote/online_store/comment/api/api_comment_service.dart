@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/comment/abstract/comment_service.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/request/create_comment_textile_markup_request.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/request/update_comment_body_request.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/approve_and_publish_comment_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/count_comments_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/create_comment_textile_markup_response.dart';
@@ -10,6 +11,7 @@ import 'package:apis/network/remote/online_store/comment/freezed_model/response/
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_as_spam_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/mark_comment_not_spam_restore_response.dart';
 import 'package:apis/network/remote/online_store/comment/freezed_model/response/restore_removed_comment_response.dart';
+import 'package:apis/network/remote/online_store/comment/freezed_model/response/update_comment_body_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -107,5 +109,13 @@ abstract class CommentServiceClient implements CommentService {
     @Query('published_at_max') String? publishedAtMax,
     @Query('published_status') String? publishedStatus,
     @Query('status') String? status,
+  });
+
+  /// 📦 Update Comment Body Response
+  @PUT('/api/{api_version}/comments/{comment_id}.json')
+  Future<UpdateCommentBodyResponse> updateCommentBody({
+    @Path('api_version') required String apiVersion,
+    @Path('comment_id') required String commentId,
+    @Body() required UpdateCommentBodyRequest model,
   });
 }
