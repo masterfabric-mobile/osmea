@@ -109,4 +109,10 @@ abstract class PageService{
     required String pageId,
     required HidePublishedPageRequest model,
   });
+
+  /// 📄 Delete Page
+  Future<void> deletePage({
+    required String apiVersion,
+    required String pageId,
+  });
 }

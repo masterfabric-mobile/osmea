@@ -137,4 +137,11 @@ abstract class PageServiceClient implements PageService {
     @Path('page_id') required String pageId,
     @Body() required HidePublishedPageRequest model,
   });
+
+  /// 📄 Delete Page
+  @DELETE('/api/{api_version}/pages/{page_id}.json')
+  Future<void> deletePage({
+    @Path('api_version') required String apiVersion,
+    @Path('page_id') required String pageId,
+  });
 }
