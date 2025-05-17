@@ -1,4 +1,6 @@
+import 'package:apis/network/remote/online_store/script_tag/freezed_model/request/create_script_tag_request.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/count_all_script_response.dart';
+import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/create_script_tag_response.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/get_single_script_response.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/list_all_script_tags_response.dart';
 
@@ -30,5 +32,11 @@ abstract class ScriptTagService {
   Future<CountAllScriptResponse> countAllScriptTags({
     required String apiVersion,
     String? src,
+  });
+
+  /// 📋 Create a new script tag
+  Future<CreateScriptTagResponse> createScriptTag({
+    required String apiVersion,
+    required CreateScriptTagRequest body,
   });
 }

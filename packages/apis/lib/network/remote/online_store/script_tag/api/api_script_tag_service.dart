@@ -1,7 +1,9 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/script_tag/abstract/script_tag_service.dart';
+import 'package:apis/network/remote/online_store/script_tag/freezed_model/request/create_script_tag_request.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/count_all_script_response.dart';
+import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/create_script_tag_response.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/get_single_script_response.dart';
 import 'package:apis/network/remote/online_store/script_tag/freezed_model/response/list_all_script_tags_response.dart';
 import 'package:dio/dio.dart';
@@ -50,5 +52,12 @@ abstract class ScriptTagServiceClient implements ScriptTagService {
   Future<CountAllScriptResponse> countAllScriptTags({
     @Path('api_version') required String apiVersion,
     @Query('src') String? src,
+  });
+
+  /// 🔄 Create a new script tag
+  @POST('/api/{api_version}/script_tags.json')
+  Future<CreateScriptTagResponse> createScriptTag({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateScriptTagRequest body,
   });
 }
