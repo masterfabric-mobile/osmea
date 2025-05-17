@@ -59,6 +59,7 @@ import 'package:example/services/handlers/metafield_handlers/update_metafield_ha
 import 'package:example/services/handlers/orders/order/create_cancel_order_handler.dart';
 import 'package:example/services/handlers/orders/order/create_close_order_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_comprehensive_handler.dart';
+import 'package:example/services/handlers/orders/order/create_order_fulfill_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_partially_paid_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_sending_order_confirmation_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_pending_customer_handler.dart';
@@ -783,6 +784,13 @@ class ApiServiceRegistry {
       category: ApiCategory.orders,
       subcategory: 'Order',
       handler: CreateOrderWithPendingCustomerHandler(),
+    ),
+    ApiService(
+      name: 'Create Order Fulfill',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order',
+      handler: CreateOrderFulfillHandler(),
     )
   ];
 

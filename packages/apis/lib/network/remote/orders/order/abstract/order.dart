@@ -1,6 +1,7 @@
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_cancel_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_close_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_comprehensive_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_fulfill_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_partially_paid_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_sending_order_confirmation_request.dart';
@@ -13,6 +14,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/update_or
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_cancel_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_close_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_comprehensive_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_fulfill_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_partially_paid_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_sending_order_confirmation_response.dart';
@@ -62,6 +64,11 @@ abstract class OrderService {
       createOrderSendingOrderConfirmation({
     required String apiVersion,
     required CreateOrderSendingOrderConfirmationRequest model,
+  });
+
+  Future<CreateOrderFulfillResponse> createOrderFulfill({
+    required String apiVersion,
+    required CreateOrderFulfillRequest model,
   });
 
   Future<CreateOrderWithPendingCustomerResponse>
