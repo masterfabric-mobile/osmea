@@ -2,9 +2,11 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/online_store/theme/abstract/theme_service.dart';
 import 'package:apis/network/remote/online_store/theme/freezed_model/request/publish_unpublished_theme_request.dart';
+import 'package:apis/network/remote/online_store/theme/freezed_model/request/update_theme_name_request.dart';
 import 'package:apis/network/remote/online_store/theme/freezed_model/response/get_single_theme_response.dart';
 import 'package:apis/network/remote/online_store/theme/freezed_model/response/list_themes_response.dart';
 import 'package:apis/network/remote/online_store/theme/freezed_model/response/publish_unpublished_theme_response.dart';
+import 'package:apis/network/remote/online_store/theme/freezed_model/response/update_theme_name_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -43,6 +45,14 @@ abstract class ThemeServiceClient implements ThemeService {
     @Path('api_version') required String apiVersion,
     @Path('theme_id') required String themeId,
     @Body() required PublishUnpublishedThemeRequest body,
+  });
+
+  // 🔄 Update Theme Name
+  @PUT('/api/{api_version}/themes/{theme_id}.json')
+  Future<UpdateThemeNameResponse> updateThemeName({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required String themeId,
+    @Body() required UpdateThemeNameRequest body,
   });
 
 }
