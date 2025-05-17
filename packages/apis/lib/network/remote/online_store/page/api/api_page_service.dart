@@ -1,5 +1,6 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
+import 'package:apis/network/remote/online_store/blog/freezed_model/response/count_all_blogs_response.dart';
 import 'package:apis/network/remote/online_store/page/abstract/page_service.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
@@ -44,5 +45,19 @@ abstract class PageServiceClient implements PageService {
     @Path('api_version') required String apiVersion,
     @Path('page_id') required String pageId,
     @Query('fields') String? fields,
+  });
+
+  /// 📄 Count All Pages
+  @GET('/api/{api_version}/pages/count.json')
+  Future<CountAllBlogsResponse> countAllPages({
+    @Path('api_version') required String apiVersion,
+    @Query('title') String? title,
+    @Query('created_at_min') String? createdAtMin,
+    @Query('created_at_max') String? createdAtMax,
+    @Query('updated_at_min') String? updatedAtMin,
+    @Query('updated_at_max') String? updatedAtMax,
+    @Query('published_at_min') String? publishedAtMin,
+    @Query('published_at_max') String? publishedAtMax,
+    @Query('published_status') String? publishedStatus,
   });
 }
