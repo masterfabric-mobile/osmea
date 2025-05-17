@@ -27,6 +27,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_o
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_risks_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/update_order_response.dart';
 
@@ -85,6 +86,10 @@ abstract class OrderService {
     required CreateOrderWithPendingCustomerRequest model,
   });
 
+  Future<GetListOrderRisksResponse> getListOrderRisks({
+    required String apiVersion,
+    required String orderId,
+  });
   Future<GetSingleOrderResponse> getSingleOrder({
     required String apiVersion,
     required String orderId,

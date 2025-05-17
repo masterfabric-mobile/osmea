@@ -30,6 +30,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_o
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_reopen_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_count_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/get_list_order_risks_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/get_single_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/update_order_response.dart';
 import 'package:dio/dio.dart';
@@ -121,6 +122,12 @@ abstract class OrderServiceClient implements OrderService {
     @Path('api_version') required String apiVersion,
     @Path('order_id') required String orderId,
     @Body() required CreateOrderRiskRequest model,
+  });
+
+  @GET('/api/{api_version}/orders/{order_id}/risks.json')
+  Future<GetListOrderRisksResponse> getListOrderRisks({
+    @Path('api_version') required String apiVersion,
+    @Path('order_id') required String orderId,
   });
 
   @override
