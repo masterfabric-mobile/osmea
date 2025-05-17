@@ -27,6 +27,7 @@ import 'package:example/services/handlers/online_store_handlers/comment/mark_com
 import 'package:example/services/handlers/online_store_handlers/comment/remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/restore_remove_comment_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/comment/update_comment_body_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page/add_metafield_to_page_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/count_all_pages_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_page_html_markup_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/page/create_page_with_metafield_handler.dart';
@@ -1352,6 +1353,15 @@ class ApiServiceRegistry {
       category: ApiCategory.onlineStore,
       subcategory: 'Page',
       handler: UpdateExistingPageCompletelyHandler(),
+    ),
+
+    // 🏷️ ADD METAFIELD TO PAGE
+    ApiService(
+      name: 'Add Metafield to Page',
+      endpoint: '/pages/:page_id/metafields',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: AddMetafieldToPageHandler(),
     ),
   ];
 
