@@ -4,8 +4,10 @@ import 'package:apis/network/remote/online_store/blog/freezed_model/response/cou
 import 'package:apis/network/remote/online_store/page/abstract/page_service.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_html_markup_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_page_with_metafield_request.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/request/create_unpublished_page_request.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_html_markup_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_page_with_metafield_response.dart';
+import 'package:apis/network/remote/online_store/page/freeezed_model/response/create_unpublished_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/get_single_page_response.dart';
 import 'package:apis/network/remote/online_store/page/freeezed_model/response/list_all_pages_response.dart';
 import 'package:dio/dio.dart';
@@ -77,5 +79,12 @@ abstract class PageServiceClient implements PageService {
   Future<CreatePageHtmlMarkupResponse> createPageHtmlMarkup({
     @Path('api_version') required String apiVersion,
     @Body() required CreatePageHtmlMarkupRequest model,
+  });
+
+  /// 📦 Create Unpublished Page
+  @POST('/api/{api_version}/pages.json')
+  Future<CreateUnpublishedPageResponse> createUnpublishedPage({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateUnpublishedPageRequest model,
   });
 }
