@@ -64,6 +64,11 @@ abstract class ThemeServiceClient implements ThemeService {
     @Body() required CreateThemeRequest body,
   });
 
-  
+  // 🗑️ Delete Theme
+  @DELETE('/api/{api_version}/themes/{theme_id}.json')
+  Future<void> deleteTheme({
+    @Path('api_version') required String apiVersion,
+    @Path('theme_id') required String themeId,
+  });
 
 }

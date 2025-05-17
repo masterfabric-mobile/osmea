@@ -42,5 +42,9 @@ abstract class ThemeService {
     required CreateThemeRequest body,
   });
 
-
+  /// 🗑️ Delete Theme
+  Future<void> deleteTheme({
+    required String apiVersion,
+    required String themeId,
+  });
 }
