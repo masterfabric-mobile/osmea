@@ -61,6 +61,7 @@ import 'package:example/services/handlers/orders/order/create_close_order_handle
 import 'package:example/services/handlers/orders/order/create_order_comprehensive_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_partially_paid_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_sending_order_confirmation_handler.dart';
+import 'package:example/services/handlers/orders/order/create_order_with_pending_customer_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_product_id_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_with_tax_lines_handler.dart';
 import 'package:example/services/handlers/orders/order/create_order_without_order_receipt_handler.dart';
@@ -775,6 +776,13 @@ class ApiServiceRegistry {
       category: ApiCategory.orders,
       subcategory: 'Order',
       handler: CreateOrderSendingOrderConfirmationHandler(),
+    ),
+    ApiService(
+      name: 'Create Order with Pending Customer',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Order',
+      handler: CreateOrderWithPendingCustomerHandler(),
     )
   ];
 

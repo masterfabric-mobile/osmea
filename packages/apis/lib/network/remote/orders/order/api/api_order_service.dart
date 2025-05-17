@@ -7,6 +7,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/request/create_or
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_partially_paid_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_sending_order_confirmation_request.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_pending_customer_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_product_id_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_with_tax_lines_request.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/request/create_order_without_order_receipt_request.dart';
@@ -18,6 +19,7 @@ import 'package:apis/network/remote/orders/order/freezed_model/response/create_o
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_partially_paid_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_sending_order_confirmation_response.dart';
+import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_pending_customer_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_product_id_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_with_tax_lines_response.dart';
 import 'package:apis/network/remote/orders/order/freezed_model/response/create_order_without_order_receipt_response.dart';
@@ -92,6 +94,14 @@ abstract class OrderServiceClient implements OrderService {
       createOrderSendingOrderConfirmation({
     @Path('api_version') required String apiVersion,
     @Body() required CreateOrderSendingOrderConfirmationRequest model,
+  });
+
+  @override
+  @POST('/api/{api_version}/orders.json')
+  Future<CreateOrderWithPendingCustomerResponse>
+      createOrderWithPendingCustomer({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateOrderWithPendingCustomerRequest model,
   });
 
   @override
