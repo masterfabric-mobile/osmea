@@ -133,6 +133,7 @@ import 'package:example/services/handlers/online_store_handlers/asset_handlers/c
 import 'package:example/services/handlers/online_store_handlers/asset_handlers/create_image_asset_source_url_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset_handlers/get_liquid_template_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/asset_handlers/list_all_assets_theme_handler.dart';
+import 'package:example/services/handlers/tendertransaction_handlers/tendertransaction_handler/retrieve_list_of_tender_transactions_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -176,6 +177,7 @@ enum ApiCategory {
   metafield,
   storeProperties,
   onlineStore,
+  tendertransaction
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -207,6 +209,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Store Properties APIs';
       case ApiCategory.onlineStore:
         return 'Online Store APIs';
+      case ApiCategory.tendertransaction:
+        return 'Tender Transaction APIs';
     }
   }
 }
@@ -354,7 +358,7 @@ class ApiServiceRegistry {
       name: 'List Application Credits',
       endpoint: '/application_credits',
       category: ApiCategory.billing,
-      subcategory: 'Application Credit',  // New subcategory
+      subcategory: 'Application Credit', // New subcategory
       handler: RetrieveListOfApplicationCreditsHandler(),
     ),
 
@@ -425,7 +429,7 @@ class ApiServiceRegistry {
     ApiService(
       name: 'Create Capped Recurring Application Charge',
       endpoint: '/recurring_application_charges/capped',
-      category: ApiCategory.billing, 
+      category: ApiCategory.billing,
       subcategory: 'Recurring Application Charge',
       handler: CreateCappedRecurringApplicationChargeHandler(),
     ),
@@ -433,7 +437,8 @@ class ApiServiceRegistry {
     // 💰 Usage Charge APIs
     ApiService(
       name: 'Retrieve List of Usage Charges',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: RetrieveListOfUsageChargesHandler(),
@@ -441,7 +446,8 @@ class ApiServiceRegistry {
 
     ApiService(
       name: 'Retrieve a Usage Charge',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: RetrieveAUsageChargeHandler(),
@@ -449,7 +455,8 @@ class ApiServiceRegistry {
 
     ApiService(
       name: 'Create Usage Charge',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: CreateUsageChargeHandler(),
@@ -1261,7 +1268,6 @@ class ApiServiceRegistry {
       handler: UpdateCommentBodyHandler(),
     ),
 
-    
     // 💬 CREATE COMMENT WITH TEXTILE MARKUP
     ApiService(
       name: 'Create Comment With Textile Markup',
@@ -1301,7 +1307,8 @@ class ApiServiceRegistry {
     /// 🔄 RESTORE REMOVE COMMENT
     ApiService(
       name: 'Restore Removed Comment',
-      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id/restore',
+      endpoint:
+          '/blogs/:blog_id/articles/:article_id/comments/:comment_id/restore',
       category: ApiCategory.onlineStore,
       subcategory: 'Comment',
       handler: RestoreRemoveCommentHandler(),
@@ -1310,7 +1317,8 @@ class ApiServiceRegistry {
     /// 🚫 MARK COMMENT AS SPAM
     ApiService(
       name: 'Mark Comment As Spam',
-      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id/spam',
+      endpoint:
+          '/blogs/:blog_id/articles/:article_id/comments/:comment_id/spam',
       category: ApiCategory.onlineStore,
       subcategory: 'Comment',
       handler: MarkCommentAsSpamHandler(),
@@ -1333,7 +1341,7 @@ class ApiServiceRegistry {
       subcategory: 'Page',
       handler: GetSinglePageHandler(),
     ),
-    
+
     // 🔢 COUNT ALL PAGES
     ApiService(
       name: 'Count All Pages',
@@ -1496,7 +1504,7 @@ class ApiServiceRegistry {
       handler: DeleteRedirectHandler(),
     ),
 
-    // 📋 LIST ALL SCRIPT TAGS 
+    // 📋 LIST ALL SCRIPT TAGS
     ApiService(
       name: 'List All Script Tags',
       endpoint: '/script_tags',
@@ -1603,6 +1611,15 @@ class ApiServiceRegistry {
       subcategory: 'Theme',
       handler: DeleteThemeHandler(),
     ),
+
+    // 💰 Tender Transaction APIs
+    ApiService(
+      name: 'List Tender Transactions',
+      endpoint: '/tender_transactions',
+      category: ApiCategory.tendertransaction, // Changed from billing
+      subcategory: 'Tender Transaction',
+      handler: RetrieveListOfTenderTransactionsHandler(),
+    )
   ];
 
   static void initialize() {}
@@ -1657,6 +1674,8 @@ class ApiServiceRegistry {
         return 'Store Properties';
       case ApiCategory.onlineStore:
         return 'Online Store';
+      case ApiCategory.tendertransaction:
+        return 'Tender Transaction';
     }
   }
 }
