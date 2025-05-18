@@ -59,6 +59,7 @@ import 'package:example/services/handlers/online_store_handlers/theme_handler/ge
 import 'package:example/services/handlers/online_store_handlers/theme_handler/list_themes_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/publish_unpublished_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -175,8 +176,9 @@ enum ApiCategory {
   inventory,
   giftCard,
   metafield,
-  storeProperties,
   onlineStore,
+  products,
+  storeProperties,
   tendertransaction
 }
 
@@ -205,10 +207,12 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Gift Card APIs';
       case ApiCategory.metafield:
         return 'Metafield APIs';
-      case ApiCategory.storeProperties:
-        return 'Store Properties APIs';
       case ApiCategory.onlineStore:
         return 'Online Store APIs';
+      case ApiCategory.products:
+        return 'Products APIs';
+      case ApiCategory.storeProperties:
+        return 'Store Properties APIs';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction APIs';
     }
@@ -1619,7 +1623,16 @@ class ApiServiceRegistry {
       category: ApiCategory.tendertransaction, // Changed from billing
       subcategory: 'Tender Transaction',
       handler: RetrieveListOfTenderTransactionsHandler(),
-    )
+    ),
+
+    // 📋 LIST ALL CUSTOM COLLECTIONS
+    ApiService(
+      name: 'List All Custom Collections',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: ListAllCustomCollectionsHandler(),
+    ),
   ];
 
   static void initialize() {}
@@ -1670,10 +1683,12 @@ class ApiServiceRegistry {
         return 'Gift Card';
       case ApiCategory.metafield:
         return 'Metafield';
-      case ApiCategory.storeProperties:
-        return 'Store Properties';
       case ApiCategory.onlineStore:
         return 'Online Store';
+      case ApiCategory.products:
+        return 'Products';
+      case ApiCategory.storeProperties:
+        return 'Store Properties';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction';
     }
