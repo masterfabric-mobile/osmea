@@ -1,3 +1,4 @@
+import 'package:apis/network/remote/products/custom_collection/freezed_model/response/count_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/list_all_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/specific_custom_collections_response.dart';
 
@@ -24,5 +25,17 @@ abstract class CustomCollectionsService {
     required String apiVersion,
     required int custom_collection_id,
     String? fields,
+  });
+
+  // 📋 Count Custom Collections Response
+  Future<CountCustomCollectionsResponse> countCustomCollections({
+    required String apiVersion,
+    String? title,
+    String? updatedAtMin,
+    String? updatedAtMax,
+    String? publishedAtMin,
+    String? publishedAtMax,
+    String? product_id,
+    String? published_status,
   });
 }

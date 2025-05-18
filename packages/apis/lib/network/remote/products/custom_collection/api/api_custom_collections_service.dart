@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/products/custom_collection/abstract/custom_collections_service.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/response/count_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/list_all_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/specific_custom_collections_response.dart';
 import 'package:dio/dio.dart';
@@ -47,5 +48,18 @@ abstract class CustomCollectionsServiceClient
     @Path('api_version') required String apiVersion,
     @Path('custom_collection_id') required int custom_collection_id,
     @Query('fields') String? fields,
+  });
+
+  /// 🔄 Count Custom Collections Response
+  @GET('/api/{api_version}/custom_collections/count.json')
+  Future<CountCustomCollectionsResponse> countCustomCollections({
+    @Path('api_version') required String apiVersion,
+    @Query('title') String? title,
+    @Query('updated_at_min') String? updatedAtMin,
+    @Query('updated_at_max') String? updatedAtMax,
+    @Query('published_at_min') String? publishedAtMin,
+    @Query('published_at_max') String? publishedAtMax,
+    @Query('product_id') String? product_id,
+    @Query('published_status') String? published_status,
   });
 }
