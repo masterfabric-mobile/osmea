@@ -2,3 +2,4 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
     duplicate_ignore: ignore
+    unnecessary_import: ignore

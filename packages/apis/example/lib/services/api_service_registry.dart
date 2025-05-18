@@ -1,6 +1,64 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:example/services/handlers/customers_handlers/customer/searches_for_customers_that_match_supplied_query_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/create_article_base_image_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/create_article_html_markup_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/create_article_with_image_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/create_article_with_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/create_unpublished_article_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/delete_image_from_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/duplicate_asset_source_key_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/count_all_blogs_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/create_empty_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/create_empty_blog_with_metafield.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/get_all_blogs_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/get_single_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/metafield_existing_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/remove_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/update_blog_title_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/blog_handlers/update_existing_blog_title_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/approve_and_publish_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/count_comments_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/create_comment_textile_markup_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/get_single_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/list_all_comments_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/mark_comment_as_spam_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/mark_comment_not_spam_restore_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/remove_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/restore_remove_comment_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/comment_handlers/update_comment_body_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/add_metafield_to_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/count_all_pages_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/create_page_html_markup_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/create_page_with_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/create_unpublished_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/delete_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/get_single_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/hide_published_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/list_all_pages_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/show_hidden_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/update_body_html_of_page_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/page_handlers/update_existing_page_completely_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/count_all_redirects_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/create_redirect_full_url_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/create_redirect_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/delete_redirect_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/get_single_redirect_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/list_all_redirects_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_and_target_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/redirect_handlers/update_redirect_path_uri_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/count_all_script_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/create_script_tag_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/delete_script_tag_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/get_single_script_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/list_all_script_tags_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/script_tag_handler/update_script_tag_url_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/create_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/delete_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/get_single_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/list_themes_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/publish_unpublished_theme_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -59,6 +117,22 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/count_blog_articles_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/delete_article_from_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/get_single_article_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_all_article_authors_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_article_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_articles_from_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_most_popular_tags_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_most_popular_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_tags_all_articles_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/list_tags_specific_blog_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/article_handlers/update_article_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/change_liquid_template_value_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/create_image_asset_base_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/create_image_asset_source_url_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/get_liquid_template_handler.dart';
+import 'package:example/services/handlers/online_store_handlers/asset_handlers/list_all_assets_theme_handler.dart';
 import 'package:example/services/handlers/tendertransaction_handlers/tendertransaction_handler/retrieve_list_of_tender_transactions_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
@@ -102,6 +176,7 @@ enum ApiCategory {
   giftCard,
   metafield,
   storeProperties,
+  onlineStore,
   tendertransaction
 }
 
@@ -132,6 +207,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Metafield APIs';
       case ApiCategory.storeProperties:
         return 'Store Properties APIs';
+      case ApiCategory.onlineStore:
+        return 'Online Store APIs';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction APIs';
     }
@@ -281,7 +358,7 @@ class ApiServiceRegistry {
       name: 'List Application Credits',
       endpoint: '/application_credits',
       category: ApiCategory.billing,
-      subcategory: 'Application Credit',  // New subcategory
+      subcategory: 'Application Credit', // New subcategory
       handler: RetrieveListOfApplicationCreditsHandler(),
     ),
 
@@ -352,7 +429,7 @@ class ApiServiceRegistry {
     ApiService(
       name: 'Create Capped Recurring Application Charge',
       endpoint: '/recurring_application_charges/capped',
-      category: ApiCategory.billing, 
+      category: ApiCategory.billing,
       subcategory: 'Recurring Application Charge',
       handler: CreateCappedRecurringApplicationChargeHandler(),
     ),
@@ -360,7 +437,8 @@ class ApiServiceRegistry {
     // 💰 Usage Charge APIs
     ApiService(
       name: 'Retrieve List of Usage Charges',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: RetrieveListOfUsageChargesHandler(),
@@ -368,7 +446,8 @@ class ApiServiceRegistry {
 
     ApiService(
       name: 'Retrieve a Usage Charge',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges/:id',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: RetrieveAUsageChargeHandler(),
@@ -376,7 +455,8 @@ class ApiServiceRegistry {
 
     ApiService(
       name: 'Create Usage Charge',
-      endpoint: '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
+      endpoint:
+          '/recurring_application_charges/:recurring_application_charge_id/usage_charges',
       category: ApiCategory.billing,
       subcategory: 'Usage Charge',
       handler: CreateUsageChargeHandler(),
@@ -759,6 +839,7 @@ class ApiServiceRegistry {
       subcategory: 'Metafield',
       handler: DeleteMetafieldHandler(),
     ),
+
     ApiService(
       name: 'Countries List',
       endpoint: '/countries',
@@ -865,14 +946,680 @@ class ApiServiceRegistry {
       handler: RetrievesShopConfigurationHandler(),
     ),
 
+    // 📝 LIST ALL ARTICLE AUTHORS
+    ApiService(
+      name: 'List All Article Authors',
+      endpoint: '/article_authors',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListAllArticleAuthorsHandler(),
+    ),
+    // 📝 LIST TAGS FOR A SPECIFIC BLOG
+    ApiService(
+      name: 'List Tags for a Specific Blog',
+      endpoint: '/blogs/:blog_id/tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListTagsSpecificBlogHandler(),
+    ),
+    // 🏷️ LIST MOST POPULAR TAGS
+    ApiService(
+      name: 'List Most Popular Tags',
+      endpoint: '/tags/popular',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListMostPopularTagsHandler(),
+    ),
+
+    // 🏷️ LIST TAGS FOR ALL ARTICLES
+    ApiService(
+      name: 'List Tags for All Articles',
+      endpoint: '/tags/all',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListTagsAllArticlesHandler(),
+    ),
+
+    // 🏷️ LIST MOST POPULAR TAGS FOR SPECIFIC BLOG
+    ApiService(
+      name: 'List Most Popular Tags for Specific Blog',
+      endpoint: '/blogs/:blog_id/tags/popular',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListMostPopularTagsSpecificBlogHandler(),
+    ),
+
+    // 📚 LIST ARTICLES FROM BLOG
+    ApiService(
+      name: 'List Articles from Blog',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListArticlesFromBlogHandler(),
+    ),
+
+    // 📝 GET SINGLE ARTICLE
+    ApiService(
+      name: 'Get Single Article',
+      endpoint: '/blogs/:blogs_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: GetSingleArticleHandler(),
+    ),
+
+    // 🔢 COUNT BLOG ARTICLES
+    ApiService(
+      name: 'Count Blog Articles',
+      endpoint: '/blogs/:blog_id/articles/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CountBlogArticlesHandler(),
+    ),
+
+    // 🏷️ LIST ARTICLE TAGS SPECIFIC BLOG
+    ApiService(
+      name: 'List Article Tags Specific Blog',
+      endpoint: '/blogs/:blog_id/articles/tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: ListArticleTagsSpecificBlogHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE WITH METAFIELD
+    ApiService(
+      name: 'Create Article With Metafield',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleWithMetafieldHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE WITH IMAGE
+    ApiService(
+      name: 'Create Article With Image',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleWithImageHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE HTML MARKUP
+    ApiService(
+      name: 'Create Article HTML Markup',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleHtmlMarkupHandler(),
+    ),
+
+    // 📝 CREATE ARTICLE WITH BASE64
+    ApiService(
+      name: 'Create Article With Base',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateArticleBaseImageHandler(),
+    ),
+
+    // 📝 CREATE UNPUBLISHED ARTICLE
+    ApiService(
+      name: 'Create Unpublished Article',
+      endpoint: '/blogs/:blog_id/articles',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: CreateUnpublishedArticleBlogHandler(),
+    ),
+
+    // 📝 UPDATE ARTICLE
+    ApiService(
+      name: 'Update Article',
+      endpoint: '/blogs/:blog_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: UpdateArticleHandler(),
+    ),
+
+    //🗑️ DELETE ARTICLE
+    ApiService(
+      name: 'Delete Article',
+      endpoint: '/blogs/:blog_id/articles/:article_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Article',
+      handler: DeleteArticleFromBlogHandler(),
+    ),
+
+    // 🎨 LIST ALL THEME ASSETS
+    ApiService(
+      name: 'List All Theme Assets',
+      endpoint: '/themes/:theme_id/assets',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: ListAllAssetsThemeHandler(),
+    ),
+
+    // 🖼️ GET LIQUID TEMPLATE
+    ApiService(
+      name: 'Get Liquid Template',
+      endpoint: '/themes/:theme_id/assets/:key',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: GetLiquidTemplateHandler(),
+    ),
+
+    // 🖼️ CREATE IMAGE ASSET BASE
+    ApiService(
+      name: 'Create Image Asset Base',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: CreateImageAssetBaseHandler(),
+    ),
+
+    // 🔗 CREATE IMAGE ASSET FROM URL
+    ApiService(
+      name: 'Create Image Asset From URL',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: CreateImageAssetSourceUrlHandler(),
+    ),
+
+    // 📝 CHANGE LIQUID TEMPLATE
+    ApiService(
+      name: 'Change Liquid Template',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: ChangeLiquidTemplateValueHandler(),
+    ),
+
+    // 🔄 DUPLICATE ASSET SOURCE KEY
+    ApiService(
+      name: 'Duplicate Asset Source Key',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: DuplicateAssetSourceKeyHandler(),
+    ),
+
+    // 🗑️ DELETE IMAGE FROM THEME
+    ApiService(
+      name: 'Delete Image From Theme',
+      endpoint: '/themes/:theme_id/assets.json',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Asset',
+      handler: DeleteImageFromThemeHandler(),
+    ),
+
+    // 📋 GET ALL BLOGS
+    ApiService(
+      name: 'Get All Blogs',
+      endpoint: '/blogs',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: GetAllBlogsHandler(),
+    ),
+
+    // 📝 GET SINGLE BLOG
+    ApiService(
+      name: 'Get Single Blog',
+      endpoint: '/blogs/:id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: GetSingleBlogHandler(),
+    ),
+
+    // 🔢 COUNT ALL BLOGS
+    ApiService(
+      name: 'Count All Blogs',
+      endpoint: '/blogs/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: CountAllBlogsHandler(),
+    ),
+
+    // 📝 CREATE EMPTY BLOG
+    ApiService(
+      name: 'Create Empty Blog',
+      endpoint: '/blogs',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: CreateEmptyBlogHandler(),
+    ),
+
+    // 📝 CREATE BLOG WITH METAFIELD
+    ApiService(
+      name: 'Create Blog With Metafield',
+      endpoint: '/blogs',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: CreateEmptyBlogWithMetafieldHandler(),
+    ),
+
+    // 🏷️ METAFIELD TO EXISTING BLOG
+    ApiService(
+      name: 'Metafield To Existing Blog',
+      endpoint: '/blogs/:blog_id/metafields',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: MetafieldExistingBlogHandler(),
+    ),
+
+    // 📝 UPDATE EXISTING BLOG TITLE
+    ApiService(
+      name: 'Update Existing Blog Title',
+      endpoint: '/blogs/:blog_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: UpdateExistingBlogTitleHandler(),
+    ),
+
+    // 📝 Update Blog Title
+    ApiService(
+      name: 'Update Blog Title',
+      endpoint: '/blogs/:blog_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: UpdateBlogTitleHandler(),
+    ),
+
+    // 🗑️ REMOVE BLOG
+    ApiService(
+      name: 'Remove Blog',
+      endpoint: '/blogs/:blog_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Blog',
+      handler: RemoveBlogHandler(),
+    ),
+
+    // 📋 LIST ALL COMMENTS
+    ApiService(
+      name: 'List All Comments',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: ListAllCommentsHandler(),
+    ),
+
+    //📋 GET SINGLE COMMENT
+    ApiService(
+      name: 'Get Single Comment',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: GetSingleCommentHandler(),
+    ),
+
+    // 🔢 COUNT COMMENTS
+    ApiService(
+      name: 'Count Comments',
+      endpoint: 'comments/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: CountCommentsHandler(),
+    ),
+
+    // ✏️ UPDATE COMMENT BODY
+    ApiService(
+      name: 'Update Comment Body',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: UpdateCommentBodyHandler(),
+    ),
+
+    // 💬 CREATE COMMENT WITH TEXTILE MARKUP
+    ApiService(
+      name: 'Create Comment With Textile Markup',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: CreateCommentTextileMarkupHandler(),
+    ),
+
+    // ✅ APPROVE AND PUBLISH COMMENT
+    ApiService(
+      name: 'Approve And Publish Comment',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: ApproveAndPublishCommentHandler(),
+    ),
+
+    // 🔄 MARK COMMENT NOT SPAM & RESTORE
+    ApiService(
+      name: 'Mark Comment Not Spam & Restore',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: MarkCommentNotSpamRestoreHandler(),
+    ),
+
+    /// 📦 Remove a comment
+    ApiService(
+      name: 'Remove Comment',
+      endpoint: '/blogs/:blog_id/articles/:article_id/comments/:comment_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: RemoveCommentHandler(),
+    ),
+
+    /// 🔄 RESTORE REMOVE COMMENT
+    ApiService(
+      name: 'Restore Removed Comment',
+      endpoint:
+          '/blogs/:blog_id/articles/:article_id/comments/:comment_id/restore',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: RestoreRemoveCommentHandler(),
+    ),
+
+    /// 🚫 MARK COMMENT AS SPAM
+    ApiService(
+      name: 'Mark Comment As Spam',
+      endpoint:
+          '/blogs/:blog_id/articles/:article_id/comments/:comment_id/spam',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Comment',
+      handler: MarkCommentAsSpamHandler(),
+    ),
+
+    // 📋 LIST ALL PAGES
+    ApiService(
+      name: 'List All Pages',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: ListAllPagesHandler(),
+    ),
+
+    // 📋 GET SINGLE PAGE
+    ApiService(
+      name: 'Get Single Page',
+      endpoint: '/pages/:page_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: GetSinglePageHandler(),
+    ),
+
+    // 🔢 COUNT ALL PAGES
+    ApiService(
+      name: 'Count All Pages',
+      endpoint: '/pages/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CountAllPagesHandler(),
+    ),
+
+    // 📝 CREATE PAGE WITH METAFIELD
+    ApiService(
+      name: 'Create Page With Metafield',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CreatePageWithMetafieldHandler(),
+    ),
+
+    // 📝 CREATE PAGE WITH HTML MARKUP
+    ApiService(
+      name: 'Create Page With HTML Markup',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CreatePageHtmlMarkupHandler(),
+    ),
+
+    // 📝 CREATE UNPUBLISHED PAGE
+    ApiService(
+      name: 'Create Unpublished Page',
+      endpoint: '/pages',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: CreateUnpublishedPageHandler(),
+    ),
+
+    // 📝 UPDATE EXISTING PAGE COMPLETELY
+    ApiService(
+      name: 'Update Existing Page Completely',
+      endpoint: '/pages/:page_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: UpdateExistingPageCompletelyHandler(),
+    ),
+
+    // 🏷️ ADD METAFIELD TO PAGE
+    ApiService(
+      name: 'Add Metafield to Page',
+      endpoint: '/pages/:page_id/metafields',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: AddMetafieldToPageHandler(),
+    ),
+
+    // 👁️ SHOW HIDDEN PAGE
+    ApiService(
+      name: 'Show Hidden Page',
+      endpoint: '/pages/:page_id/show',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: ShowHiddenPageHandler(),
+    ),
+
+    // 📝 UPDATE PAGE BODY HTML
+    ApiService(
+      name: 'Update Page Body HTML',
+      endpoint: '/pages/:page_id/body_html',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: UpdateBodyHtmlOfPageHandler(),
+    ),
+
+    // 🙈 HIDE PUBLISHED PAGE
+    ApiService(
+      name: 'Hide Published Page',
+      endpoint: '/pages/:page_id/hide',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: HidePublishedPageHandler(),
+    ),
+
+    // 🗑️ DELETE PAGE
+    ApiService(
+      name: 'Delete Page',
+      endpoint: '/pages/:page_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Page',
+      handler: DeletePageHandler(),
+    ),
+
+    // 📋 LIST ALL REDIRECTS
+    ApiService(
+      name: 'List All Redirects',
+      endpoint: '/redirects',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: ListAllRedirectsHandler(),
+    ),
+
+    // 📋 GET SINGLE REDIRECT
+    ApiService(
+      name: 'Get Single Redirect',
+      endpoint: '/redirects/:redirect_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: GetSingleRedirectHandler(),
+    ),
+
+    // 🔢 COUNT ALL REDIRECTS
+    ApiService(
+      name: 'Count All Redirects',
+      endpoint: '/redirects/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: CountAllRedirectsHandler(),
+    ),
+
+    // 🔀 CREATE REDIRECT WITH FULL URL
+    ApiService(
+      name: 'Create Redirect With Full URL',
+      endpoint: '/redirects',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: CreateRedirectFullUrlHandler(),
+    ),
+
+    // 🔀 CREATE REDIRECT
+    ApiService(
+      name: 'Create Redirect',
+      endpoint: '/redirects',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: CreateRedirectHandler(),
+    ),
+
+    // 🔄 UPDATE REDIRECT PATH/URI
+    ApiService(
+      name: 'Update Redirect Path/URI',
+      endpoint: '/redirects/:redirect_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: UpdateRedirectPathUriHandler(),
+    ),
+
+    // 🔄 UPDATE REDIRECT PATH AND TARGET
+    ApiService(
+      name: 'Update Redirect Path and Target',
+      endpoint: '/redirects/:redirect_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: UpdateRedirectPathAndTargetHandler(),
+    ),
+
+    // 🗑️ DELETE REDIRECT
+    ApiService(
+      name: 'Delete Redirect',
+      endpoint: '/redirects/:redirect_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Redirect',
+      handler: DeleteRedirectHandler(),
+    ),
+
+    // 📋 LIST ALL SCRIPT TAGS
+    ApiService(
+      name: 'List All Script Tags',
+      endpoint: '/script_tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: ListAllScriptTagsHandler(),
+    ),
+
+    // 📋 GET SINGLE SCRIPT TAG
+    ApiService(
+      name: 'Get Single Script Tag',
+      endpoint: '/script_tags/:script_tag_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: GetSingleScriptHandler(),
+    ),
+
+    // 🔢 COUNT ALL SCRIPT TAGS
+    ApiService(
+      name: 'Count All Script Tags',
+      endpoint: '/script_tags/count',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: CountAllScriptHandler(),
+    ),
+
+    // 📝 CREATE SCRIPT TAG
+    ApiService(
+      name: 'Create Script Tag',
+      endpoint: '/script_tags',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: CreateScriptTagHandler(),
+    ),
+
+    // 🔄 UPDATE SCRIPT TAG URL
+    ApiService(
+      name: 'Update Script Tag URL',
+      endpoint: '/script_tags/:script_tag_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: UpdateScriptTagUrlHandler(),
+    ),
+
+    // 🗑️ DELETE SCRIPT TAG
+    ApiService(
+      name: 'Delete Script Tag',
+      endpoint: '/script_tags/:script_tag_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Script Tag',
+      handler: DeleteScriptTagHandler(),
+    ),
+
+    // 📋 LIST ALL THEMES
+    ApiService(
+      name: 'List All Themes',
+      endpoint: '/themes',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: ListThemesHandler(),
+    ),
+
+    // 📋 GET SINGLE THEME
+    ApiService(
+      name: 'Get Single Theme',
+      endpoint: '/themes/:theme_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: GetSingleThemeHandler(),
+    ),
+
+    // 🚀 PUBLISH UNPUBLISHED THEME
+    ApiService(
+      name: 'Publish Unpublished Theme',
+      endpoint: '/themes/:theme_id/publish',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: PublishUnpublishedThemeHandler(),
+    ),
+
+    // 📝 UPDATE THEME NAME
+    ApiService(
+      name: 'Update Theme Name',
+      endpoint: '/themes/:theme_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: UpdateThemeNameHandler(),
+    ),
+
+    // 🎨 CREATE THEME
+    ApiService(
+      name: 'Create Theme',
+      endpoint: '/themes',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: CreateThemeHandler(),
+    ),
+
+    // 🗑️ DELETE THEME
+    ApiService(
+      name: 'Delete Theme',
+      endpoint: '/themes/:theme_id',
+      category: ApiCategory.onlineStore,
+      subcategory: 'Theme',
+      handler: DeleteThemeHandler(),
+    ),
+
     // 💰 Tender Transaction APIs
     ApiService(
       name: 'List Tender Transactions',
       endpoint: '/tender_transactions',
-      category: ApiCategory.tendertransaction,  // Changed from billing
+      category: ApiCategory.tendertransaction, // Changed from billing
       subcategory: 'Tender Transaction',
       handler: RetrieveListOfTenderTransactionsHandler(),
-    ),
+    )
   ];
 
   static void initialize() {}
@@ -925,6 +1672,8 @@ class ApiServiceRegistry {
         return 'Metafield';
       case ApiCategory.storeProperties:
         return 'Store Properties';
+      case ApiCategory.onlineStore:
+        return 'Online Store';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction';
     }
