@@ -59,6 +59,7 @@ import 'package:example/services/handlers/metafield_handlers/get_specific_metafi
 import 'package:example/services/handlers/metafield_handlers/list_metafields_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/list_metafields_query_parameters_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/update_metafield_handler.dart';
+import 'package:example/services/handlers/tendertransaction_handlers/tendertransaction_handler/retrieve_list_of_tender_transactions_handler.dart';
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
 import 'handlers/customers_handlers/customer/retrieves_all_orders_belonging_to_customer_handler.dart';
@@ -101,6 +102,7 @@ enum ApiCategory {
   giftCard,
   metafield,
   storeProperties,
+  tendertransaction
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -130,6 +132,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Metafield APIs';
       case ApiCategory.storeProperties:
         return 'Store Properties APIs';
+      case ApiCategory.tendertransaction:
+        return 'Tender Transaction APIs';
     }
   }
 }
@@ -860,6 +864,15 @@ class ApiServiceRegistry {
       subcategory: 'Shop',
       handler: RetrievesShopConfigurationHandler(),
     ),
+
+    // 💰 Tender Transaction APIs
+    ApiService(
+      name: 'List Tender Transactions',
+      endpoint: '/tender_transactions',
+      category: ApiCategory.tendertransaction,  // Changed from billing
+      subcategory: 'Tender Transaction',
+      handler: RetrieveListOfTenderTransactionsHandler(),
+    ),
   ];
 
   static void initialize() {}
@@ -912,6 +925,8 @@ class ApiServiceRegistry {
         return 'Metafield';
       case ApiCategory.storeProperties:
         return 'Store Properties';
+      case ApiCategory.tendertransaction:
+        return 'Tender Transaction';
     }
   }
 }
