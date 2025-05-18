@@ -60,6 +60,7 @@ import 'package:example/services/handlers/online_store_handlers/theme_handler/li
 import 'package:example/services/handlers/online_store_handlers/theme_handler/publish_unpublished_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/specific_custom_collections_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/retrieves_count_of_countries_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/creates_new_country_handler.dart';
@@ -1632,6 +1633,15 @@ class ApiServiceRegistry {
       category: ApiCategory.products,
       subcategory: 'Custom Collection',
       handler: ListAllCustomCollectionsHandler(),
+    ),
+
+    // 📋 SPECIFIC CUSTOM COLLECTION
+    ApiService(
+      name: 'Get Specific Custom Collection',
+      endpoint: '/custom_collections/:id',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: SpecificCustomCollectionsHandler(),
     ),
   ];
 
