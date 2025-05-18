@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/products/custom_collection/abstract/custom_collections_service.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/list_all_custom_collections_response.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/response/specific_custom_collections_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/http.dart';
@@ -38,6 +39,13 @@ abstract class CustomCollectionsServiceClient
     @Query('title') String? title,
     @Query('updated_at_max') String? updatedAtMax,
     @Query('updated_at_min') String? updatedAtMin,
-    
+  });
+
+  /// 🔄 Get specific custom collection by ID
+  @GET('/api/{api_version}/custom_collections/{custom_collection_id}.json')
+  Future<SpecificCustomCollectionsResponse> specificCustomCollections({
+    @Path('api_version') required String apiVersion,
+    @Path('custom_collection_id') required int custom_collection_id,
+    @Query('fields') String? fields,
   });
 }
