@@ -60,6 +60,7 @@ import 'package:example/services/handlers/online_store_handlers/theme_handler/li
 import 'package:example/services/handlers/online_store_handlers/theme_handler/publish_unpublished_theme_handler.dart';
 import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/count_custom_collections_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/create_collection_with_collect_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_unpublished_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
@@ -1746,17 +1747,21 @@ class ApiServiceRegistry {
       endpoint: '/custom_collections',
       category: ApiCategory.products,
       subcategory: 'Custom Collection',
-      handler: CreateUnpublishedCustomCollectionHandler(),),
+      handler: CreateUnpublishedCustomCollectionHandler(),
+    ),
+
+    // 🆕 CREATE COLLECTION WITH COLLECT
+    ApiService(
+      name: 'Create Collection With Collect',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: CreateCollectionWithCollectHandler(),
+    ),
 
 
 
 
-
-
-
-
-
-      
     // 🔔 Webhooks APIs
     ApiService(
       name: 'List Webhooks',
