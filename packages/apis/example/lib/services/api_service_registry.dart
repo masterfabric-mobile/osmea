@@ -115,6 +115,13 @@ import 'package:example/services/handlers/inventory/inventory_level_handlers/set
 import 'package:example/services/handlers/inventory/location/count_all_locations_handler.dart';
 import 'package:example/services/handlers/inventory/location/list_inventory_by_location_id_handler.dart';
 import 'package:example/services/handlers/inventory/location/single_location_by_id_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/creates_marketing_engagements_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/creates_marketing_event_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/deletes_a_marketing_event_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_count_of_all_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_list_of_all_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_single_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/updates_a_marketing_event_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/count_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/delete_metafield_handler.dart';
@@ -167,6 +174,12 @@ import 'package:example/services/handlers/billing_handlers/recurring_application
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_list_of_usage_charges_handler.dart';
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_a_usage_charge_handler.dart';
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/create_usage_charge_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_list_of_webhooks_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_a_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_count_of_webhooks_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/create_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/update_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/delete_webhook_handler.dart';
 
 enum ApiCategory {
   access,
@@ -178,12 +191,14 @@ enum ApiCategory {
   discounts,
   events,
   inventory,
+  marketingEvent,
   giftCard,
   metafield,
   onlineStore,
   products,
   storeProperties,
-  tendertransaction
+  tendertransaction,
+  webhooks
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -207,6 +222,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Events APIs';
       case ApiCategory.inventory:
         return 'Inventory APIs';
+      case ApiCategory.marketingEvent:
+        return 'Marketing Event APIs';
       case ApiCategory.giftCard:
         return 'Gift Card APIs';
       case ApiCategory.metafield:
@@ -219,6 +236,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Store Properties APIs';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction APIs';
+      case ApiCategory.webhooks:
+        return 'Webhooks APIs';
     }
   }
 }
@@ -736,6 +755,62 @@ class ApiServiceRegistry {
       subcategory: 'Inventory Levels',
       handler: ListInventoryLevelsSingleItemHandler(),
     ),
+
+    // 📈 Marketing Events APIs - Retrieves A List Of All Marketing Events
+    ApiService(
+        name: 'Retrieves A List Of All',
+        endpoint: '/marketing_events',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: RetrievesAListOfAllHandler()),
+
+    // 📊 Marketing Events APIs - Retrieves A Single Marketing Event
+    ApiService(
+        name: 'Retrieves A Single',
+        endpoint: '/marketing_events/:id',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: RetrievesASingleHandler()),
+
+    // 🔢 Marketing Events APIs - Retrieves A Count Of All Marketing Events
+    ApiService(
+        name: 'Retrieves A Count Of All',
+        endpoint: '/marketing_events/count',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: RetrievesACountOfAllHandler()),
+
+    // ➕ Marketing Events APIs - Creates A Marketing Event
+    ApiService(
+        name: 'Creates A Marketing Event',
+        endpoint: '/marketing_events',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: CreatesMarketingEventHandler()),
+
+    // 🔄 Marketing Events APIs - Update Marketing Event
+    ApiService(
+        name: 'Update Marketing Event',
+        endpoint: '/marketing_events/:id',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: UpdatesAMarketingEventHandler()),
+
+    // 🗑️ Marketing Events APIs - Delete Marketing Event
+    ApiService(
+        name: 'Delete Marketing Event',
+        endpoint: '/marketing_events/:id',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: DeletesAMarketingEventHandler()),
+
+    // 🔗 Marketing Events APIs - Create Marketing Event Engagement On A Marketing Event
+    ApiService(
+        name: 'Create Marketing Event Engagement',
+        endpoint: '/marketing_events/:id/engagements',
+        category: ApiCategory.marketingEvent,
+        subcategory: 'Marketing Events',
+        handler: CreatesMarketingEngagementsHandler()),
     ApiService(
       name: 'Create Gift Card',
       endpoint: '/gift_cards',
@@ -1671,7 +1746,59 @@ class ApiServiceRegistry {
       endpoint: '/custom_collections',
       category: ApiCategory.products,
       subcategory: 'Custom Collection',
-      handler: CreateUnpublishedCustomCollectionHandler(),
+      handler: CreateUnpublishedCustomCollectionHandler(),),
+
+
+
+
+
+
+
+
+
+      
+    // 🔔 Webhooks APIs
+    ApiService(
+      name: 'List Webhooks',
+      endpoint: '/webhooks',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveListOfWebhooksHandler(),
+    ),
+    ApiService(
+      name: 'Get Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveAWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Count Webhooks',
+      endpoint: '/webhooks/count',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveCountOfWebhooksHandler(),
+    ),
+    ApiService(
+      name: 'Create Webhook',
+      endpoint: '/webhooks',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: CreateWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Update Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: UpdateWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Delete Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: DeleteWebhookHandler(),
     ),
   ];
 
@@ -1719,6 +1846,8 @@ class ApiServiceRegistry {
         return 'Events';
       case ApiCategory.inventory:
         return 'Inventory';
+      case ApiCategory.marketingEvent:
+        return 'Marketing Event';
       case ApiCategory.giftCard:
         return 'Gift Card';
       case ApiCategory.metafield:
@@ -1731,6 +1860,8 @@ class ApiServiceRegistry {
         return 'Store Properties';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction';
+      case ApiCategory.webhooks:
+        return 'Webhooks';
     }
   }
 }
