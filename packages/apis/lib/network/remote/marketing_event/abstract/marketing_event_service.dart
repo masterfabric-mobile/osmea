@@ -29,6 +29,8 @@ abstract class MarketingEventEvents {
 
   Future<RetrievesAListOfAllResponseModel> retrievesAListOfAll({
     required String apiVersion,
+    String limit,
+    String offset,
   });
 
   Future<RetrievesASingleResponseModel> retrievesASingle({

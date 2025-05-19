@@ -55,6 +55,8 @@ abstract class MarketingEventEventsApi implements MarketingEventEvents {
   @GET('/api/{api_version}/marketing_events.json')
   Future<RetrievesAListOfAllResponseModel> retrievesAListOfAll({
     @Path('api_version') required String apiVersion,
+    @Query('limit') String? limit,
+    @Query('offset') String? offset,
   });
 
   @override
@@ -65,14 +67,14 @@ abstract class MarketingEventEventsApi implements MarketingEventEvents {
   });
 
   @override
-  @GET('/api/{api_version}/marketing_events/{marketing_event_id}.json')
+  @PUT('/api/{api_version}/marketing_events/{marketing_event_id}.json')
   Future<UpdatesAMarketingEventResponseModel> updatesAMarketingEvent(
       {@Path('api_version') required String apiVersion,
       @Path('marketing_event_id') required String marketingEventId,
       @Body() required UpdatesAMarketingEventRequestModel model});
 
   @override
-  @GET('/api/{api_version}/marketing_events/{marketing_event_id}.json')
+  @DELETE('/api/{api_version}/marketing_events/{marketing_event_id}.json')
   Future<DeletesAMarketingEventResponseModel> deletesAMarketingEvent({
     @Path('api_version') required String apiVersion,
     @Path('marketing_event_id') required String marketingEventId,
