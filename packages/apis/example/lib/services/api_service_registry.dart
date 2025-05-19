@@ -116,7 +116,7 @@ import 'package:example/services/handlers/marketing_event_handlers/deletes_a_mar
 import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_count_of_all_handler.dart';
 import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_list_of_all_handler.dart';
 import 'package:example/services/handlers/marketing_event_handlers/retrieves_a_single_handler.dart';
-import 'package:example/services/handlers/marketing_event_handlers/updatesa_a_marketing_event_handler.dart';
+import 'package:example/services/handlers/marketing_event_handlers/updates_a_marketing_event_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/count_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/create_metafield_handler.dart';
 import 'package:example/services/handlers/metafield_handlers/delete_metafield_handler.dart';

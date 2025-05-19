@@ -29,25 +29,39 @@ class UpdatesAMarketingEventHandler implements ApiRequestHandler {
           }
 
           // 📋 Extract marketing event fields
+          // final marketingEventId = params['id'] ?? '';
+          // // Convert id to int or null if conversion fails
+          final id = params['id'] != null ? int.tryParse(params['id']!) : null;
           final eventType = params['event_type'];
           final startedAt = params['started_at'];
+          final endedAt = params['ended_at'];
+          final scheduledToEndAt = params['scheduled_to_end_at'];
           final budget = params['budget'] != null
               ? double.tryParse(params['budget']!)
               : null;
+          final budgetType = params['budget_type'];
           final currency = params['currency'];
           final utmCampaign = params['utm_campaign'];
           final utmSource = params['utm_source'];
           final utmMedium = params['utm_medium'];
+          final remoteId = params['remote_id'];
+          final referringDomain = params['referring_domain'];
 
           // Create marketing event update model
           final updatedEvent = MarketingEvent(
+            id: id, // Now properly converted to int?
             eventType: eventType,
             startedAt: startedAt, // String is expected, not DateTime
+            endedAt: endedAt,
+            scheduledToEndAt: scheduledToEndAt,
             budget: budget?.toString(), // Convert to String
+            budgetType: budgetType,
             currency: currency,
             utmCampaign: utmCampaign,
             utmSource: utmSource,
             utmMedium: utmMedium,
+            remoteId: remoteId,
+            referringDomain: referringDomain,
           );
 
           // 📞 Call the API to update the marketing event
@@ -155,14 +169,19 @@ class UpdatesAMarketingEventHandler implements ApiRequestHandler {
             hint: 'Date when the event started (ISO format)',
           ),
           const ApiField(
+            name: 'ended_at',
+            label: 'Ended At',
+            hint: 'Date when the event ended (ISO format)',
+          ),
+          const ApiField(
+            name: 'scheduled_to_end_at',
+            label: 'Scheduled To End At',
+            hint: 'Date when the event is scheduled to end (ISO format)',
+          ),
+          const ApiField(
             name: 'description',
             label: 'Description',
             hint: 'Description of the marketing event',
-          ),
-          const ApiField(
-            name: 'marketing_channel',
-            label: 'Marketing Channel',
-            hint: 'Channel used for marketing (e.g., social, email)',
           ),
           const ApiField(
             name: 'paid',
@@ -175,9 +194,24 @@ class UpdatesAMarketingEventHandler implements ApiRequestHandler {
             hint: 'Budget allocated for this event',
           ),
           const ApiField(
+            name: 'budget_type',
+            label: 'Budget Type',
+            hint: 'Type of budget (e.g., daily, total)',
+          ),
+          const ApiField(
             name: 'currency',
             label: 'Currency',
             hint: 'Currency code for the budget (e.g., USD)',
+          ),
+          const ApiField(
+            name: 'remote_id',
+            label: 'Remote ID',
+            hint: 'ID used in external systems',
+          ),
+          const ApiField(
+            name: 'referring_domain',
+            label: 'Referring Domain',
+            hint: 'Domain that refers to this marketing event',
           ),
           const ApiField(
             name: 'utm_campaign',
