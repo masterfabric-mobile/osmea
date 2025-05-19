@@ -1,23 +1,15 @@
-import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:flutter/foundation.dart'; // FlutterError için
+import 'package:flutter/foundation.dart';
 
 /// 🧩 Base class for all ViewModel Blocs.
 /// Provides logging and state management utilities.
 abstract class BaseViewModelBloc<E, S> extends Bloc<E, S> {
   /// 📝 Logger instance for logging state changes.
-  final ICommonLogger logger;
 
   /// 🏗️ Constructor with optional logger for testability.
-  /// 
+  ///
   /// Throws assertion error if logger is null.
-  BaseViewModelBloc(
-    S state, {
-    ICommonLogger? logger,
-  })  : logger = logger ?? GetIt.I.get<ICommonLogger>(),
-        assert(logger != null, 'Logger must not be null! 🚨'),
-        super(state);
+  BaseViewModelBloc(S state) : super(state);
 
   /// 📦 Getter for current state.
   S get currentState => state;
@@ -32,13 +24,9 @@ abstract class BaseViewModelBloc<E, S> extends Bloc<E, S> {
   void onChange(Change<S> change) {
     // 🔔 State change detected!
     try {
-      logger.printBaseViewModelLogs(
-        [
-          '🔄 State changed!',
-          'Current: ${change.currentState}',
-          'Next: ${change.nextState}'
-        ],
-      );
+      debugPrint('🔄 State changed!');
+      debugPrint('Current: ${change.currentState}');
+      debugPrint('Next: ${change.nextState}');
     } catch (e, stack) {
       // ⚠️ Logging failed, report to FlutterError
       FlutterError.reportError(FlutterErrorDetails(
@@ -55,14 +43,10 @@ abstract class BaseViewModelBloc<E, S> extends Bloc<E, S> {
   void onTransition(Transition<E, S> transition) {
     // 🔁 Bloc transition detected!
     try {
-      logger.printBaseViewModelLogs(
-        [
-          '🔁 Transition!',
-          'Event: ${transition.event}',
-          'CurrentState: ${transition.currentState}',
-          'NextState: ${transition.nextState}'
-        ],
-      );
+      debugPrint('🔁 Transition!');
+      debugPrint('Event: ${transition.event}');
+      debugPrint('CurrentState: ${transition.currentState}');
+      debugPrint('NextState: ${transition.nextState}');
     } catch (e, stack) {
       // ⚠️ Logging failed, report to FlutterError
       FlutterError.reportError(FlutterErrorDetails(
@@ -79,12 +63,8 @@ abstract class BaseViewModelBloc<E, S> extends Bloc<E, S> {
   void onError(Object error, StackTrace stackTrace) {
     // ❌ Error detected in Bloc!
     try {
-      logger.printBaseViewModelLogs(
-        [
-          '❌ Error: $error',
-          '🧵 StackTrace: $stackTrace',
-        ],
-      );
+      debugPrint('❌ Error: $error');
+      debugPrint('🧵 StackTrace: $stackTrace');
     } catch (e) {
       // ⚠️ Logging failed, report to FlutterError
       FlutterError.reportError(FlutterErrorDetails(

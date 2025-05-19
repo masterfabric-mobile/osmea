@@ -1,25 +1,22 @@
+import 'package:core/core.dart';
 import 'package:example/config/config_di.dart';
-import 'package:example/views/view_home/home_view.dart';
+import 'package:example/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  
+  /// Initializes necessary components before the app starts.
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Perform any necessary setup before the app starts
+  await MasterApp.runBefore(
+    allowCollectDataTelemetry: true
+  );
+  // Configure dependency injection for the application
   configureDependencies();
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'OSMEA Core Package',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: HomeView());
-  }
+  // Run the main application with the specified router
+  runApp(MasterApp(
+    router: appRouter, // The router handles navigation within the app
+  ));
 }
