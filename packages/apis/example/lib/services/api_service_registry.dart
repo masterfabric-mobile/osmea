@@ -61,6 +61,7 @@ import 'package:example/services/handlers/online_store_handlers/theme_handler/pu
 import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/count_custom_collections_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/create_unpublished_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/specific_custom_collections_handler.dart';
 import 'package:example/services/handlers/store_properties_handlers/country_handlers/receive_list_of_countries_handler.dart';
@@ -1662,6 +1663,15 @@ class ApiServiceRegistry {
       category: ApiCategory.products,
       subcategory: 'Custom Collection',
       handler: CreateCustomCollectionHandler(),
+    ),
+
+    // 🆕 CREATE UNPUBLISHED CUSTOM COLLECTION
+    ApiService(
+      name: 'Create Unpublished Custom Collection',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: CreateUnpublishedCustomCollectionHandler(),
     ),
   ];
 
