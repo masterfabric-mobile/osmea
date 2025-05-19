@@ -162,6 +162,12 @@ import 'package:example/services/handlers/billing_handlers/recurring_application
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_list_of_usage_charges_handler.dart';
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/retrieve_a_usage_charge_handler.dart';
 import 'package:example/services/handlers/billing_handlers/usage_charge_handlers/create_usage_charge_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_list_of_webhooks_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_a_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/retrieve_count_of_webhooks_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/create_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/update_webhook_handler.dart';
+import 'package:example/services/handlers/webhooks_handlers/webhook_handlers/delete_webhook_handler.dart';
 
 enum ApiCategory {
   access,
@@ -177,7 +183,8 @@ enum ApiCategory {
   metafield,
   storeProperties,
   onlineStore,
-  tendertransaction
+  tendertransaction,
+  webhooks
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -211,6 +218,8 @@ extension ApiCategoryExtension on ApiCategory {
         return 'Online Store APIs';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction APIs';
+      case ApiCategory.webhooks:
+        return 'Webhooks APIs';
     }
   }
 }
@@ -1619,7 +1628,51 @@ class ApiServiceRegistry {
       category: ApiCategory.tendertransaction, // Changed from billing
       subcategory: 'Tender Transaction',
       handler: RetrieveListOfTenderTransactionsHandler(),
-    )
+    ),
+
+    // 🔔 Webhooks APIs
+    ApiService(
+      name: 'List Webhooks',
+      endpoint: '/webhooks',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveListOfWebhooksHandler(),
+    ),
+    ApiService(
+      name: 'Get Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveAWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Count Webhooks',
+      endpoint: '/webhooks/count',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: RetrieveCountOfWebhooksHandler(),
+    ),
+    ApiService(
+      name: 'Create Webhook',
+      endpoint: '/webhooks',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: CreateWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Update Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: UpdateWebhookHandler(),
+    ),
+    ApiService(
+      name: 'Delete Webhook',
+      endpoint: '/webhooks/:id',
+      category: ApiCategory.webhooks,
+      subcategory: 'Webhook',
+      handler: DeleteWebhookHandler(),
+    ),
   ];
 
   static void initialize() {}
@@ -1676,6 +1729,8 @@ class ApiServiceRegistry {
         return 'Online Store';
       case ApiCategory.tendertransaction:
         return 'Tender Transaction';
+      case ApiCategory.webhooks:
+        return 'Webhooks';
     }
   }
 }
