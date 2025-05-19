@@ -2,8 +2,10 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/products/custom_collection/abstract/custom_collections_service.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_custom_collection_request.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_unpublished_custom_collection_request.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/count_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_custom_collection_response.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_unpublished_custom_collection_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/list_all_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/specific_custom_collections_response.dart';
 import 'package:dio/dio.dart';
@@ -70,5 +72,12 @@ abstract class CustomCollectionsServiceClient
   Future<CreateCustomCollectionResponse> createCustomCollection({
     @Path('api_version') required String apiVersion,
     @Body() required CreateCustomCollectionRequest model,
+  });
+
+  // ➕ Create Unpublished Custom Collection
+  @POST('/api/{api_version}/custom_collections.json')
+  Future<CreateUnpublishedCustomCollectionResponse> createUnpublishedCustomCollection({
+    @Path('api_version') required String apiVersion,
+    @Body() required CreateUnpublishedCustomCollectionRequest model,
   });
 }
