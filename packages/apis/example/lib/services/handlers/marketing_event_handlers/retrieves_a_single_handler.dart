@@ -1,5 +1,6 @@
 import 'package:apis/apis.dart';
 import 'package:apis/network/remote/marketing_event/abstract/marketing_event_service.dart';
+import 'package:apis/network/remote/marketing_event/freezed_model/response/retrieves_a_single_response_model.dart';
 import 'package:get_it/get_it.dart';
 import '../../api_service_registry.dart';
 import '../../api_request_handler.dart';
@@ -15,15 +16,14 @@ class RetrievesASingleHandler implements ApiRequestHandler {
     // 🔍 Validate method
     if (method == 'GET') {
       // Validate required parameters
-      if (!params.containsKey('id')) {
+      final marketingEventId = params['marketing_event_id'] ?? '';
+      if (marketingEventId.isEmpty) {
         return {
           "status": "error",
-          "message": "Missing required parameter: 'id'",
+          "message": "Marketing Event ID is required",
           "timestamp": DateTime.now().toIso8601String(),
         };
       }
-
-      final String marketingEventId = params['id']!;
 
       try {
         // 🚀 Make API call to get single marketing event
@@ -64,11 +64,11 @@ class RetrievesASingleHandler implements ApiRequestHandler {
           };
         }
 
-        // ✅ Return successful response
+        // ✅ Return successful response with properly formatted data
         return {
           "status": "success",
-          "marketingEvent": formattedEvent,
-          "responseData": response.toJson(),
+          "marketingEvent": marketingEventId,
+          "responseData": _sanitizeJsonData(response),
           "timestamp": DateTime.now().toIso8601String(),
         };
       } catch (e) {
@@ -129,11 +129,55 @@ class RetrievesASingleHandler implements ApiRequestHandler {
     };
   }
 
+  // Helper method to convert response to serializable Map
+  Map<String, dynamic> _sanitizeJsonData(
+      RetrievesASingleResponseModel response) {
+    final Map<String, dynamic> serializedData = {};
+
+    if (response.marketingEvent != null) {
+      final event = response.marketingEvent!;
+      serializedData['marketing_event'] = {
+        "id": event.id,
+        "event_type": event.eventType,
+        "remote_id": event.remoteId,
+        "started_at": event.startedAt?.toIso8601String(),
+        "ended_at": event.endedAt,
+        "scheduled_to_end_at": event.scheduledToEndAt,
+        "budget": event.budget,
+        "currency": event.currency,
+        "manage_url": event.manageUrl,
+        "preview_url": event.previewUrl,
+        "utm_campaign": event.utmCampaign,
+        "utm_source": event.utmSource,
+        "utm_medium": event.utmMedium,
+        "budget_type": event.budgetType,
+        "description": event.description,
+        "marketing_channel": event.marketingChannel,
+        "paid": event.paid,
+        "referring_domain": event.referringDomain,
+        "breadcrumb_id": event.breadcrumbId,
+        "marketing_activity_id": event.marketingActivityId,
+        "admin_graphql_api_id": event.adminGraphqlApiId,
+        "marketed_resources": event.marketedResources,
+      };
+    }
+
+    return serializedData;
+  }
+
   @override
   // Support only GET method
   List<String> get supportedMethods => ['GET'];
 
   @override
   // ID parameter is required for this endpoint
-  Map<String, List<ApiField>> get requiredFields => {};
+  Map<String, List<ApiField>> get requiredFields => {
+        'GET': [
+          const ApiField(
+            name: 'marketing_event_id',
+            label: 'Marketing Event ID',
+            hint: 'ID of the marketing event to retrieve',
+          ),
+        ],
+      };
 }
