@@ -1,11 +1,13 @@
 import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_collection_with_collect_request.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_custom_collection_base_image_request.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_custom_collection_request.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_custom_collection_with_metafield_request.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/request/create_unpublished_custom_collection_request.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/count_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_collection_with_collect_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_custom_collection_base_image_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_custom_collection_response.dart';
+import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_custom_collection_with_metafield_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/create_unpublished_custom_collection_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/list_all_custom_collections_response.dart';
 import 'package:apis/network/remote/products/custom_collection/freezed_model/response/specific_custom_collections_response.dart';
@@ -69,5 +71,11 @@ abstract class CustomCollectionsService {
   Future<CreateCustomCollectionBaseImageResponse> createCustomCollectionBaseImage({
     required String apiVersion,
     required CreateCustomCollectionBaseImageRequest model
+  });
+
+  // ➕ Create Custom Collection With Metafield
+  Future<CreateCustomCollectionWithMetafieldResponse> createCustomCollectionWithMetafield({
+    required String apiVersion,
+    required CreateCustomCollectionWithMetafieldRequest model
   });
 }
