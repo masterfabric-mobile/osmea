@@ -63,6 +63,7 @@ import 'package:example/services/handlers/products/custom_collections_handlers/c
 import 'package:example/services/handlers/products/custom_collections_handlers/create_collection_with_collect_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_base_image_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_uploaded_image_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_with_metafield_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_unpublished_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
@@ -1778,6 +1779,20 @@ class ApiServiceRegistry {
       subcategory: 'Custom Collection',
       handler: CreateCustomCollectionWithMetafieldHandler(),
     ),
+
+    // 🖼️ CREATE CUSTOM COLLECTION WITH UPLOADED IMAGE
+    ApiService(
+      name: 'Create Custom Collection With Uploaded Image',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: CreateCustomCollectionUploadedImageHandler(),
+    ),
+
+
+
+
+
 
     // 🔔 Webhooks APIs
     ApiService(
