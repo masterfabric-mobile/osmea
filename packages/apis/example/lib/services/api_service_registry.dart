@@ -74,6 +74,7 @@ import 'package:example/services/handlers/orders/order/order_handler.dart';
 import 'package:example/services/handlers/orders/order_risk/get_list_order_risks_handler.dart';
 
 import 'package:example/services/handlers/orders/order_risk/order_risk_handler.dart';
+import 'package:example/services/handlers/orders/refund/refund_handler.dart';
 
 import 'package:example/services/index.dart';
 import 'handlers/customers_handlers/customer/retrieves_list_of_customers_handler.dart';
@@ -812,7 +813,14 @@ class ApiServiceRegistry {
       category: ApiCategory.orders,
       subcategory: 'Order Risk',
       handler: OrderRiskHandler(),
-    )
+    ),
+    ApiService(
+      name: 'Get Single Refund',
+      endpoint: '/orders/order',
+      category: ApiCategory.orders,
+      subcategory: 'Refund',
+      handler: RefundHandler(),
+    ),
   ];
 
   static void initialize() {}
