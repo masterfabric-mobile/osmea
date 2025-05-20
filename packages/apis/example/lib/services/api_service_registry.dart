@@ -61,6 +61,7 @@ import 'package:example/services/handlers/online_store_handlers/theme_handler/pu
 import 'package:example/services/handlers/online_store_handlers/theme_handler/update_theme_name_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/count_custom_collections_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_collection_with_collect_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_base_image_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_unpublished_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
@@ -1759,8 +1760,14 @@ class ApiServiceRegistry {
       handler: CreateCollectionWithCollectHandler(),
     ),
 
-
-
+    // 🖼️ CREATE CUSTOM COLLECTION WITH IMAGE
+    ApiService(
+      name: 'Create Custom Collection With Image',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: CreateCustomCollectionBaseImageHandler(),
+    ),
 
     // 🔔 Webhooks APIs
     ApiService(
