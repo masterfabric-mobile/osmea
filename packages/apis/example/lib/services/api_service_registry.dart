@@ -63,6 +63,7 @@ import 'package:example/services/handlers/products/custom_collections_handlers/c
 import 'package:example/services/handlers/products/custom_collections_handlers/create_collection_with_collect_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_base_image_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_handler.dart';
+import 'package:example/services/handlers/products/custom_collections_handlers/create_custom_collection_with_metafield_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/create_unpublished_custom_collection_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/list_all_custom_collections_handler.dart';
 import 'package:example/services/handlers/products/custom_collections_handlers/specific_custom_collections_handler.dart';
@@ -1767,6 +1768,15 @@ class ApiServiceRegistry {
       category: ApiCategory.products,
       subcategory: 'Custom Collection',
       handler: CreateCustomCollectionBaseImageHandler(),
+    ),
+
+    // 🏷️ CREATE COLLECTION WITH METAFIELD
+    ApiService(
+      name: 'Create Collection With Metafield',
+      endpoint: '/custom_collections',
+      category: ApiCategory.products,
+      subcategory: 'Custom Collection',
+      handler: CreateCustomCollectionWithMetafieldHandler(),
     ),
 
     // 🔔 Webhooks APIs
