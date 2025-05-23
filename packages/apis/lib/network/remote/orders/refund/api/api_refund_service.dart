@@ -1,6 +1,7 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/api_dio_client.dart';
 import 'package:apis/network/remote/orders/refund/abstract/refund.dart';
+import 'package:apis/network/remote/orders/refund/freezed_model/response/get_list_refund_response.dart';
 import 'package:apis/network/remote/orders/refund/freezed_model/response/get_single_refund_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -23,5 +24,11 @@ abstract class RefundServiceClient implements RefundService {
     @Path('api_version') required String apiVersion,
     @Path('order_id') required String orderId,
     @Path('refund_id') required String refundId,
+  });
+
+  @GET('/api/{api_version}/orders/{order_id}/refunds.json')
+  Future<GetListRefundResponse> getListRefund({
+    @Path('api_version') required String apiVersion,
+    @Path('order_id') required String orderId,
   });
 }
