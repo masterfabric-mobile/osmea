@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import '../model/ocr_cheque_model.dart';
 
 abstract class OcrChequeState {}
@@ -11,11 +12,21 @@ class OcrChequeLoadedState extends OcrChequeState {
   final String? rawText;
   final Map<String, dynamic>? allFields;
   final String? imageRef;
-  OcrChequeLoadedState(this.chequeData,
-      {this.rawText, this.allFields, this.imageRef});
+  final List<Map<String, dynamic>>? batchResults;
+
+  OcrChequeLoadedState(
+    this.chequeData, {
+    this.rawText,
+    this.allFields,
+    this.imageRef,
+    this.batchResults,
+  });
 }
 
 class OcrChequeErrorState extends OcrChequeState {
   final String message;
-  OcrChequeErrorState(this.message);
+  final String? rawText;
+  final DocumentType? documentType;
+
+  OcrChequeErrorState(this.message, {this.rawText, this.documentType});
 }
