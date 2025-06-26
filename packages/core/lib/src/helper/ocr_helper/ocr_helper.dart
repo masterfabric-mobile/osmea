@@ -222,14 +222,63 @@ class OcrHelper {
   }
 
   static String? _findCheckAmount(String text) {
-    const keywords = ['TL', '₺', 'Tutar', 'Çek Tutarı'];
-    // First look for numbers next to TL/₺
-    final amount =
-        _findFlexibleField(text, ['TL', '₺'], numberPattern: r'[0-9.,]+');
-    if (amount != null) return amount;
-    // Then search with classic Amount keywords
-    return _findFlexibleField(text, ['Tutar', 'Çek Tutarı'],
-        numberPattern: r'[0-9.,]+');
+    const keywords = ['TL', '₺', 'Tutar', 'Çek Tutarı', 'Tutar:', 'TL:', '₺:'];
+
+    // Debug: Print lines containing TL/₺/Tutar
+    final lines = text.split('\n');
+    for (final line in lines) {
+      if (line.toLowerCase().contains('tl') ||
+          line.toLowerCase().contains('₺') ||
+          line.toLowerCase().contains('tutar')) {
+        print('AMOUNT LINE FOUND: "$line"');
+      }
+    }
+
+    // 1. Try multiple flexible regex patterns for amount
+    final patterns = [
+      RegExp(r'([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)\s*(?:TL|₺)',
+          caseSensitive: false),
+      RegExp(r'(?:TL|₺)\s*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)',
+          caseSensitive: false),
+      RegExp(r'Tutar[:\s]*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)',
+          caseSensitive: false),
+      RegExp(r'Çek Tutarı[:\s]*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)',
+          caseSensitive: false),
+      RegExp(r'([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)',
+          caseSensitive: false), // Fallback: any amount
+    ];
+
+    for (final pattern in patterns) {
+      final match = pattern.firstMatch(text);
+      if (match != null) {
+        final amount = match.group(1);
+        if (amount != null && amount.isNotEmpty) {
+          print('AMOUNT MATCHED: $amount');
+          return amount;
+        }
+      }
+    }
+
+    // 2. Search line by line with keywords
+    final result =
+        _findFlexibleField(text, keywords, numberPattern: r'[0-9.,]+');
+    if (result != null) return result;
+
+    // 3. Look for amounts in lines containing TL/₺/Tutar
+    for (final line in lines) {
+      if (line.toLowerCase().contains('tl') ||
+          line.toLowerCase().contains('₺') ||
+          line.toLowerCase().contains('tutar')) {
+        final match = RegExp(r'[0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?')
+            .firstMatch(line);
+        if (match != null) {
+          print('AMOUNT FOUND in line: ${match.group(0)}');
+          return match.group(0);
+        }
+      }
+    }
+
+    return null;
   }
 
   static String? _findBasimTarihi(String text) {
