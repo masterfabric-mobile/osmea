@@ -88,10 +88,13 @@ class OcrHelper {
     for (final line in lines) {
       if (excludeMersis && line.toLowerCase().contains('mersis')) continue;
       for (final keyword in keywords) {
-        if (line
-            .toLowerCase()
-            .replaceAll('.', '')
-            .contains(keyword.toLowerCase().replaceAll('.', ''))) {
+        // Clean the line and keyword for comparison (remove #, ., spaces)
+        final cleanedLine =
+            line.toLowerCase().replaceAll(RegExp(r'[#\.\s]+'), '');
+        final cleanedKeyword =
+            keyword.toLowerCase().replaceAll(RegExp(r'[#\.\s]+'), '');
+
+        if (cleanedLine.contains(cleanedKeyword)) {
           if (numberPattern != null) {
             final match = RegExp(numberPattern).firstMatch(line);
             if (match != null) return match.group(0);
