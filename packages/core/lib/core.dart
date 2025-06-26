@@ -18,3 +18,6 @@ export 'package:core/src/resources/resources.g.dart';
 
 // 🧩 Exports the helper for local storage
 export 'package:core/src/helper/local_storage/local_storage_helper.dart';
+
+// 🚀 Exports the smart OCR helper for intelligent document analysis
+export 'package:core/src/helper/ocr_helper/ocr_helper.dart';

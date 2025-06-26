@@ -29,6 +29,11 @@ dependencies:
   firebase_core: ^3.13.0 # Firebase core
   device_info_plus: ^11.4.0 # Device info
   package_info_plus: ^8.3.0 # Package info
+  flutter_tesseract_ocr: ^0.4.24 # OCR için eklendi
+  file_picker: ^10.2.0
+  js: ^0.6.7
+  string_similarity: ^2.0.0
+
 
 # -------------------------------
 # Development dependencies
