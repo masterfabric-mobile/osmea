@@ -43,6 +43,15 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get appTitle => 'OSMEA App';
 	String get emptyText => '';
 	String get cancel => 'Cancel';
+	String get loading => 'Loading...';
+	String get error => 'An error occurred.';
+	String get maintenance => 'Maintenance mode.';
+	String get empty => 'No data available.';
+	String get unauthorized => 'Unauthorized access.';
+	String get timeout => 'Request timed out.';
+	String get undo => 'Undo';
+	String get webview => 'WebView';
+	String get defaultMessage => 'An unexpected error occurred. Please try again later.';
 }
 
 /// Flat map(s) containing all translations.
@@ -54,6 +63,15 @@ extension on Translations {
 			case 'appTitle': return 'OSMEA App';
 			case 'emptyText': return '';
 			case 'cancel': return 'Cancel';
+			case 'loading': return 'Loading...';
+			case 'error': return 'An error occurred.';
+			case 'maintenance': return 'Maintenance mode.';
+			case 'empty': return 'No data available.';
+			case 'unauthorized': return 'Unauthorized access.';
+			case 'timeout': return 'Request timed out.';
+			case 'undo': return 'Undo';
+			case 'webview': return 'WebView';
+			case 'defaultMessage': return 'An unexpected error occurred. Please try again later.';
 			default: return null;
 		}
 	}
