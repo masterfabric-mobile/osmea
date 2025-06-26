@@ -7,6 +7,7 @@ import 'module/ocr_cheque_state.dart';
 import 'model/ocr_cheque_model.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
+import 'dart:convert';
 
 /// 🚀 **Smart OCR Çek Görünümü** - Gelişmiş OCR ve filepicker entegrasyonu
 class OcrChequeView
@@ -65,7 +66,209 @@ class OcrChequeView
     } else if (state is OcrChequeErrorState) {
       return _buildErrorWidget(context, viewModel, state.message);
     } else if (state is OcrChequeLoadedState) {
-      return _buildChequeData(context, viewModel, state.chequeData);
+      if (state.batchResults != null && state.batchResults!.isNotEmpty) {
+        // Batch mode: show each result as a card in a scrollable ListView
+        return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 32),
+          itemCount: state.batchResults!.length + 1,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Toplu İşlem Sonuçları (${state.batchResults!.length} görsel)',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }
+            final result = state.batchResults![index - 1];
+            final docType = result['documentType'];
+            final isCheck = docType == DocumentType.cheque ||
+                docType?.toString() == 'DocumentType.cheque' ||
+                docType == 'cheque' ||
+                docType == 'DocumentType.cheque';
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: EdgeInsets.all(0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Left: Image
+                  Container(
+                    width: 150,
+                    height: 110,
+                    margin: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade100,
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: result['imageRef'] != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.memory(
+                              base64Decode(result['imageRef'].split(',').last),
+                              fit: BoxFit.cover,
+                              width: 150,
+                              height: 110,
+                            ),
+                          )
+                        : Icon(Icons.image,
+                            size: 48, color: Colors.grey.shade400),
+                  ),
+                  // Right: Details
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: 700),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isCheck
+                                      ? Colors.green.shade100
+                                      : Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  isCheck ? 'Çek' : 'Çek Değil',
+                                  style: TextStyle(
+                                    color: isCheck
+                                        ? Colors.green.shade700
+                                        : Colors.red.shade700,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          if (isCheck) ...[
+                            ..._buildAllChequeFields(result),
+                          ] else ...[
+                            Container(
+                              margin: EdgeInsets.only(top: 8, bottom: 8),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Hiçbir temel çek alanı tespit edilemedi. Görseli ve OCR sonucunu kontrol edin.',
+                                style: TextStyle(
+                                    color: Colors.red.shade400,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+                          SizedBox(height: 8),
+                          _MinimalOcrText(text: result['rawText'] ?? ''),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      } else {
+        // Single mode: show everything in a scrollable ListView
+        return ListView(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 0),
+          children: [
+            if (state.imageRef != null)
+              Container(
+                width: double.infinity,
+                constraints: BoxConstraints(maxHeight: 260),
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.memory(
+                    base64Decode(state.imageRef!.split(',').last),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            SizedBox(height: 24),
+            // OCR metni
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: SelectableText(
+                state.allFields?['rawText'] ?? '',
+                style: TextStyle(fontSize: 15, color: Colors.grey.shade900),
+              ),
+            ),
+            SizedBox(height: 24),
+            // Çek alanları
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: state.allFields == null || state.allFields!.isEmpty
+                  ? Card(
+                      color: Colors.red.shade50,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded,
+                                color: Colors.red.shade400),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Hiçbir çek alanı tespit edilemedi.',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Wrap(
+                        spacing: 0,
+                        children: [..._buildAllChequeFields(state.allFields)],
+                      ),
+                    ),
+            ),
+            SizedBox(height: 24),
+          ],
+        );
+      }
     }
     // Initial state
     return _buildInitialWidget(context, viewModel);
@@ -120,6 +323,25 @@ class OcrChequeView
               elevation: 4,
             ),
             onPressed: () => viewModel.add(OcrChequePickImageEvent()),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.photo_library, size: 28),
+            label: const Text(
+              'Toplu Çek Okuma',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(230),
+              foregroundColor: Colors.blue.shade600,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              elevation: 4,
+            ),
+            onPressed: () =>
+                viewModel.add(OcrChequePickImageEvent(isMultiple: true)),
           ),
           const SizedBox(height: 24),
           _buildFeatureCards(),
@@ -347,9 +569,6 @@ class OcrChequeView
                           'MICR Kodu', data.micrCode, Icons.qr_code,
                           copyable: true),
                       _buildEnhancedField(
-                          'Çek Tutarı', data.checkAmount, Icons.attach_money,
-                          copyable: true),
-                      _buildEnhancedField(
                           'Mersis No', data.mersisNo, Icons.numbers,
                           copyable: true),
                     ],
@@ -525,8 +744,6 @@ class OcrChequeView
       buffer.writeln('Hesap No: ${data.accountNumber}');
     if (data.tcknVkn != null) buffer.writeln('TCKN/VKN: ${data.tcknVkn}');
     if (data.micrCode != null) buffer.writeln('MICR Kodu: ${data.micrCode}');
-    if (data.checkAmount != null)
-      buffer.writeln('Çek Tutarı: ${data.checkAmount}');
     if (data.mersisNo != null) buffer.writeln('Mersis No: ${data.mersisNo}');
     buffer.writeln('==================');
 
@@ -612,6 +829,115 @@ class OcrChequeView
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+
+  List<Widget> _buildAllChequeFields(Map<String, dynamic>? fields) {
+    if (fields == null) return [];
+    final List<Map<String, dynamic>> allFields = [
+      {'key': 'iban', 'label': 'IBAN', 'icon': Icons.account_balance},
+      {'key': 'cekNo', 'label': 'Çek No', 'icon': Icons.confirmation_number},
+      {'key': 'branchCode', 'label': 'Şube Kodu', 'icon': Icons.location_on},
+      {
+        'key': 'accountNumber',
+        'label': 'Hesap No',
+        'icon': Icons.account_balance_wallet
+      },
+      {'key': 'tcknVkn', 'label': 'TCKN/VKN', 'icon': Icons.person},
+      {'key': 'tckn', 'label': 'TCKN', 'icon': Icons.person},
+      {'key': 'vkn', 'label': 'VKN', 'icon': Icons.person},
+      {'key': 'bankCode', 'label': 'Banka Kodu', 'icon': Icons.business},
+      {'key': 'micrCode', 'label': 'MICR Kodu', 'icon': Icons.qr_code},
+      {'key': 'basimTarihi', 'label': 'Basım Tarihi', 'icon': Icons.event},
+      {'key': 'tarih', 'label': 'Tarih', 'icon': Icons.event},
+      {
+        'key': 'subeBilgisi',
+        'label': 'Şube Bilgisi',
+        'icon': Icons.info_outline
+      },
+      {'key': 'subeKodu', 'label': 'Şube Kodu', 'icon': Icons.location_on},
+      {
+        'key': 'imzaTarihi',
+        'label': 'İmza Tarihi',
+        'icon': Icons.edit_calendar
+      },
+      {'key': 'mersisNo', 'label': 'Mersis No', 'icon': Icons.numbers},
+      {'key': 'rawText', 'label': 'OCR Metni', 'icon': Icons.text_snippet},
+    ];
+    final List<Widget> items = [];
+    for (final field in allFields) {
+      final value = fields[field['key']];
+      if (value != null &&
+          value.toString().trim().isNotEmpty &&
+          value != '[Bulunamadı]') {
+        items.add(
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade200, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(field['icon'], color: Colors.blueGrey, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  field['label'],
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.black87),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  value.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+    return items;
+  }
+}
+
+class _MinimalOcrText extends StatefulWidget {
+  final String text;
+  const _MinimalOcrText({required this.text});
+  @override
+  State<_MinimalOcrText> createState() => _MinimalOcrTextState();
+}
+
+class _MinimalOcrTextState extends State<_MinimalOcrText> {
+  bool expanded = false;
+  @override
+  Widget build(BuildContext context) {
+    final maxLines = expanded ? 20 : 2;
+    return GestureDetector(
+      onTap: () => setState(() => expanded = !expanded),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Text(
+          widget.text.isEmpty ? 'OCR metni yok' : widget.text,
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade800),
+        ),
       ),
     );
   }

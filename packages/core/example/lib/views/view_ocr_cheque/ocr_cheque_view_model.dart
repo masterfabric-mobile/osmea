@@ -12,6 +12,7 @@ import 'model/ocr_cheque_model.dart';
 class OcrChequeViewModel
     extends BaseViewModelBloc<OcrChequeEvent, OcrChequeState> {
   String? _lastImageRef;
+  List<String> _selectedImages = [];
 
   OcrChequeViewModel() : super(OcrChequeInitialState()) {
     on<OcrChequePickImageEvent>(_onPickImage);
@@ -25,23 +26,29 @@ class OcrChequeViewModel
 
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
-        allowMultiple: false,
+        allowMultiple: event.isMultiple,
       );
 
-      if (result != null && result.files.single.path != null) {
+      if (result != null && result.files.isNotEmpty) {
         if (kIsWeb) {
-          final bytes = result.files.single.bytes;
-          if (bytes != null) {
-            final base64String =
-                'data:image/${result.files.single.extension};base64,${base64Encode(bytes)}';
-            _lastImageRef = base64String;
-            add(OcrChequeProcessImageEvent(base64String));
-          } else {
-            emit(OcrChequeErrorState('Dosya okunamadı'));
+          _selectedImages.clear();
+          for (final file in result.files) {
+            if (file.bytes != null) {
+              final base64String =
+                  'data:image/${file.extension};base64,${base64Encode(file.bytes!)}';
+              _selectedImages.add(base64String);
+            }
           }
+          if (_selectedImages.isEmpty) {
+            emit(OcrChequeErrorState('Dosyalar okunamadı'));
+            return;
+          }
+          _lastImageRef = _selectedImages.first;
+          add(OcrChequeProcessImageEvent(_selectedImages.first));
         } else {
-          _lastImageRef = result.files.single.path!;
-          add(OcrChequeProcessImageEvent(result.files.single.path!));
+          _selectedImages = result.files.map((f) => f.path!).toList();
+          _lastImageRef = _selectedImages.first;
+          add(OcrChequeProcessImageEvent(_selectedImages.first));
         }
       } else {
         emit(OcrChequeInitialState());
@@ -56,31 +63,70 @@ class OcrChequeViewModel
     try {
       emit(OcrChequeLoadingState());
 
-      Map<String, dynamic> data;
+      if (_selectedImages.length > 1) {
+        // Toplu işlem
+        final results = await OcrHelper.analyzeImagesWeb(_selectedImages);
+        final chequeModels = <OcrChequeModel>[];
+        final allFields = <Map<String, dynamic>>[];
 
-      if (kIsWeb) {
-        data = await OcrHelper.readChequeInfoOptimized(event.imagePath);
+        for (int i = 0; i < results.length; i++) {
+          final data = results[i];
+          // Her item'a imageRef ekle
+          data['imageRef'] = _selectedImages[i];
+          if (data['documentType'] == DocumentType.cheque ||
+              data['documentType'] == 'cheque' ||
+              data['documentType']?.toString() == 'DocumentType.cheque') {
+            final chequeFields = <String, String?>{
+              'iban': data['iban'] as String?,
+              'cekNo': data['cekNo'] as String?,
+              'branchCode': data['branchCode'] as String?,
+              'accountNumber': data['accountNumber'] as String?,
+              'tcknVkn': data['tcknVkn'] as String?,
+              'bankCode': data['bankCode'] as String?,
+              'micrCode': data['micrCode'] as String?,
+              'mersisNo': data['mersisNo'] as String?,
+            };
+            chequeModels.add(OcrChequeModel.fromMap(chequeFields));
+            allFields.add(data);
+          }
+        }
+
+        if (chequeModels.isEmpty) {
+          emit(OcrChequeErrorState('Hiçbir çek bulunamadı'));
+          return;
+        }
+
+        emit(OcrChequeLoadedState(chequeModels.first,
+            rawText: results.first['rawText'] as String?,
+            allFields: allFields.first,
+            imageRef: _lastImageRef,
+            batchResults: results));
       } else {
-        data = await OcrHelper.readChequeInfo(event.imagePath);
+        // Tekli işlem
+        Map<String, dynamic> data;
+        if (kIsWeb) {
+          data = await OcrChequeHelper.readChequeInfoOptimized(event.imagePath);
+        } else {
+          data = await OcrChequeHelper.readChequeInfo(event.imagePath);
+        }
+
+        _logOcrResults(data);
+
+        final chequeFields = <String, String?>{
+          'iban': data['iban'] as String?,
+          'cekNo': data['cekNo'] as String?,
+          'branchCode': data['branchCode'] as String?,
+          'accountNumber': data['accountNumber'] as String?,
+          'tcknVkn': data['tcknVkn'] as String?,
+          'bankCode': data['bankCode'] as String?,
+          'micrCode': data['micrCode'] as String?,
+          'mersisNo': data['mersisNo'] as String?,
+        };
+        final chequeModel = OcrChequeModel.fromMap(chequeFields);
+        final rawText = data['rawText'] as String?;
+        emit(OcrChequeLoadedState(chequeModel,
+            rawText: rawText, allFields: data, imageRef: _lastImageRef));
       }
-
-      _logOcrResults(data);
-
-      final chequeFields = <String, String?>{
-        'iban': data['iban'] as String?,
-        'cekNo': data['cekNo'] as String?,
-        'branchCode': data['branchCode'] as String?,
-        'accountNumber': data['accountNumber'] as String?,
-        'tcknVkn': data['tcknVkn'] as String?,
-        'bankCode': data['bankCode'] as String?,
-        'micrCode': data['micrCode'] as String?,
-        'checkAmount': data['checkAmount'] as String?,
-        'mersisNo': data['mersisNo'] as String?,
-      };
-      final chequeModel = OcrChequeModel.fromMap(chequeFields);
-      final rawText = data['rawText'] as String?;
-      emit(OcrChequeLoadedState(chequeModel,
-          rawText: rawText, allFields: data, imageRef: _lastImageRef));
     } catch (e) {
       emit(OcrChequeErrorState('OCR işlemi başarısız: ${e.toString()}'));
     }
