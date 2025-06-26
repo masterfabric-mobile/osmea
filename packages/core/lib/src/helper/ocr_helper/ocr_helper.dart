@@ -127,10 +127,17 @@ class OcrHelper {
   }
 
   static String? _findIban(String text) {
+    // 1. First, search line by line with keywords
     const keywords = ['IBAN', 'IBAN No', 'IBAN:', 'IBAN.', 'Hesap No'];
-    // IBAN: Starts with TR and 20-32 characters
-    return _findFlexibleField(text, keywords,
+    final iban = _findFlexibleField(text, keywords,
         numberPattern: r'TR[0-9A-Za-z\s]{10,32}');
+    if (iban != null) return iban;
+
+    // 2. Fallback: find the first TR... code in the whole text
+    final match = RegExp(r'TR[0-9A-Za-z\s]{10,32}').firstMatch(text);
+    if (match != null) return match.group(0);
+
+    return null;
   }
 
   static String? _findBranchCode(String text) {
