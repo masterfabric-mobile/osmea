@@ -8,6 +8,7 @@ import 'package:example/views/view_home/module/events.dart';
 import 'package:example/views/view_home/module/states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 // ignore: implementation_imports
 
@@ -26,6 +27,7 @@ class HomeViewModel extends BaseViewModelBloc<HomeViewEvent, HomeViewState> {
     on<HomeViewLoadProductsEvent>(_onLoadProducts);
     on<HomeViewAddProductEvent>(_onAddProduct);
     on<HomeViewDeleteProductEvent>(_onDeleteProduct);
+    on<GoToOcrChequeEvent>(_onGoToOcrCheque);
 
     // Initialize storage as soon as the ViewModel is created
     _initStorage();
@@ -406,5 +408,9 @@ class HomeViewModel extends BaseViewModelBloc<HomeViewEvent, HomeViewState> {
   // Add a public method to clear all products
   void clearAll() {
     clearAllProducts();
+  }
+
+  void _onGoToOcrCheque(GoToOcrChequeEvent event, Emitter<HomeViewState> emit) {
+    event.context.go('/ocr-cheque');
   }
 }

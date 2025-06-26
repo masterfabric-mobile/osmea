@@ -40,6 +40,11 @@ class HomeView extends MasterView<HomeViewModel, HomeViewEvent, HomeViewState> {
               tooltip: 'Refresh Products',
             ),
             IconButton(
+              icon: const Icon(Icons.document_scanner),
+              onPressed: () => viewModel.add(GoToOcrChequeEvent(context)),
+              tooltip: 'Çek OCR',
+            ),
+            IconButton(
               icon: const Icon(Icons.delete_sweep),
               onPressed: () => _confirmClearAll(context, viewModel),
               tooltip: 'Clear All Products',
@@ -50,8 +55,10 @@ class HomeView extends MasterView<HomeViewModel, HomeViewEvent, HomeViewState> {
           child: Stack(
             children: [
               FutureBuilder<dynamic>(
-                future: _localStorageHelper.getItem("osmea_package_device_name"),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                future:
+                    _localStorageHelper.getItem("osmea_package_device_name"),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {

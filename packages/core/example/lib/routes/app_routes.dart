@@ -2,6 +2,7 @@
 import 'package:core/core.dart';
 import 'package:example/views/view_home/home_view.dart';
 import 'package:example/views/view_splash/splash_view.dart';
+import 'package:example/views/view_ocr_cheque/ocr_cheque_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,7 +31,15 @@ final GoRouter appRouter = GoRouter(
         return SplashView(
           arguments: {"title": "Splash View"},
           currentView: MasterViewTypes.content,
-         
+        );
+      },
+    ),
+    GoRoute(
+      path: '/ocr-cheque',
+      builder: (BuildContext context, GoRouterState state) {
+        return OcrChequeView(
+          arguments: {"title": "OCR View"},
+          currentView: MasterViewTypes.content,
         );
       },
     ),

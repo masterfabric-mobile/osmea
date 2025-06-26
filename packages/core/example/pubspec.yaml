@@ -31,6 +31,8 @@ dependencies:
   injectable: ^2.5.0
   get_it: ^8.0.3
   go_router: ^15.1.1
+  js: ^0.6.7
+  file_picker: ^10.2.0
 
 # -------------------------------
 # Development dependencies

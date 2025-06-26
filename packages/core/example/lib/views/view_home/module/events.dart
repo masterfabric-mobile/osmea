@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class HomeViewEvent {}
 
 class HomeViewInitialEvent extends HomeViewEvent {}
@@ -20,4 +22,9 @@ class HomeViewDeleteProductEvent extends HomeViewEvent {
   final String productId;
 
   HomeViewDeleteProductEvent({required this.productId});
+}
+
+class GoToOcrChequeEvent extends HomeViewEvent {
+  final BuildContext context;
+  GoToOcrChequeEvent(this.context);
 }
