@@ -6,7 +6,6 @@ class OcrChequeModel {
   final String? tcknVkn;
   final String? bankCode;
   final String? micrCode;
-  final String? checkAmount;
   final String? mersisNo;
 
   OcrChequeModel({
@@ -17,7 +16,6 @@ class OcrChequeModel {
     this.tcknVkn,
     this.bankCode,
     this.micrCode,
-    this.checkAmount,
     this.mersisNo,
   });
 
@@ -30,7 +28,6 @@ class OcrChequeModel {
       tcknVkn: map['tcknVkn'],
       bankCode: map['bankCode'],
       micrCode: map['micrCode'],
-      checkAmount: map['checkAmount'],
       mersisNo: map['mersisNo'],
     );
   }
