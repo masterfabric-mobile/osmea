@@ -75,6 +75,7 @@ class OcrChequeViewModel
         'bankCode': data['bankCode'] as String?,
         'micrCode': data['micrCode'] as String?,
         'checkAmount': data['checkAmount'] as String?,
+        'mersisNo': data['mersisNo'] as String?,
       };
       final chequeModel = OcrChequeModel.fromMap(chequeFields);
       final rawText = data['rawText'] as String?;

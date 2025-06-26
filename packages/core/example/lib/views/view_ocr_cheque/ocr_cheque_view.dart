@@ -349,8 +349,8 @@ class OcrChequeView
                       _buildEnhancedField(
                           'Çek Tutarı', data.checkAmount, Icons.attach_money,
                           copyable: true),
-                      _buildEnhancedField('Mersis No',
-                          allFields?['mersisNo'] as String?, Icons.numbers,
+                      _buildEnhancedField(
+                          'Mersis No', data.mersisNo, Icons.numbers,
                           copyable: true),
                     ],
                   ),
@@ -527,6 +527,7 @@ class OcrChequeView
     if (data.micrCode != null) buffer.writeln('MICR Kodu: ${data.micrCode}');
     if (data.checkAmount != null)
       buffer.writeln('Çek Tutarı: ${data.checkAmount}');
+    if (data.mersisNo != null) buffer.writeln('Mersis No: ${data.mersisNo}');
     buffer.writeln('==================');
 
     Clipboard.setData(ClipboardData(text: buffer.toString()));

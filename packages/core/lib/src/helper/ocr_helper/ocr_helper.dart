@@ -54,12 +54,16 @@ class OcrHelper {
   static Map<String, String?> _extractChequeFields(String text) {
     final subeBilgisi = _findSubeBilgisi(text);
     final iban = _findIban(text);
+    final tckn = _findTckn(text);
+    final vkn = _findVkn(text);
     final Map<String, String?> fields = {
       'iban': iban,
       'cekNo': _findChequeNo(text),
       'branchCode': _findBranchCode(text),
       'accountNumber': iban, // Same as IBAN
-      'tcknVkn': _findTcknVkn(text),
+      'tckn': tckn,
+      'vkn': vkn,
+      'tcknVkn': tckn ?? vkn, // Show TCKN if available, otherwise VKN
       'bankCode': _findBankCode(text),
       'micrCode': _findMicrCode(text),
       'checkAmount': _findCheckAmount(text),
@@ -133,26 +137,7 @@ class OcrHelper {
     return regex.firstMatch(text)?.group(2);
   }
 
-  static String? _findAccountNumber(String text) {
-    const keywords = [
-      'Hesap No',
-      'Hesap Numarası',
-      'HesapNo',
-      'HesapNumarası',
-      'Hesap:',
-      'Hesap No:',
-      'Hesap Numarası:',
-      'Hesap No.',
-      'Hesap Numarası.',
-      'HESAP NO',
-      'HESAP NUMARASI',
-      'HESAPNO',
-      'HESAPNUMARASI'
-    ];
-    return _findFlexibleField(text, keywords, numberPattern: r'[0-9]{6,12}');
-  }
-
-  static String? _findTcknVkn(String text) {
+  static String? _findTckn(String text) {
     const keywords = [
       'TCKN',
       'T.C.K.N',
@@ -165,6 +150,30 @@ class OcrHelper {
       'KimlikNo',
       'Kimlik Numarası',
       'KimlikNumarası',
+      'TCKN:',
+      'TCKN-'
+    ];
+    // 1. Search line by line with keywords
+    final result =
+        _findFlexibleField(text, keywords, numberPattern: r'[0-9]{10,11}');
+    if (result != null) return result;
+
+    // 2. Look for 10-11 digit numbers in lines containing "kimlik"
+    final lines = text.split('\n');
+    for (final line in lines) {
+      if (line.toLowerCase().contains('kimlik')) {
+        final match = RegExp(r'[0-9]{10,11}').firstMatch(line);
+        if (match != null) return match.group(0);
+      }
+    }
+
+    // 3. Fallback: first 10-11 digit number in entire text
+    final fallback = RegExp(r'[0-9]{10,11}').firstMatch(text);
+    return fallback?.group(0);
+  }
+
+  static String? _findVkn(String text) {
+    const keywords = [
       'VKN',
       'V.K.N',
       'Vergi No',
@@ -174,8 +183,9 @@ class OcrHelper {
       'TCKN/VKN',
       'TCKN - VKN',
       'TCKN / VKN',
-      'TCKN:',
+      'V.K.N./T.C.K.N.',
       'VKN:',
+      'TCKN:',
       'TCKN-',
       'VKN-'
     ];
@@ -184,11 +194,10 @@ class OcrHelper {
         _findFlexibleField(text, keywords, numberPattern: r'[0-9]{10,11}');
     if (result != null) return result;
 
-    // 2. Look for 10-11 digit numbers in lines containing "kimlik" or "vergi"
+    // 2. Look for 10-11 digit numbers in lines containing "vergi"
     final lines = text.split('\n');
     for (final line in lines) {
-      if (line.toLowerCase().contains('kimlik') ||
-          line.toLowerCase().contains('vergi')) {
+      if (line.toLowerCase().contains('vergi')) {
         final match = RegExp(r'[0-9]{10,11}').firstMatch(line);
         if (match != null) return match.group(0);
       }
@@ -262,6 +271,7 @@ class OcrHelper {
       'MERSİS NO',
       'Mersis No',
       'Mersis:',
+      'Mersis No :',
       'MERSIS',
       'MERSIS NO',
       'MersisNo',
@@ -291,18 +301,53 @@ class OcrHelper {
       'MERSISNUMARAS',
       'MERSİSNUMARAS'
     ];
-    // 1. Search line by line with keywords
+
+    // Debug: Print lines containing "mersis"
+    final lines = text.split('\n');
+    for (final line in lines) {
+      if (line.toLowerCase().contains('mersis')) {
+        print('MERSIS LINE FOUND: "$line"');
+      }
+    }
+
+    // 1. Try multiple flexible regex patterns for "Mersis No" format
+    final patterns = [
+      RegExp(r'Mersis\s*No\s*[:\-\.\s]*([0-9\s]{15,32})', caseSensitive: false),
+      RegExp(r'Mersis.*?([0-9\s]{16,32})', caseSensitive: false),
+      RegExp(r'MERSIS.*?([0-9\s]{16,32})', caseSensitive: false),
+    ];
+
+    for (final pattern in patterns) {
+      final match = pattern.firstMatch(text);
+      if (match != null) {
+        final raw = match.group(1);
+        final cleaned = raw?.replaceAll(RegExp(r'\s+'), '');
+        if (cleaned != null && cleaned.length >= 15) {
+          print('MERSIS MATCHED with pattern: $cleaned');
+          return cleaned;
+        }
+      }
+    }
+
+    // 2. Search line by line with keywords
     final result =
         _findFlexibleField(text, keywords, numberPattern: r'[0-9]{16}');
     if (result != null) return result;
 
-    // 2. Look for 16-digit numbers only in lines containing 'mersis' (may start with #, *, -, :, .)
-    final lines = text.split('\n');
+    // 3. Try with afterKeywordPattern for "Mersis No" format
+    final afterResult = _findFlexibleField(text, ['Mersis No'],
+        afterKeywordPattern: r'[:\s\-\.]*([0-9]{16})');
+    if (afterResult != null) return afterResult;
+
+    // 4. Look for 16-digit numbers only in lines containing 'mersis' (may start with #, *, -, :, .)
     for (final line in lines) {
       if (line.toLowerCase().contains('mersis')) {
         final cleaned = line.replaceFirst(RegExp(r'^[#*\-:\.\s]+'), '');
         final match = RegExp(r'[0-9]{16}').firstMatch(cleaned);
-        if (match != null) return match.group(0);
+        if (match != null) {
+          print('MERSIS FOUND in cleaned line: ${match.group(0)}');
+          return match.group(0);
+        }
       }
     }
     return null;

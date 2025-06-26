@@ -7,6 +7,7 @@ class OcrChequeModel {
   final String? bankCode;
   final String? micrCode;
   final String? checkAmount;
+  final String? mersisNo;
 
   OcrChequeModel({
     this.iban,
@@ -17,6 +18,7 @@ class OcrChequeModel {
     this.bankCode,
     this.micrCode,
     this.checkAmount,
+    this.mersisNo,
   });
 
   factory OcrChequeModel.fromMap(Map<String, String?> map) {
@@ -29,6 +31,7 @@ class OcrChequeModel {
       bankCode: map['bankCode'],
       micrCode: map['micrCode'],
       checkAmount: map['checkAmount'],
+      mersisNo: map['mersisNo'],
     );
   }
 }
