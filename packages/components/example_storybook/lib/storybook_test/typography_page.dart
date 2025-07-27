@@ -7,7 +7,7 @@ import 'package:osmea_components/osmea_components.dart';
 /// in a clean web format similar to design system documentation.
 
 class TypographyDocumentationPage extends StatelessWidget {
-  const TypographyDocumentationPage({Key? key}) : super(key: key);
+  const TypographyDocumentationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
