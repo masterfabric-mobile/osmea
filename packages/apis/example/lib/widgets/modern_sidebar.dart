@@ -789,6 +789,10 @@ class _ModernSidebarState extends State<ModernSidebar>
         return Icons.shopping_cart_rounded;
       case ApiCategory.woocommerceCustomers:
         return Icons.people_rounded;
+      case ApiCategory.woocommerceWebhooks:
+        return Icons.webhook_rounded;
+      case ApiCategory.woocommerceSystemStatus:
+        return Icons.system_update_rounded;
     }
   }
 }

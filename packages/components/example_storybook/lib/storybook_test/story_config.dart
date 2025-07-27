@@ -7,6 +7,7 @@ class StoryConfig {
   // Page names
   static const String homePage = 'Home';
   static const String typographyPage = 'Typography';
+  static const String colorsPage = 'Colors';
   
   // Indentation/prefix for pages (you can use spaces, dashes, or any character)
   static const String pageIndentation = '   '; // Three spaces for indentation

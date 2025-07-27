@@ -1,10 +1,10 @@
 import 'package:apis/apis.dart';
-import 'package:apis/network/remote/woocommerce/products/reviews/abstract/product_reviews_service.dart';
+import 'package:apis/network/remote/woocommerce/webhooks/abstract/webhooks_service.dart';
 import 'package:dio/dio.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/api_service_registry.dart';
 
-class ListAllProductReviewsHandler implements ApiRequestHandler {
+class ListAllWebhooksHandler implements ApiRequestHandler {
   @override
   List<String> get supportedMethods => ['GET'];
 
@@ -57,21 +57,14 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
             name: 'orderby',
             label: 'Order By',
             hint:
-                'Sort collection by object attribute (date, id, include, product, rating)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'product',
-            label: 'Product IDs',
-            hint:
-                'Limit result set to reviews for specific products (comma-separated)',
+                'Sort collection by object attribute (date, id, include, title, slug)',
             isRequired: false,
           ),
           const ApiField(
             name: 'status',
             label: 'Status',
             hint:
-                'Limit result set to reviews with specific status (approved, hold, spam, unspam, trash, untrash)',
+                'Limit result set to webhooks with specific status (active, inactive)',
             isRequired: false,
           ),
           const ApiField(
@@ -133,18 +126,7 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
             .toList();
       }
 
-      List<int>? product;
-      if (params['product']?.toString().isNotEmpty == true) {
-        product = params['product']
-            .toString()
-            .split(',')
-            .map((e) => int.tryParse(e.trim()))
-            .where((e) => e != null)
-            .cast<int>()
-            .toList();
-      }
-
-      print('📋 List All Product Reviews Parameters:');
+      print('📋 List All Webhooks Parameters:');
       print('  API Version: $apiVersion');
       print('  Context: $context');
       print('  Page: $page');
@@ -154,12 +136,11 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
       print('  Include: $include');
       print('  Order: $order');
       print('  Order By: $orderby');
-      print('  Product: $product');
       print('  Status: $status');
 
       // Get service and call API
-      final service = WooNetwork.getIt.get<ProductReviewsService>();
-      final response = await service.listAllProductReviews(
+      final service = WooNetwork.getIt.get<WebhooksService>();
+      final response = await service.listAllWebhooks(
         apiVersion: apiVersion,
         context: context,
         page: page,
@@ -169,21 +150,19 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
         include: include,
         order: order,
         orderby: orderby,
-        product: product,
         status: status,
       );
 
-      print(
-          '✅ List All Product Reviews Success: Found ${response.length} reviews');
+      print('✅ List All Webhooks Success: Found ${response.length} webhooks');
 
       return {
         'success': true,
-        'data': response.map((review) => review.toJson()).toList(),
-        'message': 'Product reviews retrieved successfully',
+        'data': response.map((webhook) => webhook.toJson()).toList(),
+        'message': 'Webhooks retrieved successfully',
         'count': response.length,
       };
     } on DioException catch (e) {
-      String errorMessage = 'Failed to retrieve product reviews';
+      String errorMessage = 'Failed to retrieve webhooks';
 
       if (e.response?.statusCode == 400) {
         errorMessage = 'Invalid parameters provided';
@@ -194,7 +173,7 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
         }
       }
 
-      print('❌ List All Product Reviews Error: $errorMessage');
+      print('❌ List All Webhooks Error: $errorMessage');
       print('🔍 Full error: ${e.toString()}');
 
       return {
@@ -203,10 +182,10 @@ class ListAllProductReviewsHandler implements ApiRequestHandler {
         'error_details': e.toString(),
       };
     } catch (e) {
-      print('❌ List All Product Reviews Unexpected Error: ${e.toString()}');
+      print('❌ List All Webhooks Unexpected Error: ${e.toString()}');
       return {
         'success': false,
-        'message': 'Unexpected error occurred while retrieving product reviews',
+        'message': 'Unexpected error occurred while retrieving webhooks',
         'error_details': e.toString(),
       };
     }

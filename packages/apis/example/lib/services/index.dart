@@ -416,6 +416,23 @@ export 'handlers/woocommerce/product_attribute_terms_handlers/retrieve_product_a
 export 'handlers/woocommerce/product_attribute_terms_handlers/update_product_attribute_term_handler.dart';
 export 'handlers/woocommerce/product_attribute_terms_handlers/delete_product_attribute_term_handler.dart';
 
+// 🔄 WooCommerce Product Variations Handlers
+export 'handlers/woocommerce/product_variations_handlers/list_all_product_variations_handler.dart';
+export 'handlers/woocommerce/product_variations_handlers/create_product_variation_handler.dart';
+
+// 🔗 WooCommerce Webhooks Handlers
+export 'handlers/woocommerce/webhooks_handlers/list_all_webhooks_handler.dart';
+export 'handlers/woocommerce/webhooks_handlers/create_webhook_handler.dart';
+export 'handlers/woocommerce/webhooks_handlers/retrieve_webhook_handler.dart';
+export 'handlers/woocommerce/webhooks_handlers/update_webhook_handler.dart';
+export 'handlers/woocommerce/webhooks_handlers/delete_webhook_handler.dart';
+
+// 🔧 WooCommerce System Status Handlers
+export 'handlers/woocommerce/system_status_handlers/get_system_status_handler.dart';
+export 'handlers/woocommerce/system_status_handlers/list_all_tools_from_system_status_handler.dart';
+export 'handlers/woocommerce/system_status_handlers/retrieve_tool_from_system_status_handler.dart';
+export 'handlers/woocommerce/system_status_handlers/run_tool_from_system_status_handler.dart';
+
 // 🛒 Orders Handlers
 export 'handlers/woocommerce/orders_handlers/list_all_orders_handler.dart';
 export 'handlers/woocommerce/orders_handlers/create_order_handler.dart';

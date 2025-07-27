@@ -3,6 +3,7 @@ import 'package:apis/network/remote/woocommerce/products/variations/abstract/pro
 import 'package:dio/dio.dart';
 import 'package:example/services/api_request_handler.dart';
 import 'package:example/services/api_service_registry.dart';
+import 'dart:convert'; // Added for json.decode
 
 class CreateProductVariationHandler implements ApiRequestHandler {
   @override
@@ -18,6 +19,12 @@ class CreateProductVariationHandler implements ApiRequestHandler {
             isRequired: true,
           ),
           const ApiField(
+            name: 'regular_price',
+            label: 'Regular Price',
+            hint: 'Variation regular price (required)',
+            isRequired: true,
+          ),
+          const ApiField(
             name: 'description',
             label: 'Description',
             hint: 'Variation description (optional)',
@@ -26,73 +33,7 @@ class CreateProductVariationHandler implements ApiRequestHandler {
           const ApiField(
             name: 'sku',
             label: 'SKU',
-            hint: 'Stock keeping unit (optional)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'price',
-            label: 'Price',
-            hint: 'Variation price (optional)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'regular_price',
-            label: 'Regular Price',
-            hint: 'Regular price (optional)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'sale_price',
-            label: 'Sale Price',
-            hint: 'Sale price (optional)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'status',
-            label: 'Status',
-            hint: 'Variation status (draft, pending, private, publish)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'purchasable',
-            label: 'Purchasable',
-            hint: 'Whether the variation is purchasable (true/false)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'virtual',
-            label: 'Virtual',
-            hint: 'Whether the variation is virtual (true/false)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'downloadable',
-            label: 'Downloadable',
-            hint: 'Whether the variation is downloadable (true/false)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'download_limit',
-            label: 'Download Limit',
-            hint: 'Number of times downloadable files can be downloaded',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'download_expiry',
-            label: 'Download Expiry',
-            hint: 'Number of days before access to downloadable files expires',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'tax_status',
-            label: 'Tax Status',
-            hint: 'Tax status (taxable, shipping, none)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'tax_class',
-            label: 'Tax Class',
-            hint: 'Tax class (optional)',
+            hint: 'Variation SKU (optional)',
             isRequired: false,
           ),
           const ApiField(
@@ -104,7 +45,7 @@ class CreateProductVariationHandler implements ApiRequestHandler {
           const ApiField(
             name: 'stock_quantity',
             label: 'Stock Quantity',
-            hint: 'Stock quantity (number)',
+            hint: 'Stock quantity (optional)',
             isRequired: false,
           ),
           const ApiField(
@@ -116,43 +57,31 @@ class CreateProductVariationHandler implements ApiRequestHandler {
           const ApiField(
             name: 'backorders',
             label: 'Backorders',
-            hint: 'Backorders (no, notify, yes)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'backorders_allowed',
-            label: 'Backorders Allowed',
-            hint: 'Whether backorders are allowed (true/false)',
-            isRequired: false,
-          ),
-          const ApiField(
-            name: 'backordered',
-            label: 'Backordered',
-            hint: 'Whether the variation is backordered (true/false)',
+            hint: 'Backorder setting (no, notify, yes)',
             isRequired: false,
           ),
           const ApiField(
             name: 'weight',
             label: 'Weight',
-            hint: 'Variation weight (number)',
+            hint: 'Variation weight (optional)',
             isRequired: false,
           ),
           const ApiField(
-            name: 'length',
+            name: 'dimensions_length',
             label: 'Length',
-            hint: 'Variation length (number)',
+            hint: 'Variation length (optional)',
             isRequired: false,
           ),
           const ApiField(
-            name: 'width',
+            name: 'dimensions_width',
             label: 'Width',
-            hint: 'Variation width (number)',
+            hint: 'Variation width (optional)',
             isRequired: false,
           ),
           const ApiField(
-            name: 'height',
+            name: 'dimensions_height',
             label: 'Height',
-            hint: 'Variation height (number)',
+            hint: 'Variation height (optional)',
             isRequired: false,
           ),
           const ApiField(
@@ -162,15 +91,27 @@ class CreateProductVariationHandler implements ApiRequestHandler {
             isRequired: false,
           ),
           const ApiField(
-            name: 'shipping_class_id',
-            label: 'Shipping Class ID',
-            hint: 'Shipping class ID (number)',
+            name: 'image_id',
+            label: 'Image ID',
+            hint: 'Variation image ID (optional)',
+            isRequired: false,
+          ),
+          const ApiField(
+            name: 'attributes',
+            label: 'Attributes',
+            hint: 'Variation attributes (JSON format)',
             isRequired: false,
           ),
           const ApiField(
             name: 'menu_order',
             label: 'Menu Order',
-            hint: 'Menu order (number)',
+            hint: 'Menu order (optional)',
+            isRequired: false,
+          ),
+          const ApiField(
+            name: 'meta_data',
+            label: 'Meta Data',
+            hint: 'Meta data (JSON format)',
             isRequired: false,
           ),
           const ApiField(
@@ -200,57 +141,71 @@ class CreateProductVariationHandler implements ApiRequestHandler {
         };
       }
 
+      // Validate required regular_price parameter
+      final regularPriceStr = params['regular_price']?.toString() ?? '';
+      final regularPrice = double.tryParse(regularPriceStr);
+
+      if (regularPrice == null || regularPrice < 0) {
+        return {
+          'success': false,
+          'message':
+              'Valid regular_price is required and must be a non-negative number',
+        };
+      }
+
       // Parse API version
       final apiVersion = params['api_version']?.toString() ?? 'v3';
 
       // Create variation data map
       final Map<String, dynamic> variationData = {};
 
-      // Parse string fields
+      // Add required regular_price
+      variationData['regular_price'] = regularPrice.toString();
+
+      // Parse optional parameters
       final description = params['description']?.toString()?.trim();
       final sku = params['sku']?.toString()?.trim();
-      final price = params['price']?.toString()?.trim();
-      final regularPrice = params['regular_price']?.toString()?.trim();
-      final salePrice = params['sale_price']?.toString()?.trim();
-      final status = params['status']?.toString()?.trim();
-      final taxStatus = params['tax_status']?.toString()?.trim();
-      final taxClass = params['tax_class']?.toString()?.trim();
-      final stockStatus = params['stock_status']?.toString()?.trim();
-      final backorders = params['backorders']?.toString()?.trim();
-      final weight = params['weight']?.toString()?.trim();
+      final stockStatus = params['stock_status']?.toString();
+      final backorders = params['backorders']?.toString();
       final shippingClass = params['shipping_class']?.toString()?.trim();
 
-      // Parse boolean fields
-      bool? purchasable;
-      if (params['purchasable'] != null) {
-        final purchasableStr = params['purchasable'].toString().toLowerCase();
-        if (purchasableStr == 'true' || purchasableStr == '1') {
-          purchasable = true;
-        } else if (purchasableStr == 'false' || purchasableStr == '0') {
-          purchasable = false;
-        }
+      // Parse numeric parameters
+      double? weight;
+      if (params['weight'] != null) {
+        weight = double.tryParse(params['weight'].toString());
       }
 
-      bool? virtual;
-      if (params['virtual'] != null) {
-        final virtualStr = params['virtual'].toString().toLowerCase();
-        if (virtualStr == 'true' || virtualStr == '1') {
-          virtual = true;
-        } else if (virtualStr == 'false' || virtualStr == '0') {
-          virtual = false;
-        }
+      double? length;
+      if (params['dimensions_length'] != null) {
+        length = double.tryParse(params['dimensions_length'].toString());
       }
 
-      bool? downloadable;
-      if (params['downloadable'] != null) {
-        final downloadableStr = params['downloadable'].toString().toLowerCase();
-        if (downloadableStr == 'true' || downloadableStr == '1') {
-          downloadable = true;
-        } else if (downloadableStr == 'false' || downloadableStr == '0') {
-          downloadable = false;
-        }
+      double? width;
+      if (params['dimensions_width'] != null) {
+        width = double.tryParse(params['dimensions_width'].toString());
       }
 
+      double? height;
+      if (params['dimensions_height'] != null) {
+        height = double.tryParse(params['dimensions_height'].toString());
+      }
+
+      int? stockQuantity;
+      if (params['stock_quantity'] != null) {
+        stockQuantity = int.tryParse(params['stock_quantity'].toString());
+      }
+
+      int? imageId;
+      if (params['image_id'] != null) {
+        imageId = int.tryParse(params['image_id'].toString());
+      }
+
+      int? menuOrder;
+      if (params['menu_order'] != null) {
+        menuOrder = int.tryParse(params['menu_order'].toString());
+      }
+
+      // Parse boolean parameter
       bool? manageStock;
       if (params['manage_stock'] != null) {
         final manageStockStr = params['manage_stock'].toString().toLowerCase();
@@ -261,58 +216,28 @@ class CreateProductVariationHandler implements ApiRequestHandler {
         }
       }
 
-      bool? backordersAllowed;
-      if (params['backorders_allowed'] != null) {
-        final backordersAllowedStr =
-            params['backorders_allowed'].toString().toLowerCase();
-        if (backordersAllowedStr == 'true' || backordersAllowedStr == '1') {
-          backordersAllowed = true;
-        } else if (backordersAllowedStr == 'false' ||
-            backordersAllowedStr == '0') {
-          backordersAllowed = false;
+      // Parse JSON parameters
+      List<Map<String, dynamic>>? attributes;
+      if (params['attributes']?.toString().isNotEmpty == true) {
+        try {
+          final attributesJson = params['attributes'].toString();
+          final attributesList = json.decode(attributesJson) as List;
+          attributes = attributesList.cast<Map<String, dynamic>>();
+        } catch (e) {
+          print('⚠️ Warning: Invalid attributes JSON format: ${e.toString()}');
         }
       }
 
-      bool? backordered;
-      if (params['backordered'] != null) {
-        final backorderedStr = params['backordered'].toString().toLowerCase();
-        if (backorderedStr == 'true' || backorderedStr == '1') {
-          backordered = true;
-        } else if (backorderedStr == 'false' || backorderedStr == '0') {
-          backordered = false;
+      List<Map<String, dynamic>>? metaData;
+      if (params['meta_data']?.toString().isNotEmpty == true) {
+        try {
+          final metaDataJson = params['meta_data'].toString();
+          final metaDataList = json.decode(metaDataJson) as List;
+          metaData = metaDataList.cast<Map<String, dynamic>>();
+        } catch (e) {
+          print('⚠️ Warning: Invalid meta_data JSON format: ${e.toString()}');
         }
       }
-
-      // Parse integer fields
-      int? downloadLimit;
-      if (params['download_limit'] != null) {
-        downloadLimit = int.tryParse(params['download_limit'].toString());
-      }
-
-      int? downloadExpiry;
-      if (params['download_expiry'] != null) {
-        downloadExpiry = int.tryParse(params['download_expiry'].toString());
-      }
-
-      int? stockQuantity;
-      if (params['stock_quantity'] != null) {
-        stockQuantity = int.tryParse(params['stock_quantity'].toString());
-      }
-
-      int? shippingClassId;
-      if (params['shipping_class_id'] != null) {
-        shippingClassId = int.tryParse(params['shipping_class_id'].toString());
-      }
-
-      int? menuOrder;
-      if (params['menu_order'] != null) {
-        menuOrder = int.tryParse(params['menu_order'].toString());
-      }
-
-      // Parse dimension fields
-      final length = params['length']?.toString()?.trim();
-      final width = params['width']?.toString()?.trim();
-      final height = params['height']?.toString()?.trim();
 
       // Build variation data
       if (description?.isNotEmpty == true) {
@@ -320,39 +245,6 @@ class CreateProductVariationHandler implements ApiRequestHandler {
       }
       if (sku?.isNotEmpty == true) {
         variationData['sku'] = sku;
-      }
-      if (price?.isNotEmpty == true) {
-        variationData['price'] = price;
-      }
-      if (regularPrice?.isNotEmpty == true) {
-        variationData['regular_price'] = regularPrice;
-      }
-      if (salePrice?.isNotEmpty == true) {
-        variationData['sale_price'] = salePrice;
-      }
-      if (status?.isNotEmpty == true) {
-        variationData['status'] = status;
-      }
-      if (purchasable != null) {
-        variationData['purchasable'] = purchasable;
-      }
-      if (virtual != null) {
-        variationData['virtual'] = virtual;
-      }
-      if (downloadable != null) {
-        variationData['downloadable'] = downloadable;
-      }
-      if (downloadLimit != null) {
-        variationData['download_limit'] = downloadLimit;
-      }
-      if (downloadExpiry != null) {
-        variationData['download_expiry'] = downloadExpiry;
-      }
-      if (taxStatus?.isNotEmpty == true) {
-        variationData['tax_status'] = taxStatus;
-      }
-      if (taxClass?.isNotEmpty == true) {
-        variationData['tax_class'] = taxClass;
       }
       if (manageStock != null) {
         variationData['manage_stock'] = manageStock;
@@ -366,60 +258,53 @@ class CreateProductVariationHandler implements ApiRequestHandler {
       if (backorders?.isNotEmpty == true) {
         variationData['backorders'] = backorders;
       }
-      if (backordersAllowed != null) {
-        variationData['backorders_allowed'] = backordersAllowed;
-      }
-      if (backordered != null) {
-        variationData['backordered'] = backordered;
-      }
-      if (weight?.isNotEmpty == true) {
-        variationData['weight'] = weight;
+      if (weight != null) {
+        variationData['weight'] = weight.toString();
       }
       if (shippingClass?.isNotEmpty == true) {
         variationData['shipping_class'] = shippingClass;
       }
-      if (shippingClassId != null) {
-        variationData['shipping_class_id'] = shippingClassId;
+      if (imageId != null) {
+        variationData['image'] = {'id': imageId};
       }
       if (menuOrder != null) {
         variationData['menu_order'] = menuOrder;
       }
+      if (attributes != null) {
+        variationData['attributes'] = attributes;
+      }
+      if (metaData != null) {
+        variationData['meta_data'] = metaData;
+      }
 
-      // Add dimensions if any are provided
-      if (length?.isNotEmpty == true ||
-          width?.isNotEmpty == true ||
-          height?.isNotEmpty == true) {
-        final dimensions = <String, String>{};
-        if (length?.isNotEmpty == true) {
-          dimensions['length'] = length!;
-        }
-        if (width?.isNotEmpty == true) {
-          dimensions['width'] = width!;
-        }
-        if (height?.isNotEmpty == true) {
-          dimensions['height'] = height!;
-        }
+      // Add dimensions if any dimension is provided
+      if (length != null || width != null || height != null) {
+        final Map<String, dynamic> dimensions = {};
+        if (length != null) dimensions['length'] = length.toString();
+        if (width != null) dimensions['width'] = width.toString();
+        if (height != null) dimensions['height'] = height.toString();
         variationData['dimensions'] = dimensions;
       }
 
       print('➕ Create Product Variation Parameters:');
       print('  API Version: $apiVersion');
       print('  Product ID: $productId');
+      print('  Regular Price: $regularPrice');
       print('  Description: $description');
       print('  SKU: $sku');
-      print('  Price: $price');
-      print('  Regular Price: $regularPrice');
-      print('  Sale Price: $salePrice');
-      print('  Status: $status');
-      print('  Purchasable: $purchasable');
-      print('  Virtual: $virtual');
-      print('  Downloadable: $downloadable');
       print('  Manage Stock: $manageStock');
       print('  Stock Quantity: $stockQuantity');
       print('  Stock Status: $stockStatus');
+      print('  Backorders: $backorders');
       print('  Weight: $weight');
-      print(
-          '  Dimensions: ${length != null || width != null || height != null ? 'Length: $length, Width: $width, Height: $height' : 'Not provided'}');
+      print('  Length: $length');
+      print('  Width: $width');
+      print('  Height: $height');
+      print('  Shipping Class: $shippingClass');
+      print('  Image ID: $imageId');
+      print('  Menu Order: $menuOrder');
+      print('  Attributes: $attributes');
+      print('  Meta Data: $metaData');
       print('  Request body: $variationData');
 
       // Get service and call API

@@ -25,6 +25,8 @@ enum ApiCategory {
   woocommerceProducts,
   woocommerceOrders,
   woocommerceCustomers,
+  woocommerceWebhooks,
+  woocommerceSystemStatus,
 }
 
 extension ApiCategoryExtension on ApiCategory {
@@ -78,6 +80,10 @@ extension ApiCategoryExtension on ApiCategory {
         return 'WooCommerce Orders APIs';
       case ApiCategory.woocommerceCustomers:
         return 'WooCommerce Customers APIs';
+      case ApiCategory.woocommerceWebhooks:
+        return 'WooCommerce Webhooks APIs';
+      case ApiCategory.woocommerceSystemStatus:
+        return 'WooCommerce System Status APIs';
     }
   }
 }
@@ -3063,6 +3069,80 @@ class ApiServiceRegistry {
       handler: DeleteProductAttributeTermHandler(),
     ),
 
+    // 🔗 WooCommerce Webhooks Services
+    ApiService(
+      name: 'WooCommerce List All Webhooks',
+      endpoint: '/wp-json/wc/v3/webhooks',
+      category: ApiCategory.woocommerceWebhooks,
+      subcategory: 'WooCommerce Webhooks',
+      handler: ListAllWebhooksHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Create Webhook',
+      endpoint: '/wp-json/wc/v3/webhooks',
+      category: ApiCategory.woocommerceWebhooks,
+      subcategory: 'WooCommerce Webhooks',
+      handler: WooCreateWebhookHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Retrieve Webhook',
+      endpoint: '/wp-json/wc/v3/webhooks/{webhook_id}',
+      category: ApiCategory.woocommerceWebhooks,
+      subcategory: 'WooCommerce Webhooks',
+      handler: RetrieveWebhookHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Update Webhook',
+      endpoint: '/wp-json/wc/v3/webhooks/{webhook_id}',
+      category: ApiCategory.woocommerceWebhooks,
+      subcategory: 'WooCommerce Webhooks',
+      handler: WooUpdateWebhookHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Delete Webhook',
+      endpoint: '/wp-json/wc/v3/webhooks/{webhook_id}',
+      category: ApiCategory.woocommerceWebhooks,
+      subcategory: 'WooCommerce Webhooks',
+      handler: WooDeleteWebhookHandler(),
+    ),
+
+    // 🔧 WooCommerce System Status Services
+    ApiService(
+      name: 'WooCommerce Get System Status',
+      endpoint: '/wp-json/wc/v3/system_status',
+      category: ApiCategory.woocommerceSystemStatus,
+      subcategory: 'WooCommerce System Status',
+      handler: GetSystemStatusHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce List All Tools From System Status',
+      endpoint: '/wp-json/wc/v3/system_status/tools',
+      category: ApiCategory.woocommerceSystemStatus,
+      subcategory: 'WooCommerce System Status',
+      handler: ListAllToolsFromSystemStatusHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Retrieve Tool From System Status',
+      endpoint: '/wp-json/wc/v3/system_status/tools/{tool_id}',
+      category: ApiCategory.woocommerceSystemStatus,
+      subcategory: 'WooCommerce System Status',
+      handler: RetrieveToolFromSystemStatusHandler(),
+    ),
+
+    ApiService(
+      name: 'WooCommerce Run Tool From System Status',
+      endpoint: '/wp-json/wc/v3/system_status/tools/{tool_id}',
+      category: ApiCategory.woocommerceSystemStatus,
+      subcategory: 'WooCommerce System Status',
+      handler: RunToolFromSystemStatusHandler(),
+    ),
+
     // 👥 WooCommerce Customers Services
     ApiService(
       name: 'WooCommerce List All Customers',
@@ -3213,6 +3293,8 @@ class ApiServiceRegistry {
       ApiCategory.woocommerceProducts,
       ApiCategory.woocommerceOrders,
       ApiCategory.woocommerceCustomers,
+      ApiCategory.woocommerceWebhooks,
+      ApiCategory.woocommerceSystemStatus,
     ];
   }
 
@@ -3284,6 +3366,10 @@ class ApiServiceRegistry {
         return 'WooCommerce Orders';
       case ApiCategory.woocommerceCustomers:
         return 'WooCommerce Customers';
+      case ApiCategory.woocommerceWebhooks:
+        return 'WooCommerce Webhooks';
+      case ApiCategory.woocommerceSystemStatus:
+        return 'WooCommerce System Status';
     }
   }
 }
