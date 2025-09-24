@@ -38,7 +38,10 @@ dependencies:
   permission_handler: ^11.2.0 # Runtime permissions handler
   share_plus: ^10.1.4 # Sharing text/files across platforms
   osmea_components:
-    path: ../components
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/components
  
 # -------------------------------
 # Development dependencies
