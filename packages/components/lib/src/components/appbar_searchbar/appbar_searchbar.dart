@@ -145,6 +145,10 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
     this.searchBarTextInputAction = TextInputAction.search,
     this.searchBarFullWidth = true,
     this.searchBarAnimationDuration,
+    // SearchBar action parameters
+    this.searchBarActions = const [],
+    this.searchBarActionMargin = EdgeInsets.zero,
+    this.searchBarActionAlignment = MainAxisAlignment.end,
   });
 
   // AppBar properties
@@ -393,6 +397,15 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
   /// Animation duration for search bar
   final Duration? searchBarAnimationDuration;
 
+  /// 🎮 Action buttons to display in the searchbar
+  final List<Widget> searchBarActions;
+
+  /// 📏 Margin for searchbar action buttons
+  final EdgeInsetsGeometry searchBarActionMargin;
+
+  /// 📐 Alignment for searchbar action buttons
+  final MainAxisAlignment searchBarActionAlignment;
+
   @override
   Size get preferredSize {
     // Calculate total height: AppBar height + SearchBar height + padding
@@ -527,6 +540,10 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
                 initialHistory: initialHistory,
                 enableHoverEffect: enableHoverEffect,
                 hoverAnimationDuration: hoverAnimationDuration,
+                // SearchBar action parameters
+                actions: searchBarActions,
+                actionMargin: searchBarActionMargin,
+                actionAlignment: searchBarActionAlignment,
               ),
             ),
           ),
