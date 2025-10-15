@@ -1,4 +1,5 @@
 import 'package:core/src/views/loading/cubit/loading_cubit.dart';
+import 'package:core/src/views/search/cubit/search_cubit.dart';
 
 import 'config_di.config.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
@@ -18,5 +19,6 @@ Future<GetIt> configureDependencies() async {
   getIt.registerFactory<OnboardingCubit>(() => OnboardingCubit());
   getIt.registerFactory<LoadingViewCubit>(() => LoadingViewCubit());
   getIt.registerFactory<ErrorHandlingCubit>(() => ErrorHandlingCubit());
+  getIt.registerFactory<SearchCubit>(() => SearchCubit());
   return result;
 }

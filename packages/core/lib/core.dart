@@ -134,3 +134,8 @@ export 'package:core/src/views/loading/cubit/loading_state.dart';
 
 // 🔄 Exports the loading models
 export 'package:core/src/models/loading_models.dart';
+
+// 🔍 Exports the search view and cubit
+export 'package:core/src/views/search/search_view.dart';
+export 'package:core/src/views/search/cubit/search_cubit.dart';
+export 'package:core/src/views/search/cubit/search_state.dart';
