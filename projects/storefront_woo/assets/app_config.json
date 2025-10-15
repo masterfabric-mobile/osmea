@@ -25,6 +25,7 @@
       "theme_mode": "light",
       "primary_color": "#000000",
       "accent_color": "#FFFFFF",
+      "search_app_bar_color": "#A3D3F2FF",
       "font_scale": 1.0,
       "enable_haptic_feedback": true,
       "enable_sound_effects": true
