@@ -1,18 +1,10 @@
-// 📦 Importing generated dependency injection config
+// 📦 Importing core module dependencies
 import 'package:core/src/di/config/config_di.config.dart';
 import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart';
 import 'package:core/src/helper/common_logger_helper/common_logger_helper.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart';
-import 'package:core/src/views/loading/cubit/loading_cubit.dart';
-
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
-<<<<<<< HEAD
-=======
-import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart';
-import 'package:core/src/views/image_detail/cubit/image_detail_cubit.dart';
->>>>>>> origin/dev
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -21,12 +13,12 @@ import 'package:logger/logger.dart';
 GetIt getIt = GetIt.instance;
 
 // 🛠️ This annotation generates the dependency injection initialization code
-@InjectableInit()
+@InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies() async {
   // Register Logger first
   getIt.registerFactory<Logger>(() => Logger());
 
-  // Register ICommonLogger
+  // ⭐ Register ICommonLogger (CRITICAL - needed by BaseViewModelCubit)
   getIt.registerLazySingleton<ICommonLogger>(
     () => CommonLogger(logger: Logger()),
   );
@@ -39,17 +31,9 @@ Future<GetIt> configureDependencies() async {
 
   // Register SignInCubit in core package
   getIt.registerFactory<SignInCubit>(() => SignInCubit());
-  getIt.registerFactory<LoadingViewCubit>(() => LoadingViewCubit());
-  getIt.registerFactory<ErrorHandlingCubit>(() => ErrorHandlingCubit());
-<<<<<<< HEAD
 
   // 🔄 Run the generated initialization and return the configured GetIt instance
   await getIt.init();
 
   return getIt;
 }
-=======
-  getIt.registerFactory<ImageDetailCubit>(() => ImageDetailCubit());
-  return result;
-}
->>>>>>> origin/dev
