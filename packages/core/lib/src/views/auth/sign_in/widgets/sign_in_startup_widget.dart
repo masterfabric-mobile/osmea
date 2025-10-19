@@ -8,7 +8,7 @@ import 'package:osmea_components/osmea_components.dart';
 /// Copyright (c) 2025, OSMEA Team
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
-/// Basic sign in style - Clean and simple design
+/// Modern sign in style with tabs and gradient background
 ///
 /// {@category Widgets}
 /// {@subCategory SignInStartup}
@@ -35,8 +35,22 @@ class SignInStartupWidget extends StatefulWidget {
   State<SignInStartupWidget> createState() => _SignInStartupWidgetState();
 }
 
-class _SignInStartupWidgetState extends State<SignInStartupWidget> {
+class _SignInStartupWidgetState extends State<SignInStartupWidget>
+    with SingleTickerProviderStateMixin {
   SignInStatus? _lastHandledStatus;
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(SignInStartupWidget oldWidget) {
@@ -63,86 +77,131 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: OsmeaComponents.container(
-        color: OsmeaColors.paperWhite,
-        child: SingleChildScrollView(
-          padding: context.paddingNormal,
-          child: OsmeaComponents.column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              OsmeaComponents.sizedBox(height: context.spacing64),
+    return Scaffold(
+      backgroundColor: OsmeaColors.paperWhite,
+      body: Column(
+        children: [
+          // 🎨 Top Gradient Section with Tabs
+          _buildGradientHeader(context),
 
-              // 🎯 Header Section
-              _buildHeader(context),
+          // 📋 Form Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.spacing24,
+                vertical: context.spacing32,
+              ),
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 📧 Email Field
+                  _buildEmailField(context),
 
-              OsmeaComponents.sizedBox(height: context.spacing48),
+                  OsmeaComponents.sizedBox(height: context.spacing20),
 
-              // 📧 Email Field
-              _buildEmailField(context),
+                  // 🔑 Password Field
+                  _buildPasswordField(context),
 
-              OsmeaComponents.sizedBox(height: context.spacing20),
+                  OsmeaComponents.sizedBox(height: context.spacing16),
 
-              // 🔑 Password Field
-              _buildPasswordField(context),
+                  // 🔗 Remember Me & Forgot Password
+                  _buildRememberMeAndForgotPassword(context),
 
-              OsmeaComponents.sizedBox(height: context.spacing16),
+                  OsmeaComponents.sizedBox(height: context.spacing32),
 
-              // 🔗 Remember Me & Forgot Password
-              _buildRememberMeAndForgotPassword(context),
+                  // ✅ Sign In Button
+                  _buildSignInButton(context),
 
-              OsmeaComponents.sizedBox(height: context.spacing32),
-
-              // ✅ Sign In Button
-              _buildSignInButton(context),
-
-              OsmeaComponents.sizedBox(height: context.spacing24),
-
-              // 🔗 Sign Up Link
-              if (widget.onSignUpTap != null) _buildSignUpLink(context),
-
-              OsmeaComponents.sizedBox(height: context.spacing64),
-            ],
+                  OsmeaComponents.sizedBox(height: context.spacing64),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  /// 🎯 Header Section
-  Widget _buildHeader(BuildContext context) {
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Lock icon
-        Icon(
-          Icons.lock_outline,
-          size: 64,
-          color: OsmeaColors.nordicBlue,
+  /// 🎨 Gradient Header with Tabs
+  Widget _buildGradientHeader(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.35, // 35% of screen
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            OsmeaColors.nordicBlue,
+            OsmeaColors.nordicBlue.withOpacity(0.8),
+            OsmeaColors.nordicBlue.withOpacity(0.9),
+          ],
         ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 🎨 Logo Area
+            Expanded(
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.all(context.spacing20),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.white.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.store,
+                    size: 80,
+                    color: OsmeaColors.white,
+                  ),
+                ),
+              ),
+            ),
 
-        OsmeaComponents.sizedBox(height: context.spacing20),
-
-        // Title
-        OsmeaComponents.text(
-          'Welcome Back',
-          variant: OsmeaTextVariant.headlineLarge,
-          fontWeight: FontWeight.bold,
-          color: OsmeaColors.thunder,
-          textAlign: TextAlign.center,
+            // 📑 Tabs Container
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: context.spacing24),
+              padding: EdgeInsets.all(context.spacing4),
+              decoration: BoxDecoration(
+                color: OsmeaColors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(context.spacing16),
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: OsmeaColors.white,
+                  borderRadius: BorderRadius.circular(context.spacing12),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: OsmeaColors.nordicBlue,
+                unselectedLabelColor: OsmeaColors.white.withOpacity(0.8),
+                labelStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                tabs: const [
+                  Tab(text: 'Giriş Yap'),
+                  Tab(text: 'Kayıt Ol'),
+                ],
+                onTap: (index) {
+                  if (index == 1 && widget.onSignUpTap != null) {
+                    widget.onSignUpTap!();
+                  }
+                },
+              ),
+            ),
+          ],
         ),
-
-        OsmeaComponents.sizedBox(height: context.spacing8),
-
-        // Subtitle
-        OsmeaComponents.text(
-          'Sign in to continue',
-          variant: OsmeaTextVariant.bodyLarge,
-          color: OsmeaColors.thunder.withOpacity(0.6),
-          textAlign: TextAlign.center,
-        ),
-      ],
+      ),
     );
   }
 
@@ -152,16 +211,14 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Email',
+          'E-Posta',
           variant: OsmeaTextVariant.bodyMedium,
           fontWeight: FontWeight.w600,
           color: OsmeaColors.thunder,
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
-          hint: 'Enter your email',
-          prefixIcon: Icon(Icons.email_outlined,
-              color: OsmeaColors.thunder.withOpacity(0.5)),
+          hint: 'Giriniz',
           keyboardType: TextInputType.emailAddress,
           onChanged: widget.viewModel.updateEmail,
           errorText: widget.state.emailError,
@@ -177,16 +234,14 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Password',
+          'Şifre',
           variant: OsmeaTextVariant.bodyMedium,
           fontWeight: FontWeight.w600,
           color: OsmeaColors.thunder,
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
-          hint: 'Enter your password',
-          prefixIcon: Icon(Icons.lock_outline,
-              color: OsmeaColors.thunder.withOpacity(0.5)),
+          hint: 'Giriniz',
           obscureText: widget.state.obscurePassword,
           onChanged: widget.viewModel.updatePassword,
           errorText: widget.state.passwordError,
@@ -213,14 +268,15 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
         // Remember Me Checkbox
         OsmeaComponents.row(
           children: [
-            Checkbox(
+            OsmeaComponents.checkbox(
               value: widget.state.rememberMe,
               onChanged: (value) => widget.viewModel.toggleRememberMe(),
               activeColor: OsmeaColors.nordicBlue,
+              size: CheckboxSize.small,
             ),
             OsmeaComponents.sizedBox(width: context.spacing8),
             OsmeaComponents.text(
-              'Remember me',
+              'Beni Hatırla',
               variant: OsmeaTextVariant.bodyMedium,
               color: OsmeaColors.thunder,
             ),
@@ -232,10 +288,10 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
           GestureDetector(
             onTap: widget.onForgotPasswordTap,
             child: OsmeaComponents.text(
-              'Forgot Password?',
+              'Şifremi Unuttum',
               variant: OsmeaTextVariant.bodyMedium,
               color: OsmeaColors.nordicBlue,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             ),
           ),
       ],
@@ -248,35 +304,13 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget> {
     final isEnabled = widget.state.isValid && !isLoading;
 
     return OsmeaComponents.button(
-      text: isLoading ? 'Signing In...' : 'Sign In',
+      text: isLoading ? 'Giriş Yapılıyor...' : 'Devam Et',
       onPressed: isEnabled ? widget.viewModel.signIn : null,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
       fullWidth: true,
-    );
-  }
-
-  /// 🔗 Sign Up Link
-  Widget _buildSignUpLink(BuildContext context) {
-    return OsmeaComponents.row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        OsmeaComponents.text(
-          "Don't have an account? ",
-          variant: OsmeaTextVariant.bodyMedium,
-          color: OsmeaColors.thunder.withOpacity(0.6),
-        ),
-        GestureDetector(
-          onTap: widget.onSignUpTap,
-          child: OsmeaComponents.text(
-            'Sign Up',
-            variant: OsmeaTextVariant.bodyMedium,
-            color: OsmeaColors.nordicBlue,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
+      backgroundColor: OsmeaColors.nordicBlue,
     );
   }
 }
