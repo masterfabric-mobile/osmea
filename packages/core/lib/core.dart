@@ -150,3 +150,6 @@ export 'package:core/src/helper/auth_storage_helper.dart';
 export 'package:core/src/views/auth/sign_in/sign_in_view.dart';
 export 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
 export 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
+export 'package:core/src/views/auth/sign_up/sign_up_view.dart';
+export 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+export 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
