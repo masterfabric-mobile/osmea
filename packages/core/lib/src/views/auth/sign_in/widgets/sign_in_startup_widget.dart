@@ -20,6 +20,7 @@ class SignInStartupWidget extends StatefulWidget {
   final Function(String error)? onSignInError;
   final VoidCallback? onSignUpTap;
   final VoidCallback? onForgotPasswordTap;
+  final Map<String, dynamic>? config;
 
   const SignInStartupWidget({
     super.key,
@@ -29,6 +30,7 @@ class SignInStartupWidget extends StatefulWidget {
     this.onSignInError,
     this.onSignUpTap,
     this.onForgotPasswordTap,
+    this.config,
   });
 
   @override
@@ -122,6 +124,11 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
     );
   }
 
+  /// Get config value with fallback
+  String _getConfigValue(String key, String fallback) {
+    return widget.config?[key] ?? fallback;
+  }
+
   /// 🎨 Gradient Header with Tabs
   Widget _buildGradientHeader(BuildContext context) {
     return Container(
@@ -188,9 +195,9 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
-                tabs: const [
-                  Tab(text: 'Giriş Yap'),
-                  Tab(text: 'Kayıt Ol'),
+                tabs: [
+                  Tab(text: _getConfigValue('tab_sign_in', 'Sign In')),
+                  Tab(text: _getConfigValue('tab_sign_up', 'Sign Up')),
                 ],
                 onTap: (index) {
                   if (index == 1 && widget.onSignUpTap != null) {
@@ -211,14 +218,14 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'E-Posta',
+          _getConfigValue('email_label', 'Email'),
           variant: OsmeaTextVariant.bodyMedium,
           fontWeight: FontWeight.w600,
           color: OsmeaColors.thunder,
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
-          hint: 'Giriniz',
+          hint: _getConfigValue('email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: widget.viewModel.updateEmail,
           errorText: widget.state.emailError,
@@ -234,14 +241,14 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Şifre',
+          _getConfigValue('password_label', 'Password'),
           variant: OsmeaTextVariant.bodyMedium,
           fontWeight: FontWeight.w600,
           color: OsmeaColors.thunder,
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
-          hint: 'Giriniz',
+          hint: _getConfigValue('password_hint', 'Enter your password'),
           obscureText: widget.state.obscurePassword,
           onChanged: widget.viewModel.updatePassword,
           errorText: widget.state.passwordError,
@@ -276,7 +283,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
             ),
             OsmeaComponents.sizedBox(width: context.spacing8),
             OsmeaComponents.text(
-              'Beni Hatırla',
+              _getConfigValue('remember_me_label', 'Remember me'),
               variant: OsmeaTextVariant.bodyMedium,
               color: OsmeaColors.thunder,
             ),
@@ -288,7 +295,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
           GestureDetector(
             onTap: widget.onForgotPasswordTap,
             child: OsmeaComponents.text(
-              'Şifremi Unuttum',
+              _getConfigValue('forgot_password_label', 'Forgot Password?'),
               variant: OsmeaTextVariant.bodyMedium,
               color: OsmeaColors.nordicBlue,
               fontWeight: FontWeight.w500,
@@ -304,7 +311,9 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
     final isEnabled = widget.state.isValid && !isLoading;
 
     return OsmeaComponents.button(
-      text: isLoading ? 'Giriş Yapılıyor...' : 'Devam Et',
+      text: isLoading
+          ? _getConfigValue('sign_in_button_loading', 'Signing in...')
+          : _getConfigValue('sign_in_button', 'Continue'),
       onPressed: isEnabled ? widget.viewModel.signIn : null,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
