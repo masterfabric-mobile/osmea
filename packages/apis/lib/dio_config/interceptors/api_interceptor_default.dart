@@ -2,6 +2,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+
 /// 🌐 Default API Interceptor for Dio
 /// Handles logging, request/response modification, and error mapping.
 /// Open-source friendly! Contribute and improve! 🚀
@@ -16,6 +17,7 @@ class ApiInterceptorDefault extends Interceptor {
     // 404 is handled in onResponse, nothing to do here
     super.onError(err, handler);
   }
+
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
@@ -41,6 +43,7 @@ class ApiInterceptorDefault extends Interceptor {
     _dioLogger.printOnRequestLogs(options);
     super.onRequest(options, handler);
   }
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     // 📥 Log incoming response
@@ -73,6 +76,7 @@ class ApiInterceptorDefault extends Interceptor {
     super.onResponse(response, handler);
   }
 }
+
 /// Interceptor that adds Basic Auth and JSON headers for WooCommerce
 class WooInterceptor extends Interceptor {
   final _dioLogger = GetIt.I.get<ApiBaseLogger>();
@@ -82,9 +86,11 @@ class WooInterceptor extends Interceptor {
     try {
       // 🌐 Pre-request hook for network checks or analytics
       await ApiNetwork.onRequestInterceptor();
-      // 🔑 Add Basic Auth for WooCommerce
+      // 🔑 Add Basic Auth for WooCommerce only if credentials are provided
       final authHeader = WooNetwork.basicAuthHeader();
-      options.headers['Authorization'] = authHeader;
+      if (authHeader.isNotEmpty) {
+        options.headers['Authorization'] = authHeader;
+      }
       options.headers['Accept'] = 'application/json';
       options.headers['Content-Type'] = 'application/json';
       // 📋 Log outgoing request
@@ -99,15 +105,17 @@ class WooInterceptor extends Interceptor {
         ),
       );
     }
-    
+
     super.onRequest(options, handler);
   }
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     // 📥 Log incoming response
     _dioLogger.printOnResponseLogs(response);
     super.onResponse(response, handler);
   }
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // 🐞 Log error details for debugging
@@ -115,4 +123,3 @@ class WooInterceptor extends Interceptor {
     super.onError(err, handler);
   }
 }
-

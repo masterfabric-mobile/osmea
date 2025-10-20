@@ -85,7 +85,10 @@ Future<void> main() async {
   }
 
   // 🚀 Initialize MasterApp components
-  await MasterApp.runBefore(allowCollectDataTelemetry: true);
+  await MasterApp.runBefore(
+    allowCollectDataTelemetry: true,
+    enableRemoteConfig: false, // Disable remote config for API Explorer
+  );
 
   // ⏳ Small delay to ensure proper initialization
   if (kIsWeb) {
@@ -106,5 +109,6 @@ Future<void> main() async {
     themeMode: ThemeMode.light,
     devModeGrid: false,
     devModeSpacer: false,
+    useConfigurationHelpers: false, // Disable config helpers for API Explorer
   ));
 }

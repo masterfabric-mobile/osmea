@@ -95,3 +95,6 @@ export 'dot_indicator_enums.dart';
 
 // Container enums
 export 'container_enums.dart';
+
+// Sound Dialog enums
+export 'sound_dialog_enums.dart';

@@ -227,7 +227,8 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
               'Positioned',
               'ClipRRect',
               'Scaffold',
-              'SingleChildScrollView'
+              'SingleChildScrollView',
+              'SoundDialog'
             ].contains(c['title']))
         .toList();
   }
@@ -263,6 +264,7 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
               'Loading',
               'Toast',
               'Snackbar',
+              'SoundDialog',
               'Colors',
               'Divider',
               'ListItem',
@@ -298,6 +300,7 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
               'Snackbar',
               'Loading',
               'Progress',
+              'Sound Dialog',
               'Badge',
               'Counter',
               'Button',
@@ -510,6 +513,7 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
       'SingleChildScrollView': 'Scrollable content',
       'SizedBox': 'Fixed size container',
       'Snackbar': 'Brief message display',
+      'Sound Dialog': 'Record and play audio with dialog interface',
       'Spacer': 'Flexible space element',
       'Stack': 'Layered widget positioning',
       'Stepper': 'Step-by-step process',

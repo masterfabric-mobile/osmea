@@ -25,20 +25,9 @@ import 'package:apis/di/config/config_di.dart';
 import 'package:apis/services/wizard_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
-import 'package:injectable/injectable.dart';
-import 'package:logger/logger.dart';
 
 // For WooCommerce: Basic Auth and configuration
 import 'dart:convert';
-
-/// 🛠️ Provides a singleton [Logger] instance for the entire app.
-///
-/// Use this logger for consistent logging across your project!
-@module
-abstract class DioLoggerModule {
-  @Singleton()
-  Logger get logger => Logger();
-}
 
 /// 🚀 API Network Configuration & Dependency Management
 ///
@@ -204,8 +193,8 @@ class WooNetwork {
     WooNetwork.password = password;
     WooNetwork.apiVersion = apiVersion ?? 'v3';
 
-    // You can register WooCommerce dependencies here
-    // e.g.: configureWooDependencies();
+    // Register WooCommerce dependencies
+    configureDependencies();
     return getIt;
   }
 
@@ -294,6 +283,10 @@ class WooNetwork {
 
   /// Generates Basic Auth header
   static String basicAuthHeader() {
+    // If username or password is empty, return empty string (no auth)
+    if (WooNetwork.username.isEmpty || WooNetwork.password.isEmpty) {
+      return '';
+    }
     String credentials = '${WooNetwork.username}:${WooNetwork.password}';
     String encoded = base64Encode(utf8.encode(credentials));
     return 'Basic $encoded';

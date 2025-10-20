@@ -20,7 +20,7 @@ abstract class ProductServiceClient implements ProductService {
   /// 🏭 Factory for dependency injection
   @factoryMethod
   factory ProductServiceClient(Dio dio) => _ProductServiceClient(
-        ApiDioClient.wooDio(),
+        ApiDioClient.wooPublicDio(),
         baseUrl: WooNetwork.storeUrl,
       );
 

@@ -2,7 +2,22 @@
 
 > This changelog is generated from the latest closed pull requests. For a full, always-up-to-date changelog, visit [Closed PRs on GitHub](https://github.com/masterfabric-mobile/osmea/pulls?q=is%3Apr+is%3Aclosed).  
 
-## 📦 APIs – v0.43.11
+## 📦 APIs – v0.48.11
+
+- **[#226 – Package → API → Woocommerce Checkout Checkout Order and Order API](https://github.com/masterfabric-mobile/osmea/pull/226)**  
+  Adds checkout, order creation, order retrieval, payment, and related handlers/models for WooCommerce Store API. Completes core transactional flow.
+
+- **[#225 – Package → API → Woocommerce Product Brand Attribute Attribute Term API](https://github.com/masterfabric-mobile/osmea/pull/225)**  
+  Adds support for Product Brands, Attributes, and Attribute Terms to the API layer, including models, handlers, DI, and UI integration.
+
+- **[#224 – Package → API → Woocommerce Product Reviews Collection Data Category Tags API](https://github.com/masterfabric-mobile/osmea/pull/224)**  
+  Adds support for WooCommerce Product Tags, Reviews, Collections, and Categories APIs, with services, models, registry, and UI-side support.
+
+- **[#223 – Package → API → Woocommerce Product API](https://github.com/masterfabric-mobile/osmea/pull/223)**  
+  Implements WooCommerce Store API Product and Product Variations endpoints, including services, models, DI, filtering, and cleanup.
+
+- **[#218 – Package → API → Woocommerce Cart Items API](https://github.com/masterfabric-mobile/osmea/pull/218)**  
+  Adds full CRUD support for WooCommerce Store API Cart Items (models, handlers, DI registration).
 
 - **[#206 – Package → API → Woocommerce Wishlist](https://github.com/masterfabric-mobile/osmea/pull/206)**  
   Integrates WooCommerce Wishlist API, CRUD operations, group and item management, Admin/Customer API separation, models and services.
@@ -165,7 +180,19 @@
   Major improvements to customer management: new API endpoints, enhanced validation, search and filtering, pagination fixes, UI enhancements, and updated documentation.
 
 
-## 🎨 Components – v0.63.25
+## 🎨 Components – v0.67.25
+
+- **[#229 – Components → Component and Styling Improvements](https://github.com/masterfabric-mobile/osmea/pull/229)**  
+  Enhances OsmeaChips, IconButton, ImageCard, and other UI components with new shape, style, icon, and customization options.
+
+- **[#222 – Components → Appbar With Searchbar and Improvements Components App](https://github.com/masterfabric-mobile/osmea/pull/222)**  
+  Adds AppBar with integrated search bar, suggestions/history, action buttons, layout and SafeArea improvements, and utility extensions.
+
+- **[#221 – Components → ImageCard and Carousel Improvement](https://github.com/masterfabric-mobile/osmea/pull/221)**  
+  Adds text overflow control, padding options to card components, customizable dot indicators for carousel, and visual flexibility.
+
+- **[#217 – Components → Phone Picker](https://github.com/masterfabric-mobile/osmea/pull/217)**  
+  Adds Phone Picker component to UI Kit, supports country code/flag, validation, customizability, and callback integration.
 
 - **[#168 – Storybook – Wrap Component](https://github.com/masterfabric-mobile/osmea/pull/168)**  
   Adds Storybook for Wrap component, modular architecture, flexible layout, alignment/direction/spacing controls, dynamic child management, and responsive design.
@@ -429,7 +456,25 @@
   Established a modular, scalable UI structure (`lib/src/`), reusable components, enums, design tokens, and core infrastructure for future UI elements.
                                            
 
-## ⚙️ Core – v3.14.4
+## ⚙️ Core – v3.20.4
+
+- **[#227 – Core → Loading/Error Views and State Management Improvements](https://github.com/masterfabric-mobile/osmea/pull/227)**  
+  Adds LoadingViewCubit, ErrorHandlingCubit, new loading/error widgets with styles, and centralizes asynchronous state handling.
+
+- **[#219 – Core → WebViewerHelper Integration](https://github.com/masterfabric-mobile/osmea/pull/219)**  
+  Adds a unified helper for HTML/WebView rendering, OSMEA-styled widgets, auto-detection logic, and secure HTML sanitization.
+
+- **[#214 – Core → MasterScaffoldWidget](https://github.com/masterfabric-mobile/osmea/pull/214)**  
+  Introduces MasterScaffoldWidget for unified flexible layout in MasterView ecosystem, with no breaking changes; enhances configuration and maintainability.
+
+- **[#212 – Core → Hydrated Cubit](https://github.com/masterfabric-mobile/osmea/pull/212)**  
+  Adds hydrated_bloc, hydrated base classes for cubits, enables persisted state management across app restarts, aligns dependencies, and enhances developer experience.
+
+- **[#211 – Core → BaseView & ViewModel Cubit Refactor](https://github.com/masterfabric-mobile/osmea/pull/211)**  
+  Refactors BaseViewCubit, BaseViewModelCubit, and related classes for simplification and clarity; renames typedefs and improves maintainability.
+
+- **[#207 – Core → Permission Handler Helper Improvements](https://github.com/masterfabric-mobile/osmea/pull/207)**  
+  Adds enhanced permission handling (Android 12+ exact alarm permission), intelligent caching, robust error handling, cross-platform support, and production-ready architecture.
 
 - **[#207 – Core → Permission Handler Helper Improvements](https://github.com/masterfabric-mobile/osmea/pull/207)**  
     Adds exact alarm permission management for Android 12+, intelligent permission caching, cross-platform permission handling, advanced error handling, smart storage permission management, real-time permission status tracking, and production-ready architecture.

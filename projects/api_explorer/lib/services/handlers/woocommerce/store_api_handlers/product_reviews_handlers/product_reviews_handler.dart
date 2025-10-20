@@ -3,7 +3,6 @@ import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/abstract/store_product_reviews_service.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 
 ///*******************************************************************
 ///******************* 📝 PRODUCT REVIEWS HANDLER *******************

@@ -3984,13 +3984,7 @@ class ApiServiceRegistry {
       subcategory: 'Authentication',
       handler: UserLogoutHandler(),
     ),
-    ApiService(
-      name: 'Password Reset',
-      endpoint: '/wp-json/{brand_name}-auth-reset/v1/auth',
-      category: ApiCategory.woocommerce,
-      subcategory: 'Authentication',
-      handler: PasswordResetHandler(),
-    ),
+
     ApiService(
       name: 'Password Update',
       endpoint: '/wp-json/{brand_name}-auth-login/v1/user/reset_password',
@@ -4079,6 +4073,44 @@ class ApiServiceRegistry {
       subcategory: 'Cart API',
       handler: GetCartHandler(),
     ),
+
+    // 🎟️ WooCommerce Store API Cart Coupons
+    ApiService(
+      name: 'Get Cart Coupons',
+      endpoint: '/wp-json/wc/store/v1/cart/coupons',
+      category: ApiCategory.woocommerceCart,
+      subcategory: 'Cart Coupons',
+      handler: GetCartCouponsHandler(),
+    ),
+    ApiService(
+      name: 'Get Cart Coupon',
+      endpoint: '/wp-json/wc/store/v1/cart/coupons/{coupon_code}',
+      category: ApiCategory.woocommerceCart,
+      subcategory: 'Cart Coupons',
+      handler: GetCartCouponHandler(),
+    ),
+    ApiService(
+      name: 'Add Cart Coupon',
+      endpoint: '/wp-json/wc/store/v1/cart/coupons',
+      category: ApiCategory.woocommerceCart,
+      subcategory: 'Cart Coupons',
+      handler: AddCartCouponHandler(),
+    ),
+    ApiService(
+      name: 'Delete Cart Coupon',
+      endpoint: '/wp-json/wc/store/v1/cart/coupons/{coupon_code}',
+      category: ApiCategory.woocommerceCart,
+      subcategory: 'Cart Coupons',
+      handler: DeleteCartCouponHandler(),
+    ),
+    ApiService(
+      name: 'Delete All Cart Coupons',
+      endpoint: '/wp-json/wc/store/v1/cart/coupons',
+      category: ApiCategory.woocommerceCart,
+      subcategory: 'Cart Coupons',
+      handler: DeleteAllCartCouponsHandler(),
+    ),
+
     ApiService(
       name: 'Add Item',
       endpoint: '/wp-json/wc/store/v1/cart/add-item',

@@ -16,6 +16,7 @@ dependencies:
     path: ../../packages/apis # Networking layer (REST, GraphQL, etc.)
 
   cupertino_icons: ^1.0.8
+  flutter_dotenv: ^5.1.0
 
 
   # ────────────────────────────────

@@ -111,6 +111,11 @@ export 'package:core/src/views/splash/splash_view.dart';
 export 'package:core/src/views/splash/cubit/splash_cubit.dart';
 export 'package:core/src/views/splash/cubit/splash_state.dart';
 
+// 🔐 Exports the permissions view and cubit
+export 'package:core/src/views/permissions/permissions_view.dart';
+export 'package:core/src/views/permissions/cubit/permissions_cubit.dart';
+export 'package:core/src/views/permissions/cubit/permissions_state.dart';
+
 // 🚨 Exports the error handling models
 export 'package:core/src/models/error_handling_models.dart';
 
@@ -134,6 +139,22 @@ export 'package:core/src/views/loading/cubit/loading_state.dart';
 
 // 🔄 Exports the loading models
 export 'package:core/src/models/loading_models.dart';
+
+// 🔄 Exports the routes
+export 'package:core/src/views/routes.dart';
+
+// 📷 Exports the image detail view and cubit
+export 'package:core/src/views/image_detail/image_detail_view.dart';
+export 'package:core/src/views/image_detail/cubit/image_detail_cubit.dart';
+export 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
+
+// 🔐 Exports the auth storage helper
+export 'package:core/src/helper/auth_storage_helper.dart';
+
+// 🔐 Exports the sign in view, cubit and state
+export 'package:core/src/views/auth/sign_in/sign_in_view.dart';
+export 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
+export 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
 
 // 🔍 Exports the search view and cubit
 export 'package:core/src/views/search/search_view.dart';

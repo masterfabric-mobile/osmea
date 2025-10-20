@@ -3,7 +3,6 @@ import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/password_update_request.dart';
 
 ///*******************************************************************
 ///******************* 🔐 PASSWORD UPDATE HANDLER *******************

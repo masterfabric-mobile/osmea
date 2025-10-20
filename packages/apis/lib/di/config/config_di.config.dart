@@ -8,7 +8,6 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:apis/apis.dart' as _i367;
 import 'package:apis/dio_config/dio_client/abstract/api_base_client.dart'
     as _i661;
 import 'package:apis/dio_config/dio_client/api_dio_client.dart' as _i1004;
@@ -325,6 +324,10 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart
     as _i654;
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/api/api_cart_service.dart'
     as _i845;
+import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/abstract/cart_coupons_service.dart'
+    as _i441;
+import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/api/api_cart_coupons_service.dart'
+    as _i359;
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/abstract/cart_items_service.dart'
     as _i240;
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/api/api_cart_items_service.dart'
@@ -395,9 +398,7 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
-    final dioLoggerModule = _$DioLoggerModule();
     final dioModule = _$DioModule();
-    gh.singleton<_i974.Logger>(() => dioLoggerModule.logger);
     gh.singleton<_i361.Dio>(() => dioModule.dio());
     gh.factory<_i1013.CurrenciesService>(
         () => _i730.ApiCurrenciesService(gh<_i361.Dio>()));
@@ -433,6 +434,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i331.WebhooksServiceClient(gh<_i361.Dio>()));
     gh.factory<_i197.StoreProductTagsService>(
         () => _i1053.StoreProductTagsServiceClient(gh<_i361.Dio>()));
+    gh.factory<_i441.CartCouponsService>(
+        () => _i359.CartCouponsServiceClient(gh<_i361.Dio>()));
     gh.factory<_i654.CartService>(
         () => _i845.CartServiceClient(gh<_i361.Dio>()));
     gh.factory<_i330.SystemStatusService>(
@@ -594,7 +597,5 @@ extension GetItInjectableX on _i174.GetIt {
     return this;
   }
 }
-
-class _$DioLoggerModule extends _i367.DioLoggerModule {}
 
 class _$DioModule extends _i1004.DioModule {}

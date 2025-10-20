@@ -1,5 +1,6 @@
 // ignore_for_file: await_only_futures
 
+import 'package:core/core.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/di/config/config_di.config.dart';
 import 'package:flutter/material.dart';
@@ -11,21 +12,25 @@ GetIt getIt = GetIt.instance;
 @InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies() async {
   try {
-    // Check if already initialized
-    if (getIt.isRegistered<GetIt>()) {
-      debugPrint('🔧 GetIt already initialized, skipping...');
-      return getIt;
-    }
+    debugPrint('🔧 Configuring dependencies for API Explorer (Wizard-based)');
 
-    // Initialize wizard helper and storage
+    // Initialize core dependencies first
+    getIt = await Core().init(getIt);
+    debugPrint('✅ Core dependencies initialized');
+
+    // Initialize wizard helper and storage for API Explorer
     await ApiNetwork.initWizard();
+    debugPrint('✅ Wizard system initialized');
 
     // Try to initialize networks from wizard configuration
+    // This will be empty initially until user completes wizard
     try {
       await initNetworksFromWizard(getIt);
+      debugPrint('✅ Networks initialized from wizard configuration');
     } catch (e) {
       debugPrint(
-          '⚠️ No networks initialized from wizard. User needs to complete setup first.');
+          '⚠️ No networks initialized from wizard. User needs to complete setup wizard first.');
+      // This is expected for first-time users
     }
 
     // Initialize dependency injection
@@ -39,26 +44,12 @@ Future<GetIt> configureDependencies() async {
     if (e.toString().contains('already registered')) {
       debugPrint('🔄 Attempting to reset and reinitialize GetIt...');
       try {
-        // Check if Logger is already registered and unregister it first
-        if (getIt.isRegistered<Object>()) {
-          debugPrint(
-              '🔧 Some services already registered, unregistering first...');
-          getIt.reset();
-        }
-
         getIt.reset();
         final result = await getIt.init();
         debugPrint('✅ GetIt reset and reinitialized successfully');
         return result;
       } catch (resetError) {
         debugPrint('❌ Failed to reset GetIt: $resetError');
-
-        // Last resort: try to continue with existing instance
-        if (getIt.isRegistered<GetIt>()) {
-          debugPrint('🔄 Continuing with existing GetIt instance...');
-          return getIt;
-        }
-
         rethrow;
       }
     }

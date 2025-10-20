@@ -1939,10 +1939,6 @@ class _ModernSidebarState extends State<ModernSidebar>
     final customerCategories =
         ApiServiceRegistry.getWooCommerceCustomerCategories();
 
-    // Debug: Print categories to console
-    debugPrint(
-        '🔍 Customer Categories: ${customerCategories.map((c) => c.name).toList()}');
-
     return OsmeaComponents.container(
       margin: EdgeInsets.only(
         left: isNarrow ? 16 : 24,

@@ -83,7 +83,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('MasterViewCubit build. -> View Type: $currentView');
+    debugPrint('🔍 [MasterViewCubit] build() called');
 
     if (currentView != MasterViewCubitTypes.content) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -91,7 +91,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
           final snackBar = _createSnackBar(currentView);
           _showSnackBar(context, snackBar);
         } catch (e) {
-          debugPrint('Error creating or showing Snackbar: $e');
+          debugPrint('🔴 [MasterViewCubit] Error creating or showing Snackbar: $e');
         }
       });
     }
@@ -99,11 +99,11 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
     try {
       return _scaffold(context);
     } on Exception catch (e, s) {
-      debugPrint('Exception in MasterViewCubit build: $e');
+      debugPrint('🔴 [MasterViewCubit] Exception in build: $e');
       debugPrintStack(stackTrace: s);
       return _buildErrorScaffold(context, 'Exception: $e');
     } catch (e, s) {
-      debugPrint('Unknown error in MasterViewCubit build: $e');
+      debugPrint('🔴 [MasterViewCubit] Unknown error in build: $e');
       debugPrintStack(stackTrace: s);
       return _buildErrorScaffold(context, 'Unknown error: $e');
     }
@@ -124,7 +124,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
                     initialContent(viewModel, ctx);
                   }
                 } catch (e, s) {
-                  debugPrint('initialContent error: $e');
+                  debugPrint('🔴 [MasterViewCubit] initialContent error: $e');
                   debugPrintStack(stackTrace: s);
                 } finally {
                   _didCallInitial.value = true;
