@@ -129,7 +129,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
     return widget.config?[key] ?? fallback;
   }
 
-  /// 🎨 Gradient Header with Tabs (Ticimax Style)
+  /// 🎨 Gradient Header with Tabs
   Widget _buildGradientHeader(BuildContext context) {
     final showLogo = widget.config?['show_logo'] as bool? ?? true;
     final logoIcon = widget.config?['logo_icon'] as String? ?? 'store';
@@ -142,7 +142,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A6FE8), // Ticimax blue
+            Color(0xFF4A6FE8),
             Color(0xFF5B7BED),
             Color(0xFF6C8BF2),
           ],
@@ -410,7 +410,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
             OsmeaComponents.checkbox(
               value: widget.state.rememberMe,
               onChanged: (value) => widget.viewModel.toggleRememberMe(),
-              activeColor: Color(0xFF4A6FE8), // Ticimax blue
+              activeColor: Color(0xFF4A6FE8),
               size: CheckboxSize.small,
             ),
             OsmeaComponents.sizedBox(width: context.spacing8),
@@ -430,7 +430,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
             child: OsmeaComponents.text(
               _getConfigValue('forgot_password_label', 'Şifremi Unuttum'),
               variant: OsmeaTextVariant.bodyMedium,
-              color: Color(0xFF4A6FE8), // Ticimax blue
+              color: Color(0xFF4A6FE8),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -438,7 +438,6 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
     );
   }
 
-  /// ✅ Sign In Button (Ticimax Style)
   Widget _buildSignInButton(BuildContext context) {
     final isLoading = widget.state.status == SignInStatus.loading;
     final isEnabled = widget.state.isValid && !isLoading;
@@ -452,7 +451,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
       size: ButtonSize.large,
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
       fullWidth: true,
-      backgroundColor: Color(0xFF4A6FE8), // Ticimax blue
+      backgroundColor: Color(0xFF4A6FE8),
     );
   }
 }

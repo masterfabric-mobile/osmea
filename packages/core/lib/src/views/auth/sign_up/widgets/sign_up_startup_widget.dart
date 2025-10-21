@@ -110,7 +110,7 @@ class _SignUpStartupWidgetState extends State<SignUpStartupWidget>
     );
   }
 
-  /// 🎨 Gradient Header with Tabs (Ticimax Style)
+  /// 🎨 Gradient Header with Tabs
   Widget _buildGradientHeader(BuildContext context) {
     final showLogo = widget.config?['show_logo'] as bool? ?? true;
     final logoIcon = widget.config?['logo_icon'] as String? ?? 'store';
@@ -123,7 +123,7 @@ class _SignUpStartupWidgetState extends State<SignUpStartupWidget>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A6FE8), // Ticimax blue
+            Color(0xFF4A6FE8),
             Color(0xFF5B7BED),
             Color(0xFF6C8BF2),
           ],
@@ -430,7 +430,7 @@ class _SignUpStartupWidgetState extends State<SignUpStartupWidget>
     );
   }
 
-  /// ✅ Sign Up Button (Ticimax Style)
+  /// ✅ Sign Up Button
   Widget _buildSignUpButton(BuildContext context) {
     final isLoading = widget.state.status == SignUpStatus.loading;
     final isEnabled = widget.state.isValid && !isLoading;
@@ -444,7 +444,7 @@ class _SignUpStartupWidgetState extends State<SignUpStartupWidget>
       size: ButtonSize.large,
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
       fullWidth: true,
-      backgroundColor: Color(0xFF4A6FE8), // Ticimax blue
+      backgroundColor: Color(0xFF4A6FE8),
     );
   }
 }
