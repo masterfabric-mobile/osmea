@@ -16,6 +16,7 @@
   "woocommerce_configuration": {
     "store_url": "http://your_store_url.com",
     "brand_name": "your_brand_name",
+    "auth_key": "YOUR_SPECIAL_AUTH_CODE",
     "version": "v?",
     "verify_ssl": true,
     "query_string_auth": false,
