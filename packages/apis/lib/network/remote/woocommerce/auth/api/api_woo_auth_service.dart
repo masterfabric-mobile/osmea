@@ -6,7 +6,6 @@ import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/delete_user_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/password_update_request.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/send_reset_password_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/delete_user_response.dart';
@@ -59,13 +58,13 @@ abstract class ApiWooAuthService implements WooAuthService {
     @Body() DeleteUserRequest request,
   );
 
-  /// 📧 Send Reset Password Mail
-  /// Sends password reset email to user
-  @POST('/?rest_route=/{brand_name}-auth-reset/v1/auth')
+  /// 📧 Send Reset Password
+  /// Sends a password reset email to the user
+  @POST('/?rest_route=/{brand_name}-auth-login/v1/user/reset_password')
   @override
-  Future<SendResetPasswordResponse> sendResetPasswordMail(
+  Future<SendResetPasswordResponse> sendResetPassword(
     @Path('brand_name') String brandName,
-    @Body() SendResetPasswordRequest request,
+    @Query('email') String email,
   );
 
   /// 🔐 Update Password

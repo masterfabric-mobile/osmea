@@ -7,6 +7,7 @@ import '../screens/components_screen.dart';
 import '../screens/helpers_screen.dart';
 import '../screens/info_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/permissions_screen.dart';
 
 // Import all component examples
 import '../components/align_example.dart';
@@ -73,6 +74,7 @@ class AppRoutes {
   static const String components = '/components';
   static const String helpers = '/helpers';
   static const String info = '/info';
+  static const String permissions = '/permissions';
 
   // Route paths - Component pages (Only a few for testing)
   static const String align = '/component/align';
@@ -156,6 +158,11 @@ class AppRoutes {
         name: 'login',
         builder: (context, state) => const ModernLoginScreen(),
       ),
+      GoRoute(
+        path: permissions,
+        name: 'permissions',
+        builder: (context, state) => const PermissionsScreen(),
+      ),
 
       // Shell route for bottom navigation - bottom nav bar preserved on all pages
       ShellRoute(
@@ -214,6 +221,11 @@ class AppRoutes {
 
   static void goToInfo(BuildContext context) {
     context.go(info);
+  }
+
+  static void goToPermissions(BuildContext context) {
+    debugPrint('🔍 [AppRoutes] Navigating to permissions');
+    context.push(permissions);
   }
 
   static void goToComponent(BuildContext context, String componentName) {

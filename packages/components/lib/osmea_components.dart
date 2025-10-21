@@ -95,6 +95,8 @@ export 'src/core/cubit_button/cubit/core_button_state.dart';
 export 'src/core/cubit_button/cubit/core_button_cubit.dart';
 export 'src/components/collapse/cubit/collapse_cubit.dart';
 export 'src/components/collapse/cubit/collapse_state.dart';
+export 'src/components/sound_dialog/cubit/sound_dialog_cubit.dart';
+export 'src/components/sound_dialog/cubit/sound_dialog_state.dart';
 
 // 🌀 Loading
 export 'src/utils/loading_extensions.dart';

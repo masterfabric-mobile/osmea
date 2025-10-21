@@ -238,36 +238,29 @@ class WooAuthManager {
   }
 
   /// 📧 Send Reset Password Email
-  Future<WooAuthResult<SendResetPasswordData>> sendResetPassword({
+  Future<WooAuthResult<SendResetPasswordResponse>> sendResetPassword({
     required String email,
-    String? resetUrl,
   }) async {
     try {
       debugPrint('📧 Starting password reset process...');
 
-      // Create reset password request
-      final request = SendResetPasswordRequest(
-        email: email,
-        resetUrl: resetUrl,
-      );
-
       // Call authentication API
       debugPrint('📡 Calling reset password API...');
-      final response = await _authService.sendResetPasswordMail(
-          WooNetwork.storeName, request);
+      final response = await _authService.sendResetPassword(
+          WooNetwork.storeName, email);
 
-      if (response.success && response.data != null) {
+      if (response.success == true) {
         debugPrint('✅ Password reset email sent successfully');
-        debugPrint('📧 Email sent to: ${response.data!.email}');
+        debugPrint('📧 Message: ${response.message}');
 
         return WooAuthResult.success(
-          data: response.data!,
+          data: response,
           message: response.message ?? 'Password reset email sent successfully',
         );
       } else {
         debugPrint('❌ Password reset failed: ${response.message}');
         return WooAuthResult.failure(
-          error: response.error ?? 'Password reset failed',
+          error: response.message ?? 'Password reset failed',
           message: response.message ?? 'Password reset failed',
         );
       }

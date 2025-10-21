@@ -1,6 +1,5 @@
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/delete_user_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/password_update_request.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/send_reset_password_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/delete_user_response.dart';
@@ -27,10 +26,10 @@ abstract class WooAuthService {
   Future<DeleteUserResponse> deleteUser(
       String brandName, String jwt, String authKey, DeleteUserRequest request);
 
-  /// 📧 Send Reset Password Mail
-  /// Sends password reset email to user
-  Future<SendResetPasswordResponse> sendResetPasswordMail(
-      String brandName, SendResetPasswordRequest request);
+  /// 📧 Send Reset Password
+  /// Sends a password reset email to the user
+  Future<SendResetPasswordResponse> sendResetPassword(
+      String brandName, String email);
 
   /// 🔐 Update Password
   /// Updates user password with JWT authentication

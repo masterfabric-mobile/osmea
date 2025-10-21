@@ -21,10 +21,8 @@ SendResetPasswordRequest _$SendResetPasswordRequestFromJson(
 
 /// @nodoc
 mixin _$SendResetPasswordRequest {
+  @JsonKey(name: "email")
   String get email => throw _privateConstructorUsedError;
-  @JsonKey(name: 'reset_url')
-  String? get resetUrl => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -38,10 +36,7 @@ abstract class $SendResetPasswordRequestCopyWith<$Res> {
           $Res Function(SendResetPasswordRequest) then) =
       _$SendResetPasswordRequestCopyWithImpl<$Res, SendResetPasswordRequest>;
   @useResult
-  $Res call(
-      {String email,
-      @JsonKey(name: 'reset_url') String? resetUrl,
-      Map<String, dynamic>? metadata});
+  $Res call({@JsonKey(name: "email") String email});
 }
 
 /// @nodoc
@@ -59,22 +54,12 @@ class _$SendResetPasswordRequestCopyWithImpl<$Res,
   @override
   $Res call({
     Object? email = null,
-    Object? resetUrl = freezed,
-    Object? metadata = freezed,
   }) {
     return _then(_value.copyWith(
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      resetUrl: freezed == resetUrl
-          ? _value.resetUrl
-          : resetUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -88,10 +73,7 @@ abstract class _$$SendResetPasswordRequestImplCopyWith<$Res>
       __$$SendResetPasswordRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String email,
-      @JsonKey(name: 'reset_url') String? resetUrl,
-      Map<String, dynamic>? metadata});
+  $Res call({@JsonKey(name: "email") String email});
 }
 
 /// @nodoc
@@ -108,22 +90,12 @@ class __$$SendResetPasswordRequestImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? email = null,
-    Object? resetUrl = freezed,
-    Object? metadata = freezed,
   }) {
     return _then(_$SendResetPasswordRequestImpl(
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      resetUrl: freezed == resetUrl
-          ? _value.resetUrl
-          : resetUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
     ));
   }
 }
@@ -132,32 +104,18 @@ class __$$SendResetPasswordRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SendResetPasswordRequestImpl implements _SendResetPasswordRequest {
   const _$SendResetPasswordRequestImpl(
-      {required this.email,
-      @JsonKey(name: 'reset_url') this.resetUrl,
-      final Map<String, dynamic>? metadata})
-      : _metadata = metadata;
+      {@JsonKey(name: "email") required this.email});
 
   factory _$SendResetPasswordRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$SendResetPasswordRequestImplFromJson(json);
 
   @override
+  @JsonKey(name: "email")
   final String email;
-  @override
-  @JsonKey(name: 'reset_url')
-  final String? resetUrl;
-  final Map<String, dynamic>? _metadata;
-  @override
-  Map<String, dynamic>? get metadata {
-    final value = _metadata;
-    if (value == null) return null;
-    if (_metadata is EqualUnmodifiableMapView) return _metadata;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
 
   @override
   String toString() {
-    return 'SendResetPasswordRequest(email: $email, resetUrl: $resetUrl, metadata: $metadata)';
+    return 'SendResetPasswordRequest(email: $email)';
   }
 
   @override
@@ -165,16 +123,12 @@ class _$SendResetPasswordRequestImpl implements _SendResetPasswordRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SendResetPasswordRequestImpl &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.resetUrl, resetUrl) ||
-                other.resetUrl == resetUrl) &&
-            const DeepCollectionEquality().equals(other._metadata, _metadata));
+            (identical(other.email, email) || other.email == email));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, email, resetUrl,
-      const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hash(runtimeType, email);
 
   @JsonKey(ignore: true)
   @override
@@ -193,20 +147,15 @@ class _$SendResetPasswordRequestImpl implements _SendResetPasswordRequest {
 
 abstract class _SendResetPasswordRequest implements SendResetPasswordRequest {
   const factory _SendResetPasswordRequest(
-      {required final String email,
-      @JsonKey(name: 'reset_url') final String? resetUrl,
-      final Map<String, dynamic>? metadata}) = _$SendResetPasswordRequestImpl;
+          {@JsonKey(name: "email") required final String email}) =
+      _$SendResetPasswordRequestImpl;
 
   factory _SendResetPasswordRequest.fromJson(Map<String, dynamic> json) =
       _$SendResetPasswordRequestImpl.fromJson;
 
   @override
+  @JsonKey(name: "email")
   String get email;
-  @override
-  @JsonKey(name: 'reset_url')
-  String? get resetUrl;
-  @override
-  Map<String, dynamic>? get metadata;
   @override
   @JsonKey(ignore: true)
   _$$SendResetPasswordRequestImplCopyWith<_$SendResetPasswordRequestImpl>

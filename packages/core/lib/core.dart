@@ -111,6 +111,11 @@ export 'package:core/src/views/splash/splash_view.dart';
 export 'package:core/src/views/splash/cubit/splash_cubit.dart';
 export 'package:core/src/views/splash/cubit/splash_state.dart';
 
+// 🔐 Exports the permissions view and cubit
+export 'package:core/src/views/permissions/permissions_view.dart';
+export 'package:core/src/views/permissions/cubit/permissions_cubit.dart';
+export 'package:core/src/views/permissions/cubit/permissions_state.dart';
+
 // 🚨 Exports the error handling models
 export 'package:core/src/models/error_handling_models.dart';
 

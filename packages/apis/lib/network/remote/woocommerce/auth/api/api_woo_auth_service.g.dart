@@ -114,14 +114,14 @@ class _ApiWooAuthService implements ApiWooAuthService {
   }
 
   @override
-  Future<SendResetPasswordResponse> sendResetPasswordMail(
+  Future<SendResetPasswordResponse> sendResetPassword(
     String brandName,
-    SendResetPasswordRequest request,
+    String email,
   ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'email': email};
     final _headers = <String, dynamic>{};
-    final _data = request;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<SendResetPasswordResponse>(Options(
       method: 'POST',
@@ -130,7 +130,7 @@ class _ApiWooAuthService implements ApiWooAuthService {
     )
             .compose(
               _dio.options,
-              '/?rest_route=/${brandName}-auth-reset/v1/auth',
+              '/?rest_route=/${brandName}-auth-login/v1/user/reset_password',
               queryParameters: queryParameters,
               data: _data,
             )

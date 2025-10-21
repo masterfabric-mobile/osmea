@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import './routes/app_routes.dart';
 import './widgets/device_frame_wrapper.dart';
 
@@ -9,6 +10,9 @@ void main() async {
 
   // Initialize core components before running the app
   await MasterApp.runBefore(allowCollectDataTelemetry: true);
+  
+  // Initialize dependency injection
+  await Core().init(GetIt.instance);
 
   runApp(const MyApp());
 }
