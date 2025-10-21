@@ -25,15 +25,15 @@ final GoRouter appRouter = GoRouter(
                 debugPrint('👤 User already authenticated, navigating to home');
                 context.go('/home');
               } else {
-                // User not authenticated, follow normal flow
+                // User not authenticated, go to guest mode (onboarding → home)
                 if (path.contains(Routes.home.name)) {
-                  context.go('/auth'); // Redirect to auth first
+                  context.go('/home'); // Allow guest mode
                 } else if (path.contains(Routes.onboarding.name)) {
                   context.go('/onboarding');
                 } else if (path.contains(Routes.signIn.name)) {
                   context.go('/auth');
                 } else {
-                  // Default: onboarding then auth
+                  // Default: onboarding (guest mode enabled)
                   context.go('/onboarding');
                 }
               }
@@ -54,20 +54,20 @@ final GoRouter appRouter = GoRouter(
             } else if (path.contains(Routes.signIn.name)) {
               context.go('/auth');
             } else {
-              context.go('/auth'); // Default to auth
+              context.go('/home'); // Default to home (guest mode)
             }
           },
           onCompleted: () {
-            debugPrint('🎉 Onboarding completed!');
-            context.go('/auth');
+            debugPrint('🎉 Onboarding completed! Going to home (guest mode)');
+            context.go('/home');
           },
           onSkipped: () {
-            debugPrint('⏭️ Onboarding skipped!');
-            context.go('/auth');
+            debugPrint('⏭️ Onboarding skipped! Going to home (guest mode)');
+            context.go('/home');
           },
           onError: (error) {
-            debugPrint('❌ Onboarding error: $error');
-            context.go('/auth');
+            debugPrint('❌ Onboarding error: $error, going to home anyway');
+            context.go('/home');
           },
         );
       },
