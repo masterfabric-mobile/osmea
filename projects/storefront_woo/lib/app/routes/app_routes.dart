@@ -5,6 +5,7 @@ import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
 import 'package:get_it/get_it.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -26,13 +27,13 @@ final GoRouter appRouter = GoRouter(
               } else {
                 // User not authenticated, follow normal flow
                 if (path.contains(Routes.home.name)) {
-                  context.go('/sign-in'); // Redirect to sign in first
+                  context.go('/auth'); // Redirect to auth first
                 } else if (path.contains(Routes.onboarding.name)) {
                   context.go('/onboarding');
                 } else if (path.contains(Routes.signIn.name)) {
-                  context.go('/sign-in');
+                  context.go('/auth');
                 } else {
-                  // Default: onboarding then sign-in
+                  // Default: onboarding then auth
                   context.go('/onboarding');
                 }
               }
@@ -51,31 +52,34 @@ final GoRouter appRouter = GoRouter(
             if (path.contains(Routes.home.name)) {
               context.go('/home');
             } else if (path.contains(Routes.signIn.name)) {
-              context.go('/sign-in');
+              context.go('/auth');
             } else {
-              context.go('/sign-in'); // Default to sign in
+              context.go('/auth'); // Default to auth
             }
           },
           onCompleted: () {
             debugPrint('🎉 Onboarding completed!');
-            context.go('/sign-in');
+            context.go('/auth');
           },
           onSkipped: () {
             debugPrint('⏭️ Onboarding skipped!');
-            context.go('/sign-in');
+            context.go('/auth');
           },
           onError: (error) {
             debugPrint('❌ Onboarding error: $error');
-            context.go('/sign-in');
+            context.go('/auth');
           },
         );
       },
     ),
 
-    // Sign In Route
+    // Auth Route (Combined Sign In + Sign Up with TabBar)
     GoRoute(
-      path: '/sign-in',
+      path: '/auth',
       builder: (BuildContext context, GoRouterState state) {
+        // Get initial tab from query parameter (0 = Sign In, 1 = Sign Up)
+        final initialTab =
+            int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0;
         // Extract brand name from store URL
         String extractBrandNameFromUrl(String storeUrl) {
           try {
@@ -182,24 +186,137 @@ final GoRouter appRouter = GoRouter(
           }
         }
 
-        return SignInView(
+        // Handle sign up with auth service
+        Future<bool> handleSignUp(String email, String password) async {
+          try {
+            debugPrint('🔐 Starting sign up for user: $email');
+
+            // Get brand name and store URL from app_config.json
+            final configHelper = AssetConfigHelper();
+            await configHelper.loadConfig('assets/app_config.json');
+
+            final storeUrl = configHelper.getString(
+              'woocommerce_configuration.store_url',
+              'http://your_store_url.com',
+            );
+
+            var brandName = configHelper.getString(
+              'woocommerce_configuration.brand_name',
+              '',
+            );
+
+            if (brandName.isEmpty) {
+              brandName = extractBrandNameFromUrl(storeUrl);
+            }
+
+            debugPrint('🏪 Using brand name: $brandName');
+            debugPrint('🌐 Store URL: $storeUrl');
+            debugPrint('📧 User email: $email');
+
+            // Get WooAuthService from GetIt
+            final authService = GetIt.I<WooAuthService>();
+
+            // Get AUTH_KEY from config (required by API)
+            final authKey = configHelper.getString(
+              'woocommerce_configuration.auth_key',
+              'default_auth_key',
+            );
+
+            // Extract first and last name from email
+            final emailParts = email.split('@');
+            final username = emailParts.isNotEmpty ? emailParts.first : 'User';
+
+            // Create sign up request
+            final signUpRequest = UserSignUpRequest(
+              email: email,
+              password: password,
+              firstName: username,
+              lastName: 'User',
+              authKey: authKey,
+              acceptTerms: true,
+              subscribeNewsletter: false,
+            );
+
+            // Call API
+            final response = await authService.userSignUp(
+              brandName,
+              signUpRequest,
+            );
+
+            debugPrint('🔍 API response received: ${response.success}');
+            debugPrint('📦 Response data: ${response.data}');
+            debugPrint('📝 Response message: ${response.message}');
+
+            // Check if user was successfully created
+            final messageContainsSuccess =
+                response.message != null &&
+                (response.message!.toLowerCase().contains(
+                      'successfully created',
+                    ) ||
+                    response.message!.toLowerCase().contains(
+                      'created successfully',
+                    ));
+
+            if (response.success || messageContainsSuccess) {
+              debugPrint('✅ Sign up successful!');
+              if (response.data != null) {
+                debugPrint('👤 User ID: ${response.data!.userId}');
+                debugPrint('📧 Email: ${response.data!.email}');
+              }
+              return true;
+            } else {
+              debugPrint(
+                '❌ Sign up failed: ${response.message ?? response.error}',
+              );
+              return false;
+            }
+          } catch (e) {
+            debugPrint('❌ Sign up error: $e');
+            return false;
+          }
+        }
+
+        return AuthView(
           goRoute: (String path) {
             if (path.contains(Routes.home.name)) {
               context.go('/home');
             }
           },
+          initialTab: initialTab,
           onSignInSuccess: () {
             debugPrint('✅ Sign in successful!');
             context.go('/home');
           },
           onSignInError: (error) {
             debugPrint('❌ Sign in error: $error');
-            // Show error message to user
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(error), backgroundColor: Colors.red),
             );
           },
-          arguments: {'sign_in': true, 'onSignIn': handleSignIn},
+          onSignUpSuccess: () {
+            debugPrint('✅ Sign up successful!');
+            // After successful registration, switch to Sign In tab
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '✅ Account created successfully! You can sign in now.',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+            context.go('/auth?tab=0'); // Switch to Sign In tab
+          },
+          onSignUpError: (error) {
+            debugPrint('❌ Sign up error: $error');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error), backgroundColor: Colors.red),
+            );
+          },
+          arguments: {
+            'auth': true,
+            'onSignIn': handleSignIn,
+            'onSignUp': handleSignUp,
+          },
         );
       },
     ),
