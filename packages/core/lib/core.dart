@@ -146,6 +146,10 @@ export 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
 // 🔐 Exports the auth storage helper
 export 'package:core/src/helper/auth_storage_helper.dart';
 
+// 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
+export 'package:core/src/views/auth/auth_view.dart';
+export 'package:core/src/views/auth/auth_widget.dart';
+
 // 🔐 Exports the sign in view, cubit and state
 export 'package:core/src/views/auth/sign_in/sign_in_view.dart';
 export 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
