@@ -344,7 +344,7 @@ class _TextFieldExampleState extends State<TextFieldExample> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: OsmeaComponents.text('6-digit OTP completed: $otp'),
-                backgroundColor: OsmeaColors.forestHeart,
+                backgroundColor: OsmeaColors.orange,
               ),
             );
           },
@@ -389,11 +389,11 @@ class _TextFieldExampleState extends State<TextFieldExample> {
         OsmeaComponents.otpTextField(
           digitCount: 5,
           size: TextFieldSize.large,
-          variant: TextFieldVariant.underlined,
+          variant: TextFieldVariant.filled,
           spacing: 16.0,
           obscureText: true, // Hidden digits for security
-          backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.05),
-          focusColor: OsmeaColors.nordicBlue,
+          backgroundColor: OsmeaColors.orange,
+          focusColor: OsmeaColors.orange,
           borderColor: OsmeaColors.silver,
           onChanged: (otp) =>
               debugPrint('5-digit secure OTP changed: ${'*' * otp.length}'),
@@ -402,7 +402,7 @@ class _TextFieldExampleState extends State<TextFieldExample> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: OsmeaComponents.text('Secure OTP completed!'),
-                backgroundColor: OsmeaColors.nordicBlue,
+                backgroundColor: OsmeaColors.orange,
               ),
             );
           },
@@ -501,9 +501,9 @@ class _TextFieldExampleState extends State<TextFieldExample> {
         OsmeaComponents.textField(
           label: 'Custom Themed TextField',
           hint: 'This field has custom colors',
-          variant: TextFieldVariant.outlined,
+          variant: TextFieldVariant.filled,
           size: TextFieldSize.medium,
-          backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.05),
+          backgroundColor: OsmeaColors.orange,
           borderColor: OsmeaColors.nordicBlue,
           focusColor: OsmeaColors.forestHeart,
           textColor: OsmeaColors.slate,

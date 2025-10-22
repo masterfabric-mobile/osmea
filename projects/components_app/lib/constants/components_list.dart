@@ -57,8 +57,14 @@ import '../components/wrap_example.dart';
 import '../components/application_share_helper_example.dart';
 import '../components/file_download_helper_example.dart';
 import '../components/sound_dialog_example.dart';
+import '../components/location_picker_example.dart';
 
 final List<Map<String, dynamic>> components = [
+  {
+    'title': 'Location Picker',
+    'icon': Icons.location_on_outlined,
+    'route': () => const LocationPickerExample(),
+  },
   {
     'title': 'Align',
     'icon': Icons.align_horizontal_center_outlined,

@@ -38,10 +38,11 @@
 
 <div align="center">
 
-> **Experience OSMEA Components in Action**  
+> **Experience OSMEA Components in Action**
+> 
 > 🌐 **[components.masterfabric.co](https://components.masterfabric.co)**
-
-*Interactive playground showcasing all OSMEA components with real-time examples*
+>
+> *Interactive playground showcasing all OSMEA components with real-time examples*
 
 </div>
 
@@ -188,18 +189,21 @@ projects/components_app/
 ### 📦 Installation
 
 1. **Clone the repository:**
-   ```bash
+
+```bash
    git clone https://github.com/masterfabric-mobile/osmea.git
    cd osmea/projects/components_app
-   ```
+```
 
 2. **Install dependencies:**
-   ```bash
+
+```bash
    flutter pub get
-   ```
+```
 
 3. **Run the application:**
-   ```bash
+
+```bash
    # Run on web (recommended for showcase)
    flutter run -d chrome
    
@@ -208,7 +212,7 @@ projects/components_app/
    
    # Run on specific device
    flutter run -d <device-id>
-   ```
+```
 
 ### 🌐 **Web Deployment**
 
@@ -356,6 +360,7 @@ OsmeaColors.gray100       // Very light gray
 ## 🛠️ Development
 
 ### **Code Generation**
+
 ```bash
 # Generate app icons
 flutter packages pub run flutter_launcher_icons:main
@@ -365,6 +370,7 @@ flutter test
 ```
 
 ### **Building**
+
 ```bash
 # Build for web
 flutter build web --release
@@ -396,10 +402,55 @@ We welcome contributions! Here's how you can help:
 
 ## 📄 License
 
-> 🔐 **License:** GNU AGPL v3.0  
+> 🔐 **License:** GNU AGPL v3.0
+> 
 > 📜 This project is protected under the **GNU Affero General Public License v3.0**.
+>
+> 📎 Full details available in the [LICENSE](LICENSE) file.
 
-📎 Full details available in the [`LICENSE`](LICENSE) file.
+### 📚 Third-Party Licenses
+
+This project uses the following third-party packages:
+
+#### **Google Maps Flutter**
+- **Package:** [google_maps_flutter](https://pub.dev/packages/google_maps_flutter)
+- **License:** BSD-3-Clause
+- **Copyright:** Copyright 2013 The Flutter Authors. All rights reserved.
+
+<details>
+<summary>View Full License</summary>
+
+```
+Copyright 2013 The Flutter Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following
+  disclaimer in the documentation and/or other materials provided
+  with the distribution.
+* Neither the name of Google Inc. nor the names of its
+  contributors may be used to endorse or promote products derived
+  from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+</details>
+
+> 📝 **Note:** For a complete list of all third-party dependencies and their licenses, please refer to the `pubspec.yaml` file and run `flutter pub licenses` in your terminal.
 
 ---
 

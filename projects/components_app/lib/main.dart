@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import './routes/app_routes.dart';
 import './widgets/device_frame_wrapper.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -13,6 +14,7 @@ void main() async {
   
   // Initialize dependency injection
   await Core().init(GetIt.instance);
+  await dotenv.load(fileName: ".env");
 
   runApp(const MyApp());
 }
@@ -35,3 +37,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

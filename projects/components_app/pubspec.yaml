@@ -29,12 +29,16 @@ dependencies:
   # Device features (camera/files)
   camera: ^0.10.5+2 # for testing only
   path_provider: ^2.0.15 # for testing only
-  
+  google_maps_flutter: ^2.6.1
+  geolocator: ^12.0.0
+  geocoding: ^2.0.6    
   # ────────────────────────────────
   # LOCAL OSMEA PACKAGES
   # ────────────────────────────────
   core:
     path: ../../packages/core       # Shared business logic, constants, utilities
+  
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   # ────────────────────────────────
@@ -60,5 +64,6 @@ flutter:
   uses-material-design: true       # Enable Material Design
   assets:
     - assets/images/               # Image assets directory
-    - assets/                      # All assets including screen_titles.json
+    - assets/
+    - .env                      # All assets including screen_titles.json
 
