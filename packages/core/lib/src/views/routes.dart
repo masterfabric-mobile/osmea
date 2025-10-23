@@ -1,1 +1,10 @@
-enum Routes { splash, onboarding, home, errorHandling, loading, signIn }
+enum Routes {
+  splash,
+  onboarding,
+  home,
+  errorHandling,
+  loading,
+  auth,
+  signIn,
+  signUp
+}
