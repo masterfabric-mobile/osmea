@@ -16,6 +16,7 @@
   "woocommerce_configuration": {
     "store_url": "http://your_store_url.com",
     "brand_name": "your_brand_name",
+    "auth_key": "YOUR_SPECIAL_AUTH_CODE",
     "version": "v?",
     "verify_ssl": true,
     "query_string_auth": false,
@@ -228,6 +229,54 @@
       "background_color": "#FAFAFAFF",
       "text_color": "#000000FF"
       
+    },
+    "auth_configuration": {
+      "ui_style": {
+        "tab_container_radius": 12,
+        "tab_item_radius": 10,
+        "button_radius": 12,
+        "content_area_top_radius": 32,
+        "background_color": "#4A6FE8",
+        "horizontal_padding": 24
+      },
+      "sign_in": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "remember_me_label": "Remember me",
+        "forgot_password_label": "Forgot Password?",
+        "sign_in_button": "Continue",
+        "sign_in_button_loading": "Signing in...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "sign_up": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "password_confirm_label": "Confirm Password",
+        "password_confirm_hint": "Confirm your password",
+        "privacy_policy_label": "I have read and accept the Privacy Policy",
+        "terms_label": "I have read and accept the Terms of Service",
+        "sign_up_button": "Create Account",
+        "sign_up_button_loading": "Creating account...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "forgot_password": {
+        "title": "Reset Password",
+        "subtitle": "Enter your email to reset"
+      }
     }
 
   }

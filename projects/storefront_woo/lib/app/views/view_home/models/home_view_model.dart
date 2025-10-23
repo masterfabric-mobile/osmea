@@ -256,6 +256,21 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   Future<void> _addToCart(int productId) async {
     try {
+      // ✅ Check if user is authenticated
+      final authStorage = AuthStorageHelper();
+      final isAuthenticated = await authStorage.isAuthenticated();
+
+      if (!isAuthenticated) {
+        debugPrint('🔒 User not authenticated, requiring sign in');
+        emit(
+          HomeAuthRequiredState(
+            message: 'Please sign in to add items to cart',
+            productId: productId,
+          ),
+        );
+        return;
+      }
+
       // Find the product to add to cart
       final product = _allProducts.firstWhere(
         (p) => p.id == productId,

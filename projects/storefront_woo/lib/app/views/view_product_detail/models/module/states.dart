@@ -70,3 +70,18 @@ class ProductDetailSuccessState extends ProductDetailState {
     required this.previousState,
   });
 }
+
+/// Auth required state when user needs to sign in
+class ProductDetailAuthRequiredState extends ProductDetailState {
+  final String message;
+  final int? productId; // Optional: product to add to cart after auth
+  final int? quantity; // Optional: quantity to add after auth
+  final ProductDetailLoadedState? previousState;
+
+  ProductDetailAuthRequiredState({
+    this.message = 'Please sign in to add items to cart',
+    this.productId,
+    this.quantity,
+    this.previousState,
+  });
+}
