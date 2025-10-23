@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
@@ -23,6 +24,10 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
   AuthView({
     required super.goRoute,
     super.arguments = const {'auth': true},
+    super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.useSafeArea = false,
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
     this.onSignInSuccess,
     this.onSignInError,
     this.onSignUpSuccess,
@@ -60,6 +65,7 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
         final signUpCallback = arguments['onSignUp'] as Future<bool> Function(
           String,
           String,
+          bool,
         )?;
 
         return AuthWidget(
