@@ -139,6 +139,14 @@
     ]
   },
   "auth_configuration": {
+    "ui_style": {
+      "tab_container_radius": 12,
+      "tab_item_radius": 10,
+      "button_radius": 12,
+      "content_area_top_radius": 32,
+      "background_color": "#4A6FE8",
+      "horizontal_padding": 50
+    },
     "sign_in": {
       "app_name": "OSMEA",
       "tab_sign_in": "Sign In",
@@ -165,6 +173,7 @@
       "password_hint": "Enter your password",
       "password_confirm_label": "Confirm Password",
       "password_confirm_hint": "Confirm your password",
+      "marketing_consent_label": "I would like to receive promotional emails/SMS",
       "privacy_policy_label": "I have read and accept the Privacy Policy",
       "terms_label": "I have read and accept the Terms of Service",
       "sign_up_button": "Create Account",
