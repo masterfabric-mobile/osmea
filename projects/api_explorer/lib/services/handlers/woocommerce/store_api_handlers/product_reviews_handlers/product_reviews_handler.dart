@@ -96,9 +96,9 @@ class ProductReviewsHandler implements ApiRequestHandler {
           "data": {
             "review": {
               "id": review.id,
-              "date_created": review.dateCreated?.toIso8601String(),
+              "date_created": review.dateCreated,
               "formatted_date_created": review.formattedDateCreated,
-              "date_created_gmt": review.dateCreatedGmt?.toIso8601String(),
+              "date_created_gmt": review.dateCreatedGmt,
               "product_id": review.productId,
               "product_name": review.productName,
               "product_permalink": review.productPermalink,
@@ -155,10 +155,9 @@ class ProductReviewsHandler implements ApiRequestHandler {
             "reviews": reviews
                 .map((review) => {
                       "id": review.id,
-                      "date_created": review.dateCreated?.toIso8601String(),
+                      "date_created": review.dateCreated,
                       "formatted_date_created": review.formattedDateCreated,
-                      "date_created_gmt":
-                          review.dateCreatedGmt?.toIso8601String(),
+                      "date_created_gmt": review.dateCreatedGmt,
                       "product_id": review.productId,
                       "product_name": review.productName,
                       "product_permalink": review.productPermalink,

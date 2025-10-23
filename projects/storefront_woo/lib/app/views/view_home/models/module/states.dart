@@ -60,3 +60,14 @@ class HomeErrorState extends HomeState {
 
   HomeErrorState({required this.message});
 }
+
+/// Auth required state when user needs to sign in
+class HomeAuthRequiredState extends HomeState {
+  final String message;
+  final int? productId; // Optional: product to add to cart after auth
+
+  HomeAuthRequiredState({
+    this.message = 'Please sign in to add items to cart',
+    this.productId,
+  });
+}

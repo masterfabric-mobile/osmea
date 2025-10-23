@@ -2,7 +2,6 @@
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/abstract/cart_items_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/freezed_model/response/cart_item.dart';
-import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/freezed_model/response/single_cart_item_response.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/freezed_model/response/add_cart_item_response.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_items_api/freezed_model/response/edit_single_cart_item_response.dart';
 import 'package:dio/dio.dart';

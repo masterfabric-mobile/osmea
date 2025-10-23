@@ -1,51 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
+import 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+import 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
 import 'package:osmea_components/osmea_components.dart';
 
-/// 🔐 **OSMEA Sign In Startup Widget**
+/// 🎨 **Sign Up Startup Widget**
 ///
-/// Copyright (c) 2025, OSMEA Team
-/// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
-///
-/// Modern sign in style with tabs and gradient background
+/// Modern sign up style with tabs and gradient background
 ///
 /// {@category Widgets}
-/// {@subCategory SignInStartup}
+/// {@subCategory SignUpStartup}
 
-class SignInStartupWidget extends StatefulWidget {
-  final SignInCubit viewModel;
-  final SignInState state;
-  final VoidCallback? onSignInSuccess;
-  final Function(String error)? onSignInError;
-  final VoidCallback? onSignUpTap;
-  final VoidCallback? onForgotPasswordTap;
+class SignUpStartupWidget extends StatefulWidget {
+  final SignUpCubit viewModel;
+  final SignUpState state;
+  final VoidCallback? onSignUpSuccess;
+  final Function(String error)? onSignUpError;
+  final VoidCallback? onSignInTap;
   final Map<String, dynamic>? config;
 
-  const SignInStartupWidget({
+  const SignUpStartupWidget({
     super.key,
     required this.viewModel,
     required this.state,
-    this.onSignInSuccess,
-    this.onSignInError,
-    this.onSignUpTap,
-    this.onForgotPasswordTap,
+    this.onSignUpSuccess,
+    this.onSignUpError,
+    this.onSignInTap,
     this.config,
   });
 
   @override
-  State<SignInStartupWidget> createState() => _SignInStartupWidgetState();
+  State<SignUpStartupWidget> createState() => _SignUpStartupWidgetState();
 }
 
-class _SignInStartupWidgetState extends State<SignInStartupWidget>
+class _SignUpStartupWidgetState extends State<SignUpStartupWidget>
     with SingleTickerProviderStateMixin {
-  SignInStatus? _lastHandledStatus;
+  SignUpStatus? _lastHandledStatus;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.index = 1; // Default to Sign Up tab
   }
 
   @override
@@ -55,26 +51,29 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
   }
 
   @override
-  void didUpdateWidget(SignInStartupWidget oldWidget) {
+  void didUpdateWidget(SignUpStartupWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Handle success callback
-    if (widget.state.status == SignInStatus.success &&
-        _lastHandledStatus != SignInStatus.success) {
-      _lastHandledStatus = SignInStatus.success;
+    // Handle success/error callbacks only when status changes
+    if (widget.state.status == SignUpStatus.success &&
+        _lastHandledStatus != SignUpStatus.success) {
+      _lastHandledStatus = SignUpStatus.success;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSignInSuccess?.call();
+        widget.onSignUpSuccess?.call();
       });
-    }
-    // Handle error callback
-    else if (widget.state.status == SignInStatus.error &&
+    } else if (widget.state.status == SignUpStatus.error &&
         widget.state.errorMessage != null &&
-        _lastHandledStatus != SignInStatus.error) {
-      _lastHandledStatus = SignInStatus.error;
+        _lastHandledStatus != SignUpStatus.error) {
+      _lastHandledStatus = SignUpStatus.error;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSignInError?.call(widget.state.errorMessage!);
+        widget.onSignUpError?.call(widget.state.errorMessage!);
       });
     }
+  }
+
+  /// Get config value with fallback
+  String _getConfigValue(String key, String fallback) {
+    return widget.config?[key] ?? fallback;
   }
 
   @override
@@ -83,12 +82,10 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
       backgroundColor: OsmeaColors.paperWhite,
       body: Column(
         children: [
-          // 🎨 Top Gradient Section with Tabs
           _buildGradientHeader(context),
-
-          // 📋 Form Content
           Expanded(
             child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(
                 horizontal: context.spacing24,
                 vertical: context.spacing32,
@@ -96,24 +93,13 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
               child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 📧 Email Field
                   _buildEmailField(context),
-
                   OsmeaComponents.sizedBox(height: context.spacing20),
-
-                  // 🔑 Password Field
                   _buildPasswordField(context),
-
-                  OsmeaComponents.sizedBox(height: context.spacing16),
-
-                  // 🔗 Remember Me & Forgot Password
-                  _buildRememberMeAndForgotPassword(context),
-
+                  OsmeaComponents.sizedBox(height: context.spacing20),
+                  _buildPasswordConfirmField(context),
                   OsmeaComponents.sizedBox(height: context.spacing32),
-
-                  // ✅ Sign In Button
-                  _buildSignInButton(context),
-
+                  _buildSignUpButton(context),
                   OsmeaComponents.sizedBox(height: context.spacing64),
                 ],
               ),
@@ -122,11 +108,6 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
         ],
       ),
     );
-  }
-
-  /// Get config value with fallback
-  String _getConfigValue(String key, String fallback) {
-    return widget.config?[key] ?? fallback;
   }
 
   /// 🎨 Gradient Header with Tabs
@@ -198,9 +179,9 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              setState(() {
-                                _tabController.index = 0;
-                              });
+                              if (widget.onSignInTap != null) {
+                                widget.onSignInTap!();
+                              }
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -242,9 +223,9 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              if (widget.onSignUpTap != null) {
-                                widget.onSignUpTap!();
-                              }
+                              setState(() {
+                                _tabController.index = 1;
+                              });
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -343,7 +324,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
           keyboardType: TextInputType.emailAddress,
           onChanged: widget.viewModel.updateEmail,
           errorText: widget.state.emailError,
-          enabled: widget.state.status != SignInStatus.loading,
+          enabled: widget.state.status != SignUpStatus.loading,
         ),
       ],
     );
@@ -383,7 +364,7 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
           obscureText: widget.state.obscurePassword,
           onChanged: widget.viewModel.updatePassword,
           errorText: widget.state.passwordError,
-          enabled: widget.state.status != SignInStatus.loading,
+          enabled: widget.state.status != SignUpStatus.loading,
           suffixIcon: IconButton(
             icon: Icon(
               widget.state.obscurePassword
@@ -399,54 +380,66 @@ class _SignInStartupWidgetState extends State<SignInStartupWidget>
     );
   }
 
-  /// 🔗 Remember Me & Forgot Password
-  Widget _buildRememberMeAndForgotPassword(BuildContext context) {
-    return OsmeaComponents.row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  /// 🔑 Password Confirmation Field
+  Widget _buildPasswordConfirmField(BuildContext context) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Remember Me Checkbox
-        OsmeaComponents.row(
-          children: [
-            OsmeaComponents.checkbox(
-              value: widget.state.rememberMe,
-              onChanged: (value) => widget.viewModel.toggleRememberMe(),
-              activeColor: Color(0xFF4A6FE8),
-              size: CheckboxSize.small,
-            ),
-            OsmeaComponents.sizedBox(width: context.spacing8),
-            OsmeaComponents.text(
-              _getConfigValue('remember_me_label', 'Beni Hatırla'),
-              variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.thunder,
-              fontWeight: FontWeight.w400,
-            ),
-          ],
-        ),
-
-        // Forgot Password Link
-        if (widget.onForgotPasswordTap != null)
-          GestureDetector(
-            onTap: widget.onForgotPasswordTap,
-            child: OsmeaComponents.text(
-              _getConfigValue('forgot_password_label', 'Şifremi Unuttum'),
-              variant: OsmeaTextVariant.bodyMedium,
-              color: Color(0xFF4A6FE8),
-              fontWeight: FontWeight.w500,
-            ),
+        // Label with asterisk
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: _getConfigValue('password_confirm_label', 'Şifre Tekrar'),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.thunder,
+                ),
+              ),
+              TextSpan(
+                text: '*',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red,
+                ),
+              ),
+            ],
           ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          hint: _getConfigValue('password_confirm_hint', 'Giriniz'),
+          obscureText: widget.state.obscurePasswordConfirm,
+          onChanged: widget.viewModel.updatePasswordConfirm,
+          errorText: widget.state.passwordConfirmError,
+          enabled: widget.state.status != SignUpStatus.loading,
+          suffixIcon: IconButton(
+            icon: Icon(
+              widget.state.obscurePasswordConfirm
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              color: OsmeaColors.thunder.withOpacity(0.4),
+              size: 20,
+            ),
+            onPressed: widget.viewModel.togglePasswordConfirmVisibility,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildSignInButton(BuildContext context) {
-    final isLoading = widget.state.status == SignInStatus.loading;
+  /// ✅ Sign Up Button
+  Widget _buildSignUpButton(BuildContext context) {
+    final isLoading = widget.state.status == SignUpStatus.loading;
     final isEnabled = widget.state.isValid && !isLoading;
 
     return OsmeaComponents.button(
       text: isLoading
-          ? _getConfigValue('sign_in_button_loading', 'Giriş yapılıyor...')
-          : _getConfigValue('sign_in_button', 'Devam Et'),
-      onPressed: isEnabled ? widget.viewModel.signIn : null,
+          ? _getConfigValue('sign_up_button_loading', 'Hesap oluşturuluyor...')
+          : _getConfigValue('sign_up_button', 'Devam Et'),
+      onPressed: isEnabled ? widget.viewModel.signUp : null,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
