@@ -250,11 +250,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<UpdateCustomerResponse> updateCustomer({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required UpdateCustomerRequest request,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -286,7 +287,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<SelectShippingRateResponse> selectShippingRate({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required int packageId,
     required String rateId,
   }) async {
@@ -295,6 +296,7 @@ class _CartServiceClient implements CartServiceClient {
       r'package_id': packageId,
       r'rate_id': rateId,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,

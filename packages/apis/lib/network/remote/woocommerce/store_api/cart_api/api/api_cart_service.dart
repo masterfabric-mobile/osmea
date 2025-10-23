@@ -103,7 +103,7 @@ abstract class CartServiceClient implements CartService {
   Future<UpdateCustomerResponse> updateCustomer({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Body() required UpdateCustomerRequest request,
   });
 
@@ -114,7 +114,7 @@ abstract class CartServiceClient implements CartService {
   Future<SelectShippingRateResponse> selectShippingRate({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('package_id') required int packageId,
     @Query('rate_id') required String rateId,
   });

@@ -71,7 +71,7 @@ abstract class CartService {
   Future<UpdateCustomerResponse> updateCustomer({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required UpdateCustomerRequest request,
   });
 
@@ -80,7 +80,7 @@ abstract class CartService {
   Future<SelectShippingRateResponse> selectShippingRate({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required int packageId,
     required String rateId,
   });
