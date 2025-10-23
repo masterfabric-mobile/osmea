@@ -40,6 +40,8 @@ dependencies:
   flutter_html: ^3.0.0 # HTML rendering for CoreRawDataViewer
   flutter_inappwebview: ^6.1.5 # WebView functionality for CoreWebViewViewer
   webview_flutter: ^4.10.0 # Native WebView for mobile platforms
+  timezone: ^0.10.1 # Timezone handling 
+  flutter_local_notifications: ^19.4.2 # Local notifications
   osmea_components:
     path: ../components
  

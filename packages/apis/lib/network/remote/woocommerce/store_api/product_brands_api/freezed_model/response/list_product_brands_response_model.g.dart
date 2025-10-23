@@ -23,18 +23,26 @@ _$ListProductBrandsResponseModelImpl
         );
 
 Map<String, dynamic> _$$ListProductBrandsResponseModelImplToJson(
-        _$ListProductBrandsResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.slug case final value?) 'slug': value,
-      if (instance.description case final value?) 'description': value,
-      if (instance.parent case final value?) 'parent': value,
-      if (instance.count case final value?) 'count': value,
-      if (instance.image?.toJson() case final value?) 'image': value,
-      if (instance.reviewCount case final value?) 'review_count': value,
-      if (instance.permalink case final value?) 'permalink': value,
-    };
+    _$ListProductBrandsResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('slug', instance.slug);
+  writeNotNull('description', instance.description);
+  writeNotNull('parent', instance.parent);
+  writeNotNull('count', instance.count);
+  writeNotNull('image', instance.image?.toJson());
+  writeNotNull('review_count', instance.reviewCount);
+  writeNotNull('permalink', instance.permalink);
+  return val;
+}
 
 _$ImageImpl _$$ImageImplFromJson(Map<String, dynamic> json) => _$ImageImpl(
       id: (json['id'] as num?)?.toInt(),
@@ -46,13 +54,21 @@ _$ImageImpl _$$ImageImplFromJson(Map<String, dynamic> json) => _$ImageImpl(
       alt: json['alt'] as String?,
     );
 
-Map<String, dynamic> _$$ImageImplToJson(_$ImageImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.src case final value?) 'src': value,
-      if (instance.thumbnail case final value?) 'thumbnail': value,
-      if (instance.srcset case final value?) 'srcset': value,
-      if (instance.sizes case final value?) 'sizes': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.alt case final value?) 'alt': value,
-    };
+Map<String, dynamic> _$$ImageImplToJson(_$ImageImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('src', instance.src);
+  writeNotNull('thumbnail', instance.thumbnail);
+  writeNotNull('srcset', instance.srcset);
+  writeNotNull('sizes', instance.sizes);
+  writeNotNull('name', instance.name);
+  writeNotNull('alt', instance.alt);
+  return val;
+}

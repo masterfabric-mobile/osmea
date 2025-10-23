@@ -91,9 +91,12 @@ class _IntroScreenState extends State<IntroScreen>
 
   Future<void> _handleProceed() async {
     try {
+      // Mark onboarding as completed without requesting permissions
       await _markOnboardingCompleted();
-    } catch (_) {
-      // Ignore errors; continue navigation regardless
+    } catch (e) {
+      debugPrint('❌ Error in onboarding completion: $e');
+      // Still mark onboarding as completed even if there's an error
+      await _markOnboardingCompleted();
     }
     _goToLogin();
   }
