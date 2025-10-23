@@ -54,7 +54,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<AddItemResponse> addItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required int id,
     required int quantity,
     List<dynamic>? variation,
@@ -98,11 +98,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<RemoveItemResponse> removeItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String key,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'key': key};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -134,7 +135,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<UpdateItemResponse> updateItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String key,
     required int quantity,
   }) async {
@@ -143,6 +144,7 @@ class _CartServiceClient implements CartServiceClient {
       r'key': key,
       r'quantity': quantity,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -174,11 +176,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<ApplyCouponResponse> applyCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String code,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'code': code};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -210,11 +213,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<RemoveCouponResponse> removeCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String code,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'code': code};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
