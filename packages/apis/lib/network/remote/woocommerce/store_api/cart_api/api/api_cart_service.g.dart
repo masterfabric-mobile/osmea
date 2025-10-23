@@ -19,10 +19,15 @@ class _CartServiceClient implements CartServiceClient {
   String? baseUrl;
 
   @override
-  Future<GetCartResponse> getCart({required String apiVersion}) async {
+  Future<GetCartResponse> getCart({
+    required String apiVersion,
+    String? jwtToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': jwtToken};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<GetCartResponse>(Options(

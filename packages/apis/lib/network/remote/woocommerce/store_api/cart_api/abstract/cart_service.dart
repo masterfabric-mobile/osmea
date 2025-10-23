@@ -12,8 +12,10 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model
 /// Implement this to fetch cart from WooCommerce Store API! 🌐
 abstract class CartService {
   /// 🚀 Fetches the cart contents from the WooCommerce Store API.
+  /// JWT token is optional - you can get it from this response for subsequent requests.
   Future<GetCartResponse> getCart({
     required String apiVersion,
+    String? jwtToken,
   });
 
   /// 🛒 Adds an item to the cart using WooCommerce Store API.

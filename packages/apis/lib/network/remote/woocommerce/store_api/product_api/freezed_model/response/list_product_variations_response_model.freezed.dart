@@ -1336,9 +1336,9 @@ mixin _$Category {
   @JsonKey(name: "id")
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: "name")
-  Name? get name => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "slug")
-  Slug? get slug => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
   @JsonKey(name: "link")
   String? get link => throw _privateConstructorUsedError;
 
@@ -1355,8 +1355,8 @@ abstract class $CategoryCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "name") Name? name,
-      @JsonKey(name: "slug") Slug? slug,
+      @JsonKey(name: "name") String? name,
+      @JsonKey(name: "slug") String? slug,
       @JsonKey(name: "link") String? link});
 }
 
@@ -1386,11 +1386,11 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as Slug?,
+              as String?,
       link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
@@ -1409,8 +1409,8 @@ abstract class _$$CategoryImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "name") Name? name,
-      @JsonKey(name: "slug") Slug? slug,
+      @JsonKey(name: "name") String? name,
+      @JsonKey(name: "slug") String? slug,
       @JsonKey(name: "link") String? link});
 }
 
@@ -1438,11 +1438,11 @@ class __$$CategoryImplCopyWithImpl<$Res>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as Slug?,
+              as String?,
       link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
@@ -1468,10 +1468,10 @@ class _$CategoryImpl implements _Category {
   final int? id;
   @override
   @JsonKey(name: "name")
-  final Name? name;
+  final String? name;
   @override
   @JsonKey(name: "slug")
-  final Slug? slug;
+  final String? slug;
   @override
   @JsonKey(name: "link")
   final String? link;
@@ -1513,8 +1513,8 @@ class _$CategoryImpl implements _Category {
 abstract class _Category implements Category {
   const factory _Category(
       {@JsonKey(name: "id") final int? id,
-      @JsonKey(name: "name") final Name? name,
-      @JsonKey(name: "slug") final Slug? slug,
+      @JsonKey(name: "name") final String? name,
+      @JsonKey(name: "slug") final String? slug,
       @JsonKey(name: "link") final String? link}) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
@@ -1525,10 +1525,10 @@ abstract class _Category implements Category {
   int? get id;
   @override
   @JsonKey(name: "name")
-  Name? get name;
+  String? get name;
   @override
   @JsonKey(name: "slug")
-  Slug? get slug;
+  String? get slug;
   @override
   @JsonKey(name: "link")
   String? get link;
@@ -1634,7 +1634,7 @@ mixin _$Image {
   @JsonKey(name: "srcset")
   String? get srcset => throw _privateConstructorUsedError;
   @JsonKey(name: "sizes")
-  Sizes? get sizes => throw _privateConstructorUsedError;
+  String? get sizes => throw _privateConstructorUsedError;
   @JsonKey(name: "name")
   String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "alt")
@@ -1655,7 +1655,7 @@ abstract class $ImageCopyWith<$Res> {
       @JsonKey(name: "src") String? src,
       @JsonKey(name: "thumbnail") String? thumbnail,
       @JsonKey(name: "srcset") String? srcset,
-      @JsonKey(name: "sizes") Sizes? sizes,
+      @JsonKey(name: "sizes") String? sizes,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "alt") String? alt});
 }
@@ -1701,7 +1701,7 @@ class _$ImageCopyWithImpl<$Res, $Val extends Image>
       sizes: freezed == sizes
           ? _value.sizes
           : sizes // ignore: cast_nullable_to_non_nullable
-              as Sizes?,
+              as String?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -1726,7 +1726,7 @@ abstract class _$$ImageImplCopyWith<$Res> implements $ImageCopyWith<$Res> {
       @JsonKey(name: "src") String? src,
       @JsonKey(name: "thumbnail") String? thumbnail,
       @JsonKey(name: "srcset") String? srcset,
-      @JsonKey(name: "sizes") Sizes? sizes,
+      @JsonKey(name: "sizes") String? sizes,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "alt") String? alt});
 }
@@ -1770,7 +1770,7 @@ class __$$ImageImplCopyWithImpl<$Res>
       sizes: freezed == sizes
           ? _value.sizes
           : sizes // ignore: cast_nullable_to_non_nullable
-              as Sizes?,
+              as String?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -1812,7 +1812,7 @@ class _$ImageImpl implements _Image {
   final String? srcset;
   @override
   @JsonKey(name: "sizes")
-  final Sizes? sizes;
+  final String? sizes;
   @override
   @JsonKey(name: "name")
   final String? name;
@@ -1865,7 +1865,7 @@ abstract class _Image implements Image {
       @JsonKey(name: "src") final String? src,
       @JsonKey(name: "thumbnail") final String? thumbnail,
       @JsonKey(name: "srcset") final String? srcset,
-      @JsonKey(name: "sizes") final Sizes? sizes,
+      @JsonKey(name: "sizes") final String? sizes,
       @JsonKey(name: "name") final String? name,
       @JsonKey(name: "alt") final String? alt}) = _$ImageImpl;
 
@@ -1885,7 +1885,7 @@ abstract class _Image implements Image {
   String? get srcset;
   @override
   @JsonKey(name: "sizes")
-  Sizes? get sizes;
+  String? get sizes;
   @override
   @JsonKey(name: "name")
   String? get name;

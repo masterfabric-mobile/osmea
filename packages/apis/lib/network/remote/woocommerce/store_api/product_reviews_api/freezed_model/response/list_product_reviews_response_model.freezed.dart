@@ -24,11 +24,11 @@ mixin _$ListProductReviewsResponseModel {
   @JsonKey(name: "id")
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: "date_created")
-  DateTime? get dateCreated => throw _privateConstructorUsedError;
+  String? get dateCreated => throw _privateConstructorUsedError;
   @JsonKey(name: "formatted_date_created")
   String? get formattedDateCreated => throw _privateConstructorUsedError;
   @JsonKey(name: "date_created_gmt")
-  DateTime? get dateCreatedGmt => throw _privateConstructorUsedError;
+  String? get dateCreatedGmt => throw _privateConstructorUsedError;
   @JsonKey(name: "product_id")
   int? get productId => throw _privateConstructorUsedError;
   @JsonKey(name: "product_name")
@@ -46,7 +46,7 @@ mixin _$ListProductReviewsResponseModel {
   @JsonKey(name: "verified")
   bool? get verified => throw _privateConstructorUsedError;
   @JsonKey(name: "reviewer_avatar_urls")
-  Map<String, String>? get reviewerAvatarUrls =>
+  ReviewerAvatarUrls? get reviewerAvatarUrls =>
       throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -65,9 +65,9 @@ abstract class $ListProductReviewsResponseModelCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "date_created") DateTime? dateCreated,
+      @JsonKey(name: "date_created") String? dateCreated,
       @JsonKey(name: "formatted_date_created") String? formattedDateCreated,
-      @JsonKey(name: "date_created_gmt") DateTime? dateCreatedGmt,
+      @JsonKey(name: "date_created_gmt") String? dateCreatedGmt,
       @JsonKey(name: "product_id") int? productId,
       @JsonKey(name: "product_name") String? productName,
       @JsonKey(name: "product_permalink") String? productPermalink,
@@ -77,9 +77,10 @@ abstract class $ListProductReviewsResponseModelCopyWith<$Res> {
       @JsonKey(name: "rating") int? rating,
       @JsonKey(name: "verified") bool? verified,
       @JsonKey(name: "reviewer_avatar_urls")
-      Map<String, String>? reviewerAvatarUrls});
+      ReviewerAvatarUrls? reviewerAvatarUrls});
 
   $ProductImageCopyWith<$Res>? get productImage;
+  $ReviewerAvatarUrlsCopyWith<$Res>? get reviewerAvatarUrls;
 }
 
 /// @nodoc
@@ -118,7 +119,7 @@ class _$ListProductReviewsResponseModelCopyWithImpl<$Res,
       dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as String?,
       formattedDateCreated: freezed == formattedDateCreated
           ? _value.formattedDateCreated
           : formattedDateCreated // ignore: cast_nullable_to_non_nullable
@@ -126,7 +127,7 @@ class _$ListProductReviewsResponseModelCopyWithImpl<$Res,
       dateCreatedGmt: freezed == dateCreatedGmt
           ? _value.dateCreatedGmt
           : dateCreatedGmt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as String?,
       productId: freezed == productId
           ? _value.productId
           : productId // ignore: cast_nullable_to_non_nullable
@@ -162,7 +163,7 @@ class _$ListProductReviewsResponseModelCopyWithImpl<$Res,
       reviewerAvatarUrls: freezed == reviewerAvatarUrls
           ? _value.reviewerAvatarUrls
           : reviewerAvatarUrls // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
+              as ReviewerAvatarUrls?,
     ) as $Val);
   }
 
@@ -175,6 +176,19 @@ class _$ListProductReviewsResponseModelCopyWithImpl<$Res,
 
     return $ProductImageCopyWith<$Res>(_value.productImage!, (value) {
       return _then(_value.copyWith(productImage: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ReviewerAvatarUrlsCopyWith<$Res>? get reviewerAvatarUrls {
+    if (_value.reviewerAvatarUrls == null) {
+      return null;
+    }
+
+    return $ReviewerAvatarUrlsCopyWith<$Res>(_value.reviewerAvatarUrls!,
+        (value) {
+      return _then(_value.copyWith(reviewerAvatarUrls: value) as $Val);
     });
   }
 }
@@ -190,9 +204,9 @@ abstract class _$$ListProductReviewsResponseModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "date_created") DateTime? dateCreated,
+      @JsonKey(name: "date_created") String? dateCreated,
       @JsonKey(name: "formatted_date_created") String? formattedDateCreated,
-      @JsonKey(name: "date_created_gmt") DateTime? dateCreatedGmt,
+      @JsonKey(name: "date_created_gmt") String? dateCreatedGmt,
       @JsonKey(name: "product_id") int? productId,
       @JsonKey(name: "product_name") String? productName,
       @JsonKey(name: "product_permalink") String? productPermalink,
@@ -202,10 +216,12 @@ abstract class _$$ListProductReviewsResponseModelImplCopyWith<$Res>
       @JsonKey(name: "rating") int? rating,
       @JsonKey(name: "verified") bool? verified,
       @JsonKey(name: "reviewer_avatar_urls")
-      Map<String, String>? reviewerAvatarUrls});
+      ReviewerAvatarUrls? reviewerAvatarUrls});
 
   @override
   $ProductImageCopyWith<$Res>? get productImage;
+  @override
+  $ReviewerAvatarUrlsCopyWith<$Res>? get reviewerAvatarUrls;
 }
 
 /// @nodoc
@@ -243,7 +259,7 @@ class __$$ListProductReviewsResponseModelImplCopyWithImpl<$Res>
       dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as String?,
       formattedDateCreated: freezed == formattedDateCreated
           ? _value.formattedDateCreated
           : formattedDateCreated // ignore: cast_nullable_to_non_nullable
@@ -251,7 +267,7 @@ class __$$ListProductReviewsResponseModelImplCopyWithImpl<$Res>
       dateCreatedGmt: freezed == dateCreatedGmt
           ? _value.dateCreatedGmt
           : dateCreatedGmt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+              as String?,
       productId: freezed == productId
           ? _value.productId
           : productId // ignore: cast_nullable_to_non_nullable
@@ -285,9 +301,9 @@ class __$$ListProductReviewsResponseModelImplCopyWithImpl<$Res>
           : verified // ignore: cast_nullable_to_non_nullable
               as bool?,
       reviewerAvatarUrls: freezed == reviewerAvatarUrls
-          ? _value._reviewerAvatarUrls
+          ? _value.reviewerAvatarUrls
           : reviewerAvatarUrls // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>?,
+              as ReviewerAvatarUrls?,
     ));
   }
 }
@@ -309,9 +325,7 @@ class _$ListProductReviewsResponseModelImpl
       @JsonKey(name: "review") this.review,
       @JsonKey(name: "rating") this.rating,
       @JsonKey(name: "verified") this.verified,
-      @JsonKey(name: "reviewer_avatar_urls")
-      final Map<String, String>? reviewerAvatarUrls})
-      : _reviewerAvatarUrls = reviewerAvatarUrls;
+      @JsonKey(name: "reviewer_avatar_urls") this.reviewerAvatarUrls});
 
   factory _$ListProductReviewsResponseModelImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -322,13 +336,13 @@ class _$ListProductReviewsResponseModelImpl
   final int? id;
   @override
   @JsonKey(name: "date_created")
-  final DateTime? dateCreated;
+  final String? dateCreated;
   @override
   @JsonKey(name: "formatted_date_created")
   final String? formattedDateCreated;
   @override
   @JsonKey(name: "date_created_gmt")
-  final DateTime? dateCreatedGmt;
+  final String? dateCreatedGmt;
   @override
   @JsonKey(name: "product_id")
   final int? productId;
@@ -353,17 +367,9 @@ class _$ListProductReviewsResponseModelImpl
   @override
   @JsonKey(name: "verified")
   final bool? verified;
-  final Map<String, String>? _reviewerAvatarUrls;
   @override
   @JsonKey(name: "reviewer_avatar_urls")
-  Map<String, String>? get reviewerAvatarUrls {
-    final value = _reviewerAvatarUrls;
-    if (value == null) return null;
-    if (_reviewerAvatarUrls is EqualUnmodifiableMapView)
-      return _reviewerAvatarUrls;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
+  final ReviewerAvatarUrls? reviewerAvatarUrls;
 
   @override
   String toString() {
@@ -396,8 +402,8 @@ class _$ListProductReviewsResponseModelImpl
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.verified, verified) ||
                 other.verified == verified) &&
-            const DeepCollectionEquality()
-                .equals(other._reviewerAvatarUrls, _reviewerAvatarUrls));
+            (identical(other.reviewerAvatarUrls, reviewerAvatarUrls) ||
+                other.reviewerAvatarUrls == reviewerAvatarUrls));
   }
 
   @JsonKey(ignore: true)
@@ -416,7 +422,7 @@ class _$ListProductReviewsResponseModelImpl
       review,
       rating,
       verified,
-      const DeepCollectionEquality().hash(_reviewerAvatarUrls));
+      reviewerAvatarUrls);
 
   @JsonKey(ignore: true)
   @override
@@ -438,10 +444,10 @@ abstract class _ListProductReviewsResponseModel
     implements ListProductReviewsResponseModel {
   const factory _ListProductReviewsResponseModel(
           {@JsonKey(name: "id") final int? id,
-          @JsonKey(name: "date_created") final DateTime? dateCreated,
+          @JsonKey(name: "date_created") final String? dateCreated,
           @JsonKey(name: "formatted_date_created")
           final String? formattedDateCreated,
-          @JsonKey(name: "date_created_gmt") final DateTime? dateCreatedGmt,
+          @JsonKey(name: "date_created_gmt") final String? dateCreatedGmt,
           @JsonKey(name: "product_id") final int? productId,
           @JsonKey(name: "product_name") final String? productName,
           @JsonKey(name: "product_permalink") final String? productPermalink,
@@ -451,7 +457,7 @@ abstract class _ListProductReviewsResponseModel
           @JsonKey(name: "rating") final int? rating,
           @JsonKey(name: "verified") final bool? verified,
           @JsonKey(name: "reviewer_avatar_urls")
-          final Map<String, String>? reviewerAvatarUrls}) =
+          final ReviewerAvatarUrls? reviewerAvatarUrls}) =
       _$ListProductReviewsResponseModelImpl;
 
   factory _ListProductReviewsResponseModel.fromJson(Map<String, dynamic> json) =
@@ -462,13 +468,13 @@ abstract class _ListProductReviewsResponseModel
   int? get id;
   @override
   @JsonKey(name: "date_created")
-  DateTime? get dateCreated;
+  String? get dateCreated;
   @override
   @JsonKey(name: "formatted_date_created")
   String? get formattedDateCreated;
   @override
   @JsonKey(name: "date_created_gmt")
-  DateTime? get dateCreatedGmt;
+  String? get dateCreatedGmt;
   @override
   @JsonKey(name: "product_id")
   int? get productId;
@@ -495,7 +501,7 @@ abstract class _ListProductReviewsResponseModel
   bool? get verified;
   @override
   @JsonKey(name: "reviewer_avatar_urls")
-  Map<String, String>? get reviewerAvatarUrls;
+  ReviewerAvatarUrls? get reviewerAvatarUrls;
   @override
   @JsonKey(ignore: true)
   _$$ListProductReviewsResponseModelImplCopyWith<
@@ -783,5 +789,195 @@ abstract class _ProductImage implements ProductImage {
   @override
   @JsonKey(ignore: true)
   _$$ProductImageImplCopyWith<_$ProductImageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ReviewerAvatarUrls _$ReviewerAvatarUrlsFromJson(Map<String, dynamic> json) {
+  return _ReviewerAvatarUrls.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ReviewerAvatarUrls {
+  @JsonKey(name: "24")
+  String? get the24 => throw _privateConstructorUsedError;
+  @JsonKey(name: "48")
+  String? get the48 => throw _privateConstructorUsedError;
+  @JsonKey(name: "96")
+  String? get the96 => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ReviewerAvatarUrlsCopyWith<ReviewerAvatarUrls> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ReviewerAvatarUrlsCopyWith<$Res> {
+  factory $ReviewerAvatarUrlsCopyWith(
+          ReviewerAvatarUrls value, $Res Function(ReviewerAvatarUrls) then) =
+      _$ReviewerAvatarUrlsCopyWithImpl<$Res, ReviewerAvatarUrls>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: "24") String? the24,
+      @JsonKey(name: "48") String? the48,
+      @JsonKey(name: "96") String? the96});
+}
+
+/// @nodoc
+class _$ReviewerAvatarUrlsCopyWithImpl<$Res, $Val extends ReviewerAvatarUrls>
+    implements $ReviewerAvatarUrlsCopyWith<$Res> {
+  _$ReviewerAvatarUrlsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? the24 = freezed,
+    Object? the48 = freezed,
+    Object? the96 = freezed,
+  }) {
+    return _then(_value.copyWith(
+      the24: freezed == the24
+          ? _value.the24
+          : the24 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      the48: freezed == the48
+          ? _value.the48
+          : the48 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      the96: freezed == the96
+          ? _value.the96
+          : the96 // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ReviewerAvatarUrlsImplCopyWith<$Res>
+    implements $ReviewerAvatarUrlsCopyWith<$Res> {
+  factory _$$ReviewerAvatarUrlsImplCopyWith(_$ReviewerAvatarUrlsImpl value,
+          $Res Function(_$ReviewerAvatarUrlsImpl) then) =
+      __$$ReviewerAvatarUrlsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: "24") String? the24,
+      @JsonKey(name: "48") String? the48,
+      @JsonKey(name: "96") String? the96});
+}
+
+/// @nodoc
+class __$$ReviewerAvatarUrlsImplCopyWithImpl<$Res>
+    extends _$ReviewerAvatarUrlsCopyWithImpl<$Res, _$ReviewerAvatarUrlsImpl>
+    implements _$$ReviewerAvatarUrlsImplCopyWith<$Res> {
+  __$$ReviewerAvatarUrlsImplCopyWithImpl(_$ReviewerAvatarUrlsImpl _value,
+      $Res Function(_$ReviewerAvatarUrlsImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? the24 = freezed,
+    Object? the48 = freezed,
+    Object? the96 = freezed,
+  }) {
+    return _then(_$ReviewerAvatarUrlsImpl(
+      the24: freezed == the24
+          ? _value.the24
+          : the24 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      the48: freezed == the48
+          ? _value.the48
+          : the48 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      the96: freezed == the96
+          ? _value.the96
+          : the96 // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ReviewerAvatarUrlsImpl implements _ReviewerAvatarUrls {
+  const _$ReviewerAvatarUrlsImpl(
+      {@JsonKey(name: "24") this.the24,
+      @JsonKey(name: "48") this.the48,
+      @JsonKey(name: "96") this.the96});
+
+  factory _$ReviewerAvatarUrlsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ReviewerAvatarUrlsImplFromJson(json);
+
+  @override
+  @JsonKey(name: "24")
+  final String? the24;
+  @override
+  @JsonKey(name: "48")
+  final String? the48;
+  @override
+  @JsonKey(name: "96")
+  final String? the96;
+
+  @override
+  String toString() {
+    return 'ReviewerAvatarUrls(the24: $the24, the48: $the48, the96: $the96)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ReviewerAvatarUrlsImpl &&
+            (identical(other.the24, the24) || other.the24 == the24) &&
+            (identical(other.the48, the48) || other.the48 == the48) &&
+            (identical(other.the96, the96) || other.the96 == the96));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, the24, the48, the96);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ReviewerAvatarUrlsImplCopyWith<_$ReviewerAvatarUrlsImpl> get copyWith =>
+      __$$ReviewerAvatarUrlsImplCopyWithImpl<_$ReviewerAvatarUrlsImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ReviewerAvatarUrlsImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ReviewerAvatarUrls implements ReviewerAvatarUrls {
+  const factory _ReviewerAvatarUrls(
+      {@JsonKey(name: "24") final String? the24,
+      @JsonKey(name: "48") final String? the48,
+      @JsonKey(name: "96") final String? the96}) = _$ReviewerAvatarUrlsImpl;
+
+  factory _ReviewerAvatarUrls.fromJson(Map<String, dynamic> json) =
+      _$ReviewerAvatarUrlsImpl.fromJson;
+
+  @override
+  @JsonKey(name: "24")
+  String? get the24;
+  @override
+  @JsonKey(name: "48")
+  String? get the48;
+  @override
+  @JsonKey(name: "96")
+  String? get the96;
+  @override
+  @JsonKey(ignore: true)
+  _$$ReviewerAvatarUrlsImplCopyWith<_$ReviewerAvatarUrlsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

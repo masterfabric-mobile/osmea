@@ -30,10 +30,12 @@ abstract class CartServiceClient implements CartService {
       );
 
   /// 🛒 Get cart contents from WooCommerce Store API
+  /// JWT token is optional - you can get JWT from this response for subsequent requests! 🔑
   @override
   @GET('/wp-json/wc/store/{api_version}/cart')
   Future<GetCartResponse> getCart({
     @Path('api_version') required String apiVersion,
+    @Header('Authorization') String? jwtToken,
   });
 
   /// 🛍️ Add item to cart using WooCommerce Store API
