@@ -187,7 +187,11 @@ final GoRouter appRouter = GoRouter(
         }
 
         // Handle sign up with auth service
-        Future<bool> handleSignUp(String email, String password) async {
+        Future<bool> handleSignUp(
+          String email,
+          String password,
+          bool marketingConsent,
+        ) async {
           try {
             debugPrint('🔐 Starting sign up for user: $email');
 
@@ -234,7 +238,7 @@ final GoRouter appRouter = GoRouter(
               lastName: 'User',
               authKey: authKey,
               acceptTerms: true,
-              subscribeNewsletter: false,
+              subscribeNewsletter: marketingConsent,
             );
 
             // Call API
@@ -310,6 +314,16 @@ final GoRouter appRouter = GoRouter(
             debugPrint('❌ Sign up error: $error');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(error), backgroundColor: Colors.red),
+            );
+          },
+          onForgotPasswordTap: () {
+            debugPrint('🔑 Forgot password tapped');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Password reset feature coming soon!'),
+                backgroundColor: Colors.blue,
+                duration: Duration(seconds: 2),
+              ),
             );
           },
           arguments: {
