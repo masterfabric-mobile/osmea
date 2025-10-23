@@ -237,8 +237,10 @@ final GoRouter appRouter = GoRouter(
               firstName: username,
               lastName: 'User',
               authKey: authKey,
-              acceptTerms: true,
-              subscribeNewsletter: marketingConsent,
+              userMeta: UserMeta(
+                acceptTerms: true,
+                subscribeNewsletter: marketingConsent,
+              ),
             );
 
             // Call API
