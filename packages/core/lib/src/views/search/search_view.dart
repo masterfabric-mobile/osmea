@@ -4,7 +4,6 @@ import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/search/cubit/search_state.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:osmea_components/osmea_components.dart';
-import 'package:osmea_components/src/components/appbar_searchbar/appbar_searchbar.dart';
 
 /// 🔍 **OSMEA Search View**
 ///
@@ -30,6 +29,7 @@ import 'package:osmea_components/src/components/appbar_searchbar/appbar_searchba
 ///   searchHint: 'Search for products...',
 ///   searchProvider: (query) async => await searchAPI(query),
 ///   onSearchResult: (results) => handleResults(results),
+///   body: MyCustomSearchWidget(), // Optional custom body
 /// )
 /// ```
 ///
@@ -84,6 +84,9 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 🎨 Background color for the scaffold
   final Color? backgroundColor;
 
+  /// 📏 AppBar elevation
+  final double elevation;
+
   /// ⬅️ Whether to show back button
   final bool showBackButton;
 
@@ -98,6 +101,15 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
   /// 📜 Initial search history
   final List<String> initialHistory;
+
+  /// 📱 Body widget to display instead of default search body
+  final Widget? body;
+
+  /// 📷 Whether to show barcode scanner action
+  final bool showBarcodeScanner;
+
+  /// 🎤 Whether to show voice search action
+  final bool showVoiceSearch;
 
   SearchView({
     super.key,
@@ -119,11 +131,15 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.searchBarVariant = SearchbarVariant.outlined,
     this.searchBarSize = TextFieldSize.medium,
     this.backgroundColor,
+    this.elevation = 0,
     this.showBackButton = true,
     this.onBackPressed,
     this.maxHistoryItems = 10,
     this.minQueryLength = 2,
     this.initialHistory = const [],
+    this.body,
+    this.showBarcodeScanner = true,
+    this.showVoiceSearch = true,
   }) : super(
           goRoute: goRoute,
           arguments: arguments,
@@ -154,9 +170,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
       backgroundColor: backgroundColor,
       appBar: _buildAppBar(context, viewModel, state),
       body: SafeArea(
-        child: Center(
-          child: _buildBody(context, viewModel, state),
-        ),
+        child: body ??
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: _buildBody(context, viewModel, state),
+            ),
       ),
     );
   }
@@ -166,73 +185,35 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
       BuildContext context, SearchCubit viewModel, SearchState state) {
     // Get app bar color from configuration
     final AssetConfigHelper configHelper = AssetConfigHelper();
-    final Color appBarBgColor =
+    final Color configAppBarBgColor =
         configHelper.getSearchAppBarColor(Theme.of(context).primaryColor);
 
-    return OsmeaAppBarWithSearchBar(
-      title: title ?? const Text('Search'),
+    // Test: Geçici olarak sabit renk kullan
+    final Color appBarBgColor = const Color(0xFFF6F6F6); // #F6F6F6FF
+    debugPrint('🎨 Using fixed color instead of config: $appBarBgColor');
+    debugPrint('🎨 Config would have given: $configAppBarBgColor');
+
+    // Debug: Hangi rengin kullanıldığını kontrol et
+    debugPrint('🎨 SearchView AppBar color: $appBarBgColor');
+    debugPrint(
+        '🎨 SearchView Theme primary: ${Theme.of(context).primaryColor}');
+    debugPrint(
+        '🎨 SearchView AppBar hex: #${appBarBgColor.value.toRadixString(16).toUpperCase()}');
+
+    return OsmeaComponents.appBar(
+      backgroundColor: appBarBgColor,
+      elevation: elevation,
+      variant: appBarVariant,
+      size: appBarSize,
       leading: showBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
             )
           : null,
-      actions: actions,
-      // Apply color from configuration
-      appBarBackgroundColor: appBarBgColor,
-      appBarVariant: appBarVariant,
-      appBarSize: appBarSize,
-      searchBarVariant: searchBarVariant,
-      searchBarSize: searchBarSize,
-      searchHint: searchHint ?? 'Search...',
-      searchController: searchController,
-      searchFocusNode: searchFocusNode,
-      onSearchChanged: (query) {
-        viewModel.updateQuery(query);
-        onSearchChanged?.call(query);
-
-        // Get suggestions if provider is available
-        if (searchSuggestionProvider != null) {
-          viewModel.getSuggestions(query,
-              suggestionProvider: searchSuggestionProvider);
-        }
-      },
-      onSearchSubmitted: (query) {
-        viewModel.performSearch(query, searchProvider: searchProvider);
-        onSearchSubmitted?.call(query);
-      },
-      onSearchClear: () {
-        viewModel.clearSearch();
-        onSearchClear?.call();
-      },
-      searchSuggestionProvider: searchSuggestionProvider,
-      searchProvider: searchProvider,
-      showClearButton: true,
-      showBackButton: false,
-      showSearchIcon: true,
-      showSuggestions: true,
-      minQueryLength: minQueryLength,
-      debounceDuration: const Duration(milliseconds: 300),
-      searchBarActions: [
-        IconButton(
-          icon: const Icon(Icons.qr_code_scanner, size: 20),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Barcode scanner clicked!')),
-            );
-          },
-          tooltip: 'Scan barcode',
-        ),
-        IconButton(
-          icon: const Icon(Icons.mic, size: 20),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Voice search clicked!')),
-            );
-          },
-          tooltip: 'Voice search',
-        ),
-      ],
+      title: _buildSearchBarTitle(context, viewModel, state),
+      titleAlignment: AppBarTitleAlignment.left,
+      actions: _buildAppBarActions(context, viewModel),
     );
   }
 
@@ -468,5 +449,117 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
         ),
       ),
     );
+  }
+
+  /// Build search bar as title
+  Widget _buildSearchBarTitle(
+      BuildContext context, SearchCubit viewModel, SearchState state) {
+    return OsmeaComponents.searchbar(
+      controller: searchController,
+      focusNode: searchFocusNode,
+      hint: searchHint ?? 'Searchbar',
+      size: TextFieldSize.extraLarge,
+      searchbarVariant: SearchbarVariant.borderless,
+      onChanged: (query) {
+        viewModel.updateQuery(query);
+        onSearchChanged?.call(query);
+
+        // Get suggestions if provider is available
+        if (searchSuggestionProvider != null) {
+          viewModel.getSuggestions(query,
+              suggestionProvider: searchSuggestionProvider);
+        }
+      },
+      onSubmitted: (query) {
+        viewModel.performSearch(query, searchProvider: searchProvider);
+        onSearchSubmitted?.call(query);
+      },
+      onClear: () {
+        viewModel.clearSearch();
+        onSearchClear?.call();
+      },
+      suggestionProvider: searchSuggestionProvider,
+      searchProvider: searchProvider,
+      showClearButton: true,
+      showSearchIcon: false,
+      actions: _buildSearchActions(context),
+    );
+  }
+
+  /// Build app bar actions
+  List<AppBarAction> _buildAppBarActions(
+      BuildContext context, SearchCubit viewModel) {
+    List<AppBarAction> appBarActions = [];
+
+    // Add custom actions if any
+    appBarActions.addAll(actions
+        .map((action) => AppBarAction(
+              icon: action.icon,
+              onPressed: action.isEnabled ? action.onPressed : null,
+              tooltip: action.tooltip,
+              type: action.type,
+            ))
+        .toList());
+
+    return appBarActions;
+  }
+
+  /// Build search actions based on configuration
+  List<Widget> _buildSearchActions(BuildContext context) {
+    List<Widget> actions = [];
+
+    // Add barcode scanner action if enabled
+    if (showBarcodeScanner) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.qr_code_scanner, size: 20),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Barcode scanner clicked!')),
+            );
+          },
+          tooltip: 'Scan barcode',
+        ),
+      );
+    }
+
+    // Add voice search action if enabled
+    if (showVoiceSearch) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.mic, size: 20),
+          onPressed: () {
+            OsmeaComponents.soundDialog(
+              context,
+              variant: SoundDialogVariant.standard,
+              promptTitleText: 'Voice Search',
+              recordingTitleText: 'Listening...',
+              okButtonText: 'Search',
+              cancelButtonText: 'Cancel',
+              onConfirm: (filePath) {
+                // Handle voice search result
+                debugPrint('🎤 Voice search recorded: $filePath');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Voice search completed! Processing...'),
+                  ),
+                );
+                // TODO: Implement actual voice-to-text conversion
+                // and trigger search with the converted text
+              },
+              onCancel: () {
+                debugPrint('🚫 Voice search cancelled');
+              },
+              primaryActionColor: Theme.of(context).primaryColor,
+              maxRecordingDuration: const Duration(seconds: 30),
+              autoStopOnMaxDuration: true,
+            );
+          },
+          tooltip: 'Voice search',
+        ),
+      );
+    }
+
+    return actions;
   }
 }
