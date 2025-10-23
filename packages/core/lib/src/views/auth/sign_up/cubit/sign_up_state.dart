@@ -66,6 +66,15 @@ class SignUpState extends Equatable {
   /// User data after successful registration
   final Map<String, dynamic>? userData;
 
+  /// Marketing consent - receive promotional emails/SMS
+  final bool marketingConsent;
+
+  /// Privacy policy accepted
+  final bool privacyPolicyAccepted;
+
+  /// Terms of service accepted
+  final bool termsAccepted;
+
   const SignUpState({
     this.status = SignUpStatus.initial,
     this.email = '',
@@ -79,6 +88,9 @@ class SignUpState extends Equatable {
     this.errorMessage,
     this.token,
     this.userData,
+    this.marketingConsent = false,
+    this.privacyPolicyAccepted = false,
+    this.termsAccepted = false,
   });
 
   /// Create a copy of this state with some fields changed
@@ -95,6 +107,9 @@ class SignUpState extends Equatable {
     String? errorMessage,
     String? token,
     Map<String, dynamic>? userData,
+    bool? marketingConsent,
+    bool? privacyPolicyAccepted,
+    bool? termsAccepted,
   }) {
     return SignUpState(
       status: status ?? this.status,
@@ -110,6 +125,10 @@ class SignUpState extends Equatable {
       errorMessage: errorMessage,
       token: token ?? this.token,
       userData: userData ?? this.userData,
+      marketingConsent: marketingConsent ?? this.marketingConsent,
+      privacyPolicyAccepted:
+          privacyPolicyAccepted ?? this.privacyPolicyAccepted,
+      termsAccepted: termsAccepted ?? this.termsAccepted,
     );
   }
 
@@ -121,7 +140,9 @@ class SignUpState extends Equatable {
       password == passwordConfirm &&
       emailError == null &&
       passwordError == null &&
-      passwordConfirmError == null;
+      passwordConfirmError == null &&
+      privacyPolicyAccepted &&
+      termsAccepted;
 
   /// Check if there are any validation errors
   bool get hasError =>
@@ -135,19 +156,22 @@ class SignUpState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    email,
-    password,
-    passwordConfirm,
-    obscurePassword,
-    obscurePasswordConfirm,
-    emailError,
-    passwordError,
-    passwordConfirmError,
-    errorMessage,
-    token,
-    userData,
-  ];
+        status,
+        email,
+        password,
+        passwordConfirm,
+        obscurePassword,
+        obscurePasswordConfirm,
+        emailError,
+        passwordError,
+        passwordConfirmError,
+        errorMessage,
+        token,
+        userData,
+        marketingConsent,
+        privacyPolicyAccepted,
+        termsAccepted,
+      ];
 
   @override
   String toString() {

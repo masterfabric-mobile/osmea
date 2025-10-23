@@ -39,6 +39,7 @@ class SignUpView extends MasterViewCubit<SignUpCubit, SignUpState> {
     final authCallback = arguments['onSignUp'] as Future<bool> Function(
       String,
       String,
+      bool,
     )?;
 
     if (authCallback != null) {

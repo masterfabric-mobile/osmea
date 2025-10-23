@@ -19,7 +19,8 @@ class SignUpCubit extends BaseViewModelCubit<SignUpState> {
   final AuthStorageHelper _authStorage = AuthStorageHelper();
 
   /// Callback for authentication - injected from app_routes
-  Future<bool> Function(String email, String password)? authenticationCallback;
+  Future<bool> Function(String email, String password, bool marketingConsent)?
+      authenticationCallback;
 
   /// Update email field
   void updateEmail(String email) {
@@ -60,6 +61,27 @@ class SignUpCubit extends BaseViewModelCubit<SignUpState> {
   void togglePasswordConfirmVisibility() {
     stateChanger(
       state.copyWith(obscurePasswordConfirm: !state.obscurePasswordConfirm),
+    );
+  }
+
+  /// Toggle marketing consent
+  void toggleMarketingConsent() {
+    stateChanger(
+      state.copyWith(marketingConsent: !state.marketingConsent),
+    );
+  }
+
+  /// Toggle privacy policy acceptance
+  void togglePrivacyPolicy() {
+    stateChanger(
+      state.copyWith(privacyPolicyAccepted: !state.privacyPolicyAccepted),
+    );
+  }
+
+  /// Toggle terms of service acceptance
+  void toggleTerms() {
+    stateChanger(
+      state.copyWith(termsAccepted: !state.termsAccepted),
     );
   }
 
@@ -136,6 +158,7 @@ class SignUpCubit extends BaseViewModelCubit<SignUpState> {
         final success = await authenticationCallback!(
           state.email,
           state.password,
+          state.marketingConsent,
         );
 
         if (success) {
