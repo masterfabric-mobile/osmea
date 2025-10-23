@@ -13,7 +13,7 @@ import 'package:get_it/get_it.dart';
 class AuthWidget extends StatefulWidget {
   final SignInCubit signInViewModel;
   final SignInState signInState;
-  final Future<bool> Function(String, String)? signUpCallback;
+  final Future<bool> Function(String, String, bool)? signUpCallback;
   final VoidCallback? onSignInSuccess;
   final Function(String error)? onSignInError;
   final VoidCallback? onSignUpSuccess;
@@ -105,10 +105,37 @@ class _AuthWidgetState extends State<AuthWidget> {
             120.0;
     final appName = _getConfigValue('sign_in', 'app_name', 'OSMEA');
 
+    // UI Style configuration
+    final tabContainerRadius =
+        (widget.config?['ui_style']?['tab_container_radius'] as num?)
+                ?.toDouble() ??
+            12.0;
+    final tabItemRadius =
+        (widget.config?['ui_style']?['tab_item_radius'] as num?)?.toDouble() ??
+            10.0;
+    final buttonRadius =
+        (widget.config?['ui_style']?['button_radius'] as num?)?.toDouble() ??
+            12.0;
+    final contentAreaTopRadius =
+        (widget.config?['ui_style']?['content_area_top_radius'] as num?)
+                ?.toDouble() ??
+            32.0;
+    final horizontalPadding =
+        (widget.config?['ui_style']?['horizontal_padding'] as num?)
+                ?.toDouble() ??
+            24.0;
+    final backgroundColor =
+        widget.config?['ui_style']?['background_color'] as String?;
+
     return Scaffold(
-      backgroundColor: Color(0xFF4A6FE8),
+      backgroundColor: backgroundColor != null
+          ? Color(int.parse(backgroundColor.replaceAll('#', '0xFF')))
+          : Color(0xFF4A6FE8),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
+        left: false,
+        right: false,
+        bottom: false,
         child: Column(
           children: [
             // 🎨 Logo/App Name Header
@@ -138,19 +165,23 @@ class _AuthWidgetState extends State<AuthWidget> {
                 decoration: BoxDecoration(
                   color: OsmeaColors.white,
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(32),
+                    top: Radius.circular(contentAreaTopRadius),
                   ),
                 ),
                 child: Column(
                   children: [
                     // 📑 Tab Bar
                     Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: 24,
+                      ),
                       child: Container(
                         padding: EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(tabContainerRadius),
                         ),
                         child: Row(
                           children: [
@@ -164,7 +195,8 @@ class _AuthWidgetState extends State<AuthWidget> {
                                     color: _currentTab == 0
                                         ? OsmeaColors.white
                                         : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius:
+                                        BorderRadius.circular(tabItemRadius),
                                     boxShadow: _currentTab == 0
                                         ? [
                                             BoxShadow(
@@ -203,7 +235,8 @@ class _AuthWidgetState extends State<AuthWidget> {
                                     color: _currentTab == 1
                                         ? OsmeaColors.white
                                         : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius:
+                                        BorderRadius.circular(tabItemRadius),
                                     boxShadow: _currentTab == 1
                                         ? [
                                             BoxShadow(
@@ -240,8 +273,9 @@ class _AuthWidgetState extends State<AuthWidget> {
                     // 📋 Content Area
                     Expanded(
                       child: _currentTab == 0
-                          ? _buildSignInContent()
-                          : _buildSignUpContent(),
+                          ? _buildSignInContent(buttonRadius, horizontalPadding)
+                          : _buildSignUpContent(
+                              buttonRadius, horizontalPadding),
                     ),
                   ],
                 ),
@@ -254,9 +288,9 @@ class _AuthWidgetState extends State<AuthWidget> {
   }
 
   /// 📧 Sign In Content
-  Widget _buildSignInContent() {
+  Widget _buildSignInContent(double buttonRadius, double horizontalPadding) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -266,8 +300,8 @@ class _AuthWidgetState extends State<AuthWidget> {
           _buildPasswordField(widget.signInViewModel, widget.signInState),
           SizedBox(height: 16),
           _buildRememberMeAndForgotPassword(),
-          SizedBox(height: 32),
-          _buildSignInButton(),
+          SizedBox(height: 48),
+          _buildSignInButton(buttonRadius),
           SizedBox(height: 64),
         ],
       ),
@@ -275,7 +309,7 @@ class _AuthWidgetState extends State<AuthWidget> {
   }
 
   /// 📝 Sign Up Content
-  Widget _buildSignUpContent() {
+  Widget _buildSignUpContent(double buttonRadius, double horizontalPadding) {
     return BlocBuilder<SignUpCubit, SignUpState>(
       bloc: _signUpCubit,
       builder: (context, signUpState) {
@@ -296,7 +330,7 @@ class _AuthWidgetState extends State<AuthWidget> {
         }
 
         return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -306,8 +340,14 @@ class _AuthWidgetState extends State<AuthWidget> {
               _buildSignUpPasswordField(signUpState),
               SizedBox(height: 20),
               _buildSignUpPasswordConfirmField(signUpState),
+              SizedBox(height: 24),
+              _buildMarketingConsentCheckbox(signUpState),
+              SizedBox(height: 16),
+              _buildPrivacyPolicyCheckbox(signUpState),
+              SizedBox(height: 16),
+              _buildTermsCheckbox(signUpState),
               SizedBox(height: 32),
-              _buildSignUpButton(signUpState),
+              _buildSignUpButton(signUpState, buttonRadius),
               SizedBox(height: 64),
             ],
           ),
@@ -422,7 +462,7 @@ class _AuthWidgetState extends State<AuthWidget> {
             SizedBox(width: 8),
             OsmeaComponents.text(
               _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
-              variant: OsmeaTextVariant.bodyMedium,
+              variant: OsmeaTextVariant.bodySmall,
               color: OsmeaColors.thunder,
               fontWeight: FontWeight.w400,
             ),
@@ -434,7 +474,7 @@ class _AuthWidgetState extends State<AuthWidget> {
             child: OsmeaComponents.text(
               _getConfigValue(
                   'sign_in', 'forgot_password_label', 'Forgot Password?'),
-              variant: OsmeaTextVariant.bodyMedium,
+              variant: OsmeaTextVariant.bodySmall,
               color: Color(0xFF4A6FE8),
               fontWeight: FontWeight.w500,
             ),
@@ -443,7 +483,7 @@ class _AuthWidgetState extends State<AuthWidget> {
     );
   }
 
-  Widget _buildSignInButton() {
+  Widget _buildSignInButton(double buttonRadius) {
     final isLoading = widget.signInState.status == SignInStatus.loading;
     final isEnabled = widget.signInState.isValid && !isLoading;
 
@@ -458,6 +498,7 @@ class _AuthWidgetState extends State<AuthWidget> {
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
       fullWidth: true,
       backgroundColor: Color(0xFF4A6FE8),
+      borderRadius: buttonRadius,
     );
   }
 
@@ -602,7 +643,123 @@ class _AuthWidgetState extends State<AuthWidget> {
     );
   }
 
-  Widget _buildSignUpButton(SignUpState state) {
+  /// 📧 Marketing Consent Checkbox
+  Widget _buildMarketingConsentCheckbox(SignUpState state) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.checkbox(
+          value: state.marketingConsent,
+          onChanged: (value) => _signUpCubit.toggleMarketingConsent(),
+          activeColor: Color(0xFF4A6FE8),
+          size: CheckboxSize.small,
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: OsmeaComponents.text(
+            _getConfigValue(
+              'sign_up',
+              'marketing_consent_label',
+              'I would like to receive promotional emails/SMS',
+            ),
+            variant: OsmeaTextVariant.bodySmall,
+            color: OsmeaColors.thunder,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 📄 Privacy Policy Checkbox
+  Widget _buildPrivacyPolicyCheckbox(SignUpState state) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.checkbox(
+          value: state.privacyPolicyAccepted,
+          onChanged: (value) => _signUpCubit.togglePrivacyPolicy(),
+          activeColor: Color(0xFF4A6FE8),
+          size: CheckboxSize.small,
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: _getConfigValue(
+                    'sign_up',
+                    'privacy_policy_label',
+                    'I have read and accept the Privacy Policy',
+                  ),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: OsmeaColors.thunder,
+                  ),
+                ),
+                TextSpan(
+                  text: '*',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 📜 Terms of Service Checkbox
+  Widget _buildTermsCheckbox(SignUpState state) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.checkbox(
+          value: state.termsAccepted,
+          onChanged: (value) => _signUpCubit.toggleTerms(),
+          activeColor: Color(0xFF4A6FE8),
+          size: CheckboxSize.small,
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: _getConfigValue(
+                    'sign_up',
+                    'terms_label',
+                    'I have read and accept the Terms of Service',
+                  ),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: OsmeaColors.thunder,
+                  ),
+                ),
+                TextSpan(
+                  text: '*',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignUpButton(SignUpState state, double buttonRadius) {
     final isLoading = state.status == SignUpStatus.loading;
     final isEnabled = state.isValid && !isLoading;
 
@@ -617,6 +774,7 @@ class _AuthWidgetState extends State<AuthWidget> {
       state: isLoading ? ButtonState.loading : ButtonState.enabled,
       fullWidth: true,
       backgroundColor: Color(0xFF4A6FE8),
+      borderRadius: buttonRadius,
     );
   }
 }
