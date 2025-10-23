@@ -52,6 +52,9 @@ export 'package:core/src/helper/onboarding_helper.dart';
 // 🧩 Exports the spacer helper for CoreSpacerType
 export 'package:core/src/helper/spacer_helper.dart';
 
+// 🧩 Exports the local notification helper
+export 'package:core/src/helper/local_notification_helper.dart';
+
 // 🔤 Exports the string extension helper for text formatting and capitalization
 export 'package:core/src/helper/first_letter_capitalize_helper.dart';
 

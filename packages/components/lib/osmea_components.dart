@@ -40,11 +40,21 @@ export 'src/components/phone_picker/models/country.dart';
 export 'src/components/phone_picker/cubit/phone_picker_cubit.dart';
 export 'src/components/phone_picker/cubit/phone_picker_state.dart';
 
+// 📍 Location Picker
+
+export 'src/components/location_picker/models/location_model.dart';
+export 'src/components/location_picker/cubit/location_picker_cubit.dart';
+export 'src/components/location_picker/cubit/location_picker_state.dart';
+
+
 // 📏 FittedBox Components
 export 'src/components/fitted_box/fitted_box.dart';
 
 // ✂️ ClipRRect Components
 export 'src/components/clip_r_rect/clip_r_rect.dart';
+
+// 🔘 Dot Indicator
+export 'src/components/dot_indicator/dot_indicator.dart';
 
 // 🖼️ Avatars & Cards
 export 'src/utils/avatar_extensions.dart';

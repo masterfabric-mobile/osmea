@@ -430,7 +430,8 @@ class _OsmeaTextFieldView extends StatelessWidget {
       suffixIcon: textField.suffixIcon != null
           ? _buildIcon(textField.suffixIcon!, config, colors, state)
           : null,
-      filled: textField.variant == TextFieldVariant.filled ||
+      filled: textField.backgroundColor != null ||
+          textField.variant == TextFieldVariant.filled ||
           textField.variant == TextFieldVariant.borderless,
       fillColor: colors.background,
       contentPadding: textField.customContentPadding ?? config.padding,

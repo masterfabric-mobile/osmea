@@ -1,3 +1,4 @@
+import 'package:osmea_components/src/components/location_picker/location_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
@@ -907,6 +908,61 @@ class OsmeaComponents {
       password: password,
     );
   }
+
+  /// 📍 **OSMEA Location Picker** - Comprehensive location picker component
+  ///
+  /// Creates a feature-rich location picker component with support for:
+  /// - Combined (input + map), input-only, and map-only variants
+  /// - Small, medium, and large sizes
+  /// - Outlined and filled styles
+  /// - Initial location setting
+  /// - Label and hint text
+  ///
+  /// Example:
+  /// ```dart
+  /// OsmeaComponents.locationPicker(
+  ///   onLocationChanged: (location) {
+  ///     print('Selected: ${location.address}');
+  ///   },
+  ///   label: 'Select Delivery Address',
+  ///   variant: LocationPickerVariant.combined,
+  /// )
+  /// ```
+  static Widget locationPicker({
+  Key? key,
+  LocationData? initialLocation,
+  required ValueChanged<LocationData?> onLocationChanged,
+  VoidCallback? onShowMapPressed,
+  VoidCallback? onCurrentLocationPressed,
+  required String apiKey,
+  LocationPickerVariant variant = LocationPickerVariant.combined,
+  LocationPickerSize size = LocationPickerSize.medium,
+  LocationPickerStyle style = LocationPickerStyle.outlined,
+  String? label,
+  String? hintText,
+  bool isRequired = false,
+  bool showCurrentLocation = true,
+  bool autofocusCurrentLocation = false,
+  bool showMapButtonInSearch = false,
+}) {
+  return OsmeaLocationPicker(
+    key: key,
+    initialLocation: initialLocation,
+    onLocationChanged: onLocationChanged,
+    onShowMapPressed: onShowMapPressed,
+    onCurrentLocationPressed: onCurrentLocationPressed,
+    apiKey: apiKey,
+    variant: variant,
+    size: size,
+    style: style,
+    label: label,
+    hintText: hintText,
+    isRequired: isRequired,
+    showCurrentLocation: showCurrentLocation,
+    autofocusCurrentLocation: autofocusCurrentLocation,
+    showMapButtonInSearch: showMapButtonInSearch,
+  );
+}
 
   /// 🔽 **OSMEA Dropdown** - A comprehensive dropdown component
   ///
