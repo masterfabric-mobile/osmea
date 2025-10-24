@@ -84,7 +84,25 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 🎨 Background color for the scaffold
   final Color? backgroundColor;
 
-  /// 📏 AppBar elevation
+  /// 🎨 AppBar background color
+  final Color? appBarBackgroundColor;
+
+  /// 🎨 SearchBar background color
+  final Color? searchBarBackgroundColor;
+
+  /// � SearchBar border radius
+  final BorderRadius? searchBarBorderRadius;
+
+  /// 🔲 SearchBar border color
+  final Color? searchBarBorderColor;
+
+  /// � SearchBar padding around the search field
+  final EdgeInsetsGeometry? searchBarPadding;
+
+  /// � SearchBar maximum width constraint
+  final double? searchBarMaxWidth;
+
+  /// ��📏 AppBar elevation
   final double elevation;
 
   /// ⬅️ Whether to show back button
@@ -111,6 +129,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 🎤 Whether to show voice search action
   final bool showVoiceSearch;
 
+  /// 🗑️ Whether to show clear button in search bar
+  final bool showClearButton;
+
+  /// 🔍 Whether to show search icon in search bar
+  final bool showSearchIcon;
+
   SearchView({
     super.key,
     required Function(String path) goRoute,
@@ -131,6 +155,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.searchBarVariant = SearchbarVariant.outlined,
     this.searchBarSize = TextFieldSize.medium,
     this.backgroundColor,
+    this.appBarBackgroundColor,
+    this.searchBarBackgroundColor,
+    this.searchBarBorderRadius,
+    this.searchBarBorderColor,
+    this.searchBarPadding,
+    this.searchBarMaxWidth,
     this.elevation = 0,
     this.showBackButton = true,
     this.onBackPressed,
@@ -140,6 +170,8 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.body,
     this.showBarcodeScanner = true,
     this.showVoiceSearch = true,
+    this.showClearButton = true,
+    this.showSearchIcon = false,
   }) : super(
           goRoute: goRoute,
           arguments: arguments,
@@ -183,22 +215,19 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// Build the app bar with search functionality
   PreferredSizeWidget _buildAppBar(
       BuildContext context, SearchCubit viewModel, SearchState state) {
-    // Get app bar color from configuration
-    final AssetConfigHelper configHelper = AssetConfigHelper();
-    final Color configAppBarBgColor =
-        configHelper.getSearchAppBarColor(Theme.of(context).primaryColor);
-
-    // Test: Geçici olarak sabit renk kullan
-    final Color appBarBgColor = const Color(0xFFF6F6F6); // #F6F6F6FF
-    debugPrint('🎨 Using fixed color instead of config: $appBarBgColor');
-    debugPrint('🎨 Config would have given: $configAppBarBgColor');
-
-    // Debug: Hangi rengin kullanıldığını kontrol et
-    debugPrint('🎨 SearchView AppBar color: $appBarBgColor');
-    debugPrint(
-        '🎨 SearchView Theme primary: ${Theme.of(context).primaryColor}');
-    debugPrint(
-        '🎨 SearchView AppBar hex: #${appBarBgColor.value.toRadixString(16).toUpperCase()}');
+    // Determine AppBar background color
+    // Priority: 1. Parameter value, 2. Config value, 3. Theme primary color
+    Color appBarBgColor;
+    if (appBarBackgroundColor != null) {
+      appBarBgColor = appBarBackgroundColor!;
+      debugPrint('🎨 Using parameter AppBar color: $appBarBgColor');
+    } else {
+      // Get app bar color from configuration
+      final AssetConfigHelper configHelper = AssetConfigHelper();
+      appBarBgColor =
+          configHelper.getSearchAppBarColor(Theme.of(context).primaryColor);
+      debugPrint('🎨 Using config AppBar color: $appBarBgColor');
+    }
 
     return OsmeaComponents.appBar(
       backgroundColor: appBarBgColor,
@@ -454,12 +483,91 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// Build search bar as title
   Widget _buildSearchBarTitle(
       BuildContext context, SearchCubit viewModel, SearchState state) {
-    return OsmeaComponents.searchbar(
+    final AssetConfigHelper configHelper = AssetConfigHelper();
+
+    // Determine SearchBar background color
+    // Priority: 1. Parameter value, 2. Config value, 3. Default light gray
+    Color searchBarBgColor;
+    if (searchBarBackgroundColor != null) {
+      searchBarBgColor = searchBarBackgroundColor!;
+      debugPrint(
+          '🎨 Using parameter SearchBar background color: $searchBarBgColor');
+    } else {
+      searchBarBgColor = configHelper.getSearchBarBackgroundColor();
+      debugPrint(
+          '🎨 Using config SearchBar background color: $searchBarBgColor');
+    }
+
+    // Determine SearchBar border color
+    // Priority: 1. Parameter value, 2. Config value, 3. Default light gray
+    Color searchBarBorderCol;
+    if (searchBarBorderColor != null) {
+      searchBarBorderCol = searchBarBorderColor!;
+      debugPrint(
+          '🎨 Using parameter SearchBar border color: $searchBarBorderCol');
+    } else {
+      searchBarBorderCol = configHelper.getSearchBarBorderColor();
+      debugPrint('🎨 Using config SearchBar border color: $searchBarBorderCol');
+    }
+
+    // Determine SearchBar border radius
+    // Priority: 1. Parameter value, 2. Config value, 3. Default radius
+    BorderRadius searchBarBorderRad;
+    if (searchBarBorderRadius != null) {
+      searchBarBorderRad = searchBarBorderRadius!;
+      debugPrint(
+          '🎨 Using parameter SearchBar border radius: $searchBarBorderRad');
+    } else {
+      searchBarBorderRad = configHelper.getSearchBarBorderRadius();
+      debugPrint(
+          '🎨 Using config SearchBar border radius: $searchBarBorderRad');
+    }
+
+    // Determine SearchBar padding
+    // Priority: 1. Parameter value, 2. Config value, 3. Default padding
+    EdgeInsetsGeometry searchBarPad;
+    if (searchBarPadding != null) {
+      searchBarPad = searchBarPadding!;
+      debugPrint('🎨 Using parameter SearchBar padding: $searchBarPad');
+    } else {
+      searchBarPad = configHelper.getSearchBarPadding();
+      debugPrint('🎨 Using config SearchBar padding: $searchBarPad');
+    }
+
+    // Determine SearchBar show clear button
+    // Priority: 1. Parameter value, 2. Config value, 3. Default value
+    bool showClearBtn = showClearButton;
+    if (!showClearButton) {
+      // If parameter is explicitly false, check config for override
+      showClearBtn = configHelper.getSearchBarShowClearButton(showClearButton);
+      debugPrint('🎨 Using config SearchBar show clear button: $showClearBtn');
+    } else {
+      debugPrint(
+          '🎨 Using parameter SearchBar show clear button: $showClearBtn');
+    }
+
+    // Determine SearchBar show search icon
+    // Priority: 1. Parameter value, 2. Config value, 3. Default value
+    bool showSearchIco = showSearchIcon;
+    if (!showSearchIcon) {
+      // If parameter is explicitly false, check config for override
+      showSearchIco = configHelper.getSearchBarShowSearchIcon(showSearchIcon);
+      debugPrint('🎨 Using config SearchBar show search icon: $showSearchIco');
+    } else {
+      debugPrint(
+          '🎨 Using parameter SearchBar show search icon: $showSearchIco');
+    }
+
+    // Build the searchbar widget
+    Widget searchBarWidget = OsmeaComponents.searchbar(
       controller: searchController,
       focusNode: searchFocusNode,
       hint: searchHint ?? 'Searchbar',
-      size: TextFieldSize.extraLarge,
-      searchbarVariant: SearchbarVariant.borderless,
+      size: searchBarSize, // Use the configurable size parameter
+      searchbarVariant: searchBarVariant,
+      backgroundColor: searchBarBgColor,
+      borderColor: searchBarBorderCol,
+      customBorderRadius: searchBarBorderRad,
       onChanged: (query) {
         viewModel.updateQuery(query);
         onSearchChanged?.call(query);
@@ -480,9 +588,22 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
       },
       suggestionProvider: searchSuggestionProvider,
       searchProvider: searchProvider,
-      showClearButton: true,
-      showSearchIcon: false,
+      showClearButton: showClearBtn,
+      showSearchIcon: showSearchIco,
       actions: _buildSearchActions(context),
+    );
+
+    // Apply width constraint if specified
+    if (searchBarMaxWidth != null) {
+      searchBarWidget = SizedBox(
+        width: searchBarMaxWidth,
+        child: searchBarWidget,
+      );
+    }
+
+    return Padding(
+      padding: searchBarPad,
+      child: searchBarWidget,
     );
   }
 
@@ -512,7 +633,9 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     if (showBarcodeScanner) {
       actions.add(
         IconButton(
-          icon: const Icon(Icons.qr_code_scanner, size: 20),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: const Icon(Icons.qr_code_scanner, size: 18),
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Barcode scanner clicked!')),
@@ -527,7 +650,9 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     if (showVoiceSearch) {
       actions.add(
         IconButton(
-          icon: const Icon(Icons.mic, size: 20),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: const Icon(Icons.mic, size: 18),
           onPressed: () {
             OsmeaComponents.soundDialog(
               context,
@@ -539,13 +664,9 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
               onConfirm: (filePath) {
                 // Handle voice search result
                 debugPrint('🎤 Voice search recorded: $filePath');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Voice search completed! Processing...'),
-                  ),
-                );
-                // TODO: Implement actual voice-to-text conversion
-                // and trigger search with the converted text
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Voice search completed! Processing...'),
+                ));
               },
               onCancel: () {
                 debugPrint('🚫 Voice search cancelled');
