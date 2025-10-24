@@ -111,12 +111,11 @@ class SelectShippingRateHandler implements ApiRequestHandler {
         };
       }
 
+      // JWT token is optional - just log if missing
       if (jwtToken == null || jwtToken.isEmpty) {
-        return {
-          "status": "error",
-          "message": "JWT token is required. Please provide it manually or ensure you're logged in.",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
+        debugPrint('⚠️ JWT token not provided - continuing without authentication');
+      } else {
+        debugPrint('🔐 JWT token available for authenticated request');
       }
 
       debugPrint('🚚 Starting select shipping rate:');
@@ -127,10 +126,10 @@ class SelectShippingRateHandler implements ApiRequestHandler {
       // Get CartService from DI
       final cartService = GetIt.I<CartService>();
 
-      // Format JWT token with Bearer prefix if not already present
-      final formattedJwtToken = jwtToken.startsWith('Bearer ') 
-          ? jwtToken 
-          : 'Bearer $jwtToken';
+      // Format JWT token with Bearer prefix if available
+      final formattedJwtToken = (jwtToken != null && jwtToken.isNotEmpty)
+          ? (jwtToken.startsWith('Bearer ') ? jwtToken : 'Bearer $jwtToken')
+          : null;
 
       // Call the service
       final response = await cartService.selectShippingRate(
@@ -197,7 +196,7 @@ class SelectShippingRateHandler implements ApiRequestHandler {
           "cart_token_source": params.containsKey('cart_token') && params['cart_token']!.isNotEmpty ? "manual" : "auto_storage",
           "jwt_token_source": params.containsKey('jwt_token') && params['jwt_token']!.isNotEmpty ? "manual" : "auto_storage",
           "cart_token_available": cartToken.isNotEmpty,
-          "jwt_token_available": jwtToken.isNotEmpty,
+          "jwt_token_available": jwtToken != null && jwtToken.isNotEmpty,
         },
         "shipping_info": {
           "selected_package_id": packageId,
@@ -361,7 +360,7 @@ class SelectShippingRateHandler implements ApiRequestHandler {
           ),
           const ApiField(
             name: 'jwt_token',
-            label: 'JWT Token',
+            label: 'JWT Token (Optional)',
             hint: 'JWT authentication token (auto-loaded from storage if empty)',
             isRequired: false,
           ),
