@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class ImageDetailCubit extends BaseViewModelCubit<ImageDetailState> {
   ImageDetailCubit() : super(const ImageDetailState());
 
