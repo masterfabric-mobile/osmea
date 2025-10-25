@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
+import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
@@ -291,7 +292,13 @@ final GoRouter appRouter = GoRouter(
           initialTab: initialTab,
           onSignInSuccess: () {
             debugPrint('✅ Sign in successful!');
-            context.go('/home');
+            // Check if there's a return path
+            final returnTo = state.uri.queryParameters['returnTo'];
+            if (returnTo != null && returnTo.isNotEmpty) {
+              context.go(returnTo);
+            } else {
+              context.go('/home');
+            }
           },
           onSignInError: (error) {
             debugPrint('❌ Sign in error: $error');
@@ -340,18 +347,63 @@ final GoRouter appRouter = GoRouter(
     // Home Page - Show products directly
     GoRoute(
       path: '/home',
-      builder: (BuildContext context, GoRouterState state) {
-        return HomeView(
-          arguments: const {'home': true},
-          goRoute: (String path) {
-            if (path.contains('products')) {
-              context.go('/products');
-            } else if (path.contains('product-detail')) {
-              context.go('/product-detail');
-            } else {
-              context.go('/home');
-            }
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: HomeView(
+            arguments: const {'home': true},
+            goRoute: (String path) {
+              if (path.contains('products')) {
+                context.go('/products');
+              } else if (path.contains('product-detail')) {
+                context.go('/product-detail');
+              } else if (path.contains('cart')) {
+                context.go('/cart');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
           },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Cart Page
+    GoRoute(
+      path: '/cart',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: CartView(
+            arguments: const {'cart': true},
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('product-detail')) {
+                context.go('/product-detail');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOutCubic,
+                    ),
+                  ),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 400),
         );
       },
     ),
@@ -359,20 +411,31 @@ final GoRouter appRouter = GoRouter(
     // Product Detail Route
     GoRoute(
       path: '/product-detail/:productId',
-      builder: (BuildContext context, GoRouterState state) {
+      pageBuilder: (BuildContext context, GoRouterState state) {
         final productId = int.tryParse(
           state.pathParameters['productId'] ?? '0',
         );
-        return ProductDetailView(
-          productId: productId ?? 0,
-          arguments: const {'productDetail': true},
-          goRoute: (String path) {
-            if (path.contains('home')) {
-              context.go('/home');
-            } else {
-              context.go('/home');
-            }
+        return CustomTransitionPage(
+          child: ProductDetailView(
+            productId: productId ?? 0,
+            arguments: const {'productDetail': true},
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return ScaleTransition(
+              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
+              ),
+              child: FadeTransition(opacity: animation, child: child),
+            );
           },
+          transitionDuration: const Duration(milliseconds: 500),
         );
       },
     ),
