@@ -41,6 +41,27 @@
       "enable_haptic_feedback": true,
       "enable_sound_effects": true
     },
+
+      "search_view_configuration": {
+    "search_app_bar_color": "#FFFFFFFF",
+    "search_bar_background_color": "#EAE9E9FF",
+    "search_bar_border_color": "#E0E0E0FF",
+    "search_bar_show_clear_button": true,
+    "search_bar_show_search_icon": true,
+    "elevation": 4.0,
+    "search_bar_size": "medium",
+    "search_bar_variant": "borderless",
+    "search_bar_border_radius": 20.0,
+    "title": "Search",
+    "search_hint": "Search products, brands, categories...",
+    "show_barcode_scanner": true,
+    "show_voice_search": true,
+    "show_back_button": true,
+    "action_button_spacing": 2.0,
+    "action_button_min_width": 32.0,
+    "action_button_min_height": 32.0,
+    "action_button_padding_all": 4.0
+  },
     "security_configuration": {
       "enable_ssl_pinning": true,
       "certificate_validation": true,
