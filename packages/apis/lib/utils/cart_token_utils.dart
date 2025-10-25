@@ -46,7 +46,7 @@ class CartTokenUtils {
 
         cartId = data['cart_id'] as String? ??
             data['cartId'] as String? ??
-            data['id'] as String?;
+            data['id']?.toString();
       }
 
       // Extract from cookies if not found in headers or data
@@ -112,7 +112,7 @@ class CartTokenUtils {
 
       cartId = data['cart_id'] as String? ??
           data['cartId'] as String? ??
-          data['id'] as String?;
+          data['id']?.toString();
 
       debugPrint(
           '🛒 Cart token extracted from data: ${cartToken != null ? "Present" : "Not found"}');
