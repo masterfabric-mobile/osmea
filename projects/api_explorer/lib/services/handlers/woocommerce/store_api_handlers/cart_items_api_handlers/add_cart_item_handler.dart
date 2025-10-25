@@ -106,12 +106,11 @@ class AddCartItemHandler implements ApiRequestHandler {
         };
       }
 
+      // JWT token is optional - just log if missing
       if (jwtToken == null || jwtToken.isEmpty) {
-        return {
-          "status": "error",
-          "message": "JWT token is required. Please provide it manually or ensure you're logged in.",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
+        debugPrint('⚠️ JWT token not provided - continuing without authentication');
+      } else {
+        debugPrint('🔐 JWT token available for authenticated request');
       }
 
       // Parse variation if provided
@@ -131,15 +130,15 @@ class AddCartItemHandler implements ApiRequestHandler {
       debugPrint('  - Product ID: $productId');
       debugPrint('  - Quantity: $quantity');
       debugPrint('  - Cart Token Available: ${cartToken.isNotEmpty}');
-      debugPrint('  - JWT Token Available: ${jwtToken.isNotEmpty}');
+      debugPrint('  - JWT Token Available: ${jwtToken != null && jwtToken.isNotEmpty}');
 
       // Get CartItemsService from DI
       final cartItemsService = GetIt.I<CartItemsService>();
 
-      // Format JWT token with Bearer prefix if not already present
-      final formattedJwtToken = jwtToken.startsWith('Bearer ') 
-          ? jwtToken 
-          : 'Bearer $jwtToken';
+      // Format JWT token with Bearer prefix if available, or use empty string
+      final formattedJwtToken = (jwtToken != null && jwtToken.isNotEmpty)
+          ? (jwtToken.startsWith('Bearer ') ? jwtToken : 'Bearer $jwtToken')
+          : '';
 
       // Call the service
       final response = await cartItemsService.addCartItem(
@@ -163,7 +162,7 @@ class AddCartItemHandler implements ApiRequestHandler {
           "cart_token_source": params.containsKey('cart_token') && params['cart_token']!.isNotEmpty ? "manual" : "auto_storage",
           "jwt_token_source": params.containsKey('jwt_token') && params['jwt_token']!.isNotEmpty ? "manual" : "auto_storage",
           "cart_token_available": cartToken.isNotEmpty,
-          "jwt_token_available": jwtToken.isNotEmpty,
+          "jwt_token_available": jwtToken != null && jwtToken.isNotEmpty,
         },
         "added_item": "Cart item added successfully - response details will be available after build generation",
         "request_params": {
@@ -271,7 +270,7 @@ class AddCartItemHandler implements ApiRequestHandler {
           ),
           const ApiField(
             name: 'jwt_token',
-            label: 'JWT Token',
+            label: 'JWT Token (Optional)',
             hint: 'JWT authentication token (auto-loaded from storage if empty)',
             isRequired: false,
           ),
