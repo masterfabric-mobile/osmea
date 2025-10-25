@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
+import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
@@ -13,6 +14,83 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   // Global route configuration
   routes: <RouteBase>[
+    // Shell Route with Navbar for main app sections
+    ShellRoute(
+      builder: (BuildContext context, GoRouterState state, Widget child) {
+        return Scaffold(
+          body: child,
+          bottomNavigationBar: _getNavbarForRoute(state.uri.path),
+        );
+      },
+      routes: [
+        // Home Page - Show products directly
+        GoRoute(
+          path: '/home',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: HomeView(
+                arguments: const {'home': true},
+                goRoute: (String path) {
+                  if (path.contains('products')) {
+                    context.go('/products');
+                  } else if (path.contains('product-detail')) {
+                    context.go('/product-detail');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Cart Page
+        GoRoute(
+          path: '/cart',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: CartView(
+                arguments: const {'cart': true},
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('product-detail')) {
+                    context.go('/product-detail');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+              transitionDuration: const Duration(milliseconds: 400),
+            );
+          },
+        ),
+      ],
+    ),
+
     // Splash Screen Route
     GoRoute(
       path: '/',
@@ -344,70 +422,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Home Page - Show products directly
-    GoRoute(
-      path: '/home',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: HomeView(
-            arguments: const {'home': true},
-            goRoute: (String path) {
-              if (path.contains('products')) {
-                context.go('/products');
-              } else if (path.contains('product-detail')) {
-                context.go('/product-detail');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Cart Page
-    GoRoute(
-      path: '/cart',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: CartView(
-            arguments: const {'cart': true},
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('product-detail')) {
-                context.go('/product-detail');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInOutCubic,
-                    ),
-                  ),
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        );
-      },
-    ),
-
     // Product Detail Route
     GoRoute(
       path: '/product-detail/:productId',
@@ -441,3 +455,17 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
+/// Get navbar for specific route
+Widget? _getNavbarForRoute(String location) {
+  // Show navbar only for main app sections
+  if (location == '/home' || location == '/cart') {
+    if (location == '/home') {
+      return AppNavbar(currentIndex: 0);
+    } else if (location == '/cart') {
+      return AppNavbar(currentIndex: 1);
+    }
+  }
+  // No navbar for splash, onboarding, auth, product-detail
+  return null;
+}
