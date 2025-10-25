@@ -385,7 +385,7 @@ class AssetConfigHelper {
 
   /// 🔍 Get the search AppBar color from configuration
   ///
-  /// Returns the search_app_bar_color if specified,
+  /// Returns the search_app_bar_color from search_view_configuration if specified,
   /// or falls back to primary_color if search_app_bar_color isn't found
   ///
   /// Parameters:
@@ -394,14 +394,166 @@ class AssetConfigHelper {
   /// Returns:
   /// - Color: The search AppBar color or default color
   Color getSearchAppBarColor([Color defaultColor = const Color(0xFF2196F3)]) {
-    // First try to get the specific search AppBar color
-    final String searchAppBarColorKey = 'ui_configuration.search_app_bar_color';
+    // First try to get the specific search AppBar color from search_view_configuration
+    final String searchAppBarColorKey =
+        'search_view_configuration.search_app_bar_color';
     if (hasKey(searchAppBarColorKey)) {
       return getColor(searchAppBarColorKey, defaultColor);
     }
 
     // Fall back to primary color if search AppBar color isn't specified
     return getColor('ui_configuration.primary_color', defaultColor);
+  }
+
+  /// 🔍 Get the search bar background color from configuration
+  ///
+  /// Returns the search_bar_background_color from search_view_configuration if specified,
+  /// or falls back to a light gray color if search_bar_background_color isn't found
+  ///
+  /// Parameters:
+  /// - [defaultColor]: Default color to return if no configuration is found
+  ///
+  /// Returns:
+  /// - Color: The search bar background color or default color
+  Color getSearchBarBackgroundColor(
+      [Color defaultColor = const Color(0xFFF5F5F5)]) {
+    // Try to get the specific search bar background color from search_view_configuration
+    final String searchBarBackgroundColorKey =
+        'search_view_configuration.search_bar_background_color';
+    if (hasKey(searchBarBackgroundColorKey)) {
+      return getColor(searchBarBackgroundColorKey, defaultColor);
+    }
+
+    // Fall back to default light gray if search bar background color isn't specified
+    return defaultColor;
+  }
+
+  /// 🔍 Get the search bar border color from configuration
+  ///
+  /// Returns the search_bar_border_color if specified,
+  /// or falls back to a light gray border color if search_bar_border_color isn't found
+  ///
+  /// Parameters:
+  /// - [defaultColor]: Default color to return if no configuration is found
+  ///
+  /// Returns:
+  /// - Color: The search bar border color or default color
+  Color getSearchBarBorderColor(
+      [Color defaultColor = const Color(0xFFE0E0E0)]) {
+    // Try to get the specific search bar border color from search_view_configuration
+    final String searchBarBorderColorKey =
+        'search_view_configuration.search_bar_border_color';
+    if (hasKey(searchBarBorderColorKey)) {
+      return getColor(searchBarBorderColorKey, defaultColor);
+    }
+
+    // Fall back to default light gray border if search bar border color isn't specified
+    return defaultColor;
+  }
+
+  /// 🔍 Get the search bar show clear button setting from configuration
+  ///
+  /// Returns the search_bar_show_clear_button from search_view_configuration if specified,
+  /// or falls back to default value if not found
+  ///
+  /// Parameters:
+  /// - [defaultValue]: Default boolean to return if no configuration is found
+  ///
+  /// Returns:
+  /// - bool: Whether to show the clear button or default value
+  bool getSearchBarShowClearButton([bool defaultValue = true]) {
+    return getBool(
+        'search_view_configuration.search_bar_show_clear_button', defaultValue);
+  }
+
+  /// 🔍 Get the search bar show search icon setting from configuration
+  ///
+  /// Returns the search_bar_show_search_icon from search_view_configuration if specified,
+  /// or falls back to default value if not found
+  ///
+  /// Parameters:
+  /// - [defaultValue]: Default boolean to return if no configuration is found
+  ///
+  /// Returns:
+  /// - bool: Whether to show the search icon or default value
+  bool getSearchBarShowSearchIcon([bool defaultValue = false]) {
+    return getBool(
+        'search_view_configuration.search_bar_show_search_icon', defaultValue);
+  }
+
+  // MARK: - Search View Configuration Methods
+
+  /// 🔍 Get SearchView elevation from configuration
+  double getSearchViewElevation([double defaultValue = 4.0]) {
+    return getDouble('search_view_configuration.elevation', defaultValue);
+  }
+
+  /// 🔍 Get SearchView bar size from configuration
+  String getSearchViewBarSize([String defaultValue = 'medium']) {
+    return getString('search_view_configuration.search_bar_size', defaultValue);
+  }
+
+  /// 🔍 Get SearchView bar variant from configuration
+  String getSearchViewBarVariant([String defaultValue = 'borderless']) {
+    return getString(
+        'search_view_configuration.search_bar_variant', defaultValue);
+  }
+
+  /// 🔍 Get SearchView border radius from configuration
+  double getSearchViewBorderRadius([double defaultValue = 20.0]) {
+    return getDouble(
+        'search_view_configuration.search_bar_border_radius', defaultValue);
+  }
+
+  /// 🔍 Get SearchView title from configuration
+  String getSearchViewTitle([String defaultValue = 'Search']) {
+    return getString('search_view_configuration.title', defaultValue);
+  }
+
+  /// 🔍 Get SearchView hint from configuration
+  String getSearchViewHint(
+      [String defaultValue = 'Search products, brands, categories...']) {
+    return getString('search_view_configuration.search_hint', defaultValue);
+  }
+
+  /// 🔍 Get SearchView show barcode scanner setting from configuration
+  bool getSearchViewShowBarcodeScanner([bool defaultValue = true]) {
+    return getBool(
+        'search_view_configuration.show_barcode_scanner', defaultValue);
+  }
+
+  /// 🔍 Get SearchView show voice search setting from configuration
+  bool getSearchViewShowVoiceSearch([bool defaultValue = true]) {
+    return getBool('search_view_configuration.show_voice_search', defaultValue);
+  }
+
+  /// 🔍 Get SearchView show back button setting from configuration
+  bool getSearchViewShowBackButton([bool defaultValue = true]) {
+    return getBool('search_view_configuration.show_back_button', defaultValue);
+  }
+
+  /// 🔍 Get SearchView action button spacing from configuration
+  double getSearchViewActionButtonSpacing([double defaultValue = 2.0]) {
+    return getDouble(
+        'search_view_configuration.action_button_spacing', defaultValue);
+  }
+
+  /// 🔍 Get SearchView action button min width from configuration
+  double getSearchViewActionButtonMinWidth([double defaultValue = 32.0]) {
+    return getDouble(
+        'search_view_configuration.action_button_min_width', defaultValue);
+  }
+
+  /// 🔍 Get SearchView action button min height from configuration
+  double getSearchViewActionButtonMinHeight([double defaultValue = 32.0]) {
+    return getDouble(
+        'search_view_configuration.action_button_min_height', defaultValue);
+  }
+
+  /// 🔍 Get SearchView action button padding from configuration
+  double getSearchViewActionButtonPadding([double defaultValue = 4.0]) {
+    return getDouble(
+        'search_view_configuration.action_button_padding_all', defaultValue);
   }
 
   /// 🔍 Check if a key exists in the configuration
