@@ -30,6 +30,14 @@ import 'package:osmea_components/osmea_components.dart';
 ///   searchProvider: (query) async => await searchAPI(query),
 ///   onSearchResult: (results) => handleResults(results),
 ///   body: MyCustomSearchWidget(), // Optional custom body
+///   // SearchBar styling (parameters only, no config dependency)
+///   searchBarBorderRadius: BorderRadius.circular(16.0),
+///   searchBarPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+///   // Action button customization (parameters only)
+///   actionButtonSpacing: 1.0, // Reduce spacing between buttons
+///   actionButtonMinWidth: 28.0, // Smaller button width
+///   actionButtonMinHeight: 28.0, // Smaller button height
+///   actionButtonPadding: EdgeInsets.all(2.0), // Tighter padding
 /// )
 /// ```
 ///
@@ -135,6 +143,18 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 🔍 Whether to show search icon in search bar
   final bool showSearchIcon;
 
+  /// � Horizontal spacing between action buttons
+  final double actionButtonSpacing;
+
+  /// 📏 Minimum width for action buttons
+  final double actionButtonMinWidth;
+
+  /// 📏 Minimum height for action buttons
+  final double actionButtonMinHeight;
+
+  /// �📦 Padding for action buttons
+  final EdgeInsetsGeometry actionButtonPadding;
+
   SearchView({
     super.key,
     required Function(String path) goRoute,
@@ -172,6 +192,10 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.showVoiceSearch = true,
     this.showClearButton = true,
     this.showSearchIcon = false,
+    this.actionButtonSpacing = 2.0,
+    this.actionButtonMinWidth = 32.0,
+    this.actionButtonMinHeight = 32.0,
+    this.actionButtonPadding = const EdgeInsets.all(4.0),
   }) : super(
           goRoute: goRoute,
           arguments: arguments,
@@ -180,6 +204,11 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
     debugPrint('🔍 Search View Started!');
+
+    // Load configuration from app_config.json
+    final AssetConfigHelper configHelper = AssetConfigHelper();
+    await configHelper.loadConfig();
+    debugPrint('🔧 Configuration loaded for SearchView');
 
     // Initialize search with history
     await viewModel.initializeSearch(
@@ -212,6 +241,101 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     );
   }
 
+  // MARK: - Config Helper Methods
+
+  /// Get effective elevation value (parameter or config)
+  double get effectiveElevation {
+    if (elevation != 0) return elevation;
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewElevation();
+  }
+
+  /// Get effective search bar size (parameter or config)
+  TextFieldSize get effectiveSearchBarSize {
+    final configHelper = AssetConfigHelper();
+    final sizeStr = configHelper.getSearchViewBarSize();
+    switch (sizeStr.toLowerCase()) {
+      case 'small':
+        return TextFieldSize.small;
+      case 'large':
+        return TextFieldSize.large;
+      default:
+        return searchBarSize;
+    }
+  }
+
+  /// Get effective search bar variant (parameter or config)
+  SearchbarVariant get effectiveSearchBarVariant {
+    final configHelper = AssetConfigHelper();
+    final variantStr = configHelper.getSearchViewBarVariant();
+    switch (variantStr.toLowerCase()) {
+      case 'outlined':
+        return SearchbarVariant.outlined;
+      case 'filled':
+        return SearchbarVariant.filled;
+      default:
+        return searchBarVariant;
+    }
+  }
+
+  /// Get effective title (parameter or config)
+  Widget? get effectiveTitle {
+    if (title != null) return title;
+    final configHelper = AssetConfigHelper();
+    return Text(configHelper.getSearchViewTitle());
+  }
+
+  /// Get effective search hint (parameter or config)
+  String get effectiveSearchHint {
+    if (searchHint != null) return searchHint!;
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewHint();
+  }
+
+  /// Get effective show barcode scanner (parameter or config)
+  bool get effectiveShowBarcodeScanner {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewShowBarcodeScanner(showBarcodeScanner);
+  }
+
+  /// Get effective show voice search (parameter or config)
+  bool get effectiveShowVoiceSearch {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewShowVoiceSearch(showVoiceSearch);
+  }
+
+  /// Get effective show back button (parameter or config)
+  bool get effectiveShowBackButton {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewShowBackButton(showBackButton);
+  }
+
+  /// Get effective action button spacing (parameter or config)
+  double get effectiveActionButtonSpacing {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewActionButtonSpacing(actionButtonSpacing);
+  }
+
+  /// Get effective action button min width (parameter or config)
+  double get effectiveActionButtonMinWidth {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getSearchViewActionButtonMinWidth(actionButtonMinWidth);
+  }
+
+  /// Get effective action button min height (parameter or config)
+  double get effectiveActionButtonMinHeight {
+    final configHelper = AssetConfigHelper();
+    return configHelper
+        .getSearchViewActionButtonMinHeight(actionButtonMinHeight);
+  }
+
+  /// Get effective action button padding (parameter or config)
+  EdgeInsetsGeometry get effectiveActionButtonPadding {
+    final configHelper = AssetConfigHelper();
+    final paddingValue = configHelper.getSearchViewActionButtonPadding(4.0);
+    return EdgeInsets.all(paddingValue);
+  }
+
   /// Build the app bar with search functionality
   PreferredSizeWidget _buildAppBar(
       BuildContext context, SearchCubit viewModel, SearchState state) {
@@ -231,10 +355,10 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
     return OsmeaComponents.appBar(
       backgroundColor: appBarBgColor,
-      elevation: elevation,
+      elevation: effectiveElevation,
       variant: appBarVariant,
       size: appBarSize,
-      leading: showBackButton
+      leading: effectiveShowBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
@@ -511,28 +635,16 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     }
 
     // Determine SearchBar border radius
-    // Priority: 1. Parameter value, 2. Config value, 3. Default radius
-    BorderRadius searchBarBorderRad;
-    if (searchBarBorderRadius != null) {
-      searchBarBorderRad = searchBarBorderRadius!;
-      debugPrint(
-          '🎨 Using parameter SearchBar border radius: $searchBarBorderRad');
-    } else {
-      searchBarBorderRad = configHelper.getSearchBarBorderRadius();
-      debugPrint(
-          '🎨 Using config SearchBar border radius: $searchBarBorderRad');
-    }
+    // Priority: 1. Parameter value, 2. Default radius
+    BorderRadius searchBarBorderRad =
+        searchBarBorderRadius ?? BorderRadius.circular(12.0);
+    debugPrint('🎨 Using SearchBar border radius: $searchBarBorderRad');
 
     // Determine SearchBar padding
-    // Priority: 1. Parameter value, 2. Config value, 3. Default padding
-    EdgeInsetsGeometry searchBarPad;
-    if (searchBarPadding != null) {
-      searchBarPad = searchBarPadding!;
-      debugPrint('🎨 Using parameter SearchBar padding: $searchBarPad');
-    } else {
-      searchBarPad = configHelper.getSearchBarPadding();
-      debugPrint('🎨 Using config SearchBar padding: $searchBarPad');
-    }
+    // Priority: 1. Parameter value, 2. Default padding
+    EdgeInsetsGeometry searchBarPad = searchBarPadding ??
+        const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0);
+    debugPrint('🎨 Using SearchBar padding: $searchBarPad');
 
     // Determine SearchBar show clear button
     // Priority: 1. Parameter value, 2. Config value, 3. Default value
@@ -562,9 +674,9 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     Widget searchBarWidget = OsmeaComponents.searchbar(
       controller: searchController,
       focusNode: searchFocusNode,
-      hint: searchHint ?? 'Searchbar',
-      size: searchBarSize, // Use the configurable size parameter
-      searchbarVariant: searchBarVariant,
+      hint: effectiveSearchHint,
+      size: effectiveSearchBarSize, // Use the configurable size parameter
+      searchbarVariant: effectiveSearchBarVariant,
       backgroundColor: searchBarBgColor,
       borderColor: searchBarBorderCol,
       customBorderRadius: searchBarBorderRad,
@@ -630,53 +742,67 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     List<Widget> actions = [];
 
     // Add barcode scanner action if enabled
-    if (showBarcodeScanner) {
+    if (effectiveShowBarcodeScanner) {
       actions.add(
-        IconButton(
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          icon: const Icon(Icons.qr_code_scanner, size: 18),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Barcode scanner clicked!')),
-            );
-          },
-          tooltip: 'Scan barcode',
+        Container(
+          margin:
+              EdgeInsets.symmetric(horizontal: effectiveActionButtonSpacing),
+          child: IconButton(
+            constraints: BoxConstraints(
+              minWidth: effectiveActionButtonMinWidth,
+              minHeight: effectiveActionButtonMinHeight,
+            ),
+            padding: effectiveActionButtonPadding,
+            icon: const Icon(Icons.qr_code_scanner, size: 18),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Barcode scanner clicked!')),
+              );
+            },
+            tooltip: 'Scan barcode',
+          ),
         ),
       );
     }
 
     // Add voice search action if enabled
-    if (showVoiceSearch) {
+    if (effectiveShowVoiceSearch) {
       actions.add(
-        IconButton(
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          icon: const Icon(Icons.mic, size: 18),
-          onPressed: () {
-            OsmeaComponents.soundDialog(
-              context,
-              variant: SoundDialogVariant.standard,
-              promptTitleText: 'Voice Search',
-              recordingTitleText: 'Listening...',
-              okButtonText: 'Search',
-              cancelButtonText: 'Cancel',
-              onConfirm: (filePath) {
-                // Handle voice search result
-                debugPrint('🎤 Voice search recorded: $filePath');
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Voice search completed! Processing...'),
-                ));
-              },
-              onCancel: () {
-                debugPrint('🚫 Voice search cancelled');
-              },
-              primaryActionColor: Theme.of(context).primaryColor,
-              maxRecordingDuration: const Duration(seconds: 30),
-              autoStopOnMaxDuration: true,
-            );
-          },
-          tooltip: 'Voice search',
+        Container(
+          margin:
+              EdgeInsets.symmetric(horizontal: effectiveActionButtonSpacing),
+          child: IconButton(
+            constraints: BoxConstraints(
+              minWidth: effectiveActionButtonMinWidth,
+              minHeight: effectiveActionButtonMinHeight,
+            ),
+            padding: effectiveActionButtonPadding,
+            icon: const Icon(Icons.mic, size: 18),
+            onPressed: () {
+              OsmeaComponents.soundDialog(
+                context,
+                variant: SoundDialogVariant.standard,
+                promptTitleText: 'Voice Search',
+                recordingTitleText: 'Listening...',
+                okButtonText: 'Search',
+                cancelButtonText: 'Cancel',
+                onConfirm: (filePath) {
+                  // Handle voice search result
+                  debugPrint('🎤 Voice search recorded: $filePath');
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Voice search completed! Processing...'),
+                  ));
+                },
+                onCancel: () {
+                  debugPrint('🚫 Voice search cancelled');
+                },
+                primaryActionColor: Theme.of(context).primaryColor,
+                maxRecordingDuration: const Duration(seconds: 30),
+                autoStopOnMaxDuration: true,
+              );
+            },
+            tooltip: 'Voice search',
+          ),
         ),
       );
     }
