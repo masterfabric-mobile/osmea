@@ -12,30 +12,28 @@ import 'di/config/config_di.dart';
 
 /// 🚀 Main entry point of the API Explorer application
 Future<void> main() async {
-  debugPrint('🔥 API Explorer başlatılıyor...');
+  debugPrint('🔥 API Explorer starting...');
   
-  // 🔧 Critical error handler - tüm hataları yakala
+  // 🔧 Critical error handler - catch all errors
   try {
     if (kIsWeb) {
-      // Web için hızlı başlatma
+      // Fast startup for web
       await _initializeWebApp();
     } else {
-      // Mobil için tam başlatma
+      // Full startup for mobile
       await _initializeApp();
     }
   } catch (e, stackTrace) {
-    debugPrint('🚨 KRİTİK HATA - Ana başlatma başarısız: $e');
+    debugPrint('🚨 CRITICAL ERROR - Main initialization failed: $e');
     debugPrint('Stack trace: $stackTrace');
-    
-    // Hata durumunda minimal app çalıştır
-    runApp(_createErrorApp(e.toString()));
+
     return;
   }
 }
 
-/// 🌐 Web için optimize edilmiş başlatma
+/// 🌐 Optimized startup for web
 Future<void> _initializeWebApp() async {
-  debugPrint('🌐 Web app başlatılıyor...');
+  debugPrint('🌐 Web app starting...');
   
   // 🪄🧵 Flutter bindings
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,22 +46,22 @@ Future<void> _initializeWebApp() async {
     debugPrint('❌ Web URL strategy failed: $e');
   }
 
-  // 🗄️ Sadece temel storage - diğerlerini lazy load
+  // 🗄️ Only basic storage - lazy load others
   try {
     final localStorageHelper = LocalStorageHelper();
     await localStorageHelper.init();
-    debugPrint('✅ LocalStorageHelper (web) başlatıldı');
+    debugPrint('✅ LocalStorageHelper (web) initialized');
   } catch (e) {
-    debugPrint('❌ UYARI - Storage başlatılamadı (web): $e');
-    // Web'de devam et
+    debugPrint('❌ WARNING - Storage initialization failed (web): $e');
+    // Continue on web
   }
 
-  // 🚀 Minimal app başlat - servisleri lazy load et
-  debugPrint('🚀 Minimal web app başlatılıyor...');
+  // 🚀 Start minimal app - lazy load services
+  debugPrint('🚀 Minimal web app starting...');
   runApp(MasterApp(
     router: AppRouter.router,
-    shouldSetOrientation: false, // Web'de orientation yok
-    preferredOrientations: [], // Web'de orientation yok
+    shouldSetOrientation: false, // No orientation on web
+    preferredOrientations: [], // No orientation on web
     showPerformanceOverlay: false,
     textDirection: TextDirection.ltr,
     fontScale: 1.0,
@@ -73,21 +71,21 @@ Future<void> _initializeWebApp() async {
     useConfigurationHelpers: false,
   ));
   
-  // 🔄 Servisleri background'da başlat
+  // 🔄 Start services in background
   _initializeServicesLazy();
 }
 
-/// 🔄 Servisleri background'da lazy başlat (web için)
+/// 🔄 Lazy initialize services in background (for web)
 void _initializeServicesLazy() {
-  // UI yüklendikten sonra servisleri başlat
+  // Start services after UI loads
   Future.delayed(const Duration(milliseconds: 1000), () async {
     try {
-      debugPrint('🔄 Background servisler başlatılıyor...');
+      debugPrint('🔄 Background services starting...');
       
       // API Services
       try {
         ApiServiceRegistry.initialize();
-        debugPrint('✅ API services (lazy) başlatıldı');
+        debugPrint('✅ API services (lazy) started');
       } catch (e) {
         debugPrint('❌ API services lazy failed: $e');
       }
@@ -95,7 +93,7 @@ void _initializeServicesLazy() {
       // Dependency Injection
       try {
         await configureDependencies();
-        debugPrint('✅ DI (lazy) başlatıldı');
+        debugPrint('✅ DI (lazy) started');
       } catch (e) {
         debugPrint('❌ DI lazy failed: $e');
       }
@@ -103,19 +101,19 @@ void _initializeServicesLazy() {
       // WizardHelper
       try {
         await WizardHelper.init();
-        debugPrint('✅ WizardHelper (lazy) başlatıldı');
+        debugPrint('✅ WizardHelper (lazy) started');
       } catch (e) {
         debugPrint('❌ WizardHelper lazy failed: $e');
       }
       
-      debugPrint('🎉 Background servisler tamamlandı');
+      debugPrint('🎉 Background services completed');
     } catch (e) {
-      debugPrint('❌ Background servis hatası: $e');
+      debugPrint('❌ Background service error: $e');
     }
   });
 }
 
-/// 🛠️ Ana başlatma işlemi - hataları yakalar
+/// 🛠️ Main startup process - catches errors
 Future<void> _initializeApp() async {
   // 🪄🧵 Ensures Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
@@ -136,12 +134,12 @@ Future<void> _initializeApp() async {
     await localStorageHelper.init();
     debugPrint('✅ LocalStorageHelper initialized successfully');
   } catch (e) {
-    debugPrint('❌ HATA - LocalStorageHelper başlatılamadı: $e');
-    // Web'de bu kritik bir hata olabilir - devam et ama logla
+    debugPrint('❌ ERROR - LocalStorageHelper initialization failed: $e');
+    // This can be a critical error on web - continue but log it
     if (kIsWeb) {
-      debugPrint('🌐 Web platformda storage hatası - SharedPreferences sorunu olabilir');
+      debugPrint('🌐 Web platform storage error - SharedPreferences issue possible');
     }
-    // Devam et - UI'da handle ederiz
+    // Continue - we'll handle it in UI
   }
 
   // 🌐 Network initialization is now handled by the wizard system
@@ -157,30 +155,30 @@ Future<void> _initializeApp() async {
   // ⚠️🔁 Initialize API services before dependency injection
   try {
     ApiServiceRegistry.initialize();
-    debugPrint('✅ API services başlatıldı');
+    debugPrint('✅ API services started');
   } catch (e) {
-    debugPrint('❌ HATA - API servisleri başlatılamadı: $e');
-    throw Exception('API servisleri kritik hata: $e');
+    debugPrint('❌ ERROR - API services failed to start: $e');
+    throw Exception('API services critical error: $e');
   }
 
   // 🔗🧬 Set up dependency injection with error handling
   try {
     await configureDependencies();
-    debugPrint('✅ Dependency injection başlatıldı');
+    debugPrint('✅ Dependency injection started');
   } catch (e) {
-    debugPrint('❌ KRİTİK HATA - Dependency injection başarısız: $e');
-    throw Exception('DI sistemi başlatılamadı: $e');
+    debugPrint('❌ CRITICAL ERROR - Dependency injection failed: $e');
+    throw Exception('DI system failed to start: $e');
   }
 
   // 🔧 Initialize WizardHelper for store management
   try {
     await WizardHelper.init();
-    debugPrint('✅ WizardHelper başlatıldı');
+    debugPrint('✅ WizardHelper started');
   } catch (e) {
-    debugPrint('❌ UYARI - WizardHelper başlatılamadı: $e');
-    // Bu kritik değil, uygulama çalışabilir
+    debugPrint('❌ WARNING - WizardHelper failed to start: $e');
+    // This is not critical, app can run
     if (kIsWeb) {
-      debugPrint('🌐 Web platformda WizardHelper sorunu - storage ile ilgili olabilir');
+      debugPrint('🌐 Web platform WizardHelper issue - storage related possible');
     }
   }
 
@@ -188,24 +186,24 @@ Future<void> _initializeApp() async {
   if (!kIsWeb) {
     try {
       await ApiDioClient.prepareCookiesJar();
-      debugPrint('✅ Cookies jar hazırlandı');
+      debugPrint('✅ Cookies jar prepared');
     } catch (e) {
-      debugPrint('❌ Cookies jar hazırlanamadı: $e');
+      debugPrint('❌ Cookies jar could not be prepared: $e');
     }
   } else {
-    debugPrint('🌐 Web platformu - cookies jar atlandı');
+    debugPrint('🌐 Web platform - cookies jar skipped');
   }
 
   // 🚀 Initialize MasterApp components
   try {
     await MasterApp.runBefore(
-      allowCollectDataTelemetry: kIsWeb ? false : true, // Web'de telemetry kapalı
-      enableRemoteConfig: false, // API Explorer için remote config kapalı
+      allowCollectDataTelemetry: kIsWeb ? false : true, // Telemetry disabled on web
+      enableRemoteConfig: false, // Remote config disabled for API Explorer
     );
-    debugPrint('✅ MasterApp bileşenleri başlatıldı');
+    debugPrint('✅ MasterApp components initialized');
   } catch (e) {
-    debugPrint('❌ UYARI - MasterApp başlatılamadı: $e');
-    // Web'de bu bazen sorun çıkarabilir, devam et
+    debugPrint('❌ WARNING - MasterApp initialization failed: $e');
+    // This can sometimes cause issues on web, continue
   }
 
   // ⏳ Small delay to ensure proper initialization
@@ -229,66 +227,4 @@ Future<void> _initializeApp() async {
     devModeSpacer: false,
     useConfigurationHelpers: false, // Disable config helpers for API Explorer
   ));
-}
-
-/// 🚨 Hata durumunda gösterilecek minimal app
-Widget _createErrorApp(String error) {
-  return MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Scaffold(
-      backgroundColor: Colors.red.shade50,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red.shade600,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Uygulama Başlatma Hatası',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red.shade800,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Text(
-                  error,
-                  style: const TextStyle(
-                    fontFamily: 'Courier',
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  // Web'de sayfayı yenile
-                  if (kIsWeb) {
-                    // ignore: avoid_web_libraries_in_flutter
-                    // html.window.location.reload();
-                  }
-                },
-                child: const Text('Sayfayı Yenile'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }
