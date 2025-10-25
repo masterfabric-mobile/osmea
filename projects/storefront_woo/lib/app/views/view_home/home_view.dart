@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/services/cart_service.dart';
@@ -39,6 +40,33 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     HomeViewModel viewModel,
     HomeState state,
   ) {
+    // ✅ Listen for auth required state and navigate to auth screen
+    if (state is HomeAuthRequiredState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('🔒 Auth required, navigating to auth screen');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.message),
+            backgroundColor: OsmeaColors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        // Reset to loading state to prevent infinite loop
+        viewModel.restart();
+        // Navigate to auth
+        context.push('/auth');
+      });
+      // Show loading while navigating
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(
+            child: CircularProgressIndicator(color: OsmeaColors.nordicBlue),
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16),

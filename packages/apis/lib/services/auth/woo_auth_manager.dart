@@ -150,8 +150,10 @@ class WooAuthManager {
         lastName: lastName,
         phone: phone,
         company: company,
-        acceptTerms: acceptTerms,
-        subscribeNewsletter: subscribeNewsletter,
+        userMeta: UserMeta(
+          acceptTerms: acceptTerms,
+          subscribeNewsletter: subscribeNewsletter,
+        ),
         referralCode: referralCode,
       );
 
@@ -246,8 +248,8 @@ class WooAuthManager {
 
       // Call authentication API
       debugPrint('📡 Calling reset password API...');
-      final response = await _authService.sendResetPassword(
-          WooNetwork.storeName, email);
+      final response =
+          await _authService.sendResetPassword(WooNetwork.storeName, email);
 
       if (response.success == true) {
         debugPrint('✅ Password reset email sent successfully');

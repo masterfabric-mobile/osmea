@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
@@ -47,6 +48,33 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailState state,
   ) {
+    // ✅ Auth required state - navigate to auth screen
+    if (state is ProductDetailAuthRequiredState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('🔒 Auth required, navigating to auth screen');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.message),
+            backgroundColor: OsmeaColors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        // Reset to previous state to prevent infinite loop
+        viewModel.loadProduct(productId);
+        // Navigate to auth
+        context.push('/auth');
+      });
+      // Show previous state while navigating
+      if (state.previousState != null) {
+        return ProductDetailContentWidget(
+          viewModel: viewModel,
+          state: state.previousState!,
+        );
+      }
+      // Fallback to loading
+      return const ProductDetailLoadingWidget();
+    }
+
     // Error state
     if (state is ProductDetailErrorState) {
       return ProductDetailErrorWidget(

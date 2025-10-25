@@ -1,50 +1,47 @@
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
-import 'package:core/src/views/auth/sign_in/widgets/sign_in_startup_widget.dart';
+import 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+import 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
+import 'package:core/src/views/auth/sign_up/widgets/sign_up_startup_widget.dart';
 
-/// 🔐 **OSMEA Sign In View**
+/// 🔐 **OSMEA Sign Up View**
 ///
 /// Copyright (c) 2025, OSMEA Team
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
-/// Main sign in view - Handles user authentication
-/// Uses MasterViewCubit for lifecycle management
-///
 /// {@category Views}
-/// {@subCategory SignInView}
+/// {@subCategory Auth}
 
-class SignInView extends MasterViewCubit<SignInCubit, SignInState> {
-  /// Callback triggered when sign in is successful
-  final VoidCallback? onSignInSuccess;
+class SignUpView extends MasterViewCubit<SignUpCubit, SignUpState> {
+  /// Callback triggered when sign up is successful
+  final VoidCallback? onSignUpSuccess;
 
-  /// Callback triggered when sign in fails
-  final Function(String error)? onSignInError;
+  /// Callback triggered when sign up fails
+  final Function(String error)? onSignUpError;
 
-  /// Callback triggered when navigating to sign up
-  final VoidCallback? onSignUpTap;
+  /// Callback triggered when navigating to sign in
+  final VoidCallback? onSignInTap;
 
-  /// Callback triggered when navigating to forgot password
-  final VoidCallback? onForgotPasswordTap;
-
-  SignInView({
+  SignUpView({
     required super.goRoute,
-    super.arguments = const {'sign_in': true},
-    this.onSignInSuccess,
-    this.onSignInError,
-    this.onSignUpTap,
-    this.onForgotPasswordTap,
+    super.arguments = const {'sign_up': true},
+    this.onSignUpSuccess,
+    this.onSignUpError,
+    this.onSignInTap,
   });
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
-    debugPrint('🔐 Sign In View initializing...');
+    debugPrint('🔐 Sign Up View initializing...');
 
     // Extract and set authentication callback from arguments
-    final authCallback =
-        arguments['onSignIn'] as Future<bool> Function(String, String)?;
+    final authCallback = arguments['onSignUp'] as Future<bool> Function(
+      String,
+      String,
+      bool,
+    )?;
+
     if (authCallback != null) {
       viewModel.authenticationCallback = authCallback;
       debugPrint('✅ Authentication callback configured');
@@ -57,9 +54,9 @@ class SignInView extends MasterViewCubit<SignInCubit, SignInState> {
 
     if (isAuthenticated) {
       debugPrint('👤 User already authenticated, navigating to home');
-      onSignInSuccess?.call();
+      onSignUpSuccess?.call();
     } else {
-      debugPrint('🔓 User not authenticated, showing sign in screen');
+      debugPrint('🔓 User not authenticated, showing sign up screen');
     }
   }
 
@@ -69,13 +66,12 @@ class SignInView extends MasterViewCubit<SignInCubit, SignInState> {
       future: _loadAuthConfig(),
       builder: (context, snapshot) {
         final config = snapshot.data;
-        return SignInStartupWidget(
+        return SignUpStartupWidget(
           viewModel: viewModel,
           state: state,
-          onSignInSuccess: onSignInSuccess,
-          onSignInError: onSignInError,
-          onSignUpTap: onSignUpTap,
-          onForgotPasswordTap: onForgotPasswordTap,
+          onSignUpSuccess: onSignUpSuccess,
+          onSignUpError: onSignUpError,
+          onSignInTap: onSignInTap,
           config: config,
         );
       },
@@ -89,7 +85,7 @@ class SignInView extends MasterViewCubit<SignInCubit, SignInState> {
       await configHelper.loadConfig();
       final allConfig = configHelper.getAllConfig();
       final authConfig =
-          allConfig?['auth_configuration']?['sign_in'] as Map<String, dynamic>?;
+          allConfig?['auth_configuration']?['sign_up'] as Map<String, dynamic>?;
       debugPrint('✅ Auth configuration loaded: ${authConfig?.keys}');
       return authConfig;
     } catch (e) {

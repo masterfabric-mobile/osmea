@@ -105,6 +105,23 @@ class ProductDetailViewModel
       final currentState = state;
       if (currentState is! ProductDetailLoadedState) return;
 
+      // ✅ Check if user is authenticated
+      final authStorage = AuthStorageHelper();
+      final isAuthenticated = await authStorage.isAuthenticated();
+
+      if (!isAuthenticated) {
+        debugPrint('🔒 User not authenticated, requiring sign in');
+        emit(
+          ProductDetailAuthRequiredState(
+            message: 'Please sign in to add items to cart',
+            productId: productId,
+            quantity: quantity,
+            previousState: currentState,
+          ),
+        );
+        return;
+      }
+
       // Find the product to add to cart
       final product = currentState.product;
 
