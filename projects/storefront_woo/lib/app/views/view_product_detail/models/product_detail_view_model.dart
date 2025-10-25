@@ -75,11 +75,14 @@ class ProductDetailViewModel
       final imageUrls = <String>[];
       if (product.images != null) {
         for (final img in product.images!) {
-          if (img is Map<String, dynamic> && img['src'] != null) {
-            imageUrls.add(img['src'] as String);
+          if (img.src != null && img.src!.isNotEmpty) {
+            imageUrls.add(img.src!);
           }
         }
       }
+      debugPrint(
+        '📸 Extracted ${imageUrls.length} image URLs for product: ${product.name}',
+      );
 
       // Check if product is in cart or wishlist
       final isInCart = _cartService.isInCart(productId);
@@ -105,34 +108,22 @@ class ProductDetailViewModel
       final currentState = state;
       if (currentState is! ProductDetailLoadedState) return;
 
-      // ✅ Check if user is authenticated
-      final authStorage = AuthStorageHelper();
-      final isAuthenticated = await authStorage.isAuthenticated();
-
-      if (!isAuthenticated) {
-        debugPrint('🔒 User not authenticated, requiring sign in');
-        emit(
-          ProductDetailAuthRequiredState(
-            message: 'Please sign in to add items to cart',
-            productId: productId,
-            quantity: quantity,
-            previousState: currentState,
-          ),
-        );
-        return;
-      }
-
       // Find the product to add to cart
       final product = currentState.product;
 
       // Create cart item
-      // Get image URL safely
+      // Get image URL safely for cart item
       String? imageUrl;
       if (product.images != null && product.images!.isNotEmpty) {
         final firstImg = product.images!.first;
-        if (firstImg is Map<String, dynamic> && firstImg['src'] != null) {
-          imageUrl = firstImg['src'] as String;
+        if (firstImg.src != null && firstImg.src!.isNotEmpty) {
+          imageUrl = firstImg.src!;
+          debugPrint('🖼️ Using image URL for cart: $imageUrl');
+        } else {
+          debugPrint('⚠️ First image has no src property');
         }
+      } else {
+        debugPrint('⚠️ No images available for product ${product.name}');
       }
 
       final cartItem = CartItem(
