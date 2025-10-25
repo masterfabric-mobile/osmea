@@ -11,8 +11,6 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
-import 'package:storefront_woo/app/services/cart_service.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/cart_content_widget.dart';
 
 /// HomeView displays the main e-commerce product catalog
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
@@ -81,8 +79,6 @@ PreferredSizeWidget _buildHomeAppBar(
   BuildContext context,
   HomeViewModel? viewModel,
 ) {
-  final cartService = CartService();
-
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
       'Home',
@@ -101,48 +97,13 @@ PreferredSizeWidget _buildHomeAppBar(
         onPressed: () => viewModel?.restart(),
         tooltip: 'Restart',
       ),
-      // Cart button with badge
+      // Cart button
       AppBarAction(
         type: AppBarActionType.secondary,
         icon: Icon(Icons.shopping_cart, color: OsmeaColors.thunder),
-        onPressed: () => _showCartModal(context, cartService),
-        tooltip: 'Cart (${cartService.itemCount})',
-        badge: cartService.itemCount > 0
-            ? OsmeaComponents.container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: OsmeaColors.red,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                child: OsmeaComponents.text(
-                  '${cartService.itemCount}',
-                  color: OsmeaColors.white,
-                  textStyle: OsmeaTextStyle.bodySmall(
-                    context,
-                  ).copyWith(fontSize: 11, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              )
-            : null,
+        onPressed: () => context.go('/cart'),
+        tooltip: 'Cart',
       ),
     ],
   );
 }
-
-/// Shows cart modal following OSMEA standards
-void _showCartModal(BuildContext context, CartService cartService) {
-  OsmeaComponents.showPopup(
-    context: context,
-    child: CartContentWidget(cartService: cartService),
-    size: PopupSize.large,
-    variant: PopupVariant.modal,
-    title: 'Shopping Cart',
-    backgroundColor: OsmeaColors.paperWhite,
-    barrierColor: OsmeaColors.black.withOpacity(0.5),
-    isDismissible: true,
-    showCloseButton: true,
-  );
-}
-
-/// Cart content widget following OSMEA standards
