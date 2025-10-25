@@ -23,6 +23,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     super.snackBarFunction,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(
          coreAppBar: (context, viewModel) =>
@@ -57,22 +58,12 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
         context.push('/auth');
       });
       // Show loading while navigating
-      return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Center(
-            child: CircularProgressIndicator(color: OsmeaColors.nordicBlue),
-          ),
-        ),
+      return Center(
+        child: CircularProgressIndicator(color: OsmeaColors.nordicBlue),
       );
     }
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: viewModel.buildContent(context, state),
-      ),
-    );
+    return viewModel.buildContent(context, state);
   }
 }
 
@@ -84,6 +75,7 @@ PreferredSizeWidget _buildHomeAppBar(
   final cartService = CartService();
 
   return OsmeaComponents.appBar(
+    padding: const EdgeInsets.only(bottom: 16),
     title: OsmeaComponents.text(
       'Home',
       color: OsmeaColors.thunder,
