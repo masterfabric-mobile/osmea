@@ -2,7 +2,16 @@
 
 > This changelog is generated from the latest closed pull requests. For a full, always-up-to-date changelog, visit [Closed PRs on GitHub](https://github.com/masterfabric-mobile/osmea/pulls?q=is%3Apr+is%3Aclosed).  
 
-## 📦 APIs – v0.48.11
+## 📦 APIs – v0.51.11
+
+- **[#240 – Package → API → Image Model](https://github.com/masterfabric-mobile/osmea/pull/240)**  
+  Refactors product/brand/category models to use a strongly-typed Image model, improving serialization and code safety.
+
+- **[#236 – Package → API → Woocommerce Send Reset Password with Mail Module](https://github.com/masterfabric-mobile/osmea/pull/236)**  
+  Refactors reset password API to align with the new contract, updating handler, Freezed models, and validation logic.
+
+- **[#232 – Package → API → Woocommerce Cart Coupons API](https://github.com/masterfabric-mobile/osmea/pull/232)**  
+  Implements full CRUD for WooCommerce Cart Coupons, including service, client, handlers, Freezed models, and DI registration.
 
 - **[#226 – Package → API → Woocommerce Checkout Checkout Order and Order API](https://github.com/masterfabric-mobile/osmea/pull/226)**  
   Adds checkout, order creation, order retrieval, payment, and related handlers/models for WooCommerce Store API. Completes core transactional flow.
@@ -180,7 +189,16 @@
   Major improvements to customer management: new API endpoints, enhanced validation, search and filtering, pagination fixes, UI enhancements, and updated documentation.
 
 
-## 🎨 Components – v0.67.25
+## 🎨 Components – v0.69.26
+
+- **[#239 – Components → Location Picker](https://github.com/masterfabric-mobile/osmea/pull/239)**  
+  Adds Google Maps-integrated, BLoC-based location picker with autocomplete, map variants, and UX improvements.
+
+- **[#238 – FIX – Components – TextField](https://github.com/masterfabric-mobile/osmea/pull/238)**  
+  Fixes TextField `filled` and `backgroundColor` logic to ensure background visibility regardless of variant.
+
+- **[#234 – Components → Sound Dialog](https://github.com/masterfabric-mobile/osmea/pull/234)**  
+  Adds max duration and auto-stop, API customization, localization, icon overrides, and improved demo for `OsmeaSoundDialog`.
 
 - **[#229 – Components → Component and Styling Improvements](https://github.com/masterfabric-mobile/osmea/pull/229)**  
   Enhances OsmeaChips, IconButton, ImageCard, and other UI components with new shape, style, icon, and customization options.
@@ -456,7 +474,16 @@
   Established a modular, scalable UI structure (`lib/src/`), reusable components, enums, design tokens, and core infrastructure for future UI elements.
                                            
 
-## ⚙️ Core – v3.20.4
+## ⚙️ Core – v3.25.4
+
+- **[#237 – Core → Sign Up Auth View](https://github.com/masterfabric-mobile/osmea/pull/237)**  
+  Unifies sign-in and sign-up flows, enhances dependency injection, adds guest mode, configuration improvements, and new UI assets.
+
+- **[#235 – Core → Auth View](https://github.com/masterfabric-mobile/osmea/pull/235)**  
+  Implements initial JWT-based sign-in, stateful authentication, DI setup, `/signIn` route, and storage integration.
+
+- **[#228 – Core → Image Detail View](https://github.com/masterfabric-mobile/osmea/pull/228)**  
+  Adds `ImageDetailView` and `ImageDetailScreen` with pinch-to-zoom carousel, Cubit state, hero transitions, and empty state handling.
 
 - **[#227 – Core → Loading/Error Views and State Management Improvements](https://github.com/masterfabric-mobile/osmea/pull/227)**  
   Adds LoadingViewCubit, ErrorHandlingCubit, new loading/error widgets with styles, and centralizes asynchronous state handling.
@@ -473,8 +500,8 @@
 - **[#211 – Core → BaseView & ViewModel Cubit Refactor](https://github.com/masterfabric-mobile/osmea/pull/211)**  
   Refactors BaseViewCubit, BaseViewModelCubit, and related classes for simplification and clarity; renames typedefs and improves maintainability.
 
-- **[#207 – Core → Permission Handler Helper Improvements](https://github.com/masterfabric-mobile/osmea/pull/207)**  
-  Adds enhanced permission handling (Android 12+ exact alarm permission), intelligent caching, robust error handling, cross-platform support, and production-ready architecture.
+- **[#208 – Core → Permission Handler Helper Example](https://github.com/masterfabric-mobile/osmea/pull/208)**  
+  Adds a mobile-first, responsive Permissions Helper Example screen and guidance document. Refactors UI for responsiveness and adds platform-specific test flows.
 
 - **[#207 – Core → Permission Handler Helper Improvements](https://github.com/masterfabric-mobile/osmea/pull/207)**  
     Adds exact alarm permission management for Android 12+, intelligent permission caching, cross-platform permission handling, advanced error handling, smart storage permission management, real-time permission status tracking, and production-ready architecture.
@@ -484,6 +511,9 @@
 
 - **[#202 – Core → File Download Helper & Update → Components App](https://github.com/masterfabric-mobile/osmea/pull/202)**  
   Enhances File Download Helper & Permission Handler (iOS/Android support, onboarding flow, simulator compatibility, permission logic, component app updates).
+
+- **[#200 – Core → Local-Notification-Helper](https://github.com/masterfabric-mobile/osmea/pull/200)**  
+  Adds a comprehensive `NotificationHelper` for local notifications (instant, scheduled, repeating) with multi-platform support, permission management, advanced scheduling, and custom channels.
 
 - **[#199 – Core → Price-Currency-Info-Helper](https://github.com/masterfabric-mobile/osmea/pull/199)**  
   Old `PriceFormatWithCurrencyHelper` deprecated and replaced by `CurrencyHelper` (method signatures, global state, extension usage, migration required).
