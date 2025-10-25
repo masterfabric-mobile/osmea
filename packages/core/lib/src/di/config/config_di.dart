@@ -2,6 +2,7 @@
 import 'package:core/src/di/config/config_di.config.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
 import 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/permissions/cubit/permissions_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
@@ -43,5 +44,6 @@ Future<GetIt> configureDependencies() async {
     getIt.registerFactory<SignUpCubit>(() => SignUpCubit());
   }
 
+  getIt.registerFactory<SearchCubit>(() => SearchCubit());
   return getIt;
 }

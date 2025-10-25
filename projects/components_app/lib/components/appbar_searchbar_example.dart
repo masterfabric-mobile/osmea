@@ -91,6 +91,30 @@ class _AppBarSearchBarExampleState extends State<AppBarSearchBarExample> {
         maxHistoryItems: 10,
         minQueryLength: 2,
         debounceDuration: const Duration(milliseconds: 300),
+        // SearchBar action buttons
+        searchBarActions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner, size: 20),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Barcode scanner clicked!')),
+              );
+            },
+            tooltip: 'Scan barcode',
+          ),
+          IconButton(
+            icon: const Icon(Icons.mic, size: 20),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Voice search clicked!')),
+              );
+            },
+            tooltip: 'Voice search',
+          ),
+        ],
+        searchBarActionMargin: EdgeInsets.zero,
+        searchBarActionAlignment: MainAxisAlignment.end,
+        // AppBar action buttons
         actions: [
           AppBarWithSearchBarAction(
             icon: const Icon(Icons.notifications_outlined),

@@ -6,5 +6,6 @@ enum Routes {
   loading,
   auth,
   signIn,
+  search,
   signUp
 }

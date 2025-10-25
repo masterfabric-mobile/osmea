@@ -165,3 +165,8 @@ export 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
 export 'package:core/src/views/auth/sign_up/sign_up_view.dart';
 export 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
 export 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
+
+// 🔍 Exports the search view and cubit
+export 'package:core/src/views/search/search_view.dart';
+export 'package:core/src/views/search/cubit/search_cubit.dart';
+export 'package:core/src/views/search/cubit/search_state.dart';
