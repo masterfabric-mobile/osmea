@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import '../components/url_launcher_example.dart';
 import '../components/file_download_helper_example.dart';
 import '../components/viewer_helper_example.dart';
+import '../components/permission_handler_example.dart';
 
 /// 🔧 **Helpers Screen**
 ///
@@ -110,23 +111,44 @@ class HelpersScreen extends StatelessWidget {
         'route': () => const ViewerHelperExample(),
         'isComingSoon': false,
       },
+      {
+        'title': 'Permissions',
+        'icon': Icons.privacy_tip,
+        'description': 'Request and inspect app permissions',
+        'route': () => const PermissionHandlerExample(),
+        'isComingSoon': false,
+      },
     ];
 
-    return OsmeaComponents.padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.0,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: helpers.length,
-        itemBuilder: (context, index) {
-          final helper = helpers[index];
-          return _buildModernCard(context, helper);
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        int crossAxisCount = 2;
+        if (width < 360) {
+          crossAxisCount = 1;
+        } else if (width >= 720) {
+          crossAxisCount = 3;
+        } else if (width >= 1024) {
+          crossAxisCount = 4;
+        }
+
+        return OsmeaComponents.padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: crossAxisCount == 1 ? 3.2 : 1.1,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: helpers.length,
+            itemBuilder: (context, index) {
+              final helper = helpers[index];
+              return _buildModernCard(context, helper);
+            },
+          ),
+        );
+      },
     );
   }
 

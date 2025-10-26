@@ -1,3 +1,4 @@
+import 'package:osmea_components/src/components/location_picker/location_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
@@ -46,6 +47,8 @@ import 'package:osmea_components/src/components/ticket_widget/ticket_widget.dart
 import 'package:osmea_components/src/components/popup/popup.dart';
 import 'package:osmea_components/src/components/searchbar/searchbar.dart';
 import 'package:osmea_components/src/components/searchbar/expandable_searchbar.dart';
+import 'package:osmea_components/src/components/sound_dialog/sound_dialog.dart';
+import 'package:osmea_components/src/enums/sound_dialog_enums.dart';
 
 import 'components/collapse/collapse.dart';
 import 'components/dropdown/dropdown.dart';
@@ -905,6 +908,61 @@ class OsmeaComponents {
       password: password,
     );
   }
+
+  /// 📍 **OSMEA Location Picker** - Comprehensive location picker component
+  ///
+  /// Creates a feature-rich location picker component with support for:
+  /// - Combined (input + map), input-only, and map-only variants
+  /// - Small, medium, and large sizes
+  /// - Outlined and filled styles
+  /// - Initial location setting
+  /// - Label and hint text
+  ///
+  /// Example:
+  /// ```dart
+  /// OsmeaComponents.locationPicker(
+  ///   onLocationChanged: (location) {
+  ///     print('Selected: ${location.address}');
+  ///   },
+  ///   label: 'Select Delivery Address',
+  ///   variant: LocationPickerVariant.combined,
+  /// )
+  /// ```
+  static Widget locationPicker({
+  Key? key,
+  LocationData? initialLocation,
+  required ValueChanged<LocationData?> onLocationChanged,
+  VoidCallback? onShowMapPressed,
+  VoidCallback? onCurrentLocationPressed,
+  required String apiKey,
+  LocationPickerVariant variant = LocationPickerVariant.combined,
+  LocationPickerSize size = LocationPickerSize.medium,
+  LocationPickerStyle style = LocationPickerStyle.outlined,
+  String? label,
+  String? hintText,
+  bool isRequired = false,
+  bool showCurrentLocation = true,
+  bool autofocusCurrentLocation = false,
+  bool showMapButtonInSearch = false,
+}) {
+  return OsmeaLocationPicker(
+    key: key,
+    initialLocation: initialLocation,
+    onLocationChanged: onLocationChanged,
+    onShowMapPressed: onShowMapPressed,
+    onCurrentLocationPressed: onCurrentLocationPressed,
+    apiKey: apiKey,
+    variant: variant,
+    size: size,
+    style: style,
+    label: label,
+    hintText: hintText,
+    isRequired: isRequired,
+    showCurrentLocation: showCurrentLocation,
+    autofocusCurrentLocation: autofocusCurrentLocation,
+    showMapButtonInSearch: showMapButtonInSearch,
+  );
+}
 
   /// 🔽 **OSMEA Dropdown** - A comprehensive dropdown component
   ///
@@ -4237,6 +4295,194 @@ class OsmeaComponents {
       validator: validator,
       animationDuration: animationDuration,
       debounceDuration: debounceDuration,
+    );
+  }
+
+  // ... Diğer component metodlarınız burada yer alabilir (image, footer, vs.)
+
+  // ==================== SOUND DIALOG (GÜNCELLENDİ) ====================
+
+  /// 🎤 **Show OSMEA Sound Dialog**
+  ///
+  /// Opens a highly customizable, self-contained sound recording dialog as a modal pop-up.
+  ///
+  /// **Features:**
+  /// - Manages its own state internally via `SoundDialogCubit`.
+  /// - Supports multiple variants (`standard`, `expandable`, `inlineSearchBar`, `feedbackRecorder`).
+  /// - Provides extensive customization for colors, texts, icons, and behavior.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// OsmeaComponents.soundDialog(
+  ///   context,
+  ///   variant: SoundDialogVariant.feedbackRecorder,
+  ///   onConfirm: (path) => print("Saved: $path"),
+  ///   onCancel: () => print("Canceled"),
+  ///   // --- Customization ---
+  ///   primaryActionColor: Colors.blueAccent,
+  ///   dialogBackgroundColor: Colors.white,
+  ///   reviewTitleText: "Confirm your recording",
+  ///   confirmButtonText: "Submit",
+  ///   maxRecordingDuration: const Duration(seconds: 30),
+  ///   autoStopOnMaxDuration: true,
+  /// );
+  /// ```
+  static Future<void> soundDialog(
+    BuildContext context, {
+    // Core Functionality
+    SoundDialogVariant variant = SoundDialogVariant.standard,
+    void Function(String filePath)? onConfirm,
+    VoidCallback? onCancel,
+
+    // 🎨 Theming & Styling
+    Color? dialogBackgroundColor,
+    BorderRadius? dialogBorderRadius,
+    Color? primaryActionColor,
+    Color? secondaryActionColor,
+    Color? destructiveActionColor,
+    Color? defaultTextColor,
+    Color? statusTextColor,
+    TextStyle? defaultTitleStyle,
+    TextStyle? statusTextStyle,
+
+    // ✍️ Text & Localization
+    String? promptTitleText,
+    String? recordingTitleText,
+    String? pausedTitleText,
+    String? reviewTitleText,
+    String? okButtonText,
+    String? cancelButtonText,
+    String? confirmButtonText,
+    String? retryButtonText,
+    String? reviewPlayButtonText,
+
+    // ✨ Icons
+    Widget? startRecordingIcon,
+    Widget? stopRecordingIcon,
+    Widget? pauseRecordingIcon,
+    Widget? resumeRecordingIcon,
+    Widget? reviewPlayIcon,
+    Widget? confirmCheckIcon,
+
+    // ⚙️ Behavior
+    Duration? maxRecordingDuration,
+    bool autoStopOnMaxDuration = false,
+  }) async {
+    return showDialog(
+      context: context,
+      builder: (_) => OsmeaSoundDialog(
+        variant: variant,
+        onConfirm: onConfirm,
+        onCancel: onCancel,
+        dialogBackgroundColor: dialogBackgroundColor,
+        dialogBorderRadius: dialogBorderRadius,
+        primaryActionColor: primaryActionColor,
+        secondaryActionColor: secondaryActionColor,
+        destructiveActionColor: destructiveActionColor,
+        defaultTextColor: defaultTextColor,
+        statusTextColor: statusTextColor,
+        defaultTitleStyle: defaultTitleStyle,
+        statusTextStyle: statusTextStyle,
+        promptTitleText: promptTitleText,
+        recordingTitleText: recordingTitleText,
+        pausedTitleText: pausedTitleText,
+        reviewTitleText: reviewTitleText,
+        okButtonText: okButtonText,
+        cancelButtonText: cancelButtonText,
+        confirmButtonText: confirmButtonText,
+        retryButtonText: retryButtonText,
+        reviewPlayButtonText: reviewPlayButtonText,
+        startRecordingIcon: startRecordingIcon,
+        stopRecordingIcon: stopRecordingIcon,
+        pauseRecordingIcon: pauseRecordingIcon,
+        resumeRecordingIcon: resumeRecordingIcon,
+        reviewPlayIcon: reviewPlayIcon,
+        confirmCheckIcon: confirmCheckIcon,
+        maxRecordingDuration: maxRecordingDuration,
+        autoStopOnMaxDuration: autoStopOnMaxDuration,
+      ),
+    );
+  }
+
+  /// 🔊 **OSMEA Sound Dialog Widget**
+  ///
+  /// Returns a highly customizable, self-contained sound recording dialog widget.
+  /// This can be used directly inside custom layouts.
+  ///
+  /// **Note:** For most cases, using the `OsmeaComponents.soundDialog()` helper
+  /// to show a modal dialog is recommended.
+  static Widget soundDialogWidget({
+    Key? key,
+    // Core Functionality
+    SoundDialogVariant variant = SoundDialogVariant.standard,
+    void Function(String filePath)? onConfirm,
+    VoidCallback? onCancel,
+
+    // 🎨 Theming & Styling
+    Color? dialogBackgroundColor,
+    BorderRadius? dialogBorderRadius,
+    Color? primaryActionColor,
+    Color? secondaryActionColor,
+    Color? destructiveActionColor,
+    Color? defaultTextColor,
+    Color? statusTextColor,
+    TextStyle? defaultTitleStyle,
+    TextStyle? statusTextStyle,
+
+    // ✍️ Text & Localization
+    String? promptTitleText,
+    String? recordingTitleText,
+    String? pausedTitleText,
+    String? reviewTitleText,
+    String? okButtonText,
+    String? cancelButtonText,
+    String? confirmButtonText,
+    String? retryButtonText,
+    String? reviewPlayButtonText,
+
+    // ✨ Icons
+    Widget? startRecordingIcon,
+    Widget? stopRecordingIcon,
+    Widget? pauseRecordingIcon,
+    Widget? resumeRecordingIcon,
+    Widget? reviewPlayIcon,
+    Widget? confirmCheckIcon,
+
+    // ⚙️ Behavior
+    Duration? maxRecordingDuration,
+    bool autoStopOnMaxDuration = false,
+  }) {
+    return OsmeaSoundDialog(
+      key: key,
+      variant: variant,
+      onConfirm: onConfirm,
+      onCancel: onCancel,
+      dialogBackgroundColor: dialogBackgroundColor,
+      dialogBorderRadius: dialogBorderRadius,
+      primaryActionColor: primaryActionColor,
+      secondaryActionColor: secondaryActionColor,
+      destructiveActionColor: destructiveActionColor,
+      defaultTextColor: defaultTextColor,
+      statusTextColor: statusTextColor,
+      defaultTitleStyle: defaultTitleStyle,
+      statusTextStyle: statusTextStyle,
+      promptTitleText: promptTitleText,
+      recordingTitleText: recordingTitleText,
+      pausedTitleText: pausedTitleText,
+      reviewTitleText: reviewTitleText,
+      okButtonText: okButtonText,
+      cancelButtonText: cancelButtonText,
+      confirmButtonText: confirmButtonText,
+      retryButtonText: retryButtonText,
+      reviewPlayButtonText: reviewPlayButtonText,
+      startRecordingIcon: startRecordingIcon,
+      stopRecordingIcon: stopRecordingIcon,
+      pauseRecordingIcon: pauseRecordingIcon,
+      resumeRecordingIcon: resumeRecordingIcon,
+      reviewPlayIcon: reviewPlayIcon,
+      confirmCheckIcon: confirmCheckIcon,
+      maxRecordingDuration: maxRecordingDuration,
+      autoStopOnMaxDuration: autoStopOnMaxDuration,
     );
   }
 }

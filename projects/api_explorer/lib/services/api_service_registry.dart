@@ -3984,13 +3984,7 @@ class ApiServiceRegistry {
       subcategory: 'Authentication',
       handler: UserLogoutHandler(),
     ),
-    ApiService(
-      name: 'Password Reset',
-      endpoint: '/wp-json/{brand_name}-auth-reset/v1/auth',
-      category: ApiCategory.woocommerce,
-      subcategory: 'Authentication',
-      handler: PasswordResetHandler(),
-    ),
+
     ApiService(
       name: 'Password Update',
       endpoint: '/wp-json/{brand_name}-auth-login/v1/user/reset_password',

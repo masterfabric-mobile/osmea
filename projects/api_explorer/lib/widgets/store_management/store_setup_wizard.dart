@@ -4,6 +4,7 @@ import 'package:apis/apis.dart';
 import 'package:core/core.dart';
 import '../../services/handlers/woocommerce/auth_handlers/jwt_auth_test_handler.dart';
 import '../../services/handlers/woocommerce/auth_handlers/user_signup_handler.dart';
+import '../../services/handlers/woocommerce/auth_handlers/send_reset_password_handler.dart';
 
 class StoreSetupWizard extends StatefulWidget {
   final Function(StoreConfiguration)? onStoreAdded;
@@ -97,7 +98,9 @@ class _StoreSetupWizardState extends State<StoreSetupWizard>
   // Authentication testing state
   bool _isTestingAuth = false;
   bool _isSigningUp = false;
+  bool _isResettingPassword = false;
   String? _authTestResult;
+  String? _resetPasswordResult;
 
   // Controllers for form fields
   final _storeNameController = TextEditingController();
@@ -116,6 +119,9 @@ class _StoreSetupWizardState extends State<StoreSetupWizard>
   final _signupEmailController = TextEditingController();
   final _signupPasswordController = TextEditingController();
   final _signupAuthKeyController = TextEditingController();
+  
+  // Reset password email field
+  final _resetPasswordEmailController = TextEditingController();
 
   // Password visibility states
   bool _isAccessTokenVisible = false;
@@ -1038,6 +1044,7 @@ class _StoreSetupWizardState extends State<StoreSetupWizard>
     _signupEmailController.dispose();
     _signupPasswordController.dispose();
     _signupAuthKeyController.dispose();
+    _resetPasswordEmailController.dispose();
     super.dispose();
   }
 
@@ -1581,6 +1588,12 @@ class _StoreSetupWizardState extends State<StoreSetupWizard>
               ? TextInputType.datetime
               : TextInputType.text,
         ),
+
+        // Reset Password Button for WooCommerce
+        if (_selectedPlatform == 'woocommerce') ...[
+          OsmeaComponents.sizedBox(height: context.spacing24),
+          _buildResetPasswordButton(),
+        ],
       ],
     );
   }
@@ -2004,6 +2017,235 @@ class _StoreSetupWizardState extends State<StoreSetupWizard>
         return 'WooCommerce';
       default:
         return 'Unknown Platform';
+    }
+  }
+
+  /// 📧 Build Reset Password Section for WooCommerce
+  Widget _buildResetPasswordButton() {
+    return OsmeaComponents.container(
+      padding: EdgeInsets.all(context.spacing20),
+      decoration: BoxDecoration(
+        color: OsmeaColors.crystalBay.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.steel.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Header
+          OsmeaComponents.row(
+            children: [
+              Icon(
+                Icons.password_outlined,
+                color: OsmeaColors.nordicBlue,
+                size: 20,
+              ),
+              OsmeaComponents.sizedBox(width: 8),
+              OsmeaComponents.text(
+                'Password Reset',
+                textStyle: OsmeaTextStyle.titleSmall(context),
+                color: OsmeaColors.nordicBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+          
+          OsmeaComponents.sizedBox(height: context.spacing8),
+          
+          // Description
+          OsmeaComponents.text(
+            'Send a password reset email to any user. No authentication required.',
+            textStyle: OsmeaTextStyle.bodySmall(context),
+            color: OsmeaColors.steel.withValues(alpha: 0.8),
+          ),
+          
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          
+          // Store Name field
+          _buildTextField(
+            controller: _storeNameController,
+            label: 'Store Name',
+            hint: 'Enter store name',
+            errorText: null,
+            icon: Icons.store,
+          ),
+          
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          
+          // Store URL field
+          _buildTextField(
+            controller: _storeUrlController,
+            label: 'Store URL',
+            hint: 'Enter store URL (e.g., https://yourstore.com)',
+            errorText: null,
+            icon: Icons.link,
+            keyboardType: TextInputType.url,
+          ),
+          
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          
+          // Email field for reset password
+          _buildTextField(
+            controller: _resetPasswordEmailController,
+            label: 'User Email Address',
+            hint: 'Enter the email address for password reset',
+            errorText: null,
+            icon: Icons.email,
+            keyboardType: TextInputType.emailAddress,
+          ),
+          
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          
+          // Reset Password Button
+          SizedBox(
+            width: double.infinity,
+            child: OsmeaComponents.button(
+              text: _isResettingPassword 
+                  ? 'Sending Reset Email...' 
+                  : 'Send Reset Password Email',
+              variant: ButtonVariant.primary,
+              size: ButtonSize.medium,
+              onPressed: _isResettingPassword ? null : _sendResetPasswordEmail,
+            ),
+          ),
+          
+          // Reset password result message
+          if (_resetPasswordResult != null) ...[
+            OsmeaComponents.sizedBox(height: context.spacing12),
+            Container(
+              padding: EdgeInsets.all(context.spacing12),
+              decoration: BoxDecoration(
+                color: _resetPasswordResult!.contains('✅') 
+                    ? Colors.green.withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _resetPasswordResult!.contains('✅')
+                      ? Colors.green.withOpacity(0.3)
+                      : Colors.red.withOpacity(0.3),
+                ),
+              ),
+              child: OsmeaComponents.row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    _resetPasswordResult!.contains('✅') 
+                        ? Icons.check_circle 
+                        : Icons.error,
+                    color: _resetPasswordResult!.contains('✅')
+                        ? Colors.green
+                        : Colors.red,
+                    size: 20,
+                  ),
+                  OsmeaComponents.sizedBox(width: 8),
+                  Expanded(
+                    child: OsmeaComponents.text(
+                      _resetPasswordResult!,
+                      textStyle: OsmeaTextStyle.bodySmall(context),
+                      color: _resetPasswordResult!.contains('✅')
+                          ? Colors.green[700]
+                          : Colors.red[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// 📧 Send Reset Password Email
+  Future<void> _sendResetPasswordEmail() async {
+    // Validate all required fields
+    final storeName = _storeNameController.text.trim();
+    final storeUrl = _storeUrlController.text.trim();
+    final email = _resetPasswordEmailController.text.trim();
+
+    if (storeName.isEmpty) {
+      setState(() {
+        _resetPasswordResult = '❌ Please enter a store name';
+      });
+      return;
+    }
+
+    if (storeUrl.isEmpty) {
+      setState(() {
+        _resetPasswordResult = '❌ Please enter a store URL';
+      });
+      return;
+    }
+
+    if (email.isEmpty) {
+      setState(() {
+        _resetPasswordResult = '❌ Please enter an email address';
+      });
+      return;
+    }
+
+    // Email validation
+    if (!_emailRegex.hasMatch(email)) {
+      setState(() {
+        _resetPasswordResult = '❌ Please enter a valid email address';
+      });
+      return;
+    }
+
+    // Store URL validation
+    if (!_wooCommerceUrlRegex.hasMatch(storeUrl)) {
+      setState(() {
+        _resetPasswordResult = '❌ Please enter a valid store URL (e.g., https://yourstore.com)';
+      });
+      return;
+    }
+
+    setState(() {
+      _isResettingPassword = true;
+      _resetPasswordResult = null;
+    });
+
+    try {
+      debugPrint('📧 Starting reset password process...');
+      debugPrint('📧 Store Name: $storeName');
+      debugPrint('📧 Store URL: $storeUrl');
+      debugPrint('📧 Email: $email');
+      
+      // Configure WooNetwork for this request
+      WooNetwork.updateStoreUrl(storeUrl);
+      WooNetwork.updateStoreName(storeName);
+      WooNetwork.updateApiVersion('v1'); // Default version for reset password
+      
+      debugPrint('📧 WooNetwork configured with URL: ${WooNetwork.baseUrl}');
+      
+      final handler = SendResetPasswordHandler();
+      final response = await handler.handleRequest('POST', {
+        'email': email,
+        'brand_name': storeName,
+      });
+
+      setState(() {
+        _isResettingPassword = false;
+        if (response['status'] == 'success') {
+          _resetPasswordResult = '✅ Reset password email sent successfully! Please check your inbox.';
+          // Clear the email field after successful send
+          _resetPasswordEmailController.clear();
+        } else {
+          _resetPasswordResult = '❌ ${response['message'] ?? 'Failed to send reset password email'}';
+        }
+      });
+
+      debugPrint('📧 Reset password result: ${response['status']}');
+      
+    } catch (e) {
+      setState(() {
+        _isResettingPassword = false;
+        _resetPasswordResult = '❌ Error occurred while sending reset email: ${e.toString()}';
+      });
+      debugPrint('❌ Reset password error: $e');
     }
   }
 

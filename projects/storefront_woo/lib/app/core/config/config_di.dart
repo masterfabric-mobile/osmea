@@ -57,62 +57,41 @@ Future<void> _initializeFromEnvironment(String? environment) async {
       'woocommerce_configuration.store_url',
       '',
     );
+    final brandName = configHelper.getString(
+      'woocommerce_configuration.brand_name',
+      'simple-jwt-login',
+    );
     final apiVersion = configHelper.getString(
       'woocommerce_configuration.version',
-      'v1',
-    );
-    final verifySsl = configHelper.getBool(
-      'woocommerce_configuration.verify_ssl',
-      true,
-    );
-    final queryStringAuth = configHelper.getBool(
-      'woocommerce_configuration.query_string_auth',
-      false,
-    );
-    final productsPerPage = configHelper.getInt(
-      'woocommerce_configuration.products_per_page',
-      20,
-    );
-    final enableReviews = configHelper.getBool(
-      'woocommerce_configuration.enable_reviews',
-      true,
-    );
-    final enableCoupons = configHelper.getBool(
-      'woocommerce_configuration.enable_coupons',
-      true,
-    );
-    final enableGuestCheckout = configHelper.getBool(
-      'woocommerce_configuration.enable_guest_checkout',
-      true,
+      'v3',
     );
 
-    if (storeUrl.isNotEmpty) {
-      // Initialize WooCommerce network for public API access
-      debugPrint('🔧 Initializing WooCommerce (Public API):');
+    if (storeUrl.isNotEmpty && brandName.isNotEmpty) {
+      // Initialize WooCommerce network
+      debugPrint('🔧 Initializing WooCommerce with JWT Auth:');
       debugPrint('  - Store URL: $storeUrl');
+      debugPrint('  - Brand Name (JWT Plugin): $brandName');
       debugPrint('  - API Version: $apiVersion');
-      debugPrint('  - Verify SSL: $verifySsl');
-      debugPrint('  - Query String Auth: $queryStringAuth');
-      debugPrint('  - Products Per Page: $productsPerPage');
-      debugPrint('  - Enable Reviews: $enableReviews');
-      debugPrint('  - Enable Coupons: $enableCoupons');
-      debugPrint('  - Enable Guest Checkout: $enableGuestCheckout');
-      debugPrint('  - Source: app_config.json');
+      debugPrint('  - Auth Method: JWT (No consumer key/secret needed)');
 
-      // Initialize WooCommerce network without authentication for public APIs
+      // Initialize WooCommerce network for JWT auth (no credentials needed)
       WooNetwork.init(
         getIt,
         storeUrl: storeUrl,
-        username: '', // No authentication needed for public APIs
-        password: '', // No authentication needed for public APIs
+        storeName: brandName,
+        username: '', // Not needed for JWT auth
+        password: '', // Not needed for JWT auth
         apiVersion: apiVersion,
       );
 
-      debugPrint('✅ WooCommerce network initialized for public API access');
+      debugPrint('✅ WooCommerce network initialized for JWT Auth');
     } else {
       debugPrint('❌ Missing required configuration:');
       debugPrint('  - Store URL: ${storeUrl.isEmpty ? 'MISSING' : 'OK'}');
-      throw Exception('Required WooCommerce store URL is missing');
+      debugPrint('  - Brand Name: ${brandName.isEmpty ? 'MISSING' : 'OK'}');
+      throw Exception(
+        'Required WooCommerce configuration (store_url, brand_name) is missing',
+      );
     }
   } catch (e) {
     debugPrint('❌ Error initializing from app configuration: $e');

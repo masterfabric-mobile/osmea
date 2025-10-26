@@ -14,15 +14,16 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "https://api.masterfabric.co/woo",
-    "version": "v1",
+    "store_url": "http://your_store_url.com",
+    "brand_name": "your_brand_name",
+    "version": "v?",
     "verify_ssl": true,
     "query_string_auth": false,
     "products_per_page": 20,
     "enable_reviews": true,
     "enable_coupons": true,
     "enable_guest_checkout": true
-    },
+  },
     "firebase_configuration": {
       "analytics_enabled": true,
       "crashlytics_enabled": true,

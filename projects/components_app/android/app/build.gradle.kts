@@ -5,6 +5,17 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Read the .env file
+val envFile = rootProject.file("../.env")
+val env = if (envFile.exists()) {
+    envFile.readLines().mapNotNull { line ->
+        val parts = line.split("=", limit = 2)
+        if (parts.size == 2) parts[0] to parts[1] else null
+    }.toMap()
+} else {
+    emptyMap()
+}
+
 android {
     // Align NDK with plugins that require 27.x
     ndkVersion = "27.0.12077973"
@@ -31,6 +42,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Add the API key to the manifest
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = env["API_KEY"] ?: "YOUR_API_KEY"
     }
 
     buildTypes {
