@@ -14,6 +14,7 @@ class CartItem {
   final double price;
   int quantity;
   final String? imageUrl;
+  final String key;
 
   CartItem({
     required this.productId,
@@ -21,7 +22,10 @@ class CartItem {
     required this.price,
     required this.quantity,
     this.imageUrl,
-  });
+    String? key,
+  }) : key =
+           key ??
+           'cart_item_${productId}_${DateTime.now().millisecondsSinceEpoch}';
 
   /// Total price for this item
   double get totalPrice => price * quantity;
@@ -38,7 +42,8 @@ class CartService extends ChangeNotifier {
   int get itemCount => _items.fold(0, (sum, item) => sum + item.quantity);
 
   /// Get total price of all items in cart
-  double get totalPrice => _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+  double get totalPrice =>
+      _items.fold(0.0, (sum, item) => sum + item.totalPrice);
 
   /// Add item to cart
   void addItem(CartItem newItem) {

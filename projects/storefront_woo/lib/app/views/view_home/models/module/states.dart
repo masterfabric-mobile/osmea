@@ -71,3 +71,11 @@ class HomeAuthRequiredState extends HomeState {
     this.productId,
   });
 }
+
+/// Success state when an action is completed successfully
+class HomeSuccessState extends HomeState {
+  final String message;
+  final HomeLoadedState? previousState;
+
+  HomeSuccessState({required this.message, this.previousState});
+}

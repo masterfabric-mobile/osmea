@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart'
+    as _i892;
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
     as _i867;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
@@ -23,6 +25,7 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    gh.factory<_i892.CartViewModel>(() => _i892.CartViewModel());
     gh.factory<_i819.ProductDetailViewModel>(
       () => _i819.ProductDetailViewModel(),
     );
