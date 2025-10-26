@@ -1,4 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:core/src/views/image_detail/cubit/image_detail_cubit.dart';
 import 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
@@ -43,9 +45,31 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
     final hasImages = state.images.isNotEmpty;
     final media = MediaQuery.of(context);
     final double screenWidth = media.size.width;
+    final double screenHeight = media.size.height;
 
     const double thumbnailsHeight = 88; // Fixed thumbnail height
     const double fixedSpacing = 12; // Fixed 12px padding as per design
+
+    // Get dynamic height for current image
+    final String? currentImageUrl = state.images.isNotEmpty && state.currentIndex < state.images.length
+        ? state.images[state.currentIndex]
+        : null;
+    final double? dynamicHeight = currentImageUrl != null && state.imageHeights.containsKey(currentImageUrl)
+        ? state.imageHeights[currentImageUrl]
+        : null;
+    // Use dynamic height if available, otherwise fallback to screen height ratio
+    // Constrain height to max 60% of screen height to prevent overflow
+    final double maxHeight = screenHeight * 0.6;
+    final double imageHeight = dynamicHeight != null 
+        ? math.min(dynamicHeight, maxHeight) 
+        : maxHeight;
+    
+    // Debug: Log current image height if it changed
+    if (currentImageUrl != null) {
+      debugPrint('🖼️ Displaying image ${state.currentIndex + 1}/${state.images.length}');
+      debugPrint('   Height: ${imageHeight.toInt()}px (${dynamicHeight != null ? 'DYNAMIC' : 'FALLBACK'})');
+      debugPrint('   Aspect ratio preserved: ${dynamicHeight != null ? 'YES' : 'NO - using default'}');
+    }
 
     // Update image heights if screen width changed (e.g., orientation change)
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -57,66 +81,70 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
     return state.status == ImageDetailStatus.loading
         ? _buildLoadingState(context)
         : hasImages
-            ? Column(
-                children: [
-                  // Top spacing
-                  SizedBox(height: fixedSpacing),
-
-                  // Main Image - Simple and clean
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.6, // 60% of screen height
-                    child: Stack(
-                      children: [
-                        PageView.builder(
-                          key: ValueKey('pageview_${state.currentIndex}'),
-                          itemCount: state.images.length,
-                          controller: PageController(initialPage: state.currentIndex),
-                          onPageChanged: (index) => viewModel.goTo(index),
-                          itemBuilder: (context, index) {
-                            return InteractiveViewer(
-                              minScale: 0.5,
-                              maxScale: 4.0,
-                              child: Container(
-                                alignment: Alignment.topCenter, // Align content to top
-                                child: OsmeaComponents.image(
-                                  imageUrl: state.images[index],
-                                  variant: ImageVariant.normal,
-                                  size: ImageSize.custom,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.contain,
-                                  heroTag: state.heroTag,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        // Page indicators - positioned at bottom center of main image
-                        if (state.images.length > 1)
-                          Positioned(
-                            bottom: 16,
-                            left: 0,
-                            right: 0,
-                            child: OsmeaComponents.row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(state.images.length, (index) {
-                                return Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 4),
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: index == state.currentIndex
-                                        ? OsmeaColors.black
-                                        : OsmeaColors.black.withValues(alpha: 0.5),
-                                  ),
-                                );
-                              }),
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Top buttons - OUTSIDE of image
+                    SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: _buildTopButtonsRow(context, state),
+                      ),
+                    ),
+                    
+                    // Main Image - Dynamic size based on actual image dimensions
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      height: imageHeight,
+                      width: double.infinity,
+                    child: PageView.builder(
+                      key: ValueKey('pageview_${state.currentIndex}'),
+                      itemCount: state.images.length,
+                      controller: PageController(initialPage: state.currentIndex),
+                      onPageChanged: (index) => viewModel.goTo(index),
+                      itemBuilder: (context, index) {
+                        return InteractiveViewer(
+                          minScale: 0.5,
+                          maxScale: 4.0,
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: OsmeaComponents.image(
+                              imageUrl: state.images[index],
+                              variant: ImageVariant.normal,
+                              size: ImageSize.custom,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                              heroTag: state.heroTag,
                             ),
                           ),
-                      ],
+                        );
+                      },
                     ),
                   ),
+
+                  // Page indicators - BELOW the image
+                  if (state.images.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: OsmeaComponents.row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(state.images.length, (index) {
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 4),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: index == state.currentIndex
+                                  ? OsmeaColors.black
+                                  : OsmeaColors.black.withValues(alpha: 0.3),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
 
                   // Middle spacing
                   SizedBox(height: fixedSpacing),
@@ -161,11 +189,87 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
                     ),
                   ),
 
-                  // Bottom spacing - larger space as requested
-                  SizedBox(height: fixedSpacing * 2),
+                  // Bottom spacing
+                  SizedBox(height: fixedSpacing),
                 ],
-              )
+              ),
+            )
             : _buildEmptyState(context);
+  }
+
+  Widget _buildTopButtonsRow(BuildContext context, ImageDetailState state) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Back button (left)
+        if (state.showBackButton)
+          _buildActionButton(
+            context: context,
+            icon: Icons.arrow_back_ios_new,
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                goRoute('/home');
+              }
+            },
+          )
+        else
+          const SizedBox(width: 44), // Placeholder for alignment
+
+        // Close button (right)
+        if (state.showCloseButton)
+          _buildActionButton(
+            context: context,
+            icon: Icons.close,
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                goRoute('/home');
+              }
+            },
+          )
+        else
+          const SizedBox(width: 44), // Placeholder for alignment
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: OsmeaColors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: OsmeaColors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: OsmeaColors.black.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              size: 24,
+              color: OsmeaColors.black,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildLoadingState(BuildContext context) {

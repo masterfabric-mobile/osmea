@@ -10,6 +10,8 @@ class ImageDetailState extends Equatable {
   final String? heroTag;
   final Map<String, Size> imageSizes; // Store actual image dimensions
   final Map<String, double> imageHeights; // Store calculated heights for each image
+  final bool showBackButton;
+  final bool showCloseButton;
 
   const ImageDetailState({
     this.status = ImageDetailStatus.initial,
@@ -18,6 +20,8 @@ class ImageDetailState extends Equatable {
     this.heroTag,
     this.imageSizes = const {},
     this.imageHeights = const {},
+    this.showBackButton = true,
+    this.showCloseButton = true,
   });
 
   bool get hasImages => images.isNotEmpty;
@@ -43,6 +47,8 @@ class ImageDetailState extends Equatable {
     String? heroTag,
     Map<String, Size>? imageSizes,
     Map<String, double>? imageHeights,
+    bool? showBackButton,
+    bool? showCloseButton,
   }) {
     return ImageDetailState(
       status: status ?? this.status,
@@ -51,11 +57,13 @@ class ImageDetailState extends Equatable {
       heroTag: heroTag ?? this.heroTag,
       imageSizes: imageSizes ?? this.imageSizes,
       imageHeights: imageHeights ?? this.imageHeights,
+      showBackButton: showBackButton ?? this.showBackButton,
+      showCloseButton: showCloseButton ?? this.showCloseButton,
     );
   }
 
   @override
-  List<Object?> get props => [status, images, currentIndex, heroTag, imageSizes, imageHeights];
+  List<Object?> get props => [status, images, currentIndex, heroTag, imageSizes, imageHeights, showBackButton, showCloseButton];
 }
 
 
