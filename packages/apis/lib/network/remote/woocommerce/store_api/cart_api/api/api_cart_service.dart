@@ -39,60 +39,60 @@ abstract class CartServiceClient implements CartService {
   });
 
   /// 🛍️ Add item to cart using WooCommerce Store API
-  /// Requires JWT authentication and cart token headers! 🔑
+  /// Cart token required, JWT authentication optional 🔑
   @override
   @POST('/wp-json/wc/store/{api_version}/cart/add-item')
   Future<AddItemResponse> addItem({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Field('id') required int id,
     @Field('quantity') required int quantity,
     @Field('variation') List<dynamic>? variation,
   });
 
   /// 🗑️ Remove item from cart using WooCommerce Store API
-  /// Requires JWT authentication and cart token headers! 🔑
+  /// Cart token required, JWT authentication optional 🔑
   @override
   @POST('/wp-json/wc/store/{api_version}/cart/remove-item')
   Future<RemoveItemResponse> removeItem({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('key') required String key,
   });
 
   /// 📝 Update item in cart using WooCommerce Store API
-  /// Requires JWT authentication and cart token headers! 🔑
+  /// Cart token required, JWT authentication optional 🔑
   @override
   @POST('/wp-json/wc/store/{api_version}/cart/update-item')
   Future<UpdateItemResponse> updateItem({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('key') required String key,
     @Query('quantity') required int quantity,
   });
 
   /// 🎫 Apply coupon to cart using WooCommerce Store API
-  /// Requires JWT authentication and cart token headers! 🔑
+  /// Cart token required, JWT authentication optional 🔑
   @override
   @POST('/wp-json/wc/store/{api_version}/cart/apply-coupon')
   Future<ApplyCouponResponse> applyCoupon({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('code') required String code,
   });
 
   /// 🗑️ Remove coupon from cart using WooCommerce Store API
-  /// Requires JWT authentication and cart token headers! 🔑
+  /// Cart token required, JWT authentication optional 🔑
   @override
   @POST('/wp-json/wc/store/{api_version}/cart/remove-coupon')
   Future<RemoveCouponResponse> removeCoupon({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('code') required String code,
   });
 
@@ -103,7 +103,7 @@ abstract class CartServiceClient implements CartService {
   Future<UpdateCustomerResponse> updateCustomer({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Body() required UpdateCustomerRequest request,
   });
 
@@ -114,7 +114,7 @@ abstract class CartServiceClient implements CartService {
   Future<SelectShippingRateResponse> selectShippingRate({
     @Path('api_version') required String apiVersion,
     @Header('CART_TOKEN') required String cartToken,
-    @Header('Authorization') required String jwtToken,
+    @Header('Authorization') String? jwtToken, // Optional JWT
     @Query('package_id') required int packageId,
     @Query('rate_id') required String rateId,
   });

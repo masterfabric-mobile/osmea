@@ -30,7 +30,7 @@ class ListCartItemsHandler implements ApiRequestHandler {
       String? cartToken = params['cart_token'];
       if (cartToken == null || cartToken.isEmpty) {
         try {
-          debugPrint('� Loading cart token from storage...');
+          debugPrint('🔍 Loading cart token from storage...');
           final storedToken = await WooCartTokenStorage.loadCartToken();
           cartToken = storedToken?.cartToken;
           
@@ -44,9 +44,35 @@ class ListCartItemsHandler implements ApiRequestHandler {
         }
       }
 
+      // 🔐 Auto-fetch JWT token from local storage
+      String? jwtToken = params['jwt_token'];
+      if (jwtToken == null || jwtToken.isEmpty) {
+        try {
+          debugPrint('🔍 Loading JWT token from storage...');
+          final storedJwt = await WooJwtTokenStorage.loadToken();
+          jwtToken = storedJwt?.accessToken;
+          
+          if (jwtToken != null && jwtToken.isNotEmpty) {
+            debugPrint('� JWT token loaded from storage: ${jwtToken.length > 20 ? jwtToken.substring(0, 20) + "..." : jwtToken}');
+          } else {
+            debugPrint('⚠️ No JWT token found in storage');
+          }
+        } catch (e) {
+          debugPrint('❌ Could not load JWT token from storage: $e');
+        }
+      }
+
+      // JWT token is optional - just log if missing
+      if (jwtToken == null || jwtToken.isEmpty) {
+        debugPrint('⚠️ JWT token not provided - continuing without authentication');
+      } else {
+        debugPrint('🔐 JWT token available for authenticated request');
+      }
+
       debugPrint('�📋 Starting list cart items:');
       debugPrint('  - API Version: $apiVersion');
       debugPrint('  - Cart Token Available: ${cartToken != null && cartToken.isNotEmpty}');
+      debugPrint('  - JWT Token Available: ${jwtToken != null && jwtToken.isNotEmpty}');
 
       // Get CartItemsService from DI
       final cartItemsService = GetIt.I<CartItemsService>();
@@ -81,7 +107,9 @@ class ListCartItemsHandler implements ApiRequestHandler {
         "message": "Cart items retrieved successfully",
         "auth_info": {
           "cart_token_source": params.containsKey('cart_token') && params['cart_token']!.isNotEmpty ? "manual" : "auto_storage",
+          "jwt_token_source": params.containsKey('jwt_token') && params['jwt_token']!.isNotEmpty ? "manual" : "auto_storage",
           "cart_token_available": cartToken != null && cartToken.isNotEmpty,
+          "jwt_token_available": jwtToken != null && jwtToken.isNotEmpty,
         },
         "cart_summary": {
           "items_count": cartItems.length,
@@ -251,6 +279,12 @@ class ListCartItemsHandler implements ApiRequestHandler {
             name: 'cart_token',
             label: 'Cart Token',
             hint: 'Cart token for authentication (auto-loaded from storage if empty). May be required for proper cart context.',
+            isRequired: false,
+          ),
+          const ApiField(
+            name: 'jwt_token',
+            label: 'JWT Token (Optional)',
+            hint: 'JWT authentication token (auto-loaded from storage if empty)',
             isRequired: false,
           ),
           const ApiField(
