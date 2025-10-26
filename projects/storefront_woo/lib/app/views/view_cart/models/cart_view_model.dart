@@ -12,6 +12,7 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 
 @injectable
@@ -202,18 +203,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       debugPrint('✅ Successfully added item to API cart');
 
-      // Show success message and keep current state
-      final currentState = state;
-      if (currentState is CartLoadedState) {
-        // Just emit the same state to avoid UI issues
-        emit(currentState);
-
-        // Show success message via a different mechanism
-        debugPrint('🎉 Success: Item added to cart successfully!');
-      } else {
-        // If no current state, load cart
-        await _loadCart();
-      }
+      // Reload cart to get updated data from API
+      await _loadCartFromAPI();
     } catch (e) {
       debugPrint('❌ Failed to add item to API cart: $e');
       emit(CartErrorState(message: 'Failed to add item to cart: $e'));
@@ -230,6 +221,78 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     }
   }
 
+  /// Remove item from cart via API
+  Future<void> _removeItemFromAPI(int productId) async {
+    try {
+      debugPrint(
+        '🛒 CartViewModel: Calling removeItem API: productId=$productId',
+      );
+
+      // Get cart token first
+      final cartToken = await _getCartToken();
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint('❌ No cart token available for removeItem');
+        emit(CartErrorState(message: 'No cart token available'));
+        return;
+      }
+
+      // Find the cart item key for this product
+      final currentState = state;
+      if (currentState is! CartLoadedState) {
+        debugPrint('❌ No cart loaded to remove item from');
+        emit(CartErrorState(message: 'No cart loaded'));
+        return;
+      }
+
+      // Find the item key for this product
+      String? itemKey;
+      for (final item in currentState.cartItems) {
+        if (item.productId == productId) {
+          itemKey = item.key;
+          break;
+        }
+      }
+
+      if (itemKey == null) {
+        debugPrint('❌ Item not found in cart: $productId');
+        emit(CartErrorState(message: 'Item not found in cart'));
+        return;
+      }
+
+      debugPrint('🛒 CartViewModel: Removing item with key: $itemKey');
+
+      final response = await _cartService.removeItem(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        cartToken: cartToken,
+        jwtToken: await _getJwtToken(),
+        key: itemKey,
+      );
+
+      debugPrint(
+        '🛒 CartViewModel: RemoveItem API response: ${response.toJson()}',
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API remove item error: ${response.errors!.first}');
+        emit(
+          CartErrorState(
+            message: 'Failed to remove item: ${response.errors!.first}',
+          ),
+        );
+        return;
+      }
+
+      debugPrint('✅ Successfully removed item from API cart');
+      // Reload cart to get updated data from API
+      await _loadCartFromAPI();
+    } catch (e) {
+      debugPrint('❌ Failed to remove item from API cart: $e');
+      emit(CartErrorState(message: 'Failed to remove item from cart: $e'));
+    }
+  }
+
   Future<void> _updateItemQuantity(int productId, int quantity) async {
     try {
       debugPrint(
@@ -240,6 +303,69 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error updating quantity: $e');
       emit(CartErrorState(message: 'Failed to update quantity: $e'));
+    }
+  }
+
+  /// Update item quantity via API
+  Future<void> _updateItemQuantityFromAPI(int productId, int quantity) async {
+    try {
+      debugPrint(
+        '🛒 CartViewModel: Calling updateItem API: productId=$productId, quantity=$quantity',
+      );
+
+      // Find the cart item key for this product
+      final currentState = state;
+      if (currentState is! CartLoadedState) {
+        debugPrint('❌ No cart loaded to update item in');
+        emit(CartErrorState(message: 'No cart loaded'));
+        return;
+      }
+
+      // Find the item key for this product
+      String? itemKey;
+      for (final item in currentState.cartItems) {
+        if (item.productId == productId) {
+          itemKey = item.key;
+          break;
+        }
+      }
+
+      if (itemKey == null) {
+        debugPrint('❌ Item not found in cart: $productId');
+        emit(CartErrorState(message: 'Item not found in cart'));
+        return;
+      }
+
+      final response = await _cartService.updateItem(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        cartToken: await _getCartToken() ?? '',
+        jwtToken: await _getJwtToken(),
+        key: itemKey,
+        quantity: quantity,
+      );
+
+      debugPrint(
+        '🛒 CartViewModel: UpdateItem API response: ${response.toJson()}',
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API update item error: ${response.errors!.first}');
+        emit(
+          CartErrorState(
+            message: 'Failed to update item: ${response.errors!.first}',
+          ),
+        );
+        return;
+      }
+
+      debugPrint('✅ Successfully updated item in API cart');
+      // Reload cart to get updated data from API
+      await _loadCartFromAPI();
+    } catch (e) {
+      debugPrint('❌ Failed to update item in API cart: $e');
+      emit(CartErrorState(message: 'Failed to update item quantity: $e'));
     }
   }
 
@@ -265,141 +391,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   }
 
   /// Remove item from cart via API
-  Future<void> _removeItemFromAPI(int productId) async {
-    try {
-      // Find the item in current state to get its key
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ Cannot remove item: cart not loaded');
-        return;
-      }
-
-      final item = currentState.cartItems.firstWhere(
-        (item) => item.productId == productId,
-        orElse: () => throw Exception('Item not found in cart'),
-      );
-
-      debugPrint(
-        '🛒 CartViewModel: Removing item via API with key: ${item.key}',
-      );
-
-      // Get cart token first
-      final cartToken = await _getCartToken();
-      if (cartToken == null || cartToken.isEmpty) {
-        debugPrint('❌ No cart token available for removeItem');
-        emit(CartErrorState(message: 'No cart token available'));
-        return;
-      }
-
-      final response = await _cartService.removeItem(
-        apiVersion: _configHelper.getString(
-          'woocommerce_configuration.version',
-        ),
-        cartToken: cartToken,
-        jwtToken: await _getJwtToken(),
-        key: item.key,
-      );
-
-      if (response.errors != null && response.errors!.isNotEmpty) {
-        debugPrint('❌ API remove item error: ${response.errors!.first}');
-        emit(
-          CartErrorState(
-            message: 'Failed to remove item: ${response.errors!.first}',
-          ),
-        );
-        return;
-      }
-
-      debugPrint('✅ Successfully removed item from API cart');
-
-      // Show success message and keep current state
-      final removeState = state;
-      if (removeState is CartLoadedState) {
-        // Just emit the same state to avoid UI issues
-        emit(removeState);
-
-        // Show success message via a different mechanism
-        debugPrint('🎉 Success: Item removed from cart successfully!');
-      } else {
-        // If no current state, load cart
-        await _loadCart();
-      }
-    } catch (e) {
-      debugPrint('❌ Failed to remove item: $e');
-      emit(CartErrorState(message: 'Failed to remove item: $e'));
-    }
-  }
-
-  /// Update item quantity via API
-  Future<void> _updateItemQuantityFromAPI(int productId, int quantity) async {
-    try {
-      debugPrint(
-        '🛒 CartViewModel: _updateItemQuantityFromAPI called - productId: $productId, quantity: $quantity',
-      );
-
-      // Find the item in current state to get its key
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ Cannot update quantity: cart not loaded');
-        return;
-      }
-
-      final item = currentState.cartItems.firstWhere(
-        (item) => item.productId == productId,
-        orElse: () => throw Exception('Item not found in cart'),
-      );
-
-      debugPrint(
-        '🛒 CartViewModel: Updating quantity via API with key: ${item.key}',
-      );
-
-      // Get cart token first
-      final cartToken = await _getCartToken();
-      if (cartToken == null || cartToken.isEmpty) {
-        debugPrint('❌ No cart token available for updateItem');
-        emit(CartErrorState(message: 'No cart token available'));
-        return;
-      }
-
-      final response = await _cartService.updateItem(
-        apiVersion: _configHelper.getString(
-          'woocommerce_configuration.version',
-        ),
-        cartToken: cartToken,
-        jwtToken: await _getJwtToken(),
-        key: item.key,
-        quantity: quantity,
-      );
-
-      if (response.errors != null && response.errors!.isNotEmpty) {
-        debugPrint('❌ API update quantity error: ${response.errors!.first}');
-        emit(
-          CartErrorState(
-            message: 'Failed to update quantity: ${response.errors!.first}',
-          ),
-        );
-        return;
-      }
-
-      debugPrint('✅ Successfully updated quantity in API cart');
-
-      // Show success message and keep current state
-      final updateState = state;
-      if (updateState is CartLoadedState) {
-        // Just emit the same state to avoid UI issues
-        emit(updateState);
-
-        // Show success message via a different mechanism
-        debugPrint('🎉 Success: Quantity updated successfully!');
-      } else {
-        // If no current state, load cart
-        await _loadCart();
-      }
-    } catch (e) {
-      debugPrint('❌ Failed to update quantity in API cart: $e');
-      emit(CartErrorState(message: 'Failed to update quantity: $e'));
-    }
-  }
 
   Future<void> _applyCoupon(String couponCode) async {
     try {
@@ -512,14 +503,17 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   /// Gets cart token from storage
   Future<String?> _getCartToken() async {
     try {
-      // Cart token interceptor zaten storage'a kaydediyor, oradan okuyalım
-      final storage = LocalStorageHelper();
-      await storage.init();
-      final token = await storage.getItem('woo_cart_token');
+      // Use local CartTokenStorage for consistency
+      final token = await CartTokenStorage.loadCartToken();
       debugPrint(
-        '🛒 CartViewModel: Cart token from storage: ${token != null ? "Found (${token.toString().length} chars)" : "Not found"}',
+        '🛒 CartViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
       );
-      return token?.toString();
+      if (token != null) {
+        debugPrint(
+          '🛒 CartViewModel: Cart token value: ${token.substring(0, token.length > 20 ? 20 : token.length)}...',
+        );
+      }
+      return token;
     } catch (e) {
       debugPrint('❌ Failed to get cart token: $e');
       return null;
