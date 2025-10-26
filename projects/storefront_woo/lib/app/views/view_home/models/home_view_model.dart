@@ -16,7 +16,9 @@ import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:osmea_components/osmea_components.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
-import 'package:storefront_woo/app/services/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:get_it/get_it.dart';
 
@@ -26,7 +28,8 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   // Dependencies
   final ProductService _productService = GetIt.I<ProductService>();
-  final CartService _cartService = CartService();
+  final CartService _cartService = GetIt.I<CartService>();
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // State variables
   List<ListAllProductsResponseModel> _products = [];
@@ -53,7 +56,12 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   void clearSearch() => _clearSearch();
   void restart() => _restart();
   void filterByCategory(int? categoryId) => _filterByCategory(categoryId);
-  void addProductToCart(int productId) => _addToCart(productId);
+  Future<void> addProductToCart(int productId, BuildContext context) async {
+    await _addToCart(productId);
+    // Show success popup after adding to cart
+    _showCartSuccessDialog(context);
+  }
+
   void addProductToWishlist(int productId) => _addToWishlist(productId);
   void selectProduct(ListAllProductsResponseModel product) =>
       _selectProduct(product);
@@ -256,44 +264,36 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   Future<void> _addToCart(int productId) async {
     try {
-      // ✅ Check if user is authenticated
-      final authStorage = AuthStorageHelper();
-      final isAuthenticated = await authStorage.isAuthenticated();
+      debugPrint('🛒 HomeViewModel: Adding product $productId to cart via API');
 
-      if (!isAuthenticated) {
-        debugPrint('🔒 User not authenticated, requiring sign in');
+      // Add item to cart via API
+      final response = await _cartService.addItem(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        cartToken: await _getCartToken() ?? '',
+        jwtToken: await _getJwtToken(), // Optional JWT token
+        id: productId,
+        quantity: 1,
+      );
+
+      debugPrint(
+        '🛒 HomeViewModel: AddItem API response: ${response.toJson()}',
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API add item error: ${response.errors!.first}');
         emit(
-          HomeAuthRequiredState(
-            message: 'Please sign in to add items to cart',
-            productId: productId,
+          HomeErrorState(
+            message: 'Failed to add item: ${response.errors!.first}',
           ),
         );
         return;
       }
 
-      // Find the product to add to cart
-      final product = _allProducts.firstWhere(
-        (p) => p.id == productId,
-        orElse: () => throw Exception('Product not found'),
-      );
+      debugPrint('✅ Successfully added product $productId to cart via API');
 
-      // Create cart item
-      final cartItem = CartItem(
-        productId: product.id ?? 0,
-        productName: product.name ?? 'Unknown Product',
-        price: _parsePrice(product.prices),
-        quantity: 1,
-        imageUrl: product.images?.isNotEmpty == true
-            ? product.images!.first.src
-            : null,
-      );
-
-      // Add to cart service
-      _cartService.addItem(cartItem);
-
-      debugPrint('✅ Added product ${product.name} to cart');
-
-      // Show success state
+      // Just emit loaded state - UI will handle popup
       emit(
         HomeLoadedState(
           products: _products,
@@ -681,7 +681,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () => addProductToCart(product.id ?? 0),
+                        onTap: () => addProductToCart(product.id ?? 0, context),
                         child: Container(
                           width: 32,
                           height: 32,
@@ -806,42 +806,6 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     return null; // No need to persist home state
   }
 
-  /// Parses price string to double for cart calculations
-  double _parsePrice(Prices? prices) {
-    if (prices == null) {
-      debugPrint('❌ _parsePrice: Prices is null');
-      return 0.0;
-    }
-
-    // Prefer sale price if available, otherwise regular price, then main price
-    String? priceString;
-    if (prices.salePrice != null &&
-        prices.salePrice!.isNotEmpty &&
-        prices.salePrice != '0') {
-      priceString = prices.salePrice;
-      debugPrint('💰 _parsePrice: Using sale price: $priceString');
-    } else if (prices.regularPrice != null &&
-        prices.regularPrice!.isNotEmpty &&
-        prices.regularPrice != '0') {
-      priceString = prices.regularPrice;
-      debugPrint('💰 _parsePrice: Using regular price: $priceString');
-    } else if (prices.price != null &&
-        prices.price!.isNotEmpty &&
-        prices.price != '0') {
-      priceString = prices.price;
-      debugPrint('💰 _parsePrice: Using main price: $priceString');
-    } else {
-      priceString = '0.00';
-      debugPrint('💰 _parsePrice: No valid price, using default: $priceString');
-    }
-
-    // Use PriceInfoCurrencyHelper for parsing
-    final parsedPrice =
-        PriceInfoCurrencyHelper.parsePriceToDouble(priceString!) ?? 0.0;
-    debugPrint('💰 _parsePrice: Parsed price: $parsedPrice');
-    return parsedPrice;
-  }
-
   /// Parses price string to formatted string for display - NO .00, COMMA SEPARATOR
   String _formatPriceString(String? priceString) {
     if (priceString == null || priceString.isEmpty) {
@@ -869,5 +833,132 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
             (Match m) => '${m[1]},',
           );
     }
+  }
+
+  /// Gets cart token from storage
+  Future<String?> _getCartToken() async {
+    try {
+      // Use local CartTokenStorage for consistency
+      final token = await CartTokenStorage.loadCartToken();
+      debugPrint(
+        '🛒 HomeViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
+      );
+      return token;
+    } catch (e) {
+      debugPrint('❌ Failed to get cart token: $e');
+      return null;
+    }
+  }
+
+  /// Gets JWT token from storage
+  Future<String?> _getJwtToken() async {
+    try {
+      final authStorage = AuthStorageHelper();
+      return await authStorage.getToken();
+    } catch (e) {
+      debugPrint('❌ Failed to get JWT token: $e');
+      return null;
+    }
+  }
+
+  /// Shows clean cart success dialog
+  void _showCartSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          contentPadding: const EdgeInsets.all(20),
+          content: OsmeaComponents.column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success Icon
+              OsmeaComponents.container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: OsmeaComponents.center(
+                  child: Icon(
+                    Icons.check_circle,
+                    size: 24,
+                    color: OsmeaColors.green,
+                  ),
+                ),
+              ),
+              OsmeaComponents.sizedBox(height: 16),
+
+              // Title
+              OsmeaComponents.text(
+                'Success!',
+                textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                  color: OsmeaColors.thunder,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              OsmeaComponents.sizedBox(height: 8),
+
+              // Message
+              OsmeaComponents.text(
+                'Product added to cart successfully!',
+                textStyle: OsmeaTextStyle.bodyMedium(
+                  context,
+                ).copyWith(color: OsmeaColors.grayMaterial[600]),
+                textAlign: TextAlign.center,
+              ),
+              OsmeaComponents.sizedBox(height: 20),
+
+              // Action Buttons
+              OsmeaComponents.row(
+                children: [
+                  // Continue Shopping
+                  OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                        // Stay on home page
+                      },
+                      backgroundColor: OsmeaColors.grayMaterial[100],
+                      textColor: OsmeaColors.thunder,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      borderRadius: 8,
+                      text: 'Continue',
+                      textStyle: OsmeaTextStyle.bodyMedium(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(width: 12),
+
+                  // Go to Cart
+                  OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog first
+                        context.push('/cart'); // Then navigate to cart
+                      },
+                      backgroundColor: OsmeaColors.blue,
+                      textColor: OsmeaColors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      borderRadius: 8,
+                      text: 'View Cart',
+                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                        color: OsmeaColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
