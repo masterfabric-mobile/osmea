@@ -96,6 +96,10 @@ class OsmeaSearchbar extends CoreTextField {
     this.initialHistory = const [],
     this.enableHoverEffect = true,
     this.hoverAnimationDuration,
+    // New action parameters
+    this.actions = const [],
+    this.actionMargin = EdgeInsets.zero,
+    this.actionAlignment = MainAxisAlignment.end,
   });
 
   /// Visual style variant for the searchbar
@@ -190,6 +194,15 @@ class OsmeaSearchbar extends CoreTextField {
   /// Duration for hover animations
   final Duration? hoverAnimationDuration;
 
+  /// 🎮 Action buttons to display on the right side of the searchbar
+  final List<Widget> actions;
+
+  /// 📏 Margin for action buttons
+  final EdgeInsetsGeometry actionMargin;
+
+  /// 📐 Alignment for action buttons
+  final MainAxisAlignment actionAlignment;
+
   /// Get effective transition duration
   Duration getEffectiveTransitionDuration(BuildContext context) =>
       transitionDuration ?? animationDuration ?? context.animationMedium;
@@ -200,7 +213,7 @@ class OsmeaSearchbar extends CoreTextField {
 
   @override
   Widget buildWidget(BuildContext context) {
-    return BlocProvider(
+    return BlocProvider<SearchbarCubit>(
       create: (context) => SearchbarCubit(
         controller: controller,
         focusNode: focusNode,
@@ -223,7 +236,7 @@ class OsmeaSearchbar extends CoreTextField {
       child: _OsmeaSearchbarView(
         searchbar: this,
       ),
-    );
+    ) as Widget;
   }
 }
 
@@ -255,24 +268,46 @@ class _OsmeaSearchbarView extends StatelessWidget {
   }
 
   Widget _buildSearchbarField(BuildContext context, SearchbarCubitState state) {
-    final cubit = context.read<SearchbarCubit>();
+    final cubit = BlocProvider.of<SearchbarCubit>(context);
 
     return Container(
       width: searchbar.fullWidth ? double.infinity : null,
       height: _getSearchbarHeight(),
       decoration: _buildDecoration(context, state),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Back button
-          if (state.shouldShowBackButton) _buildBackButton(context, cubit),
-
-          // Text field
+          // Left side: Back button + Text field
           Expanded(
-            child: _buildTextField(context, state, cubit),
+            child: Row(
+              children: [
+                // Back button
+                if (state.shouldShowBackButton)
+                  _buildBackButton(context, cubit),
+
+                // Text field
+                Expanded(
+                  child: _buildTextField(context, state, cubit),
+                ),
+
+                // Loading indicator
+                if (state.isLoading) _buildLoadingIndicator(context),
+              ],
+            ),
           ),
 
-          // Loading indicator
-          if (state.isLoading) _buildLoadingIndicator(context),
+          // Right side: Actions
+          if (searchbar.actions.isNotEmpty)
+            Row(
+              mainAxisAlignment: searchbar.actionAlignment,
+              mainAxisSize: MainAxisSize.min,
+              children: searchbar.actions.map((action) {
+                return Container(
+                  margin: searchbar.actionMargin,
+                  child: action,
+                );
+              }).toList(),
+            ),
         ],
       ),
     );
@@ -428,15 +463,15 @@ class _OsmeaSearchbarView extends StatelessWidget {
       return searchbar.suggestionBuilder!(
         context,
         state.suggestions,
-        (suggestion) =>
-            context.read<SearchbarCubit>().selectSuggestion(suggestion),
+        (suggestion) => BlocProvider.of<SearchbarCubit>(context)
+            .selectSuggestion(suggestion),
       );
     }
 
     return OsmeaContainer(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          maxHeight: 200.0, 
+          maxHeight: 200.0,
         ),
         child: ListView.builder(
           shrinkWrap: true,
@@ -447,8 +482,8 @@ class _OsmeaSearchbarView extends StatelessWidget {
             return ListTile(
               dense: true,
               title: Text(suggestion),
-              onTap: () =>
-                  context.read<SearchbarCubit>().selectSuggestion(suggestion),
+              onTap: () => BlocProvider.of<SearchbarCubit>(context)
+                  .selectSuggestion(suggestion),
             );
           },
         ),

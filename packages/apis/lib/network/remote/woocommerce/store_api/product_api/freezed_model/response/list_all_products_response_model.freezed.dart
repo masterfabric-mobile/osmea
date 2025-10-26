@@ -1340,13 +1340,13 @@ mixin _$ListAllProductsResponseModelAttribute {
   @JsonKey(name: "id")
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: "name")
-  Name? get name => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "taxonomy")
   String? get taxonomy => throw _privateConstructorUsedError;
   @JsonKey(name: "has_variations")
   bool? get hasVariations => throw _privateConstructorUsedError;
   @JsonKey(name: "terms")
-  List<Category>? get terms => throw _privateConstructorUsedError;
+  List<Term>? get terms => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1365,10 +1365,10 @@ abstract class $ListAllProductsResponseModelAttributeCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "name") Name? name,
+      @JsonKey(name: "name") String? name,
       @JsonKey(name: "taxonomy") String? taxonomy,
       @JsonKey(name: "has_variations") bool? hasVariations,
-      @JsonKey(name: "terms") List<Category>? terms});
+      @JsonKey(name: "terms") List<Term>? terms});
 }
 
 /// @nodoc
@@ -1399,7 +1399,7 @@ class _$ListAllProductsResponseModelAttributeCopyWithImpl<$Res,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       taxonomy: freezed == taxonomy
           ? _value.taxonomy
           : taxonomy // ignore: cast_nullable_to_non_nullable
@@ -1411,7 +1411,7 @@ class _$ListAllProductsResponseModelAttributeCopyWithImpl<$Res,
       terms: freezed == terms
           ? _value.terms
           : terms // ignore: cast_nullable_to_non_nullable
-              as List<Category>?,
+              as List<Term>?,
     ) as $Val);
   }
 }
@@ -1427,10 +1427,10 @@ abstract class _$$ListAllProductsResponseModelAttributeImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: "id") int? id,
-      @JsonKey(name: "name") Name? name,
+      @JsonKey(name: "name") String? name,
       @JsonKey(name: "taxonomy") String? taxonomy,
       @JsonKey(name: "has_variations") bool? hasVariations,
-      @JsonKey(name: "terms") List<Category>? terms});
+      @JsonKey(name: "terms") List<Term>? terms});
 }
 
 /// @nodoc
@@ -1460,7 +1460,7 @@ class __$$ListAllProductsResponseModelAttributeImplCopyWithImpl<$Res>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       taxonomy: freezed == taxonomy
           ? _value.taxonomy
           : taxonomy // ignore: cast_nullable_to_non_nullable
@@ -1472,7 +1472,7 @@ class __$$ListAllProductsResponseModelAttributeImplCopyWithImpl<$Res>
       terms: freezed == terms
           ? _value._terms
           : terms // ignore: cast_nullable_to_non_nullable
-              as List<Category>?,
+              as List<Term>?,
     ));
   }
 }
@@ -1486,7 +1486,7 @@ class _$ListAllProductsResponseModelAttributeImpl
       @JsonKey(name: "name") this.name,
       @JsonKey(name: "taxonomy") this.taxonomy,
       @JsonKey(name: "has_variations") this.hasVariations,
-      @JsonKey(name: "terms") final List<Category>? terms})
+      @JsonKey(name: "terms") final List<Term>? terms})
       : _terms = terms;
 
   factory _$ListAllProductsResponseModelAttributeImpl.fromJson(
@@ -1498,17 +1498,17 @@ class _$ListAllProductsResponseModelAttributeImpl
   final int? id;
   @override
   @JsonKey(name: "name")
-  final Name? name;
+  final String? name;
   @override
   @JsonKey(name: "taxonomy")
   final String? taxonomy;
   @override
   @JsonKey(name: "has_variations")
   final bool? hasVariations;
-  final List<Category>? _terms;
+  final List<Term>? _terms;
   @override
   @JsonKey(name: "terms")
-  List<Category>? get terms {
+  List<Term>? get terms {
     final value = _terms;
     if (value == null) return null;
     if (_terms is EqualUnmodifiableListView) return _terms;
@@ -1560,10 +1560,10 @@ abstract class _ListAllProductsResponseModelAttribute
     implements ListAllProductsResponseModelAttribute {
   const factory _ListAllProductsResponseModelAttribute(
           {@JsonKey(name: "id") final int? id,
-          @JsonKey(name: "name") final Name? name,
+          @JsonKey(name: "name") final String? name,
           @JsonKey(name: "taxonomy") final String? taxonomy,
           @JsonKey(name: "has_variations") final bool? hasVariations,
-          @JsonKey(name: "terms") final List<Category>? terms}) =
+          @JsonKey(name: "terms") final List<Term>? terms}) =
       _$ListAllProductsResponseModelAttributeImpl;
 
   factory _ListAllProductsResponseModelAttribute.fromJson(
@@ -1575,7 +1575,7 @@ abstract class _ListAllProductsResponseModelAttribute
   int? get id;
   @override
   @JsonKey(name: "name")
-  Name? get name;
+  String? get name;
   @override
   @JsonKey(name: "taxonomy")
   String? get taxonomy;
@@ -1584,12 +1584,220 @@ abstract class _ListAllProductsResponseModelAttribute
   bool? get hasVariations;
   @override
   @JsonKey(name: "terms")
-  List<Category>? get terms;
+  List<Term>? get terms;
   @override
   @JsonKey(ignore: true)
   _$$ListAllProductsResponseModelAttributeImplCopyWith<
           _$ListAllProductsResponseModelAttributeImpl>
       get copyWith => throw _privateConstructorUsedError;
+}
+
+Term _$TermFromJson(Map<String, dynamic> json) {
+  return _Term.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Term {
+  @JsonKey(name: "id")
+  int? get id => throw _privateConstructorUsedError;
+  @JsonKey(name: "name")
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: "slug")
+  String? get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: "default")
+  bool? get termDefault => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TermCopyWith<Term> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TermCopyWith<$Res> {
+  factory $TermCopyWith(Term value, $Res Function(Term) then) =
+      _$TermCopyWithImpl<$Res, Term>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: "id") int? id,
+      @JsonKey(name: "name") String? name,
+      @JsonKey(name: "slug") String? slug,
+      @JsonKey(name: "default") bool? termDefault});
+}
+
+/// @nodoc
+class _$TermCopyWithImpl<$Res, $Val extends Term>
+    implements $TermCopyWith<$Res> {
+  _$TermCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? termDefault = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      termDefault: freezed == termDefault
+          ? _value.termDefault
+          : termDefault // ignore: cast_nullable_to_non_nullable
+              as bool?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$TermImplCopyWith<$Res> implements $TermCopyWith<$Res> {
+  factory _$$TermImplCopyWith(
+          _$TermImpl value, $Res Function(_$TermImpl) then) =
+      __$$TermImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: "id") int? id,
+      @JsonKey(name: "name") String? name,
+      @JsonKey(name: "slug") String? slug,
+      @JsonKey(name: "default") bool? termDefault});
+}
+
+/// @nodoc
+class __$$TermImplCopyWithImpl<$Res>
+    extends _$TermCopyWithImpl<$Res, _$TermImpl>
+    implements _$$TermImplCopyWith<$Res> {
+  __$$TermImplCopyWithImpl(_$TermImpl _value, $Res Function(_$TermImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? termDefault = freezed,
+  }) {
+    return _then(_$TermImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      termDefault: freezed == termDefault
+          ? _value.termDefault
+          : termDefault // ignore: cast_nullable_to_non_nullable
+              as bool?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TermImpl implements _Term {
+  const _$TermImpl(
+      {@JsonKey(name: "id") this.id,
+      @JsonKey(name: "name") this.name,
+      @JsonKey(name: "slug") this.slug,
+      @JsonKey(name: "default") this.termDefault});
+
+  factory _$TermImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TermImplFromJson(json);
+
+  @override
+  @JsonKey(name: "id")
+  final int? id;
+  @override
+  @JsonKey(name: "name")
+  final String? name;
+  @override
+  @JsonKey(name: "slug")
+  final String? slug;
+  @override
+  @JsonKey(name: "default")
+  final bool? termDefault;
+
+  @override
+  String toString() {
+    return 'Term(id: $id, name: $name, slug: $slug, termDefault: $termDefault)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TermImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.termDefault, termDefault) ||
+                other.termDefault == termDefault));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, slug, termDefault);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TermImplCopyWith<_$TermImpl> get copyWith =>
+      __$$TermImplCopyWithImpl<_$TermImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TermImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Term implements Term {
+  const factory _Term(
+      {@JsonKey(name: "id") final int? id,
+      @JsonKey(name: "name") final String? name,
+      @JsonKey(name: "slug") final String? slug,
+      @JsonKey(name: "default") final bool? termDefault}) = _$TermImpl;
+
+  factory _Term.fromJson(Map<String, dynamic> json) = _$TermImpl.fromJson;
+
+  @override
+  @JsonKey(name: "id")
+  int? get id;
+  @override
+  @JsonKey(name: "name")
+  String? get name;
+  @override
+  @JsonKey(name: "slug")
+  String? get slug;
+  @override
+  @JsonKey(name: "default")
+  bool? get termDefault;
+  @override
+  @JsonKey(ignore: true)
+  _$$TermImplCopyWith<_$TermImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 Category _$CategoryFromJson(Map<String, dynamic> json) {
@@ -1604,8 +1812,6 @@ mixin _$Category {
   String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "slug")
   String? get slug => throw _privateConstructorUsedError;
-  @JsonKey(name: "default")
-  bool? get categoryDefault => throw _privateConstructorUsedError;
   @JsonKey(name: "link")
   String? get link => throw _privateConstructorUsedError;
 
@@ -1624,7 +1830,6 @@ abstract class $CategoryCopyWith<$Res> {
       {@JsonKey(name: "id") int? id,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "slug") String? slug,
-      @JsonKey(name: "default") bool? categoryDefault,
       @JsonKey(name: "link") String? link});
 }
 
@@ -1644,7 +1849,6 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
     Object? id = freezed,
     Object? name = freezed,
     Object? slug = freezed,
-    Object? categoryDefault = freezed,
     Object? link = freezed,
   }) {
     return _then(_value.copyWith(
@@ -1660,10 +1864,6 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String?,
-      categoryDefault: freezed == categoryDefault
-          ? _value.categoryDefault
-          : categoryDefault // ignore: cast_nullable_to_non_nullable
-              as bool?,
       link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
@@ -1684,7 +1884,6 @@ abstract class _$$CategoryImplCopyWith<$Res>
       {@JsonKey(name: "id") int? id,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "slug") String? slug,
-      @JsonKey(name: "default") bool? categoryDefault,
       @JsonKey(name: "link") String? link});
 }
 
@@ -1702,7 +1901,6 @@ class __$$CategoryImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? slug = freezed,
-    Object? categoryDefault = freezed,
     Object? link = freezed,
   }) {
     return _then(_$CategoryImpl(
@@ -1718,10 +1916,6 @@ class __$$CategoryImplCopyWithImpl<$Res>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String?,
-      categoryDefault: freezed == categoryDefault
-          ? _value.categoryDefault
-          : categoryDefault // ignore: cast_nullable_to_non_nullable
-              as bool?,
       link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
@@ -1737,7 +1931,6 @@ class _$CategoryImpl implements _Category {
       {@JsonKey(name: "id") this.id,
       @JsonKey(name: "name") this.name,
       @JsonKey(name: "slug") this.slug,
-      @JsonKey(name: "default") this.categoryDefault,
       @JsonKey(name: "link") this.link});
 
   factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -1753,15 +1946,12 @@ class _$CategoryImpl implements _Category {
   @JsonKey(name: "slug")
   final String? slug;
   @override
-  @JsonKey(name: "default")
-  final bool? categoryDefault;
-  @override
   @JsonKey(name: "link")
   final String? link;
 
   @override
   String toString() {
-    return 'Category(id: $id, name: $name, slug: $slug, categoryDefault: $categoryDefault, link: $link)';
+    return 'Category(id: $id, name: $name, slug: $slug, link: $link)';
   }
 
   @override
@@ -1772,15 +1962,12 @@ class _$CategoryImpl implements _Category {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.slug, slug) || other.slug == slug) &&
-            (identical(other.categoryDefault, categoryDefault) ||
-                other.categoryDefault == categoryDefault) &&
             (identical(other.link, link) || other.link == link));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, slug, categoryDefault, link);
+  int get hashCode => Object.hash(runtimeType, id, name, slug, link);
 
   @JsonKey(ignore: true)
   @override
@@ -1801,7 +1988,6 @@ abstract class _Category implements Category {
       {@JsonKey(name: "id") final int? id,
       @JsonKey(name: "name") final String? name,
       @JsonKey(name: "slug") final String? slug,
-      @JsonKey(name: "default") final bool? categoryDefault,
       @JsonKey(name: "link") final String? link}) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
@@ -1816,9 +2002,6 @@ abstract class _Category implements Category {
   @override
   @JsonKey(name: "slug")
   String? get slug;
-  @override
-  @JsonKey(name: "default")
-  bool? get categoryDefault;
   @override
   @JsonKey(name: "link")
   String? get link;
@@ -1924,7 +2107,7 @@ mixin _$Image {
   @JsonKey(name: "srcset")
   String? get srcset => throw _privateConstructorUsedError;
   @JsonKey(name: "sizes")
-  Sizes? get sizes => throw _privateConstructorUsedError;
+  String? get sizes => throw _privateConstructorUsedError;
   @JsonKey(name: "name")
   String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "alt")
@@ -1945,7 +2128,7 @@ abstract class $ImageCopyWith<$Res> {
       @JsonKey(name: "src") String? src,
       @JsonKey(name: "thumbnail") String? thumbnail,
       @JsonKey(name: "srcset") String? srcset,
-      @JsonKey(name: "sizes") Sizes? sizes,
+      @JsonKey(name: "sizes") String? sizes,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "alt") String? alt});
 }
@@ -1991,7 +2174,7 @@ class _$ImageCopyWithImpl<$Res, $Val extends Image>
       sizes: freezed == sizes
           ? _value.sizes
           : sizes // ignore: cast_nullable_to_non_nullable
-              as Sizes?,
+              as String?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -2016,7 +2199,7 @@ abstract class _$$ImageImplCopyWith<$Res> implements $ImageCopyWith<$Res> {
       @JsonKey(name: "src") String? src,
       @JsonKey(name: "thumbnail") String? thumbnail,
       @JsonKey(name: "srcset") String? srcset,
-      @JsonKey(name: "sizes") Sizes? sizes,
+      @JsonKey(name: "sizes") String? sizes,
       @JsonKey(name: "name") String? name,
       @JsonKey(name: "alt") String? alt});
 }
@@ -2060,7 +2243,7 @@ class __$$ImageImplCopyWithImpl<$Res>
       sizes: freezed == sizes
           ? _value.sizes
           : sizes // ignore: cast_nullable_to_non_nullable
-              as Sizes?,
+              as String?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -2102,7 +2285,7 @@ class _$ImageImpl implements _Image {
   final String? srcset;
   @override
   @JsonKey(name: "sizes")
-  final Sizes? sizes;
+  final String? sizes;
   @override
   @JsonKey(name: "name")
   final String? name;
@@ -2155,7 +2338,7 @@ abstract class _Image implements Image {
       @JsonKey(name: "src") final String? src,
       @JsonKey(name: "thumbnail") final String? thumbnail,
       @JsonKey(name: "srcset") final String? srcset,
-      @JsonKey(name: "sizes") final Sizes? sizes,
+      @JsonKey(name: "sizes") final String? sizes,
       @JsonKey(name: "name") final String? name,
       @JsonKey(name: "alt") final String? alt}) = _$ImageImpl;
 
@@ -2175,7 +2358,7 @@ abstract class _Image implements Image {
   String? get srcset;
   @override
   @JsonKey(name: "sizes")
-  Sizes? get sizes;
+  String? get sizes;
   @override
   @JsonKey(name: "name")
   String? get name;
@@ -2943,7 +3126,7 @@ VariationAttribute _$VariationAttributeFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$VariationAttribute {
   @JsonKey(name: "name")
-  Name? get name => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: "value")
   String? get value => throw _privateConstructorUsedError;
 
@@ -2960,7 +3143,7 @@ abstract class $VariationAttributeCopyWith<$Res> {
       _$VariationAttributeCopyWithImpl<$Res, VariationAttribute>;
   @useResult
   $Res call(
-      {@JsonKey(name: "name") Name? name,
+      {@JsonKey(name: "name") String? name,
       @JsonKey(name: "value") String? value});
 }
 
@@ -2984,7 +3167,7 @@ class _$VariationAttributeCopyWithImpl<$Res, $Val extends VariationAttribute>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       value: freezed == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
@@ -3002,7 +3185,7 @@ abstract class _$$VariationAttributeImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: "name") Name? name,
+      {@JsonKey(name: "name") String? name,
       @JsonKey(name: "value") String? value});
 }
 
@@ -3024,7 +3207,7 @@ class __$$VariationAttributeImplCopyWithImpl<$Res>
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as Name?,
+              as String?,
       value: freezed == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
@@ -3044,7 +3227,7 @@ class _$VariationAttributeImpl implements _VariationAttribute {
 
   @override
   @JsonKey(name: "name")
-  final Name? name;
+  final String? name;
   @override
   @JsonKey(name: "value")
   final String? value;
@@ -3084,7 +3267,7 @@ class _$VariationAttributeImpl implements _VariationAttribute {
 
 abstract class _VariationAttribute implements VariationAttribute {
   const factory _VariationAttribute(
-      {@JsonKey(name: "name") final Name? name,
+      {@JsonKey(name: "name") final String? name,
       @JsonKey(name: "value") final String? value}) = _$VariationAttributeImpl;
 
   factory _VariationAttribute.fromJson(Map<String, dynamic> json) =
@@ -3092,7 +3275,7 @@ abstract class _VariationAttribute implements VariationAttribute {
 
   @override
   @JsonKey(name: "name")
-  Name? get name;
+  String? get name;
   @override
   @JsonKey(name: "value")
   String? get value;

@@ -159,7 +159,7 @@ class WooCartTokenInterceptor extends Interceptor {
 
         cartId = data['cart_id'] as String? ??
             data['cartId'] as String? ??
-            data['id'] as String?;
+            data['id']?.toString();
 
         if (cartToken != null) {
           debugPrint('🛒 Found cart token in response data');

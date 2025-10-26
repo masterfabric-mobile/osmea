@@ -1,5 +1,6 @@
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
 import 'package:core/src/views/auth/sign_in/widgets/sign_in_startup_widget.dart';
@@ -64,17 +65,36 @@ class SignInView extends MasterViewCubit<SignInCubit, SignInState> {
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return Scaffold(
-      body: SafeArea(
-        child: SignInStartupWidget(
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _loadAuthConfig(),
+      builder: (context, snapshot) {
+        final config = snapshot.data;
+        return SignInStartupWidget(
           viewModel: viewModel,
           state: state,
           onSignInSuccess: onSignInSuccess,
           onSignInError: onSignInError,
           onSignUpTap: onSignUpTap,
           onForgotPasswordTap: onForgotPasswordTap,
-        ),
-      ),
+          config: config,
+        );
+      },
     );
+  }
+
+  /// Load auth configuration from app_config.json
+  Future<Map<String, dynamic>?> _loadAuthConfig() async {
+    try {
+      final configHelper = AssetConfigHelper();
+      await configHelper.loadConfig();
+      final allConfig = configHelper.getAllConfig();
+      final authConfig =
+          allConfig?['auth_configuration']?['sign_in'] as Map<String, dynamic>?;
+      debugPrint('✅ Auth configuration loaded: ${authConfig?.keys}');
+      return authConfig;
+    } catch (e) {
+      debugPrint('⚠️ Could not load auth config, using defaults: $e');
+      return null;
+    }
   }
 }

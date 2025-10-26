@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
@@ -47,6 +48,33 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailState state,
   ) {
+    // ✅ Auth required state - navigate to auth screen
+    if (state is ProductDetailAuthRequiredState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('🔒 Auth required, navigating to auth screen');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.message),
+            backgroundColor: OsmeaColors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        // Reset to previous state to prevent infinite loop
+        viewModel.loadProduct(productId);
+        // Navigate to auth
+        context.push('/auth');
+      });
+      // Show previous state while navigating
+      if (state.previousState != null) {
+        return ProductDetailContentWidget(
+          viewModel: viewModel,
+          state: state.previousState!,
+        );
+      }
+      // Fallback to loading
+      return const ProductDetailLoadingWidget();
+    }
+
     // Error state
     if (state is ProductDetailErrorState) {
       return ProductDetailErrorWidget(
@@ -131,6 +159,105 @@ AppBar productDetailCoreAppBar(
         },
       ),
     ],
+  );
+}
+
+/// Shows clean cart success dialog
+void _showCartSuccessDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.all(20),
+        content: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Success Icon
+            OsmeaComponents.container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: OsmeaColors.green.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: OsmeaComponents.center(
+                child: Icon(
+                  Icons.check_circle,
+                  size: 24,
+                  color: OsmeaColors.green,
+                ),
+              ),
+            ),
+            OsmeaComponents.sizedBox(height: 16),
+
+            // Title
+            OsmeaComponents.text(
+              'Success!',
+              textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                color: OsmeaColors.thunder,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+
+            // Message
+            OsmeaComponents.text(
+              'Product added to cart successfully!',
+              textStyle: OsmeaTextStyle.bodyMedium(
+                context,
+              ).copyWith(color: OsmeaColors.grayMaterial[600]),
+              textAlign: TextAlign.center,
+            ),
+            OsmeaComponents.sizedBox(height: 20),
+
+            // Action Buttons
+            OsmeaComponents.row(
+              children: [
+                // Continue Shopping
+                OsmeaComponents.expanded(
+                  child: OsmeaComponents.button(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                      Navigator.of(context).pop(); // Go back to home
+                    },
+                    backgroundColor: OsmeaColors.grayMaterial[100],
+                    textColor: OsmeaColors.thunder,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    borderRadius: 8,
+                    text: 'Continue',
+                    textStyle: OsmeaTextStyle.bodyMedium(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 12),
+
+                // Go to Cart
+                OsmeaComponents.expanded(
+                  child: OsmeaComponents.button(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog first
+                      context.push('/cart'); // Then navigate to cart
+                    },
+                    backgroundColor: OsmeaColors.blue,
+                    textColor: OsmeaColors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    borderRadius: 8,
+                    text: 'View Cart',
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 

@@ -12,55 +12,57 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model
 /// Implement this to fetch cart from WooCommerce Store API! 🌐
 abstract class CartService {
   /// 🚀 Fetches the cart contents from the WooCommerce Store API.
+  /// JWT token is optional - you can get it from this response for subsequent requests.
   Future<GetCartResponse> getCart({
     required String apiVersion,
+    String? jwtToken,
   });
 
   /// 🛒 Adds an item to the cart using WooCommerce Store API.
-  /// Requires JWT authentication and cart token for proper authorization.
+  /// Cart token is required, JWT authentication is optional.
   Future<AddItemResponse> addItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required int id,
     required int quantity,
     List<dynamic>? variation,
   });
 
   /// 🗑️ Removes an item from the cart using WooCommerce Store API.
-  /// Requires JWT authentication and cart token for proper authorization.
+  /// Cart token is required, JWT authentication is optional.
   Future<RemoveItemResponse> removeItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required String key,
   });
 
   /// 📝 Updates an item in the cart using WooCommerce Store API.
-  /// Requires JWT authentication and cart token for proper authorization.
+  /// Cart token is required, JWT authentication is optional.
   Future<UpdateItemResponse> updateItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required String key,
     required int quantity,
   });
 
   /// 🎫 Applies a coupon to the cart using WooCommerce Store API.
-  /// Requires JWT authentication and cart token for proper authorization.
+  /// Cart token is required, JWT authentication is optional.
   Future<ApplyCouponResponse> applyCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required String code,
   });
 
   /// 🗑️ Removes a coupon from the cart using WooCommerce Store API.
-  /// Requires JWT authentication and cart token for proper authorization.
+  /// Cart token is required, JWT authentication is optional.
   Future<RemoveCouponResponse> removeCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required String code,
   });
 
@@ -69,7 +71,7 @@ abstract class CartService {
   Future<UpdateCustomerResponse> updateCustomer({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required UpdateCustomerRequest request,
   });
 
@@ -78,7 +80,7 @@ abstract class CartService {
   Future<SelectShippingRateResponse> selectShippingRate({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken, // Optional JWT token
     required int packageId,
     required String rateId,
   });

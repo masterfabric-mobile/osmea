@@ -72,12 +72,11 @@ class UpdateCartCustomerHandler implements ApiRequestHandler {
         };
       }
 
+      // JWT token is optional - just log if missing
       if (jwtToken == null || jwtToken.isEmpty) {
-        return {
-          "status": "error",
-          "message": "JWT token is required. Please provide it manually or ensure you're logged in.",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
+        debugPrint('⚠️ JWT token not provided - continuing without authentication');
+      } else {
+        debugPrint('🔐 JWT token available for authenticated request');
       }
 
       // Create UpdateCustomerRequest from parameters
@@ -119,7 +118,28 @@ class UpdateCartCustomerHandler implements ApiRequestHandler {
       if (billingAddress == null && shippingAddress == null) {
         return {
           "status": "error",
-          "message": "At least one address (billing or shipping) must be provided for customer update",
+          "message": "At least one address (billing or shipping) must be provided for customer update. Please fill at least one billing field (e.g., billing_first_name, billing_email) or one shipping field (e.g., shipping_first_name, shipping_city).",
+          "available_fields": {
+            "billing_fields": [
+              "billing_first_name", "billing_last_name", "billing_address_1", "billing_address_2", 
+              "billing_city", "billing_state", "billing_postcode", "billing_country", 
+              "billing_email", "billing_phone"
+            ],
+            "shipping_fields": [
+              "shipping_first_name", "shipping_last_name", "shipping_address_1", "shipping_address_2",
+              "shipping_city", "shipping_state", "shipping_postcode", "shipping_country", "shipping_phone"
+            ]
+          },
+          "example_usage": {
+            "minimal_billing": {
+              "billing_first_name": "John",
+              "billing_email": "john@example.com"
+            },
+            "minimal_shipping": {
+              "shipping_first_name": "Jane",
+              "shipping_city": "Istanbul"
+            }
+          },
           "timestamp": DateTime.now().toIso8601String(),
         };
       }
@@ -146,10 +166,10 @@ class UpdateCartCustomerHandler implements ApiRequestHandler {
       // Get CartService from DI
       final cartService = GetIt.I<CartService>();
 
-      // Format JWT token with Bearer prefix if not already present
-      final formattedJwtToken = jwtToken.startsWith('Bearer ') 
-          ? jwtToken 
-          : 'Bearer $jwtToken';
+      // Format JWT token with Bearer prefix if available
+      final formattedJwtToken = (jwtToken != null && jwtToken.isNotEmpty)
+          ? (jwtToken.startsWith('Bearer ') ? jwtToken : 'Bearer $jwtToken')
+          : null;
 
       // Call the service
       final response = await cartService.updateCustomer(
@@ -202,7 +222,7 @@ class UpdateCartCustomerHandler implements ApiRequestHandler {
           "cart_token_source": params.containsKey('cart_token') && params['cart_token']!.isNotEmpty ? "manual" : "auto_storage",
           "jwt_token_source": params.containsKey('jwt_token') && params['jwt_token']!.isNotEmpty ? "manual" : "auto_storage",
           "cart_token_available": cartToken.isNotEmpty,
-          "jwt_token_available": jwtToken.isNotEmpty,
+          "jwt_token_available": jwtToken != null && jwtToken.isNotEmpty,
         },
         "customer_info": {
           "billing_address_updated": billingUpdated,
@@ -348,7 +368,7 @@ class UpdateCartCustomerHandler implements ApiRequestHandler {
           ),
           const ApiField(
             name: 'jwt_token',
-            label: 'JWT Token',
+            label: 'JWT Token (Optional)',
             hint: 'JWT authentication token (auto-loaded from storage if empty)',
             isRequired: false,
           ),

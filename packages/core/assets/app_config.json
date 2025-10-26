@@ -29,6 +29,26 @@
     "enable_haptic_feedback": true,
     "enable_sound_effects": true
   },
+  "search_view_configuration": {
+    "search_app_bar_color": "#FFFFFFFF",
+    "search_bar_background_color": "#EAE9E9FF",
+    "search_bar_border_color": "#E0E0E0FF",
+    "search_bar_show_clear_button": true,
+    "search_bar_show_search_icon": true,
+    "elevation": 4.0,
+    "search_bar_size": "medium",
+    "search_bar_variant": "borderless",
+    "search_bar_border_radius": 20.0,
+    "title": "Search",
+    "search_hint": "Search products, brands, categories...",
+    "show_barcode_scanner": true,
+    "show_voice_search": true,
+    "show_back_button": true,
+    "action_button_spacing": 2.0,
+    "action_button_min_width": 32.0,
+    "action_button_min_height": 32.0,
+    "action_button_padding_all": 4.0
+  },
   "security_configuration": {
     "enable_ssl_pinning": true,
     "certificate_validation": true,
@@ -137,6 +157,55 @@
         "next_text": null
       }
     ]
+  },
+  "auth_configuration": {
+    "ui_style": {
+      "tab_container_radius": 12,
+      "tab_item_radius": 10,
+      "button_radius": 12,
+      "content_area_top_radius": 32,
+      "background_color": "#4A6FE8",
+      "horizontal_padding": 50
+    },
+    "sign_in": {
+      "app_name": "OSMEA",
+      "tab_sign_in": "Sign In",
+      "tab_sign_up": "Sign Up",
+      "email_label": "Email",
+      "email_hint": "Enter your email",
+      "password_label": "Password",
+      "password_hint": "Enter your password",
+      "remember_me_label": "Remember me",
+      "forgot_password_label": "Forgot Password?",
+      "sign_in_button": "Continue",
+      "sign_in_button_loading": "Signing in...",
+      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+      "logo_width": 120,
+      "logo_height": 120
+    },
+    "sign_up": {
+      "app_name": "OSMEA",
+      "tab_sign_in": "Sign In",
+      "tab_sign_up": "Sign Up",
+      "email_label": "Email",
+      "email_hint": "Enter your email",
+      "password_label": "Password",
+      "password_hint": "Enter your password",
+      "password_confirm_label": "Confirm Password",
+      "password_confirm_hint": "Confirm your password",
+      "marketing_consent_label": "I would like to receive promotional emails/SMS",
+      "privacy_policy_label": "I have read and accept the Privacy Policy",
+      "terms_label": "I have read and accept the Terms of Service",
+      "sign_up_button": "Create Account",
+      "sign_up_button_loading": "Creating account...",
+      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+      "logo_width": 120,
+      "logo_height": 120
+    },
+    "forgot_password": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to reset"
+    }
   },
   "url_launcher_configuration": {
     "social_media_urls": {

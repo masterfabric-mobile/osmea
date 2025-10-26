@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class ImageDetailCubit extends BaseViewModelCubit<ImageDetailState> {
   final AssetConfigHelper _configHelper = AssetConfigHelper();
   

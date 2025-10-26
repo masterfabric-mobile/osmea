@@ -19,10 +19,15 @@ class _CartServiceClient implements CartServiceClient {
   String? baseUrl;
 
   @override
-  Future<GetCartResponse> getCart({required String apiVersion}) async {
+  Future<GetCartResponse> getCart({
+    required String apiVersion,
+    String? jwtToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': jwtToken};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<GetCartResponse>(Options(
@@ -49,7 +54,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<AddItemResponse> addItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required int id,
     required int quantity,
     List<dynamic>? variation,
@@ -93,11 +98,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<RemoveItemResponse> removeItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String key,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'key': key};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -129,7 +135,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<UpdateItemResponse> updateItem({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String key,
     required int quantity,
   }) async {
@@ -138,6 +144,7 @@ class _CartServiceClient implements CartServiceClient {
       r'key': key,
       r'quantity': quantity,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -169,11 +176,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<ApplyCouponResponse> applyCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String code,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'code': code};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -205,11 +213,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<RemoveCouponResponse> removeCoupon({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required String code,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'code': code};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -241,11 +250,12 @@ class _CartServiceClient implements CartServiceClient {
   Future<UpdateCustomerResponse> updateCustomer({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required UpdateCustomerRequest request,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,
@@ -277,7 +287,7 @@ class _CartServiceClient implements CartServiceClient {
   Future<SelectShippingRateResponse> selectShippingRate({
     required String apiVersion,
     required String cartToken,
-    required String jwtToken,
+    String? jwtToken,
     required int packageId,
     required String rateId,
   }) async {
@@ -286,6 +296,7 @@ class _CartServiceClient implements CartServiceClient {
       r'package_id': packageId,
       r'rate_id': rateId,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
       r'CART_TOKEN': cartToken,
       r'Authorization': jwtToken,

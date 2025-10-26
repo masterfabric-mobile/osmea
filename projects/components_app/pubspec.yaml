@@ -50,6 +50,13 @@ dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # App icon generation
 
 # ────────────────────────────────
+# DEPENDENCY OVERRIDES
+# ────────────────────────────────
+dependency_overrides:
+  osmea_components:
+    path: ../../packages/components # Override git dependency with local path
+
+# ────────────────────────────────
 # FLUTTER LAUNCHER ICONS CONFIG
 # ────────────────────────────────
 flutter_launcher_icons:

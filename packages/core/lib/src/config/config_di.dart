@@ -19,7 +19,10 @@ GetIt getIt = GetIt.instance;
 @InjectableInit()
 Future<GetIt> configureDependencies() async {
   // ⚙️ Initialize and return all registered dependencies
-  getIt.registerLazySingleton<ICommonLogger>(
-      () => CommonLogger(logger: Logger()));
+  // Only register if not already registered (prevents duplicate registration error)
+  if (!getIt.isRegistered<ICommonLogger>()) {
+    getIt.registerLazySingleton<ICommonLogger>(
+        () => CommonLogger(logger: Logger()));
+  }
   return getIt;
 }

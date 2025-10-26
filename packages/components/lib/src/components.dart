@@ -2092,6 +2092,10 @@ class OsmeaComponents {
     TextInputAction searchBarTextInputAction = TextInputAction.search,
     bool searchBarFullWidth = true,
     Duration? searchBarAnimationDuration,
+    // SearchBar action parameters
+    List<Widget> searchBarActions = const [],
+    EdgeInsetsGeometry searchBarActionMargin = EdgeInsets.zero,
+    MainAxisAlignment searchBarActionAlignment = MainAxisAlignment.end,
   }) {
     return OsmeaAppBarWithSearchBar(
       key: key,
@@ -2176,6 +2180,10 @@ class OsmeaComponents {
       searchBarTextInputAction: searchBarTextInputAction,
       searchBarFullWidth: searchBarFullWidth,
       searchBarAnimationDuration: searchBarAnimationDuration,
+      // SearchBar action parameters
+      searchBarActions: searchBarActions,
+      searchBarActionMargin: searchBarActionMargin,
+      searchBarActionAlignment: searchBarActionAlignment,
     );
   }
 
@@ -3676,6 +3684,10 @@ class OsmeaComponents {
     List<String> initialHistory = const [],
     bool enableHoverEffect = true,
     Duration? hoverAnimationDuration,
+    // New action parameters
+    List<Widget> actions = const [],
+    EdgeInsetsGeometry actionMargin = EdgeInsets.zero,
+    MainAxisAlignment actionAlignment = MainAxisAlignment.end,
   }) {
     return OsmeaSearchbar(
       key: key,
@@ -3732,6 +3744,10 @@ class OsmeaComponents {
       initialHistory: initialHistory,
       enableHoverEffect: enableHoverEffect,
       hoverAnimationDuration: hoverAnimationDuration,
+      // New action parameters
+      actions: actions,
+      actionMargin: actionMargin,
+      actionAlignment: actionAlignment,
     );
   }
 

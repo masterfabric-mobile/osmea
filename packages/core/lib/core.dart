@@ -52,6 +52,9 @@ export 'package:core/src/helper/onboarding_helper.dart';
 // 🧩 Exports the spacer helper for CoreSpacerType
 export 'package:core/src/helper/spacer_helper.dart';
 
+// 🧩 Exports the local notification helper
+export 'package:core/src/helper/local_notification_helper.dart';
+
 // 🔤 Exports the string extension helper for text formatting and capitalization
 export 'package:core/src/helper/first_letter_capitalize_helper.dart';
 
@@ -151,7 +154,19 @@ export 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
 // 🔐 Exports the auth storage helper
 export 'package:core/src/helper/auth_storage_helper.dart';
 
+// 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
+export 'package:core/src/views/auth/auth_view.dart';
+export 'package:core/src/views/auth/auth_widget.dart';
+
 // 🔐 Exports the sign in view, cubit and state
 export 'package:core/src/views/auth/sign_in/sign_in_view.dart';
 export 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
 export 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
+export 'package:core/src/views/auth/sign_up/sign_up_view.dart';
+export 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+export 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
+
+// 🔍 Exports the search view and cubit
+export 'package:core/src/views/search/search_view.dart';
+export 'package:core/src/views/search/cubit/search_cubit.dart';
+export 'package:core/src/views/search/cubit/search_state.dart';

@@ -57,47 +57,49 @@ _$ListProductVariationsResponseModelImpl
         );
 
 Map<String, dynamic> _$$ListProductVariationsResponseModelImplToJson(
-        _$ListProductVariationsResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.slug case final value?) 'slug': value,
-      if (instance.parent case final value?) 'parent': value,
-      if (instance.type case final value?) 'type': value,
-      if (instance.variation case final value?) 'variation': value,
-      if (instance.permalink case final value?) 'permalink': value,
-      if (instance.sku case final value?) 'sku': value,
-      if (instance.shortDescription case final value?)
-        'short_description': value,
-      if (instance.description case final value?) 'description': value,
-      if (instance.onSale case final value?) 'on_sale': value,
-      if (instance.prices?.toJson() case final value?) 'prices': value,
-      if (instance.priceHtml case final value?) 'price_html': value,
-      if (instance.averageRating case final value?) 'average_rating': value,
-      if (instance.reviewCount case final value?) 'review_count': value,
-      if (instance.images?.map((e) => e.toJson()).toList() case final value?)
-        'images': value,
-      if (instance.categories?.map((e) => e.toJson()).toList()
-          case final value?)
-        'categories': value,
-      if (instance.tags case final value?) 'tags': value,
-      if (instance.brands case final value?) 'brands': value,
-      if (instance.attributes case final value?) 'attributes': value,
-      if (instance.variations case final value?) 'variations': value,
-      if (instance.groupedProducts case final value?) 'grouped_products': value,
-      if (instance.hasOptions case final value?) 'has_options': value,
-      if (instance.isPurchasable case final value?) 'is_purchasable': value,
-      if (instance.isInStock case final value?) 'is_in_stock': value,
-      if (instance.isOnBackorder case final value?) 'is_on_backorder': value,
-      if (instance.lowStockRemaining case final value?)
-        'low_stock_remaining': value,
-      if (instance.stockAvailability?.toJson() case final value?)
-        'stock_availability': value,
-      if (instance.soldIndividually case final value?)
-        'sold_individually': value,
-      if (instance.addToCart?.toJson() case final value?) 'add_to_cart': value,
-      if (instance.extensions?.toJson() case final value?) 'extensions': value,
-    };
+    _$ListProductVariationsResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('slug', instance.slug);
+  writeNotNull('parent', instance.parent);
+  writeNotNull('type', instance.type);
+  writeNotNull('variation', instance.variation);
+  writeNotNull('permalink', instance.permalink);
+  writeNotNull('sku', instance.sku);
+  writeNotNull('short_description', instance.shortDescription);
+  writeNotNull('description', instance.description);
+  writeNotNull('on_sale', instance.onSale);
+  writeNotNull('prices', instance.prices?.toJson());
+  writeNotNull('price_html', instance.priceHtml);
+  writeNotNull('average_rating', instance.averageRating);
+  writeNotNull('review_count', instance.reviewCount);
+  writeNotNull('images', instance.images?.map((e) => e.toJson()).toList());
+  writeNotNull(
+      'categories', instance.categories?.map((e) => e.toJson()).toList());
+  writeNotNull('tags', instance.tags);
+  writeNotNull('brands', instance.brands);
+  writeNotNull('attributes', instance.attributes);
+  writeNotNull('variations', instance.variations);
+  writeNotNull('grouped_products', instance.groupedProducts);
+  writeNotNull('has_options', instance.hasOptions);
+  writeNotNull('is_purchasable', instance.isPurchasable);
+  writeNotNull('is_in_stock', instance.isInStock);
+  writeNotNull('is_on_backorder', instance.isOnBackorder);
+  writeNotNull('low_stock_remaining', instance.lowStockRemaining);
+  writeNotNull('stock_availability', instance.stockAvailability?.toJson());
+  writeNotNull('sold_individually', instance.soldIndividually);
+  writeNotNull('add_to_cart', instance.addToCart?.toJson());
+  writeNotNull('extensions', instance.extensions?.toJson());
+  return val;
+}
 
 _$AddToCartImpl _$$AddToCartImplFromJson(Map<String, dynamic> json) =>
     _$AddToCartImpl(
@@ -110,44 +112,48 @@ _$AddToCartImpl _$$AddToCartImplFromJson(Map<String, dynamic> json) =>
       multipleOf: (json['multiple_of'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$AddToCartImplToJson(_$AddToCartImpl instance) =>
-    <String, dynamic>{
-      if (instance.text case final value?) 'text': value,
-      if (instance.description case final value?) 'description': value,
-      if (instance.url case final value?) 'url': value,
-      if (instance.singleText case final value?) 'single_text': value,
-      if (instance.minimum case final value?) 'minimum': value,
-      if (instance.maximum case final value?) 'maximum': value,
-      if (instance.multipleOf case final value?) 'multiple_of': value,
-    };
+Map<String, dynamic> _$$AddToCartImplToJson(_$AddToCartImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('text', instance.text);
+  writeNotNull('description', instance.description);
+  writeNotNull('url', instance.url);
+  writeNotNull('single_text', instance.singleText);
+  writeNotNull('minimum', instance.minimum);
+  writeNotNull('maximum', instance.maximum);
+  writeNotNull('multiple_of', instance.multipleOf);
+  return val;
+}
 
 _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
       id: (json['id'] as num?)?.toInt(),
-      name: $enumDecodeNullable(_$NameEnumMap, json['name']),
-      slug: $enumDecodeNullable(_$SlugEnumMap, json['slug']),
+      name: json['name'] as String?,
+      slug: json['slug'] as String?,
       link: json['link'] as String?,
     );
 
-Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (_$NameEnumMap[instance.name] case final value?) 'name': value,
-      if (_$SlugEnumMap[instance.slug] case final value?) 'slug': value,
-      if (instance.link case final value?) 'link': value,
-    };
+Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) {
+  final val = <String, dynamic>{};
 
-const _$NameEnumMap = {
-  Name.AYAKKABLAR: 'Ayakkabılar',
-  Name.LEOPAR_KADIN_TOPUKLU_AYAKKABI: 'leopar kadin topuklu ayakkabi',
-  Name.OXFORD_AYAKKABLAR: 'Oxford Ayakkabılar',
-};
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
 
-const _$SlugEnumMap = {
-  Slug.AYAKKABILAR: 'ayakkabilar',
-  Slug.OXFORD_AYAKKABILAR: 'oxford-ayakkabilar',
-  Slug.TOPUKLU_AYAKKABILAR: 'topuklu-ayakkabilar',
-};
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('slug', instance.slug);
+  writeNotNull('link', instance.link);
+  return val;
+}
 
 _$ExtensionsImpl _$$ExtensionsImplFromJson(Map<String, dynamic> json) =>
     _$ExtensionsImpl();
@@ -160,25 +166,29 @@ _$ImageImpl _$$ImageImplFromJson(Map<String, dynamic> json) => _$ImageImpl(
       src: json['src'] as String?,
       thumbnail: json['thumbnail'] as String?,
       srcset: json['srcset'] as String?,
-      sizes: $enumDecodeNullable(_$SizesEnumMap, json['sizes']),
+      sizes: json['sizes'] as String?,
       name: json['name'] as String?,
       alt: json['alt'] as String?,
     );
 
-Map<String, dynamic> _$$ImageImplToJson(_$ImageImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.src case final value?) 'src': value,
-      if (instance.thumbnail case final value?) 'thumbnail': value,
-      if (instance.srcset case final value?) 'srcset': value,
-      if (_$SizesEnumMap[instance.sizes] case final value?) 'sizes': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.alt case final value?) 'alt': value,
-    };
+Map<String, dynamic> _$$ImageImplToJson(_$ImageImpl instance) {
+  final val = <String, dynamic>{};
 
-const _$SizesEnumMap = {
-  Sizes.MAX_WIDTH_800_PX_100_VW_800_PX: '(max-width: 800px) 100vw, 800px',
-};
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('src', instance.src);
+  writeNotNull('thumbnail', instance.thumbnail);
+  writeNotNull('srcset', instance.srcset);
+  writeNotNull('sizes', instance.sizes);
+  writeNotNull('name', instance.name);
+  writeNotNull('alt', instance.alt);
+  return val;
+}
 
 _$PricesImpl _$$PricesImplFromJson(Map<String, dynamic> json) => _$PricesImpl(
       price: json['price'] as String?,
@@ -194,23 +204,29 @@ _$PricesImpl _$$PricesImplFromJson(Map<String, dynamic> json) => _$PricesImpl(
       currencySuffix: json['currency_suffix'] as String?,
     );
 
-Map<String, dynamic> _$$PricesImplToJson(_$PricesImpl instance) =>
-    <String, dynamic>{
-      if (instance.price case final value?) 'price': value,
-      if (instance.regularPrice case final value?) 'regular_price': value,
-      if (instance.salePrice case final value?) 'sale_price': value,
-      if (instance.priceRange case final value?) 'price_range': value,
-      if (instance.currencyCode case final value?) 'currency_code': value,
-      if (instance.currencySymbol case final value?) 'currency_symbol': value,
-      if (instance.currencyMinorUnit case final value?)
-        'currency_minor_unit': value,
-      if (instance.currencyDecimalSeparator case final value?)
-        'currency_decimal_separator': value,
-      if (instance.currencyThousandSeparator case final value?)
-        'currency_thousand_separator': value,
-      if (instance.currencyPrefix case final value?) 'currency_prefix': value,
-      if (instance.currencySuffix case final value?) 'currency_suffix': value,
-    };
+Map<String, dynamic> _$$PricesImplToJson(_$PricesImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('price', instance.price);
+  writeNotNull('regular_price', instance.regularPrice);
+  writeNotNull('sale_price', instance.salePrice);
+  writeNotNull('price_range', instance.priceRange);
+  writeNotNull('currency_code', instance.currencyCode);
+  writeNotNull('currency_symbol', instance.currencySymbol);
+  writeNotNull('currency_minor_unit', instance.currencyMinorUnit);
+  writeNotNull('currency_decimal_separator', instance.currencyDecimalSeparator);
+  writeNotNull(
+      'currency_thousand_separator', instance.currencyThousandSeparator);
+  writeNotNull('currency_prefix', instance.currencyPrefix);
+  writeNotNull('currency_suffix', instance.currencySuffix);
+  return val;
+}
 
 _$StockAvailabilityImpl _$$StockAvailabilityImplFromJson(
         Map<String, dynamic> json) =>
@@ -220,8 +236,16 @@ _$StockAvailabilityImpl _$$StockAvailabilityImplFromJson(
     );
 
 Map<String, dynamic> _$$StockAvailabilityImplToJson(
-        _$StockAvailabilityImpl instance) =>
-    <String, dynamic>{
-      if (instance.text case final value?) 'text': value,
-      if (instance.stockAvailabilityClass case final value?) 'class': value,
-    };
+    _$StockAvailabilityImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('text', instance.text);
+  writeNotNull('class', instance.stockAvailabilityClass);
+  return val;
+}

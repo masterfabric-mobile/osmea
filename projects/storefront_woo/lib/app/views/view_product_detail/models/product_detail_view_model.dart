@@ -9,13 +9,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
-import 'package:storefront_woo/app/services/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:get_it/get_it.dart';
 
 @injectable
@@ -25,7 +25,8 @@ class ProductDetailViewModel
 
   // Dependencies
   final ProductService _productService = GetIt.I<ProductService>();
-  final CartService _cartService = CartService();
+  final CartService _cartService = GetIt.I<CartService>();
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // State variables
   int _selectedQuantity = 1;
@@ -34,8 +35,8 @@ class ProductDetailViewModel
 
   // Public trigger functions - HydratedCubit pattern
   void loadProduct(int productId) => _loadProduct(productId);
-  void addProductToCart(int productId, {int quantity = 1}) =>
-      _addToCart(productId, quantity);
+  Future<void> addProductToCart(int productId, {int quantity = 1}) async =>
+      await _addToCart(productId, quantity);
   void addProductToWishlist(int productId) => _addToWishlist(productId);
   void updateQuantity(int quantity) => _changeQuantity(quantity);
   void loadProductImages(List<String> imageUrls) => _loadImages(imageUrls);
@@ -75,14 +76,17 @@ class ProductDetailViewModel
       final imageUrls = <String>[];
       if (product.images != null) {
         for (final img in product.images!) {
-          if (img is Map<String, dynamic> && img['src'] != null) {
-            imageUrls.add(img['src'] as String);
+          if (img.src != null && img.src!.isNotEmpty) {
+            imageUrls.add(img.src!);
           }
         }
       }
+      debugPrint(
+        '📸 Extracted ${imageUrls.length} image URLs for product: ${product.name}',
+      );
 
       // Check if product is in cart or wishlist
-      final isInCart = _cartService.isInCart(productId);
+      final isInCart = false; // TODO: Implement cart check via API
       final isInWishlist = false; // TODO: Implement wishlist service
 
       emit(
@@ -102,45 +106,42 @@ class ProductDetailViewModel
 
   Future<void> _addToCart(int productId, int quantity) async {
     try {
-      final currentState = state;
-      if (currentState is! ProductDetailLoadedState) return;
+      debugPrint(
+        '🛒 ProductDetailViewModel: Adding product $productId to cart via API',
+      );
 
-      // Find the product to add to cart
-      final product = currentState.product;
+      // Add item to cart via API
+      final response = await _cartService.addItem(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        cartToken: await _getCartToken() ?? '',
+        jwtToken: await _getJwtToken(), // Optional JWT token
+        id: productId,
+        quantity: quantity,
+      );
 
-      // Create cart item
-      // Get image URL safely
-      String? imageUrl;
-      if (product.images != null && product.images!.isNotEmpty) {
-        final firstImg = product.images!.first;
-        if (firstImg is Map<String, dynamic> && firstImg['src'] != null) {
-          imageUrl = firstImg['src'] as String;
-        }
+      debugPrint(
+        '🛒 ProductDetailViewModel: AddItem API response: ${response.toJson()}',
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API add item error: ${response.errors!.first}');
+        emit(
+          ProductDetailErrorState(
+            message: 'Failed to add item: ${response.errors!.first}',
+          ),
+        );
+        return;
       }
 
-      final cartItem = CartItem(
-        productId: product.id ?? 0,
-        productName: product.name ?? 'Unknown Product',
-        price: _parsePrice(product.prices),
-        quantity: quantity,
-        imageUrl: imageUrl,
-      );
+      debugPrint('✅ Successfully added product $productId to cart via API');
 
-      // Add to cart service
-      _cartService.addItem(cartItem);
-
-      debugPrint('✅ Added product ${product.name} to cart');
-
-      // Update state
-      emit(currentState.copyWith(isInCart: true));
-
-      // Show success message
-      emit(
-        ProductDetailSuccessState(
-          message: 'Product added to cart successfully!',
-          previousState: currentState.copyWith(isInCart: true),
-        ),
-      );
+      // Update state to show product is in cart
+      final currentState = state;
+      if (currentState is ProductDetailLoadedState) {
+        emit(currentState.copyWith(isInCart: true));
+      }
     } catch (e) {
       debugPrint('❌ Failed to add to cart: $e');
       emit(ProductDetailErrorState(message: 'Failed to add to cart: $e'));
@@ -207,26 +208,29 @@ class ProductDetailViewModel
     return null; // No need to persist product detail state
   }
 
-  /// Parses price string to double for cart calculations
-  double _parsePrice(Prices? prices) {
-    if (prices == null) {
-      debugPrint('❌ ProductDetailViewModel: Prices is null');
-      return 0.0;
+  /// Gets cart token from storage
+  Future<String?> _getCartToken() async {
+    try {
+      // Use local CartTokenStorage for consistency
+      final token = await CartTokenStorage.loadCartToken();
+      debugPrint(
+        '🛒 ProductDetailViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
+      );
+      return token;
+    } catch (e) {
+      debugPrint('❌ Failed to get cart token: $e');
+      return null;
     }
+  }
 
-    debugPrint('💰 ProductDetailViewModel: Price data: ${prices.toJson()}');
-
-    // Prefer sale price if available, otherwise regular price, then main price
-    final priceString =
-        prices.salePrice ?? prices.regularPrice ?? prices.price ?? '0.00';
-
-    debugPrint('💰 ProductDetailViewModel: Price string: $priceString');
-
-    // Use PriceInfoCurrencyHelper for parsing
-    final parsedPrice =
-        PriceInfoCurrencyHelper.parsePriceToDouble(priceString) ?? 0.0;
-
-    debugPrint('💰 ProductDetailViewModel: Parsed price: $parsedPrice');
-    return parsedPrice;
+  /// Gets JWT token from storage
+  Future<String?> _getJwtToken() async {
+    try {
+      final authStorage = AuthStorageHelper();
+      return await authStorage.getToken();
+    } catch (e) {
+      debugPrint('❌ Failed to get JWT token: $e');
+      return null;
+    }
   }
 }
