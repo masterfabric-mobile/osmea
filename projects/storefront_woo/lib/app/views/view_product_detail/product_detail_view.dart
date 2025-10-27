@@ -22,6 +22,7 @@ class ProductDetailView
   ProductDetailView({
     super.key,
     required this.productId,
+    super.footerSpacer = const SpacerVisibility.disabled(),
     super.arguments,
     required super.goRoute,
   }) : super(
