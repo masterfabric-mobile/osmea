@@ -3,10 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
+import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
 class ImageDetailCubit extends BaseViewModelCubit<ImageDetailState> {
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
+  
   ImageDetailCubit() : super(const ImageDetailState());
 
   Future<void> initialize({required List<String> images, int initialIndex = 0, String? heroTag, double? screenWidth}) async {
@@ -18,10 +21,33 @@ class ImageDetailCubit extends BaseViewModelCubit<ImageDetailState> {
     final safeIndex = initialIndex.clamp(0, images.length - 1);
     stateChanger(state.copyWith(status: ImageDetailStatus.loading, images: List.unmodifiable(images), currentIndex: safeIndex, heroTag: heroTag));
     
+    // Load button visibility config
+    await _loadButtonConfig();
+    
     // Load image dimensions for all images with actual screen width
     await _loadImageDimensions(images, screenWidth: screenWidth);
     
     stateChanger(state.copyWith(status: ImageDetailStatus.ready));
+  }
+
+  Future<void> _loadButtonConfig() async {
+    try {
+      await _configHelper.loadConfig('packages/core/assets/app_config.json');
+      
+      final showBackButton = _configHelper.getBool('image_detail_configuration.show_back_button', true);
+      final showCloseButton = _configHelper.getBool('image_detail_configuration.show_close_button', true);
+      
+      stateChanger(state.copyWith(
+        showBackButton: showBackButton,
+        showCloseButton: showCloseButton,
+      ));
+    } catch (e) {
+      // Use default values if config fails to load
+      stateChanger(state.copyWith(
+        showBackButton: true,
+        showCloseButton: true,
+      ));
+    }
   }
 
   Future<void> _loadImageDimensions(List<String> images, {double? screenWidth}) async {
