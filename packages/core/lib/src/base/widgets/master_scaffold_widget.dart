@@ -92,6 +92,7 @@ class MasterScaffoldWidget extends StatelessWidget {
   final SpacerVisibility? footerSpacer; // Bottom spacer configuration
   final PaddingVisibility?
       horizontalPadding; // Horizontal padding configuration
+  final PaddingVisibility? verticalPadding; // Vertical padding configuration
   final AppBarPaddingVisibility?
       appBarPadding; // App bar padding configuration (when SafeArea disabled)
 
@@ -104,6 +105,8 @@ class MasterScaffoldWidget extends StatelessWidget {
   // 📏 Padding values - custom overrides default
   final double? customHorizontalPadding; // Custom horizontal padding value
   final double defaultHorizontalPadding; // Default horizontal padding value
+  final double? customVerticalPadding; // Custom vertical padding value
+  final double defaultVerticalPadding; // Default vertical padding value
   final double? customAppBarPadding; // Custom app bar padding value
   final double defaultAppBarPadding; // Default app bar padding value
 
@@ -125,6 +128,7 @@ class MasterScaffoldWidget extends StatelessWidget {
     this.navbarSpacer, // Top spacer configuration
     this.footerSpacer, // Bottom spacer configuration
     this.horizontalPadding, // Horizontal padding configuration
+    this.verticalPadding, // Vertical padding configuration
     this.appBarPadding, // App bar padding configuration
 
     // 🔧 Spacer type overrides
@@ -137,6 +141,8 @@ class MasterScaffoldWidget extends StatelessWidget {
     this.customHorizontalPadding, // Custom horizontal padding value
     this.defaultHorizontalPadding =
         GridHelper.defaultMargin, // Default padding value
+    this.customVerticalPadding, // Custom vertical padding value
+    this.defaultVerticalPadding = 16.0, // Default vertical padding value
     this.customAppBarPadding, // Custom app bar padding value
     this.defaultAppBarPadding = 16.0, // Default app bar padding value
   });
@@ -156,6 +162,10 @@ class MasterScaffoldWidget extends StatelessWidget {
       horizontalPadding:
           (horizontalPadding ?? const PaddingVisibility.enabled()).withDefault(
         fallback: customHorizontalPadding ?? defaultHorizontalPadding,
+      ),
+      verticalPadding:
+          (verticalPadding ?? const PaddingVisibility.enabled()).withDefault(
+        fallback: customVerticalPadding ?? defaultVerticalPadding,
       ),
       appBarPadding: (appBarPadding ?? const AppBarPaddingVisibility.enabled())
           .withDefault(
@@ -193,13 +203,7 @@ class MasterScaffoldWidget extends StatelessWidget {
 
                   // 📱 Main content with configurable padding
                   Expanded(
-                    child: config.horizontalPadding.isEnabled
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: config.horizontalPadding.value),
-                            child: body,
-                          )
-                        : body,
+                    child: _buildPaddedBody(config),
                   ),
 
                   // 🔻 Footer spacer - based on configuration
@@ -222,19 +226,37 @@ class MasterScaffoldWidget extends StatelessWidget {
 
         // 📱 Main content with configurable padding (no SafeArea)
         Expanded(
-          child: config.horizontalPadding.isEnabled
-              ? Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: config.horizontalPadding.value),
-                  child: body,
-                )
-              : body,
+          child: _buildPaddedBody(config),
         ),
 
         // 🔻 Footer spacer - based on configuration (no SafeArea)
         if (config.footerSpacer.isEnabled) CoreSpacer(config.footerSpacer.type),
       ],
     );
+  }
+
+  /// 📱 Build body with combined horizontal and vertical padding
+  Widget _buildPaddedBody(_LayoutConfig config) {
+    Widget paddedBody = body;
+
+    // Apply vertical padding if enabled
+    if (config.verticalPadding.isEnabled) {
+      paddedBody = Padding(
+        padding: EdgeInsets.symmetric(vertical: config.verticalPadding.value),
+        child: paddedBody,
+      );
+    }
+
+    // Apply horizontal padding if enabled
+    if (config.horizontalPadding.isEnabled) {
+      paddedBody = Padding(
+        padding:
+            EdgeInsets.symmetric(horizontal: config.horizontalPadding.value),
+        child: paddedBody,
+      );
+    }
+
+    return paddedBody;
   }
 
   // No presets: config is resolved above from external parameters only
@@ -248,12 +270,14 @@ class _LayoutConfig {
   final SpacerVisibility navbarSpacer;
   final SpacerVisibility footerSpacer;
   final PaddingVisibility horizontalPadding;
+  final PaddingVisibility verticalPadding;
   final AppBarPaddingVisibility appBarPadding;
 
   const _LayoutConfig({
     required this.navbarSpacer,
     required this.footerSpacer,
     required this.horizontalPadding,
+    required this.verticalPadding,
     required this.appBarPadding,
   });
 }

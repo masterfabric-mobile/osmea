@@ -55,6 +55,7 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
   final SpacerVisibility? navbarSpacer;
   final SpacerVisibility? footerSpacer;
   final PaddingVisibility? horizontalPadding;
+  final PaddingVisibility? verticalPadding;
   final AppBarPaddingVisibility? appBarPadding;
   final bool? useSafeArea;
 
@@ -67,6 +68,8 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
   // Padding values - custom overrides default
   final double? customHorizontalPadding;
   final double defaultHorizontalPadding;
+  final double? customVerticalPadding;
+  final double defaultVerticalPadding;
   final double? customAppBarPadding;
   final double defaultAppBarPadding;
 
@@ -90,6 +93,7 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
     this.navbarSpacer,
     this.footerSpacer,
     this.horizontalPadding,
+    this.verticalPadding,
     this.appBarPadding,
     this.useSafeArea,
     this.customNavbarSpacerType,
@@ -98,6 +102,8 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
     this.defaultFooterSpacerType = CoreSpacerType.footer,
     this.customHorizontalPadding,
     this.defaultHorizontalPadding = 16.0,
+    this.customVerticalPadding,
+    this.defaultVerticalPadding = 16.0,
     this.customAppBarPadding,
     this.defaultAppBarPadding = 16.0,
   }) : assert(arguments.isNotEmpty, 'Arguments must not be empty') {
@@ -172,6 +178,8 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
             defaultFooterSpacerType: defaultFooterSpacerType,
             customHorizontalPadding: customHorizontalPadding,
             defaultHorizontalPadding: defaultHorizontalPadding,
+            customVerticalPadding: customVerticalPadding,
+            defaultVerticalPadding: defaultVerticalPadding,
             customAppBarPadding: customAppBarPadding,
             defaultAppBarPadding: defaultAppBarPadding,
           );

@@ -25,6 +25,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
   final SpacerVisibility? navbarSpacer;
   final SpacerVisibility? footerSpacer;
   final PaddingVisibility? horizontalPadding;
+  final PaddingVisibility? verticalPadding;
   final AppBarPaddingVisibility? appBarPadding;
   final bool? useSafeArea;
 
@@ -37,6 +38,8 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
   // Padding values - custom overrides default
   final double? customHorizontalPadding;
   final double defaultHorizontalPadding;
+  final double? customVerticalPadding;
+  final double defaultVerticalPadding;
   final double? customAppBarPadding;
   final double defaultAppBarPadding;
 
@@ -58,6 +61,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
     this.navbarSpacer,
     this.footerSpacer,
     this.horizontalPadding,
+    this.verticalPadding,
     this.appBarPadding,
     this.useSafeArea,
     this.customNavbarSpacerType,
@@ -66,6 +70,8 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
     this.defaultFooterSpacerType = CoreSpacerType.footer,
     this.customHorizontalPadding,
     this.defaultHorizontalPadding = 16.0,
+    this.customVerticalPadding,
+    this.defaultVerticalPadding = 16.0,
     this.customAppBarPadding,
     this.defaultAppBarPadding = 16.0,
     required this.goRoute,
@@ -155,6 +161,7 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
             navbarSpacer: navbarSpacer,
             footerSpacer: footerSpacer,
             horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding,
             appBarPadding: appBarPadding,
             useSafeArea: useSafeArea,
             customNavbarSpacerType: customNavbarSpacerType,
@@ -163,6 +170,8 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
             defaultFooterSpacerType: defaultFooterSpacerType,
             customHorizontalPadding: customHorizontalPadding,
             defaultHorizontalPadding: defaultHorizontalPadding,
+            customVerticalPadding: customVerticalPadding,
+            defaultVerticalPadding: defaultVerticalPadding,
             customAppBarPadding: customAppBarPadding,
             defaultAppBarPadding: defaultAppBarPadding,
           );
