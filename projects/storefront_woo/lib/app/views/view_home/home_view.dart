@@ -22,6 +22,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(
          coreAppBar: (context, viewModel) =>

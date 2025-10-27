@@ -23,6 +23,7 @@ class ProductDetailView
     super.key,
     required this.productId,
     super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
     super.arguments,
     required super.goRoute,
   }) : super(
