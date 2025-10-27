@@ -19,11 +19,11 @@ class AppNavbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.navbar(
-      variant: NavbarVariant.outlined,
+      variant: NavbarVariant.transparent,
       size: NavbarSize.medium,
       position: NavbarPosition.bottom,
       currentIndex: currentIndex,
-      elevation: 8,
+      elevation: 0,
       backgroundColor: OsmeaColors.white,
       items: _getNavbarItems(context),
       onItemTap: onItemTap ?? (index) => _navigateToPage(context, index),
