@@ -457,13 +457,14 @@ final GoRouter appRouter = GoRouter(
 );
 
 /// Get navbar for specific route
+/// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
 Widget? _getNavbarForRoute(String location) {
   // Show navbar only for main app sections
   if (location == '/home' || location == '/cart') {
     if (location == '/home') {
-      return AppNavbar(currentIndex: 0);
+      return AppNavbar(currentIndex: 0); // Home
     } else if (location == '/cart') {
-      return AppNavbar(currentIndex: 1);
+      return AppNavbar(currentIndex: 3); // Cart
     }
   }
   // No navbar for splash, onboarding, auth, product-detail
