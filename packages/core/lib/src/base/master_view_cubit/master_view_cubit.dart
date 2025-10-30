@@ -2,7 +2,6 @@ library master_view_cubit;
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
 import 'package:go_router/go_router.dart';
 
 part 'master_view_cubit_enums.dart';
@@ -20,11 +19,14 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
   final Function(String path) goRoute;
   final bool? extendBody;
   final bool? extendBodyBehindAppBar;
+  final Color? backgroundColor;
 
   // Layout configuration - external values
   final SpacerVisibility? navbarSpacer;
   final SpacerVisibility? footerSpacer;
   final PaddingVisibility? horizontalPadding;
+  final PaddingVisibility? verticalPadding;
+  final AppBarPaddingVisibility? appBarPadding;
   final bool? useSafeArea;
 
   // Spacer types - custom overrides default
@@ -36,6 +38,10 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
   // Padding values - custom overrides default
   final double? customHorizontalPadding;
   final double defaultHorizontalPadding;
+  final double? customVerticalPadding;
+  final double defaultVerticalPadding;
+  final double? customAppBarPadding;
+  final double defaultAppBarPadding;
 
   /// Optional bottom navigation bar widget for the Scaffold.
   final Widget? bottomNavigationBar;
@@ -51,9 +57,12 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
     this.bottomNavigationBar,
     this.extendBody,
     this.extendBodyBehindAppBar,
+    this.backgroundColor,
     this.navbarSpacer,
     this.footerSpacer,
     this.horizontalPadding,
+    this.verticalPadding,
+    this.appBarPadding,
     this.useSafeArea,
     this.customNavbarSpacerType,
     this.customFooterSpacerType,
@@ -61,6 +70,10 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
     this.defaultFooterSpacerType = CoreSpacerType.footer,
     this.customHorizontalPadding,
     this.defaultHorizontalPadding = 16.0,
+    this.customVerticalPadding,
+    this.defaultVerticalPadding = 16.0,
+    this.customAppBarPadding,
+    this.defaultAppBarPadding = 16.0,
     required this.goRoute,
   }) : assert(arguments.isNotEmpty, 'Arguments must not be empty') {
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -91,7 +104,8 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
           final snackBar = _createSnackBar(currentView);
           _showSnackBar(context, snackBar);
         } catch (e) {
-          debugPrint('🔴 [MasterViewCubit] Error creating or showing Snackbar: $e');
+          debugPrint(
+              '🔴 [MasterViewCubit] Error creating or showing Snackbar: $e');
         }
       });
     }
@@ -143,9 +157,12 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
                 : bottomNavigationBar,
             extendBody: extendBody,
             extendBodyBehindAppBar: extendBodyBehindAppBar,
+            backgroundColor: backgroundColor,
             navbarSpacer: navbarSpacer,
             footerSpacer: footerSpacer,
             horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding,
+            appBarPadding: appBarPadding,
             useSafeArea: useSafeArea,
             customNavbarSpacerType: customNavbarSpacerType,
             customFooterSpacerType: customFooterSpacerType,
@@ -153,6 +170,10 @@ abstract class MasterViewCubit<V extends BaseViewModelCubit<S>, S>
             defaultFooterSpacerType: defaultFooterSpacerType,
             customHorizontalPadding: customHorizontalPadding,
             defaultHorizontalPadding: defaultHorizontalPadding,
+            customVerticalPadding: customVerticalPadding,
+            defaultVerticalPadding: defaultVerticalPadding,
+            customAppBarPadding: customAppBarPadding,
+            defaultAppBarPadding: defaultAppBarPadding,
           );
         },
       );

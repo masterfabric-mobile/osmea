@@ -1,7 +1,6 @@
 library master_view; // Define a library name
 
 import 'package:core/core.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,11 +49,14 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
   final bool showDevGrid;
   final bool? extendBody;
   final bool? extendBodyBehindAppBar;
+  final Color? backgroundColor;
 
   // Layout configuration - external values
   final SpacerVisibility? navbarSpacer;
   final SpacerVisibility? footerSpacer;
   final PaddingVisibility? horizontalPadding;
+  final PaddingVisibility? verticalPadding;
+  final AppBarPaddingVisibility? appBarPadding;
   final bool? useSafeArea;
 
   // Spacer types - custom overrides default
@@ -66,6 +68,12 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
   // Padding values - custom overrides default
   final double? customHorizontalPadding;
   final double defaultHorizontalPadding;
+  final double? customVerticalPadding;
+  final double defaultVerticalPadding;
+  final double? customAppBarPadding;
+  final double defaultAppBarPadding;
+
+  // System UI color management
 
   /// Optional bottom navigation bar widget for the Scaffold.
   final Widget? bottomNavigationBar;
@@ -81,9 +89,12 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
     this.bottomNavigationBar, // Optional bottom navigation bar
     this.extendBody,
     this.extendBodyBehindAppBar,
+    this.backgroundColor,
     this.navbarSpacer,
     this.footerSpacer,
     this.horizontalPadding,
+    this.verticalPadding,
+    this.appBarPadding,
     this.useSafeArea,
     this.customNavbarSpacerType,
     this.customFooterSpacerType,
@@ -91,11 +102,13 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
     this.defaultFooterSpacerType = CoreSpacerType.footer,
     this.customHorizontalPadding,
     this.defaultHorizontalPadding = 16.0,
+    this.customVerticalPadding,
+    this.defaultVerticalPadding = 16.0,
+    this.customAppBarPadding,
+    this.defaultAppBarPadding = 16.0,
   }) : assert(arguments.isNotEmpty, 'Arguments must not be empty') {
     // Global Flutter error handler
     FlutterError.onError = (FlutterErrorDetails details) {
-      debugPrint(
-          'FlutterError: \u001b[36m[36m${details.exception}\u001b[39m\u001b[39m');
       debugPrintStack(stackTrace: details.stack);
     };
   }
@@ -153,9 +166,11 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
                 : bottomNavigationBar,
             extendBody: extendBody,
             extendBodyBehindAppBar: extendBodyBehindAppBar,
+            backgroundColor: backgroundColor,
             navbarSpacer: navbarSpacer,
             footerSpacer: footerSpacer,
             horizontalPadding: horizontalPadding,
+            appBarPadding: appBarPadding,
             useSafeArea: useSafeArea,
             customNavbarSpacerType: customNavbarSpacerType,
             customFooterSpacerType: customFooterSpacerType,
@@ -163,6 +178,10 @@ abstract class MasterView<V extends BaseViewModelBloc<E, S>, E, S>
             defaultFooterSpacerType: defaultFooterSpacerType,
             customHorizontalPadding: customHorizontalPadding,
             defaultHorizontalPadding: defaultHorizontalPadding,
+            customVerticalPadding: customVerticalPadding,
+            defaultVerticalPadding: defaultVerticalPadding,
+            customAppBarPadding: customAppBarPadding,
+            defaultAppBarPadding: defaultAppBarPadding,
           );
         },
       );

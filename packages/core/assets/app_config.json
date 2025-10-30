@@ -310,6 +310,15 @@
       }
     }
   },
+  "image_detail_configuration": {
+    "show_back_button": true,
+    "show_close_button": true,
+    "button_size": 40,
+    "button_padding": 12,
+    "button_icon_color": "#000000",
+    "button_background_color": "#FFFFFF",
+    "button_opacity": 0.8
+  },
   "error_handling_configuration": {
     "style": "enterprise",
     "errorTitle": "Oops! Something went wrong",

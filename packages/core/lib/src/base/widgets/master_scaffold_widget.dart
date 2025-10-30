@@ -43,6 +43,37 @@ import 'package:core/src/helper/grid_helper.dart';
 ///   horizontalPadding: const PaddingVisibility.disabled(), // 🚫 No padding
 /// )
 /// ```
+///
+/// ## 📱 App Bar Padding Example (SafeArea disabled)
+/// ```dart
+/// MasterScaffoldWidget(
+///   scaffoldMessengerKey: key,
+///   appBar: MyAppBar(),
+///   body: content,
+///   useSafeArea: false,                               // 🔧 Disable SafeArea
+///   appBarPadding: const AppBarPaddingVisibility.enabled(value: 24.0), // 📏 Custom app bar padding
+/// )
+/// ```
+///
+/// ## 🚫 Disable App Bar Padding Example
+/// ```dart
+/// MasterScaffoldWidget(
+///   scaffoldMessengerKey: key,
+///   appBar: MyAppBar(),
+///   body: content,
+///   useSafeArea: false,                               // 🔧 Disable SafeArea
+///   appBarPadding: const AppBarPaddingVisibility.disabled(), // 🚫 No app bar padding
+/// )
+/// ```
+///
+/// ## 🎨 Background Color Example
+/// ```dart
+/// MasterScaffoldWidget(
+///   scaffoldMessengerKey: key,
+///   body: content,
+///   backgroundColor: OsmeaColors.nordicBlue,         // 🎨 Custom background color
+/// )
+/// ```
 class MasterScaffoldWidget extends StatelessWidget {
   // 🔑 Required parameters
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
@@ -54,12 +85,16 @@ class MasterScaffoldWidget extends StatelessWidget {
   final bool? extendBody; // Default: true
   final bool? extendBodyBehindAppBar; // Default: true
   final bool? useSafeArea; // Default: true
+  final Color? backgroundColor; // Default: OsmeaColors.white
 
   // 🎨 Layout configuration via custom value options
   final SpacerVisibility? navbarSpacer; // Top spacer configuration
   final SpacerVisibility? footerSpacer; // Bottom spacer configuration
   final PaddingVisibility?
       horizontalPadding; // Horizontal padding configuration
+  final PaddingVisibility? verticalPadding; // Vertical padding configuration
+  final AppBarPaddingVisibility?
+      appBarPadding; // App bar padding configuration (when SafeArea disabled)
 
   // 🔧 Spacer types - custom overrides default
   final CoreSpacerType? customNavbarSpacerType; // Custom navbar spacer type
@@ -70,6 +105,10 @@ class MasterScaffoldWidget extends StatelessWidget {
   // 📏 Padding values - custom overrides default
   final double? customHorizontalPadding; // Custom horizontal padding value
   final double defaultHorizontalPadding; // Default horizontal padding value
+  final double? customVerticalPadding; // Custom vertical padding value
+  final double defaultVerticalPadding; // Default vertical padding value
+  final double? customAppBarPadding; // Custom app bar padding value
+  final double defaultAppBarPadding; // Default app bar padding value
 
   const MasterScaffoldWidget({
     super.key,
@@ -83,11 +122,14 @@ class MasterScaffoldWidget extends StatelessWidget {
     this.extendBody, // Default: true
     this.extendBodyBehindAppBar, // Default: true
     this.useSafeArea, // Default: true
+    this.backgroundColor, // Default: OsmeaColors.white
 
     // 🎨 Layout configuration
     this.navbarSpacer, // Top spacer configuration
     this.footerSpacer, // Bottom spacer configuration
     this.horizontalPadding, // Horizontal padding configuration
+    this.verticalPadding, // Vertical padding configuration
+    this.appBarPadding, // App bar padding configuration
 
     // 🔧 Spacer type overrides
     this.customNavbarSpacerType, // Custom navbar spacer type
@@ -99,6 +141,10 @@ class MasterScaffoldWidget extends StatelessWidget {
     this.customHorizontalPadding, // Custom horizontal padding value
     this.defaultHorizontalPadding =
         GridHelper.defaultMargin, // Default padding value
+    this.customVerticalPadding, // Custom vertical padding value
+    this.defaultVerticalPadding = 16.0, // Default vertical padding value
+    this.customAppBarPadding, // Custom app bar padding value
+    this.defaultAppBarPadding = 16.0, // Default app bar padding value
   });
 
   @override
@@ -117,14 +163,34 @@ class MasterScaffoldWidget extends StatelessWidget {
           (horizontalPadding ?? const PaddingVisibility.enabled()).withDefault(
         fallback: customHorizontalPadding ?? defaultHorizontalPadding,
       ),
+      verticalPadding:
+          (verticalPadding ?? const PaddingVisibility.enabled()).withDefault(
+        fallback: customVerticalPadding ?? defaultVerticalPadding,
+      ),
+      appBarPadding: (appBarPadding ?? const AppBarPaddingVisibility.enabled())
+          .withDefault(
+        fallback: customAppBarPadding ?? defaultAppBarPadding,
+      ),
     );
 
     return Scaffold(
       // 🎛️ Apply scaffold parameters with defaults
       extendBody: extendBody ?? true,
       extendBodyBehindAppBar: extendBodyBehindAppBar ?? true,
+      backgroundColor: backgroundColor ?? OsmeaColors.white,
       key: scaffoldMessengerKey,
-      appBar: appBar,
+      appBar: appBar != null &&
+              (useSafeArea ?? true) == false &&
+              config.appBarPadding.isEnabled
+          ? PreferredSize(
+              preferredSize: Size.fromHeight(
+                  appBar!.preferredSize.height + config.appBarPadding.value),
+              child: Padding(
+                padding: EdgeInsets.only(top: config.appBarPadding.value),
+                child: appBar!,
+              ),
+            )
+          : appBar,
 
       // 🏗️ Build body with conditional SafeArea wrapper
       body: (useSafeArea ?? true)
@@ -137,13 +203,7 @@ class MasterScaffoldWidget extends StatelessWidget {
 
                   // 📱 Main content with configurable padding
                   Expanded(
-                    child: config.horizontalPadding.isEnabled
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: config.horizontalPadding.value),
-                            child: body,
-                          )
-                        : body,
+                    child: _buildPaddedBody(config),
                   ),
 
                   // 🔻 Footer spacer - based on configuration
@@ -152,30 +212,51 @@ class MasterScaffoldWidget extends StatelessWidget {
                 ],
               ),
             )
-          : Column(
-              children: [
-                // 🔝 Navbar spacer - based on configuration (no SafeArea)
-                if (config.navbarSpacer.isEnabled)
-                  CoreSpacer(config.navbarSpacer.type),
-
-                // 📱 Main content with configurable padding (no SafeArea)
-                Expanded(
-                  child: config.horizontalPadding.isEnabled
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: config.horizontalPadding.value),
-                          child: body,
-                        )
-                      : body,
-                ),
-
-                // 🔻 Footer spacer - based on configuration (no SafeArea)
-                if (config.footerSpacer.isEnabled)
-                  CoreSpacer(config.footerSpacer.type),
-              ],
-            ),
+          : _buildBodyWithoutSafeArea(config, body),
       bottomNavigationBar: bottomNavigationBar,
     );
+  }
+
+  /// 🏗️ Builds body without SafeArea, with optional app bar padding
+  Widget _buildBodyWithoutSafeArea(_LayoutConfig config, Widget body) {
+    return Column(
+      children: [
+        // 🔝 Navbar spacer - based on configuration (no SafeArea)
+        if (config.navbarSpacer.isEnabled) CoreSpacer(config.navbarSpacer.type),
+
+        // 📱 Main content with configurable padding (no SafeArea)
+        Expanded(
+          child: _buildPaddedBody(config),
+        ),
+
+        // 🔻 Footer spacer - based on configuration (no SafeArea)
+        if (config.footerSpacer.isEnabled) CoreSpacer(config.footerSpacer.type),
+      ],
+    );
+  }
+
+  /// 📱 Build body with combined horizontal and vertical padding
+  Widget _buildPaddedBody(_LayoutConfig config) {
+    Widget paddedBody = body;
+
+    // Apply vertical padding if enabled
+    if (config.verticalPadding.isEnabled) {
+      paddedBody = Padding(
+        padding: EdgeInsets.symmetric(vertical: config.verticalPadding.value),
+        child: paddedBody,
+      );
+    }
+
+    // Apply horizontal padding if enabled
+    if (config.horizontalPadding.isEnabled) {
+      paddedBody = Padding(
+        padding:
+            EdgeInsets.symmetric(horizontal: config.horizontalPadding.value),
+        child: paddedBody,
+      );
+    }
+
+    return paddedBody;
   }
 
   // No presets: config is resolved above from external parameters only
@@ -189,11 +270,15 @@ class _LayoutConfig {
   final SpacerVisibility navbarSpacer;
   final SpacerVisibility footerSpacer;
   final PaddingVisibility horizontalPadding;
+  final PaddingVisibility verticalPadding;
+  final AppBarPaddingVisibility appBarPadding;
 
   const _LayoutConfig({
     required this.navbarSpacer,
     required this.footerSpacer,
     required this.horizontalPadding,
+    required this.verticalPadding,
+    required this.appBarPadding,
   });
 }
 
@@ -260,5 +345,38 @@ class PaddingVisibility {
   PaddingVisibility withDefault({required double fallback}) {
     if (!isEnabled) return const PaddingVisibility.disabled();
     return PaddingVisibility.enabled(value: _value ?? fallback);
+  }
+}
+
+/// 📱 Option type for app bar padding visibility and custom value
+///
+/// Provides a clean API for configuring app bar padding when SafeArea is disabled.
+///
+/// ## Usage Examples:
+/// ```dart
+/// // ✅ Enabled with default value (16.0)
+/// const AppBarPaddingVisibility.enabled()
+///
+/// // ✅ Enabled with custom value
+/// const AppBarPaddingVisibility.enabled(value: 24.0)
+///
+/// // ❌ Disabled
+/// const AppBarPaddingVisibility.disabled()
+/// ```
+class AppBarPaddingVisibility {
+  final bool isEnabled;
+  final double? _value;
+
+  const AppBarPaddingVisibility._(this.isEnabled, this._value);
+  const AppBarPaddingVisibility.enabled({double? value}) : this._(true, value);
+  const AppBarPaddingVisibility.disabled() : this._(false, null);
+
+  /// 🎯 Get the effective padding value (custom or default)
+  double get value => _value ?? 16.0;
+
+  /// 🔄 Apply fallback value if no custom value is provided
+  AppBarPaddingVisibility withDefault({required double fallback}) {
+    if (!isEnabled) return const AppBarPaddingVisibility.disabled();
+    return AppBarPaddingVisibility.enabled(value: _value ?? fallback);
   }
 }
