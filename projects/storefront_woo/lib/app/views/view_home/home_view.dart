@@ -9,8 +9,12 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:osmea_components/osmea_components.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/home_loading_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/home_error_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.dart';
 
 /// HomeView displays the main e-commerce product catalog
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
@@ -19,6 +23,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     super.arguments,
     super.currentView,
     super.snackBarFunction,
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
@@ -62,107 +67,25 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
       );
     }
 
-    return viewModel.buildContent(context, state);
-  }
-}
-
-/// Shows clean cart success dialog
-void _showCartSuccessDialog(BuildContext context, String message) {
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.all(20),
-        content: OsmeaComponents.column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Success Icon
-            OsmeaComponents.container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: OsmeaColors.green.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: OsmeaComponents.center(
-                child: Icon(
-                  Icons.check_circle,
-                  size: 24,
-                  color: OsmeaColors.green,
-                ),
-              ),
-            ),
-            OsmeaComponents.sizedBox(height: 16),
-
-            // Title
-            OsmeaComponents.text(
-              'Success!',
-              textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                color: OsmeaColors.thunder,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            OsmeaComponents.sizedBox(height: 8),
-
-            // Message
-            OsmeaComponents.text(
-              'Product added to cart successfully!',
-              textStyle: OsmeaTextStyle.bodyMedium(
-                context,
-              ).copyWith(color: OsmeaColors.grayMaterial[600]),
-              textAlign: TextAlign.center,
-            ),
-            OsmeaComponents.sizedBox(height: 20),
-
-            // Action Buttons
-            OsmeaComponents.row(
-              children: [
-                // Continue Shopping
-                OsmeaComponents.expanded(
-                  child: OsmeaComponents.button(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      // Stay on home page
-                    },
-                    backgroundColor: OsmeaColors.grayMaterial[100],
-                    textColor: OsmeaColors.thunder,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    borderRadius: 8,
-                    text: 'Continue',
-                    textStyle: OsmeaTextStyle.bodyMedium(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                OsmeaComponents.sizedBox(width: 12),
-
-                // Go to Cart
-                OsmeaComponents.expanded(
-                  child: OsmeaComponents.button(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog first
-                      context.push('/cart'); // Then navigate to cart
-                    },
-                    backgroundColor: OsmeaColors.blue,
-                    textColor: OsmeaColors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    borderRadius: 8,
-                    text: 'View Cart',
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: OsmeaColors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    // Build content based on state - using widgets instead of ViewModel methods
+    if (state is HomeErrorState) {
+      return HomeErrorWidget(
+        message: state.message,
+        onRetry: () => viewModel.loadProducts(),
       );
-    },
-  );
+    }
+
+    if (state is HomeLoadingState) {
+      return const HomeLoadingWidget();
+    }
+
+    if (state is HomeLoadedState) {
+      return HomeContentWidget(state: state, viewModel: viewModel);
+    }
+
+    // Initial state - show loading
+    return const HomeLoadingWidget();
+  }
 }
 
 /// Builds home app bar following OSMEA standards
@@ -170,32 +93,26 @@ PreferredSizeWidget _buildHomeAppBar(
   BuildContext context,
   HomeViewModel? viewModel,
 ) {
+  // Try to get app name from config, fallback to "MasterFabric"
+  final configHelper = AssetConfigHelper();
+  final appName = configHelper.getString(
+    'app_settings.app_name',
+    'MasterFabric',
+  );
+
   return OsmeaComponents.appBar(
     padding: const EdgeInsets.only(bottom: 16),
     title: OsmeaComponents.text(
-      'Home',
+      'MasterFabric',
       color: OsmeaColors.thunder,
-      textStyle: OsmeaTextStyle.titleLarge(context),
+      textStyle: OsmeaTextStyle.titleLarge(
+        context,
+      ).copyWith(fontWeight: FontWeight.w700),
     ),
     variant: AppBarVariant.standard,
     size: AppBarSize.standard,
     backgroundColor: OsmeaColors.paperWhite,
     foregroundColor: OsmeaColors.thunder,
-    actions: [
-      // Restart button
-      AppBarAction(
-        type: AppBarActionType.refresh,
-        icon: Icon(Icons.refresh, color: OsmeaColors.thunder),
-        onPressed: () => viewModel?.restart(),
-        tooltip: 'Restart',
-      ),
-      // Cart button
-      AppBarAction(
-        type: AppBarActionType.secondary,
-        icon: Icon(Icons.shopping_cart, color: OsmeaColors.thunder),
-        onPressed: () => context.go('/cart'),
-        tooltip: 'Cart',
-      ),
-    ],
+    actions: const [],
   );
 }
