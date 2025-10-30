@@ -10,6 +10,10 @@ class WishlistView
     extends MasterViewHydratedCubit<WishlistViewModel, WishlistState> {
   WishlistView({
     super.key,
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.backgroundColor = OsmeaColors.white,
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     required super.goRoute,
     Map<String, dynamic>? arguments,
   }) : super(
@@ -113,16 +117,19 @@ class WishlistView
     }
 
     return ListView.separated(
-      padding: EdgeInsets.all(context.spacing16),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing12,
+        vertical: context.spacing10,
+      ),
       itemBuilder: (context, index) {
         final item = items[index];
         return OsmeaComponents.container(
-          padding: EdgeInsets.all(context.spacing12),
+          padding: EdgeInsets.all(context.spacing10),
           decoration: BoxDecoration(
             color: OsmeaColors.white,
             borderRadius: BorderRadius.circular(context.radiusNormal),
             border: Border.all(
-              color: OsmeaColors.silver.withOpacity(0.5),
+              color: OsmeaColors.silver.withValues(alpha: 0.3),
               width: context.borderWidth,
             ),
           ),
@@ -135,21 +142,21 @@ class WishlistView
                 child: item.imageUrl != null && item.imageUrl!.isNotEmpty
                     ? Image.network(
                         item.imageUrl!,
-                        width: 64,
-                        height: 64,
+                        width: 56,
+                        height: 56,
                         fit: BoxFit.cover,
                       )
                     : Container(
-                        width: 64,
-                        height: 64,
-                        color: OsmeaColors.pewter.withOpacity(0.06),
+                        width: 56,
+                        height: 56,
+                        color: OsmeaColors.pewter.withValues(alpha: 0.06),
                         child: Icon(
                           Icons.image_outlined,
                           color: OsmeaColors.pewter,
                         ),
                       ),
               ),
-              OsmeaComponents.sizedBox(width: context.spacing12),
+              OsmeaComponents.sizedBox(width: context.spacing10),
 
               // Title + price
               OsmeaComponents.expanded(
@@ -176,13 +183,13 @@ class WishlistView
 
               // Actions - tighter width to avoid row overflow on small screens
               SizedBox(
-                width: 80,
+                width: 76,
                 child: OsmeaComponents.row(
                   mainAxisAlignment: context.spaceBetween,
                   children: [
                     SizedBox(
-                      width: 36,
-                      height: 36,
+                      width: 32,
+                      height: 32,
                       child: OsmeaComponents.iconButton(
                         icon: Icon(
                           Icons.shopping_cart_outlined,
@@ -196,12 +203,15 @@ class WishlistView
                       ),
                     ),
                     SizedBox(
-                      width: 36,
-                      height: 36,
+                      width: 32,
+                      height: 32,
                       child: OsmeaComponents.iconButton(
-                        icon: Icon(Icons.favorite, color: OsmeaColors.red),
+                        icon: Icon(
+                          Icons.favorite,
+                          color: OsmeaColors.nordicBlue,
+                        ),
                         variant: ButtonVariant.ghost,
-                        backgroundColor: OsmeaColors.red.withValues(
+                        backgroundColor: OsmeaColors.nordicBlue.withValues(
                           alpha: 0.08,
                         ),
                         onPressed: () => viewModel.remove(item.id),

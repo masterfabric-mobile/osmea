@@ -291,14 +291,48 @@ class ProductDetailContentWidget extends StatelessWidget {
     BuildContext context,
     ProductDetailViewModel viewModel,
   ) {
-    final attrs = state.product.attributes!;
+    final rawAttributes = state.product.attributes!;
+
+    // Normalize attributes coming from different Woo APIs
+    List<Map<String, dynamic>> normalized = [];
+    for (final item in rawAttributes) {
+      if (item is Map<String, dynamic>) {
+        // Store API shape often provides either `options: List<String>`
+        // or `terms: List<{ name: string }>`
+        final name = (item['name'] ?? item['label'] ?? '').toString();
+        List<String> options = [];
+        final rawOptions = item['options'];
+        final rawTerms = item['terms'];
+        if (rawOptions is List) {
+          options = rawOptions.map((e) => e.toString()).toList();
+        } else if (rawTerms is List) {
+          options = rawTerms
+              .map((e) => e is Map ? (e['name'] ?? e['value'] ?? '').toString() : e.toString())
+              .where((e) => e.isNotEmpty)
+              .toList();
+        }
+        normalized.add({'name': name, 'options': options});
+      } else {
+        // Fallback for typed model with getters `name` and `options`
+        try {
+          final dynamic dyn = item;
+          final String name = (dyn.name as String?) ?? '';
+          final List<String> options =
+              (dyn.options as List?)?.map((e) => e.toString()).toList() ?? [];
+          normalized.add({'name': name, 'options': options});
+        } catch (_) {
+          // Skip unknown shapes gracefully
+        }
+      }
+    }
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final attr in attrs)
-          if ((attr.options?.isNotEmpty ?? false)) ...[
+        for (final attr in normalized)
+          if ((attr['options'] as List).isNotEmpty) ...[
             OsmeaComponents.text(
-              attr.name ?? '',
+              (attr['name'] as String?) ?? '',
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 color: OsmeaColors.pewter,
                 fontWeight: FontWeight.w500,
@@ -309,12 +343,14 @@ class ProductDetailContentWidget extends StatelessWidget {
               spacing: context.spacing8,
               runSpacing: context.spacing8,
               children: [
-                for (final opt in attr.options!)
+                for (final opt in (attr['options'] as List<String>))
                   ChoiceChip(
                     label: Text(opt),
-                    selected: state.selectedAttributes[attr.name] == opt,
-                    onSelected: (_) =>
-                        viewModel.setSelectedAttribute(attr.name ?? '', opt),
+                    selected: state.selectedAttributes[(attr['name'] as String?)] == opt,
+                    onSelected: (_) => viewModel.setSelectedAttribute(
+                      (attr['name'] as String?) ?? '',
+                      opt,
+                    ),
                     selectedColor: OsmeaColors.nordicBlue.withValues(
                       alpha: 0.12,
                     ),

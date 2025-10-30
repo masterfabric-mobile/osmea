@@ -51,7 +51,7 @@ class WishlistItem {
 // State moved to module/states.dart (SavedInitial/Loading/Loaded/Error)
 
 /// Hydrated wishlist view model that also syncs with Woo Wishlist API
-@lazySingleton
+@injectable
 class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   WishlistViewModel() : super(WishlistInitialState());
 
@@ -106,6 +106,18 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   // Private implementations
   Future<void> _syncFromServer({int? groupId}) async {
     try {
+      // If not authenticated, keep local (hydrated) state without erroring
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        final s = state;
+        if (s is WishlistLoadedState) {
+          emit(WishlistLoadedState(items: s.items));
+        } else {
+          emit(WishlistLoadedState(items: const []));
+        }
+        return;
+      }
+
       emit(WishlistLoadingState());
       final apiVersion = _config.getString(
         'woocommerce_configuration.version',
@@ -155,6 +167,13 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       final items = s is WishlistLoadedState ? [...s.items, item] : [item];
       emit(WishlistLoadedState(items: items));
 
+      // Sync with server only if authenticated
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: unauthenticated add -> local only');
+        return;
+      }
+
       final apiVersion = _config.getString(
         'woocommerce_configuration.version',
         'v1',
@@ -169,7 +188,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     } catch (e, s) {
       debugPrint('❌ Wishlist add error: $e');
       debugPrintStack(stackTrace: s);
-      emit(WishlistErrorState(message: '$e'));
+      // Keep local state; avoid throwing user to error screen for wishlist
+      final cur = state;
+      if (cur is WishlistLoadedState) {
+        final rolledBack = cur.items.where((w) => w.id != item.id).toList();
+        emit(WishlistLoadedState(items: rolledBack));
+      }
     }
   }
 
@@ -180,6 +204,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           ? s.items.where((e) => e.id != productId).toList()
           : const <WishlistItem>[];
       emit(WishlistLoadedState(items: items));
+
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: unauthenticated remove -> local only');
+        return;
+      }
 
       final apiVersion = _config.getString(
         'woocommerce_configuration.version',
@@ -195,7 +225,20 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     } catch (e, s) {
       debugPrint('❌ Wishlist remove error: $e');
       debugPrintStack(stackTrace: s);
-      emit(WishlistErrorState(message: '$e'));
+      // Rollback removal on failure
+      final cur = state;
+      if (cur is WishlistLoadedState) {
+        emit(WishlistLoadedState(items: [...cur.items]));
+      }
+    }
+  }
+
+  Future<String?> _getJwtToken() async {
+    try {
+      final auth = AuthStorageHelper();
+      return await auth.getToken();
+    } catch (_) {
+      return null;
     }
   }
 

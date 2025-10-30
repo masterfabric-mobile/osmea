@@ -32,7 +32,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i819.ProductDetailViewModel(),
     );
     gh.factory<_i867.HomeViewModel>(() => _i867.HomeViewModel());
-    gh.lazySingleton<_i241.WishlistViewModel>(() => _i241.WishlistViewModel());
+    gh.factory<_i241.WishlistViewModel>(() => _i241.WishlistViewModel());
     return this;
   }
 }

@@ -177,11 +177,26 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling addItem API: productId=$productId, quantity=$quantity',
       );
 
-      final response = await _cartService.addItem(
+      // Ensure cart token exists; if not, initialize cart first
+      String? cartToken = await _getCartToken();
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint(
+          '🛒 CartViewModel: No cart token found. Initializing with getCart...',
+        );
+        await _cartService.getCart(
+          apiVersion: _configHelper.getString(
+            'woocommerce_configuration.version',
+          ),
+          jwtToken: await _getJwtToken(),
+        );
+        cartToken = await _getCartToken();
+      }
+
+      var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
-        cartToken: await _getCartToken() ?? '',
+        cartToken: cartToken ?? '',
         jwtToken: await _getJwtToken(), // Optional JWT token
         id: productId,
         quantity: quantity,
@@ -193,12 +208,46 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API add item error: ${response.errors!.first}');
-        emit(
-          CartErrorState(
-            message: 'Failed to add item: ${response.errors!.first}',
-          ),
-        );
-        return;
+        final errorText = response.errors!.first.toString().toLowerCase();
+        if (errorText.contains('401') ||
+            errorText.contains('unauthorized') ||
+            errorText.contains('token')) {
+          debugPrint(
+            '🛒 CartViewModel: Retrying addItem after refreshing cart token',
+          );
+          await _cartService.getCart(
+            apiVersion: _configHelper.getString(
+              'woocommerce_configuration.version',
+            ),
+            jwtToken: await _getJwtToken(),
+          );
+          final refreshed = await _getCartToken();
+          response = await _cartService.addItem(
+            apiVersion: _configHelper.getString(
+              'woocommerce_configuration.version',
+            ),
+            cartToken: refreshed ?? '',
+            jwtToken: await _getJwtToken(),
+            id: productId,
+            quantity: quantity,
+          );
+
+          if (response.errors != null && response.errors!.isNotEmpty) {
+            emit(
+              CartErrorState(
+                message: 'Failed to add item: ${response.errors!.first}',
+              ),
+            );
+            return;
+          }
+        } else {
+          emit(
+            CartErrorState(
+              message: 'Failed to add item: ${response.errors!.first}',
+            ),
+          );
+          return;
+        }
       }
 
       debugPrint('✅ Successfully added item to API cart');
