@@ -13,8 +13,14 @@ import 'package:go_router/go_router.dart';
 class AppNavbar extends StatelessWidget {
   final int currentIndex;
   final Function(int)? onItemTap;
+  final int wishlistCount;
 
-  const AppNavbar({super.key, required this.currentIndex, this.onItemTap});
+  const AppNavbar({
+    super.key,
+    required this.currentIndex,
+    this.onItemTap,
+    this.wishlistCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,8 @@ class AppNavbar extends StatelessWidget {
 
   /// Get navbar items (5 items: Home, Search, Saved, Cart, Profile/Sign In)
   List<NavbarItem> _getNavbarItems(BuildContext context, bool isAuthenticated) {
+    final count = wishlistCount;
+
     return [
       NavbarItem(
         text: 'Home',
@@ -64,15 +72,8 @@ class AppNavbar extends StatelessWidget {
       ),
       NavbarItem(
         text: 'Saved',
-        icon: Icon(Icons.favorite_outline),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Saved items feature coming soon!'),
-              backgroundColor: OsmeaColors.nordicBlue,
-            ),
-          );
-        },
+        icon: Icon(count > 0 ? Icons.favorite : Icons.favorite_outline),
+        onTap: () => context.go('/saved'),
         tooltip: 'Saved Items',
       ),
       NavbarItem(
@@ -120,12 +121,7 @@ class AppNavbar extends StatelessWidget {
         );
         break;
       case 2: // Saved
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Saved items feature coming soon!'),
-            backgroundColor: OsmeaColors.nordicBlue,
-          ),
-        );
+        context.go('/saved');
         break;
       case 3: // Cart
         context.go('/cart');

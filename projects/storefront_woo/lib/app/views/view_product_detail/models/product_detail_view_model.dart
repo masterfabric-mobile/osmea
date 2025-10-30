@@ -169,18 +169,21 @@ class ProductDetailViewModel
       Future.microtask(() {
         final currentState = state;
         if (currentState is ProductDetailLoadedState) {
-          final updated = Map<String, String>.from(currentState.selectedAttributes)
-            ..[name] = value;
+          final updated = Map<String, String>.from(
+            currentState.selectedAttributes,
+          )..[name] = value;
           emit(currentState.copyWith(selectedAttributes: updated));
         }
       });
 
   /// Clears a selected attribute
-  Future<void> clearSelectedAttribute(String name) async => Future.microtask(() {
+  Future<void> clearSelectedAttribute(String name) async =>
+      Future.microtask(() {
         final currentState = state;
         if (currentState is ProductDetailLoadedState) {
-          final updated = Map<String, String>.from(currentState.selectedAttributes)
-            ..remove(name);
+          final updated = Map<String, String>.from(
+            currentState.selectedAttributes,
+          )..remove(name);
           emit(currentState.copyWith(selectedAttributes: updated));
         }
       });
@@ -255,12 +258,28 @@ class ProductDetailViewModel
         '🛒 ProductDetailViewModel: Adding product $productId to cart via API',
       );
 
-      // Add item to cart via API
-      final response = await _cartService.addItem(
+      // Ensure we have a cart token; if missing, initialize cart first
+      String? cartToken = await _getCartToken();
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint('🛒 No cart token found. Initializing cart via getCart...');
+        await _cartService.getCart(
+          apiVersion: _configHelper.getString(
+            'woocommerce_configuration.version',
+          ),
+          jwtToken: await _getJwtToken(),
+        );
+        cartToken = await _getCartToken();
+        debugPrint(
+          '🛒 Cart token after init: ${cartToken != null && cartToken.isNotEmpty}',
+        );
+      }
+
+      // Add item to cart via API (first attempt)
+      var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
-        cartToken: await _getCartToken() ?? '',
+        cartToken: cartToken ?? '',
         jwtToken: await _getJwtToken(), // Optional JWT token
         id: productId,
         quantity: quantity,
@@ -272,12 +291,45 @@ class ProductDetailViewModel
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API add item error: ${response.errors!.first}');
-        emit(
-          ProductDetailErrorState(
-            message: 'Failed to add item: ${response.errors!.first}',
-          ),
-        );
-        return;
+        // If unauthorized or token-related, try to refresh cart and retry once
+        final errorText = response.errors!.first.toString().toLowerCase();
+        if (errorText.contains('401') ||
+            errorText.contains('unauthorized') ||
+            errorText.contains('token')) {
+          debugPrint('🛒 Retrying addItem after refreshing cart token...');
+          await _cartService.getCart(
+            apiVersion: _configHelper.getString(
+              'woocommerce_configuration.version',
+            ),
+            jwtToken: await _getJwtToken(),
+          );
+          final refreshedToken = await _getCartToken();
+          response = await _cartService.addItem(
+            apiVersion: _configHelper.getString(
+              'woocommerce_configuration.version',
+            ),
+            cartToken: refreshedToken ?? '',
+            jwtToken: await _getJwtToken(),
+            id: productId,
+            quantity: quantity,
+          );
+
+          if (response.errors != null && response.errors!.isNotEmpty) {
+            emit(
+              ProductDetailErrorState(
+                message: 'Failed to add item: ${response.errors!.first}',
+              ),
+            );
+            return;
+          }
+        } else {
+          emit(
+            ProductDetailErrorState(
+              message: 'Failed to add item: ${response.errors!.first}',
+            ),
+          );
+          return;
+        }
       }
 
       // Persist cart token if provided in response (fallback in case interceptor misses)
