@@ -5,6 +5,9 @@ import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
+import 'package:storefront_woo/app/views/view_saved/saved_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
@@ -17,9 +20,17 @@ final GoRouter appRouter = GoRouter(
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return Scaffold(
-          body: child,
-          bottomNavigationBar: _getNavbarForRoute(state.uri.path),
+        return BlocBuilder<WishlistViewModel, WishlistState>(
+          bloc: GetIt.I<WishlistViewModel>(),
+          builder: (context, wishlistState) {
+            return Scaffold(
+              body: child,
+              bottomNavigationBar: _getNavbarForRoute(
+                state.uri.path,
+                wishlistState.items.length,
+              ),
+            );
+          },
         );
       },
       routes: [
@@ -41,6 +52,30 @@ final GoRouter appRouter = GoRouter(
                     context.go('/home');
                   }
                 },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Saved Page
+        GoRoute(
+          path: '/saved',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: SavedView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else {
+                    context.go('/saved');
+                  }
+                },
+                arguments: const {'saved': true},
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -100,6 +135,7 @@ final GoRouter appRouter = GoRouter(
             // Check user authentication status
             final authStorage = AuthStorageHelper();
             authStorage.isAuthenticated().then((isAuthenticated) {
+              if (!context.mounted) return;
               if (isAuthenticated) {
                 debugPrint('👤 User already authenticated, navigating to home');
                 context.go('/home');
@@ -458,13 +494,15 @@ final GoRouter appRouter = GoRouter(
 
 /// Get navbar for specific route
 /// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
-Widget? _getNavbarForRoute(String location) {
+Widget? _getNavbarForRoute(String location, int wishlistCount) {
   // Show navbar only for main app sections
-  if (location == '/home' || location == '/cart') {
+  if (location == '/home' || location == '/cart' || location == '/saved') {
     if (location == '/home') {
-      return AppNavbar(currentIndex: 0); // Home
+      return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
+    } else if (location == '/saved') {
+      return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
     } else if (location == '/cart') {
-      return AppNavbar(currentIndex: 3); // Cart
+      return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
     }
   }
   // No navbar for splash, onboarding, auth, product-detail
