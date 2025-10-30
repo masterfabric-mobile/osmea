@@ -13,7 +13,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/cart_content.dart';
 import 'package:storefront_woo/app/services/cart_service.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/action_section.dart';
+import 'package:osmea_components/src/utils/toast_extensions.dart';
 
 /// ProductDetailView displays detailed information about a single product
 class ProductDetailView
@@ -57,6 +57,16 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailState state,
   ) {
+    // Success state (e.g., wishlist added)
+    if (state is ProductDetailSuccessState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.toastSuccess(state.message);
+      });
+      return ProductDetailContentWidget(
+        viewModel: viewModel,
+        state: state.previousState,
+      );
+    }
     // ✅ Auth required state - navigate to auth screen
     if (state is ProductDetailAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

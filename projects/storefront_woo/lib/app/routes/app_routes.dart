@@ -6,7 +6,7 @@ import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
-import 'package:storefront_woo/app/views/view_wishlist/saved_view.dart';
+import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';

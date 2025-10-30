@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 
 /// Recommended section widget
 class RecommendedSectionWidget extends StatelessWidget {
@@ -209,8 +210,38 @@ class RecommendedSectionWidget extends StatelessWidget {
                   top: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () =>
-                        viewModel.addProductToWishlist(product.id ?? 0),
+                    onTap: () {
+                      final int pid = product.id ?? 0;
+                      final bool wasSaved = viewModel.isProductSaved(pid);
+                      viewModel.addProductToWishlist(pid);
+
+                      // Show feedback with Undo
+                      if (wasSaved) {
+                        // It was saved; toggle will remove
+                        context.showSnackbar(
+                          title: 'Removed from favorites',
+                          message: 'Item was removed from your favorites',
+                          type: SnackbarType.error, // red
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                          animation: SnackbarAnimation.slide,
+                          actionLabel: 'Undo',
+                          onAction: () => viewModel.addProductToWishlist(pid),
+                        );
+                      } else {
+                        // It was not saved; toggle will add
+                        context.showSnackbar(
+                          title: 'Added to favorites',
+                          message: 'Item was added to your favorites',
+                          type: SnackbarType.info, // blue
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                          animation: SnackbarAnimation.slide,
+                          actionLabel: 'Undo',
+                          onAction: () => viewModel.addProductToWishlist(pid),
+                        );
+                      }
+                    },
                     child: Container(
                       width: 30,
                       height: 30,
