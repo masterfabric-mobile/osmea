@@ -16,6 +16,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
 
 @injectable
 class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
@@ -327,10 +328,25 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   Future<void> addProductToWishlist(int productId) async {
     try {
-      // TODO: Implement add to wishlist logic
-      debugPrint('Adding product $productId to wishlist');
+      final product = _allProducts.firstWhere(
+        (p) => (p.id ?? 0) == productId,
+        orElse: () => ListAllProductsResponseModel(),
+      );
 
-      // For now, just show success state
+      final wishlistVm = GetIt.I<WishlistViewModel>();
+      final item = WishlistItem(
+        id: productId,
+        name: product.name,
+        imageUrl: (product.images?.isNotEmpty ?? false)
+            ? product.images!.first.src
+            : null,
+        regularPrice: product.prices?.regularPrice,
+        salePrice: product.prices?.salePrice,
+        currencyCode: product.prices?.currencyCode,
+        onSale: product.onSale == true,
+      );
+      await wishlistVm.toggle(item);
+
       emit(
         HomeLoadedState(
           products: _products,

@@ -45,6 +45,8 @@ class HomeContentWidget extends StatelessWidget {
           saleProducts:
               state.products.where((p) => p.onSale == true).toList(),
           ),
+          // Spacing between carousels and recommended section for better UI
+          OsmeaComponents.sizedBox(height: context.spacing24),
           // Recommended section (compact grid)
           RecommendedSectionWidget(
             configHelper: configHelper,

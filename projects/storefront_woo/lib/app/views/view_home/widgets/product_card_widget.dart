@@ -10,6 +10,9 @@ import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:core/core.dart';
 import 'package:osmea_components/osmea_components.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
+import 'package:get_it/get_it.dart';
 
 /// Product card widget
 class ProductCardWidget extends StatelessWidget {
@@ -41,7 +44,7 @@ class ProductCardWidget extends StatelessWidget {
           border: Border.all(
             color: OsmeaColors.silver.withOpacity(0.5),
             width: context.borderWidth,
-            ),
+          ),
         ),
         child: OsmeaComponents.column(
           crossAxisAlignment: context.crossStart,
@@ -116,21 +119,31 @@ class ProductCardWidget extends StatelessWidget {
                         ),
                       ),
 
-                    // Wishlist heart - Using OsmeaComponents.iconButton
+                    // Wishlist heart - reacts to WishlistViewModel
                     Positioned(
                       right: context.spacing8,
                       top: context.spacing8,
-                      child: OsmeaComponents.iconButton(
-                        icon: Icon(
-                          Icons.favorite_border,
-                          size: context.iconSizeExtraSmall,
-                          color: OsmeaColors.pewter,
-                        ),
-                        size: ButtonSize.small,
-                        variant: ButtonVariant.ghost,
-                        backgroundColor: OsmeaColors.white.withOpacity(0.9),
-                        borderRadius: context.width20, // Circular
-                        onPressed: onWishlistTap,
+                      child: BlocBuilder<WishlistViewModel, WishlistState>(
+                        bloc: GetIt.I<WishlistViewModel>(),
+                        builder: (context, wishlistState) {
+                          final saved = GetIt.I<WishlistViewModel>().isSaved(
+                            product.id ?? 0,
+                          );
+                          return OsmeaComponents.iconButton(
+                            icon: Icon(
+                              saved ? Icons.favorite : Icons.favorite_border,
+                              size: context.iconSizeExtraSmall,
+                              color: saved
+                                  ? OsmeaColors.nordicBlue
+                                  : OsmeaColors.pewter,
+                            ),
+                            size: ButtonSize.small,
+                            variant: ButtonVariant.ghost,
+                            backgroundColor: OsmeaColors.white.withOpacity(0.9),
+                            borderRadius: context.width20, // Circular
+                            onPressed: onWishlistTap,
+                          );
+                        },
                       ),
                     ),
                   ],

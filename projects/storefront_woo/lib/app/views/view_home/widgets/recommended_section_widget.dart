@@ -9,6 +9,9 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 
@@ -211,22 +214,32 @@ class RecommendedSectionWidget extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () =>
                         viewModel.addProductToWishlist(product.id ?? 0),
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: OsmeaColors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: OsmeaColors.thunder.withOpacity(0.1),
-                          width: 0.1,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 14,
-                        color: OsmeaColors.thunder,
-                      ),
+                    child: BlocBuilder<WishlistViewModel, WishlistState>(
+                      bloc: GetIt.I<WishlistViewModel>(),
+                      builder: (context, wishlistState) {
+                        final saved = GetIt.I<WishlistViewModel>().isSaved(
+                          product.id ?? 0,
+                        );
+                        return Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: OsmeaColors.thunder.withOpacity(0.1),
+                              width: 0.1,
+                            ),
+                          ),
+                          child: Icon(
+                            saved ? Icons.favorite : Icons.favorite_border,
+                            size: 14,
+                            color: saved
+                                ? OsmeaColors.nordicBlue
+                                : OsmeaColors.thunder,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

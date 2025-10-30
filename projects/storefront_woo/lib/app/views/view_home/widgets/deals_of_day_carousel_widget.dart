@@ -126,13 +126,6 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               width: context.allWidth,
               customPadding: EdgeInsets.zero,
               backgroundColor: OsmeaColors.transparent,
-              customShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(13),
-                side: BorderSide(
-                  color: OsmeaColors.silver.withOpacity(0.5),
-                  width: 0.5,
-                ),
-              ),
               showIndicators: true,
               showArrows: false,
               autoPlay: CarouselAutoPlay.continuous,
@@ -140,7 +133,6 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               animationDuration: Duration(milliseconds: 600),
               indicatorType: CarouselIndicatorType.dot,
               indicatorPosition: CarouselIndicatorPosition.bottomCenter,
-              borderRadiusValue: BorderRadius.circular(13),
             ),
           ),
       ],

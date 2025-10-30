@@ -78,12 +78,11 @@ class ProductsGridWidget extends StatelessWidget {
         final product = state.products[index];
         return ProductCardWidget(
           product: product,
-          onWishlistTap: () => viewModel.addProductToWishlist(product.id ?? 0),
-          onTap: () => _navigateToProductDetail(
-            context,
-            viewModel,
-            product,
-          ),
+          onWishlistTap: () {
+            // Delegate to HomeViewModel which uses WishlistCubit
+            viewModel.addProductToWishlist(product.id ?? 0);
+          },
+          onTap: () => _navigateToProductDetail(context, viewModel, product),
         );
       },
     );
@@ -122,4 +121,3 @@ class ProductsGridWidget extends StatelessWidget {
     );
   }
 }
-
