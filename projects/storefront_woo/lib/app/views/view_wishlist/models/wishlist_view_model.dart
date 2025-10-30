@@ -1,0 +1,209 @@
+import 'package:core/core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+
+/// Lightweight DTO persisted for wishlist items
+class WishlistItem {
+  final int id;
+  final String? name;
+  final String? imageUrl;
+  final String? regularPrice;
+  final String? salePrice;
+  final String? currencyCode;
+  final bool onSale;
+
+  const WishlistItem({
+    required this.id,
+    this.name,
+    this.imageUrl,
+    this.regularPrice,
+    this.salePrice,
+    this.currencyCode,
+    this.onSale = false,
+  });
+
+  factory WishlistItem.fromJson(Map<String, dynamic> json) => WishlistItem(
+    id: json['id'] as int,
+    name: json['name'] as String?,
+    imageUrl: json['imageUrl'] as String?,
+    regularPrice: json['regularPrice'] as String?,
+    salePrice: json['salePrice'] as String?,
+    currencyCode: json['currencyCode'] as String?,
+    onSale: (json['onSale'] as bool?) ?? false,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'imageUrl': imageUrl,
+    'regularPrice': regularPrice,
+    'salePrice': salePrice,
+    'currencyCode': currencyCode,
+    'onSale': onSale,
+  };
+}
+
+// State moved to module/states.dart (SavedInitial/Loading/Loaded/Error)
+
+/// Hydrated wishlist view model that also syncs with Woo Wishlist API
+@lazySingleton
+class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
+  WishlistViewModel() : super(WishlistInitialState());
+
+  // Dependencies (resolved via DI)
+  final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
+  final AssetConfigHelper _config = AssetConfigHelper();
+
+  // Optional route/view arguments holder (to align with other views)
+  final Map<String, dynamic> _arguments = {};
+  void setArguments(Map<String, dynamic> args) {
+    _arguments
+      ..clear()
+      ..addAll(args);
+  }
+
+  Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
+
+  // Hydrated storage key
+  @override
+  String get id => 'wishlist_view_model_v1';
+
+  // Selectors
+  List<int> get savedIds {
+    final s = state;
+    return s is WishlistLoadedState
+        ? s.items.map((e) => e.id).toList(growable: false)
+        : const <int>[];
+  }
+
+  bool isSaved(int productId) {
+    final s = state;
+    return s is WishlistLoadedState
+        ? s.items.any((e) => e.id == productId)
+        : false;
+  }
+
+  int get count => state is WishlistLoadedState
+      ? (state as WishlistLoadedState).items.length
+      : 0;
+
+  // Public triggers (OSMEA style)
+  Future<void> initial() => _syncFromServer();
+  Future<void> syncFromServer({int? groupId}) =>
+      _syncFromServer(groupId: groupId);
+  Future<void> toggle(WishlistItem item, {int? groupId}) =>
+      _toggle(item, groupId: groupId);
+  Future<void> add(WishlistItem item, {int? groupId}) =>
+      _add(item, groupId: groupId);
+  Future<void> remove(int productId, {int? groupId}) =>
+      _remove(productId, groupId: groupId);
+
+  // Private implementations
+  Future<void> _syncFromServer({int? groupId}) async {
+    try {
+      emit(WishlistLoadingState());
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+      final paged = await _wishlistService.getWishlistItems(
+        apiVersion: apiVersion,
+        groupId: groupId,
+        page: 1,
+        perPage: 100,
+      );
+
+      final mapped = (paged.data ?? [])
+          .map(
+            (w) => WishlistItem(
+              id: w.productId ?? 0,
+              name: w.productName,
+              imageUrl: w.productImage,
+              regularPrice: w.productPrice,
+              salePrice: null,
+              currencyCode: null,
+              onSale: false,
+            ),
+          )
+          .toList();
+
+      emit(WishlistLoadedState(items: mapped));
+    } catch (e, s) {
+      debugPrint('❌ Wishlist sync error: $e');
+      debugPrintStack(stackTrace: s);
+      emit(WishlistErrorState(message: '$e'));
+    }
+  }
+
+  Future<void> _toggle(WishlistItem item, {int? groupId}) async {
+    final exists = isSaved(item.id);
+    if (exists) {
+      await _remove(item.id, groupId: groupId);
+    } else {
+      await _add(item, groupId: groupId);
+    }
+  }
+
+  Future<void> _add(WishlistItem item, {int? groupId}) async {
+    try {
+      final s = state;
+      final items = s is WishlistLoadedState ? [...s.items, item] : [item];
+      emit(WishlistLoadedState(items: items));
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+      await _wishlistService.addItemToWishlist(
+        apiVersion: apiVersion,
+        request: AddWishlistItemRequest(
+          productId: item.id,
+          groupId: groupId ?? 0,
+        ),
+      );
+    } catch (e, s) {
+      debugPrint('❌ Wishlist add error: $e');
+      debugPrintStack(stackTrace: s);
+      emit(WishlistErrorState(message: '$e'));
+    }
+  }
+
+  Future<void> _remove(int productId, {int? groupId}) async {
+    try {
+      final s = state;
+      final items = s is WishlistLoadedState
+          ? s.items.where((e) => e.id != productId).toList()
+          : const <WishlistItem>[];
+      emit(WishlistLoadedState(items: items));
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+      await _wishlistService.deleteItemByProduct(
+        apiVersion: apiVersion,
+        request: DeleteWishlistItemRequest(
+          productId: productId,
+          groupId: groupId ?? 0,
+        ),
+      );
+    } catch (e, s) {
+      debugPrint('❌ Wishlist remove error: $e');
+      debugPrintStack(stackTrace: s);
+      emit(WishlistErrorState(message: '$e'));
+    }
+  }
+
+  @override
+  WishlistState? fromJson(Map<String, dynamic> json) =>
+      WishlistLoadedState.fromJson(json);
+
+  @override
+  Map<String, dynamic>? toJson(WishlistState state) =>
+      state is WishlistLoadedState ? state.toJson() : null;
+}

@@ -1,12 +1,14 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+// Single source of truth: WishlistViewModel
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
-class SavedView
+class WishlistView
     extends MasterViewHydratedCubit<WishlistViewModel, WishlistState> {
-  SavedView({
+  WishlistView({
     super.key,
     required super.goRoute,
     Map<String, dynamic>? arguments,
@@ -37,6 +39,8 @@ class SavedView
 
   @override
   void initialContent(WishlistViewModel viewModel, BuildContext context) {
+    // Pass widget-level arguments to ViewModel for consistency with other views
+    viewModel.setArguments(arguments);
     viewModel.syncFromServer();
   }
 
@@ -46,7 +50,23 @@ class SavedView
     WishlistViewModel viewModel,
     WishlistState state,
   ) {
-    if (state.items.isEmpty) {
+    if (state is WishlistLoadingState) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is WishlistErrorState) {
+      return Center(
+        child: OsmeaComponents.text(
+          state.message,
+          textStyle: OsmeaTextStyle.bodyMedium(context),
+        ),
+      );
+    }
+
+    final items = state is WishlistLoadedState
+        ? state.items
+        : const <WishlistItem>[];
+    if (items.isEmpty) {
       return Center(
         child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
@@ -95,7 +115,7 @@ class SavedView
     return ListView.separated(
       padding: EdgeInsets.all(context.spacing16),
       itemBuilder: (context, index) {
-        final item = state.items[index];
+        final item = items[index];
         return OsmeaComponents.container(
           padding: EdgeInsets.all(context.spacing12),
           decoration: BoxDecoration(
@@ -196,7 +216,7 @@ class SavedView
       },
       separatorBuilder: (_, __) =>
           OsmeaComponents.sizedBox(height: context.spacing8),
-      itemCount: state.items.length,
+      itemCount: items.length,
     );
   }
 
@@ -263,7 +283,7 @@ class SavedView
   }
 }
 
-extension on SavedView {
+extension on WishlistView {
   Future<void> _addToCart(BuildContext context, int productId) async {
     final cartVm = GetIt.I<CartViewModel>();
     cartVm.addItemToCart(productId, quantity: 1);
