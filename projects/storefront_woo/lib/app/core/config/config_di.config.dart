@@ -18,7 +18,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
     as _i819;
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart'
-    as _i626;
+    as _i241;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -32,7 +32,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i819.ProductDetailViewModel(),
     );
     gh.factory<_i867.HomeViewModel>(() => _i867.HomeViewModel());
-    gh.lazySingleton<_i626.WishlistViewModel>(() => _i626.WishlistViewModel());
+    gh.lazySingleton<_i241.WishlistViewModel>(() => _i241.WishlistViewModel());
     return this;
   }
 }
