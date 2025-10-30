@@ -2,9 +2,8 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 // Single source of truth: WishlistViewModel
-import 'package:get_it/get_it.dart';
-import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
 class WishlistView
     extends MasterViewHydratedCubit<WishlistViewModel, WishlistState> {
@@ -67,9 +66,79 @@ class WishlistView
       );
     }
 
+    if (state is WishlistSuccessState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.snackbarSuccess(state.message);
+      });
+      return _buildList(context, viewModel, state.previousState.items);
+    }
+
+    if (state is WishlistActionPromptState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await OsmeaComponents.showPopup(
+          context: context,
+          variant: PopupVariant.dialog,
+          title: 'Add to cart?',
+          subtitle: 'Choose what to do with this saved item.',
+          padding: EdgeInsets.all(context.spacing16),
+          child: OsmeaComponents.column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OsmeaComponents.row(
+                children: [
+                  OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      text: 'Add & keep saved',
+                      variant: ButtonVariant.primary,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        viewModel.addItemToCartFromWishlist(state.item.id);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+              OsmeaComponents.row(
+                children: [
+                  OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      text: 'Add & remove from saved',
+                      variant: ButtonVariant.secondary,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        viewModel.addItemToCartFromWishlist(state.item.id);
+                        viewModel.remove(state.item.id);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+              OsmeaComponents.button(
+                text: 'Cancel',
+                variant: ButtonVariant.ghost,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+        viewModel.restorePrevious(state.previousState);
+      });
+      return _buildList(context, viewModel, state.previousState.items);
+    }
+
     final items = state is WishlistLoadedState
         ? state.items
         : const <WishlistItem>[];
+    return _buildList(context, viewModel, items);
+  }
+
+  Widget _buildList(
+    BuildContext context,
+    WishlistViewModel viewModel,
+    List<WishlistItem> items,
+  ) {
     if (items.isEmpty) {
       return Center(
         child: OsmeaComponents.column(
@@ -199,7 +268,7 @@ class WishlistView
                         backgroundColor: OsmeaColors.nordicBlue.withValues(
                           alpha: 0.08,
                         ),
-                        onPressed: () => _addToCart(context, item.id),
+                        onPressed: () => viewModel.promptAddToCartOptions(item),
                       ),
                     ),
                     SizedBox(
@@ -214,7 +283,21 @@ class WishlistView
                         backgroundColor: OsmeaColors.nordicBlue.withValues(
                           alpha: 0.08,
                         ),
-                        onPressed: () => viewModel.remove(item.id),
+                        onPressed: () {
+                          // Remove from wishlist
+                          viewModel.remove(item.id);
+                          // Show red snackbar with Undo to re-add
+                          context.showSnackbar(
+                            title: 'Removed from favorites',
+                            message: 'Item was removed from your favorites',
+                            type: SnackbarType.error,
+                            style: SnackbarStyle.minimal,
+                            position: SnackbarPosition.bottom,
+                            animation: SnackbarAnimation.slide,
+                            actionLabel: 'Undo',
+                            onAction: () => viewModel.toggle(item),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -224,8 +307,12 @@ class WishlistView
           ),
         );
       },
-      separatorBuilder: (_, __) =>
-          OsmeaComponents.sizedBox(height: context.spacing8),
+      separatorBuilder: (_, __) => OsmeaComponents.padding(
+        padding: EdgeInsets.symmetric(horizontal: context.spacing12),
+        child: OsmeaComponents.divider(
+          color: OsmeaColors.silver.withValues(alpha: 0.2),
+        ),
+      ),
       itemCount: items.length,
     );
   }
@@ -290,12 +377,5 @@ class WishlistView
         context,
       ).copyWith(color: OsmeaColors.thunder, fontWeight: FontWeight.w600),
     );
-  }
-}
-
-extension on WishlistView {
-  Future<void> _addToCart(BuildContext context, int productId) async {
-    final cartVm = GetIt.I<CartViewModel>();
-    cartVm.addItemToCart(productId, quantity: 1);
   }
 }

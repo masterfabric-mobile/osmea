@@ -35,3 +35,17 @@ class WishlistErrorState extends WishlistState {
   final String message;
   WishlistErrorState({required this.message});
 }
+
+class WishlistSuccessState extends WishlistState {
+  final String message;
+  final WishlistLoadedState previousState;
+
+  WishlistSuccessState({required this.message, required this.previousState});
+}
+
+class WishlistActionPromptState extends WishlistState {
+  final WishlistLoadedState previousState;
+  final WishlistItem item;
+
+  WishlistActionPromptState({required this.previousState, required this.item});
+}

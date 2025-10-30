@@ -6,6 +6,7 @@ import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_s
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
 /// Lightweight DTO persisted for wishlist items
 class WishlistItem {
@@ -102,6 +103,11 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       _add(item, groupId: groupId);
   Future<void> remove(int productId, {int? groupId}) =>
       _remove(productId, groupId: groupId);
+  Future<void> addItemToCartFromWishlist(int productId) =>
+      _addItemToCartFromWishlist(productId);
+  void promptAddToCartOptions(WishlistItem item) =>
+      _promptAddToCartOptions(item);
+  void restorePrevious(WishlistLoadedState prev) => emit(prev);
 
   // Private implementations
   Future<void> _syncFromServer({int? groupId}) async {
@@ -230,6 +236,31 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       if (cur is WishlistLoadedState) {
         emit(WishlistLoadedState(items: [...cur.items]));
       }
+    }
+  }
+
+  Future<void> _addItemToCartFromWishlist(int productId) async {
+    try {
+      // Delegate to CartViewModel via DI
+      final cartVm = GetIt.I<CartViewModel>();
+      cartVm.addItemToCart(productId, quantity: 1);
+
+      // Emit success message for the view to display
+      final cur = state;
+      if (cur is WishlistLoadedState) {
+        emit(
+          WishlistSuccessState(message: 'Added to cart', previousState: cur),
+        );
+      }
+    } catch (e) {
+      emit(WishlistErrorState(message: 'Failed to add to cart: $e'));
+    }
+  }
+
+  void _promptAddToCartOptions(WishlistItem item) {
+    final cur = state;
+    if (cur is WishlistLoadedState) {
+      emit(WishlistActionPromptState(previousState: cur, item: item));
     }
   }
 
