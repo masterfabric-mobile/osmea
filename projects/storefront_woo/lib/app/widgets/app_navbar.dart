@@ -60,14 +60,7 @@ class AppNavbar extends StatelessWidget {
       NavbarItem(
         text: 'Search',
         icon: Icon(Icons.search_outlined),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Search feature coming soon!'),
-              backgroundColor: OsmeaColors.nordicBlue,
-            ),
-          );
-        },
+        onTap: () => context.go('/search'),
         tooltip: 'Search',
       ),
       NavbarItem(
@@ -113,12 +106,7 @@ class AppNavbar extends StatelessWidget {
         context.go('/home');
         break;
       case 1: // Search
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Search feature coming soon!'),
-            backgroundColor: OsmeaColors.nordicBlue,
-          ),
-        );
+        context.go('/search');
         break;
       case 2: // Saved
         context.go('/saved');

@@ -7,6 +7,8 @@ import 'package:storefront_woo/app/views/view_product_detail/product_detail_view
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
+import 'package:storefront_woo/app/views/view_search/search_view.dart'
+    as store_search;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
@@ -52,6 +54,31 @@ final GoRouter appRouter = GoRouter(
                     context.go('/cart');
                   } else {
                     context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Search Page
+        GoRoute(
+          path: '/search',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: store_search.SearchView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('product-detail')) {
+                    context.go('/product-detail');
+                  } else {
+                    context.go('/search');
                   }
                 },
               ),
@@ -498,9 +525,14 @@ final GoRouter appRouter = GoRouter(
 /// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
 Widget? _getNavbarForRoute(String location, int wishlistCount) {
   // Show navbar only for main app sections
-  if (location == '/home' || location == '/cart' || location == '/saved') {
+  if (location == '/home' ||
+      location == '/cart' ||
+      location == '/saved' ||
+      location == '/search') {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
+    } else if (location == '/search') {
+      return AppNavbar(currentIndex: 1, wishlistCount: wishlistCount); // Search
     } else if (location == '/saved') {
       return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
     } else if (location == '/cart') {
