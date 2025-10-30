@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
-import 'package:storefront_woo/app/views/view_saved/saved_view.dart';
+import 'package:storefront_woo/app/views/view_wishlist/saved_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
@@ -27,7 +29,7 @@ final GoRouter appRouter = GoRouter(
               body: child,
               bottomNavigationBar: _getNavbarForRoute(
                 state.uri.path,
-                wishlistState.items.length,
+                GetIt.I<WishlistViewModel>().count,
               ),
             );
           },
@@ -67,7 +69,7 @@ final GoRouter appRouter = GoRouter(
           path: '/saved',
           pageBuilder: (BuildContext context, GoRouterState state) {
             return CustomTransitionPage(
-              child: SavedView(
+              child: WishlistView(
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');

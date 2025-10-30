@@ -17,7 +17,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
     as _i867;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
     as _i819;
-import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart'
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart'
     as _i626;
 
 extension GetItInjectableX on _i174.GetIt {
