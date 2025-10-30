@@ -18,20 +18,30 @@ class AppNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.navbar(
-      variant: NavbarVariant.transparent,
-      size: NavbarSize.medium,
-      position: NavbarPosition.bottom,
-      currentIndex: currentIndex,
-      elevation: 0,
-      backgroundColor: OsmeaColors.white,
-      items: _getNavbarItems(context),
-      onItemTap: onItemTap ?? (index) => _navigateToPage(context, index),
+    return FutureBuilder<bool>(
+      future: AuthStorageHelper().isAuthenticated(),
+      builder: (context, snapshot) {
+        final isAuthenticated = snapshot.data ?? false;
+
+        return OsmeaComponents.navbar(
+          variant: NavbarVariant.transparent,
+          size: NavbarSize.medium,
+          position: NavbarPosition.bottom,
+          currentIndex: currentIndex,
+          borderColor: OsmeaColors.silver,
+          elevation: .5,
+          backgroundColor: OsmeaColors.white,
+          items: _getNavbarItems(context, isAuthenticated),
+          onItemTap:
+              onItemTap ??
+              (index) => _navigateToPage(context, index, isAuthenticated),
+        );
+      },
     );
   }
 
-  /// Get navbar items
-  List<NavbarItem> _getNavbarItems(BuildContext context) {
+  /// Get navbar items (5 items: Home, Search, Saved, Cart, Profile/Sign In)
+  List<NavbarItem> _getNavbarItems(BuildContext context, bool isAuthenticated) {
     return [
       NavbarItem(
         text: 'Home',
@@ -40,43 +50,99 @@ class AppNavbar extends StatelessWidget {
         tooltip: 'Home',
       ),
       NavbarItem(
+        text: 'Search',
+        icon: Icon(Icons.search_outlined),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Search feature coming soon!'),
+              backgroundColor: OsmeaColors.nordicBlue,
+            ),
+          );
+        },
+        tooltip: 'Search',
+      ),
+      NavbarItem(
+        text: 'Saved',
+        icon: Icon(Icons.favorite_outline),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Saved items feature coming soon!'),
+              backgroundColor: OsmeaColors.nordicBlue,
+            ),
+          );
+        },
+        tooltip: 'Saved Items',
+      ),
+      NavbarItem(
         text: 'Cart',
         icon: Icon(Icons.shopping_cart_outlined),
         onTap: () => context.go('/cart'),
         tooltip: 'Shopping Cart',
       ),
       NavbarItem(
-        text: 'Wishlist',
-        icon: Icon(Icons.favorite_outline),
+        text: isAuthenticated ? 'Profile' : 'Sign In',
+        icon: Icon(
+          isAuthenticated ? Icons.person_outline : Icons.login_outlined,
+        ),
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Wishlist feature coming soon!'),
-              backgroundColor: OsmeaColors.nordicBlue,
-            ),
-          );
+          if (isAuthenticated) {
+            // Navigate to profile page (todo: create profile view)
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Profile feature coming soon!'),
+                backgroundColor: OsmeaColors.nordicBlue,
+              ),
+            );
+          } else {
+            // Navigate to sign in page
+            context.go('/auth');
+          }
         },
-        tooltip: 'Wishlist',
+        tooltip: isAuthenticated ? 'Profile' : 'Sign In',
       ),
     ];
   }
 
   /// Navigate to page based on index
-  void _navigateToPage(BuildContext context, int index) {
+  void _navigateToPage(BuildContext context, int index, bool isAuthenticated) {
     switch (index) {
-      case 0:
+      case 0: // Home
         context.go('/home');
         break;
-      case 1:
-        context.go('/cart');
-        break;
-      case 2:
+      case 1: // Search
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Wishlist feature coming soon!'),
+            content: Text('Search feature coming soon!'),
             backgroundColor: OsmeaColors.nordicBlue,
           ),
         );
+        break;
+      case 2: // Saved
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saved items feature coming soon!'),
+            backgroundColor: OsmeaColors.nordicBlue,
+          ),
+        );
+        break;
+      case 3: // Cart
+        context.go('/cart');
+        break;
+      case 4: // Profile/Sign In
+        if (isAuthenticated) {
+          // Navigate to profile page (todo: create profile view)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Profile feature coming soon!'),
+              backgroundColor: OsmeaColors.nordicBlue,
+            ),
+          );
+        } else {
+          // Navigate to sign in page
+          context.go('/auth');
+        }
         break;
     }
   }
