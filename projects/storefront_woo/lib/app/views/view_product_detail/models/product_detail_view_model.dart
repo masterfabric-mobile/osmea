@@ -31,15 +31,159 @@ class ProductDetailViewModel
   // State variables
   int _selectedQuantity = 1;
   List<String> _imageUrls = [];
-  int _currentImageIndex = 0;
+  final int _currentImageIndex = 0;
 
-  // Public trigger functions - HydratedCubit pattern
-  void loadProduct(int productId) => _loadProduct(productId);
+  // ============================================================================
+  // Public API Methods - Structured Pattern: Future first, then Fire (void)
+  // ============================================================================
+
+  // ----------------------------------------------------------------------------
+  // Product Loading
+  // ----------------------------------------------------------------------------
+
+  /// Loads product details from API or cache
+  /// Fetches product data, images, and checks cart/wishlist status
+  /// Returns Future to allow await in calling code
+  Future<void> loadProduct(int productId) async =>
+      await _loadProduct(productId);
+
+  /// Convenience: fire-and-forget product load (void)
+  /// Calls the Future-based loadProduct under the hood
+  void loadProductFire(int productId) {
+    // Fire-and-forget wrapper that sits on top of Future method
+    // ignore: discarded_futures
+    loadProduct(productId);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Cart Operations
+  // ----------------------------------------------------------------------------
+
+  /// Adds product to cart with specified quantity
+  /// Returns Future to allow await in calling code
   Future<void> addProductToCart(int productId, {int quantity = 1}) async =>
       await _addToCart(productId, quantity);
-  void addProductToWishlist(int productId) => _addToWishlist(productId);
-  void updateQuantity(int quantity) => _changeQuantity(quantity);
-  void loadProductImages(List<String> imageUrls) => _loadImages(imageUrls);
+
+  /// Convenience: fire-and-forget add to cart (void)
+  /// Calls the Future-based addProductToCart under the hood
+  void addProductToCartFire(int productId, {int quantity = 1}) {
+    // Fire-and-forget wrapper that sits on top of Future method
+    // ignore: discarded_futures
+    addProductToCart(productId, quantity: quantity);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Wishlist Operations
+  // ----------------------------------------------------------------------------
+
+  /// Adds or removes product from wishlist
+  /// Returns Future to allow await in calling code
+  Future<void> addProductToWishlist(int productId) async =>
+      await _addToWishlist(productId);
+
+  /// Convenience: fire-and-forget wishlist toggle (void)
+  /// Calls the Future-based addProductToWishlist under the hood
+  void addProductToWishlistFire(int productId) {
+    // Fire-and-forget wrapper that sits on top of Future method
+    // ignore: discarded_futures
+    addProductToWishlist(productId);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Quantity Management
+  // ----------------------------------------------------------------------------
+
+  /// Updates the selected quantity for the product
+  /// Returns Future to allow await in calling code (wrapped sync operation)
+  Future<void> updateQuantity(int quantity) async =>
+      await Future.microtask(() => _changeQuantity(quantity));
+
+  /// Convenience: fire-and-forget quantity update (void)
+  /// Calls the Future-based updateQuantity under the hood
+  void updateQuantityFire(int quantity) {
+    // Fire-and-forget wrapper that sits on top of Future method
+    // ignore: discarded_futures
+    updateQuantity(quantity);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Image Management
+  // ----------------------------------------------------------------------------
+
+  /// Loads and sets product image URLs
+  /// Returns Future to allow await in calling code (wrapped sync operation)
+  Future<void> loadProductImages(List<String> imageUrls) async =>
+      await Future.microtask(() => _loadImages(imageUrls));
+
+  /// Convenience: fire-and-forget image load (void)
+  /// Calls the Future-based loadProductImages under the hood
+  void loadProductImagesFire(List<String> imageUrls) {
+    // Fire-and-forget wrapper that sits on top of Future method
+    // ignore: discarded_futures
+    loadProductImages(imageUrls);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Description Expand/Collapse Management
+  // ----------------------------------------------------------------------------
+
+  /// Sets description expanded state
+  Future<void> setDescriptionExpanded(bool isExpanded) async =>
+      Future.microtask(() {
+        final currentState = state;
+        if (currentState is ProductDetailLoadedState) {
+          emit(currentState.copyWith(isDescriptionExpanded: isExpanded));
+        }
+      });
+
+  /// Fire-and-forget version
+  void setDescriptionExpandedFire(bool isExpanded) {
+    // ignore: discarded_futures
+    setDescriptionExpanded(isExpanded);
+  }
+
+  /// Toggles description expanded state
+  Future<void> toggleDescriptionExpanded() async => Future.microtask(() {
+    final currentState = state;
+    if (currentState is ProductDetailLoadedState) {
+      emit(
+        currentState.copyWith(
+          isDescriptionExpanded: !currentState.isDescriptionExpanded,
+        ),
+      );
+    }
+  });
+
+  /// Fire-and-forget version
+  void toggleDescriptionExpandedFire() {
+    // ignore: discarded_futures
+    toggleDescriptionExpanded();
+  }
+
+  // ----------------------------------------------------------------------------
+  // Attribute Selection (e.g., Color, Size)
+  // ----------------------------------------------------------------------------
+
+  /// Sets a selected attribute value, e.g. setSelectedAttribute('Color','Red')
+  Future<void> setSelectedAttribute(String name, String value) async =>
+      Future.microtask(() {
+        final currentState = state;
+        if (currentState is ProductDetailLoadedState) {
+          final updated = Map<String, String>.from(currentState.selectedAttributes)
+            ..[name] = value;
+          emit(currentState.copyWith(selectedAttributes: updated));
+        }
+      });
+
+  /// Clears a selected attribute
+  Future<void> clearSelectedAttribute(String name) async => Future.microtask(() {
+        final currentState = state;
+        if (currentState is ProductDetailLoadedState) {
+          final updated = Map<String, String>.from(currentState.selectedAttributes)
+            ..remove(name);
+          emit(currentState.copyWith(selectedAttributes: updated));
+        }
+      });
 
   // Private methods - HydratedCubit pattern
   Future<void> _loadProduct(int productId) async {
@@ -97,6 +241,7 @@ class ProductDetailViewModel
           currentImageIndex: _currentImageIndex,
           isInCart: isInCart,
           isInWishlist: isInWishlist,
+          isDescriptionExpanded: false,
         ),
       );
     } catch (e) {
@@ -133,6 +278,28 @@ class ProductDetailViewModel
           ),
         );
         return;
+      }
+
+      // Persist cart token if provided in response (fallback in case interceptor misses)
+      try {
+        final dynamic tokenCandidate =
+            (response as dynamic).cartToken ??
+            (response as dynamic).cartKey ??
+            (response as dynamic).cart_key ??
+            (response as dynamic).token;
+        if (tokenCandidate is String && tokenCandidate.isNotEmpty) {
+          await CartTokenStorage.saveCartToken(
+            tokenCandidate,
+            expiry: const Duration(days: 30),
+          );
+          debugPrint(
+            '🛒 ProductDetailViewModel: Saved cart token from addItem',
+          );
+        }
+      } catch (e) {
+        debugPrint(
+          '⚠️ ProductDetailViewModel: Could not extract cart token: $e',
+        );
       }
 
       debugPrint('✅ Successfully added product $productId to cart via API');
