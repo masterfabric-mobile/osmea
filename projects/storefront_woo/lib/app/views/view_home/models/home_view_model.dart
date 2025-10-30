@@ -39,6 +39,16 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   // TextEditingController for search
   final TextEditingController searchController = TextEditingController();
 
+  // Arguments holder for route/widget inputs
+  final Map<String, dynamic> _arguments = {};
+  void setArguments(Map<String, dynamic> args) {
+    _arguments
+      ..clear()
+      ..addAll(args);
+  }
+
+  Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
+
   // Public trigger functions - HydratedCubit pattern
   void initial() {
     loadProducts();
@@ -359,6 +369,16 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     } catch (e) {
       debugPrint('❌ Failed to add to wishlist: $e');
       emit(HomeErrorState(message: 'Failed to add to wishlist: $e'));
+    }
+  }
+
+  // Expose saved status for widgets without BlocBuilder
+  bool isProductSaved(int productId) {
+    try {
+      final wishlistVm = GetIt.I<WishlistViewModel>();
+      return wishlistVm.isSaved(productId);
+    } catch (_) {
+      return false;
     }
   }
 

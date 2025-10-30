@@ -9,7 +9,6 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
-import 'package:osmea_components/osmea_components.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_loading_widget.dart';
@@ -26,8 +25,8 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
-    super.horizontalPadding = const PaddingVisibility.disabled(),
     super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(
          coreAppBar: (context, viewModel) =>
@@ -36,6 +35,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
 
   @override
   void initialContent(HomeViewModel viewModel, BuildContext context) {
+    viewModel.setArguments(arguments);
     viewModel.initial();
   }
 
@@ -101,9 +101,8 @@ PreferredSizeWidget _buildHomeAppBar(
   );
 
   return OsmeaComponents.appBar(
-    padding: const EdgeInsets.only(bottom: 16),
     title: OsmeaComponents.text(
-      'MasterFabric',
+      appName,
       color: OsmeaColors.thunder,
       textStyle: OsmeaTextStyle.titleLarge(
         context,
@@ -111,7 +110,7 @@ PreferredSizeWidget _buildHomeAppBar(
     ),
     variant: AppBarVariant.standard,
     size: AppBarSize.standard,
-    backgroundColor: OsmeaColors.paperWhite,
+    backgroundColor: OsmeaColors.white,
     foregroundColor: OsmeaColors.thunder,
     actions: const [],
   );
