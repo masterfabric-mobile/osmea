@@ -2,6 +2,8 @@ import 'package:api_explorer/services/api_request_handler.dart';
 import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter/material.dart';
+import 'package:apis/apis.dart';
 
 class StoreRetrieveProductCategoryHandler extends ApiRequestHandler {
   String get serviceName => 'Retrieve Product Category';
@@ -29,6 +31,12 @@ class StoreRetrieveProductCategoryHandler extends ApiRequestHandler {
             hint: 'ID of the category to retrieve',
             isRequired: true,
             type: ApiFieldType.number,
+          ),
+          const ApiField(
+            name: 'jwt_token',
+            label: 'JWT Token (Optional)',
+            hint: 'JWT authentication token (auto-loaded from storage if empty)',
+            isRequired: false,
           ),
         ],
       };
@@ -128,6 +136,36 @@ GET /wp-json/wc/store/v1/products/categories/15?context=edit
       final apiVersion = params['api_version']!;
       final categoryId = params['category_id']!;
 
+      // 🔐 Auto-fetch JWT token from local storage
+      String? jwtToken = params['jwt_token'];
+      if (jwtToken == null || jwtToken.isEmpty) {
+        try {
+          debugPrint('🔍 Loading JWT token from storage...');
+          final storedJwt = await WooJwtTokenStorage.loadToken();
+          jwtToken = storedJwt?.accessToken;
+          
+          if (jwtToken != null && jwtToken.isNotEmpty) {
+            debugPrint('🔐 JWT token loaded from storage: ${jwtToken.length > 20 ? jwtToken.substring(0, 20) + "..." : jwtToken}');
+          } else {
+            debugPrint('⚠️ No JWT token found in storage');
+          }
+        } catch (e) {
+          debugPrint('❌ Could not load JWT token from storage: $e');
+        }
+      }
+
+      // JWT token is optional - just log if missing
+      if (jwtToken == null || jwtToken.isEmpty) {
+        debugPrint('⚠️ JWT token not provided - continuing without authentication');
+      } else {
+        debugPrint('🔐 JWT token available for authenticated request');
+      }
+
+      debugPrint('🔍 Starting retrieve product category:');
+      debugPrint('  - API Version: $apiVersion');
+      debugPrint('  - Category ID: $categoryId');
+      debugPrint('  - JWT Token Available: ${jwtToken != null && jwtToken.isNotEmpty}');
+
       // Get the service from GetIt
       final service = GetIt.I<StoreProductCategoriesService>();
 
@@ -154,6 +192,12 @@ GET /wp-json/wc/store/v1/products/categories/15?context=edit
           'success': true,
           'data': category.toJson(),
           'message': 'Product category retrieved successfully',
+          'auth_info': {
+            'jwt_token_source': params.containsKey('jwt_token') && params['jwt_token']!.isNotEmpty ? 'manual' : 'auto_storage',
+            'jwt_token_available': jwtToken != null && jwtToken.isNotEmpty,
+          },
+          'params': params,
+          'timestamp': DateTime.now().toIso8601String(),
         };
       }
 
