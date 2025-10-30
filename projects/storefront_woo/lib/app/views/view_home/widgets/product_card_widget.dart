@@ -5,9 +5,9 @@
  * Displays product information with image, price, and actions.
  */
 
-import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/material.dart' as FlutterMaterial show Image;
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:flutter/material.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
+    hide Image;
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:get_it/get_it.dart';
@@ -35,228 +35,209 @@ class ProductCardWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: OsmeaComponents.container(
-        decoration: BoxDecoration(
-          color: OsmeaColors.white,
-          borderRadius: BorderRadius.circular(context.radiusNormal),
-          border: Border.all(
-            color: OsmeaColors.silver.withOpacity(0.5),
-            width: context.borderWidth,
-          ),
+      child: OsmeaComponents.imageCard(
+        // Image configuration
+        imageUrl: product.images?.isNotEmpty == true
+            ? product.images!.first.src
+            : null,
+        imageHeight: context.dynamicHeight(0.20),
+        imageFit: BoxFit.cover,
+        imageAlignment: Alignment.center,
+
+        // Card appearance
+        variant: ComponentAppearance.outlined,
+        size: ComponentSize.medium,
+        backgroundColor: OsmeaColors.white,
+        borderColor: OsmeaColors.silver,
+        borderRadius: BorderRadius.circular(context.radiusNormal),
+
+        // Content
+        title: _formatProductName(product.name ?? 'Product'),
+        subtitle: product.categories?.isNotEmpty ?? false
+            ? _formatProductName(product.categories!.first.name ?? '')
+            : null,
+
+        // Text styling
+        titleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w400,
+          height: 1.25,
+          fontSize: context.fontSizeSmall,
+          letterSpacing: -0.15,
         ),
-        child: OsmeaComponents.column(
-          crossAxisAlignment: context.crossStart,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Image with overlays - Optimized height
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.radiusNormal),
-                topRight: Radius.circular(context.radiusNormal),
-              ),
-              child: SizedBox(
-                height: context.dynamicHeight(0.20), // Reduced image height
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    // Product image
-                    Positioned.fill(
-                      child: product.images?.isNotEmpty == true
-                          ? FlutterMaterial.Image.network(
-                              product.images!.first.src ?? '',
-                              fit: context.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: OsmeaColors.pewter.withOpacity(0.06),
-                                  child: Icon(
-                                    Icons.image_outlined,
-                                    color: OsmeaColors.pewter.withOpacity(0.35),
-                                  ),
-                                );
-                              },
-                            )
-                          : Container(
-                              color: OsmeaColors.pewter.withOpacity(0.06),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.image_outlined,
-                                color: OsmeaColors.pewter.withOpacity(0.35),
-                                size: context.iconSizeHigh,
-                              ),
-                            ),
-                    ),
+        subtitleStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+          fontWeight: FontWeight.w300,
+          height: 1.15,
+          fontSize: context.fontSizeExtraSmall,
+        ),
 
-                    // Sale badge
-                    if (product.onSale == true && discount != null)
-                      Positioned(
-                        left: context.spacing8,
-                        top: context.spacing8,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.spacing6,
-                            vertical: context.spacing2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.white.withOpacity(0.9),
-                            borderRadius: context.borderRadiusLow,
-                            border: Border.all(
-                              color: OsmeaColors.nordicBlue,
-                              width: context.borderWidth,
-                            ),
-                          ),
-                          child: OsmeaComponents.text(
-                            '$discount% OFF',
-                            textStyle: OsmeaTextStyle.bodySmall(context)
-                                .copyWith(
-                                  color: OsmeaColors.nordicBlue,
-                                  fontWeight:
-                                      FontWeight.w600, // Semi-bold, not bold
-                                  fontSize: context.fontSizeExtraSmall,
-                                ),
-                          ),
-                        ),
-                      ),
-
-                    // Wishlist heart - compute via parent HomeViewModel (no BlocBuilder)
-                    Positioned(
-                      right: context.spacing8,
-                      top: context.spacing8,
-                      child: OsmeaComponents.iconButton(
-                        icon: Icon(
-                          GetIt.I<HomeViewModel>().isProductSaved(
-                                  product.id ?? 0)
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          size: context.iconSizeExtraSmall,
-                          color: GetIt.I<HomeViewModel>().isProductSaved(
-                                  product.id ?? 0)
-                              ? OsmeaColors.nordicBlue
-                              : OsmeaColors.pewter,
-                        ),
-                        size: ButtonSize.small,
-                        variant: ButtonVariant.ghost,
-                        backgroundColor: OsmeaColors.white.withOpacity(0.9),
-                        borderRadius: context.width20, // Circular
-                        onPressed: onWishlistTap,
-                      ),
-                    ),
-                  ],
+        // Text overflow control
+        titleMaxLines: 2,
+        subtitleMaxLines: 1,
+        textOverflow: TextOverflow.ellipsis,
+        // Spacing
+        spacing: context.spacing8,
+        badge: (product.onSale == true && discount != null)
+            ? Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.spacing6,
+                  vertical: context.spacing2,
                 ),
+                decoration: BoxDecoration(
+                  color: OsmeaColors.white,
+                  borderRadius: context.borderRadiusLow,
+                  border: Border.all(
+                    color: OsmeaColors.nordicBlue,
+                    width: context.borderWidth,
+                  ),
+                ),
+                child: OsmeaComponents.text(
+                  '$discount% OFF',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    color: OsmeaColors.nordicBlue,
+                    fontWeight: FontWeight.w600,
+                    fontSize: context.fontSizeExtraSmall,
+                  ),
+                ),
+              )
+            : null,
+        badgePosition: BadgePosition.topLeft,
+
+        // Custom child for price section
+        child: _buildPriceSection(context, prices),
+
+        // Custom image widget with wishlist overlay
+        imageWidget: _buildImageWithWishlist(context),
+      ),
+    );
+  }
+
+  /// Builds image with wishlist button overlay
+  Widget? _buildImageWithWishlist(BuildContext context) {
+    if (product.images?.isEmpty ?? true) {
+      return Container(
+        height: context.dynamicHeight(0.20),
+        color: OsmeaColors.ash,
+        alignment: Alignment.center,
+        child: Stack(
+          children: [
+            Center(
+              child: Icon(
+                Icons.image_outlined,
+                color: OsmeaColors.pewter,
+                size: context.iconSizeHigh,
               ),
             ),
-
-            // Content - Compact layout to prevent overflow
-            OsmeaComponents.padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing10,
-                vertical: context.spacing10,
-              ),
-              child: OsmeaComponents.column(
-                crossAxisAlignment: context.crossStart,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Title - Compact with proper constraints
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: context.height40, // Reduced for 2 lines
-                    ),
-                    child: OsmeaComponents.text(
-                      _formatProductName(product.name ?? 'Product'),
-                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                        color: OsmeaColors.thunder,
-                        fontWeight: FontWeight.w400, // Normal weight
-                        height: 1.25, // Tighter line height
-                        fontSize: context.fontSizeSmall, // Slightly smaller
-                        letterSpacing: -0.15,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-
-                  // Meta (category) - Compact, only if space allows
-                  if (product.categories?.isNotEmpty ?? false) ...[
-                    OsmeaComponents.sizedBox(height: context.spacing4),
-                    OsmeaComponents.text(
-                      _formatProductName(product.categories!.first.name ?? ''),
-                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        color: OsmeaColors.pewter.withOpacity(0.65),
-                        fontWeight: FontWeight.w300, // Light weight
-                        height: 1.15,
-                        fontSize: context.fontSizeExtraSmall,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    OsmeaComponents.sizedBox(height: context.spacing6),
-                  ] else
-                    OsmeaComponents.sizedBox(height: context.spacing6),
-
-                  // Price - Compact styling
-                  if (prices != null &&
-                      prices.salePrice != null &&
-                      prices.salePrice!.isNotEmpty &&
-                      prices.salePrice != prices.regularPrice)
-                    OsmeaComponents.row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: OsmeaComponents.text(
-                            _formatPrice(prices.salePrice, prices.currencyCode),
-                            textStyle: OsmeaTextStyle.bodyMedium(context)
-                                .copyWith(
-                                  color: OsmeaColors.nordicBlue,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: -0.2,
-                                  fontSize: context.fontSizeSmall,
-                                ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        OsmeaComponents.sizedBox(width: context.spacing4),
-                        Flexible(
-                          child: OsmeaComponents.text(
-                            _formatPrice(
-                              prices.regularPrice,
-                              prices.currencyCode,
-                            ),
-                            textStyle: OsmeaTextStyle.bodySmall(context)
-                                .copyWith(
-                                  color: OsmeaColors.pewter.withOpacity(0.55),
-                                  decoration: TextDecoration.lineThrough,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: context.fontSizeExtraSmall,
-                                ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
-                  else
-                    OsmeaComponents.text(
-                      _formatPrice(
-                        prices?.regularPrice,
-                        prices?.currencyCode ?? 'GBP',
-                      ),
-                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                        color: OsmeaColors.thunder,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.2,
-                        fontSize: context.fontSizeSmall,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
-              ),
+            Positioned(
+              right: context.spacing8,
+              top: context.spacing8,
+              child: _buildWishlistButton(context),
             ),
           ],
         ),
-      ),
+      );
+    }
+
+    return Stack(
+      children: [
+        Image.network(
+          product.images!.first.src ?? '',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: context.dynamicHeight(0.20),
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: context.dynamicHeight(0.20),
+              color: OsmeaColors.ash,
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.image_outlined,
+                color: OsmeaColors.pewter,
+                size: context.iconSizeHigh,
+              ),
+            );
+          },
+        ),
+        Positioned(
+          right: context.spacing8,
+          top: context.spacing8,
+          child: _buildWishlistButton(context),
+        ),
+      ],
     );
+  }
+
+  /// Builds wishlist button widget
+  Widget _buildWishlistButton(BuildContext context) {
+    return OsmeaComponents.iconButton(
+      icon: Icon(
+        GetIt.I<HomeViewModel>().isProductSaved(product.id ?? 0)
+            ? Icons.favorite
+            : Icons.favorite_border,
+        size: context.iconSizeExtraSmall,
+        color: GetIt.I<HomeViewModel>().isProductSaved(product.id ?? 0)
+            ? OsmeaColors.nordicBlue
+            : OsmeaColors.pewter,
+      ),
+      size: ButtonSize.small,
+      variant: ButtonVariant.ghost,
+      backgroundColor: OsmeaColors.white,
+      borderRadius: context.width20,
+      onPressed: onWishlistTap,
+    );
+  }
+
+  /// Builds price section widget
+  Widget _buildPriceSection(BuildContext context, dynamic prices) {
+    if (prices != null &&
+        prices.salePrice != null &&
+        prices.salePrice!.isNotEmpty &&
+        prices.salePrice != prices.regularPrice) {
+      return OsmeaComponents.row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+            child: OsmeaComponents.text(
+              _formatPrice(prices.salePrice, prices.currencyCode),
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.nordicBlue,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.2,
+                fontSize: context.fontSizeSmall,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          OsmeaComponents.sizedBox(width: context.spacing4),
+          Flexible(
+            child: OsmeaComponents.text(
+              _formatPrice(prices.regularPrice, prices.currencyCode),
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                decoration: TextDecoration.lineThrough,
+                fontWeight: FontWeight.w300,
+                fontSize: context.fontSizeExtraSmall,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return OsmeaComponents.text(
+        _formatPrice(prices?.regularPrice, prices?.currencyCode ?? 'GBP'),
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.2,
+          fontSize: context.fontSizeSmall,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
   }
 
   /// Formats price using PriceInfoCurrencyHelper from core package
