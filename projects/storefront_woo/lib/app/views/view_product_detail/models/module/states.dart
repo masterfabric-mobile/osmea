@@ -24,6 +24,8 @@ class ProductDetailLoadedState extends ProductDetailState {
   final int currentImageIndex;
   final bool isInCart;
   final bool isInWishlist;
+  final bool isDescriptionExpanded;
+  final Map<String, String> selectedAttributes;
 
   ProductDetailLoadedState({
     required this.product,
@@ -32,6 +34,8 @@ class ProductDetailLoadedState extends ProductDetailState {
     this.currentImageIndex = 0,
     this.isInCart = false,
     this.isInWishlist = false,
+    this.isDescriptionExpanded = false,
+    this.selectedAttributes = const {},
   });
 
   ProductDetailLoadedState copyWith({
@@ -41,6 +45,8 @@ class ProductDetailLoadedState extends ProductDetailState {
     int? currentImageIndex,
     bool? isInCart,
     bool? isInWishlist,
+    bool? isDescriptionExpanded,
+    Map<String, String>? selectedAttributes,
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
@@ -49,6 +55,9 @@ class ProductDetailLoadedState extends ProductDetailState {
       currentImageIndex: currentImageIndex ?? this.currentImageIndex,
       isInCart: isInCart ?? this.isInCart,
       isInWishlist: isInWishlist ?? this.isInWishlist,
+      isDescriptionExpanded:
+          isDescriptionExpanded ?? this.isDescriptionExpanded,
+      selectedAttributes: selectedAttributes ?? this.selectedAttributes,
     );
   }
 }
