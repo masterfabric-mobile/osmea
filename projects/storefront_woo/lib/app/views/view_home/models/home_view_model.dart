@@ -16,7 +16,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:storefront_woo/app/views/view_saved/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 
 @injectable
 class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
