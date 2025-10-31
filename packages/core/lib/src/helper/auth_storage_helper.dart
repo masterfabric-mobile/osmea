@@ -20,12 +20,33 @@ class AuthStorageHelper {
 
   final LocalStorageHelper _storage = LocalStorageHelper();
 
+  // Cache for token-related data
+  String? _cachedToken;
+  Map<String, dynamic>? _cachedUserData;
+  DateTime? _cachedTokenExpiry;
+  bool? _cachedIsAuthenticated;
+  DateTime? _lastCacheUpdate;
+  static const Duration _cacheValidityDuration = Duration(minutes: 1); // Cache valid for 1 minute
+
+  /// Clear cache (call when token is saved/cleared)
+  void _clearCache() {
+    _cachedToken = null;
+    _cachedUserData = null;
+    _cachedTokenExpiry = null;
+    _cachedIsAuthenticated = null;
+    _lastCacheUpdate = null;
+  }
+
   /// 💾 Save JWT token to storage
   Future<void> saveToken(String token) async {
     try {
       debugPrint('💾 Saving JWT token...');
       await _storage.init();
       await _storage.setItem(_tokenKey, token);
+      // Update cache
+      _cachedToken = token;
+      _cachedIsAuthenticated = null; // Invalidate auth cache
+      _lastCacheUpdate = DateTime.now();
       debugPrint('✅ JWT token saved successfully');
     } catch (e, stackTrace) {
       debugPrint('❌ Error saving JWT token: $e');
@@ -34,12 +55,27 @@ class AuthStorageHelper {
     }
   }
 
-  /// 📖 Load JWT token from storage
+  /// 📖 Load JWT token from storage (with cache)
   Future<String?> getToken() async {
     try {
-      debugPrint('📖 Loading JWT token...');
+      // Return cached token if available and within validity period
+      if (_cachedToken != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        // Cache is valid for 1 minute to prevent excessive DB calls
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached token without debug log
+          return _cachedToken;
+        }
+      }
+
+      // Only log when actually loading from storage
+      debugPrint('📖 Loading JWT token from storage...');
       await _storage.init();
       final token = await _storage.getItem(_tokenKey);
+
+      // Update cache
+      _cachedToken = token;
+      _lastCacheUpdate = DateTime.now();
 
       if (token != null && token.isNotEmpty) {
         debugPrint('✅ JWT token loaded successfully');
@@ -64,6 +100,8 @@ class AuthStorageHelper {
       await _storage.removeItem(_userDataKey);
       await _storage.removeItem(_tokenExpiryKey);
       await _storage.removeItem(_refreshTokenKey);
+      // Clear cache
+      _clearCache();
       debugPrint('✅ JWT token cleared successfully');
     } catch (e, stackTrace) {
       debugPrint('❌ Error clearing JWT token: $e');
@@ -78,6 +116,9 @@ class AuthStorageHelper {
       debugPrint('💾 Saving user data...');
       await _storage.init();
       await _storage.setItem(_userDataKey, json.encode(userData));
+      // Update cache
+      _cachedUserData = userData;
+      _lastCacheUpdate = DateTime.now();
       debugPrint('✅ User data saved successfully');
     } catch (e, stackTrace) {
       debugPrint('❌ Error saving user data: $e');
@@ -86,19 +127,35 @@ class AuthStorageHelper {
     }
   }
 
-  /// 📖 Load user data from storage
+  /// 📖 Load user data from storage (with cache)
   Future<Map<String, dynamic>?> getUserData() async {
     try {
-      debugPrint('📖 Loading user data...');
+      // Return cached user data if available and within validity period
+      if (_cachedUserData != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached user data without debug log
+          return _cachedUserData;
+        }
+      }
+
+      // Only log when actually loading from storage
+      debugPrint('📖 Loading user data from storage...');
       await _storage.init();
       final userDataString = await _storage.getItem(_userDataKey);
 
       if (userDataString != null && userDataString.isNotEmpty) {
         final userData = json.decode(userDataString) as Map<String, dynamic>;
+        // Update cache
+        _cachedUserData = userData;
+        _lastCacheUpdate = DateTime.now();
         debugPrint('✅ User data loaded successfully');
         return userData;
       }
 
+      // Update cache with null
+      _cachedUserData = null;
+      _lastCacheUpdate = DateTime.now();
       debugPrint('ℹ️ No user data found');
       return null;
     } catch (e, stackTrace) {
@@ -157,19 +214,35 @@ class AuthStorageHelper {
     }
   }
 
-  /// 📖 Load token expiry from storage
+  /// 📖 Load token expiry from storage (with cache)
   Future<DateTime?> getTokenExpiry() async {
     try {
-      debugPrint('📖 Loading token expiry...');
+      // Return cached expiry if available and within validity period
+      if (_cachedTokenExpiry != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached expiry without debug log
+          return _cachedTokenExpiry;
+        }
+      }
+
+      // Only log when actually loading from storage
+      debugPrint('📖 Loading token expiry from storage...');
       await _storage.init();
       final expiryString = await _storage.getItem(_tokenExpiryKey);
 
       if (expiryString != null && expiryString.isNotEmpty) {
         final expiry = DateTime.parse(expiryString);
+        // Update cache
+        _cachedTokenExpiry = expiry;
+        _lastCacheUpdate = DateTime.now();
         debugPrint('✅ Token expiry loaded successfully');
         return expiry;
       }
 
+      // Update cache with null
+      _cachedTokenExpiry = null;
+      _lastCacheUpdate = DateTime.now();
       debugPrint('ℹ️ No token expiry found');
       return null;
     } catch (e, stackTrace) {
@@ -192,14 +265,32 @@ class AuthStorageHelper {
     }
   }
 
-  /// ✅ Check if user is authenticated
+  /// ✅ Check if user is authenticated (with cache)
   Future<bool> isAuthenticated() async {
     try {
+      // Return cached auth status if available and within validity period
+      if (_cachedIsAuthenticated != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached auth status without debug log
+          return _cachedIsAuthenticated!;
+        }
+      }
+
+      // Only check token when cache is invalid
       final token = await getToken();
-      if (token == null || token.isEmpty) return false;
+      if (token == null || token.isEmpty) {
+        _cachedIsAuthenticated = false;
+        _lastCacheUpdate = DateTime.now();
+        return false;
+      }
 
       final isExpired = await isTokenExpired();
-      return !isExpired;
+      final authenticated = !isExpired;
+      // Update cache
+      _cachedIsAuthenticated = authenticated;
+      _lastCacheUpdate = DateTime.now();
+      return authenticated;
     } catch (e) {
       debugPrint('❌ Error checking authentication: $e');
       return false;
