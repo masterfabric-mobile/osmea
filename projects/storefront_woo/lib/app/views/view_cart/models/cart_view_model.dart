@@ -14,6 +14,8 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:apis/models/auth/woo_jwt_token.dart';
+import 'package:apis/apis.dart';
 
 @injectable
 class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
@@ -54,11 +56,21 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     try {
       debugPrint('🛒 CartViewModel: Calling getCart API');
 
+      // Log token status before API call
+      final jwtToken = await _getJwtToken();
+      final cartToken = await _getCartToken();
+      debugPrint(
+        '🛒 CartViewModel: getCart - JWT Token: ${jwtToken != null ? "Available" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: getCart - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
       final response = await _cartService.getCart(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
-        jwtToken: await _getJwtToken(), // Optional JWT token
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
       );
 
       if (response.errors != null && response.errors!.isNotEmpty) {
@@ -177,8 +189,19 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling addItem API: productId=$productId, quantity=$quantity',
       );
 
-      // Ensure cart token exists; if not, initialize cart first
+      // Get tokens before API call
       String? cartToken = await _getCartToken();
+      final jwtToken = await _getJwtToken();
+
+      // Log token status
+      debugPrint(
+        '🛒 CartViewModel: addItem - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: addItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
+      // Ensure cart token exists; if not, initialize cart first
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint(
           '🛒 CartViewModel: No cart token found. Initializing with getCart...',
@@ -187,9 +210,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           apiVersion: _configHelper.getString(
             'woocommerce_configuration.version',
           ),
-          jwtToken: await _getJwtToken(),
+          jwtToken: jwtToken, // Use same JWT token for consistency
         );
         cartToken = await _getCartToken();
+        debugPrint(
+          '🛒 CartViewModel: Cart initialized with JWT: ${jwtToken != null ? "Yes" : "No"}',
+        );
       }
 
       var response = await _cartService.addItem(
@@ -197,7 +223,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken ?? '',
-        jwtToken: await _getJwtToken(), // Optional JWT token
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
         id: productId,
         quantity: quantity,
       );
@@ -215,11 +241,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           debugPrint(
             '🛒 CartViewModel: Retrying addItem after refreshing cart token',
           );
+          final retryJwtToken = await _getJwtToken();
           await _cartService.getCart(
             apiVersion: _configHelper.getString(
               'woocommerce_configuration.version',
             ),
-            jwtToken: await _getJwtToken(),
+            jwtToken: retryJwtToken,
           );
           final refreshed = await _getCartToken();
           response = await _cartService.addItem(
@@ -227,7 +254,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
               'woocommerce_configuration.version',
             ),
             cartToken: refreshed ?? '',
-            jwtToken: await _getJwtToken(),
+            jwtToken: retryJwtToken, // Use same JWT token for consistency
             id: productId,
             quantity: quantity,
           );
@@ -277,8 +304,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling removeItem API: productId=$productId',
       );
 
-      // Get cart token first
+      // Get tokens before API call
       final cartToken = await _getCartToken();
+      final jwtToken = await _getJwtToken();
+
+      // Log token status
+      debugPrint(
+        '🛒 CartViewModel: removeItem - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: removeItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for removeItem');
         emit(CartErrorState(message: 'No cart token available'));
@@ -315,7 +352,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken,
-        jwtToken: await _getJwtToken(),
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
         key: itemKey,
       );
 
@@ -362,6 +399,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling updateItem API: productId=$productId, quantity=$quantity',
       );
 
+      // Get tokens before API call
+      final cartToken = await _getCartToken();
+      final jwtToken = await _getJwtToken();
+
+      // Log token status
+      debugPrint(
+        '🛒 CartViewModel: updateItem - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: updateItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
       // Find the cart item key for this product
       final currentState = state;
       if (currentState is! CartLoadedState) {
@@ -385,12 +434,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return;
       }
 
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint('❌ No cart token available for updateItem');
+        emit(CartErrorState(message: 'No cart token available'));
+        return;
+      }
+
       final response = await _cartService.updateItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
-        cartToken: await _getCartToken() ?? '',
-        jwtToken: await _getJwtToken(),
+        cartToken: cartToken,
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
         key: itemKey,
         quantity: quantity,
       );
@@ -446,8 +501,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       final currentState = state;
       if (currentState is! CartLoadedState) return;
 
-      // Get cart token first
+      // Get tokens before API call
       final cartToken = await _getCartToken();
+      final jwtToken = await _getJwtToken();
+
+      // Log token status
+      debugPrint(
+        '🛒 CartViewModel: applyCoupon - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: applyCoupon - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for applyCoupon');
         emit(CartErrorState(message: 'No cart token available'));
@@ -460,7 +525,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken,
-        jwtToken: await _getJwtToken(),
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
         code: couponCode,
       );
 
@@ -495,8 +560,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       final currentState = state;
       if (currentState is! CartLoadedState) return;
 
-      // Get cart token first
+      // Get tokens before API call
       final cartToken = await _getCartToken();
+      final jwtToken = await _getJwtToken();
+
+      // Log token status
+      debugPrint(
+        '🛒 CartViewModel: removeCoupon - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: removeCoupon - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
+      );
+
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for removeCoupon');
         emit(CartErrorState(message: 'No cart token available'));
@@ -509,7 +584,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken,
-        jwtToken: await _getJwtToken(),
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
         code: couponCode,
       );
 
@@ -581,11 +656,37 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     }
   }
 
-  /// Gets JWT token from storage
+  /// Gets JWT token from storage and formats it with Bearer prefix
+  /// Uses WooJwtTokenStorage for consistency with other view models
   Future<String?> _getJwtToken() async {
     try {
+      // Try to get JWT from WooJwtTokenStorage first (primary source)
+      final wooToken = await WooJwtTokenStorage.loadToken();
+      if (wooToken != null && !wooToken.isExpired) {
+        final token =
+            wooToken.authorizationHeader; // Already includes "Bearer " prefix
+        debugPrint(
+          '🛒 CartViewModel: JWT token from WooJwtTokenStorage: ${token.length > 30 ? token.substring(0, 30) + "..." : token}',
+        );
+        return token;
+      }
+
+      // Fallback to AuthStorageHelper (legacy support)
       final authStorage = AuthStorageHelper();
-      return await authStorage.getToken();
+      final token = await authStorage.getToken();
+      if (token != null && token.isNotEmpty) {
+        // Add Bearer prefix if not already present
+        final formattedToken = token.startsWith('Bearer ')
+            ? token
+            : 'Bearer $token';
+        debugPrint(
+          '🛒 CartViewModel: JWT token from AuthStorageHelper: ${formattedToken.length > 30 ? formattedToken.substring(0, 30) + "..." : formattedToken}',
+        );
+        return formattedToken;
+      }
+
+      debugPrint('⚠️ CartViewModel: No JWT token found in storage');
+      return null;
     } catch (e) {
       debugPrint('❌ Failed to get JWT token: $e');
       return null;
