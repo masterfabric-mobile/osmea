@@ -56,6 +56,7 @@ class ProductCardWidget extends StatelessWidget {
         subtitle: product.categories?.isNotEmpty ?? false
             ? _formatProductName(product.categories!.first.name ?? '')
             : null,
+        subtitle2: _buildPriceText(context, prices),
 
         // Text styling
         titleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
@@ -70,10 +71,17 @@ class ProductCardWidget extends StatelessWidget {
           height: 1.15,
           fontSize: context.fontSizeExtraSmall,
         ),
+        subtitle2Style: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.nordicBlue,
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.2,
+          fontSize: context.fontSizeSmall,
+        ),
 
         // Text overflow control
         titleMaxLines: 2,
         subtitleMaxLines: 1,
+        subtitle2MaxLines: 1,
         textOverflow: TextOverflow.ellipsis,
         // Spacing
         spacing: context.spacing8,
@@ -102,9 +110,6 @@ class ProductCardWidget extends StatelessWidget {
               )
             : null,
         badgePosition: BadgePosition.topLeft,
-
-        // Custom child for price section
-        child: _buildPriceSection(context, prices),
 
         // Custom image widget with wishlist overlay
         imageWidget: _buildImageWithWishlist(context),
@@ -138,32 +143,10 @@ class ProductCardWidget extends StatelessWidget {
       );
     }
 
-    return Stack(
-      children: [
-        Image.network(
-          product.images!.first.src ?? '',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: context.dynamicHeight(0.20),
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              height: context.dynamicHeight(0.20),
-              color: OsmeaColors.ash,
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.image_outlined,
-                color: OsmeaColors.pewter,
-                size: context.iconSizeHigh,
-              ),
-            );
-          },
-        ),
-        Positioned(
-          right: context.spacing8,
-          top: context.spacing8,
-          child: _buildWishlistButton(context),
-        ),
-      ],
+    return Positioned(
+      right: context.spacing8,
+      top: context.spacing8,
+      child: _buildWishlistButton(context),
     );
   }
 
@@ -187,56 +170,22 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  /// Builds price section widget
-  Widget _buildPriceSection(BuildContext context, dynamic prices) {
+  /// Builds price text for subtitle2
+  String _buildPriceText(BuildContext context, dynamic prices) {
     if (prices != null &&
         prices.salePrice != null &&
         prices.salePrice!.isNotEmpty &&
         prices.salePrice != prices.regularPrice) {
-      return OsmeaComponents.row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(
-            child: OsmeaComponents.text(
-              _formatPrice(prices.salePrice, prices.currencyCode),
-              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: OsmeaColors.nordicBlue,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.2,
-                fontSize: context.fontSizeSmall,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          OsmeaComponents.sizedBox(width: context.spacing4),
-          Flexible(
-            child: OsmeaComponents.text(
-              _formatPrice(prices.regularPrice, prices.currencyCode),
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                decoration: TextDecoration.lineThrough,
-                fontWeight: FontWeight.w300,
-                fontSize: context.fontSizeExtraSmall,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      // For sale items, show sale price and regular price
+      final salePrice = _formatPrice(prices.salePrice, prices.currencyCode);
+      final regularPrice = _formatPrice(
+        prices.regularPrice,
+        prices.currencyCode,
       );
+      return '$salePrice  $regularPrice';
     } else {
-      return OsmeaComponents.text(
-        _formatPrice(prices?.regularPrice, prices?.currencyCode ?? 'GBP'),
-        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-          color: OsmeaColors.thunder,
-          fontWeight: FontWeight.w500,
-          letterSpacing: -0.2,
-          fontSize: context.fontSizeSmall,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
+      // For regular items, show just the price
+      return _formatPrice(prices?.regularPrice, prices?.currencyCode ?? 'GBP');
     }
   }
 
