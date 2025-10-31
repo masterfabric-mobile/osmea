@@ -5,6 +5,8 @@ import 'package:storefront_woo/app/views/view_search/models/search_view_model.da
 import 'package:storefront_woo/app/views/view_search/models/module/states.dart'
     as search_states;
 import 'package:storefront_woo/app/views/view_home/widgets/product_card_widget.dart';
+import 'package:get_it/get_it.dart';
+import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 
 class SearchView
     extends
@@ -17,13 +19,8 @@ class SearchView
         horizontalPadding: const PaddingVisibility.disabled(),
         coreAppBar: (context, vm) => OsmeaComponents.appBarWithSearchBar(
           title: OsmeaComponents.text(
-            (vm.state is search_states.SearchLoadedState &&
-                    ((vm.state as search_states.SearchLoadedState)
-                            .title
-                            ?.isNotEmpty ??
-                        false))
-                ? (vm.state as search_states.SearchLoadedState).title!
-                : 'Search',
+            // Always show Categories as requested
+            'Categories',
             textStyle: OsmeaTextStyle.titleLarge(
               context,
             ).copyWith(fontWeight: FontWeight.w700, color: OsmeaColors.thunder),
@@ -101,7 +98,10 @@ class SearchView
           final product = state.results[index];
           return ProductCardWidget(
             product: product,
-            onWishlistTap: () {},
+            onWishlistTap: () {
+              // Use shared HomeViewModel for wishlist to keep messages/state in sync
+              GetIt.I<HomeViewModel>().addProductToWishlist(product.id ?? 0);
+            },
             onTap: () => context.push('/product-detail/${product.id ?? 0}'),
           );
         },
@@ -125,11 +125,20 @@ class SearchView
         OsmeaComponents.sizedBox(height: context.spacing8),
         ...categories.map((c) {
           return OsmeaComponents.listItem(
-            variant: ListItemVariant.standard,
+            variant: ListItemVariant.outlined,
+            size: ListItemSize.large,
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing12,
+              vertical: context.spacing10,
+            ),
+            margin: EdgeInsets.only(bottom: context.spacing8),
             title: OsmeaComponents.text(
               c.name ?? 'Category',
-              textStyle: OsmeaTextStyle.titleSmall(context),
+              textStyle: OsmeaTextStyle.titleSmall(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
             ),
+            trailing: Icon(Icons.chevron_right, color: OsmeaColors.pewter),
             onTap: () =>
                 viewModel.searchByCategory(c.id ?? 0, name: c.name ?? ''),
           );
