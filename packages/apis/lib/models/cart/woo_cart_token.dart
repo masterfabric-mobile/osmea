@@ -147,6 +147,17 @@ class WooCartTokenStorage {
   // Core package's LocalStorageHelper instance
   static final LocalStorageHelper _storage = LocalStorageHelper();
 
+  // Cache for cart token data
+  static WooCartToken? _cachedToken;
+  static DateTime? _lastCacheUpdate;
+  static const Duration _cacheValidityDuration = Duration(minutes: 1); // Cache valid for 1 minute
+
+  /// Clear cache (call when token is saved/cleared)
+  static void _clearCache() {
+    _cachedToken = null;
+    _lastCacheUpdate = null;
+  }
+
   /// 💾 Save cart token to storage using Core package's LocalStorageHelper
   static Future<void> saveCartToken(WooCartToken token) async {
     try {
@@ -188,6 +199,10 @@ class WooCartTokenStorage {
       debugPrint(
           '✅ Cart token saved using Core LocalStorageHelper successfully');
 
+      // Update cache
+      _cachedToken = token;
+      _lastCacheUpdate = DateTime.now();
+
       // Verify the token was saved correctly
       final savedToken = await loadCartToken();
       if (savedToken != null) {
@@ -202,10 +217,20 @@ class WooCartTokenStorage {
     }
   }
 
-  /// 📖 Load cart token from storage using Core package's LocalStorageHelper
+  /// 📖 Load cart token from storage using Core package's LocalStorageHelper (with cache)
   static Future<WooCartToken?> loadCartToken() async {
     try {
-      debugPrint('📖 Loading cart token using Core LocalStorageHelper...');
+      // Return cached token if available and valid
+      if (_cachedToken != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached token without debug log
+          return _cachedToken;
+        }
+      }
+
+      // Only log when actually loading from storage
+      debugPrint('📖 Loading cart token from storage...');
 
       // Initialize Core package's LocalStorageHelper if not already done
       await _storage.init();
@@ -298,6 +323,11 @@ class WooCartTokenStorage {
 
       debugPrint(
           '✅ Cart token loaded using Core LocalStorageHelper successfully');
+
+      // Update cache
+      _cachedToken = token;
+      _lastCacheUpdate = DateTime.now();
+
       return token;
     } catch (e, stackTrace) {
       debugPrint(
@@ -325,6 +355,9 @@ class WooCartTokenStorage {
       await _storage.removeItem(_cartIdKey);
       await _storage.removeItem(_userIdKey);
       await _storage.removeItem(_lastSavedKey);
+
+      // Clear cache
+      _clearCache();
 
       debugPrint(
           '✅ Cart token cleared using Core LocalStorageHelper successfully');
