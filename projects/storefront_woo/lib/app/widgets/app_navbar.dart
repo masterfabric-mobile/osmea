@@ -8,9 +8,11 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 /// Centralized navigation bar widget
-class AppNavbar extends StatelessWidget {
+class AppNavbar extends StatefulWidget {
   final int currentIndex;
   final Function(int)? onItemTap;
   final int wishlistCount;
@@ -23,32 +25,172 @@ class AppNavbar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: AuthStorageHelper().isAuthenticated(),
-      builder: (context, snapshot) {
-        final isAuthenticated = snapshot.data ?? false;
+  State<AppNavbar> createState() => _AppNavbarState();
+}
 
-        return OsmeaComponents.navbar(
-          variant: NavbarVariant.transparent,
-          size: NavbarSize.medium,
-          position: NavbarPosition.bottom,
-          currentIndex: currentIndex,
-          borderColor: OsmeaColors.silver,
-          elevation: .5,
-          backgroundColor: OsmeaColors.white,
-          items: _getNavbarItems(context, isAuthenticated),
-          onItemTap:
-              onItemTap ??
-              (index) => _navigateToPage(context, index, isAuthenticated),
+class _AppNavbarState extends State<AppNavbar> {
+  bool _isAuthenticated = false;
+  bool _isLoading = true;
+  DateTime? _lastAuthCheck;
+  static const Duration _authCheckInterval = Duration(seconds: 10); // Check every 10 seconds instead of every build
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+    // Set up periodic check (only once)
+    _schedulePeriodicCheck();
+  }
+
+  void _schedulePeriodicCheck() {
+    // Only check periodically if needed (not on every build)
+    Future.delayed(_authCheckInterval, () {
+      if (mounted) {
+        final now = DateTime.now();
+        // Only check if enough time has passed
+        if (_lastAuthCheck == null ||
+            now.difference(_lastAuthCheck!) >= _authCheckInterval) {
+          _checkAuthStatus();
+        }
+        // Schedule next check
+        _schedulePeriodicCheck();
+      }
+    });
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      // Check auth status - use direct token check to bypass cache if needed
+      final authHelper = AuthStorageHelper();
+      
+      // First check token directly (bypasses cache)
+      final token = await authHelper.getToken();
+      final hasToken = token != null && token.isNotEmpty;
+      
+      // If token exists, verify it's not expired
+      bool isAuthenticated = false;
+      if (hasToken) {
+        // Use isAuthenticated which checks expiry
+        isAuthenticated = await authHelper.isAuthenticated();
+      }
+      
+      if (mounted) {
+        setState(() {
+          _isAuthenticated = isAuthenticated;
+          _isLoading = false;
+          _lastAuthCheck = DateTime.now();
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error checking auth status in navbar: $e');
+      if (mounted) {
+        setState(() {
+          _isAuthenticated = false;
+          _isLoading = false;
+          _lastAuthCheck = DateTime.now();
+        });
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(AppNavbar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Always check auth status when widget updates (route changed or rebuild)
+    // This ensures navbar updates immediately after sign in
+    final now = DateTime.now();
+    if (_lastAuthCheck == null ||
+        now.difference(_lastAuthCheck!) >= const Duration(milliseconds: 500)) {
+      // Check immediately if enough time passed (500ms to prevent excessive calls)
+      _checkAuthStatus();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Try to get AuthCubit from GetIt - if available, listen to it for real-time updates
+    try {
+      final authCubit = GetIt.I<AuthCubit>();
+      // Listen to AuthCubit for real-time auth status updates
+      return BlocBuilder<AuthCubit, AuthState>(
+        bloc: authCubit,
+        builder: (context, authState) {
+          final isAuthenticated = authState is AuthAuthenticatedState &&
+              authState.isAuthenticated;
+          
+          // Also trigger initial load if needed
+          if (authState is AuthInitialState || authState is AuthUnauthenticatedState) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                authCubit.loadTokens();
+              }
+            });
+          }
+          
+          return _buildNavbar(context, isAuthenticated);
+        },
+      );
+    } catch (e) {
+      // Fallback to AuthStorageHelper if AuthCubit not available
+      debugPrint('⚠️ AuthCubit not available in GetIt, using AuthStorageHelper: $e');
+      
+      // Always check auth status on build (especially after navigation from sign in)
+      final now = DateTime.now();
+      if (_lastAuthCheck == null ||
+          now.difference(_lastAuthCheck!) >= const Duration(milliseconds: 500)) {
+        // Check auth status if enough time passed (500ms to prevent excessive calls)
+        _checkAuthStatus();
+      }
+
+      // Use cached value during loading
+      if (_isLoading) {
+        return FutureBuilder<bool>(
+          future: AuthStorageHelper().isAuthenticated(),
+          builder: (context, snapshot) {
+            final isAuthenticated = snapshot.data ?? false;
+            if (snapshot.hasData) {
+              // Update state once
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && _isLoading) {
+                  setState(() {
+                    _isAuthenticated = isAuthenticated;
+                    _isLoading = false;
+                    _lastAuthCheck = DateTime.now();
+                  });
+                }
+              });
+            }
+            return _buildNavbar(context, isAuthenticated);
+          },
         );
-      },
+      }
+
+      return _buildNavbar(context, _isAuthenticated);
+    }
+  }
+
+  Widget _buildNavbar(BuildContext context, bool isAuthenticated) {
+    return OsmeaComponents.navbar(
+      variant: NavbarVariant.transparent,
+      size: NavbarSize.medium,
+      position: NavbarPosition.bottom,
+      currentIndex: widget.currentIndex,
+      borderColor: OsmeaColors.silver,
+      elevation: .5,
+      backgroundColor: OsmeaColors.white,
+      items: _getNavbarItems(context, isAuthenticated),
+      onItemTap:
+          widget.onItemTap ??
+          (index) => _navigateToPage(context, index, isAuthenticated),
     );
   }
 
   /// Get navbar items (5 items: Home, Search, Saved, Cart, Profile/Sign In)
-  List<NavbarItem> _getNavbarItems(BuildContext context, bool isAuthenticated) {
-    final count = wishlistCount;
+  List<NavbarItem> _getNavbarItems(
+    BuildContext context,
+    bool isAuthenticated,
+  ) {
+    final count = widget.wishlistCount;
 
     return [
       NavbarItem(
@@ -82,13 +224,8 @@ class AppNavbar extends StatelessWidget {
         ),
         onTap: () {
           if (isAuthenticated) {
-            // Navigate to profile page (todo: create profile view)
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Profile feature coming soon!'),
-                backgroundColor: OsmeaColors.nordicBlue,
-              ),
-            );
+            // Navigate to profile page
+            context.go('/profile');
           } else {
             // Navigate to sign in page
             context.go('/auth');
@@ -116,13 +253,8 @@ class AppNavbar extends StatelessWidget {
         break;
       case 4: // Profile/Sign In
         if (isAuthenticated) {
-          // Navigate to profile page (todo: create profile view)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Profile feature coming soon!'),
-              backgroundColor: OsmeaColors.nordicBlue,
-            ),
-          );
+          // Navigate to profile page
+          context.go('/profile');
         } else {
           // Navigate to sign in page
           context.go('/auth');

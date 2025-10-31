@@ -1,5 +1,6 @@
 import 'package:storefront_woo/app/routes/app_routes.dart';
 import 'package:storefront_woo/app/core/config/config_di.dart';
+import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -68,6 +69,24 @@ launchApp({String environment = 'dev'}) async {
 
   // Configure dependency injection for the application
   await configureDependencies(environment: environment);
+
+  // Initialize AuthCubit and register in GetIt if not already registered
+  try {
+    try {
+      GetIt.I<AuthCubit>();
+      debugPrint('✅ AuthCubit already registered in GetIt');
+    } catch (e) {
+      // AuthCubit not registered - register it now as singleton
+      debugPrint('⚠️ AuthCubit not in GetIt, registering...');
+      final authCubit = AuthCubit();
+      GetIt.instance.registerSingleton<AuthCubit>(authCubit);
+      // Load initial tokens from storage
+      await authCubit.loadTokens();
+      debugPrint('✅ AuthCubit registered and initialized');
+    }
+  } catch (e) {
+    debugPrint('⚠️ Error initializing AuthCubit: $e');
+  }
 
   // 🎨 Get UI configuration from config helpers
   bool debugMode = configLoaded
