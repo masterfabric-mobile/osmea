@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:osmea_components/osmea_components.dart';
 
 /// Banner item model from config
 class BannerItem {
@@ -54,68 +53,54 @@ class BannerCarouselWidget extends StatelessWidget {
   }
 
   Widget _buildBannerItem(BuildContext context, BannerItem banner) {
-    // If image URL provided, show image
-    if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty) {
-      return GestureDetector(
-        onTap: banner.onTap,
-        child: Container(
-          width: double.infinity,
-          height: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              banner.imageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildTextBanner(context, banner);
-              },
-            ),
-          ),
-        ),
-      );
-    }
+    return GestureDetector(
+      onTap: banner.onTap,
+      child: OsmeaComponents.imageCard(
+        // Image configuration
+        imageUrl: banner.imageUrl,
+        imageHeight: 200,
+        imageFit: BoxFit.cover,
+        imageAlignment: Alignment.center,
+        imagePosition: banner.imageUrl != null && banner.imageUrl!.isNotEmpty
+            ? ComponentPosition.center
+            : ComponentPosition.top,
 
-    // Otherwise, show text banner
-    return _buildTextBanner(context, banner);
-  }
-
-  Widget _buildTextBanner(BuildContext context, BannerItem banner) {
-    return OsmeaComponents.container(
-      decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue.withOpacity(0.1),
+        // Card appearance
+        variant: ComponentAppearance.filled,
+        size: ComponentSize.medium,
+        backgroundColor: OsmeaColors.nordicBlue,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: OsmeaColors.nordicBlue.withOpacity(0.3),
-          width: 1,
+        width: double.infinity,
+        height: 200,
+
+        // Content
+        title: banner.title,
+        content: banner.text,
+
+        // Text styling for overlay on background images
+        titleStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
+          fontWeight: FontWeight.w700,
+          color: OsmeaColors.white,
+          shadows: [Shadow(color: OsmeaColors.thunder, blurRadius: 2)],
         ),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (banner.title != null && banner.title!.isNotEmpty)
-            OsmeaComponents.text(
-              banner.title!,
-              textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                fontWeight: FontWeight.w700,
-                color: OsmeaColors.thunder,
-              ),
-            ),
-          // subtitle intentionally omitted per design
-          if (banner.text != null && banner.text!.isNotEmpty) ...[
-            OsmeaComponents.sizedBox(height: 12),
-            OsmeaComponents.text(
-              banner.text!,
-              textStyle: OsmeaTextStyle.bodyMedium(
-                context,
-              ).copyWith(color: OsmeaColors.thunder),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ],
+        contentStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.white,
+          shadows: [Shadow(color: OsmeaColors.thunder, blurRadius: 2)],
+        ),
+
+        // Text overflow control
+        titleMaxLines: 2,
+        contentMaxLines: 3,
+        textOverflow: TextOverflow.ellipsis,
+        spacing: 12,
+
+        // Show overlay for better text readability on background images
+        showOverlay: banner.imageUrl != null && banner.imageUrl!.isNotEmpty,
+        overlayGradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.transparent, OsmeaColors.thunder],
+        ),
       ),
     );
   }
