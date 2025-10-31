@@ -200,12 +200,26 @@ class WooCartTokenInterceptor extends Interceptor {
         }
       }
 
-      // Save cart token if found
+      // Save cart token if found, but only if:
+      // 1. No existing token, OR
+      // 2. Existing token is expired/invalid
       if (cartToken != null && cartToken.isNotEmpty) {
-        await _saveCartToken(
-            cartToken, cartId, response.requestOptions.uri.toString());
-        debugPrint(
-            '🛒 Cart token extracted and saved: ${cartToken.length > 20 ? cartToken.substring(0, 20) + "..." : cartToken}');
+        // Check if we have a valid existing token
+        final existingToken = await WooCartTokenStorage.loadCartToken();
+        final shouldSave = existingToken == null ||
+            (existingToken.expiresAt != null &&
+                DateTime.now().isAfter(existingToken.expiresAt!)) ||
+            existingToken.cartToken.isEmpty;
+
+        if (shouldSave) {
+          await _saveCartToken(
+              cartToken, cartId, response.requestOptions.uri.toString());
+          debugPrint(
+              '🛒 Cart token extracted and saved: ${cartToken.length > 20 ? cartToken.substring(0, 20) + "..." : cartToken}');
+        } else {
+          debugPrint(
+              'ℹ️ Cart token found in response but existing token is still valid. Keeping existing token.');
+        }
       } else {
         debugPrint('⚠️ No cart token found in response');
       }
