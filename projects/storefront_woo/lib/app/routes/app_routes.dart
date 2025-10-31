@@ -9,12 +9,16 @@ import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
+import 'package:storefront_woo/app/views/view_auth_debug/auth_debug_view.dart';
+import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
+import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
+import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:get_it/get_it.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -221,6 +225,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/auth',
       builder: (BuildContext context, GoRouterState state) {
+        // Check if user is already authenticated - redirect to profile
+        AuthStorageHelper().isAuthenticated().then((isAuthenticated) {
+          if (isAuthenticated && context.mounted) {
+            debugPrint('👤 User already authenticated, redirecting to profile');
+            context.go('/profile');
+          }
+        });
+
         // Get initial tab from query parameter (0 = Sign In, 1 = Sign Up)
         final initialTab =
             int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0;
@@ -300,19 +312,75 @@ final GoRouter appRouter = GoRouter(
 
             if (response.success && response.data != null) {
               // Get JWT token from jwt or accessToken field
-              final jwtToken = response.data!.jwt ?? response.data!.accessToken;
+              final jwtTokenString =
+                  response.data!.jwt ?? response.data!.accessToken;
 
-              if (jwtToken != null && jwtToken.isNotEmpty) {
-                // Save token to storage
+              if (jwtTokenString != null && jwtTokenString.isNotEmpty) {
+                // Create WooJwtToken
+                final wooJwtToken = WooJwtToken(
+                  accessToken: jwtTokenString,
+                  tokenType: response.data!.tokenType ?? 'Bearer',
+                  expiresIn: response.data!.expiresIn ?? 3600,
+                  issuedAt: response.data!.issuedAt ?? DateTime.now(),
+                  refreshToken: response.data!.refreshToken,
+                  scope: response.data!.scope,
+                  userData: response.data!.user != null
+                      ? response.data!.user!.toJson()
+                      : <String, dynamic>{},
+                );
+
+                // Save to all storages for backward compatibility
                 final authStorage = AuthStorageHelper();
-                await authStorage.saveToken(jwtToken);
-
-                // Save user data
+                await authStorage.saveToken(jwtTokenString);
                 if (response.data!.user != null) {
                   await authStorage.saveUserData(response.data!.user!.toJson());
                 }
+                await WooJwtTokenStorage.saveToken(wooJwtToken);
 
-                debugPrint('✅ Sign in successful - Token saved');
+                // Save to AuthCubit (HydratedCubit storage) - this is the primary storage now
+                try {
+                  AuthCubit? authCubit;
+                  try {
+                    authCubit = GetIt.I<AuthCubit>();
+                  } catch (e) {
+                    // AuthCubit not registered - register it now as singleton
+                    debugPrint(
+                      '⚠️ AuthCubit not in GetIt, registering manually...',
+                    );
+                    authCubit = AuthCubit();
+                    GetIt.instance.registerSingleton<AuthCubit>(authCubit);
+                    // Load initial tokens
+                    await authCubit.loadTokens();
+                    debugPrint(
+                      '✅ AuthCubit manually registered and initialized',
+                    );
+                  }
+
+                  // Save token and refresh state
+                  // Also save WooCommerce-specific tokens as metadata
+                  await authCubit.saveJwtToken(
+                    jwtToken: jwtTokenString,
+                    userData: response.data!.user?.toJson(),
+                    metadata: {
+                      'wooJwtToken': wooJwtToken.toJson(),
+                      // Cart token will be added by cart interceptor
+                    },
+                  );
+                  // Also refresh tokens to ensure state is fully updated
+                  await authCubit.loadTokens();
+                  debugPrint(
+                    '✅ AuthCubit: JWT token saved to HydratedCubit storage and state refreshed',
+                  );
+                } catch (e) {
+                  debugPrint(
+                    '⚠️ AuthCubit: Error saving token to AuthCubit: $e',
+                  );
+                  // Continue anyway - tokens saved to other storages
+                }
+
+                debugPrint(
+                  '✅ Sign in successful - Tokens saved to all storages including AuthCubit',
+                );
                 return true;
               } else {
                 debugPrint('❌ JWT token not found in response');
@@ -433,15 +501,25 @@ final GoRouter appRouter = GoRouter(
             }
           },
           initialTab: initialTab,
+          defaultRedirectPath:
+              '/home', // Default redirect path after successful sign in
           onSignInSuccess: () {
-            debugPrint('✅ Sign in successful!');
-            // Check if there's a return path
-            final returnTo = state.uri.queryParameters['returnTo'];
-            if (returnTo != null && returnTo.isNotEmpty) {
-              context.go(returnTo);
-            } else {
-              context.go('/home');
-            }
+            debugPrint('✅ Sign in successful! Navigating...');
+            // Small delay to ensure tokens are saved
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (!context.mounted) return;
+              // Check if there's a return path
+              final returnTo = state.uri.queryParameters['returnTo'];
+              if (returnTo != null && returnTo.isNotEmpty) {
+                debugPrint('🔄 Navigating to return path: $returnTo');
+                context.go(returnTo);
+              } else {
+                // Use default redirect path from AuthView parameter
+                const defaultPath = '/home';
+                debugPrint('🏠 Navigating to default path: $defaultPath');
+                context.go(defaultPath);
+              }
+            });
           },
           onSignInError: (error) {
             debugPrint('❌ Sign in error: $error');
@@ -487,6 +565,50 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
+    // Auth Debug Route (only visible when authenticated)
+    GoRoute(
+      path: '/auth-debug',
+      builder: (BuildContext context, GoRouterState state) {
+        return AuthDebugView(
+          goRoute: (String path) {
+            if (path.contains('home')) {
+              context.go('/home');
+            } else {
+              context.go('/home');
+            }
+          },
+        );
+      },
+    ),
+
+    // Profile Route
+    GoRoute(
+      path: '/profile',
+      builder: (BuildContext context, GoRouterState state) {
+        return BlocProvider<ProfileViewModel>(
+          create: (context) => GetIt.I<ProfileViewModel>(),
+          child: BlocBuilder<WishlistViewModel, WishlistState>(
+            bloc: GetIt.I<WishlistViewModel>(),
+            builder: (context, wishlistState) {
+              return ProfileView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                bottomNavigationBar: _getNavbarForRoute(
+                  state.uri.path,
+                  GetIt.I<WishlistViewModel>().count,
+                ),
+              );
+            },
+          ),
+        );
+      },
+    ),
+
     // Product Detail Route
     GoRoute(
       path: '/product-detail/:productId',
@@ -528,7 +650,8 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
   if (location == '/home' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/search') {
+      location == '/search' ||
+      location == '/profile') {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
     } else if (location == '/search') {
@@ -537,8 +660,13 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
     } else if (location == '/cart') {
       return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
+    } else if (location == '/profile') {
+      return AppNavbar(
+        currentIndex: 4,
+        wishlistCount: wishlistCount,
+      ); // Profile
     }
   }
-  // No navbar for splash, onboarding, auth, product-detail
+  // No navbar for splash, onboarding, auth, product-detail, auth-debug
   return null;
 }
