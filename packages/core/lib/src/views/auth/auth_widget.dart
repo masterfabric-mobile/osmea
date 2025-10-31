@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
 import 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
@@ -73,14 +74,21 @@ class _AuthWidgetState extends State<AuthWidget> {
         _lastSignInStatus != SignInStatus.success) {
       _lastSignInStatus = SignInStatus.success;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSignInSuccess?.call();
+        if (mounted && widget.onSignInSuccess != null) {
+          debugPrint('✅ Calling onSignInSuccess callback...');
+          widget.onSignInSuccess?.call();
+        } else {
+          debugPrint('⚠️ onSignInSuccess callback not available or widget not mounted');
+        }
       });
     } else if (widget.signInState.status == SignInStatus.error &&
         widget.signInState.errorMessage != null &&
         _lastSignInStatus != SignInStatus.error) {
       _lastSignInStatus = SignInStatus.error;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSignInError?.call(widget.signInState.errorMessage!);
+        if (mounted && widget.onSignInError != null) {
+          widget.onSignInError?.call(widget.signInState.errorMessage!);
+        }
       });
     }
   }
@@ -90,6 +98,28 @@ class _AuthWidgetState extends State<AuthWidget> {
   }
 
   void _switchTab(int index) {
+    // If trying to access Sign Up tab (index 1) but sign up is disabled, redirect to profile
+    if (index == 1 && widget.signUpCallback == null) {
+      debugPrint('⚠️ Sign Up is disabled, redirecting to profile');
+      // Try to navigate using context
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          // Use go_router to navigate to profile
+          try {
+            final context = this.context;
+            if (context.mounted) {
+              // Try using Navigator or GoRouter
+              final router = GoRouter.of(context);
+              router.go('/profile');
+            }
+          } catch (e) {
+            debugPrint('⚠️ Could not navigate to profile: $e');
+          }
+        }
+      });
+      return;
+    }
+
     setState(() {
       _currentTab = index;
     });
@@ -225,46 +255,47 @@ class _AuthWidgetState extends State<AuthWidget> {
                                 ),
                               ),
                             ),
-                            // Sign Up Tab
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _switchTab(1),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: _currentTab == 1
-                                        ? OsmeaColors.white
-                                        : Colors.transparent,
-                                    borderRadius:
-                                        BorderRadius.circular(tabItemRadius),
-                                    boxShadow: _currentTab == 1
-                                        ? [
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withOpacity(0.05),
-                                              blurRadius: 4,
-                                              offset: Offset(0, 2),
-                                            ),
-                                          ]
-                                        : null,
-                                  ),
-                                  child: Center(
-                                    child: OsmeaComponents.text(
-                                      _getConfigValue(
-                                          'sign_up', 'tab_sign_up', 'Sign Up'),
-                                      variant: OsmeaTextVariant.bodyLarge,
-                                      fontWeight: _currentTab == 1
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
+                            // Sign Up Tab - Only show if sign up callback is available
+                            if (widget.signUpCallback != null)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => _switchTab(1),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
                                       color: _currentTab == 1
-                                          ? OsmeaColors.thunder
-                                          : OsmeaColors.thunder
-                                              .withOpacity(0.5),
+                                          ? OsmeaColors.white
+                                          : Colors.transparent,
+                                      borderRadius:
+                                          BorderRadius.circular(tabItemRadius),
+                                      boxShadow: _currentTab == 1
+                                          ? [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.05),
+                                                blurRadius: 4,
+                                                offset: Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    child: Center(
+                                      child: OsmeaComponents.text(
+                                        _getConfigValue('sign_up',
+                                            'tab_sign_up', 'Sign Up'),
+                                        variant: OsmeaTextVariant.bodyLarge,
+                                        fontWeight: _currentTab == 1
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                        color: _currentTab == 1
+                                            ? OsmeaColors.thunder
+                                            : OsmeaColors.thunder
+                                                .withOpacity(0.5),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),

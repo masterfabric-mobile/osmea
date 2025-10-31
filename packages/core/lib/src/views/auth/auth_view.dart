@@ -20,6 +20,8 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
   final Function(String error)? onSignUpError;
   final VoidCallback? onForgotPasswordTap;
   final int initialTab; // 0 = Sign In, 1 = Sign Up
+  final String?
+      defaultRedirectPath; // Default path to redirect after successful sign in
 
   AuthView({
     required super.goRoute,
@@ -34,11 +36,24 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
     this.onSignUpError,
     this.onForgotPasswordTap,
     this.initialTab = 0,
+    this.defaultRedirectPath,
   });
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
     debugPrint('🔐 Auth View initializing...');
+
+    // Check if user is already authenticated - redirect to default path
+    final authStorage = AuthStorageHelper();
+    final isAuthenticated = await authStorage.isAuthenticated();
+    if (isAuthenticated) {
+      final redirectPath = defaultRedirectPath ?? '/home';
+      debugPrint(
+          '👤 User already authenticated, redirecting to: $redirectPath');
+      // Navigate using goRoute if available
+      goRoute(redirectPath);
+      return;
+    }
 
     // Configure Sign In callback
     final signInCallback = arguments['onSignIn'] as Future<bool> Function(
@@ -51,6 +66,16 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
       debugPrint('✅ Sign In callback configured');
     } else {
       debugPrint('⚠️ Sign In callback not found');
+    }
+
+    // Check if Sign Up is disabled - if no sign up callback, sign up tab should redirect to profile
+    final signUpCallback = arguments['onSignUp'] as Future<bool> Function(
+      String,
+      String,
+      bool,
+    )?;
+    if (signUpCallback == null) {
+      debugPrint('⚠️ Sign Up callback not found - Sign Up is disabled');
     }
   }
 
@@ -68,11 +93,25 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
           bool,
         )?;
 
+        // Create wrapper callback that uses defaultRedirectPath if callback is null
+        VoidCallback? wrappedOnSignInSuccess;
+        if (onSignInSuccess != null) {
+          wrappedOnSignInSuccess = onSignInSuccess;
+        } else if (defaultRedirectPath != null) {
+          // If no callback provided, use defaultRedirectPath
+          wrappedOnSignInSuccess = () {
+            final path = defaultRedirectPath!;
+            debugPrint(
+                '✅ Sign in successful! Navigating to default path: $path');
+            goRoute(path);
+          };
+        }
+
         return AuthWidget(
           signInViewModel: viewModel,
           signInState: state,
           signUpCallback: signUpCallback,
-          onSignInSuccess: onSignInSuccess,
+          onSignInSuccess: wrappedOnSignInSuccess,
           onSignInError: onSignInError,
           onSignUpSuccess: onSignUpSuccess,
           onSignUpError: onSignUpError,
