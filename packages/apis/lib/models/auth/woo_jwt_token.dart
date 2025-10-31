@@ -24,20 +24,25 @@ class WooJwtToken {
 
   factory WooJwtToken.fromJson(Map<String, dynamic> json) {
     // { "access_token": "..." }  |  { "jwt": "..." }  |  { "token": "..." }
-    final dynamic accessCandidate = json['access_token'] ?? json['jwt'] ?? json['token'];
+    final dynamic accessCandidate =
+        json['access_token'] ?? json['jwt'] ?? json['token'];
     final String accessToken = accessCandidate?.toString() ?? '';
 
-    final String tokenType = (json['token_type'] ?? json['type'] ?? 'Bearer').toString();
+    final String tokenType =
+        (json['token_type'] ?? json['type'] ?? 'Bearer').toString();
 
     final dynamic exp = json['expires_in'];
-    final int expiresIn = exp is int ? exp : int.tryParse(exp?.toString() ?? '') ?? 3600;
+    final int expiresIn =
+        exp is int ? exp : int.tryParse(exp?.toString() ?? '') ?? 3600;
 
     final dynamic issuedRaw = json['issued_at'] ?? json['iat'];
     DateTime issuedAt;
     if (issuedRaw == null) {
       issuedAt = DateTime.now();
     } else if (issuedRaw is int) {
-      issuedAt = DateTime.fromMillisecondsSinceEpoch(issuedRaw * 1000, isUtc: true).toLocal();
+      issuedAt =
+          DateTime.fromMillisecondsSinceEpoch(issuedRaw * 1000, isUtc: true)
+              .toLocal();
     } else {
       issuedAt = DateTime.tryParse(issuedRaw.toString()) ?? DateTime.now();
     }
@@ -45,7 +50,9 @@ class WooJwtToken {
     final String? refreshToken = json['refresh_token']?.toString();
     final String? scope = json['scope']?.toString();
     final Map<String, dynamic>? userData =
-        json['user_data'] is Map<String, dynamic> ? json['user_data'] as Map<String, dynamic> : null;
+        json['user_data'] is Map<String, dynamic>
+            ? json['user_data'] as Map<String, dynamic>
+            : null;
 
     return WooJwtToken(
       accessToken: accessToken,
@@ -137,11 +144,24 @@ class WooJwtTokenStorage {
   // Core package's LocalStorageHelper instance
   static final LocalStorageHelper _storage = LocalStorageHelper();
 
+  // Cache for token data
+  static WooJwtToken? _cachedToken;
+  static DateTime? _lastCacheUpdate;
+  static const Duration _cacheValidityDuration =
+      Duration(minutes: 1); // Cache valid for 1 minute
+
+  /// Clear cache (call when token is saved/cleared)
+  static void _clearCache() {
+    _cachedToken = null;
+    _lastCacheUpdate = null;
+  }
+
   /// 💾 Save JWT token to storage using Core package's LocalStorageHelper
   static Future<void> saveToken(WooJwtToken token) async {
     try {
       debugPrint('💾 Saving JWT token using Core LocalStorageHelper...');
-      debugPrint('🔐 Access token: ${token.accessToken.length > 20 ? token.accessToken.substring(0, 20) + "..." : token.accessToken}');
+      debugPrint(
+          '🔐 Access token: ${token.accessToken.length > 20 ? token.accessToken.substring(0, 20) + "..." : token.accessToken}');
       debugPrint('🔑 Token type: ${token.tokenType}');
       debugPrint('⏰ Expires in: ${token.expiresIn} seconds');
       debugPrint('📅 Issued at: ${token.issuedAt}');
@@ -186,7 +206,7 @@ class WooJwtTokenStorage {
       await _storage.setItem(_expiresInKey, token.expiresIn);
       debugPrint('🔍 Saved expires in');
       await _storage.setItem(
-            _tokenExpiryKey, token.expiresAt.toIso8601String());
+          _tokenExpiryKey, token.expiresAt.toIso8601String());
       debugPrint('🔍 Saved expires at');
       await _storage.setItem(_userDataKey, json.encode(token.userData ?? {}));
       debugPrint('🔍 Saved user data');
@@ -195,7 +215,12 @@ class WooJwtTokenStorage {
 
       debugPrint(
           '✅ JWT token saved using Core LocalStorageHelper successfully');
-        debugPrint('🔍 Verification - Reading back from storage:');
+
+      // Update cache
+      _cachedToken = token;
+      _lastCacheUpdate = DateTime.now();
+
+      debugPrint('🔍 Verification - Reading back from storage:');
 
       // Verify the token was saved correctly
       final savedToken = await loadToken();
@@ -215,10 +240,25 @@ class WooJwtTokenStorage {
     }
   }
 
-  /// 📖 Load JWT token from storage using Core package's LocalStorageHelper
+  /// 📖 Load JWT token from storage using Core package's LocalStorageHelper (with cache)
   static Future<WooJwtToken?> loadToken() async {
     try {
-      debugPrint('📖 Loading JWT token using Core LocalStorageHelper...');
+      // Return cached token if available and valid
+      if (_cachedToken != null && _lastCacheUpdate != null) {
+        final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
+        if (cacheAge < _cacheValidityDuration) {
+          // Return cached token if not expired (without debug log)
+          if (!_cachedToken!.isExpired) {
+            return _cachedToken;
+          } else {
+            // Token expired, clear cache
+            _clearCache();
+          }
+        }
+      }
+
+      // Only log when actually loading from storage
+      debugPrint('📖 Loading JWT token from storage...');
 
       // Initialize Core package's LocalStorageHelper if not already done
       await _storage.init();
@@ -233,15 +273,15 @@ class WooJwtTokenStorage {
       final userDataString = await _storage.getItem(_userDataKey);
 
       debugPrint('🔍 Loaded from Core LocalStorageHelper:');
-        debugPrint(
+      debugPrint(
           '  - Access token: ${accessToken != null ? "Present" : "Not found"}');
-        debugPrint(
+      debugPrint(
           '  - Refresh token: ${refreshToken != null ? "Present" : "Not found"}');
       debugPrint('  - Token type: $tokenType');
       debugPrint('  - Scope: $scope');
       debugPrint('  - Issued at: $issuedAtString');
       debugPrint('  - Expires in: $expiresIn');
-        debugPrint(
+      debugPrint(
           '  - User data: ${userDataString != null ? "Present" : "Not found"}');
 
       // Check if we have the minimum required data
@@ -287,8 +327,8 @@ class WooJwtTokenStorage {
       }
 
       // Create the token object
-        final token = WooJwtToken(
-          accessToken: accessToken,
+      final token = WooJwtToken(
+        accessToken: accessToken,
         tokenType: tokenType ?? 'Bearer',
         expiresIn: expiresInSeconds,
         issuedAt: issuedAt,
@@ -309,6 +349,10 @@ class WooJwtTokenStorage {
       debugPrint('📊 Loaded scope: ${token.scope ?? "None"}');
       debugPrint(
           '👤 Loaded user data: ${token.userData != null ? "Present" : "Not present"}');
+
+      // Update cache
+      _cachedToken = token;
+      _lastCacheUpdate = DateTime.now();
 
       return token;
     } catch (e, stackTrace) {
@@ -337,10 +381,13 @@ class WooJwtTokenStorage {
       await _storage.removeItem(_userDataKey);
       await _storage.removeItem(_lastSavedKey);
 
-        debugPrint(
+      // Clear cache
+      _clearCache();
+
+      debugPrint(
           '✅ JWT token cleared using Core LocalStorageHelper successfully');
     } catch (e, stackTrace) {
-        debugPrint(
+      debugPrint(
           '❌ Error clearing JWT token using Core LocalStorageHelper: $e');
       debugPrint('❌ Stack trace: $stackTrace');
       rethrow;
@@ -415,61 +462,61 @@ class WooJwtTokenStorage {
 
   /// 🔄 Check if token needs refresh
   static Future<bool> needsRefresh() async {
-      final token = await loadToken();
+    final token = await loadToken();
     return token?.needsRefresh ?? true;
   }
 
   /// 📋 Get token information
   static Future<Map<String, dynamic>?> getTokenInfo() async {
-      final token = await loadToken();
+    final token = await loadToken();
     if (token == null) return null;
 
-      return {
+    return {
       'accessToken': token.accessToken,
       'tokenType': token.tokenType,
       'expiresIn': token.expiresIn,
       'issuedAt': token.issuedAt.toIso8601String(),
       'expiresAt': token.expiresAt.toIso8601String(),
-        'isExpired': token.isExpired,
-        'needsRefresh': token.needsRefresh,
+      'isExpired': token.isExpired,
+      'needsRefresh': token.needsRefresh,
       'refreshToken': token.refreshToken,
-        'scope': token.scope,
-        'userData': token.userData,
+      'scope': token.scope,
+      'userData': token.userData,
     };
   }
 
   /// ✅ Check if token exists
   static Future<bool> hasToken() async {
-      final token = await loadToken();
-      return token != null;
+    final token = await loadToken();
+    return token != null;
   }
 
   /// ⏰ Get token expiry date
   static Future<DateTime?> getTokenExpiry() async {
-      final token = await loadToken();
-      return token?.expiresAt;
+    final token = await loadToken();
+    return token?.expiresAt;
   }
 
   /// 👤 Get user data
   static Future<Map<String, dynamic>?> getUserData() async {
-      final token = await loadToken();
-      return token?.userData;
+    final token = await loadToken();
+    return token?.userData;
   }
 
   /// 🔄 Update user data
   static Future<void> updateUserData(Map<String, dynamic> userData) async {
-      final token = await loadToken();
-      if (token != null) {
-        final updatedToken = WooJwtToken(
-          accessToken: token.accessToken,
-          tokenType: token.tokenType,
-          expiresIn: token.expiresIn,
-          issuedAt: token.issuedAt,
-          refreshToken: token.refreshToken,
-          scope: token.scope,
-          userData: userData,
-        );
-        await saveToken(updatedToken);
+    final token = await loadToken();
+    if (token != null) {
+      final updatedToken = WooJwtToken(
+        accessToken: token.accessToken,
+        tokenType: token.tokenType,
+        expiresIn: token.expiresIn,
+        issuedAt: token.issuedAt,
+        refreshToken: token.refreshToken,
+        scope: token.scope,
+        userData: userData,
+      );
+      await saveToken(updatedToken);
     }
   }
 
