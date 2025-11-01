@@ -39,17 +39,26 @@ class WebCookieManager extends Interceptor {
   }
 
   /// 🍪 Parse Set-Cookie header and extract cookies
+  /// 
+  /// Note: Each Set-Cookie header is a single cookie, not comma-separated.
+  /// Multiple Set-Cookie headers come as separate items in the headers list.
   Map<String, String> _parseSetCookieHeader(String setCookieHeader) {
     final Map<String, String> cookies = {};
-    final cookiePairs = setCookieHeader.split(',');
-
-    for (final pair in cookiePairs) {
-      final trimmedPair = pair.trim();
-      final cookieParts = trimmedPair.split(';');
-      if (cookieParts.isNotEmpty) {
-        final nameValue = cookieParts[0].split('=');
-        if (nameValue.length == 2) {
-          cookies[nameValue[0].trim()] = nameValue[1].trim();
+    
+    // Set-Cookie format: name=value; attribute1=value1; attribute2=value2
+    // We only need the name=value part (the first part before semicolon)
+    final cookieParts = setCookieHeader.split(';');
+    if (cookieParts.isNotEmpty) {
+      final nameValue = cookieParts[0].trim().split('=');
+      if (nameValue.length >= 2) {
+        // Handle case where value might contain '=' characters
+        final name = nameValue[0].trim();
+        final value = cookieParts[0]
+            .substring(cookieParts[0].indexOf('=') + 1)
+            .trim();
+        if (name.isNotEmpty && value.isNotEmpty) {
+          cookies[name] = value;
+          debugPrint('🍪 Parsed cookie: $name=${value.length > 50 ? value.substring(0, 50) + "..." : value}');
         }
       }
     }

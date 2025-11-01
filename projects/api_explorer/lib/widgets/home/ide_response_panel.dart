@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:core/core.dart';
+import 'package:apis/dio_config/dio_client/api_dio_client.dart';
+import 'package:flutter/foundation.dart';
 
 class IdeResponsePanel extends StatefulWidget {
   final Map<String, dynamic>? responseData;
@@ -28,6 +30,10 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
 
   // Tab management
   int _selectedTab = 0;
+
+  // Cookies storage
+  Map<String, String> _storedCookies = {};
+  bool _cookiesLoaded = false;
 
   // Code content
   final String _accessScopeCode =
@@ -166,6 +172,35 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
 
     // Split code into lines
     _codeLines.addAll(_accessScopeCode.split('\n'));
+
+    // Load stored cookies
+    _loadStoredCookies();
+  }
+
+  /// 🍪 Load stored cookies from apis package
+  Future<void> _loadStoredCookies() async {
+    try {
+      if (kIsWeb) {
+        // Use WebCookieManager on web
+        final cookies = await ApiDioClient.webCookieManager.getAllCookies();
+        setState(() {
+          _storedCookies = cookies;
+          _cookiesLoaded = true;
+        });
+        debugPrint(
+            '🍪 Loaded ${cookies.length} stored cookies from WebCookieManager');
+      } else {
+        // On mobile, cookies are managed by CookieManager (PersistCookieJar)
+        setState(() {
+          _cookiesLoaded = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading stored cookies: $e');
+      setState(() {
+        _cookiesLoaded = true;
+      });
+    }
   }
 
   @override
@@ -688,6 +723,17 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
     final cartToken = widget.responseData?['cart_token'] as String?;
     final cartId = widget.responseData?['cart_id'] as String?;
 
+    // Check if response contains cookies from handler
+    final responseCookies =
+        widget.responseData?['response_cookies'] as Map<String, dynamic>?;
+    final hasResponseCookies =
+        responseCookies != null && responseCookies.isNotEmpty;
+
+    // Refresh cookies when response data changes
+    if (widget.responseData != null && !widget.loading) {
+      _loadStoredCookies();
+    }
+
     // Show response data in JSON format
     return OsmeaComponents.container(
       color: _ideTheme ? OsmeaColors.eclipse : OsmeaColors.white,
@@ -700,7 +746,15 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
               // Cart Token Display Section (if available)
               if (hasCartToken && cartToken != null)
                 _buildCartTokenSection(cartToken, cartId, isNarrow),
-              
+
+              // Response Cookies Table (from handler response)
+              if (hasResponseCookies)
+                _buildResponseCookiesTable(responseCookies, isNarrow),
+
+              // Cookies Display Section (stored cookies from localStorage)
+              if (kIsWeb && _cookiesLoaded && _storedCookies.isNotEmpty)
+                _buildCookiesSection(isNarrow),
+
               // Main response content
               Expanded(
                 child: OsmeaComponents.row(
@@ -787,7 +841,8 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
   }
 
   /// 🛒 Build cart token display section
-  Widget _buildCartTokenSection(String cartToken, String? cartId, bool isNarrow) {
+  Widget _buildCartTokenSection(
+      String cartToken, String? cartId, bool isNarrow) {
     return OsmeaComponents.container(
       margin: EdgeInsets.all(isNarrow ? 8 : 12),
       padding: EdgeInsets.all(isNarrow ? 12 : 16),
@@ -846,7 +901,7 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
             ],
           ),
           OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
-          
+
           // Cart Token Value
           OsmeaComponents.container(
             width: double.infinity,
@@ -868,7 +923,7 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
               ),
             ),
           ),
-          
+
           // Cart ID (if available)
           if (cartId != null && cartId.isNotEmpty) ...[
             OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
@@ -879,11 +934,342 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
               fontSize: isNarrow ? 10 : 11,
             ),
           ],
-          
+
           // Info text
           OsmeaComponents.sizedBox(height: isNarrow ? 6 : 8),
           OsmeaComponents.text(
             'This token is automatically stored in local storage and refreshed on each request.',
+            variant: OsmeaTextVariant.bodySmall,
+            color: _ideTheme ? OsmeaColors.slate : OsmeaColors.steel,
+            fontSize: isNarrow ? 9 : 10,
+            fontStyle: FontStyle.italic,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🍪 Build response cookies table (from handler response)
+  Widget _buildResponseCookiesTable(
+      Map<String, dynamic> cookies, bool isNarrow) {
+    // Convert cookies to String map
+    final cookieMap =
+        cookies.map((key, value) => MapEntry(key, value.toString()));
+
+    return OsmeaComponents.container(
+      margin: EdgeInsets.all(isNarrow ? 8 : 12),
+      padding: EdgeInsets.all(isNarrow ? 12 : 16),
+      decoration: BoxDecoration(
+        color: _ideTheme ? OsmeaColors.shark : OsmeaColors.snow,
+        borderRadius: BorderRadius.circular(isNarrow ? 8 : 12),
+        border: Border.all(
+          color: OsmeaColors.forestHeart,
+          width: 1.5,
+        ),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          OsmeaComponents.row(
+            children: [
+              Icon(
+                Icons.table_chart_rounded,
+                color: OsmeaColors.forestHeart,
+                size: isNarrow ? 16 : 20,
+              ),
+              OsmeaComponents.sizedBox(width: 8),
+              OsmeaComponents.text(
+                'Response Cookies (${cookieMap.length})',
+                variant: OsmeaTextVariant.titleSmall,
+                color: _ideTheme ? OsmeaColors.white : OsmeaColors.shark,
+                fontSize: isNarrow ? 12 : 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
+
+          // Table
+          OsmeaComponents.container(
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: isNarrow ? 250 : 300,
+            ),
+            decoration: BoxDecoration(
+              color: _ideTheme ? OsmeaColors.eclipse : OsmeaColors.white,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: _ideTheme ? OsmeaColors.thunder : OsmeaColors.platinum,
+              ),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                child: Table(
+                  columnWidths: {
+                    0: FlexColumnWidth(isNarrow ? 2 : 3),
+                    1: FlexColumnWidth(isNarrow ? 4 : 5),
+                  },
+                  border: TableBorder(
+                    horizontalInside: BorderSide(
+                      color: _ideTheme
+                          ? OsmeaColors.thunder.withValues(alpha: 0.3)
+                          : OsmeaColors.platinum.withValues(alpha: 0.5),
+                      width: 1,
+                    ),
+                    top: BorderSide(
+                      color: _ideTheme
+                          ? OsmeaColors.thunder.withValues(alpha: 0.5)
+                          : OsmeaColors.platinum,
+                      width: 1,
+                    ),
+                    bottom: BorderSide(
+                      color: _ideTheme
+                          ? OsmeaColors.thunder.withValues(alpha: 0.5)
+                          : OsmeaColors.platinum,
+                      width: 1,
+                    ),
+                  ),
+                  children: [
+                    // Table header
+                    TableRow(
+                      decoration: BoxDecoration(
+                        color: _ideTheme
+                            ? OsmeaColors.thunder.withValues(alpha: 0.2)
+                            : OsmeaColors.platinum.withValues(alpha: 0.2),
+                      ),
+                      children: [
+                        OsmeaComponents.container(
+                          padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                          child: OsmeaComponents.text(
+                            'Cookie Name',
+                            variant: OsmeaTextVariant.labelMedium,
+                            color: _ideTheme
+                                ? OsmeaColors.white
+                                : OsmeaColors.shark,
+                            fontSize: isNarrow ? 10 : 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        OsmeaComponents.container(
+                          padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                          child: OsmeaComponents.text(
+                            'Cookie Value',
+                            variant: OsmeaTextVariant.labelMedium,
+                            color: _ideTheme
+                                ? OsmeaColors.white
+                                : OsmeaColors.shark,
+                            fontSize: isNarrow ? 10 : 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Table rows
+                    ...cookieMap.entries.map((entry) {
+                      return TableRow(
+                        children: [
+                          OsmeaComponents.container(
+                            padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                            child: SelectableText(
+                              entry.key,
+                              style: OsmeaTextStyle.bodySmall(context).copyWith(
+                                color: _ideTheme
+                                    ? OsmeaColors.snow
+                                    : OsmeaColors.shark,
+                                fontSize: isNarrow ? 10 : 11,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.w600,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                          OsmeaComponents.container(
+                            padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                            child: GestureDetector(
+                              onTap: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: entry.value));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Cookie value copied to clipboard!'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: SelectableText(
+                                entry.value.length > (isNarrow ? 40 : 60)
+                                    ? '${entry.value.substring(0, isNarrow ? 40 : 60)}...'
+                                    : entry.value,
+                                style:
+                                    OsmeaTextStyle.bodySmall(context).copyWith(
+                                  color: _ideTheme
+                                      ? OsmeaColors.snow
+                                      : OsmeaColors.shark,
+                                  fontSize: isNarrow ? 10 : 11,
+                                  fontFamily: 'monospace',
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Info text
+          OsmeaComponents.sizedBox(height: isNarrow ? 6 : 8),
+          OsmeaComponents.text(
+            'These cookies were received from the getCart response and have been stored in local storage.',
+            variant: OsmeaTextVariant.bodySmall,
+            color: _ideTheme ? OsmeaColors.slate : OsmeaColors.steel,
+            fontSize: isNarrow ? 9 : 10,
+            fontStyle: FontStyle.italic,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🍪 Build cookies display section
+  Widget _buildCookiesSection(bool isNarrow) {
+    return OsmeaComponents.container(
+      margin: EdgeInsets.all(isNarrow ? 8 : 12),
+      padding: EdgeInsets.all(isNarrow ? 12 : 16),
+      decoration: BoxDecoration(
+        color: _ideTheme ? OsmeaColors.shark : OsmeaColors.snow,
+        borderRadius: BorderRadius.circular(isNarrow ? 8 : 12),
+        border: Border.all(
+          color: OsmeaColors.nordicBlue,
+          width: 1.5,
+        ),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          OsmeaComponents.row(
+            children: [
+              Icon(
+                Icons.cookie_rounded,
+                color: OsmeaColors.nordicBlue,
+                size: isNarrow ? 16 : 20,
+              ),
+              OsmeaComponents.sizedBox(width: 8),
+              OsmeaComponents.text(
+                'Stored Cookies (${_storedCookies.length})',
+                variant: OsmeaTextVariant.titleSmall,
+                color: _ideTheme ? OsmeaColors.white : OsmeaColors.shark,
+                fontSize: isNarrow ? 12 : 14,
+                fontWeight: FontWeight.w600,
+              ),
+              OsmeaComponents.spacer(),
+              // Refresh button
+              GestureDetector(
+                onTap: () async {
+                  await _loadStoredCookies();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Cookies refreshed! Found ${_storedCookies.length} cookies.'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+                child: OsmeaComponents.container(
+                  padding: EdgeInsets.all(isNarrow ? 4 : 6),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: OsmeaColors.nordicBlue,
+                    size: isNarrow ? 12 : 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
+
+          // Cookies list
+          OsmeaComponents.container(
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: isNarrow ? 150 : 200,
+            ),
+            padding: EdgeInsets.all(isNarrow ? 8 : 12),
+            decoration: BoxDecoration(
+              color: _ideTheme ? OsmeaColors.eclipse : OsmeaColors.white,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: _ideTheme ? OsmeaColors.thunder : OsmeaColors.platinum,
+              ),
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _storedCookies.length,
+              itemBuilder: (context, index) {
+                final entry = _storedCookies.entries.elementAt(index);
+                return OsmeaComponents.padding(
+                  padding: EdgeInsets.only(bottom: isNarrow ? 6 : 8),
+                  child: OsmeaComponents.row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      OsmeaComponents.text(
+                        '${entry.key}: ',
+                        variant: OsmeaTextVariant.bodySmall,
+                        color: _ideTheme ? OsmeaColors.snow : OsmeaColors.shark,
+                        fontSize: isNarrow ? 10 : 11,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'monospace',
+                      ),
+                      OsmeaComponents.expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: entry.value));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Cookie value copied to clipboard!'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: SelectableText(
+                            entry.value.length > 50
+                                ? '${entry.value.substring(0, 50)}...'
+                                : entry.value,
+                            style: OsmeaTextStyle.bodySmall(context).copyWith(
+                              color: _ideTheme
+                                  ? OsmeaColors.snow
+                                  : OsmeaColors.shark,
+                              fontSize: isNarrow ? 10 : 11,
+                              fontFamily: 'monospace',
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Info text
+          OsmeaComponents.sizedBox(height: isNarrow ? 6 : 8),
+          OsmeaComponents.text(
+            'These cookies are stored in local storage by the apis package and automatically sent with requests.',
             variant: OsmeaTextVariant.bodySmall,
             color: _ideTheme ? OsmeaColors.slate : OsmeaColors.steel,
             fontSize: isNarrow ? 9 : 10,
