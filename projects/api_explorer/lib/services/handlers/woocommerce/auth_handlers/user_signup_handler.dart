@@ -88,8 +88,10 @@ class UserSignUpHandler implements ApiRequestHandler {
         lastName: '', // Not required in Postman
         phone: null,
         company: null,
-        acceptTerms: true,
-        subscribeNewsletter: false,
+        userMeta: const UserMeta(
+          acceptTerms: true,
+          subscribeNewsletter: false,
+        ),
         referralCode: null,
       );
 

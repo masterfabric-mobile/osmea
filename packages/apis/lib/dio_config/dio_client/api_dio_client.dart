@@ -11,6 +11,7 @@ import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:dio/browser.dart' if (dart.library.io) 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -62,7 +63,22 @@ class ApiDioClient implements ApiBaseClient {
           'Accept': 'application/json',
         },
       )
-      ..options.responseType = ResponseType.json;
+      ..options.responseType = ResponseType.json
+      ..options.followRedirects = true
+      ..options.validateStatus = (status) => status! < 500;
+
+    // 🍪 Enable cookie support for web platform
+    if (kIsWeb) {
+      try {
+        // Configure BrowserHttpClientAdapter with credentials support
+        (dio.httpClientAdapter as BrowserHttpClientAdapter).withCredentials =
+            true;
+        debugPrint(
+            '🍪 Web platform: withCredentials enabled for cookie support');
+      } catch (e) {
+        debugPrint('⚠️ Failed to enable withCredentials: $e');
+      }
+    }
 
     // 🔐 Add JWT authentication interceptor
     if (useJwtAuth) {
