@@ -24,12 +24,10 @@ class CookieData {
   /// Check if cookie is expired
   bool get isExpired {
     if (isSession) return false; // Session cookies expire on browser close
-    if (expiresAt != null) return DateTime.now().isAfter(expiresAt!);
-    if (maxAge != null) {
-      // Max-Age is relative to when cookie was set
-      // We need to track when it was set, but for simplicity, we check if maxAge has passed
-      return false; // We'll handle maxAge differently
+    if (expiresAt != null) {
+      return DateTime.now().isAfter(expiresAt!);
     }
+    // If no expiration data, assume it's still valid (browser will handle it)
     return false;
   }
 
