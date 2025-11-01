@@ -172,7 +172,7 @@ class WooCartTokenInterceptor extends Interceptor {
         if (cookies != null && cookies.isNotEmpty) {
           debugPrint('🔍 Checking cookies for cart token...');
           debugPrint('🔍 Set-Cookie headers: ${cookies.join(", ")}');
-          
+
           for (final cookieHeader in cookies) {
             // Parse cookie: name=value; attributes
             final cookieParts = cookieHeader.split(';');
@@ -185,18 +185,19 @@ class WooCartTokenInterceptor extends Interceptor {
                     .substring(cookieHeader.indexOf('=') + 1)
                     .split(';')[0]
                     .trim();
-                
+
                 debugPrint('🔍 Checking cookie: $cookieName');
-                
-                // Check for cart-related cookie names
-                if (cookieName.contains('woocommerce_cart_hash') ||
+
+                // Check for cart-related cookie names (WooCommerce standard cookie names)
+                // WooCommerce cookies: woocommerce_cart_hash, woocommerce_items_in_cart, wp_woocommerce_session_
+                if (cookieName == 'woocommerce_cart_hash' ||
+                    cookieName == 'woocommerce_items_in_cart' ||
+                    cookieName.startsWith('wp_woocommerce_session_') ||
                     cookieName.contains('cart_token') ||
-                    cookieName.contains('wp_woocommerce_session') ||
-                    cookieName.contains('woocommerce_session') ||
-                    cookieName.toLowerCase().contains('cart') ||
-                    cookieName.toLowerCase().contains('token')) {
+                    cookieName.toLowerCase().contains('cart')) {
                   cartToken = cookieValue;
-                  debugPrint('🛒 Found cart token in cookie: $cookieName=${cookieValue.length > 20 ? cookieValue.substring(0, 20) + "..." : cookieValue}');
+                  debugPrint(
+                      '🛒 Found cart token in cookie: $cookieName=${cookieValue.length > 20 ? cookieValue.substring(0, 20) + "..." : cookieValue}');
                   break;
                 }
               }
