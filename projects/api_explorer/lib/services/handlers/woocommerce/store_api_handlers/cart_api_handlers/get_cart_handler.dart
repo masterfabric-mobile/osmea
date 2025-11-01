@@ -51,30 +51,65 @@ class GetCartHandler implements ApiRequestHandler {
         jwtToken: jwtToken,
       );
 
+      // Wait a bit for interceptor to save cookies (WebCookieManager runs async)
+      if (kIsWeb) {
+        await Future.delayed(const Duration(milliseconds: 200)); // Increased delay for cookie processing
+      }
+
       // Get cookies after request and extract new/received cookies
       Map<String, String> receivedCookies = {};
+      Map<String, dynamic> cookieDetails = {}; // Detailed cookie information
+      
       if (kIsWeb) {
         try {
           final cookiesAfter = await ApiDioClient.webCookieManager.getAllCookies();
-          debugPrint('🍪 Cookies after request: ${cookiesAfter.keys.toList()}');
+          debugPrint('🍪 [GET CART] Cookies after request: ${cookiesAfter.keys.toList()}');
+          debugPrint('🍪 [GET CART] Cookies before request: ${cookiesBefore.keys.toList()}');
           
-          // Find new cookies (cookies that weren't there before)
+          // Find new cookies (cookies that weren't there before or were updated)
           for (final entry in cookiesAfter.entries) {
-            if (!cookiesBefore.containsKey(entry.key) || 
-                cookiesBefore[entry.key] != entry.value) {
+            final isNew = !cookiesBefore.containsKey(entry.key);
+            final isUpdated = cookiesBefore.containsKey(entry.key) && 
+                            cookiesBefore[entry.key] != entry.value;
+            
+            if (isNew || isUpdated) {
               receivedCookies[entry.key] = entry.value;
+              
+              // Add detailed information about each cookie
+              cookieDetails[entry.key] = {
+                'value': entry.value,
+                'is_new': isNew,
+                'is_updated': isUpdated,
+                'previous_value': isUpdated ? cookiesBefore[entry.key] : null,
+                'received_at': DateTime.now().toIso8601String(),
+                'cookie_type': _identifyCookieType(entry.key),
+              };
+              
+              debugPrint('🍪 [GET CART] Cookie ${entry.key}: ${isNew ? "NEW" : "UPDATED"}');
             }
           }
           
           // If no new cookies found, but cookies exist, show all cookies from this request
-          // (in case they were updated)
+          // This is important for getCart as it might receive session cookies
           if (receivedCookies.isEmpty && cookiesAfter.isNotEmpty) {
             receivedCookies = cookiesAfter;
+            for (final entry in cookiesAfter.entries) {
+              cookieDetails[entry.key] = {
+                'value': entry.value,
+                'is_new': false,
+                'is_updated': false,
+                'previous_value': cookiesBefore[entry.key],
+                'received_at': DateTime.now().toIso8601String(),
+                'cookie_type': _identifyCookieType(entry.key),
+              };
+            }
+            debugPrint('🍪 [GET CART] No new cookies detected, showing all cookies: ${receivedCookies.keys.toList()}');
           }
           
-          debugPrint('🍪 Received cookies from response: ${receivedCookies.keys.toList()}');
+          debugPrint('🍪 [GET CART] Total received cookies count: ${receivedCookies.length}');
+          debugPrint('🍪 [GET CART] Cookie details: ${cookieDetails.keys.toList()}');
         } catch (e) {
-          debugPrint('❌ Error getting cookies after request: $e');
+          debugPrint('❌ [GET CART] Error getting cookies after request: $e');
         }
       }
 
@@ -86,10 +121,12 @@ class GetCartHandler implements ApiRequestHandler {
         "timestamp": DateTime.now().toIso8601String(),
       };
 
-      // Add response cookies if available
+      // Add response cookies with detailed information for getCart
       if (receivedCookies.isNotEmpty) {
         responseData["response_cookies"] = receivedCookies;
-        debugPrint('🍪 Added ${receivedCookies.length} cookies to response data');
+        responseData["cookie_details"] = cookieDetails; // Detailed cookie analysis
+        responseData["is_get_cart"] = true; // Flag to identify getCart responses
+        debugPrint('🍪 [GET CART] Added ${receivedCookies.length} cookies with details to response data');
       }
 
       return responseData;
@@ -113,4 +150,24 @@ class GetCartHandler implements ApiRequestHandler {
           // The API version is handled automatically
         ],
       };
+
+  /// 🍪 Identify cookie type based on cookie name
+  /// This helps categorize cookies (session, cart, auth, etc.)
+  String _identifyCookieType(String cookieName) {
+    final name = cookieName.toLowerCase();
+    
+    if (name.contains('cart') || name.contains('woocommerce_cart')) {
+      return 'cart';
+    } else if (name.contains('session') || name.contains('wp_')) {
+      return 'session';
+    } else if (name.contains('auth') || name.contains('token')) {
+      return 'auth';
+    } else if (name.contains('nonce')) {
+      return 'nonce';
+    } else if (name.contains('cookie')) {
+      return 'preference';
+    } else {
+      return 'other';
+    }
+  }
 }

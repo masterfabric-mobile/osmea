@@ -34,6 +34,8 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
   // Cookies storage
   Map<String, String> _storedCookies = {};
   bool _cookiesLoaded = false;
+  Map<String, dynamic>?
+      _lastResponseData; // Track last response data to avoid infinite loop
 
   // Code content
   final String _accessScopeCode =
@@ -173,32 +175,63 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
     // Split code into lines
     _codeLines.addAll(_accessScopeCode.split('\n'));
 
-    // Load stored cookies
-    _loadStoredCookies();
+    // Load stored cookies once on init (without blocking build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadStoredCookies();
+      }
+    });
   }
 
   /// 🍪 Load stored cookies from apis package
   Future<void> _loadStoredCookies() async {
+    if (!mounted) return; // Safety check
+
     try {
       if (kIsWeb) {
         // Use WebCookieManager on web
         final cookies = await ApiDioClient.webCookieManager.getAllCookies();
-        setState(() {
-          _storedCookies = cookies;
-          _cookiesLoaded = true;
-        });
-        debugPrint(
-            '🍪 Loaded ${cookies.length} stored cookies from WebCookieManager');
+        if (mounted && _storedCookies.length != cookies.length) {
+          // Only update state if cookies actually changed
+          setState(() {
+            _storedCookies = cookies;
+            _cookiesLoaded = true;
+          });
+          debugPrint(
+              '🍪 Loaded ${cookies.length} stored cookies from WebCookieManager');
+        }
       } else {
         // On mobile, cookies are managed by CookieManager (PersistCookieJar)
+        if (mounted && !_cookiesLoaded) {
+          setState(() {
+            _cookiesLoaded = true;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading stored cookies: $e');
+      if (mounted && !_cookiesLoaded) {
         setState(() {
           _cookiesLoaded = true;
         });
       }
-    } catch (e) {
-      debugPrint('❌ Error loading stored cookies: $e');
-      setState(() {
-        _cookiesLoaded = true;
+    }
+  }
+
+  @override
+  void didUpdateWidget(IdeResponsePanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only reload cookies if response data actually changed
+    if (widget.responseData != oldWidget.responseData &&
+        widget.responseData != null &&
+        !widget.loading &&
+        widget.responseData != _lastResponseData) {
+      _lastResponseData = widget.responseData;
+      // Use post frame callback to avoid build loop
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.responseData == _lastResponseData) {
+          _loadStoredCookies();
+        }
       });
     }
   }
@@ -723,16 +756,19 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
     final cartToken = widget.responseData?['cart_token'] as String?;
     final cartId = widget.responseData?['cart_id'] as String?;
 
+    // Check if this is a getCart response (special handling for getCart)
+    final isGetCart = widget.responseData?['is_get_cart'] == true;
+
     // Check if response contains cookies from handler
     final responseCookies =
         widget.responseData?['response_cookies'] as Map<String, dynamic>?;
+    final cookieDetails =
+        widget.responseData?['cookie_details'] as Map<String, dynamic>?;
     final hasResponseCookies =
         responseCookies != null && responseCookies.isNotEmpty;
 
-    // Refresh cookies when response data changes
-    if (widget.responseData != null && !widget.loading) {
-      _loadStoredCookies();
-    }
+    // Load cookies only once when response data first appears
+    // This is handled in didUpdateWidget to avoid infinite loops
 
     // Show response data in JSON format
     return OsmeaComponents.container(
@@ -743,13 +779,19 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
 
           return OsmeaComponents.column(
             children: [
+              // Response Cookies Table (from handler response) - AT THE TOP
+              // Special handling for getCart responses with detailed cookie information
+              if (hasResponseCookies)
+                _buildResponseCookiesTable(
+                  responseCookies,
+                  isNarrow,
+                  isGetCart: isGetCart,
+                  cookieDetails: cookieDetails,
+                ),
+
               // Cart Token Display Section (if available)
               if (hasCartToken && cartToken != null)
                 _buildCartTokenSection(cartToken, cartId, isNarrow),
-
-              // Response Cookies Table (from handler response)
-              if (hasResponseCookies)
-                _buildResponseCookiesTable(responseCookies, isNarrow),
 
               // Cookies Display Section (stored cookies from localStorage)
               if (kIsWeb && _cookiesLoaded && _storedCookies.isNotEmpty)
@@ -950,11 +992,24 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
   }
 
   /// 🍪 Build response cookies table (from handler response)
+  /// Special handling for getCart responses with detailed cookie information
   Widget _buildResponseCookiesTable(
-      Map<String, dynamic> cookies, bool isNarrow) {
+    Map<String, dynamic> cookies,
+    bool isNarrow, {
+    bool isGetCart = false,
+    Map<String, dynamic>? cookieDetails,
+  }) {
     // Convert cookies to String map
     final cookieMap =
         cookies.map((key, value) => MapEntry(key, value.toString()));
+
+    // Extract cookie details if available (for getCart)
+    Map<String, Map<String, dynamic>>? detailsMap;
+    if (isGetCart && cookieDetails != null) {
+      detailsMap = cookieDetails.map(
+        (key, value) => MapEntry(key, value as Map<String, dynamic>),
+      );
+    }
 
     return OsmeaComponents.container(
       margin: EdgeInsets.all(isNarrow ? 8 : 12),
@@ -974,18 +1029,47 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
           OsmeaComponents.row(
             children: [
               Icon(
-                Icons.table_chart_rounded,
-                color: OsmeaColors.forestHeart,
+                isGetCart
+                    ? Icons.shopping_cart_rounded
+                    : Icons.table_chart_rounded,
+                color:
+                    isGetCart ? OsmeaColors.deepSea : OsmeaColors.forestHeart,
                 size: isNarrow ? 16 : 20,
               ),
               OsmeaComponents.sizedBox(width: 8),
               OsmeaComponents.text(
-                'Response Cookies (${cookieMap.length})',
+                isGetCart
+                    ? 'Get Cart Response Cookies (${cookieMap.length})'
+                    : 'Response Cookies (${cookieMap.length})',
                 variant: OsmeaTextVariant.titleSmall,
                 color: _ideTheme ? OsmeaColors.white : OsmeaColors.shark,
                 fontSize: isNarrow ? 12 : 14,
                 fontWeight: FontWeight.w600,
               ),
+              if (isGetCart) ...[
+                OsmeaComponents.sizedBox(width: 8),
+                OsmeaComponents.container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isNarrow ? 6 : 8,
+                    vertical: isNarrow ? 2 : 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.deepSea.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: OsmeaColors.deepSea.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: OsmeaComponents.text(
+                    'GET CART',
+                    variant: OsmeaTextVariant.labelSmall,
+                    color: OsmeaColors.deepSea,
+                    fontSize: isNarrow ? 8 : 9,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ],
           ),
           OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
@@ -1007,10 +1091,17 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
               scrollDirection: Axis.horizontal,
               child: SingleChildScrollView(
                 child: Table(
-                  columnWidths: {
-                    0: FlexColumnWidth(isNarrow ? 2 : 3),
-                    1: FlexColumnWidth(isNarrow ? 4 : 5),
-                  },
+                  columnWidths: isGetCart
+                      ? {
+                          0: FlexColumnWidth(isNarrow ? 2 : 3), // Cookie Name
+                          1: FlexColumnWidth(1), // Type
+                          2: FlexColumnWidth(1), // Status
+                          3: FlexColumnWidth(isNarrow ? 4 : 5), // Cookie Value
+                        }
+                      : {
+                          0: FlexColumnWidth(isNarrow ? 2 : 3),
+                          1: FlexColumnWidth(isNarrow ? 4 : 5),
+                        },
                   border: TableBorder(
                     horizontalInside: BorderSide(
                       color: _ideTheme
@@ -1052,6 +1143,34 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
                             fontWeight: FontWeight.w700,
                           ),
                         ),
+                        if (isGetCart) ...[
+                          // Cookie Type column for getCart
+                          OsmeaComponents.container(
+                            padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                            child: OsmeaComponents.text(
+                              'Type',
+                              variant: OsmeaTextVariant.labelMedium,
+                              color: _ideTheme
+                                  ? OsmeaColors.white
+                                  : OsmeaColors.shark,
+                              fontSize: isNarrow ? 10 : 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          // Status column for getCart
+                          OsmeaComponents.container(
+                            padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                            child: OsmeaComponents.text(
+                              'Status',
+                              variant: OsmeaTextVariant.labelMedium,
+                              color: _ideTheme
+                                  ? OsmeaColors.white
+                                  : OsmeaColors.shark,
+                              fontSize: isNarrow ? 10 : 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                         OsmeaComponents.container(
                           padding: EdgeInsets.all(isNarrow ? 8 : 12),
                           child: OsmeaComponents.text(
@@ -1068,6 +1187,45 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
                     ),
                     // Table rows
                     ...cookieMap.entries.map((entry) {
+                      final detail = detailsMap?[entry.key];
+                      final cookieType =
+                          detail?['cookie_type'] as String? ?? 'other';
+                      final isNew = detail?['is_new'] as bool? ?? false;
+                      final isUpdated = detail?['is_updated'] as bool? ?? false;
+
+                      // Determine status color and text
+                      Color statusColor;
+                      String statusText;
+                      if (isNew) {
+                        statusColor = OsmeaColors.forestHeart;
+                        statusText = 'NEW';
+                      } else if (isUpdated) {
+                        statusColor = OsmeaColors.amberFlame;
+                        statusText = 'UPDATED';
+                      } else {
+                        statusColor = OsmeaColors.steel;
+                        statusText = 'EXISTING';
+                      }
+
+                      // Determine cookie type color
+                      Color typeColor;
+                      switch (cookieType.toLowerCase()) {
+                        case 'cart':
+                          typeColor = OsmeaColors.deepSea;
+                          break;
+                        case 'session':
+                          typeColor = OsmeaColors.nordicBlue;
+                          break;
+                        case 'auth':
+                          typeColor = OsmeaColors.forestHeart;
+                          break;
+                        case 'nonce':
+                          typeColor = OsmeaColors.amberFlame;
+                          break;
+                        default:
+                          typeColor = OsmeaColors.steel;
+                      }
+
                       return TableRow(
                         children: [
                           OsmeaComponents.container(
@@ -1085,6 +1243,58 @@ class _IdeResponsePanelState extends State<IdeResponsePanel>
                               ),
                             ),
                           ),
+                          if (isGetCart) ...[
+                            // Cookie Type badge
+                            OsmeaComponents.container(
+                              padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                              child: OsmeaComponents.container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isNarrow ? 6 : 8,
+                                  vertical: isNarrow ? 2 : 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: typeColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: typeColor.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: OsmeaComponents.text(
+                                  cookieType.toUpperCase(),
+                                  variant: OsmeaTextVariant.labelSmall,
+                                  color: typeColor,
+                                  fontSize: isNarrow ? 8 : 9,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            // Status badge
+                            OsmeaComponents.container(
+                              padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                              child: OsmeaComponents.container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isNarrow ? 6 : 8,
+                                  vertical: isNarrow ? 2 : 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: statusColor.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: OsmeaComponents.text(
+                                  statusText,
+                                  variant: OsmeaTextVariant.labelSmall,
+                                  color: statusColor,
+                                  fontSize: isNarrow ? 8 : 9,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                           OsmeaComponents.container(
                             padding: EdgeInsets.all(isNarrow ? 8 : 12),
                             child: GestureDetector(
