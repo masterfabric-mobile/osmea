@@ -141,7 +141,7 @@ class ActionSection extends StatelessWidget {
                   : () {
                       onAddToCart();
                       // Show success snackbar immediately after triggering add
-                      context.snackbarSuccess('Ürün sepete eklendi');
+                      context.snackbarSuccess('Added to cart');
                       if (onAddSuccessNavigateToCart != null) {
                         onAddSuccessNavigateToCart!();
                       }
