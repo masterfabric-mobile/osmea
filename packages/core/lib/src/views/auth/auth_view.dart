@@ -27,9 +27,12 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
     required super.goRoute,
     super.arguments = const {'auth': true},
     super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
     super.useSafeArea = false,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.backgroundColor = Colors.transparent,
     this.onSignInSuccess,
     this.onSignInError,
     this.onSignUpSuccess,
@@ -126,11 +129,12 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
   Future<Map<String, dynamic>?> _loadAuthConfig() async {
     try {
       final configHelper = AssetConfigHelper();
-      await configHelper.loadConfig();
+      // Try to load project-specific config first, fallback to core package config
+      await configHelper.loadConfig('assets/app_config.json');
       final allConfig = configHelper.getAllConfig();
       final authConfig =
           allConfig?['auth_configuration'] as Map<String, dynamic>?;
-      debugPrint('✅ Auth configuration loaded');
+      debugPrint('✅ Auth configuration loaded from project config');
       return authConfig;
     } catch (e) {
       debugPrint('⚠️ Could not load auth config, using defaults: $e');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
@@ -78,7 +79,8 @@ class _AuthWidgetState extends State<AuthWidget> {
           debugPrint('✅ Calling onSignInSuccess callback...');
           widget.onSignInSuccess?.call();
         } else {
-          debugPrint('⚠️ onSignInSuccess callback not available or widget not mounted');
+          debugPrint(
+              '⚠️ onSignInSuccess callback not available or widget not mounted');
         }
       });
     } else if (widget.signInState.status == SignInStatus.error &&
@@ -156,21 +158,26 @@ class _AuthWidgetState extends State<AuthWidget> {
             24.0;
     final backgroundColor =
         widget.config?['ui_style']?['background_color'] as String?;
+    final bgColor = backgroundColor != null
+        ? Color(int.parse(backgroundColor.replaceAll('#', '0xFF')))
+        : Color(0xFF4A6FE8);
 
-    return Scaffold(
-      backgroundColor: backgroundColor != null
-          ? Color(int.parse(backgroundColor.replaceAll('#', '0xFF')))
-          : Color(0xFF4A6FE8),
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        left: false,
-        right: false,
-        bottom: false,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Container(
+        color: bgColor,
         child: Column(
           children: [
             // 🎨 Logo/App Name Header
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.2,
+            Container(
+              height: MediaQuery.of(context).size.height * 0.3,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+              ),
               child: Center(
                 child: logoUrl != null
                     ? OsmeaComponents.image(
