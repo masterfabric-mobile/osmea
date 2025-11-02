@@ -43,6 +43,10 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json
       ..interceptors.add(ApiInterceptorDefault(
@@ -61,6 +65,10 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json;
 
@@ -107,7 +115,12 @@ class ApiDioClient implements ApiBaseClient {
   /// 🔐 Creates a WooCommerce Dio instance specifically for JWT authentication
   static Dio wooJwtAuthDio() {
     final dio = Dio()
-      ..options = BaseOptions()
+      ..options = BaseOptions(
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
+      )
       ..options.responseType = ResponseType.json;
 
     // Add JWT authentication service and interceptor
@@ -134,6 +147,10 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json;
 
