@@ -161,32 +161,40 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
       // Update cubit state
       final currentState = state;
+      debugPrint('🔍 AuthCubit: Current state before save: ${currentState.runtimeType}');
+      
       if (currentState is AuthAuthenticatedState) {
         // Merge metadata if provided
         final mergedMetadata = metadata != null
             ? {...?currentState.metadata, ...metadata}
             : currentState.metadata;
 
-        emit(
-          currentState.copyWith(
-            jwtToken: jwtToken ?? currentState.jwtToken,
-            userData: userData ?? currentState.userData,
-            isAuthenticated: jwtToken != null && jwtToken.isNotEmpty,
-            metadata: mergedMetadata,
-          ),
+        final newState = currentState.copyWith(
+          jwtToken: jwtToken ?? currentState.jwtToken,
+          userData: userData ?? currentState.userData,
+          isAuthenticated: jwtToken != null && jwtToken.isNotEmpty,
+          metadata: mergedMetadata,
         );
+        
+        debugPrint('🔄 AuthCubit: Emitting updated AuthAuthenticatedState');
+        debugPrint('🔍 AuthCubit: isAuthenticated = ${newState.isAuthenticated}');
+        emit(newState);
       } else {
-        emit(
-          AuthAuthenticatedState(
-            jwtToken: jwtToken,
-            userData: userData,
-            isAuthenticated: jwtToken != null && jwtToken.isNotEmpty,
-            metadata: metadata,
-          ),
+        final newState = AuthAuthenticatedState(
+          jwtToken: jwtToken,
+          userData: userData,
+          isAuthenticated: jwtToken != null && jwtToken.isNotEmpty,
+          metadata: metadata,
         );
+        
+        debugPrint('🔄 AuthCubit: Emitting new AuthAuthenticatedState');
+        debugPrint('🔍 AuthCubit: isAuthenticated = ${newState.isAuthenticated}');
+        debugPrint('🔍 AuthCubit: jwtToken = ${jwtToken?.substring(0, 20)}...');
+        emit(newState);
       }
 
-      debugPrint('✅ AuthCubit: JWT token saved successfully');
+      debugPrint('✅ AuthCubit: JWT token saved and state emitted');
+      debugPrint('🔍 AuthCubit: New state type: ${state.runtimeType}');
     } catch (e) {
       debugPrint('❌ AuthCubit: Error saving JWT token: $e');
     }
