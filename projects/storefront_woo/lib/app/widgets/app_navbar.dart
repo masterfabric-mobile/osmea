@@ -96,6 +96,19 @@ class _AppNavbarState extends State<AppNavbar> {
   @override
   void didUpdateWidget(AppNavbar oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
+    // Check if AuthCubit is available and force a state check
+    try {
+      final authCubit = GetIt.I<AuthCubit>();
+      debugPrint('📱 Navbar didUpdateWidget: AuthCubit state = ${authCubit.state.runtimeType}');
+      if (authCubit.state is AuthAuthenticatedState) {
+        final authState = authCubit.state as AuthAuthenticatedState;
+        debugPrint('📱 Navbar didUpdateWidget: isAuthenticated = ${authState.isAuthenticated}');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Navbar didUpdateWidget: AuthCubit not available: $e');
+    }
+    
     // Always check auth status when widget updates (route changed or rebuild)
     // This ensures navbar updates immediately after sign in
     final now = DateTime.now();
@@ -113,32 +126,58 @@ class _AppNavbarState extends State<AppNavbar> {
     // Try to get AuthCubit from GetIt - if available, listen to it for real-time updates
     try {
       final authCubit = GetIt.I<AuthCubit>();
+      
       // Listen to AuthCubit for real-time auth status updates
-      return BlocBuilder<AuthCubit, AuthState>(
+      return BlocListener<AuthCubit, AuthState>(
         bloc: authCubit,
-        builder: (context, authState) {
+        listener: (context, authState) {
+          debugPrint('📱 Navbar Listener: State changed to ${authState.runtimeType}');
+          
           final isAuthenticated = authState is AuthAuthenticatedState &&
               authState.isAuthenticated;
           
-          // Only trigger initial load once if state is initial/unauthenticated
-          // Prevent infinite loop by checking if we've already loaded
-          if (!_hasLoadedTokens && 
-              (authState is AuthInitialState || authState is AuthUnauthenticatedState)) {
-            _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                authCubit.loadTokens();
-              }
+          debugPrint('📱 Navbar Listener: isAuthenticated = $isAuthenticated');
+          
+          // Update local state to trigger rebuild
+          if (mounted && _isAuthenticated != isAuthenticated) {
+            setState(() {
+              _isAuthenticated = isAuthenticated;
+              _isLoading = false;
             });
+            debugPrint('📱 Navbar: State updated via listener!');
           }
-          
-          // Reset flag if we're authenticated (so we can reload if needed later)
-          if (authState is AuthAuthenticatedState) {
-            _hasLoadedTokens = false; // Allow reload when authenticated changes
-          }
-          
-          return _buildNavbar(context, isAuthenticated);
         },
+        child: BlocBuilder<AuthCubit, AuthState>(
+          bloc: authCubit,
+          builder: (context, authState) {
+            debugPrint('📱 Navbar Builder: Building with state ${authState.runtimeType}');
+            
+            final isAuthenticated = authState is AuthAuthenticatedState &&
+                authState.isAuthenticated;
+            
+            debugPrint('📱 Navbar Builder: isAuthenticated = $isAuthenticated');
+            
+            // Only trigger initial load once if state is initial/unauthenticated
+            // Prevent infinite loop by checking if we've already loaded
+            if (!_hasLoadedTokens && 
+                (authState is AuthInitialState || authState is AuthUnauthenticatedState)) {
+              _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  debugPrint('📱 Navbar: Loading tokens from storage...');
+                  authCubit.loadTokens();
+                }
+              });
+            }
+            
+            // Reset flag if we're authenticated (so we can reload if needed later)
+            if (authState is AuthAuthenticatedState) {
+              _hasLoadedTokens = false; // Allow reload when authenticated changes
+            }
+            
+            return _buildNavbar(context, isAuthenticated);
+          },
+        ),
       );
     } catch (e) {
       // Fallback to AuthStorageHelper if AuthCubit not available
