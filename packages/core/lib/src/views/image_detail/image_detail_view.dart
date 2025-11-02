@@ -50,27 +50,6 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
     const double thumbnailsHeight = 88; // Fixed thumbnail height
     const double fixedSpacing = 12; // Fixed 12px padding as per design
 
-    // Get dynamic height for current image
-    final String? currentImageUrl = state.images.isNotEmpty && state.currentIndex < state.images.length
-        ? state.images[state.currentIndex]
-        : null;
-    final double? dynamicHeight = currentImageUrl != null && state.imageHeights.containsKey(currentImageUrl)
-        ? state.imageHeights[currentImageUrl]
-        : null;
-    // Use dynamic height if available, otherwise fallback to screen height ratio
-    // Constrain height to max 60% of screen height to prevent overflow
-    final double maxHeight = screenHeight * 0.6;
-    final double imageHeight = dynamicHeight != null 
-        ? math.min(dynamicHeight, maxHeight) 
-        : maxHeight;
-    
-    // Debug: Log current image height if it changed
-    if (currentImageUrl != null) {
-      debugPrint('🖼️ Displaying image ${state.currentIndex + 1}/${state.images.length}');
-      debugPrint('   Height: ${imageHeight.toInt()}px (${dynamicHeight != null ? 'DYNAMIC' : 'FALLBACK'})');
-      debugPrint('   Aspect ratio preserved: ${dynamicHeight != null ? 'YES' : 'NO - using default'}');
-    }
-
     // Update image heights if screen width changed (e.g., orientation change)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (state.status == ImageDetailStatus.ready) {
@@ -81,43 +60,79 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
     return state.status == ImageDetailStatus.loading
         ? _buildLoadingState(context)
         : hasImages
-            ? SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Top buttons - OUTSIDE of image
-                    SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: _buildTopButtonsRow(context, state),
-                      ),
+            ? Column(
+                children: [
+                  // Top buttons - OUTSIDE of image
+                  SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: _buildTopButtonsRow(context, state),
                     ),
-                    
-                    // Main Image - Dynamic size based on actual image dimensions
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      height: imageHeight,
-                      width: double.infinity,
-                    child: PageView.builder(
-                      key: ValueKey('pageview_${state.currentIndex}'),
-                      itemCount: state.images.length,
-                      controller: PageController(initialPage: state.currentIndex),
-                      onPageChanged: (index) => viewModel.goTo(index),
-                      itemBuilder: (context, index) {
-                        return InteractiveViewer(
-                          minScale: 0.5,
-                          maxScale: 4.0,
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: OsmeaComponents.image(
-                              imageUrl: state.images[index],
-                              variant: ImageVariant.normal,
-                              size: ImageSize.custom,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.contain,
-                              heroTag: state.heroTag,
-                            ),
+                  ),
+                  
+                  // Main Image - Dynamic size based on actual image dimensions with Flexible to prevent overflow
+                  Flexible(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Get dynamic height for current image
+                        final String? currentImageUrl = state.images.isNotEmpty && state.currentIndex < state.images.length
+                            ? state.images[state.currentIndex]
+                            : null;
+                        final double? dynamicHeight = currentImageUrl != null && state.imageHeights.containsKey(currentImageUrl)
+                            ? state.imageHeights[currentImageUrl]
+                            : null;
+                        
+                        // Calculate available height for image
+                        final availableHeight = constraints.maxHeight;
+                        // Reserve space for buttons, indicators, thumbnails, and spacing
+                        final reservedSpace = 8.0 + // top buttons padding
+                                            8.0 + // indicators padding
+                                            (state.images.length > 1 ? 24.0 : 0) + // indicators
+                                            fixedSpacing + // middle spacing
+                                            thumbnailsHeight + // thumbnails
+                                            fixedSpacing; // bottom spacing
+                        
+                        final maxImageHeight = math.max(
+                          200.0, // minimum height
+                          math.min(
+                            availableHeight - reservedSpace,
+                            screenHeight * 0.6, // max 60% of screen
+                          ),
+                        );
+                        
+                        final finalImageHeight = dynamicHeight != null
+                            ? math.min(dynamicHeight, maxImageHeight)
+                            : maxImageHeight;
+
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          height: finalImageHeight,
+                          width: double.infinity,
+                          child: PageView.builder(
+                            key: ValueKey('pageview_${state.currentIndex}'),
+                            itemCount: state.images.length,
+                            controller: PageController(initialPage: state.currentIndex),
+                            onPageChanged: (index) => viewModel.goTo(index),
+                            itemBuilder: (context, index) {
+                              return InteractiveViewer(
+                                minScale: 0.5,
+                                maxScale: 4.0,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: OsmeaComponents.image(
+                                    imageUrl: state.images[index],
+                                    variant: ImageVariant.normal,
+                                    size: ImageSize.custom,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.contain,
+                                    heroTag: state.heroTag,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -192,8 +207,7 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
                   // Bottom spacing
                   SizedBox(height: fixedSpacing),
                 ],
-              ),
-            )
+              )
             : _buildEmptyState(context);
   }
 
@@ -201,11 +215,9 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Back button (left)
+        // Back button (left) - using storefront style
         if (state.showBackButton)
-          _buildActionButton(
-            context: context,
-            icon: Icons.arrow_back_ios_new,
+          OsmeaComponents.iconButton(
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -213,15 +225,14 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
                 goRoute('/home');
               }
             },
+            icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
           )
         else
           const SizedBox(width: 44), // Placeholder for alignment
 
-        // Close button (right)
+        // Close button (right) - using storefront style
         if (state.showCloseButton)
-          _buildActionButton(
-            context: context,
-            icon: Icons.close,
+          OsmeaComponents.iconButton(
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -229,46 +240,11 @@ class ImageDetailView extends MasterViewCubit<ImageDetailCubit, ImageDetailState
                 goRoute('/home');
               }
             },
+            icon: Icon(Icons.close, color: OsmeaColors.thunder),
           )
         else
           const SizedBox(width: 44), // Placeholder for alignment
       ],
-    );
-  }
-
-  Widget _buildActionButton({
-    required BuildContext context,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Material(
-      color: OsmeaColors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(24),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: OsmeaColors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: OsmeaColors.black.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Icon(
-              icon,
-              size: 24,
-              color: OsmeaColors.black,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -329,6 +305,7 @@ class ImageDetailScreen extends StatelessWidget {
   final String? heroTag;
   final Color? backgroundColor;
   final Function(String path) goRoute;
+  final Map<String, dynamic> arguments;
 
   const ImageDetailScreen({
     super.key,
@@ -337,6 +314,7 @@ class ImageDetailScreen extends StatelessWidget {
     this.initialIndex = 0,
     this.heroTag,
     this.backgroundColor,
+    this.arguments = const {'imageDetail': true},
   });
 
   @override
@@ -347,6 +325,7 @@ class ImageDetailScreen extends StatelessWidget {
       initialIndex: initialIndex,
       heroTag: heroTag,
       backgroundColor: backgroundColor,
+      arguments: arguments,
     );
   }
 }
