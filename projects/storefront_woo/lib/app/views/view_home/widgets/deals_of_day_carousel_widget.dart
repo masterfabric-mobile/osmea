@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as FlutterMaterial show Image;
-import 'package:osmea_components/osmea_components.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';

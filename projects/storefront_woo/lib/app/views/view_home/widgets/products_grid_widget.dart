@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/product_card_widget.dart';
+import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 

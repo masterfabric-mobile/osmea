@@ -11,8 +11,6 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/home_loading_widget.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/home_error_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.dart';
 
 /// HomeView displays the main e-commerce product catalog
@@ -67,16 +65,13 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
       );
     }
 
-    // Build content based on state - using widgets instead of ViewModel methods
+    // Build content based on state - using core buildError and buildLoading
     if (state is HomeErrorState) {
-      return HomeErrorWidget(
-        message: state.message,
-        onRetry: () => viewModel.loadProducts(),
-      );
+      return buildError(state.message, onRetry: () => viewModel.loadProducts());
     }
 
     if (state is HomeLoadingState) {
-      return const HomeLoadingWidget();
+      return buildLoading(color: OsmeaColors.nordicBlue);
     }
 
     if (state is HomeLoadedState) {
@@ -84,7 +79,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     }
 
     // Initial state - show loading
-    return const HomeLoadingWidget();
+    return buildLoading(color: OsmeaColors.nordicBlue);
   }
 }
 
