@@ -63,8 +63,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                return FadeTransition(opacity: animation, child: child);
+              },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -88,8 +88,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                return FadeTransition(opacity: animation, child: child);
+              },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -112,8 +112,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                return FadeTransition(opacity: animation, child: child);
+              },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -138,20 +138,19 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeInOutCubic,
-                            ),
-                          ),
-                      child: child,
-                    );
-                  },
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOutCubic,
+                    ),
+                  ),
+                  child: child,
+                );
+              },
               transitionDuration: const Duration(milliseconds: 400),
             );
           },
@@ -349,14 +348,12 @@ final GoRouter appRouter = GoRouter(
                     );
                     authCubit = AuthCubit();
                     GetIt.instance.registerSingleton<AuthCubit>(authCubit);
-                    // Load initial tokens
-                    await authCubit.loadTokens();
                     debugPrint(
-                      '✅ AuthCubit manually registered and initialized',
+                      '✅ AuthCubit manually registered',
                     );
                   }
 
-                  // Save token and refresh state
+                  // Save token - this will update the state immediately
                   // Also save WooCommerce-specific tokens as metadata
                   await authCubit.saveJwtToken(
                     jwtToken: jwtTokenString,
@@ -366,10 +363,8 @@ final GoRouter appRouter = GoRouter(
                       // Cart token will be added by cart interceptor
                     },
                   );
-                  // Also refresh tokens to ensure state is fully updated
-                  await authCubit.loadTokens();
                   debugPrint(
-                    '✅ AuthCubit: JWT token saved to HydratedCubit storage and state refreshed',
+                    '✅ AuthCubit: JWT token saved and state updated',
                   );
                 } catch (e) {
                   debugPrint(
@@ -466,14 +461,13 @@ final GoRouter appRouter = GoRouter(
             debugPrint('📝 Response message: ${response.message}');
 
             // Check if user was successfully created
-            final messageContainsSuccess =
-                response.message != null &&
+            final messageContainsSuccess = response.message != null &&
                 (response.message!.toLowerCase().contains(
-                      'successfully created',
-                    ) ||
+                          'successfully created',
+                        ) ||
                     response.message!.toLowerCase().contains(
-                      'created successfully',
-                    ));
+                          'created successfully',
+                        ));
 
             if (response.success || messageContainsSuccess) {
               debugPrint('✅ Sign up successful!');
@@ -502,24 +496,42 @@ final GoRouter appRouter = GoRouter(
           },
           initialTab: initialTab,
           defaultRedirectPath:
-              '/home', // Default redirect path after successful sign in
-          onSignInSuccess: () {
+              '/profile', // Default redirect path after successful sign in
+          onSignInSuccess: () async {
             debugPrint('✅ Sign in successful! Navigating...');
-            // Small delay to ensure tokens are saved
-            Future.delayed(const Duration(milliseconds: 300), () {
-              if (!context.mounted) return;
-              // Check if there's a return path
-              final returnTo = state.uri.queryParameters['returnTo'];
-              if (returnTo != null && returnTo.isNotEmpty) {
-                debugPrint('🔄 Navigating to return path: $returnTo');
-                context.go(returnTo);
-              } else {
-                // Use default redirect path from AuthView parameter
-                const defaultPath = '/home';
-                debugPrint('🏠 Navigating to default path: $defaultPath');
-                context.go(defaultPath);
+
+            // Check AuthCubit state immediately
+            try {
+              final authCubit = GetIt.I<AuthCubit>();
+              debugPrint(
+                  '🔍 onSignInSuccess: AuthCubit state = ${authCubit.state.runtimeType}');
+              if (authCubit.state is AuthAuthenticatedState) {
+                final authState = authCubit.state as AuthAuthenticatedState;
+                debugPrint(
+                    '🔍 onSignInSuccess: isAuthenticated = ${authState.isAuthenticated}');
+                debugPrint(
+                    '🔍 onSignInSuccess: jwtToken exists = ${authState.jwtToken != null}');
               }
-            });
+            } catch (e) {
+              debugPrint('⚠️ Could not check AuthCubit state: $e');
+            }
+
+            // Small delay to ensure UI updates
+            await Future.delayed(const Duration(milliseconds: 300));
+
+            if (!context.mounted) return;
+
+            // Check if there's a return path
+            final returnTo = state.uri.queryParameters['returnTo'];
+            if (returnTo != null && returnTo.isNotEmpty) {
+              debugPrint('🔄 Navigating to return path: $returnTo');
+              context.go(returnTo);
+            } else {
+              // Navigate to profile after successful sign in
+              const defaultPath = '/profile';
+              debugPrint('👤 Navigating to profile page: $defaultPath');
+              context.go(defaultPath);
+            }
           },
           onSignInError: (error) {
             debugPrint('❌ Sign in error: $error');
