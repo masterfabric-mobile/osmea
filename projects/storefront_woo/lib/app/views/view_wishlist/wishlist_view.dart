@@ -2,7 +2,6 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 // Single source of truth: WishlistViewModel
 
 class WishlistView
@@ -86,7 +85,7 @@ class WishlistView
             ),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
-              state.message,
+          state.message,
               textStyle: OsmeaTextStyle.bodyMedium(
                 context,
               ).copyWith(color: OsmeaColors.pewter),
