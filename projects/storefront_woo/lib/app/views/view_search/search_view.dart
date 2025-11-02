@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_search/models/search_view_model.dart';
 import 'package:storefront_woo/app/views/view_search/models/module/states.dart'
     as search_states;
-import 'package:storefront_woo/app/views/view_home/widgets/product_card_widget.dart';
+import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 
@@ -26,7 +26,17 @@ class SearchView
             ).copyWith(fontWeight: FontWeight.w700, color: OsmeaColors.thunder),
           ),
           leading: OsmeaComponents.iconButton(
-            onPressed: () => context.go('/home'),
+            onPressed: () {
+              // If showing products (SearchLoadedState or SearchErrorState), go back to categories
+              // Otherwise, go to home
+              final currentState = vm.state;
+              if (currentState is search_states.SearchLoadedState ||
+                  currentState is search_states.SearchErrorState) {
+                vm.goBackToCategories();
+              } else {
+                context.go('/home');
+              }
+            },
             icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
             backgroundColor: OsmeaColors.transparent,
             tooltip: 'Back',
@@ -78,20 +88,21 @@ class SearchView
           ),
         );
       }
-      // Grid layout similar to home product grid
+      // Grid layout exactly like home product grid
       final bool isTablet = context.allWidth >= 768;
       final int crossAxisCount = isTablet ? 3 : 2;
+      // Optimized aspect ratio to prevent overflow - more vertical space (same as home)
       final double childAspectRatio = isTablet ? 0.68 : 0.58;
+      final double crossAxisSpacing = context.spacing12;
+      final double mainAxisSpacing = context.spacing12;
+
       return GridView.builder(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.spacing12,
-          vertical: context.spacing10,
-        ),
+        padding: context.paddingNormal, // Same padding as home view
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount,
           childAspectRatio: childAspectRatio,
-          crossAxisSpacing: context.spacing12,
-          mainAxisSpacing: context.spacing12,
+          crossAxisSpacing: crossAxisSpacing,
+          mainAxisSpacing: mainAxisSpacing,
         ),
         itemCount: state.results.length,
         itemBuilder: (context, index) {

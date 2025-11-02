@@ -60,7 +60,9 @@ class SearchViewModel
       final results = (products as List<ListAllProductsResponseModel>? ?? []);
       emit(search_states.SearchLoadedState(results: results, title: 'Search'));
     } catch (e) {
-      emit(search_states.SearchErrorState(message: 'Failed to search: $e'));
+      // Get user-friendly error message
+      final errorMessage = _getErrorMessage(e);
+      emit(search_states.SearchErrorState(message: errorMessage));
     }
   }
 
@@ -79,10 +81,71 @@ class SearchViewModel
       final results = (products as List<ListAllProductsResponseModel>? ?? []);
       emit(search_states.SearchLoadedState(results: results, title: name));
     } catch (e) {
+      // Get user-friendly error message
+      final errorMessage = _getErrorMessage(e);
       emit(
-        search_states.SearchErrorState(message: 'Failed to load category: $e'),
+        search_states.SearchErrorState(message: errorMessage),
       );
     }
+  }
+
+  /// Get user-friendly error message from exception
+  String _getErrorMessage(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+
+    // Handle timeout errors
+    if (errorString.contains('timeout') ||
+        errorString.contains('operation timed out') ||
+        errorString.contains('timed out')) {
+      return 'Connection timeout. Please check your internet connection and try again.';
+    }
+
+    // Handle network errors
+    if (errorString.contains('network') ||
+        errorString.contains('connection') ||
+        errorString.contains('socketexception')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+
+    // Handle 401 Unauthorized
+    if (errorString.contains('401') ||
+        errorString.contains('unauthorized')) {
+      return 'Authentication required. Please sign in and try again.';
+    }
+
+    // Handle 404 Not Found
+    if (errorString.contains('404') ||
+        errorString.contains('not found')) {
+      return 'Not found. Please try a different search or category.';
+    }
+
+    // Handle 500 Server errors
+    if (errorString.contains('500') ||
+        errorString.contains('502') ||
+        errorString.contains('503') ||
+        errorString.contains('server error')) {
+      return 'Server error. Please try again later.';
+    }
+
+    // Default friendly message
+    return 'Unable to load category. Please try again.';
+  }
+
+  /// Go back to categories view
+  /// If categories are already loaded, emit SearchReadyState
+  /// Otherwise, load categories
+  Future<void> goBackToCategories() async {
+    final currentState = state;
+    
+    // If already in SearchReadyState with categories, just emit it again
+    if (currentState is search_states.SearchReadyState &&
+        currentState.categories.isNotEmpty) {
+      emit(currentState);
+      return;
+    }
+    
+    // Otherwise, load categories
+    await loadCategories();
   }
 
   @override

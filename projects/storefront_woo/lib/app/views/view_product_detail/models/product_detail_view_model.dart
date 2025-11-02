@@ -15,6 +15,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
 import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:get_it/get_it.dart';
 
@@ -233,7 +234,36 @@ class ProductDetailViewModel
       );
 
       // Check if product is in cart or wishlist
-      final isInCart = false; // TODO: Implement cart check via API
+      bool isInCart = false;
+      int cartQuantity = 1;
+      
+      // Check cart via API
+      try {
+        final cartResponse = await _cartService.getCart(
+          apiVersion: _configHelper.getString(
+            'woocommerce_configuration.version',
+          ),
+          jwtToken: await _getJwtToken(),
+        );
+        
+        // Find product in cart items
+        if (cartResponse.items != null && cartResponse.items!.isNotEmpty) {
+          final cartItem = cartResponse.items!.firstWhere(
+            (item) => item.id == productId,
+            orElse: () => GetCartResponseItem(id: null),
+          );
+          
+          if (cartItem.id != null) {
+            isInCart = true;
+            cartQuantity = cartItem.quantity ?? 1;
+            _selectedQuantity = cartQuantity; // Set selected quantity to cart quantity
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to check cart: $e');
+        // Continue without cart check - not fatal
+      }
+      
       final isInWishlist = false; // TODO: Implement wishlist service
 
       emit(
@@ -356,10 +386,40 @@ class ProductDetailViewModel
 
       debugPrint('✅ Successfully added product $productId to cart via API');
 
-      // Update state to show product is in cart
+      // Check actual cart quantity after add (API may have merged quantities if item already exists)
+      int finalQuantity = quantity;
+      try {
+        final cartResponse = await _cartService.getCart(
+          apiVersion: _configHelper.getString(
+            'woocommerce_configuration.version',
+          ),
+          jwtToken: await _getJwtToken(),
+        );
+        
+        // Find actual quantity in cart after add
+        if (cartResponse.items != null && cartResponse.items!.isNotEmpty) {
+          final cartItem = cartResponse.items!.firstWhere(
+            (item) => item.id == productId,
+            orElse: () => GetCartResponseItem(id: null),
+          );
+          
+          if (cartItem.id != null) {
+            finalQuantity = cartItem.quantity ?? quantity;
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to check final cart quantity: $e');
+        // Use original quantity if check fails
+      }
+
+      // Update state to show product is in cart and update quantity
       final currentState = state;
       if (currentState is ProductDetailLoadedState) {
-        emit(currentState.copyWith(isInCart: true));
+        emit(currentState.copyWith(
+          isInCart: true,
+          selectedQuantity: finalQuantity, // Update to actual cart quantity
+        ));
+        _selectedQuantity = finalQuantity;
       }
     } catch (e) {
       debugPrint('❌ Failed to add to cart: $e');
@@ -398,9 +458,77 @@ class ProductDetailViewModel
 
       _selectedQuantity = quantity;
       emit(currentState.copyWith(selectedQuantity: _selectedQuantity));
+      
+      // If product is in cart, update quantity via API immediately
+      // This ensures cart quantity is synced with counter in real-time
+      if (currentState.isInCart) {
+        _updateCartQuantity(currentState.product.id ?? 0, quantity);
+      }
+      // If not in cart, just update local quantity (will be used when Add to Cart is clicked)
     } catch (e) {
       debugPrint('❌ Failed to change quantity: $e');
       emit(ProductDetailErrorState(message: 'Failed to change quantity: $e'));
+    }
+  }
+
+  /// Updates cart item quantity via API
+  Future<void> _updateCartQuantity(int productId, int quantity) async {
+    try {
+      final currentState = state;
+      if (currentState is! ProductDetailLoadedState) return;
+
+      // Get cart token and JWT token
+      String? cartToken = await _getCartToken();
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint('⚠️ No cart token available for quantity update');
+        return;
+      }
+
+      // Get cart to find item key
+      final cartResponse = await _cartService.getCart(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        jwtToken: await _getJwtToken(),
+      );
+
+      // Find item key for this product
+      String? itemKey;
+      if (cartResponse.items != null) {
+        final cartItem = cartResponse.items!.firstWhere(
+          (item) => item.id == productId,
+          orElse: () => GetCartResponseItem(id: null),
+        );
+        if (cartItem.id != null) {
+          itemKey = cartItem.key;
+        }
+      }
+
+      if (itemKey == null) {
+        debugPrint('⚠️ Item key not found for product $productId');
+        return;
+      }
+
+      // Update item quantity via API
+      final response = await _cartService.updateItem(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        cartToken: cartToken,
+        jwtToken: await _getJwtToken(),
+        key: itemKey,
+        quantity: quantity,
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API update item error: ${response.errors!.first}');
+        return;
+      }
+
+      debugPrint('✅ Successfully updated cart quantity to $quantity');
+    } catch (e) {
+      debugPrint('❌ Failed to update cart quantity: $e');
+      // Don't emit error state - just log it
     }
   }
 

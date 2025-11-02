@@ -8,7 +8,7 @@ class ActionSection extends StatelessWidget {
   final VoidCallback onToggleWishlist;
 
   final bool isInCart;
-  final VoidCallback onAddToCart;
+  final Future<void> Function() onAddToCart;
 
   final int selectedQuantity;
   final void Function(int) onUpdateQuantity;
@@ -122,6 +122,7 @@ class ActionSection extends StatelessWidget {
           ),
         if (showWishlistAndShare)
           OsmeaComponents.sizedBox(width: context.spacing8),
+        // Counter always visible - shows cart quantity if in cart, otherwise 1
         OsmeaComponents.counter(
           initialValue: selectedQuantity,
           minValue: 1,
@@ -132,21 +133,19 @@ class ActionSection extends StatelessWidget {
           onChanged: onUpdateQuantity,
         ),
         OsmeaComponents.sizedBox(width: context.spacing8),
+        // Add to Cart button always active - adds to cart or updates quantity
         OsmeaComponents.expanded(
           child: OsmeaComponents.sizedBox(
             // Use default button without extra borders or overrides
             child: OsmeaComponents.button(
-              onPressed: isInCart
-                  ? null
-                  : () {
-                      onAddToCart();
-                      // Show success snackbar immediately after triggering add
-                      context.snackbarSuccess('Added to cart');
-                      if (onAddSuccessNavigateToCart != null) {
-                        onAddSuccessNavigateToCart!();
-                      }
-                    },
-              text: isInCart ? 'In Cart' : 'Add to Cart',
+              onPressed: () async {
+                await onAddToCart();
+                // Popup will be shown after successful add via callback
+                if (onAddSuccessNavigateToCart != null) {
+                  onAddSuccessNavigateToCart!();
+                }
+              },
+              text: 'Add to Cart',
             ),
           ),
         ),

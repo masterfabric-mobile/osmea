@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 // removed unused go_router import
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
@@ -133,11 +134,19 @@ class ProductDetailContentWidget extends StatelessWidget {
                   viewModel.addProductToWishlistFire(state.product.id ?? 0);
                 },
                 isInCart: state.isInCart,
-                onAddToCart: () {
-                  viewModel.addProductToCartFire(
+                onAddToCart: () async {
+                  // Add product to cart
+                  await viewModel.addProductToCart(
                     state.product.id ?? 0,
                     quantity: state.selectedQuantity,
                   );
+                  
+                  // Check if add was successful (check state)
+                  final currentState = viewModel.state;
+                  if (currentState is ProductDetailLoadedState && currentState.isInCart) {
+                    // Show success popup
+                    _showAddToCartSuccessPopup(context);
+                  }
                 },
                 selectedQuantity: state.selectedQuantity,
                 onUpdateQuantity: (q) => viewModel.updateQuantityFire(q),
@@ -410,4 +419,50 @@ class ProductDetailErrorWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Shows add to cart success popup with options
+void _showAddToCartSuccessPopup(BuildContext context) {
+  OsmeaComponents.showPopup(
+    context: context,
+    variant: PopupVariant.dialog,
+    size: PopupSize.small,
+    title: 'Ürün sepete eklendi',
+    child: OsmeaComponents.column(
+      children: [
+        OsmeaComponents.text(
+          'Ürün başarıyla sepete eklendi.',
+          textAlign: TextAlign.center,
+          textStyle: OsmeaTextStyle.bodyMedium(context),
+          color: OsmeaColors.thunder,
+        ),
+      ],
+    ),
+    footer: OsmeaComponents.column(
+      children: [
+        OsmeaComponents.button(
+          text: 'Sepeti Kontrol Et',
+          variant: ButtonVariant.primary,
+          size: ButtonSize.medium,
+          fullWidth: true,
+          onPressed: () {
+            Navigator.of(context).pop();
+            // Navigate to cart page
+            context.push('/cart');
+          },
+        ),
+        OsmeaComponents.sizedBox(height: 12),
+        OsmeaComponents.button(
+          text: 'Alışverişe Devam Et',
+          variant: ButtonVariant.outlined,
+          size: ButtonSize.medium,
+          fullWidth: true,
+          onPressed: () {
+            Navigator.of(context).pop();
+            // Just close popup, stay on product detail page
+          },
+        ),
+      ],
+    ),
+  );
 }
