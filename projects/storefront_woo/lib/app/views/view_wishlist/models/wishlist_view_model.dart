@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
@@ -58,6 +59,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   // Dependencies (resolved via DI)
   final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
+  final ProductService _productService = GetIt.I<ProductService>();
   final AssetConfigHelper _config = AssetConfigHelper();
 
   // Optional route/view arguments holder (to align with other views)
@@ -136,10 +138,26 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         perPage: 100,
       );
 
-      final mapped = (paged.data ?? [])
-          .map(
-            (w) => WishlistItem(
-              id: w.productId ?? 0,
+      final wishlistItems = paged.data ?? [];
+      final mapped = <WishlistItem>[];
+
+      // Process each wishlist item and fetch product details if needed
+      for (final w in wishlistItems) {
+        final productId = w.productId ?? 0;
+        if (productId == 0) continue;
+
+        // Check if product details are missing from wishlist response
+        final hasProductDetails =
+            w.productName != null &&
+            w.productName!.isNotEmpty &&
+            w.productImage != null &&
+            w.productImage!.isNotEmpty;
+
+        if (hasProductDetails) {
+          // Use data from wishlist response
+          mapped.add(
+            WishlistItem(
+              id: productId,
               name: w.productName,
               imageUrl: w.productImage,
               regularPrice: w.productPrice,
@@ -147,14 +165,60 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
               currencyCode: null,
               onSale: false,
             ),
-          )
-          .toList();
+          );
+        } else {
+          // Fetch product details from ProductService
+          try {
+            final product = await _productService.retrieveProduct(
+              apiVersion: apiVersion,
+              productId: productId,
+            );
+
+            // Extract image URL
+            String? imageUrl;
+            if (product.images != null && product.images!.isNotEmpty) {
+              imageUrl = product.images!.first.src;
+            }
+
+            // Extract prices
+            final prices = product.prices;
+            final regularPrice = prices?.regularPrice ?? prices?.price;
+            final salePrice = product.onSale == true ? prices?.salePrice : null;
+            final currencyCode = prices?.currencyCode;
+
+            mapped.add(
+              WishlistItem(
+                id: productId,
+                name: product.name,
+                imageUrl: imageUrl,
+                regularPrice: regularPrice,
+                salePrice: salePrice,
+                currencyCode: currencyCode,
+                onSale: product.onSale ?? false,
+              ),
+            );
+          } catch (e) {
+            debugPrint('❌ Failed to fetch product $productId: $e');
+            // Use partial data from wishlist if available
+            mapped.add(
+              WishlistItem(
+                id: productId,
+                name: w.productName ?? 'Product',
+                imageUrl: w.productImage,
+                regularPrice: w.productPrice,
+                salePrice: null,
+                currencyCode: null,
+                onSale: false,
+              ),
+            );
+          }
+        }
+      }
 
       emit(WishlistLoadedState(items: mapped));
-    } catch (e, s) {
+    } catch (e) {
       debugPrint('❌ Wishlist sync error: $e');
-      debugPrintStack(stackTrace: s);
-      emit(WishlistErrorState(message: '$e'));
+      emit(WishlistErrorState(message: 'Failed to load saved items: $e'));
     }
   }
 
@@ -191,9 +255,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           groupId: groupId ?? 0,
         ),
       );
-    } catch (e, s) {
+    } catch (e) {
       debugPrint('❌ Wishlist add error: $e');
-      debugPrintStack(stackTrace: s);
       // Keep local state; avoid throwing user to error screen for wishlist
       final cur = state;
       if (cur is WishlistLoadedState) {
@@ -228,9 +291,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           groupId: groupId ?? 0,
         ),
       );
-    } catch (e, s) {
+    } catch (e) {
       debugPrint('❌ Wishlist remove error: $e');
-      debugPrintStack(stackTrace: s);
       // Rollback removal on failure
       final cur = state;
       if (cur is WishlistLoadedState) {
