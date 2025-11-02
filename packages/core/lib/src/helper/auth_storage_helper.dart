@@ -20,13 +20,20 @@ class AuthStorageHelper {
 
   final LocalStorageHelper _storage = LocalStorageHelper();
 
+  // 🌍 Global static instance for easy access
+  static final AuthStorageHelper _instance = AuthStorageHelper();
+
+  /// Get global instance
+  static AuthStorageHelper get instance => _instance;
+
   // Cache for token-related data
   String? _cachedToken;
   Map<String, dynamic>? _cachedUserData;
   DateTime? _cachedTokenExpiry;
   bool? _cachedIsAuthenticated;
   DateTime? _lastCacheUpdate;
-  static const Duration _cacheValidityDuration = Duration(minutes: 1); // Cache valid for 1 minute
+  static const Duration _cacheValidityDuration =
+      Duration(minutes: 1); // Cache valid for 1 minute
 
   /// Clear cache (call when token is saved/cleared)
   void _clearCache() {
@@ -295,5 +302,59 @@ class AuthStorageHelper {
       debugPrint('❌ Error checking authentication: $e');
       return false;
     }
+  }
+
+  // ========================================================================
+  // 🌍 STATIC HELPER METHODS - For easy global access
+  // ========================================================================
+
+  /// 📖 Get JWT token from storage (static helper)
+  ///
+  /// Usage:
+  /// ```dart
+  /// final token = await AuthStorageHelper.getJwtToken();
+  /// ```
+  static Future<String?> getJwtToken() async {
+    return await instance.getToken();
+  }
+
+  /// 📖 Get user data from storage (static helper)
+  ///
+  /// Usage:
+  /// ```dart
+  /// final userData = await AuthStorageHelper.getUserDataStatic();
+  /// ```
+  static Future<Map<String, dynamic>?> getUserDataStatic() async {
+    return await instance.getUserData();
+  }
+
+  /// ✅ Check if user is authenticated (static helper)
+  ///
+  /// Usage:
+  /// ```dart
+  /// final isAuth = await AuthStorageHelper.isUserAuthenticated();
+  /// ```
+  static Future<bool> isUserAuthenticated() async {
+    return await instance.isAuthenticated();
+  }
+
+  /// 💾 Save JWT token (static helper)
+  ///
+  /// Usage:
+  /// ```dart
+  /// await AuthStorageHelper.saveJwtToken('your_token_here');
+  /// ```
+  static Future<void> saveJwtToken(String token) async {
+    return await instance.saveToken(token);
+  }
+
+  /// 🗑️ Clear all auth data (static helper)
+  ///
+  /// Usage:
+  /// ```dart
+  /// await AuthStorageHelper.clearAuthData();
+  /// ```
+  static Future<void> clearAuthData() async {
+    return await instance.clearToken();
   }
 }
