@@ -7,13 +7,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_profile/models/module/states.dart';
 
 @injectable
-class ProfileViewModel
-    extends BaseViewModelHydratedCubit<ProfileState> {
+class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
   ProfileViewModel() : super(ProfileInitialState());
 
   WooJwtToken? _jwtToken;
@@ -30,13 +30,40 @@ class ProfileViewModel
     try {
       emit(ProfileLoadingState());
 
+      // First, try to get data from AuthCubit (HydratedCubit)
+      String? authJwtToken;
+      Map<String, dynamic>? authUserData;
+
+      try {
+        final authCubit = GetIt.I<AuthCubit>();
+        debugPrint('🔍 ProfileViewModel: Checking AuthCubit state...');
+        debugPrint(
+            '🔍 ProfileViewModel: AuthCubit state = ${authCubit.state.runtimeType}');
+
+        if (authCubit.state is AuthAuthenticatedState) {
+          final authState = authCubit.state as AuthAuthenticatedState;
+          authJwtToken = authState.jwtToken;
+          authUserData = authState.userData;
+          debugPrint('✅ ProfileViewModel: Got JWT from AuthCubit');
+        } else {
+          debugPrint(
+              '⚠️ ProfileViewModel: AuthCubit not authenticated, loading from storage...');
+          // Load from storage as fallback
+          final authStorage = AuthStorageHelper();
+          authJwtToken = await authStorage.getToken();
+          authUserData = await authStorage.getUserData();
+        }
+      } catch (e) {
+        debugPrint(
+            '⚠️ ProfileViewModel: AuthCubit not available, loading from storage: $e');
+        // Fallback to AuthStorageHelper
+        final authStorage = AuthStorageHelper();
+        authJwtToken = await authStorage.getToken();
+        authUserData = await authStorage.getUserData();
+      }
+
       // Load JWT token from WooCommerce storage
       final jwtToken = await WooJwtTokenStorage.loadToken();
-
-      // Load JWT token from Core AuthStorageHelper
-      final authStorage = AuthStorageHelper();
-      final authJwtToken = await authStorage.getToken();
-      final authUserData = await authStorage.getUserData();
 
       // Load cart token using WooCartTokenStorage (returns WooCartToken object)
       WooCartToken? cartToken;
@@ -99,6 +126,15 @@ class ProfileViewModel
       final authStorage = AuthStorageHelper();
       await authStorage.clearToken();
 
+      // Update AuthCubit to refresh navbar immediately
+      try {
+        final authCubit = GetIt.I<AuthCubit>();
+        await authCubit.signOut();
+        debugPrint('✅ AuthCubit cleared for navbar update');
+      } catch (e) {
+        debugPrint('⚠️ Could not clear AuthCubit: $e');
+      }
+
       emit(ProfileSignedOutState());
     } catch (e) {
       debugPrint('❌ Error signing out: $e');
@@ -112,4 +148,3 @@ class ProfileViewModel
   @override
   Map<String, dynamic>? toJson(ProfileState state) => null;
 }
-
