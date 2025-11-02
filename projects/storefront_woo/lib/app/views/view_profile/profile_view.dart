@@ -14,36 +14,35 @@ import 'package:storefront_woo/app/views/view_profile/models/module/states.dart'
 import 'package:apis/models/auth/woo_jwt_token.dart';
 
 /// Profile View - Shows user authentication status and token information
-class ProfileView
-    extends
-        MasterViewHydratedCubit<ProfileViewModel, profile_states.ProfileState> {
+class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
+    profile_states.ProfileState> {
   ProfileView({super.key, required super.goRoute, super.bottomNavigationBar})
-    : super(
-        arguments: const {'profile': true},
-        appBarPadding: const AppBarPaddingVisibility.disabled(),
-        verticalPadding: const PaddingVisibility.disabled(),
-        coreAppBar: (context, vm) => OsmeaComponents.appBar(
-          title: OsmeaComponents.text(
-            'Profile',
-            textStyle: OsmeaTextStyle.titleLarge(context),
-          ),
-          leading: OsmeaComponents.iconButton(
-            onPressed: () => context.go('/home'),
-            icon: const Icon(Icons.arrow_back),
-            tooltip: 'Back',
-          ),
-          actions: [
-            AppBarAction(
-              type: AppBarActionType.secondary,
-              icon: const Icon(Icons.refresh),
-              onPressed: () => vm.refreshProfile(),
-              tooltip: 'Refresh',
+      : super(
+          arguments: const {'profile': true},
+          appBarPadding: const AppBarPaddingVisibility.disabled(),
+          verticalPadding: const PaddingVisibility.disabled(),
+          coreAppBar: (context, vm) => OsmeaComponents.appBar(
+            title: OsmeaComponents.text(
+              'Profile',
+              textStyle: OsmeaTextStyle.titleLarge(context),
             ),
-          ],
-          variant: AppBarVariant.standard,
-          size: AppBarSize.standard,
-        ),
-      );
+            leading: OsmeaComponents.iconButton(
+              onPressed: () => context.go('/home'),
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Back',
+            ),
+            actions: [
+              AppBarAction(
+                type: AppBarActionType.secondary,
+                icon: const Icon(Icons.refresh),
+                onPressed: () => vm.refreshProfile(),
+                tooltip: 'Refresh',
+              ),
+            ],
+            variant: AppBarVariant.standard,
+            size: AppBarSize.standard,
+          ),
+        );
 
   @override
   void initialContent(ProfileViewModel viewModel, BuildContext context) {
@@ -78,6 +77,7 @@ class ProfileView
 
     if (state is profile_states.ProfileLoadedState) {
       return SingleChildScrollView(
+        padding: EdgeInsets.all(context.spacing16),
         child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -105,6 +105,9 @@ class ProfileView
 
             // Actions
             _buildActions(context, viewModel, state.isAuthenticated),
+
+            // Bottom spacing for safe area
+            OsmeaComponents.sizedBox(height: context.spacing32),
           ],
         ),
       );
@@ -126,12 +129,10 @@ class ProfileView
 
     return _buildCardWrapper(
       context: context,
-      backgroundColor: state.isAuthenticated
-          ? OsmeaColors.white
-          : OsmeaColors.ash,
-      borderColor: state.isAuthenticated
-          ? OsmeaColors.nordicBlue
-          : OsmeaColors.pewter,
+      backgroundColor:
+          state.isAuthenticated ? OsmeaColors.white : OsmeaColors.ash,
+      borderColor:
+          state.isAuthenticated ? OsmeaColors.nordicBlue : OsmeaColors.pewter,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -179,7 +180,7 @@ class ProfileView
     return _buildCardWrapper(
       context: context,
       backgroundColor: OsmeaColors.white,
-      borderColor: OsmeaColors.silver,
+      borderColor: OsmeaColors.nordicBlue,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -190,17 +191,28 @@ class ProfileView
             ).copyWith(fontWeight: FontWeight.w700),
           ),
           OsmeaComponents.sizedBox(height: context.spacing12),
-          Container(
-            padding: EdgeInsets.all(context.spacing12),
-            decoration: BoxDecoration(
-              color: OsmeaColors.ash,
-              borderRadius: context.borderRadiusNormal,
-            ),
-            child: OsmeaComponents.text(
-              userData.toString(),
-              textStyle: OsmeaTextStyle.bodySmall(context),
-            ),
-          ),
+
+          // Display user info in a structured way
+          if (userData['email'] != null)
+            _buildInfoItem(context, 'Email', userData['email'].toString()),
+          if (userData['username'] != null)
+            _buildInfoItem(
+                context, 'Username', userData['username'].toString()),
+          if (userData['displayName'] != null ||
+              userData['display_name'] != null)
+            _buildInfoItem(
+                context,
+                'Display Name',
+                (userData['displayName'] ?? userData['display_name'])
+                    .toString()),
+          if (userData['firstName'] != null || userData['first_name'] != null)
+            _buildInfoItem(context, 'First Name',
+                (userData['firstName'] ?? userData['first_name']).toString()),
+          if (userData['lastName'] != null || userData['last_name'] != null)
+            _buildInfoItem(context, 'Last Name',
+                (userData['lastName'] ?? userData['last_name']).toString()),
+          if (userData['id'] != null)
+            _buildInfoItem(context, 'User ID', userData['id'].toString()),
         ],
       ),
     );
@@ -302,8 +314,7 @@ class ProfileView
       return _buildEmptySection(context, 'Cart Token', 'No cart token found');
     }
 
-    final isExpired =
-        cartToken.expiresAt != null &&
+    final isExpired = cartToken.expiresAt != null &&
         DateTime.now().isAfter(cartToken.expiresAt!);
 
     return _buildCardWrapper(
