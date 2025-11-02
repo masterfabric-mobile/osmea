@@ -24,6 +24,11 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   AuthCubit() : super(const AuthInitialState());
 
   final AuthStorageHelper _authStorage = AuthStorageHelper();
+  
+  // Prevent multiple concurrent loadTokens() calls
+  bool _isLoadingTokens = false;
+  DateTime? _lastLoadTime;
+  static const Duration _loadDebounceDuration = Duration(seconds: 2); // Minimum 2 seconds between loads
 
   /// Check if user is authenticated
   bool get isAuthenticated {
@@ -81,7 +86,26 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
   /// Load tokens from storage and update state
   /// This method reads from core AuthStorageHelper and syncs to HydratedCubit state
+  /// Includes debounce to prevent excessive calls
   Future<void> loadTokens() async {
+    // Prevent concurrent calls
+    if (_isLoadingTokens) {
+      debugPrint('⏸️ AuthCubit: Already loading tokens, skipping...');
+      return;
+    }
+    
+    // Debounce: Prevent calls within 2 seconds of last load
+    if (_lastLoadTime != null) {
+      final timeSinceLastLoad = DateTime.now().difference(_lastLoadTime!);
+      if (timeSinceLastLoad < _loadDebounceDuration) {
+        debugPrint('⏸️ AuthCubit: Too soon since last load (${timeSinceLastLoad.inMilliseconds}ms), skipping...');
+        return;
+      }
+    }
+    
+    _isLoadingTokens = true;
+    _lastLoadTime = DateTime.now();
+    
     try {
       debugPrint('🔄 AuthCubit: Loading tokens from storage...');
       emit(const AuthLoadingState());
@@ -111,6 +135,8 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     } catch (e) {
       debugPrint('❌ AuthCubit: Error loading tokens: $e');
       emit(const AuthUnauthenticatedState());
+    } finally {
+      _isLoadingTokens = false;
     }
   }
 

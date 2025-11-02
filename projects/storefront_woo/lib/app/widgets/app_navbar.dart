@@ -106,6 +106,8 @@ class _AppNavbarState extends State<AppNavbar> {
     }
   }
 
+  bool _hasLoadedTokens = false; // Flag to prevent multiple loadTokens() calls
+
   @override
   Widget build(BuildContext context) {
     // Try to get AuthCubit from GetIt - if available, listen to it for real-time updates
@@ -118,13 +120,21 @@ class _AppNavbarState extends State<AppNavbar> {
           final isAuthenticated = authState is AuthAuthenticatedState &&
               authState.isAuthenticated;
           
-          // Also trigger initial load if needed
-          if (authState is AuthInitialState || authState is AuthUnauthenticatedState) {
+          // Only trigger initial load once if state is initial/unauthenticated
+          // Prevent infinite loop by checking if we've already loaded
+          if (!_hasLoadedTokens && 
+              (authState is AuthInitialState || authState is AuthUnauthenticatedState)) {
+            _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 authCubit.loadTokens();
               }
             });
+          }
+          
+          // Reset flag if we're authenticated (so we can reload if needed later)
+          if (authState is AuthAuthenticatedState) {
+            _hasLoadedTokens = false; // Allow reload when authenticated changes
           }
           
           return _buildNavbar(context, isAuthenticated);
