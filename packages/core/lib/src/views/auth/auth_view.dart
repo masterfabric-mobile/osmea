@@ -1,10 +1,5 @@
 import 'package:core/core.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:core/src/helper/asset_config_helper.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
-import 'package:core/src/views/auth/auth_widget.dart';
 
 /// 🔐 **OSMEA Auth View**
 ///
