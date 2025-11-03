@@ -38,6 +38,9 @@ class ProductDetailView
 
   @override
   void initialContent(ProductDetailViewModel viewModel, BuildContext context) {
+    // Set arguments to ViewModel
+    viewModel.setArguments(arguments);
+    // Load product
     viewModel.loadProduct(productId);
   }
 

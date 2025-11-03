@@ -144,8 +144,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                   // Check if add was successful (check state)
                   final currentState = viewModel.state;
                   if (currentState is ProductDetailLoadedState && currentState.isInCart) {
-                    // Show success popup
-                    _showAddToCartSuccessPopup(context);
+                    // Show success popup with cart token for navigation
+                    final cartToken = await viewModel.getCartTokenForNavigation();
+                    _showAddToCartSuccessPopup(context, cartToken: cartToken);
                   }
                 },
                 selectedQuantity: state.selectedQuantity,
@@ -422,38 +423,38 @@ class ProductDetailErrorWidget extends StatelessWidget {
 }
 
 /// Shows add to cart success popup with options
-void _showAddToCartSuccessPopup(BuildContext context) {
+void _showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
   OsmeaComponents.showPopup(
     context: context,
     variant: PopupVariant.dialog,
     size: PopupSize.small,
-    title: 'Ürün sepete eklendi',
-    child: OsmeaComponents.column(
-      children: [
-        OsmeaComponents.text(
-          'Ürün başarıyla sepete eklendi.',
-          textAlign: TextAlign.center,
-          textStyle: OsmeaTextStyle.bodyMedium(context),
-          color: OsmeaColors.thunder,
-        ),
-      ],
+    title: 'Product Added to Cart',
+    child: OsmeaComponents.text(
+      'Product successfully added to cart.',
+      textAlign: TextAlign.center,
+      textStyle: OsmeaTextStyle.bodyMedium(context),
+      color: OsmeaColors.thunder,
     ),
     footer: OsmeaComponents.column(
       children: [
         OsmeaComponents.button(
-          text: 'Sepeti Kontrol Et',
+          text: 'Check Cart',
           variant: ButtonVariant.primary,
           size: ButtonSize.medium,
           fullWidth: true,
           onPressed: () {
             Navigator.of(context).pop();
-            // Navigate to cart page
-            context.push('/cart');
+            // Navigate to cart page with cart token in arguments
+            // Use context.go instead of push since cart is in ShellRoute (bottom nav)
+            // This prevents duplicate key error in Navigator
+            context.go('/cart', extra: {
+              'cartToken': cartToken,
+            });
           },
         ),
-        OsmeaComponents.sizedBox(height: 12),
+        OsmeaComponents.sizedBox(height: context.spacing12),
         OsmeaComponents.button(
-          text: 'Alışverişe Devam Et',
+          text: 'Continue Shopping',
           variant: ButtonVariant.outlined,
           size: ButtonSize.medium,
           fullWidth: true,

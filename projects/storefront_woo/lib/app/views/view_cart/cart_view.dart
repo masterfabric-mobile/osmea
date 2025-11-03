@@ -32,7 +32,10 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
   @override
   void initialContent(CartViewModel viewModel, BuildContext context) {
     debugPrint('🛒 CartView: initialContent called');
-    viewModel.loadCart();
+    // Set arguments to ViewModel
+    viewModel.setArguments(arguments);
+    // Load cart - token will be taken from arguments or storage
+    viewModel.loadCart(cartToken: arguments['cartToken'] as String?);
   }
 
   @override

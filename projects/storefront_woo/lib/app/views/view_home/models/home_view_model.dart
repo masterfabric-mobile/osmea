@@ -14,7 +14,6 @@ import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
-import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 
@@ -298,25 +297,8 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         return;
       }
 
-      // Try to persist cart token if the API returned it (fallback to interceptor)
-      try {
-        final dynamic tokenCandidate =
-            (response as dynamic).cartToken ??
-            (response as dynamic).cartKey ??
-            (response as dynamic).cart_key ??
-            (response as dynamic).token;
-        if (tokenCandidate is String && tokenCandidate.isNotEmpty) {
-          await CartTokenStorage.saveCartToken(
-            tokenCandidate,
-            expiry: const Duration(days: 30),
-          );
-          debugPrint(
-            '🛒 HomeViewModel: Saved cart token from addItem response',
-          );
-        }
-      } catch (e) {
-        debugPrint('⚠️ HomeViewModel: Could not extract cart token: $e');
-      }
+      // Cart token is automatically handled by WooCartTokenInterceptor
+      // No need to manually save token - interceptor extracts from response headers
 
       debugPrint('✅ Successfully added product $productId to cart via API');
 
@@ -422,15 +404,39 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     return null; // No need to persist home state
   }
 
-  /// Gets cart token from storage
+  /// Gets cart token from arguments (route params) or storage
+  /// Priority: arguments > storage
+  /// Interceptor automatically adds token to request headers,
+  /// but ViewModel needs token for direct API calls
   Future<String?> _getCartToken() async {
     try {
-      // Use local CartTokenStorage for consistency
-      final token = await CartTokenStorage.loadCartToken();
-      debugPrint(
-        '🛒 HomeViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
-      );
-      return token;
+      // First try to get from arguments (route params)
+      final argsToken = _arguments['cartToken'] as String?;
+      if (argsToken != null && argsToken.isNotEmpty) {
+        debugPrint('🛒 HomeViewModel: Cart token from arguments');
+        return argsToken;
+      }
+
+      // Fallback to storage
+      final wooCartToken = await WooCartTokenStorage.loadCartToken();
+
+      if (wooCartToken != null && wooCartToken.cartToken.isNotEmpty) {
+        // Check if token has expired
+        if (wooCartToken.expiresAt != null &&
+            DateTime.now().isAfter(wooCartToken.expiresAt!)) {
+          debugPrint('⚠️ Cart token has expired');
+          await WooCartTokenStorage.clearCartToken();
+          return null;
+        }
+
+        debugPrint(
+          '🛒 HomeViewModel: Cart token from storage: ${wooCartToken.cartToken.length > 20 ? wooCartToken.cartToken.substring(0, 20) + "..." : wooCartToken.cartToken}',
+        );
+        return wooCartToken.cartToken;
+      }
+
+      debugPrint('⚠️ HomeViewModel: No cart token found');
+      return null;
     } catch (e) {
       debugPrint('❌ Failed to get cart token: $e');
       return null;

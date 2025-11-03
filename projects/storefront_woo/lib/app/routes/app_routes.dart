@@ -123,9 +123,16 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/cart',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Get cart token from extra (route params) or use default
+            final extra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'cart': true,
+              if (extra != null && extra.containsKey('cartToken'))
+                'cartToken': extra['cartToken'] as String?,
+            };
             return CustomTransitionPage(
               child: CartView(
-                arguments: const {'cart': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -628,10 +635,17 @@ final GoRouter appRouter = GoRouter(
         final productId = int.tryParse(
           state.pathParameters['productId'] ?? '0',
         );
+        // Get cart token from extra (route params) or use default
+        final extra = state.extra as Map<String, dynamic>?;
+        final arguments = {
+          'productDetail': true,
+          if (extra != null && extra.containsKey('cartToken'))
+            'cartToken': extra['cartToken'] as String?,
+        };
         return CustomTransitionPage(
           child: ProductDetailView(
             productId: productId ?? 0,
-            arguments: const {'productDetail': true},
+            arguments: arguments,
             goRoute: (String path) {
               if (path.contains('home')) {
                 context.go('/home');

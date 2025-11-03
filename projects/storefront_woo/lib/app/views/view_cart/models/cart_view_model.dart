@@ -12,7 +12,6 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
-import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:apis/apis.dart';
@@ -25,8 +24,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   final CartService _cartService = GetIt.I<CartService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
+  // Arguments holder for route/widget inputs
+  final Map<String, dynamic> _arguments = {};
+  void setArguments(Map<String, dynamic> args) {
+    _arguments
+      ..clear()
+      ..addAll(args);
+  }
+
+  Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
+
   // Public trigger functions - HydratedCubit pattern
-  void loadCart() => _loadCart();
+  void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
   void addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
   void removeItemFromCart(int productId) => _removeItemFromCart(productId);
@@ -37,10 +46,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   void removeCoupon(String couponCode) => _removeCoupon(couponCode);
 
   // Private methods - HydratedCubit pattern
-  Future<void> _loadCart() async {
+  Future<void> _loadCart({String? cartToken}) async {
     try {
       debugPrint('🛒 CartViewModel: _loadCart called');
       emit(CartLoadingState());
+
+      // Get cart token from arguments or storage
+      final token = cartToken ?? 
+          (_arguments['cartToken'] as String?) ?? 
+          await _getCartToken();
+      
+      debugPrint('🛒 CartViewModel: Cart token from arguments: ${cartToken != null}');
+      debugPrint('🛒 CartViewModel: Cart token from storage: ${token != null && token != cartToken}');
 
       // Directly call getCart API - WooCommerce handles cart token automatically
       debugPrint('🛒 CartViewModel: Loading cart from API');
@@ -624,20 +641,39 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     return null; // No need to persist cart state
   }
 
-  /// Gets cart token from storage
+  /// Gets cart token from arguments (route params) or storage
+  /// Priority: arguments > storage
+  /// Interceptor automatically adds token to request headers,
+  /// but ViewModel needs token for direct API calls
   Future<String?> _getCartToken() async {
     try {
-      // Use local CartTokenStorage for consistency
-      final token = await CartTokenStorage.loadCartToken();
-      debugPrint(
-        '🛒 CartViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
-      );
-      if (token != null) {
-        debugPrint(
-          '🛒 CartViewModel: Cart token value: ${token.substring(0, token.length > 20 ? 20 : token.length)}...',
-        );
+      // First try to get from arguments (route params)
+      final argsToken = _arguments['cartToken'] as String?;
+      if (argsToken != null && argsToken.isNotEmpty) {
+        debugPrint('🛒 CartViewModel: Cart token from arguments');
+        return argsToken;
       }
-      return token;
+
+      // Fallback to storage
+      final wooCartToken = await WooCartTokenStorage.loadCartToken();
+      
+      if (wooCartToken != null && wooCartToken.cartToken.isNotEmpty) {
+        // Check if token has expired
+        if (wooCartToken.expiresAt != null &&
+            DateTime.now().isAfter(wooCartToken.expiresAt!)) {
+          debugPrint('⚠️ Cart token has expired');
+          await WooCartTokenStorage.clearCartToken();
+          return null;
+        }
+        
+        debugPrint(
+          '🛒 CartViewModel: Cart token from storage: ${wooCartToken.cartToken.length > 20 ? wooCartToken.cartToken.substring(0, 20) + "..." : wooCartToken.cartToken}',
+        );
+        return wooCartToken.cartToken;
+      }
+      
+      debugPrint('⚠️ CartViewModel: No cart token found');
+      return null;
     } catch (e) {
       debugPrint('❌ Failed to get cart token: $e');
       return null;

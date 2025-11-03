@@ -16,7 +16,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
-import 'package:storefront_woo/app/services/cart_token_storage.dart';
+import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:get_it/get_it.dart';
 
 @injectable
@@ -28,6 +28,16 @@ class ProductDetailViewModel
   final ProductService _productService = GetIt.I<ProductService>();
   final CartService _cartService = GetIt.I<CartService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+
+  // Arguments holder for route/widget inputs
+  final Map<String, dynamic> _arguments = {};
+  void setArguments(Map<String, dynamic> args) {
+    _arguments
+      ..clear()
+      ..addAll(args);
+  }
+
+  Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
 
   // State variables
   int _selectedQuantity = 1;
@@ -236,7 +246,7 @@ class ProductDetailViewModel
       // Check if product is in cart or wishlist
       bool isInCart = false;
       int cartQuantity = 1;
-      
+
       // Check cart via API
       try {
         final cartResponse = await _cartService.getCart(
@@ -245,25 +255,26 @@ class ProductDetailViewModel
           ),
           jwtToken: await _getJwtToken(),
         );
-        
+
         // Find product in cart items
         if (cartResponse.items != null && cartResponse.items!.isNotEmpty) {
           final cartItem = cartResponse.items!.firstWhere(
             (item) => item.id == productId,
             orElse: () => GetCartResponseItem(id: null),
           );
-          
+
           if (cartItem.id != null) {
             isInCart = true;
             cartQuantity = cartItem.quantity ?? 1;
-            _selectedQuantity = cartQuantity; // Set selected quantity to cart quantity
+            _selectedQuantity =
+                cartQuantity; // Set selected quantity to cart quantity
           }
         }
       } catch (e) {
         debugPrint('⚠️ Failed to check cart: $e');
         // Continue without cart check - not fatal
       }
-      
+
       final isInWishlist = false; // TODO: Implement wishlist service
 
       emit(
@@ -362,27 +373,8 @@ class ProductDetailViewModel
         }
       }
 
-      // Persist cart token if provided in response (fallback in case interceptor misses)
-      try {
-        final dynamic tokenCandidate =
-            (response as dynamic).cartToken ??
-            (response as dynamic).cartKey ??
-            (response as dynamic).cart_key ??
-            (response as dynamic).token;
-        if (tokenCandidate is String && tokenCandidate.isNotEmpty) {
-          await CartTokenStorage.saveCartToken(
-            tokenCandidate,
-            expiry: const Duration(days: 30),
-          );
-          debugPrint(
-            '🛒 ProductDetailViewModel: Saved cart token from addItem',
-          );
-        }
-      } catch (e) {
-        debugPrint(
-          '⚠️ ProductDetailViewModel: Could not extract cart token: $e',
-        );
-      }
+      // Cart token is automatically handled by WooCartTokenInterceptor
+      // No need to manually save token - interceptor extracts from response headers
 
       debugPrint('✅ Successfully added product $productId to cart via API');
 
@@ -395,14 +387,14 @@ class ProductDetailViewModel
           ),
           jwtToken: await _getJwtToken(),
         );
-        
+
         // Find actual quantity in cart after add
         if (cartResponse.items != null && cartResponse.items!.isNotEmpty) {
           final cartItem = cartResponse.items!.firstWhere(
             (item) => item.id == productId,
             orElse: () => GetCartResponseItem(id: null),
           );
-          
+
           if (cartItem.id != null) {
             finalQuantity = cartItem.quantity ?? quantity;
           }
@@ -415,10 +407,12 @@ class ProductDetailViewModel
       // Update state to show product is in cart and update quantity
       final currentState = state;
       if (currentState is ProductDetailLoadedState) {
-        emit(currentState.copyWith(
-          isInCart: true,
-          selectedQuantity: finalQuantity, // Update to actual cart quantity
-        ));
+        emit(
+          currentState.copyWith(
+            isInCart: true,
+            selectedQuantity: finalQuantity, // Update to actual cart quantity
+          ),
+        );
         _selectedQuantity = finalQuantity;
       }
     } catch (e) {
@@ -458,7 +452,7 @@ class ProductDetailViewModel
 
       _selectedQuantity = quantity;
       emit(currentState.copyWith(selectedQuantity: _selectedQuantity));
-      
+
       // If product is in cart, update quantity via API immediately
       // This ensures cart quantity is synced with counter in real-time
       if (currentState.isInCart) {
@@ -555,19 +549,49 @@ class ProductDetailViewModel
     return null; // No need to persist product detail state
   }
 
-  /// Gets cart token from storage
+  /// Gets cart token from arguments (route params) or storage
+  /// Priority: arguments > storage
+  /// Interceptor automatically adds token to request headers,
+  /// but ViewModel needs token for direct API calls
   Future<String?> _getCartToken() async {
     try {
-      // Use local CartTokenStorage for consistency
-      final token = await CartTokenStorage.loadCartToken();
-      debugPrint(
-        '🛒 ProductDetailViewModel: Cart token from CartTokenStorage: ${token != null ? "Found (${token.length} chars)" : "Not found"}',
-      );
-      return token;
+      // First try to get from arguments (route params)
+      final argsToken = _arguments['cartToken'] as String?;
+      if (argsToken != null && argsToken.isNotEmpty) {
+        debugPrint('🛒 ProductDetailViewModel: Cart token from arguments');
+        return argsToken;
+      }
+
+      // Fallback to storage
+      final wooCartToken = await WooCartTokenStorage.loadCartToken();
+
+      if (wooCartToken != null && wooCartToken.cartToken.isNotEmpty) {
+        // Check if token has expired
+        if (wooCartToken.expiresAt != null &&
+            DateTime.now().isAfter(wooCartToken.expiresAt!)) {
+          debugPrint('⚠️ Cart token has expired');
+          await WooCartTokenStorage.clearCartToken();
+          return null;
+        }
+
+        debugPrint(
+          '🛒 ProductDetailViewModel: Cart token from storage: ${wooCartToken.cartToken.length > 20 ? "${wooCartToken.cartToken.substring(0, 20)}..." : wooCartToken.cartToken}',
+        );
+        return wooCartToken.cartToken;
+      }
+
+      debugPrint('⚠️ ProductDetailViewModel: No cart token found');
+      return null;
     } catch (e) {
       debugPrint('❌ Failed to get cart token: $e');
       return null;
     }
+  }
+
+  /// Gets cart token for navigation - public method
+  /// Returns token from arguments or storage
+  Future<String?> getCartTokenForNavigation() async {
+    return await _getCartToken();
   }
 
   /// Gets JWT token from storage

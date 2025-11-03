@@ -8,7 +8,6 @@ import 'package:apis/network/remote/woocommerce/store_api/product_categories_api
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 import 'package:storefront_woo/app/views/view_search/models/module/states.dart'
     as search_states;
-import 'package:storefront_woo/app/services/cart_token_storage.dart';
 // JWT and cart tokens are automatically added by interceptors if user is authenticated
 
 @injectable
@@ -163,9 +162,8 @@ class SearchViewModel
       final jwtToken = await authStorage.getToken();
       final hasJwt = jwtToken != null && jwtToken.isNotEmpty;
 
-      // Check cart token
-      final cartToken = await CartTokenStorage.loadCartToken();
-      final hasCartToken = cartToken != null && cartToken.isNotEmpty;
+      // Cart token is automatically handled by WooCartTokenInterceptor
+      // Interceptor adds token to requests automatically
 
       debugPrint('🔍 SearchViewModel.$operation:');
       if (hasJwt) {
@@ -173,16 +171,12 @@ class SearchViewModel
       } else {
         debugPrint('  🔐 JWT Token: Not available');
       }
-      if (hasCartToken) {
-        debugPrint('  🛒 Cart Token: Available (${cartToken.length} chars)');
-      } else {
-        debugPrint('  🛒 Cart Token: Not available');
-      }
+      debugPrint('  🛒 Cart Token: Handled automatically by interceptor');
       debugPrint(
         '  📝 Note: Interceptors will automatically add these tokens to API requests if available',
       );
 
-      if (hasJwt || hasCartToken) {
+      if (hasJwt) {
         debugPrint(
           '  ✅ Authenticated user detected - tokens will be used by interceptors',
         );

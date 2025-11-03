@@ -9,7 +9,6 @@ import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
-import 'package:storefront_woo/app/services/cart_token_storage.dart';
 import 'package:storefront_woo/app/views/view_profile/models/module/states.dart';
 
 @injectable
@@ -74,23 +73,8 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
         );
       } catch (e) {
         debugPrint('⚠️ ProfileViewModel: Could not load WooCartToken: $e');
-        // Fallback to string-based CartTokenStorage
-        final cartTokenString = await CartTokenStorage.loadCartToken();
-        if (cartTokenString != null && cartTokenString.isNotEmpty) {
-          // Create a basic WooCartToken from string
-          final configHelper = AssetConfigHelper();
-          await configHelper.loadConfig();
-          final storeUrl = configHelper.getString(
-            'woocommerce_configuration.store_url',
-            'http://woocomm.store',
-          );
-          cartToken = WooCartToken(
-            cartToken: cartTokenString,
-            storeUrl: storeUrl,
-            issuedAt: DateTime.now(),
-          );
-          debugPrint('🛒 ProfileViewModel: Created WooCartToken from string');
-        }
+        // Cart token is automatically handled by WooCartTokenInterceptor
+        // No need for fallback - interceptor manages token lifecycle
       }
 
       _jwtToken = jwtToken;
@@ -120,11 +104,32 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
 
   Future<void> signOut() async {
     try {
-      // Clear all tokens
-      await WooJwtTokenStorage.clearToken();
-      await CartTokenStorage.clearCartToken();
-      final authStorage = AuthStorageHelper();
-      await authStorage.clearToken();
+      debugPrint('🚪 Starting sign out process...');
+      
+      // Clear all JWT tokens
+      try {
+        await WooJwtTokenStorage.clearToken();
+        debugPrint('✅ WooJWT token cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear WooJWT token: $e');
+      }
+
+      // Clear all cart tokens
+      try {
+        await WooCartTokenStorage.clearCartToken();
+        debugPrint('✅ WooCartToken cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear WooCartToken: $e');
+      }
+
+      // Clear AuthStorageHelper tokens
+      try {
+        final authStorage = AuthStorageHelper();
+        await authStorage.clearToken();
+        debugPrint('✅ AuthStorageHelper tokens cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear AuthStorageHelper: $e');
+      }
 
       // Update AuthCubit to refresh navbar immediately
       try {
@@ -135,6 +140,13 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
         debugPrint('⚠️ Could not clear AuthCubit: $e');
       }
 
+      // Clear local state
+      _jwtToken = null;
+      _cartToken = null;
+      _authJwtToken = null;
+      _authUserData = null;
+
+      debugPrint('✅ Sign out completed successfully');
       emit(ProfileSignedOutState());
     } catch (e) {
       debugPrint('❌ Error signing out: $e');
