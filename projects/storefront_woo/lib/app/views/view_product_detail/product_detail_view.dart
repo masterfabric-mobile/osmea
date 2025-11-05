@@ -66,6 +66,7 @@ class ProductDetailView
       return ProductDetailContentWidget(
         viewModel: viewModel,
         state: state.previousState,
+        goRoute: goRoute,
       );
     }
     // ✅ Auth required state - navigate to auth screen
@@ -89,6 +90,7 @@ class ProductDetailView
         return ProductDetailContentWidget(
           viewModel: viewModel,
           state: state.previousState!,
+          goRoute: goRoute,
         );
       }
       // Fallback to loading
@@ -110,7 +112,11 @@ class ProductDetailView
 
     // Loaded state
     if (state is ProductDetailLoadedState) {
-      return ProductDetailContentWidget(viewModel: viewModel, state: state);
+      return ProductDetailContentWidget(
+        viewModel: viewModel,
+        state: state,
+        goRoute: goRoute,
+      );
     }
 
     // Initial state

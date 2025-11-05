@@ -19,11 +19,13 @@ import 'package:storefront_woo/app/views/view_product_detail/widgets/action_sect
 class ProductDetailContentWidget extends StatelessWidget {
   final ProductDetailViewModel viewModel;
   final ProductDetailLoadedState state;
+  final Function(String path) goRoute;
 
   const ProductDetailContentWidget({
     super.key,
     required this.viewModel,
     required this.state,
+    required this.goRoute,
   });
 
   @override
@@ -36,7 +38,7 @@ class ProductDetailContentWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Product images with overlay actions
-              _buildProductImages(context, state.imageUrls, withOverlays: true),
+              _buildProductImages(context, state.imageUrls, goRoute: goRoute, withOverlays: true),
 
               // Product info section
               OsmeaComponents.padding(
@@ -206,6 +208,7 @@ class ProductDetailContentWidget extends StatelessWidget {
   Widget _buildProductImages(
     BuildContext context,
     List<String> imageUrls, {
+    required Function(String path) goRoute,
     bool withOverlays = false,
   }) {
     if (imageUrls.isEmpty) {
@@ -229,7 +232,7 @@ class ProductDetailContentWidget extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ImageDetailScreen(
-                  goRoute: (path) {},
+                  goRoute: goRoute,
                   imageUrls: imageUrls,
                   initialIndex: index,
                 ),
