@@ -15,11 +15,8 @@ import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
-import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:get_it/get_it.dart';
+import 'package:apis/apis.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -63,8 +60,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -88,8 +85,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -112,8 +109,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -145,19 +142,20 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInOutCubic,
-                    ),
-                  ),
-                  child: child,
-                );
-              },
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
               transitionDuration: const Duration(milliseconds: 400),
             );
           },
@@ -231,269 +229,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/auth',
       builder: (BuildContext context, GoRouterState state) {
-        // Check if user is already authenticated - redirect to profile
-        AuthStorageHelper().isAuthenticated().then((isAuthenticated) {
-          if (isAuthenticated && context.mounted) {
-            debugPrint('👤 User already authenticated, redirecting to profile');
-            context.go('/profile');
-          }
-        });
-
         // Get initial tab from query parameter (0 = Sign In, 1 = Sign Up)
         final initialTab =
             int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0;
-        // Extract brand name from store URL
-        String extractBrandNameFromUrl(String storeUrl) {
-          try {
-            // Remove protocol (http://, https://)
-            var url = storeUrl.replaceAll(RegExp(r'https?://'), '');
 
-            // Remove port if exists
-            url = url.split(':').first;
-
-            // Get first part of domain (subdomain or domain)
-            var parts = url.split('.');
-
-            // If it's a subdomain.domain.tld, use subdomain
-            // If it's domain.tld, use domain
-            var brandName = parts.isNotEmpty ? parts.first : 'woocomm';
-
-            debugPrint(
-              '🔍 Extracted brand name: $brandName from URL: $storeUrl',
-            );
-            return brandName;
-          } catch (e) {
-            debugPrint(
-              '⚠️ Error extracting brand name: $e, using default: woocomm',
-            );
-            return 'woocomm';
-          }
-        }
-
-        // Handle sign in with auth service
-        Future<bool> handleSignIn(String username, String password) async {
-          try {
-            debugPrint('🔐 Starting sign in for user: $username');
-
-            // Get brand name and store URL from app_config.json
-            final configHelper = AssetConfigHelper();
-            await configHelper.loadConfig('assets/app_config.json');
-
-            final storeUrl = configHelper.getString(
-              'woocommerce_configuration.store_url',
-              'http://your_store_url.com',
-            );
-
-            // Try to get brand_name from config, if not found extract from URL
-            var brandName = configHelper.getString(
-              'woocommerce_configuration.brand_name',
-              '',
-            );
-
-            if (brandName.isEmpty) {
-              // Extract brand name from store URL as fallback
-              brandName = extractBrandNameFromUrl(storeUrl);
-            }
-
-            debugPrint('🏪 Using brand name: $brandName');
-            debugPrint('🌐 Store URL: $storeUrl');
-
-            // Get WooAuthService from GetIt
-            final authService = GetIt.I<WooAuthService>();
-
-            // Create login request
-            final loginRequest = UserLoginRequest(
-              email: username,
-              password: password,
-              rememberMe: true,
-            );
-
-            // Call API with brand name from config
-            final response = await authService.userLogin(
-              brandName,
-              loginRequest,
-            );
-
-            debugPrint('🔍 API response received: ${response.success}');
-
-            if (response.success && response.data != null) {
-              // Get JWT token from jwt or accessToken field
-              final jwtTokenString =
-                  response.data!.jwt ?? response.data!.accessToken;
-
-              if (jwtTokenString != null && jwtTokenString.isNotEmpty) {
-                // Create WooJwtToken
-                final wooJwtToken = WooJwtToken(
-                  accessToken: jwtTokenString,
-                  tokenType: response.data!.tokenType ?? 'Bearer',
-                  expiresIn: response.data!.expiresIn ?? 3600,
-                  issuedAt: response.data!.issuedAt ?? DateTime.now(),
-                  refreshToken: response.data!.refreshToken,
-                  scope: response.data!.scope,
-                  userData: response.data!.user != null
-                      ? response.data!.user!.toJson()
-                      : <String, dynamic>{},
-                );
-
-                // Save to all storages for backward compatibility
-                final authStorage = AuthStorageHelper();
-                await authStorage.saveToken(jwtTokenString);
-                if (response.data!.user != null) {
-                  await authStorage.saveUserData(response.data!.user!.toJson());
-                }
-                await WooJwtTokenStorage.saveToken(wooJwtToken);
-
-                // Save to AuthCubit (HydratedCubit storage) - this is the primary storage now
-                try {
-                  AuthCubit? authCubit;
-                  try {
-                    authCubit = GetIt.I<AuthCubit>();
-                  } catch (e) {
-                    // AuthCubit not registered - register it now as singleton
-                    debugPrint(
-                      '⚠️ AuthCubit not in GetIt, registering manually...',
-                    );
-                    authCubit = AuthCubit();
-                    GetIt.instance.registerSingleton<AuthCubit>(authCubit);
-                    debugPrint(
-                      '✅ AuthCubit manually registered',
-                    );
-                  }
-
-                  // Save token - this will update the state immediately
-                  // Also save WooCommerce-specific tokens as metadata
-                  await authCubit.saveJwtToken(
-                    jwtToken: jwtTokenString,
-                    userData: response.data!.user?.toJson(),
-                    metadata: {
-                      'wooJwtToken': wooJwtToken.toJson(),
-                      // Cart token will be added by cart interceptor
-                    },
-                  );
-                  debugPrint(
-                    '✅ AuthCubit: JWT token saved and state updated',
-                  );
-                } catch (e) {
-                  debugPrint(
-                    '⚠️ AuthCubit: Error saving token to AuthCubit: $e',
-                  );
-                  // Continue anyway - tokens saved to other storages
-                }
-
-                debugPrint(
-                  '✅ Sign in successful - Tokens saved to all storages including AuthCubit',
-                );
-                return true;
-              } else {
-                debugPrint('❌ JWT token not found in response');
-                return false;
-              }
-            } else {
-              debugPrint(
-                '❌ Sign in failed: ${response.message ?? response.error}',
-              );
-              return false;
-            }
-          } catch (e) {
-            debugPrint('❌ Sign in error: $e');
-            return false;
-          }
-        }
-
-        // Handle sign up with auth service
-        Future<bool> handleSignUp(
-          String email,
-          String password,
-          bool marketingConsent,
-        ) async {
-          try {
-            debugPrint('🔐 Starting sign up for user: $email');
-
-            // Get brand name and store URL from app_config.json
-            final configHelper = AssetConfigHelper();
-            await configHelper.loadConfig('assets/app_config.json');
-
-            final storeUrl = configHelper.getString(
-              'woocommerce_configuration.store_url',
-              'http://your_store_url.com',
-            );
-
-            var brandName = configHelper.getString(
-              'woocommerce_configuration.brand_name',
-              '',
-            );
-
-            if (brandName.isEmpty) {
-              brandName = extractBrandNameFromUrl(storeUrl);
-            }
-
-            debugPrint('🏪 Using brand name: $brandName');
-            debugPrint('🌐 Store URL: $storeUrl');
-            debugPrint('📧 User email: $email');
-
-            // Get WooAuthService from GetIt
-            final authService = GetIt.I<WooAuthService>();
-
-            // Get AUTH_KEY from config (required by API)
-            final authKey = configHelper.getString(
-              'woocommerce_configuration.auth_key',
-              'default_auth_key',
-            );
-
-            // Extract first and last name from email
-            final emailParts = email.split('@');
-            final username = emailParts.isNotEmpty ? emailParts.first : 'User';
-
-            // Create sign up request
-            final signUpRequest = UserSignUpRequest(
-              email: email,
-              password: password,
-              firstName: username,
-              lastName: 'User',
-              authKey: authKey,
-              userMeta: UserMeta(
-                acceptTerms: true,
-                subscribeNewsletter: marketingConsent,
-              ),
-            );
-
-            // Call API
-            final response = await authService.userSignUp(
-              brandName,
-              signUpRequest,
-            );
-
-            debugPrint('🔍 API response received: ${response.success}');
-            debugPrint('📦 Response data: ${response.data}');
-            debugPrint('📝 Response message: ${response.message}');
-
-            // Check if user was successfully created
-            final messageContainsSuccess = response.message != null &&
-                (response.message!.toLowerCase().contains(
-                          'successfully created',
-                        ) ||
-                    response.message!.toLowerCase().contains(
-                          'created successfully',
-                        ));
-
-            if (response.success || messageContainsSuccess) {
-              debugPrint('✅ Sign up successful!');
-              if (response.data != null) {
-                debugPrint('👤 User ID: ${response.data!.userId}');
-                debugPrint('📧 Email: ${response.data!.email}');
-              }
-              return true;
-            } else {
-              debugPrint(
-                '❌ Sign up failed: ${response.message ?? response.error}',
-              );
-              return false;
-            }
-          } catch (e) {
-            debugPrint('❌ Sign up error: $e');
-            return false;
-          }
-        }
+        // Get auth manager (APIs package)
+        final authManager = GetIt.I<WooAuthManager>();
 
         return AuthView(
           goRoute: (String path) {
@@ -502,83 +243,18 @@ final GoRouter appRouter = GoRouter(
             }
           },
           initialTab: initialTab,
-          defaultRedirectPath:
-              '/profile', // Default redirect path after successful sign in
-          onSignInSuccess: () async {
-            debugPrint('✅ Sign in successful! Navigating...');
-
-            // Check AuthCubit state immediately
-            try {
-              final authCubit = GetIt.I<AuthCubit>();
-              debugPrint(
-                  '🔍 onSignInSuccess: AuthCubit state = ${authCubit.state.runtimeType}');
-              if (authCubit.state is AuthAuthenticatedState) {
-                final authState = authCubit.state as AuthAuthenticatedState;
-                debugPrint(
-                    '🔍 onSignInSuccess: isAuthenticated = ${authState.isAuthenticated}');
-                debugPrint(
-                    '🔍 onSignInSuccess: jwtToken exists = ${authState.jwtToken != null}');
-              }
-            } catch (e) {
-              debugPrint('⚠️ Could not check AuthCubit state: $e');
-            }
-
-            // Small delay to ensure UI updates
-            await Future.delayed(const Duration(milliseconds: 300));
-
-            if (!context.mounted) return;
-
-            // Check if there's a return path
-            final returnTo = state.uri.queryParameters['returnTo'];
-            if (returnTo != null && returnTo.isNotEmpty) {
-              debugPrint('🔄 Navigating to return path: $returnTo');
-              context.go(returnTo);
-            } else {
-              // Navigate to profile after successful sign in
-              const defaultPath = '/profile';
-              debugPrint('👤 Navigating to profile page: $defaultPath');
-              context.go(defaultPath);
-            }
-          },
-          onSignInError: (error) {
-            debugPrint('❌ Sign in error: $error');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error), backgroundColor: Colors.red),
-            );
-          },
-          onSignUpSuccess: () {
-            debugPrint('✅ Sign up successful!');
-            // After successful registration, switch to Sign In tab
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '✅ Account created successfully! You can sign in now.',
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-            context.go('/auth?tab=0'); // Switch to Sign In tab
-          },
-          onSignUpError: (error) {
-            debugPrint('❌ Sign up error: $error');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error), backgroundColor: Colors.red),
-            );
-          },
-          onForgotPasswordTap: () {
-            debugPrint('🔑 Forgot password tapped');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Password reset feature coming soon!'),
-                backgroundColor: Colors.blue,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          },
+          defaultRedirectPath: '/profile',
           arguments: {
             'auth': true,
-            'onSignIn': handleSignIn,
-            'onSignUp': handleSignUp,
+            // Provide onSignIn callback expected by Core cubit
+            'onSignIn': (String email, String password) async {
+              final result = await authManager.login(
+                email: email,
+                password: password,
+              );
+              return result.isSuccess;
+            },
+            // onSignUp omitted (optional)
           },
         );
       },

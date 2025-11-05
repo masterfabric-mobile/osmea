@@ -1,7 +1,6 @@
 // 📦 Importing core module dependencies
 import 'package:core/src/di/config/config_di.config.dart';
-import 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-import 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
+import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/permissions/cubit/permissions_cubit.dart';
@@ -36,12 +35,8 @@ Future<GetIt> configureDependencies() async {
     getIt.registerFactory<OnboardingCubit>(() => OnboardingCubit());
   }
 
-  if (!getIt.isRegistered<SignInCubit>()) {
-    getIt.registerFactory<SignInCubit>(() => SignInCubit());
-  }
-
-  if (!getIt.isRegistered<SignUpCubit>()) {
-    getIt.registerFactory<SignUpCubit>(() => SignUpCubit());
+  if (!getIt.isRegistered<AuthCubit>()) {
+    getIt.registerFactory<AuthCubit>(() => AuthCubit());
   }
 
   getIt.registerFactory<SearchCubit>(() => SearchCubit());

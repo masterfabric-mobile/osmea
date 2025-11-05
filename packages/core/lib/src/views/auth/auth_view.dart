@@ -1,5 +1,8 @@
 import 'package:core/core.dart';
+import 'package:core/src/views/auth/widgets/auth_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 
 /// 🔐 **OSMEA Auth View**
 ///
@@ -8,7 +11,7 @@ import 'package:flutter/material.dart';
 /// {@category Views}
 /// {@subCategory Auth}
 
-class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
+class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
   final VoidCallback? onSignInSuccess;
   final Function(String error)? onSignInError;
   final VoidCallback? onSignUpSuccess;
@@ -41,99 +44,119 @@ class AuthView extends MasterViewCubit<SignInCubit, SignInState> {
   Future<void> initialContent(viewModel, BuildContext context) async {
     debugPrint('🔐 Auth View initializing...');
 
-    // Check if user is already authenticated - redirect to default path
-    final authStorage = AuthStorageHelper();
-    final isAuthenticated = await authStorage.isAuthenticated();
-    if (isAuthenticated) {
-      final redirectPath = defaultRedirectPath ?? '/home';
-      debugPrint(
-          '👤 User already authenticated, redirecting to: $redirectPath');
-      // Navigate using goRoute if available
-      goRoute(redirectPath);
-      return;
-    }
-
-    // Configure Sign In callback
+    // Configure callbacks from arguments
     final signInCallback = arguments['onSignIn'] as Future<bool> Function(
       String,
       String,
     )?;
-
     if (signInCallback != null) {
-      viewModel.authenticationCallback = signInCallback;
+      viewModel.signInCallback = signInCallback;
       debugPrint('✅ Sign In callback configured');
     } else {
       debugPrint('⚠️ Sign In callback not found');
     }
 
-    // Check if Sign Up is disabled - if no sign up callback, sign up tab should redirect to profile
     final signUpCallback = arguments['onSignUp'] as Future<bool> Function(
-      String,
-      String,
-      bool,
+      String, // email
+      String, // password
+      String, // authKey
+      String, // firstName
+      String, // lastName
+      bool, // marketingConsent
     )?;
-    if (signUpCallback == null) {
+    if (signUpCallback != null) {
+      viewModel.signUpCallback = signUpCallback;
+      debugPrint('✅ Sign Up callback configured');
+    } else {
       debugPrint('⚠️ Sign Up callback not found - Sign Up is disabled');
+    }
+
+    // Initialize authentication (loads config, checks auth status, initializes form)
+    final result = await viewModel.initializeAuth(
+      initialTab: initialTab,
+      defaultRedirectPath: defaultRedirectPath,
+    );
+
+    // If user is already authenticated, redirect
+    if (result.isAuthenticated && result.redirectPath != null) {
+      debugPrint(
+          '👤 User already authenticated, redirecting to: ${result.redirectPath}');
+      goRoute(result.redirectPath!);
+      return;
     }
   }
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: _loadAuthConfig(),
-      builder: (context, snapshot) {
-        final config = snapshot.data;
+    // Get config from state if available
+    final config = state is AuthFormState ? state.config : null;
 
-        // Get Sign Up callback
-        final signUpCallback = arguments['onSignUp'] as Future<bool> Function(
-          String,
-          String,
-          bool,
-        )?;
+    // Create wrapper callback that uses defaultRedirectPath if callback is null
+    VoidCallback? wrappedOnSignInSuccess;
+    if (onSignInSuccess != null) {
+      wrappedOnSignInSuccess = onSignInSuccess;
+    } else if (defaultRedirectPath != null) {
+      // If no callback provided, use defaultRedirectPath
+      wrappedOnSignInSuccess = () {
+        final path = defaultRedirectPath!;
+        debugPrint('✅ Sign in successful! Navigating to default path: $path');
+        goRoute(path);
+      };
+    }
 
-        // Create wrapper callback that uses defaultRedirectPath if callback is null
-        VoidCallback? wrappedOnSignInSuccess;
-        if (onSignInSuccess != null) {
-          wrappedOnSignInSuccess = onSignInSuccess;
-        } else if (defaultRedirectPath != null) {
-          // If no callback provided, use defaultRedirectPath
-          wrappedOnSignInSuccess = () {
-            final path = defaultRedirectPath!;
-            debugPrint(
-                '✅ Sign in successful! Navigating to default path: $path');
-            goRoute(path);
-          };
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        // Handle authentication state changes
+        if (state is AuthAuthenticatedState) {
+          if (wrappedOnSignInSuccess != null) {
+            debugPrint('✅ Calling onSignInSuccess callback...');
+            wrappedOnSignInSuccess.call();
+          }
+          return;
         }
 
-        return AuthWidget(
-          signInViewModel: viewModel,
-          signInState: state,
-          signUpCallback: signUpCallback,
-          onSignInSuccess: wrappedOnSignInSuccess,
-          onSignInError: onSignInError,
-          onSignUpSuccess: onSignUpSuccess,
-          onSignUpError: onSignUpError,
-          onForgotPasswordTap: onForgotPasswordTap,
-          config: config,
-          initialTab: initialTab,
-        );
-      },
-    );
-  }
+        // Handle form state changes
+        if (state is AuthFormState) {
+          // Handle Sign In success/error
+          if (state.operationStatus == AuthOperationStatus.success &&
+              state.currentTab == 0) {
+            if (wrappedOnSignInSuccess != null) {
+              debugPrint('✅ Calling onSignInSuccess callback...');
+              wrappedOnSignInSuccess.call();
+            }
+          } else if (state.operationStatus == AuthOperationStatus.error &&
+              state.signInErrorMessage != null &&
+              state.currentTab == 0) {
+            if (onSignInError != null) {
+              onSignInError?.call(state.signInErrorMessage!);
+            }
+          }
 
-  Future<Map<String, dynamic>?> _loadAuthConfig() async {
-    try {
-      final configHelper = AssetConfigHelper();
-      // Try to load project-specific config first, fallback to core package config
-      await configHelper.loadConfig('assets/app_config.json');
-      final allConfig = configHelper.getAllConfig();
-      final authConfig =
-          allConfig?['auth_configuration'] as Map<String, dynamic>?;
-      debugPrint('✅ Auth configuration loaded from project config');
-      return authConfig;
-    } catch (e) {
-      debugPrint('⚠️ Could not load auth config, using defaults: $e');
-      return null;
-    }
+          // Handle Sign Up success/error
+          if (state.operationStatus == AuthOperationStatus.success &&
+              state.currentTab == 1) {
+            if (onSignUpSuccess != null) {
+              debugPrint('✅ Calling onSignUpSuccess callback...');
+              onSignUpSuccess?.call();
+            }
+          } else if (state.operationStatus == AuthOperationStatus.error &&
+              state.signUpErrorMessage != null &&
+              state.currentTab == 1) {
+            if (onSignUpError != null) {
+              onSignUpError?.call(state.signUpErrorMessage!);
+            }
+          }
+        }
+      },
+      child: AuthWidget(
+        onSignInSuccess: wrappedOnSignInSuccess,
+        onSignInError: onSignInError,
+        onSignUpSuccess: onSignUpSuccess,
+        onSignUpError: onSignUpError,
+        onForgotPasswordTap: onForgotPasswordTap,
+        config: config,
+        initialTab: initialTab,
+      ),
+    );
   }
 }
