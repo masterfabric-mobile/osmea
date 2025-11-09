@@ -417,25 +417,12 @@ class _OsmeaSearchbarView extends StatelessWidget {
     );
   }
 
-  /// Build suffix icon with actions and clear button
+  /// Build suffix icon with clear button and actions
   Widget? _buildSuffixIcon(
       BuildContext context, SearchbarCubitState state, SearchbarCubit cubit) {
     final List<Widget> suffixWidgets = [];
 
-    // Add actions first
-    if (searchbar.actions.isNotEmpty) {
-      for (final action in searchbar.actions) {
-        suffixWidgets.add(
-          Container(
-            margin: searchbar.actionMargin,
-            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-            child: action,
-          ),
-        );
-      }
-    }
-
-    // Add clear button if needed
+    // Add clear button first if needed
     if (state.shouldShowClearButton) {
       suffixWidgets.add(
         Container(
@@ -449,6 +436,19 @@ class _OsmeaSearchbarView extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    // Add actions after clear button
+    if (searchbar.actions.isNotEmpty) {
+      for (final action in searchbar.actions) {
+        suffixWidgets.add(
+          Container(
+            margin: searchbar.actionMargin,
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+            child: action,
+          ),
+        );
+      }
     }
 
     // Return null if no suffix widgets
