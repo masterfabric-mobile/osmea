@@ -51,6 +51,48 @@ final GoRouter appRouter = GoRouter(
           },
         ),
 
+        // Search Page
+        GoRoute(
+          path: '/search',
+          builder: (BuildContext context, GoRouterState state) {
+            return SearchView(
+              arguments: const {'search': true},
+              goRoute: (String path) {
+                if (path.contains('home')) {
+                  context.go('/home');
+                } else if (path.contains('cart')) {
+                  context.go('/cart');
+                } else if (path.contains('product-detail')) {
+                  context.go('/product-detail');
+                } else {
+                  context.go('/home');
+                }
+              },
+              title: const Text('Search Products'),
+              titleAlignment: AppBarTitleAlignment.center,
+              showTitle: false,
+              searchHint: 'Search for products...',
+              searchBarSize: TextFieldSize.medium,
+              showBackButton: true,
+              showVoiceSearch: true,
+              showBarcodeScanner: true,
+              showSearchIcon: true,
+
+              onBackPressed: () => context.go('/home'),
+              // WooCommerce search provider will be integrated here
+              searchProvider: (query) async {
+                // TODO: Integrate with WooCommerce search API
+                await Future.delayed(const Duration(milliseconds: 500));
+                return ['Sample product 1', 'Sample product 2'];
+              },
+
+              onSearchResult: (results) {
+                debugPrint('🔍 Search results: $results');
+              },
+            );
+          },
+        ),
+
         // Cart Page
         GoRoute(
           path: '/cart',
@@ -459,11 +501,13 @@ final GoRouter appRouter = GoRouter(
 /// Get navbar for specific route
 Widget? _getNavbarForRoute(String location) {
   // Show navbar only for main app sections
-  if (location == '/home' || location == '/cart') {
+  if (location == '/home' || location == '/search' || location == '/cart') {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0);
-    } else if (location == '/cart') {
+    } else if (location == '/search') {
       return AppNavbar(currentIndex: 1);
+    } else if (location == '/cart') {
+      return AppNavbar(currentIndex: 2);
     }
   }
   // No navbar for splash, onboarding, auth, product-detail
