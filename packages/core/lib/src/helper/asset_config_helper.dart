@@ -532,6 +532,31 @@ class AssetConfigHelper {
     return getBool('search_view_configuration.show_back_button', defaultValue);
   }
 
+  /// 🔍 Get SearchView action icon color from configuration
+  ///
+  /// Returns the action_icon_color from search_view_configuration if specified,
+  /// or falls back to pewter color if action_icon_color isn't found
+  ///
+  /// Parameters:
+  /// - [defaultColor]: Default color to return if no configuration is found
+  ///
+  /// Returns:
+  /// - Color: The search action icon color or default color
+  Color getSearchViewActionIconColor([Color? defaultColor]) {
+    final Color fallbackColor =
+        defaultColor ?? const Color(0xFF6B7280); // OsmeaColors.pewter
+
+    // Try to get the specific action icon color from search_view_configuration
+    final String actionIconColorKey =
+        'search_view_configuration.action_icon_color';
+    if (hasKey(actionIconColorKey)) {
+      return getColor(actionIconColorKey, fallbackColor);
+    }
+
+    // Fall back to pewter if action icon color isn't specified
+    return fallbackColor;
+  }
+
   /// 🔍 Get SearchView action button spacing from configuration
   double getSearchViewActionButtonSpacing([double defaultValue = 2.0]) {
     return getDouble(
