@@ -275,39 +275,17 @@ class _OsmeaSearchbarView extends StatelessWidget {
       height: _getSearchbarHeight(),
       decoration: _buildDecoration(context, state),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left side: Back button + Text field
+          // Back button (outside of TextField)
+          if (state.shouldShowBackButton) _buildBackButton(context, cubit),
+
+          // Text field with actions inside
           Expanded(
-            child: Row(
-              children: [
-                // Back button
-                if (state.shouldShowBackButton)
-                  _buildBackButton(context, cubit),
-
-                // Text field
-                Expanded(
-                  child: _buildTextField(context, state, cubit),
-                ),
-
-                // Loading indicator
-                if (state.isLoading) _buildLoadingIndicator(context),
-              ],
-            ),
+            child: _buildTextField(context, state, cubit),
           ),
 
-          // Right side: Actions
-          if (searchbar.actions.isNotEmpty)
-            Row(
-              mainAxisAlignment: searchbar.actionAlignment,
-              mainAxisSize: MainAxisSize.min,
-              children: searchbar.actions.map((action) {
-                return Container(
-                  margin: searchbar.actionMargin,
-                  child: action,
-                );
-              }).toList(),
-            ),
+          // Loading indicator (outside of TextField)
+          if (state.isLoading) _buildLoadingIndicator(context),
         ],
       ),
     );
@@ -419,26 +397,74 @@ class _OsmeaSearchbarView extends StatelessWidget {
       hintColor: searchbar.hintColor,
       textStyle: searchbar.textStyle,
       textColor: searchbar.textColor,
-      customContentPadding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 12.0,
+      customContentPadding: const EdgeInsets.only(
+        left: 8.0,
+        right: 4.0,
+        top: 12.0,
+        bottom: 12.0,
       ),
       prefixIcon: searchbar.showSearchIcon
-          ? Icon(
-              Icons.search,
-              size: 20,
-              color: Colors.grey[600],
+          ? Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 4.0),
+              child: Icon(
+                Icons.search,
+                size: 20,
+                color: Colors.grey[600],
+              ),
             )
           : null,
-      suffixIcon: state.shouldShowClearButton
-          ? IconButton(
-              icon: searchbar.clearIcon ?? const Icon(Icons.clear, size: 18),
-              onPressed: cubit.clear,
-              color: Colors.grey[600],
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            )
-          : null,
+      suffixIcon: _buildSuffixIcon(context, state, cubit),
+    );
+  }
+
+  /// Build suffix icon with clear button and actions
+  Widget? _buildSuffixIcon(
+      BuildContext context, SearchbarCubitState state, SearchbarCubit cubit) {
+    final List<Widget> suffixWidgets = [];
+
+    // Add clear button first if needed
+    if (state.shouldShowClearButton) {
+      suffixWidgets.add(
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: IconButton(
+            icon: searchbar.clearIcon ?? const Icon(Icons.clear, size: 18),
+            onPressed: cubit.clear,
+            color: Colors.grey[600],
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+          ),
+        ),
+      );
+    }
+
+    // Add actions after clear button
+    if (searchbar.actions.isNotEmpty) {
+      for (final action in searchbar.actions) {
+        suffixWidgets.add(
+          Container(
+            margin: searchbar.actionMargin,
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+            child: action,
+          ),
+        );
+      }
+    }
+
+    // Return null if no suffix widgets
+    if (suffixWidgets.isEmpty) return null;
+
+    // Return single widget if only one
+    if (suffixWidgets.length == 1) return suffixWidgets.first;
+
+    // Return Row with multiple widgets
+    return Container(
+      padding: const EdgeInsets.only(right: 4.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: suffixWidgets,
+      ),
     );
   }
 

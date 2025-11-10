@@ -32,7 +32,9 @@ class _AppNavbarState extends State<AppNavbar> {
   bool _isAuthenticated = false;
   bool _isLoading = true;
   DateTime? _lastAuthCheck;
-  static const Duration _authCheckInterval = Duration(seconds: 10); // Check every 10 seconds instead of every build
+  static const Duration _authCheckInterval = Duration(
+    seconds: 10,
+  ); // Check every 10 seconds instead of every build
 
   @override
   void initState() {
@@ -62,18 +64,18 @@ class _AppNavbarState extends State<AppNavbar> {
     try {
       // Check auth status - use direct token check to bypass cache if needed
       final authHelper = AuthStorageHelper();
-      
+
       // First check token directly (bypasses cache)
       final token = await authHelper.getToken();
       final hasToken = token != null && token.isNotEmpty;
-      
+
       // If token exists, verify it's not expired
       bool isAuthenticated = false;
       if (hasToken) {
         // Use isAuthenticated which checks expiry
         isAuthenticated = await authHelper.isAuthenticated();
       }
-      
+
       if (mounted) {
         setState(() {
           _isAuthenticated = isAuthenticated;
@@ -96,19 +98,23 @@ class _AppNavbarState extends State<AppNavbar> {
   @override
   void didUpdateWidget(AppNavbar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Check if AuthCubit is available and force a state check
     try {
       final authCubit = GetIt.I<AuthCubit>();
-      debugPrint('📱 Navbar didUpdateWidget: AuthCubit state = ${authCubit.state.runtimeType}');
+      debugPrint(
+        '📱 Navbar didUpdateWidget: AuthCubit state = ${authCubit.state.runtimeType}',
+      );
       if (authCubit.state is AuthAuthenticatedState) {
         final authState = authCubit.state as AuthAuthenticatedState;
-        debugPrint('📱 Navbar didUpdateWidget: isAuthenticated = ${authState.isAuthenticated}');
+        debugPrint(
+          '📱 Navbar didUpdateWidget: isAuthenticated = ${authState.isAuthenticated}',
+        );
       }
     } catch (e) {
       debugPrint('⚠️ Navbar didUpdateWidget: AuthCubit not available: $e');
     }
-    
+
     // Always check auth status when widget updates (route changed or rebuild)
     // This ensures navbar updates immediately after sign in
     final now = DateTime.now();
@@ -126,18 +132,20 @@ class _AppNavbarState extends State<AppNavbar> {
     // Try to get AuthCubit from GetIt - if available, listen to it for real-time updates
     try {
       final authCubit = GetIt.I<AuthCubit>();
-      
+
       // Listen to AuthCubit for real-time auth status updates
       return BlocListener<AuthCubit, AuthState>(
         bloc: authCubit,
         listener: (context, authState) {
-          debugPrint('📱 Navbar Listener: State changed to ${authState.runtimeType}');
-          
-          final isAuthenticated = authState is AuthAuthenticatedState &&
-              authState.isAuthenticated;
-          
+          debugPrint(
+            '📱 Navbar Listener: State changed to ${authState.runtimeType}',
+          );
+
+          final isAuthenticated =
+              authState is AuthAuthenticatedState && authState.isAuthenticated;
+
           debugPrint('📱 Navbar Listener: isAuthenticated = $isAuthenticated');
-          
+
           // Update local state to trigger rebuild
           if (mounted && _isAuthenticated != isAuthenticated) {
             setState(() {
@@ -150,18 +158,23 @@ class _AppNavbarState extends State<AppNavbar> {
         child: BlocBuilder<AuthCubit, AuthState>(
           bloc: authCubit,
           builder: (context, authState) {
-            debugPrint('📱 Navbar Builder: Building with state ${authState.runtimeType}');
-            
-            final isAuthenticated = authState is AuthAuthenticatedState &&
+            debugPrint(
+              '📱 Navbar Builder: Building with state ${authState.runtimeType}',
+            );
+
+            final isAuthenticated =
+                authState is AuthAuthenticatedState &&
                 authState.isAuthenticated;
-            
+
             debugPrint('📱 Navbar Builder: isAuthenticated = $isAuthenticated');
-            
+
             // Only trigger initial load once if state is initial/unauthenticated
             // Prevent infinite loop by checking if we've already loaded
-            if (!_hasLoadedTokens && 
-                (authState is AuthInitialState || authState is AuthUnauthenticatedState)) {
-              _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
+            if (!_hasLoadedTokens &&
+                (authState is AuthInitialState ||
+                    authState is AuthUnauthenticatedState)) {
+              _hasLoadedTokens =
+                  true; // Mark as loaded to prevent multiple calls
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
                   debugPrint('📱 Navbar: Loading tokens from storage...');
@@ -169,24 +182,28 @@ class _AppNavbarState extends State<AppNavbar> {
                 }
               });
             }
-            
+
             // Reset flag if we're authenticated (so we can reload if needed later)
             if (authState is AuthAuthenticatedState) {
-              _hasLoadedTokens = false; // Allow reload when authenticated changes
+              _hasLoadedTokens =
+                  false; // Allow reload when authenticated changes
             }
-            
+
             return _buildNavbar(context, isAuthenticated);
           },
         ),
       );
     } catch (e) {
       // Fallback to AuthStorageHelper if AuthCubit not available
-      debugPrint('⚠️ AuthCubit not available in GetIt, using AuthStorageHelper: $e');
-      
+      debugPrint(
+        '⚠️ AuthCubit not available in GetIt, using AuthStorageHelper: $e',
+      );
+
       // Always check auth status on build (especially after navigation from sign in)
       final now = DateTime.now();
       if (_lastAuthCheck == null ||
-          now.difference(_lastAuthCheck!) >= const Duration(milliseconds: 500)) {
+          now.difference(_lastAuthCheck!) >=
+              const Duration(milliseconds: 500)) {
         // Check auth status if enough time passed (500ms to prevent excessive calls)
         _checkAuthStatus();
       }
@@ -235,10 +252,7 @@ class _AppNavbarState extends State<AppNavbar> {
   }
 
   /// Get navbar items (5 items: Home, Search, Saved, Cart, Profile/Sign In)
-  List<NavbarItem> _getNavbarItems(
-    BuildContext context,
-    bool isAuthenticated,
-  ) {
+  List<NavbarItem> _getNavbarItems(BuildContext context, bool isAuthenticated) {
     final count = widget.wishlistCount;
 
     return [
@@ -259,6 +273,12 @@ class _AppNavbarState extends State<AppNavbar> {
         icon: Icon(count > 0 ? Icons.favorite : Icons.favorite_outline),
         onTap: () => context.go('/saved'),
         tooltip: 'Saved Items',
+      ),
+      NavbarItem(
+        text: 'Search',
+        icon: Icon(Icons.search_outlined),
+        onTap: () => context.go('/search'),
+        tooltip: 'Search Products',
       ),
       NavbarItem(
         text: 'Cart',
