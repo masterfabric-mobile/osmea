@@ -45,8 +45,13 @@
 
       "search_view_configuration": {
     "search_app_bar_color": "#FFFFFFFF",
-    "search_bar_background_color": "#EAE9E9FF",
+
     "search_bar_border_color": "#E0E0E0FF",
+    "action_icon_color": "#6B7280FF",
+    "text_color": "#000000FF",
+    "hint_text_color": "#6B7280FF",
+    "focus_color": "#2563EBFF",
+    "error_color": "#EF4444FF",
     "search_bar_show_clear_button": true,
     "search_bar_show_search_icon": true,
     "elevation": 4.0,
@@ -217,10 +222,7 @@
       "animation_enabled": true,
       "haptic_feedback_enabled": true,
       "steps": [
-        "Mağaza başlatılıyor...",
-        "Ürünler yükleniyor...",
-        "Arayüz hazırlanıyor...",
-        "Hazır!"
+       
       ],
       "custom_messages": {
         "network_error": "Network connection required",

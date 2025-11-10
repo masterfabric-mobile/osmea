@@ -40,6 +40,12 @@ class AppNavbar extends StatelessWidget {
         tooltip: 'Home',
       ),
       NavbarItem(
+        text: 'Search',
+        icon: Icon(Icons.search_outlined),
+        onTap: () => context.go('/search'),
+        tooltip: 'Search Products',
+      ),
+      NavbarItem(
         text: 'Cart',
         icon: Icon(Icons.shopping_cart_outlined),
         onTap: () => context.go('/cart'),

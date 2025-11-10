@@ -414,17 +414,17 @@ class AssetConfigHelper {
   /// - [defaultColor]: Default color to return if no configuration is found
   ///
   /// Returns:
-  /// - Color: The search bar background color or default color
-  Color getSearchBarBackgroundColor(
+  /// - Color: The search input background color or default color
+  Color getSearchInputBackgroundColor(
       [Color defaultColor = const Color(0xFFF5F5F5)]) {
-    // Try to get the specific search bar background color from search_view_configuration
-    final String searchBarBackgroundColorKey =
-        'search_view_configuration.search_bar_background_color';
-    if (hasKey(searchBarBackgroundColorKey)) {
-      return getColor(searchBarBackgroundColorKey, defaultColor);
+    // Try to get the specific search input background color from search_view_configuration
+    final String searchInputBackgroundColorKey =
+        'search_view_configuration.search_input_background_color';
+    if (hasKey(searchInputBackgroundColorKey)) {
+      return getColor(searchInputBackgroundColorKey, defaultColor);
     }
 
-    // Fall back to default light gray if search bar background color isn't specified
+    // Fall back to default light gray if search input background color isn't specified
     return defaultColor;
   }
 
@@ -532,6 +532,31 @@ class AssetConfigHelper {
     return getBool('search_view_configuration.show_back_button', defaultValue);
   }
 
+  /// 🔍 Get SearchView action icon color from configuration
+  ///
+  /// Returns the action_icon_color from search_view_configuration if specified,
+  /// or falls back to pewter color if action_icon_color isn't found
+  ///
+  /// Parameters:
+  /// - [defaultColor]: Default color to return if no configuration is found
+  ///
+  /// Returns:
+  /// - Color: The search action icon color or default color
+  Color getSearchViewActionIconColor([Color? defaultColor]) {
+    final Color fallbackColor =
+        defaultColor ?? const Color(0xFF6B7280); // OsmeaColors.pewter
+
+    // Try to get the specific action icon color from search_view_configuration
+    final String actionIconColorKey =
+        'search_view_configuration.action_icon_color';
+    if (hasKey(actionIconColorKey)) {
+      return getColor(actionIconColorKey, fallbackColor);
+    }
+
+    // Fall back to pewter if action icon color isn't specified
+    return fallbackColor;
+  }
+
   /// 🔍 Get SearchView action button spacing from configuration
   double getSearchViewActionButtonSpacing([double defaultValue = 2.0]) {
     return getDouble(
@@ -554,6 +579,105 @@ class AssetConfigHelper {
   double getSearchViewActionButtonPadding([double defaultValue = 4.0]) {
     return getDouble(
         'search_view_configuration.action_button_padding_all', defaultValue);
+  }
+
+  /// 🔍 Get SearchView text color from configuration
+  Color getSearchViewTextColor([Color? defaultColor]) {
+    const Color fallbackColor = Colors.black87;
+    final Color effectiveDefault = defaultColor ?? fallbackColor;
+
+    const String searchViewTextColorKey =
+        'search_view_configuration.text_color';
+    if (hasKey(searchViewTextColorKey)) {
+      return getColor(searchViewTextColorKey, effectiveDefault);
+    }
+    return effectiveDefault;
+  }
+
+  /// 🔍 Get SearchView hint text color from configuration
+  Color getSearchViewHintTextColor([Color? defaultColor]) {
+    const Color fallbackColor = Colors.grey;
+    final Color effectiveDefault = defaultColor ?? fallbackColor;
+
+    const String searchViewHintTextColorKey =
+        'search_view_configuration.hint_text_color';
+    if (hasKey(searchViewHintTextColorKey)) {
+      return getColor(searchViewHintTextColorKey, effectiveDefault);
+    }
+    return effectiveDefault;
+  }
+
+  /// 🔍 Get SearchView placeholder text color from configuration
+  Color getSearchViewPlaceholderTextColor([Color? defaultColor]) {
+    const Color fallbackColor = Colors.grey;
+    final Color effectiveDefault = defaultColor ?? fallbackColor;
+
+    const String searchViewPlaceholderTextColorKey =
+        'search_view_configuration.placeholder_text_color';
+    if (hasKey(searchViewPlaceholderTextColorKey)) {
+      return getColor(searchViewPlaceholderTextColorKey, effectiveDefault);
+    }
+    return effectiveDefault;
+  }
+
+  /// 🔍 Get SearchView focus color from configuration
+  Color getSearchViewFocusColor([Color? defaultColor]) {
+    const Color fallbackColor = Colors.blue;
+    final Color effectiveDefault = defaultColor ?? fallbackColor;
+
+    const String searchViewFocusColorKey =
+        'search_view_configuration.focus_color';
+    if (hasKey(searchViewFocusColorKey)) {
+      return getColor(searchViewFocusColorKey, effectiveDefault);
+    }
+    return effectiveDefault;
+  }
+
+  /// 🔍 Get SearchView error color from configuration
+  Color getSearchViewErrorColor([Color? defaultColor]) {
+    const Color fallbackColor = Colors.red;
+    final Color effectiveDefault = defaultColor ?? fallbackColor;
+
+    const String searchViewErrorColorKey =
+        'search_view_configuration.error_color';
+    if (hasKey(searchViewErrorColorKey)) {
+      return getColor(searchViewErrorColorKey, effectiveDefault);
+    }
+    return effectiveDefault;
+  }
+
+  /// 🔍 Get SearchView voice search prompt title text from configuration
+  String getSearchViewVoicePromptTitle([String defaultValue = 'Speak now']) {
+    return getString(
+        'search_view_configuration.voice_search.prompt_title', defaultValue);
+  }
+
+  /// 🔍 Get SearchView voice search recording title text from configuration
+  String getSearchViewVoiceRecordingTitle(
+      [String defaultValue = 'Listening...']) {
+    return getString(
+        'search_view_configuration.voice_search.recording_title', defaultValue);
+  }
+
+  /// 🔍 Get SearchView barcode scanner tooltip text from configuration
+  String getSearchViewBarcodeScannerTooltip(
+      [String defaultValue = 'Scan barcode']) {
+    return getString(
+        'search_view_configuration.barcode_scanner.tooltip', defaultValue);
+  }
+
+  /// 🔍 Get SearchView barcode scanner message text from configuration
+  String getSearchViewBarcodeScannerMessage(
+      [String defaultValue = 'Barcode scanner clicked!']) {
+    return getString(
+        'search_view_configuration.barcode_scanner.message', defaultValue);
+  }
+
+  /// 🔍 Get SearchView voice search tooltip text from configuration
+  String getSearchViewVoiceSearchTooltip(
+      [String defaultValue = 'Voice search']) {
+    return getString(
+        'search_view_configuration.voice_search.tooltip', defaultValue);
   }
 
   /// 🔍 Check if a key exists in the configuration
