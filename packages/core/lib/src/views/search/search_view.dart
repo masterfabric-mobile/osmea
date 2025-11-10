@@ -245,11 +245,13 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           size: 20, color: actionIconColor),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Barcode scanner clicked!')),
+                          SnackBar(
+                              content: Text(configHelper
+                                  .getSearchViewBarcodeScannerMessage())),
                         );
                       },
-                      tooltip: 'Scan barcode',
+                      tooltip:
+                          configHelper.getSearchViewBarcodeScannerTooltip(),
                       padding: EdgeInsets.zero,
                       constraints:
                           const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -268,8 +270,10 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           builder: (context) =>
                               OsmeaComponents.soundDialogWidget(
                             variant: SoundDialogVariant.inlineSearchBar,
-                            promptTitleText: 'Speak now',
-                            recordingTitleText: 'Listening...',
+                            promptTitleText:
+                                configHelper.getSearchViewVoicePromptTitle(),
+                            recordingTitleText:
+                                configHelper.getSearchViewVoiceRecordingTitle(),
                             onConfirm: (searchText) {
                               debugPrint(
                                   '🎤 Voice search result (showTitle=true): $searchText');
@@ -281,7 +285,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           ),
                         );
                       },
-                      tooltip: 'Voice search',
+                      tooltip: configHelper.getSearchViewVoiceSearchTooltip(),
                       padding: EdgeInsets.zero,
                       constraints:
                           const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -307,7 +311,13 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 appBarBackgroundColor: appBarBackgroundColor ??
                     configHelper.getSearchAppBarColor(),
                 searchBarBackgroundColor: searchBarBackgroundColor ??
-                    configHelper.getSearchBarBackgroundColor(),
+                    configHelper.getSearchInputBackgroundColor(),
+                searchBarBorderColor: searchBarBorderColor ??
+                    configHelper.getSearchBarBorderColor(),
+                searchBarTextColor: configHelper.getSearchViewTextColor(),
+                searchBarHintColor: configHelper.getSearchViewHintTextColor(),
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(),
+                searchBarErrorColor: configHelper.getSearchViewErrorColor(),
                 searchBarActions: effectiveActions,
                 searchBarActionMargin: searchBarActionMargin,
                 searchBarActionAlignment: searchBarActionAlignment,
@@ -351,11 +361,13 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           size: 20, color: actionIconColor),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Barcode scanner clicked!')),
+                          SnackBar(
+                              content: Text(configHelper
+                                  .getSearchViewBarcodeScannerMessage())),
                         );
                       },
-                      tooltip: 'Scan barcode',
+                      tooltip:
+                          configHelper.getSearchViewBarcodeScannerTooltip(),
                       padding: EdgeInsets.zero,
                       constraints:
                           const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -374,8 +386,10 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           builder: (context) =>
                               OsmeaComponents.soundDialogWidget(
                             variant: SoundDialogVariant.inlineSearchBar,
-                            promptTitleText: 'Speak now',
-                            recordingTitleText: 'Listening...',
+                            promptTitleText:
+                                configHelper.getSearchViewVoicePromptTitle(),
+                            recordingTitleText:
+                                configHelper.getSearchViewVoiceRecordingTitle(),
                             onConfirm: (searchText) {
                               debugPrint(
                                   '🎤 Voice search result (showTitle=false): $searchText');
@@ -387,7 +401,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                           ),
                         );
                       },
-                      tooltip: 'Voice search',
+                      tooltip: configHelper.getSearchViewVoiceSearchTooltip(),
                       padding: EdgeInsets.zero,
                       constraints:
                           const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -420,10 +434,15 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   searchIcon: showSearchIcon
                       ? const Icon(Icons.search, size: 20)
                       : null,
-                  borderColor: searchBarBorderColor,
+                  borderColor: searchBarBorderColor ??
+                      configHelper.getSearchBarBorderColor(),
                   variant: TextFieldVariant.outlined,
                   backgroundColor: searchBarBackgroundColor ??
-                      configHelper.getSearchBarBackgroundColor(),
+                      configHelper.getSearchInputBackgroundColor(),
+                  textColor: configHelper.getSearchViewTextColor(),
+                  hintColor: configHelper.getSearchViewHintTextColor(),
+                  focusColor: configHelper.getSearchViewFocusColor(),
+                  errorColor: configHelper.getSearchViewErrorColor(),
                   onChanged: (query) {
                     viewModel.updateQuery(query);
                     onSearchChanged?.call(query);
