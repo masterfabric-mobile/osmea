@@ -1,10 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/views/search/cubit/search_cubit.dart';
-import 'package:core/src/views/search/cubit/search_state.dart';
-import 'package:core/src/helper/asset_config_helper.dart';
-import 'package:osmea_components/osmea_components.dart';
 
 /// 🔍 **OSMEA Search View**
 ///
