@@ -45,7 +45,7 @@
 
       "search_view_configuration": {
     "search_app_bar_color": "#FFFFFFFF",
-    "search_bar_background_color": "#E4E4E4FF",
+
     "search_bar_border_color": "#E0E0E0FF",
     "action_icon_color": "#6B7280FF",
     "text_color": "#000000FF",
