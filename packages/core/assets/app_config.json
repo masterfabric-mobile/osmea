@@ -31,7 +31,7 @@
   },
   "search_view_configuration": {
     "search_app_bar_color": "#FFFFFFFF",
-    "search_input_background_color": "#BD8080FF",
+    "search_input_background_color": "#EBE5E5FF",
     "search_bar_border_color": "#E0E0E0FF",
     "action_icon_color": "#6B7280FF",
     "search_bar_show_clear_button": true,
