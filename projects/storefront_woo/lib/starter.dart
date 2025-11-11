@@ -70,19 +70,39 @@ launchApp({String environment = 'dev'}) async {
   // Configure dependency injection for the application
   await configureDependencies(environment: environment);
 
-  // Initialize AuthCubit and register in GetIt if not already registered
+  // Initialize AuthCubit and register in GetIt as SINGLETON (not factory!)
+  // This ensures all parts of the app use the same AuthCubit instance
+  // CRITICAL: AuthCubit must be singleton to avoid state desync issues
   try {
-    try {
-      GetIt.I<AuthCubit>();
-      debugPrint('✅ AuthCubit already registered in GetIt');
-    } catch (e) {
+    if (GetIt.instance.isRegistered<AuthCubit>()) {
+      // Already registered - ensure it's the same instance everywhere
+      try {
+        final existing = GetIt.I<AuthCubit>();
+        debugPrint('✅ AuthCubit already registered in GetIt (singleton)');
+        // Load initial tokens from storage if not already loaded
+        if (existing.state is AuthInitialState) {
+          await existing.loadTokens();
+          debugPrint('✅ AuthCubit tokens loaded');
+        }
+      } catch (e) {
+        debugPrint('⚠️ Error accessing existing AuthCubit: $e');
+        // If there's an issue, unregister and re-register as singleton
+        try {
+          GetIt.instance.unregister<AuthCubit>();
+        } catch (_) {}
+        final authCubit = AuthCubit();
+        GetIt.instance.registerSingleton<AuthCubit>(authCubit);
+        await authCubit.loadTokens();
+        debugPrint('✅ AuthCubit re-registered as singleton');
+      }
+    } else {
       // AuthCubit not registered - register it now as singleton
-      debugPrint('⚠️ AuthCubit not in GetIt, registering...');
+      debugPrint('⚠️ AuthCubit not in GetIt, registering as singleton...');
       final authCubit = AuthCubit();
       GetIt.instance.registerSingleton<AuthCubit>(authCubit);
       // Load initial tokens from storage
       await authCubit.loadTokens();
-      debugPrint('✅ AuthCubit registered and initialized');
+      debugPrint('✅ AuthCubit registered as singleton and initialized');
     }
   } catch (e) {
     debugPrint('⚠️ Error initializing AuthCubit: $e');

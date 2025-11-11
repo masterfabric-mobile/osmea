@@ -279,8 +279,16 @@ final GoRouter appRouter = GoRouter(
 
         return AuthView(
           goRoute: (String path) {
-            if (path.contains(Routes.home.name)) {
+            debugPrint('🔀 AuthView: goRoute called with path: $path');
+            if (path.contains('home') || path == '/home') {
+              debugPrint('🔀 AuthView: Navigating to /home');
               context.go('/home');
+            } else if (path.contains('profile') || path == '/profile') {
+              debugPrint('🔀 AuthView: Navigating to /profile');
+              context.go('/profile');
+            } else {
+              debugPrint('🔀 AuthView: Navigating to path: $path');
+              context.go(path);
             }
           },
           initialTab: initialTab,
@@ -413,7 +421,6 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/search' ||
       location == '/profile') {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
@@ -421,15 +428,13 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       return AppNavbar(currentIndex: 1, wishlistCount: wishlistCount); // Search
     } else if (location == '/saved') {
       return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
-    } else if (location == '/search') {
+    } else if (location == '/cart') {
       return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
     } else if (location == '/profile') {
       return AppNavbar(
         currentIndex: 4,
         wishlistCount: wishlistCount,
       ); // Profile
-    } else if (location == '/cart') {
-      return AppNavbar(currentIndex: 2);
     }
   }
   // No navbar for splash, onboarding, auth, product-detail, auth-debug

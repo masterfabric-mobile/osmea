@@ -183,18 +183,22 @@ class _AppNavbarState extends State<AppNavbar> {
 
           // If state is AuthAuthenticatedState but jwtToken is null/empty, 
           // this means state was restored from persistence but token was cleared
-          // Call loadTokens() once to sync state with storage
+          // Force signOut to clear invalid state
           if (authState is AuthAuthenticatedState) {
             final authStateTyped = authState;
-            // If jwtToken is null/empty, state is invalid - need to sync with storage
-            if ((authStateTyped.jwtToken == null || authStateTyped.jwtToken!.isEmpty) && !_hasLoadedTokens) {
-              _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  debugPrint('📱 Navbar: AuthAuthenticatedState has no jwtToken, syncing with storage...');
-                  authCubit.loadTokens();
-                }
-              });
+            // If jwtToken is null/empty, state is invalid - force signOut
+            if (authStateTyped.jwtToken == null || authStateTyped.jwtToken!.isEmpty) {
+              if (!_hasLoadedTokens) {
+                _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  if (mounted) {
+                    debugPrint('📱 Navbar: AuthAuthenticatedState has no jwtToken, forcing signOut...');
+                    // Force signOut to clear invalid state
+                    await authCubit.signOut();
+                    debugPrint('📱 Navbar: Forced signOut completed');
+                  }
+                });
+              }
             } else if (authStateTyped.jwtToken != null && authStateTyped.jwtToken!.isNotEmpty) {
               // Valid authenticated state - allow reload if needed later
               _hasLoadedTokens = false;

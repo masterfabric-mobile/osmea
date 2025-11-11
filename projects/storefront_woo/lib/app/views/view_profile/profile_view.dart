@@ -7,6 +7,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get_it/get_it.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_woo/app/views/view_profile/models/module/states.dart'
     as profile_states;
@@ -61,6 +63,40 @@ class ProfileView
     ProfileViewModel viewModel,
     profile_states.ProfileState state,
   ) {
+    // Listen to AuthCubit state changes and reload profile when authenticated
+    // This handles the case where ProfileView loads before AuthCubit state is updated after signin
+    try {
+      final authCubit = GetIt.I<AuthCubit>();
+      final currentProfileState = state; // Capture current state for closure
+      return BlocListener<AuthCubit, AuthState>(
+        bloc: authCubit,
+        listener: (context, authState) {
+          // If AuthCubit becomes authenticated and ProfileView is in initial/loading state,
+          // trigger loadProfile to refresh the view
+          if (authState is AuthAuthenticatedState &&
+              (currentProfileState is profile_states.ProfileInitialState ||
+                  currentProfileState is profile_states.ProfileLoadingState)) {
+            debugPrint(
+              '👤 ProfileView: AuthCubit authenticated, triggering loadProfile...',
+            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              viewModel.loadProfile();
+            });
+          }
+        },
+        child: _buildProfileContent(context, viewModel, state),
+      );
+    } catch (e) {
+      debugPrint('⚠️ ProfileView: Could not access AuthCubit: $e');
+      return _buildProfileContent(context, viewModel, state);
+    }
+  }
+
+  Widget _buildProfileContent(
+    BuildContext context,
+    ProfileViewModel viewModel,
+    profile_states.ProfileState state,
+  ) {
     // Initial state - show loading (initialContent will trigger loadProfile)
     if (state is profile_states.ProfileInitialState) {
       return buildLoading();
@@ -77,13 +113,36 @@ class ProfileView
     if (state is profile_states.ProfileSignedOutState) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         debugPrint('👤 ProfileView: Sign out completed, navigating to home');
-        // Don't reset state to initial - that would trigger loadProfile() again
-        // Just navigate away - ProfileView will be disposed
-        // Small delay to ensure signout is complete
-        await Future.delayed(const Duration(milliseconds: 100));
-        // Navigate to home page (user doesn't need to go to auth page)
-        context.go('/home');
-        debugPrint('👤 ProfileView: Navigated to /home');
+        // Small delay to ensure AuthCubit state is updated
+        await Future.delayed(const Duration(milliseconds: 150));
+
+        // Verify AuthCubit state before navigation
+        try {
+          final authCubit = GetIt.I<AuthCubit>();
+          if (authCubit.state is AuthUnauthenticatedState) {
+            debugPrint(
+              '✅ ProfileView: AuthCubit confirmed unauthenticated before navigation',
+            );
+          } else {
+            debugPrint(
+              '⚠️ ProfileView: AuthCubit state is ${authCubit.state.runtimeType}, expected AuthUnauthenticatedState',
+            );
+          }
+        } catch (e) {
+          debugPrint('⚠️ ProfileView: Could not verify AuthCubit state: $e');
+        }
+
+        // Navigate to home page using goRoute callback (safer than context.go)
+        // This avoids "Looking up a deactivated widget's ancestor" error
+        // goRoute is provided by MasterViewHydratedCubit and handles navigation safely
+        try {
+          goRoute('/home');
+          debugPrint('👤 ProfileView: Navigated to /home via goRoute');
+        } catch (e) {
+          debugPrint('❌ ProfileView: Error navigating to /home: $e');
+          // If goRoute fails, the error is logged but we don't try context.go
+          // because the widget might already be disposed
+        }
       });
       return buildLoading();
     }
