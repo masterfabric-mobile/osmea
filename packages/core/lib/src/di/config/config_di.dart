@@ -1,12 +1,8 @@
 // 📦 Importing core module dependencies
 import 'package:core/src/di/config/config_di.config.dart';
-import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
-import 'package:core/src/views/permissions/cubit/permissions_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
-import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart';
-import 'package:core/src/views/image_detail/cubit/image_detail_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -35,9 +31,9 @@ Future<GetIt> configureDependencies() async {
     getIt.registerFactory<OnboardingCubit>(() => OnboardingCubit());
   }
 
-  if (!getIt.isRegistered<AuthCubit>()) {
-    getIt.registerFactory<AuthCubit>(() => AuthCubit());
-  }
+  // AuthCubit should be registered as singleton in starter.dart
+  // Don't register here to avoid conflicts - let starter.dart handle it
+  // If not registered, it will be registered in starter.dart
 
   getIt.registerFactory<SearchCubit>(() => SearchCubit());
   return getIt;

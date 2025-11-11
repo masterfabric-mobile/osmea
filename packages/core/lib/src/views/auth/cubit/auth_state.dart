@@ -246,10 +246,15 @@ class AuthAuthenticatedState extends AuthState {
 
   /// Create from JSON for HydratedCubit persistence
   factory AuthAuthenticatedState.fromJson(Map<String, dynamic> json) {
+    final jwtToken = json['jwtToken'] as String?;
+    // isAuthenticated should be derived from jwtToken, not from JSON
+    // This ensures state is never authenticated without a valid token
+    final isAuthenticated = jwtToken != null && jwtToken.isNotEmpty;
+    
     return AuthAuthenticatedState(
-      jwtToken: json['jwtToken'] as String?,
+      jwtToken: jwtToken,
       userData: json['userData'] as Map<String, dynamic>?,
-      isAuthenticated: json['isAuthenticated'] as bool? ?? false,
+      isAuthenticated: isAuthenticated, // Always derived from jwtToken
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }

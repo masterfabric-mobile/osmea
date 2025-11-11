@@ -236,10 +236,14 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       // Update cubit state to unauthenticated
       // This will be persisted by HydratedCubit (toJson returns null for unauthenticated, which clears persistence)
       emit(const AuthUnauthenticatedState());
+      
+      // Force a state change to ensure HydratedCubit persistence is cleared
+      // Emit again to ensure state is properly persisted (or cleared)
+      await Future.delayed(const Duration(milliseconds: 10));
+      emit(const AuthUnauthenticatedState());
 
-      // Force clear HydratedCubit persistence by emitting a state that won't be persisted
-      // This ensures old authenticated state is not restored
       debugPrint('✅ AuthCubit: Sign out successful - state set to unauthenticated');
+      debugPrint('🔍 AuthCubit: Current state after signOut = ${state.runtimeType}');
     } catch (e) {
       debugPrint('❌ AuthCubit: Error signing out: $e');
       // Even on error, emit unauthenticated state

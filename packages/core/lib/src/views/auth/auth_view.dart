@@ -20,6 +20,9 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
   final int initialTab; // 0 = Sign In, 1 = Sign Up
   final String?
       defaultRedirectPath; // Default path to redirect after successful sign in
+  
+  // Track if navigation has been triggered to prevent duplicate calls
+  bool _hasNavigated = false;
 
   AuthView({
     required super.goRoute,
@@ -117,23 +120,36 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         // Handle authentication state changes
+        // Only navigate once when AuthAuthenticatedState is reached
+        // This is the primary navigation trigger after successful signin
         if (state is AuthAuthenticatedState) {
-          if (wrappedOnSignInSuccess != null) {
-            debugPrint('✅ Calling onSignInSuccess callback...');
-            wrappedOnSignInSuccess.call();
+          if (wrappedOnSignInSuccess != null && !_hasNavigated) {
+            _hasNavigated = true;
+            debugPrint('✅ AuthView: AuthAuthenticatedState detected, calling navigation callback...');
+            // Use postFrameCallback to ensure state is fully updated before navigation
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              try {
+                wrappedOnSignInSuccess?.call();
+                debugPrint('✅ AuthView: Navigation callback executed');
+              } catch (e) {
+                debugPrint('❌ AuthView: Error in navigation callback: $e');
+                _hasNavigated = false; // Reset on error to allow retry
+              }
+            });
           }
           return;
         }
 
         // Handle form state changes
+        // Don't navigate from AuthFormState.success - navigation is handled by AuthAuthenticatedState
+        // This prevents double navigation
         if (state is AuthFormState) {
           // Handle Sign In success/error
           if (state.operationStatus == AuthOperationStatus.success &&
               state.currentTab == 0) {
-            if (wrappedOnSignInSuccess != null) {
-              debugPrint('✅ Calling onSignInSuccess callback...');
-              wrappedOnSignInSuccess.call();
-            }
+            // Don't navigate here - wait for AuthAuthenticatedState
+            // This prevents double navigation
+            debugPrint('✅ AuthView: SignIn success detected, waiting for AuthAuthenticatedState...');
           } else if (state.operationStatus == AuthOperationStatus.error &&
               state.signInErrorMessage != null &&
               state.currentTab == 0) {
