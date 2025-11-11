@@ -9,7 +9,11 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 
@@ -205,64 +209,70 @@ class RecommendedSectionWidget extends StatelessWidget {
                     ),
                   ),
 
-                // Wishlist button - top right
+                // Wishlist button - top right (reactive with BlocBuilder)
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: GestureDetector(
-                    onTap: () {
-                      final int pid = product.id ?? 0;
-                      final bool wasSaved = viewModel.isProductSaved(pid);
-                      viewModel.addProductToWishlist(pid);
+                  child: BlocBuilder<WishlistViewModel, WishlistState>(
+                    bloc: GetIt.I<WishlistViewModel>(),
+                    builder: (context, wishlistState) {
+                      final productId = product.id ?? 0;
+                      final wishlistVm = GetIt.I<WishlistViewModel>();
+                      final isSaved = wishlistVm.isSaved(productId);
+                      
+                      return GestureDetector(
+                        onTap: () {
+                          final bool wasSaved = isSaved;
+                          viewModel.addProductToWishlist(productId);
 
-                      // Show feedback with Undo
-                      if (wasSaved) {
-                        // It was saved; toggle will remove
-                        context.showSnackbar(
-                          title: 'Removed from favorites',
-                          message: 'Item was removed from your favorites',
-                          type: SnackbarType.error, // red
-                          style: SnackbarStyle.minimal,
-                          position: SnackbarPosition.bottom,
-                          animation: SnackbarAnimation.slide,
-                          actionLabel: 'Undo',
-                          onAction: () => viewModel.addProductToWishlist(pid),
-                        );
-                      } else {
-                        // It was not saved; toggle will add
-                        context.showSnackbar(
-                          title: 'Added to favorites',
-                          message: 'Item was added to your favorites',
-                          type: SnackbarType.info, // blue
-                          style: SnackbarStyle.minimal,
-                          position: SnackbarPosition.bottom,
-                          animation: SnackbarAnimation.slide,
-                          actionLabel: 'Undo',
-                          onAction: () => viewModel.addProductToWishlist(pid),
-                        );
-                      }
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: OsmeaColors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: OsmeaColors.thunder.withOpacity(0.1),
-                          width: 0.1,
+                          // Show feedback with Undo
+                          if (wasSaved) {
+                            // It was saved; toggle will remove
+                            context.showSnackbar(
+                              title: 'Removed from favorites',
+                              message: 'Item was removed from your favorites',
+                              type: SnackbarType.error, // red
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
+                              animation: SnackbarAnimation.slide,
+                              actionLabel: 'Undo',
+                              onAction: () => viewModel.addProductToWishlist(productId),
+                            );
+                          } else {
+                            // It was not saved; toggle will add
+                            context.showSnackbar(
+                              title: 'Added to favorites',
+                              message: 'Item was added to your favorites',
+                              type: SnackbarType.info, // blue
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
+                              animation: SnackbarAnimation.slide,
+                              actionLabel: 'Undo',
+                              onAction: () => viewModel.addProductToWishlist(productId),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: OsmeaColors.thunder.withOpacity(0.1),
+                              width: 0.1,
+                            ),
+                          ),
+                          child: Icon(
+                            isSaved ? Icons.favorite : Icons.favorite_border,
+                            size: 14,
+                            color: isSaved
+                                ? OsmeaColors.nordicBlue
+                                : OsmeaColors.thunder,
+                          ),
                         ),
-                      ),
-                      child: Icon(
-                        viewModel.isProductSaved(product.id ?? 0)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        size: 14,
-                        color: viewModel.isProductSaved(product.id ?? 0)
-                            ? OsmeaColors.nordicBlue
-                            : OsmeaColors.thunder,
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],

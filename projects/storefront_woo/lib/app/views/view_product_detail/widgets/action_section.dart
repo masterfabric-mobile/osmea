@@ -39,13 +39,13 @@ class ActionSection extends StatelessWidget {
             icon: Icon(
               isInWishlist ? Icons.favorite : Icons.favorite_outline,
               color: isInWishlist
-                  ? OsmeaColors.red
+                  ? OsmeaColors.nordicBlue
                   : OsmeaColors.pewter.withOpacity(0.7),
             ),
             size: ButtonSize.small,
             variant: ButtonVariant.ghost,
             backgroundColor: isInWishlist
-                ? OsmeaColors.red.withOpacity(0.08)
+                ? OsmeaColors.nordicBlue.withOpacity(0.08)
                 : OsmeaColors.pewter.withOpacity(0.06),
             onPressed: () {
               final bool wasSaved = isInWishlist;
@@ -66,9 +66,7 @@ class ActionSection extends StatelessWidget {
                     children: [
                       Icon(
                         wasSaved ? Icons.favorite_border : Icons.favorite,
-                        color: wasSaved
-                            ? OsmeaColors.red
-                            : OsmeaColors.nordicBlue,
+                        color: OsmeaColors.nordicBlue,
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing10),
                       OsmeaComponents.expanded(

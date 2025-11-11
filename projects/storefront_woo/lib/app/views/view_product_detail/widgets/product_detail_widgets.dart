@@ -273,7 +273,7 @@ class ProductDetailContentWidget extends StatelessWidget {
                         ? Icons.favorite
                         : Icons.favorite_outline,
                     color: state.isInWishlist
-                        ? OsmeaColors.red
+                        ? OsmeaColors.nordicBlue
                         : OsmeaColors.thunder,
                   ),
                   size: ButtonSize.medium,

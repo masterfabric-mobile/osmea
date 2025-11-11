@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
     hide Image;
 import 'package:core/core.dart';
-import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -216,21 +215,30 @@ class ProductCardWidget extends StatelessWidget {
       bloc: GetIt.I<WishlistViewModel>(),
       builder: (context, wishlistState) {
         final productId = product.id ?? 0;
-        final isSaved = wishlistState is WishlistLoadedState
-            ? wishlistState.items.any((item) => item.id == productId)
-            : GetIt.I<HomeViewModel>().isProductSaved(productId);
+        // Use WishlistViewModel's isSaved method for accurate check
+        final wishlistVm = GetIt.I<WishlistViewModel>();
+        final isSaved = wishlistVm.isSaved(productId);
 
-        return OsmeaComponents.iconButton(
-          icon: Icon(
-            isSaved ? Icons.favorite : Icons.favorite_border,
-            size: context.iconSizeExtraSmall,
-            color: isSaved ? OsmeaColors.nordicBlue : OsmeaColors.pewter,
+        return Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: OsmeaColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: OsmeaColors.thunder.withOpacity(0.1),
+              width: 0.5,
+            ),
           ),
-          size: ButtonSize.small,
-          variant: ButtonVariant.ghost,
-          backgroundColor: OsmeaColors.white,
-          borderRadius: context.width20,
-          onPressed: onWishlistTap,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(
+              isSaved ? Icons.favorite : Icons.favorite_border,
+              size: 16,
+              color: isSaved ? OsmeaColors.nordicBlue : OsmeaColors.thunder,
+            ),
+            onPressed: onWishlistTap,
+          ),
         );
       },
     );

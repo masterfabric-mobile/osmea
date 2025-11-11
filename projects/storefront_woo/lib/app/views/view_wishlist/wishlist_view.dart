@@ -43,7 +43,8 @@ class WishlistView
   void initialContent(WishlistViewModel viewModel, BuildContext context) {
     // Pass widget-level arguments to ViewModel for consistency with other views
     viewModel.setArguments(arguments);
-    viewModel.syncFromServer();
+    // Load wishlist items from server (or local storage if not authenticated)
+    viewModel.initial();
   }
 
   @override
@@ -223,131 +224,239 @@ class WishlistView
 
     return ListView.separated(
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing12,
-        vertical: context.spacing10,
+        horizontal: context.spacing16,
+        vertical: context.spacing12,
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        return OsmeaComponents.container(
-          padding: EdgeInsets.all(context.spacing10),
+        return Dismissible(
+          key: Key('wishlist_item_${item.id}'),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.only(right: context.spacing20),
+            decoration: BoxDecoration(
+              color: OsmeaColors.red,
+              borderRadius: BorderRadius.circular(context.radiusNormal),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Icon(
+                  Icons.delete_outline,
+                  color: OsmeaColors.white,
+                  size: 24,
+                ),
+                SizedBox(width: context.spacing8),
+                Text(
+                  'Remove',
+                  style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: OsmeaColors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          confirmDismiss: (direction) async {
+            // Show confirmation dialog
+            return await showDialog<bool>(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                return AlertDialog(
+                  title: Text('Remove from favorites?'),
+                  content: Text('Are you sure you want to remove this item from your favorites?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      child: Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: OsmeaColors.red,
+                      ),
+                      child: Text('Remove'),
+                    ),
+                  ],
+                );
+              },
+            ) ?? false;
+          },
+          onDismissed: (direction) {
+            // Remove from wishlist
+            viewModel.remove(item.id);
+            // Show snackbar with Undo
+            context.showSnackbar(
+              title: 'Removed from favorites',
+              message: 'Item was removed from your favorites',
+              type: SnackbarType.error,
+              style: SnackbarStyle.minimal,
+              position: SnackbarPosition.bottom,
+              animation: SnackbarAnimation.slide,
+              actionLabel: 'Undo',
+              onAction: () => viewModel.toggle(item),
+            );
+          },
+          child: Container(
+          padding: EdgeInsets.all(context.spacing12),
           decoration: BoxDecoration(
             color: OsmeaColors.white,
             borderRadius: BorderRadius.circular(context.radiusNormal),
             border: Border.all(
-              color: OsmeaColors.silver.withValues(alpha: 0.3),
-              width: context.borderWidth,
+              color: OsmeaColors.silver.withOpacity(0.3),
+              width: 1,
             ),
+            // No shadow - removed as requested
           ),
-          child: OsmeaComponents.row(
-            crossAxisAlignment: context.crossCenter,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image
+              // Image - larger and better styled
               ClipRRect(
                 borderRadius: BorderRadius.circular(context.radiusLow),
                 child: item.imageUrl != null && item.imageUrl!.isNotEmpty
                     ? Image.network(
                         item.imageUrl!,
-                        width: 56,
-                        height: 56,
+                        width: 80,
+                        height: 80,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 80,
+                            height: 80,
+                            color: OsmeaColors.pewter.withOpacity(0.1),
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: OsmeaColors.pewter,
+                              size: 32,
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: 80,
+                            height: 80,
+                            color: OsmeaColors.pewter.withOpacity(0.1),
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                OsmeaColors.nordicBlue,
+                              ),
+                            ),
+                          );
+                        },
                       )
                     : Container(
-                        width: 56,
-                        height: 56,
-                        color: OsmeaColors.pewter.withValues(alpha: 0.06),
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.pewter.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(context.radiusLow),
+                        ),
                         child: Icon(
                           Icons.image_outlined,
                           color: OsmeaColors.pewter,
+                          size: 32,
                         ),
                       ),
               ),
-              OsmeaComponents.sizedBox(width: context.spacing10),
+              SizedBox(width: context.spacing12),
 
               // Title + price
-              OsmeaComponents.expanded(
-                child: OsmeaComponents.column(
-                  crossAxisAlignment: context.crossStart,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OsmeaComponents.text(
+                    Text(
                       item.name ?? 'Product',
-                      textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                      style: OsmeaTextStyle.titleSmall(context).copyWith(
                         color: OsmeaColors.thunder,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    OsmeaComponents.sizedBox(height: context.spacing6),
+                    SizedBox(height: context.spacing6),
                     _buildSubtitle(context, item),
                   ],
                 ),
               ),
 
-              OsmeaComponents.sizedBox(width: context.spacing8),
+              SizedBox(width: context.spacing8),
 
-              // Actions - tighter width to avoid row overflow on small screens
-              SizedBox(
-                width: 76,
-                child: OsmeaComponents.row(
-                  mainAxisAlignment: context.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: OsmeaComponents.iconButton(
-                        icon: Icon(
-                          Icons.shopping_cart_outlined,
-                          color: OsmeaColors.nordicBlue,
-                        ),
-                        variant: ButtonVariant.ghost,
-                        backgroundColor: OsmeaColors.nordicBlue.withValues(
-                          alpha: 0.08,
-                        ),
-                        onPressed: () => viewModel.promptAddToCartOptions(item),
-                      ),
+              // Actions - better styled
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Cart button - square corners
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4), // Square corners
                     ),
-                    SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: OsmeaComponents.iconButton(
-                        icon: Icon(
-                          Icons.favorite,
-                          color: OsmeaColors.nordicBlue,
-                        ),
-                        variant: ButtonVariant.ghost,
-                        backgroundColor: OsmeaColors.nordicBlue.withValues(
-                          alpha: 0.08,
-                        ),
-                        onPressed: () {
-                          // Remove from wishlist
-                          viewModel.remove(item.id);
-                          // Show red snackbar with Undo to re-add
-                          context.showSnackbar(
-                            title: 'Removed from favorites',
-                            message: 'Item was removed from your favorites',
-                            type: SnackbarType.error,
-                            style: SnackbarStyle.minimal,
-                            position: SnackbarPosition.bottom,
-                            animation: SnackbarAnimation.slide,
-                            actionLabel: 'Undo',
-                            onAction: () => viewModel.toggle(item),
-                          );
-                        },
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 18,
+                        color: OsmeaColors.nordicBlue,
                       ),
+                      onPressed: () => viewModel.promptAddToCartOptions(item),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: context.spacing8),
+                  // Favorite button - always filled and blue in wishlist, square corners
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4), // Square corners
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.favorite,
+                        size: 18,
+                        color: OsmeaColors.nordicBlue,
+                      ),
+                      onPressed: () {
+                        // Remove from wishlist
+                        viewModel.remove(item.id);
+                        // Show red snackbar with Undo to re-add
+                        context.showSnackbar(
+                          title: 'Removed from favorites',
+                          message: 'Item was removed from your favorites',
+                          type: SnackbarType.error,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                          animation: SnackbarAnimation.slide,
+                          actionLabel: 'Undo',
+                          onAction: () => viewModel.toggle(item),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+        ),
         );
       },
-      separatorBuilder: (_, __) => OsmeaComponents.padding(
-        padding: EdgeInsets.symmetric(horizontal: context.spacing12),
-        child: OsmeaComponents.divider(
-          color: OsmeaColors.silver.withValues(alpha: 0.2),
-        ),
+      separatorBuilder: (_, __) => Divider(
+        height: 1,
+        thickness: 1,
+        color: OsmeaColors.silver.withOpacity(0.3),
+        indent: context.spacing16,
+        endIndent: context.spacing16,
       ),
       itemCount: items.length,
     );
@@ -365,14 +474,7 @@ class WishlistView
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            PriceInfoCurrencyHelper.formatPrice(
-              double.tryParse(
-                    item.salePrice!.replaceAll(RegExp(r'[^\d.,]'), ''),
-                  ) ??
-                  0,
-              currencyCode: item.currencyCode,
-              decimalPlaces: 2,
-            ),
+            _formatPrice(item.salePrice, item.currencyCode),
             style: OsmeaTextStyle.bodyMedium(context).copyWith(
               color: OsmeaColors.nordicBlue,
               fontWeight: FontWeight.w600,
@@ -380,17 +482,7 @@ class WishlistView
           ),
           SizedBox(width: context.spacing6),
           Text(
-            PriceInfoCurrencyHelper.formatPrice(
-              double.tryParse(
-                    (item.regularPrice ?? '').replaceAll(
-                      RegExp(r'[^\d.,]'),
-                      '',
-                    ),
-                  ) ??
-                  0,
-              currencyCode: item.currencyCode,
-              decimalPlaces: 2,
-            ),
+            _formatPrice(item.regularPrice, item.currencyCode),
             style: OsmeaTextStyle.bodySmall(context).copyWith(
               color: OsmeaColors.pewter,
               decoration: TextDecoration.lineThrough,
@@ -401,17 +493,27 @@ class WishlistView
     }
 
     return Text(
-      PriceInfoCurrencyHelper.formatPrice(
-        double.tryParse(
-              (item.regularPrice ?? '').replaceAll(RegExp(r'[^\d.,]'), ''),
-            ) ??
-            0,
-        currencyCode: item.currencyCode,
-        decimalPlaces: 2,
-      ),
+      _formatPrice(item.regularPrice, item.currencyCode),
       style: OsmeaTextStyle.bodyMedium(
         context,
       ).copyWith(color: OsmeaColors.thunder, fontWeight: FontWeight.w600),
+    );
+  }
+
+  /// Formats price using PriceInfoCurrencyHelper
+  String _formatPrice(String? priceString, String? currencyCode) {
+    if (priceString == null || priceString.isEmpty) {
+      return PriceInfoCurrencyHelper.getDefaultPrice();
+    }
+
+    // Clean price string (remove currency symbols, spaces, etc.)
+    final cleanPrice = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
+    final parsedPrice = double.tryParse(cleanPrice) ?? 0.0;
+
+    return PriceInfoCurrencyHelper.formatPrice(
+      parsedPrice,
+      currencyCode: currencyCode,
+      decimalPlaces: 2,
     );
   }
 }

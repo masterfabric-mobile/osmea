@@ -6,6 +6,7 @@
  * Integrates with APIs package for checkout operations.
  */
 
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/abstract/checkout_data_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/checkout_order_api/abstract/checkout_order_service.dart';
@@ -307,8 +308,19 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       debugPrint('💳 CheckoutViewModel: Order Key: ${result.orderKey}');
       debugPrint('💳 CheckoutViewModel: Order ID: ${result.orderId}');
 
+      // Save order key to local storage for orders list
+      final orderKey = result.orderKey ?? '';
+      if (orderKey.isNotEmpty) {
+        try {
+          await _saveOrderKeyToStorage(orderKey, result.orderId);
+          debugPrint('✅ CheckoutViewModel: Order key saved to local storage');
+        } catch (e) {
+          debugPrint('⚠️ CheckoutViewModel: Failed to save order key: $e');
+        }
+      }
+
       emit(CheckoutSuccessState(
-        orderKey: result.orderKey ?? '',
+        orderKey: orderKey,
         orderId: result.orderId,
         orderNumber: result.orderId?.toString(),
         message: 'Order placed successfully!',
@@ -331,6 +343,49 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
     } catch (e) {
       debugPrint('⚠️ CheckoutViewModel: Could not get cart token: $e');
       return null;
+    }
+  }
+
+  /// Save order key to local storage
+  Future<void> _saveOrderKeyToStorage(String orderKey, int? orderId) async {
+    try {
+      final storage = LocalStorageHelper();
+      await storage.init();
+      
+      // Get existing order keys
+      final existingKeysJson = await storage.getItem('woo_order_keys');
+      List<String> orderKeys = [];
+      
+      if (existingKeysJson != null) {
+        try {
+          final decoded = jsonDecode(existingKeysJson as String);
+          if (decoded is List) {
+            orderKeys = decoded.cast<String>();
+          }
+        } catch (e) {
+          debugPrint('⚠️ CheckoutViewModel: Error parsing existing order keys: $e');
+        }
+      }
+      
+      // Add new order key if not already present
+      if (!orderKeys.contains(orderKey)) {
+        orderKeys.insert(0, orderKey); // Add to beginning (most recent first)
+        // Keep only last 50 orders
+        if (orderKeys.length > 50) {
+          orderKeys = orderKeys.take(50).toList();
+        }
+        
+        // Save back to storage
+        final keysJson = jsonEncode(orderKeys);
+        await storage.setItem('woo_order_keys', keysJson);
+        
+        debugPrint('✅ CheckoutViewModel: Order key saved: $orderKey (Total: ${orderKeys.length})');
+      } else {
+        debugPrint('💡 CheckoutViewModel: Order key already exists: $orderKey');
+      }
+    } catch (e) {
+      debugPrint('❌ CheckoutViewModel: Error saving order key: $e');
+      rethrow;
     }
   }
 

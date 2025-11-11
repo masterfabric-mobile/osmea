@@ -17,6 +17,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:get_it/get_it.dart';
 
 @injectable
@@ -275,7 +276,18 @@ class ProductDetailViewModel
         // Continue without cart check - not fatal
       }
 
-      final isInWishlist = false; // TODO: Implement wishlist service
+      // Check if product is in wishlist
+      bool isInWishlist = false;
+      try {
+        final wishlistViewModel = GetIt.I<WishlistViewModel>();
+        isInWishlist = wishlistViewModel.isSaved(productId);
+        debugPrint(
+          '💖 ProductDetailViewModel: Product $productId isInWishlist: $isInWishlist',
+        );
+      } catch (e) {
+        debugPrint('⚠️ Failed to check wishlist: $e');
+        // Continue without wishlist check - not fatal
+      }
 
       emit(
         ProductDetailLoadedState(
@@ -508,22 +520,64 @@ class ProductDetailViewModel
       final currentState = state;
       if (currentState is! ProductDetailLoadedState) return;
 
-      // TODO: Implement wishlist service
-      debugPrint('✅ Added product $productId to wishlist');
+      // Get WishlistViewModel from GetIt
+      final wishlistViewModel = GetIt.I<WishlistViewModel>();
 
-      // Update state
-      emit(currentState.copyWith(isInWishlist: true));
+      // Check if product is already in wishlist
+      final isCurrentlyInWishlist = wishlistViewModel.isSaved(productId);
+      final wasInWishlist = isCurrentlyInWishlist;
+
+      debugPrint('💖 ProductDetailViewModel: Toggling wishlist for product $productId (currently: $isCurrentlyInWishlist)');
+
+      // Get product details from current state
+      final product = currentState.product;
+
+      // Extract image URL
+      String? imageUrl;
+      if (product.images != null && product.images!.isNotEmpty) {
+        imageUrl = product.images!.first.src;
+      }
+
+      // Extract prices
+      final prices = product.prices;
+      final regularPrice = prices?.regularPrice ?? prices?.price;
+      final salePrice = product.onSale == true ? prices?.salePrice : null;
+      final currencyCode = prices?.currencyCode;
+
+      // Create WishlistItem from product
+      final wishlistItem = WishlistItem(
+        id: productId,
+        name: product.name,
+        imageUrl: imageUrl,
+        regularPrice: regularPrice,
+        salePrice: salePrice,
+        currencyCode: currencyCode,
+        onSale: product.onSale ?? false,
+      );
+
+      // Toggle wishlist using WishlistViewModel (add or remove)
+      await wishlistViewModel.toggle(wishlistItem);
+
+      // Get updated wishlist status
+      final isNowInWishlist = wishlistViewModel.isSaved(productId);
+
+      debugPrint('✅ ProductDetailViewModel: Wishlist toggled - now: $isNowInWishlist');
+
+      // Update local state to reflect wishlist status
+      emit(currentState.copyWith(isInWishlist: isNowInWishlist));
 
       // Show success message
       emit(
         ProductDetailSuccessState(
-          message: 'Product added to wishlist successfully!',
-          previousState: currentState.copyWith(isInWishlist: true),
+          message: wasInWishlist
+              ? 'Product removed from wishlist'
+              : 'Product added to wishlist successfully!',
+          previousState: currentState.copyWith(isInWishlist: isNowInWishlist),
         ),
       );
     } catch (e) {
-      debugPrint('❌ Failed to add to wishlist: $e');
-      emit(ProductDetailErrorState(message: 'Failed to add to wishlist: $e'));
+      debugPrint('❌ ProductDetailViewModel: Failed to toggle wishlist: $e');
+      emit(ProductDetailErrorState(message: 'Failed to toggle wishlist: $e'));
     }
   }
 

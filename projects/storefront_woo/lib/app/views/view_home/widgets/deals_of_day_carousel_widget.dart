@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 
@@ -151,17 +152,22 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     final prices = product.prices;
     final discount = _discountPercent(prices?.regularPrice, prices?.salePrice);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: OsmeaColors.silver.withOpacity(0.5),
-          width: 0.5,
+    return GestureDetector(
+      onTap: () {
+        viewModel.selectProduct(product);
+        context.push('/product-detail/${product.id ?? 0}');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: OsmeaColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: OsmeaColors.silver.withOpacity(0.5),
+            width: 0.5,
+          ),
         ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: OsmeaComponents.row(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: OsmeaComponents.row(
         children: [
           // Image
           Container(
@@ -259,6 +265,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

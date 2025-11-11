@@ -11,6 +11,7 @@ import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:storefront_woo/app/views/view_profile/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 
 @injectable
 class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
@@ -276,9 +277,18 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
       _authJwtToken = null;
       _authUserData = null;
 
+      // Step 5: Clear wishlist (user-specific data)
+      try {
+        final wishlistViewModel = GetIt.I<WishlistViewModel>();
+        wishlistViewModel.clearAll();
+        debugPrint('✅ ProfileViewModel: Wishlist cleared');
+      } catch (e) {
+        debugPrint('⚠️ ProfileViewModel: Failed to clear wishlist: $e');
+      }
+
       debugPrint('✅ ProfileViewModel: Sign out completed successfully');
 
-      // Step 4: Emit signed out state - ProfileView will handle navigation
+      // Step 6: Emit signed out state - ProfileView will handle navigation
       emit(ProfileSignedOutState());
     } catch (e) {
       debugPrint('❌ ProfileViewModel: Error signing out: $e');

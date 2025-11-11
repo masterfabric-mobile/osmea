@@ -31,8 +31,10 @@ class CartContentWidget extends StatelessWidget {
     return OsmeaComponents.singleChildScrollView(
       child: OsmeaComponents.column(
         children: [
-          // Cart items
-          ...state.cartItems.map((item) => _buildCartItem(context, item)),
+          // Cart items with swipe-to-delete
+          ...state.cartItems.map(
+            (item) => _buildCartItemWithSwipe(context, item),
+          ),
 
           OsmeaComponents.sizedBox(height: 8),
 
@@ -153,6 +155,112 @@ class CartContentWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Builds cart item with swipe-to-delete functionality
+  Widget _buildCartItemWithSwipe(BuildContext context, CartItem item) {
+    return Dismissible(
+      key: Key('cart_item_${item.key}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: context.spacing20),
+        decoration: BoxDecoration(
+          color: OsmeaColors.red,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(
+              Icons.delete_outline_rounded,
+              color: OsmeaColors.white,
+              size: 28,
+            ),
+            SizedBox(width: context.spacing12),
+            Text(
+              'Remove',
+              style: OsmeaTextStyle.titleMedium(
+                context,
+              ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        // Show confirmation dialog
+        return await showDialog<bool>(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  title: Text(
+                    'Remove item?',
+                    style: OsmeaTextStyle.titleMedium(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  content: Text(
+                    'Are you sure you want to remove "${item.productName}" from your cart?',
+                    style: OsmeaTextStyle.bodyMedium(context),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      child: Text(
+                        'Cancel',
+                        style: OsmeaTextStyle.bodyMedium(
+                          context,
+                        ).copyWith(color: OsmeaColors.pewter),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: OsmeaColors.red,
+                      ),
+                      child: Text(
+                        'Remove',
+                        style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: OsmeaColors.red,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ) ??
+            false;
+      },
+      onDismissed: (direction) {
+        // Remove item from cart
+        viewModel.removeItemFromCart(item.productId);
+        // Show snackbar with Undo
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Item removed from cart'),
+            backgroundColor: OsmeaColors.thunder,
+            action: SnackBarAction(
+              label: 'Undo',
+              textColor: OsmeaColors.white,
+              onPressed: () {
+                // Re-add item to cart
+                viewModel.addItemToCart(
+                  item.productId,
+                  quantity: item.quantity,
+                );
+              },
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      },
+      child: _buildCartItem(context, item),
     );
   }
 

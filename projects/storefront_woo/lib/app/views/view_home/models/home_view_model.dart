@@ -320,6 +320,8 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   Future<void> addProductToWishlist(int productId) async {
     try {
+      debugPrint('💖 HomeViewModel: Toggling wishlist for product $productId');
+      
       final product = _allProducts.firstWhere(
         (p) => (p.id ?? 0) == productId,
         orElse: () => ListAllProductsResponseModel(),
@@ -337,8 +339,15 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         currencyCode: product.prices?.currencyCode,
         onSale: product.onSale == true,
       );
+      
+      // Toggle wishlist - this will update WishlistViewModel state
       await wishlistVm.toggle(item);
+      
+      debugPrint('✅ HomeViewModel: Wishlist toggle completed for product $productId');
+      debugPrint('💖 HomeViewModel: Product is now saved: ${wishlistVm.isSaved(productId)}');
 
+      // Emit current state to trigger UI rebuild
+      // The BlocBuilder in the UI will automatically update based on WishlistViewModel state
       emit(
         HomeLoadedState(
           products: _products,
@@ -348,9 +357,11 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           selectedCategoryId: _selectedCategoryId,
         ),
       );
-    } catch (e) {
-      debugPrint('❌ Failed to add to wishlist: $e');
-      emit(HomeErrorState(message: 'Failed to add to wishlist: $e'));
+    } catch (e, stackTrace) {
+      debugPrint('❌ Failed to toggle wishlist: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      // Don't emit error state - just log it
+      // The UI will show error via snackbar if needed
     }
   }
 
