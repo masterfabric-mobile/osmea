@@ -132,6 +132,28 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           debugPrint(
             '🛒 CartViewModel: Item - ID: ${item.id}, Name: ${item.name}, Quantity: ${item.quantity}, Price: ${item.prices?.price}, Key: ${item.key}',
           );
+          
+          // Parse variation data from API response
+          List<Map<String, String>>? variations;
+          if (item.variation != null && item.variation!.isNotEmpty) {
+            variations = [];
+            for (final variationItem in item.variation!) {
+              if (variationItem is Map<String, dynamic>) {
+                final attribute = (variationItem['attribute'] ?? '').toString();
+                final value = (variationItem['value'] ?? '').toString();
+                if (attribute.isNotEmpty && value.isNotEmpty) {
+                  variations.add({
+                    'attribute': attribute,
+                    'value': value,
+                  });
+                }
+              }
+            }
+            debugPrint(
+              '🛒 CartViewModel: Item variations: $variations',
+            );
+          }
+          
           cartItems.add(
             CartItem(
               productId: item.id ?? 0,
@@ -141,6 +163,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
               imageUrl: item.images?.isNotEmpty == true
                   ? item.images!.first.src
                   : null,
+              variations: variations,
               key:
                   item.key ??
                   'cart_item_${item.id}_${DateTime.now().millisecondsSinceEpoch}',

@@ -299,6 +299,86 @@ class ProductDetailViewModel
         '🛒 ProductDetailViewModel: Adding product $productId to cart via API',
       );
 
+      // Get current state to check for selected attributes
+      final currentState = state;
+      Map<String, String> selectedAttributes = {};
+      if (currentState is ProductDetailLoadedState) {
+        selectedAttributes = currentState.selectedAttributes;
+        debugPrint(
+          '🛒 Selected attributes: $selectedAttributes',
+        );
+      }
+
+      // Build variation array from selectedAttributes if product has attributes
+      List<Map<String, String>>? variation;
+      if (selectedAttributes.isNotEmpty) {
+        variation = [];
+        // Get product attributes to find taxonomy names
+        final product = currentState is ProductDetailLoadedState
+            ? currentState.product
+            : null;
+        
+        if (product?.attributes != null) {
+          // Build attribute map: name -> taxonomy
+          final Map<String, String> attributeTaxonomyMap = {};
+          for (final attr in product!.attributes!) {
+            if (attr is Map<String, dynamic>) {
+              final name = (attr['name'] ?? attr['label'] ?? '').toString();
+              final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '').toString();
+              if (name.isNotEmpty && taxonomy.isNotEmpty) {
+                attributeTaxonomyMap[name] = taxonomy;
+              }
+            }
+          }
+
+          // Convert selectedAttributes to variation format
+          for (final entry in selectedAttributes.entries) {
+            final attributeName = entry.key;
+            final attributeValue = entry.value;
+            
+            // Find taxonomy for this attribute name
+            String taxonomy = attributeTaxonomyMap[attributeName] ?? attributeName;
+            
+            // Ensure taxonomy has 'pa_' prefix if it's a product attribute
+            if (!taxonomy.startsWith('pa_') && !taxonomy.startsWith('attribute_')) {
+              // Try to find matching taxonomy from product attributes
+              final matchingAttr = product.attributes?.firstWhere(
+                (attr) {
+                  if (attr is Map<String, dynamic>) {
+                    final name = (attr['name'] ?? attr['label'] ?? '').toString();
+                    return name == attributeName;
+                  }
+                  return false;
+                },
+                orElse: () => null,
+              );
+              
+              if (matchingAttr is Map<String, dynamic>) {
+                taxonomy = (matchingAttr['taxonomy'] ?? matchingAttr['id'] ?? attributeName).toString();
+              } else {
+                // Fallback: use attribute name with pa_ prefix
+                taxonomy = 'pa_${attributeName.toLowerCase().replaceAll(' ', '_')}';
+              }
+            }
+            
+            variation.add({
+              'attribute': taxonomy,
+              'value': attributeValue,
+            });
+          }
+          
+          debugPrint('🛒 Variation array: $variation');
+        } else {
+          // If no product attributes, use selectedAttributes directly
+          for (final entry in selectedAttributes.entries) {
+            variation.add({
+              'attribute': entry.key,
+              'value': entry.value,
+            });
+          }
+        }
+      }
+
       // Ensure we have a cart token; if missing, initialize cart first
       String? cartToken = await _getCartToken();
       if (cartToken == null || cartToken.isEmpty) {
@@ -324,6 +404,7 @@ class ProductDetailViewModel
         jwtToken: await _getJwtToken(), // Optional JWT token
         id: productId,
         quantity: quantity,
+        variation: variation?.cast<dynamic>(), // Convert to List<dynamic>
       );
 
       debugPrint(
@@ -353,6 +434,7 @@ class ProductDetailViewModel
             jwtToken: await _getJwtToken(),
             id: productId,
             quantity: quantity,
+            variation: variation?.cast<dynamic>(), // Convert to List<dynamic>
           );
 
           if (response.errors != null && response.errors!.isNotEmpty) {
@@ -405,10 +487,10 @@ class ProductDetailViewModel
       }
 
       // Update state to show product is in cart and update quantity
-      final currentState = state;
-      if (currentState is ProductDetailLoadedState) {
+      final finalState = state;
+      if (finalState is ProductDetailLoadedState) {
         emit(
-          currentState.copyWith(
+          finalState.copyWith(
             isInCart: true,
             selectedQuantity: finalQuantity, // Update to actual cart quantity
           ),

@@ -153,23 +153,19 @@ class ProfileView
         child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Authentication Status
-            _buildAuthStatus(context, state),
-            OsmeaComponents.sizedBox(height: context.spacing16),
+            // User Profile Header
+            _buildProfileHeader(context, state),
+            OsmeaComponents.sizedBox(height: context.spacing24),
 
-            // User Info Section
-            if (state.authUserData != null) ...[
-              _buildUserInfoSection(context, state.authUserData!),
-              OsmeaComponents.sizedBox(height: context.spacing16),
+            // Menu Items Section
+            _buildMenuItems(context, state.isAuthenticated),
+            OsmeaComponents.sizedBox(height: context.spacing24),
+
+            // Account Section (only if authenticated)
+            if (state.isAuthenticated) ...[
+              _buildAccountSection(context, state),
+              OsmeaComponents.sizedBox(height: context.spacing24),
             ],
-
-            // JWT Token Section (Core Auth JWT - single source of truth)
-            _buildJwtTokenSection(context, state.authJwtToken),
-            OsmeaComponents.sizedBox(height: context.spacing16),
-
-            // Cart Token Section
-            _buildCartTokenSection(context, state.cartToken),
-            OsmeaComponents.sizedBox(height: context.spacing16),
 
             // Actions
             _buildActions(context, viewModel, state.isAuthenticated),
@@ -183,230 +179,6 @@ class ProfileView
 
     // Initial state
     return const SizedBox.shrink();
-  }
-
-  Widget _buildAuthStatus(
-    BuildContext context,
-    profile_states.ProfileLoadedState state,
-  ) {
-    final hasJwt = state.authJwtToken != null && state.authJwtToken!.isNotEmpty;
-    final hasCartToken =
-        state.cartToken != null && state.cartToken!.cartToken.isNotEmpty;
-
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: state.isAuthenticated
-          ? OsmeaColors.white
-          : OsmeaColors.ash,
-      borderColor: state.isAuthenticated
-          ? OsmeaColors.nordicBlue
-          : OsmeaColors.pewter,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OsmeaComponents.text(
-            'Authentication Status',
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w700),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          Row(
-            children: [
-              Icon(
-                state.isAuthenticated ? Icons.check_circle : Icons.cancel,
-                color: state.isAuthenticated
-                    ? OsmeaColors.nordicBlue
-                    : OsmeaColors.pewter,
-                size: context.iconSizeMedium,
-              ),
-              OsmeaComponents.sizedBox(width: context.spacing8),
-              OsmeaComponents.text(
-                state.isAuthenticated ? 'Authenticated' : 'Not Authenticated',
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: state.isAuthenticated
-                      ? OsmeaColors.nordicBlue
-                      : OsmeaColors.pewter,
-                ),
-              ),
-            ],
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          _buildStatusItem(context, 'JWT Token', hasJwt),
-          _buildStatusItem(context, 'Cart Token', hasCartToken),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserInfoSection(
-    BuildContext context,
-    Map<String, dynamic> userData,
-  ) {
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: OsmeaColors.white,
-      borderColor: OsmeaColors.nordicBlue,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OsmeaComponents.text(
-            'User Information',
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w700),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-
-          // Display user info in a structured way
-          if (userData['email'] != null)
-            _buildInfoItem(context, 'Email', userData['email'].toString()),
-          if (userData['username'] != null)
-            _buildInfoItem(
-              context,
-              'Username',
-              userData['username'].toString(),
-            ),
-          if (userData['displayName'] != null ||
-              userData['display_name'] != null)
-            _buildInfoItem(
-              context,
-              'Display Name',
-              (userData['displayName'] ?? userData['display_name']).toString(),
-            ),
-          if (userData['firstName'] != null || userData['first_name'] != null)
-            _buildInfoItem(
-              context,
-              'First Name',
-              (userData['firstName'] ?? userData['first_name']).toString(),
-            ),
-          if (userData['lastName'] != null || userData['last_name'] != null)
-            _buildInfoItem(
-              context,
-              'Last Name',
-              (userData['lastName'] ?? userData['last_name']).toString(),
-            ),
-          if (userData['id'] != null)
-            _buildInfoItem(context, 'User ID', userData['id'].toString()),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJwtTokenSection(BuildContext context, String? authJwtToken) {
-    if (authJwtToken == null || authJwtToken.isEmpty) {
-      return _buildEmptySection(context, 'JWT Token', 'No JWT token found');
-    }
-
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: OsmeaColors.white,
-      borderColor: OsmeaColors.silver,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OsmeaComponents.text(
-            'JWT Token',
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w700),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          _buildTokenValue(context, 'Token', authJwtToken),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCartTokenSection(BuildContext context, dynamic cartToken) {
-    if (cartToken == null) {
-      return _buildEmptySection(context, 'Cart Token', 'No cart token found');
-    }
-
-    final isExpired =
-        cartToken.expiresAt != null &&
-        DateTime.now().isAfter(cartToken.expiresAt!);
-
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: OsmeaColors.white,
-      borderColor: isExpired ? Colors.red : OsmeaColors.silver,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              OsmeaComponents.text(
-                'Cart Token',
-                textStyle: OsmeaTextStyle.titleMedium(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w700),
-              ),
-              const Spacer(),
-              if (isExpired)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.spacing8,
-                    vertical: context.spacing4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: context.borderRadiusLow,
-                  ),
-                  child: OsmeaComponents.text(
-                    'EXPIRED',
-                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      color: OsmeaColors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          _buildTokenValue(context, 'Cart Token', cartToken.cartToken),
-          if (cartToken.cartId != null && cartToken.cartId!.isNotEmpty)
-            _buildTokenValue(context, 'Cart ID', cartToken.cartId!),
-          if (cartToken.expiresAt != null)
-            _buildInfoItem(
-              context,
-              'Expires At',
-              cartToken.expiresAt!.toIso8601String(),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptySection(
-    BuildContext context,
-    String title,
-    String message,
-  ) {
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: OsmeaColors.ash,
-      borderColor: OsmeaColors.pewter,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OsmeaComponents.text(
-            title,
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w700),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          OsmeaComponents.text(
-            message,
-            textStyle: OsmeaTextStyle.bodyMedium(
-              context,
-            ).copyWith(color: OsmeaColors.pewter),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildCardWrapper({
@@ -427,90 +199,361 @@ class ProfileView
     );
   }
 
-  Widget _buildStatusItem(
+  Widget _buildProfileHeader(
     BuildContext context,
-    String label,
-    bool isAvailable,
+    profile_states.ProfileLoadedState state,
   ) {
-    return Padding(
-      padding: EdgeInsets.only(top: context.spacing4),
-      child: Row(
+    final userData = state.authUserData;
+    final displayName = userData?['displayName'] ??
+        userData?['display_name'] ??
+        userData?['username'] ??
+        userData?['email'] ??
+        'Guest';
+    final email = userData?['email'] ?? 'Not available';
+    final initials = displayName
+        .toString()
+        .split(' ')
+        .map((e) => e.isNotEmpty ? e[0].toUpperCase() : '')
+        .take(2)
+        .join();
+
+    return _buildCardWrapper(
+      context: context,
+      backgroundColor: OsmeaColors.white,
+      borderColor: OsmeaColors.nordicBlue,
+      padding: EdgeInsets.all(context.spacing20),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            isAvailable ? Icons.check_circle_outline : Icons.cancel_outlined,
-            size: context.iconSizeSmall,
-            color: isAvailable ? OsmeaColors.nordicBlue : OsmeaColors.pewter,
-          ),
-          OsmeaComponents.sizedBox(width: context.spacing8),
-          OsmeaComponents.text(
-            label,
-            textStyle: OsmeaTextStyle.bodySmall(context),
-          ),
-          const Spacer(),
-          OsmeaComponents.text(
-            isAvailable ? 'Available' : 'Not Available',
-            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-              color: isAvailable ? OsmeaColors.nordicBlue : OsmeaColors.pewter,
-              fontWeight: FontWeight.w500,
-            ),
+          OsmeaComponents.row(
+            children: [
+              // Avatar
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.nordicBlue,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: OsmeaColors.nordicBlue.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: OsmeaComponents.text(
+                    initials,
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                      color: OsmeaColors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              OsmeaComponents.sizedBox(width: context.spacing16),
+              // User Info
+              Expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OsmeaComponents.text(
+                      displayName.toString(),
+                      textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: OsmeaColors.thunder,
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: context.spacing4),
+                    OsmeaComponents.text(
+                      email,
+                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                        color: OsmeaColors.pewter,
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: context.spacing8),
+                    // Status Badge
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing12,
+                        vertical: context.spacing4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: state.isAuthenticated
+                            ? OsmeaColors.nordicBlue.withOpacity(0.1)
+                            : OsmeaColors.pewter.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: state.isAuthenticated
+                              ? OsmeaColors.nordicBlue
+                              : OsmeaColors.pewter,
+                          width: 1,
+                        ),
+                      ),
+                      child: OsmeaComponents.row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            state.isAuthenticated
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            size: 16,
+                            color: state.isAuthenticated
+                                ? OsmeaColors.nordicBlue
+                                : OsmeaColors.pewter,
+                          ),
+                          OsmeaComponents.sizedBox(width: context.spacing4),
+                          OsmeaComponents.text(
+                            state.isAuthenticated
+                                ? 'Authenticated'
+                                : 'Not Authenticated',
+                            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                              color: state.isAuthenticated
+                                  ? OsmeaColors.nordicBlue
+                                  : OsmeaColors.pewter,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTokenValue(BuildContext context, String label, String value) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: context.spacing12),
+  Widget _buildMenuItems(BuildContext context, bool isAuthenticated) {
+    return _buildCardWrapper(
+      context: context,
+      backgroundColor: OsmeaColors.white,
+      borderColor: OsmeaColors.silver,
+      padding: EdgeInsets.zero,
+      child: OsmeaComponents.column(
+        children: [
+          // Orders Menu Item
+          if (isAuthenticated)
+            _buildMenuItem(
+              context: context,
+              icon: Icons.receipt_long_rounded,
+              title: 'My Orders',
+              subtitle: 'View your order history',
+              onTap: () {
+                goRoute('/orders');
+              },
+              showDivider: true,
+            ),
+          // Cart Menu Item
+          _buildMenuItem(
+            context: context,
+            icon: Icons.shopping_cart_rounded,
+            title: 'Cart',
+            subtitle: 'View your shopping cart',
+            onTap: () {
+              goRoute('/cart');
+            },
+            showDivider: true,
+          ),
+          // Saved/Wishlist Menu Item
+          _buildMenuItem(
+            context: context,
+            icon: Icons.favorite_rounded,
+            title: 'Saved Items',
+            subtitle: 'View your wishlist',
+            onTap: () {
+              goRoute('/saved');
+            },
+            showDivider: true,
+          ),
+          // Settings Menu Item
+          _buildMenuItem(
+            context: context,
+            icon: Icons.settings_rounded,
+            title: 'Settings',
+            subtitle: 'App settings and preferences',
+            onTap: () {
+              // TODO: Navigate to settings
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Settings coming soon!'),
+                  backgroundColor: OsmeaColors.nordicBlue,
+                ),
+              );
+            },
+            showDivider: true,
+          ),
+          // Help & Support Menu Item
+          _buildMenuItem(
+            context: context,
+            icon: Icons.help_outline_rounded,
+            title: 'Help & Support',
+            subtitle: 'Get help and contact support',
+            onTap: () {
+              // TODO: Navigate to help
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Help & Support coming soon!'),
+                  backgroundColor: OsmeaColors.nordicBlue,
+                ),
+              );
+            },
+            showDivider: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool showDivider = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.spacing16),
+        decoration: BoxDecoration(
+          border: showDivider
+              ? Border(
+                  bottom: BorderSide(
+                    color: OsmeaColors.silver,
+                    width: 1,
+                  ),
+                )
+              : null,
+        ),
+        child: OsmeaComponents.row(
+          children: [
+            // Icon Container
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: OsmeaColors.nordicBlue,
+                size: 24,
+              ),
+            ),
+            OsmeaComponents.sizedBox(width: context.spacing16),
+            // Title and Subtitle
+            Expanded(
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OsmeaComponents.text(
+                    title,
+                    textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing4),
+                  OsmeaComponents.text(
+                    subtitle,
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      color: OsmeaColors.pewter,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Arrow Icon
+            Icon(
+              Icons.chevron_right_rounded,
+              color: OsmeaColors.pewter,
+              size: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccountSection(
+    BuildContext context,
+    profile_states.ProfileLoadedState state,
+  ) {
+    return _buildCardWrapper(
+      context: context,
+      backgroundColor: OsmeaColors.white,
+      borderColor: OsmeaColors.silver,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            label,
-            textStyle: OsmeaTextStyle.bodySmall(
+            'Account Details',
+            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+              fontWeight: FontWeight.w700,
+              color: OsmeaColors.thunder,
+            ),
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          // JWT Token Info
+          if (state.authJwtToken != null && state.authJwtToken!.isNotEmpty)
+            _buildAccountDetailItem(
               context,
-            ).copyWith(fontWeight: FontWeight.w600, color: OsmeaColors.thunder),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing4),
-          Container(
-            padding: EdgeInsets.all(context.spacing12),
-            decoration: BoxDecoration(
-              color: OsmeaColors.ash,
-              borderRadius: context.borderRadiusNormal,
+              icon: Icons.lock_outline_rounded,
+              label: 'JWT Token',
+              value: 'Available',
+              valueColor: OsmeaColors.nordicBlue,
             ),
-            child: SelectableText(
-              value,
-              style: OsmeaTextStyle.bodySmall(
-                context,
-              ).copyWith(fontFamily: 'monospace'),
+          // Cart Token Info
+          if (state.cartToken != null)
+            _buildAccountDetailItem(
+              context,
+              icon: Icons.shopping_bag_outlined,
+              label: 'Cart Token',
+              value: 'Available',
+              valueColor: OsmeaColors.nordicBlue,
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, String label, String value) {
+  Widget _buildAccountDetailItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.spacing8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.only(bottom: context.spacing12),
+      child: OsmeaComponents.row(
         children: [
+          Icon(
+            icon,
+            size: 20,
+            color: OsmeaColors.pewter,
+          ),
+          OsmeaComponents.sizedBox(width: context.spacing12),
           Expanded(
-            flex: 2,
             child: OsmeaComponents.text(
               label,
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w600,
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 color: OsmeaColors.thunder,
               ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: OsmeaComponents.text(
-              value,
-              textStyle: OsmeaTextStyle.bodySmall(context),
+          OsmeaComponents.text(
+            value,
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+              color: valueColor ?? OsmeaColors.pewter,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -531,21 +574,25 @@ class ProfileView
             onPressed: () => viewModel.signOut(),
             variant: ButtonVariant.secondary,
             size: ButtonSize.large,
+            backgroundColor: OsmeaColors.red,
+            textColor: OsmeaColors.white,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
             ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
           ),
-        OsmeaComponents.sizedBox(height: context.spacing12),
-        OsmeaComponents.button(
-          onPressed: () => viewModel.refreshProfile(),
-          variant: ButtonVariant.primary,
-          size: ButtonSize.large,
-          text: 'Refresh',
-          textStyle: OsmeaTextStyle.bodyMedium(
-            context,
-          ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
-        ),
+        if (!isAuthenticated)
+          OsmeaComponents.button(
+            onPressed: () {
+              goRoute('/auth');
+            },
+            variant: ButtonVariant.primary,
+            size: ButtonSize.large,
+            text: 'Sign In',
+            textStyle: OsmeaTextStyle.bodyMedium(
+              context,
+            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+          ),
       ],
     );
   }

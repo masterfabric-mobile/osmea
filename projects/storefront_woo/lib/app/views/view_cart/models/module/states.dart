@@ -13,6 +13,7 @@ class CartItem {
   int quantity;
   final String? imageUrl;
   final String key;
+  final List<Map<String, String>>? variations; // Variation attributes (e.g., [{"attribute": "pa_color", "value": "bronz"}])
 
   CartItem({
     required this.productId,
@@ -20,10 +21,36 @@ class CartItem {
     required this.price,
     required this.quantity,
     this.imageUrl,
+    this.variations,
     String? key,
   }) : key = key ?? 'cart_item_${productId}_${DateTime.now().millisecondsSinceEpoch}';
 
   double get totalPrice => price * quantity;
+  
+  /// Get formatted variation string for display (e.g., "Color: Bronz, Size: 42")
+  String get formattedVariations {
+    if (variations == null || variations!.isEmpty) {
+      return '';
+    }
+    
+    return variations!.map((variation) {
+      final attribute = variation['attribute'] ?? '';
+      final value = variation['value'] ?? '';
+      
+      // Remove 'pa_' prefix and format attribute name
+      String attributeName = attribute;
+      if (attributeName.startsWith('pa_')) {
+        attributeName = attributeName.substring(3);
+      }
+      attributeName = attributeName.replaceAll('_', ' ');
+      attributeName = attributeName.split(' ').map((word) {
+        if (word.isEmpty) return word;
+        return word[0].toUpperCase() + word.substring(1);
+      }).join(' ');
+      
+      return '$attributeName: $value';
+    }).join(', ');
+  }
 }
 
 /// Base class for all cart states

@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 
@@ -229,6 +230,19 @@ class CartContentWidget extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      // Show variations if available
+                      if (item.formattedVariations.isNotEmpty) ...[
+                        OsmeaComponents.sizedBox(height: 4),
+                        OsmeaComponents.text(
+                          item.formattedVariations,
+                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                            color: OsmeaColors.pewter,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                       OsmeaComponents.sizedBox(height: 4),
                       OsmeaComponents.text(
                         PriceInfoCurrencyHelper.formatPrice(
@@ -576,14 +590,9 @@ class CartContentWidget extends StatelessWidget {
         return;
       }
 
-      // User is authenticated, proceed with checkout
+      // User is authenticated, navigate to checkout
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Checkout feature coming soon!'),
-            backgroundColor: Colors.blue,
-          ),
-        );
+        GoRouter.of(context).push('/checkout');
       }
     } catch (e) {
       if (context.mounted) {

@@ -11,6 +11,8 @@ import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
 import 'package:storefront_woo/app/views/view_auth_debug/auth_debug_view.dart';
 import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
+import 'package:storefront_woo/app/views/view_checkout/checkout_view.dart';
+import 'package:storefront_woo/app/views/view_orders/orders_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
@@ -210,12 +212,20 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         return SplashView(
           goRoute: (String path) {
-            // Check user authentication status
-            final authStorage = AuthStorageHelper();
-            authStorage.isAuthenticated().then((isAuthenticated) {
+            // Check user authentication status from AuthCubit (HydratedCubit state)
+            // This ensures we use the persisted state, not just storage
+            try {
+              final authCubit = GetIt.I<AuthCubit>();
+              final isAuthenticated =
+                  authCubit.state is AuthAuthenticatedState &&
+                  authCubit.isAuthenticated;
+
               if (!context.mounted) return;
+
               if (isAuthenticated) {
-                debugPrint('👤 User already authenticated, navigating to home');
+                debugPrint(
+                  '👤 User already authenticated (from AuthCubit), navigating to home',
+                );
                 context.go('/home');
               } else {
                 // User not authenticated, go to guest mode (onboarding → home)
@@ -230,7 +240,22 @@ final GoRouter appRouter = GoRouter(
                   context.go('/onboarding');
                 }
               }
-            });
+            } catch (e) {
+              debugPrint('⚠️ Error checking AuthCubit state: $e');
+              // Fallback to storage check
+              final authStorage = AuthStorageHelper();
+              authStorage.isAuthenticated().then((isAuthenticated) {
+                if (!context.mounted) return;
+                if (isAuthenticated) {
+                  debugPrint(
+                    '👤 User already authenticated (from storage), navigating to home',
+                  );
+                  context.go('/home');
+                } else {
+                  context.go('/onboarding');
+                }
+              });
+            }
           },
         );
       },
@@ -292,7 +317,11 @@ final GoRouter appRouter = GoRouter(
             }
           },
           initialTab: initialTab,
-          defaultRedirectPath: '/profile',
+          defaultRedirectPath: '/home',
+          onSignInSuccess: () {
+            debugPrint('✅ Sign in successful! Navigating to /home');
+            context.go('/home');
+          },
           arguments: {
             'auth': true,
             'onSignIn': (String email, String password) async {
@@ -355,8 +384,27 @@ final GoRouter appRouter = GoRouter(
         return CustomTransitionPage(
           child: ProfileView(
             goRoute: (String path) {
-              if (path.contains('home')) {
+              debugPrint('🔀 ProfileView: goRoute called with path: $path');
+              if (path.contains('home') || path == '/home') {
+                debugPrint('🔀 ProfileView: Navigating to /home');
                 context.go('/home');
+              } else if (path.contains('orders') ||
+                  path == '/orders' ||
+                  path.startsWith('/orders/')) {
+                debugPrint('🔀 ProfileView: Navigating to $path');
+                context.go(path);
+              } else if (path.contains('cart') || path == '/cart') {
+                debugPrint('🔀 ProfileView: Navigating to /cart');
+                context.go('/cart');
+              } else if (path.contains('saved') || path == '/saved') {
+                debugPrint('🔀 ProfileView: Navigating to /saved');
+                context.go('/saved');
+              } else if (path.contains('auth') || path == '/auth') {
+                debugPrint('🔀 ProfileView: Navigating to /auth');
+                context.go('/auth');
+              } else {
+                debugPrint('🔀 ProfileView: Navigating to path: $path');
+                context.go(path);
               }
             },
             bottomNavigationBar: _getNavbarForRoute(
@@ -407,6 +455,94 @@ final GoRouter appRouter = GoRouter(
             );
           },
           transitionDuration: const Duration(milliseconds: 500),
+        );
+      },
+    ),
+
+    // Checkout Route
+    GoRoute(
+      path: '/checkout',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: CheckoutView(
+            arguments: const {'checkout': true},
+            goRoute: (String path) {
+              if (path.contains('cart')) {
+                context.go('/cart');
+              } else if (path.contains('orders')) {
+                context.go('/orders');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOutCubic,
+                    ),
+                  ),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 400),
+        );
+      },
+    ),
+
+    // Orders Route (List)
+    GoRoute(
+      path: '/orders',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: OrdersView(
+            arguments: const {'orders': true},
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('checkout')) {
+                context.go('/checkout');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Order Detail Route
+    GoRoute(
+      path: '/orders/:orderKey',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        final orderKey = state.pathParameters['orderKey'] ?? '';
+        return CustomTransitionPage(
+          child: OrdersView(
+            arguments: {'orderDetail': true, 'orderKey': orderKey},
+            goRoute: (String path) {
+              if (path.contains('orders')) {
+                context.go('/orders');
+              } else if (path.contains('home')) {
+                context.go('/home');
+              } else {
+                context.go('/orders');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
         );
       },
     ),
