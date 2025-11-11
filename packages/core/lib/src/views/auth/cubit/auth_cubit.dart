@@ -495,28 +495,70 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
           // Call platform-specific onSignInSuccess callback if provided
           // This allows platforms (e.g., WooCommerce) to load tokens from their storage
+          // This callback should call saveJwtToken() which will emit AuthAuthenticatedState
           if (onSignInSuccess != null) {
             try {
               debugPrint('🔄 Calling onSignInSuccess callback...');
               await onSignInSuccess!(this);
               debugPrint('✅ onSignInSuccess callback completed');
+              
+              // Check if state was updated by onSignInSuccess callback
+              // If not, load token from storage and save it
+              if (state is! AuthAuthenticatedState) {
+                debugPrint('⚠️ State not updated by onSignInSuccess, loading from storage...');
+                final token = await _authStorage.getToken();
+                final userData = await _authStorage.getUserData();
+                
+                if (token != null && token.isNotEmpty) {
+                  // Save token using saveJwtToken which will emit AuthAuthenticatedState
+                  await saveJwtToken(
+                    jwtToken: token,
+                    userData: userData,
+                  );
+                } else {
+                  debugPrint('⚠️ No token found in storage after signin');
+                  emit(const AuthUnauthenticatedState());
+                }
+              } else {
+                debugPrint('✅ State already updated to AuthAuthenticatedState by onSignInSuccess');
+              }
             } catch (e) {
               debugPrint('⚠️ Error in onSignInSuccess callback: $e');
-              // Continue anyway - token might still be in storage
+              // Try to load token from storage as fallback
+              try {
+                final token = await _authStorage.getToken();
+                final userData = await _authStorage.getUserData();
+                
+                if (token != null && token.isNotEmpty) {
+                  await saveJwtToken(
+                    jwtToken: token,
+                    userData: userData,
+                  );
+                } else {
+                  emit(const AuthUnauthenticatedState());
+                }
+              } catch (e2) {
+                debugPrint('❌ Error loading token from storage: $e2');
+                emit(const AuthUnauthenticatedState());
+              }
+            }
+          } else {
+            // No onSignInSuccess callback, load token from storage directly
+            debugPrint('⚠️ No onSignInSuccess callback, loading token from storage...');
+            final token = await _authStorage.getToken();
+            final userData = await _authStorage.getUserData();
+            
+            if (token != null && token.isNotEmpty) {
+              // Save token using saveJwtToken which will emit AuthAuthenticatedState
+              await saveJwtToken(
+                jwtToken: token,
+                userData: userData,
+              );
+            } else {
+              debugPrint('⚠️ No token found in storage');
+              emit(const AuthUnauthenticatedState());
             }
           }
-
-          // Load token from storage (should be saved by the service or onSignInSuccess)
-          final token = await _authStorage.getToken();
-          final userData = await _authStorage.getUserData();
-
-          // Transition to authenticated state
-          emit(AuthAuthenticatedState(
-            jwtToken: token,
-            userData: userData,
-            isAuthenticated: true,
-            metadata: null,
-          ));
         } else {
           debugPrint('❌ Sign in failed');
           final currentFormState = _formState;

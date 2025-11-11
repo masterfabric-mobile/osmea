@@ -151,7 +151,6 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                 debugPrint('✅ AuthView: Navigation callback executed');
               } catch (e) {
                 debugPrint('❌ AuthView: Error in navigation callback: $e');
-                _hasNavigated = false; // Reset on error to allow retry
               }
             });
           }
