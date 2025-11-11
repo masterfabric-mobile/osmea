@@ -43,6 +43,11 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     String lastName,
     bool marketingConsent,
   )? signUpCallback;
+  
+  // Callback for post-sign-in success (platform-specific token loading)
+  // This is called after successful sign in, before emitting AuthAuthenticatedState
+  // The AuthCubit instance is passed as parameter so the callback can call saveJwtToken
+  Future<void> Function(AuthCubit authCubit)? onSignInSuccess;
 
   /// Check if user is authenticated
   bool get isAuthenticated {
@@ -225,15 +230,20 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     try {
       debugPrint('🚪 AuthCubit: Signing out...');
 
-      // Clear storage
+      // Clear storage FIRST
       await _authStorage.clearToken();
 
-      // Update cubit state
+      // Update cubit state to unauthenticated
+      // This will be persisted by HydratedCubit (toJson returns null for unauthenticated, which clears persistence)
       emit(const AuthUnauthenticatedState());
 
-      debugPrint('✅ AuthCubit: Sign out successful');
+      // Force clear HydratedCubit persistence by emitting a state that won't be persisted
+      // This ensures old authenticated state is not restored
+      debugPrint('✅ AuthCubit: Sign out successful - state set to unauthenticated');
     } catch (e) {
       debugPrint('❌ AuthCubit: Error signing out: $e');
+      // Even on error, emit unauthenticated state
+      emit(const AuthUnauthenticatedState());
     }
   }
 
@@ -479,7 +489,20 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         if (success) {
           debugPrint('✅ Sign in successful');
 
-          // Load token from storage (should be saved by the service)
+          // Call platform-specific onSignInSuccess callback if provided
+          // This allows platforms (e.g., WooCommerce) to load tokens from their storage
+          if (onSignInSuccess != null) {
+            try {
+              debugPrint('🔄 Calling onSignInSuccess callback...');
+              await onSignInSuccess!(this);
+              debugPrint('✅ onSignInSuccess callback completed');
+            } catch (e) {
+              debugPrint('⚠️ Error in onSignInSuccess callback: $e');
+              // Continue anyway - token might still be in storage
+            }
+          }
+
+          // Load token from storage (should be saved by the service or onSignInSuccess)
           final token = await _authStorage.getToken();
           final userData = await _authStorage.getUserData();
 
@@ -834,9 +857,15 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   @override
   Map<String, dynamic>? toJson(AuthState state) {
     if (state is AuthAuthenticatedState) {
-      return state.toJson();
+      // Only persist if jwtToken is valid
+      if (state.jwtToken != null && state.jwtToken!.isNotEmpty) {
+        return state.toJson();
+      }
+      // Don't persist authenticated state without valid token
+      return null;
     }
     // Don't persist initial, loading, or unauthenticated states
+    // Returning null clears the persisted state
     return null;
   }
 
@@ -844,10 +873,18 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   @override
   AuthState? fromJson(Map<String, dynamic> json) {
     try {
-      // Check if state has authentication data
-      if (json['isAuthenticated'] == true || json['jwtToken'] != null) {
+      // Check if state has valid authentication data
+      // jwtToken must be non-null and non-empty to be considered authenticated
+      final jwtToken = json['jwtToken'] as String?;
+      final isAuthenticated = json['isAuthenticated'] as bool? ?? false;
+      
+      // Only restore authenticated state if jwtToken exists and is not empty
+      if (isAuthenticated && jwtToken != null && jwtToken.isNotEmpty) {
         return AuthAuthenticatedState.fromJson(json);
       }
+      // If jwtToken is null/empty but state says authenticated, don't restore it
+      // This prevents restoring invalid authenticated states after signout
+      debugPrint('⚠️ AuthCubit: Restoring unauthenticated state (jwtToken is null/empty)');
       return const AuthUnauthenticatedState();
     } catch (e) {
       debugPrint('❌ AuthCubit: Error deserializing state: $e');

@@ -134,65 +134,84 @@ class _AppNavbarState extends State<AppNavbar> {
       final authCubit = GetIt.I<AuthCubit>();
 
       // Listen to AuthCubit for real-time auth status updates
-      return BlocListener<AuthCubit, AuthState>(
+      return BlocBuilder<AuthCubit, AuthState>(
         bloc: authCubit,
-        listener: (context, authState) {
+        builder: (context, authState) {
           debugPrint(
-            '📱 Navbar Listener: State changed to ${authState.runtimeType}',
+            '📱 Navbar Builder: Building with state ${authState.runtimeType}',
           );
 
-          final isAuthenticated =
-              authState is AuthAuthenticatedState && authState.isAuthenticated;
+          // Determine authentication status
+          // Only authenticated if state is AuthAuthenticatedState AND has valid JWT token
+          final isAuthenticated = authState is AuthAuthenticatedState &&
+              authState.isAuthenticated &&
+              authState.jwtToken != null &&
+              authState.jwtToken!.isNotEmpty;
 
-          debugPrint('📱 Navbar Listener: isAuthenticated = $isAuthenticated');
-
-          // Update local state to trigger rebuild
-          if (mounted && _isAuthenticated != isAuthenticated) {
-            setState(() {
-              _isAuthenticated = isAuthenticated;
-              _isLoading = false;
-            });
-            debugPrint('📱 Navbar: State updated via listener!');
+          debugPrint('📱 Navbar Builder: isAuthenticated = $isAuthenticated');
+          debugPrint('📱 Navbar Builder: State type = ${authState.runtimeType}');
+          if (authState is AuthAuthenticatedState) {
+            debugPrint('📱 Navbar Builder: JWT token = ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty ? "Present" : "Missing"}');
           }
-        },
-        child: BlocBuilder<AuthCubit, AuthState>(
-          bloc: authCubit,
-          builder: (context, authState) {
-            debugPrint(
-              '📱 Navbar Builder: Building with state ${authState.runtimeType}',
-            );
 
-            final isAuthenticated =
-                authState is AuthAuthenticatedState &&
-                authState.isAuthenticated;
+          // Update local state to keep it in sync with AuthCubit
+          if (mounted && _isAuthenticated != isAuthenticated) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _isAuthenticated = isAuthenticated;
+                  _isLoading = false;
+                });
+                debugPrint('📱 Navbar: Local state updated to match AuthCubit');
+              }
+            });
+          }
 
-            debugPrint('📱 Navbar Builder: isAuthenticated = $isAuthenticated');
+          // Only trigger initial load once if state is initial (not unauthenticated)
+          // Don't load tokens if user just signed out (AuthUnauthenticatedState)
+          // Prevent infinite loop by checking if we've already loaded
+          if (!_hasLoadedTokens && authState is AuthInitialState) {
+            _hasLoadedTokens =
+                true; // Mark as loaded to prevent multiple calls
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                debugPrint('📱 Navbar: Loading tokens from storage...');
+                authCubit.loadTokens();
+              }
+            });
+          }
 
-            // Only trigger initial load once if state is initial/unauthenticated
-            // Prevent infinite loop by checking if we've already loaded
-            if (!_hasLoadedTokens &&
-                (authState is AuthInitialState ||
-                    authState is AuthUnauthenticatedState)) {
-              _hasLoadedTokens =
-                  true; // Mark as loaded to prevent multiple calls
+          // If state is AuthAuthenticatedState but jwtToken is null/empty, 
+          // this means state was restored from persistence but token was cleared
+          // Call loadTokens() once to sync state with storage
+          if (authState is AuthAuthenticatedState) {
+            final authStateTyped = authState;
+            // If jwtToken is null/empty, state is invalid - need to sync with storage
+            if ((authStateTyped.jwtToken == null || authStateTyped.jwtToken!.isEmpty) && !_hasLoadedTokens) {
+              _hasLoadedTokens = true; // Mark as loaded to prevent multiple calls
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
-                  debugPrint('📱 Navbar: Loading tokens from storage...');
+                  debugPrint('📱 Navbar: AuthAuthenticatedState has no jwtToken, syncing with storage...');
                   authCubit.loadTokens();
                 }
               });
+            } else if (authStateTyped.jwtToken != null && authStateTyped.jwtToken!.isNotEmpty) {
+              // Valid authenticated state - allow reload if needed later
+              _hasLoadedTokens = false;
             }
+          }
 
-            // Reset flag if we're authenticated (so we can reload if needed later)
-            if (authState is AuthAuthenticatedState) {
-              _hasLoadedTokens =
-                  false; // Allow reload when authenticated changes
-            }
+          // Reset flag if we transition from authenticated to unauthenticated (signout)
+          // This prevents loadTokens() from being called after signout
+          if (authState is AuthUnauthenticatedState) {
+            _hasLoadedTokens =
+                true; // Mark as loaded to prevent loadTokens() after signout
+            debugPrint('📱 Navbar: User signed out - state is AuthUnauthenticatedState');
+          }
 
-            return _buildNavbar(context, isAuthenticated);
+          return _buildNavbar(context, isAuthenticated);
           },
-        ),
-      );
+        );
     } catch (e) {
       // Fallback to AuthStorageHelper if AuthCubit not available
       debugPrint(
@@ -273,12 +292,6 @@ class _AppNavbarState extends State<AppNavbar> {
         icon: Icon(count > 0 ? Icons.favorite : Icons.favorite_outline),
         onTap: () => context.go('/saved'),
         tooltip: 'Saved Items',
-      ),
-      NavbarItem(
-        text: 'Search',
-        icon: Icon(Icons.search_outlined),
-        onTap: () => context.go('/search'),
-        tooltip: 'Search Products',
       ),
       NavbarItem(
         text: 'Cart',

@@ -11,7 +11,6 @@ import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
 import 'package:storefront_woo/app/views/view_auth_debug/auth_debug_view.dart';
 import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
-import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
@@ -288,7 +287,6 @@ final GoRouter appRouter = GoRouter(
           defaultRedirectPath: '/profile',
           arguments: {
             'auth': true,
-            // Provide onSignIn callback expected by Core cubit
             'onSignIn': (String email, String password) async {
               final result = await authManager.login(
                 email: email,
@@ -296,7 +294,31 @@ final GoRouter appRouter = GoRouter(
               );
               return result.isSuccess;
             },
-            // onSignUp omitted (optional)
+            'onSignInSuccessTokenLoad': (AuthCubit authCubit) async {
+              final jwtToken = await WooJwtTokenStorage.loadToken();
+              if (jwtToken != null) {
+                // Extract user data - check if it exists and has content
+                Map<String, dynamic>? userData;
+                if (jwtToken.userData != null &&
+                    jwtToken.userData!.isNotEmpty) {
+                  userData = jwtToken.userData;
+                  debugPrint(
+                    '✅ User data found in JWT token: ${userData?.keys.toList()}',
+                  );
+                } else {
+                  debugPrint('⚠️ No user data in JWT token');
+                }
+
+                await authCubit.saveJwtToken(
+                  jwtToken: jwtToken.accessToken,
+                  userData: userData,
+                  metadata: {'woo_jwt_token': jwtToken.toJson()},
+                );
+                debugPrint('✅ JWT token and user data saved to AuthCubit');
+              } else {
+                debugPrint('⚠️ No JWT token found in storage');
+              }
+            },
           },
         );
       },
@@ -321,27 +343,23 @@ final GoRouter appRouter = GoRouter(
     // Profile Route
     GoRoute(
       path: '/profile',
-      builder: (BuildContext context, GoRouterState state) {
-        return BlocProvider<ProfileViewModel>(
-          create: (context) => GetIt.I<ProfileViewModel>(),
-          child: BlocBuilder<WishlistViewModel, WishlistState>(
-            bloc: GetIt.I<WishlistViewModel>(),
-            builder: (context, wishlistState) {
-              return ProfileView(
-                goRoute: (String path) {
-                  if (path.contains('home')) {
-                    context.go('/home');
-                  } else {
-                    context.go('/home');
-                  }
-                },
-                bottomNavigationBar: _getNavbarForRoute(
-                  state.uri.path,
-                  GetIt.I<WishlistViewModel>().count,
-                ),
-              );
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: ProfileView(
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              }
             },
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
           ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
         );
       },
     ),

@@ -20,6 +20,16 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
   String? _authJwtToken;
   Map<String, dynamic>? _authUserData;
 
+  // Arguments holder for route/widget inputs
+  final Map<String, dynamic> _arguments = {};
+  void setArguments(Map<String, dynamic> args) {
+    _arguments
+      ..clear()
+      ..addAll(args);
+  }
+
+  Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
+
   WooJwtToken? get jwtToken => _jwtToken;
   WooCartToken? get cartToken => _cartToken;
   String? get authJwtToken => _authJwtToken;
@@ -27,9 +37,10 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
 
   Future<void> loadProfile() async {
     try {
+      debugPrint('🔄 ProfileViewModel: loadProfile() called');
       emit(ProfileLoadingState());
 
-      // First, try to get data from AuthCubit (HydratedCubit)
+      // Get data from AuthCubit only (no double query - AuthCubit already uses AuthStorageHelper)
       String? authJwtToken;
       Map<String, dynamic>? authUserData;
 
@@ -46,23 +57,20 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
           debugPrint('✅ ProfileViewModel: Got JWT from AuthCubit');
         } else {
           debugPrint(
-              '⚠️ ProfileViewModel: AuthCubit not authenticated, loading from storage...');
-          // Load from storage as fallback
-          final authStorage = AuthStorageHelper();
-          authJwtToken = await authStorage.getToken();
-          authUserData = await authStorage.getUserData();
+              '⚠️ ProfileViewModel: AuthCubit not authenticated - user is signed out');
+          // User is not authenticated, set tokens to null
+          authJwtToken = null;
+          authUserData = null;
         }
       } catch (e) {
         debugPrint(
-            '⚠️ ProfileViewModel: AuthCubit not available, loading from storage: $e');
-        // Fallback to AuthStorageHelper
-        final authStorage = AuthStorageHelper();
-        authJwtToken = await authStorage.getToken();
-        authUserData = await authStorage.getUserData();
+            '⚠️ ProfileViewModel: AuthCubit not available: $e');
+        authJwtToken = null;
+        authUserData = null;
       }
 
-      // Load JWT token from WooCommerce storage
-      final jwtToken = await WooJwtTokenStorage.loadToken();
+      // No need to load WooCommerce JWT token - we only use Core Auth JWT (single source of truth)
+      // Core Auth JWT is managed by AuthCubit and AuthStorageHelper
 
       // Load cart token using WooCartTokenStorage (returns WooCartToken object)
       WooCartToken? cartToken;
@@ -77,16 +85,18 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
         // No need for fallback - interceptor manages token lifecycle
       }
 
-      _jwtToken = jwtToken;
+      // Clear WooCommerce JWT token (not used anymore - single JWT source)
+      _jwtToken = null;
       _authJwtToken = authJwtToken;
       _authUserData = authUserData;
       _cartToken = cartToken;
 
-      final isAuthenticated = (jwtToken != null && !jwtToken.isExpired) ||
-          (authJwtToken != null && authJwtToken.isNotEmpty);
+      // Authentication status should only be based on AuthCubit state
+      // Single JWT token source (Core Auth JWT managed by AuthCubit)
+      final isAuthenticated = authJwtToken != null && authJwtToken.isNotEmpty;
 
       emit(ProfileLoadedState(
-        jwtToken: jwtToken,
+        jwtToken: null, // No longer using WooCommerce JWT
         cartToken: cartToken,
         authJwtToken: authJwtToken,
         authUserData: authUserData,
@@ -106,7 +116,8 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
     try {
       debugPrint('🚪 Starting sign out process...');
       
-      // Clear all JWT tokens
+      // Step 1: Clear all storage tokens FIRST (before updating AuthCubit state)
+      // This prevents any race conditions or token reloading
       try {
         await WooJwtTokenStorage.clearToken();
         debugPrint('✅ WooJWT token cleared');
@@ -114,7 +125,6 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
         debugPrint('⚠️ Failed to clear WooJWT token: $e');
       }
 
-      // Clear all cart tokens
       try {
         await WooCartTokenStorage.clearCartToken();
         debugPrint('✅ WooCartToken cleared');
@@ -122,31 +132,39 @@ class ProfileViewModel extends BaseViewModelHydratedCubit<ProfileState> {
         debugPrint('⚠️ Failed to clear WooCartToken: $e');
       }
 
-      // Clear AuthStorageHelper tokens
       try {
         final authStorage = AuthStorageHelper();
-        await authStorage.clearToken();
-        debugPrint('✅ AuthStorageHelper tokens cleared');
+        await authStorage.clearToken(); // This clears both token and userData
+        debugPrint('✅ AuthStorageHelper tokens and userData cleared');
       } catch (e) {
         debugPrint('⚠️ Failed to clear AuthStorageHelper: $e');
       }
 
-      // Update AuthCubit to refresh navbar immediately
+      // Step 2: Update AuthCubit state AFTER clearing storage
+      // This ensures state matches storage (no tokens = unauthenticated)
       try {
         final authCubit = GetIt.I<AuthCubit>();
+        // Clear form state (email and password) first
+        authCubit.resetForm();
+        // Sign out from AuthCubit - this will emit AuthUnauthenticatedState
         await authCubit.signOut();
-        debugPrint('✅ AuthCubit cleared for navbar update');
+        debugPrint('✅ AuthCubit state updated to unauthenticated');
       } catch (e) {
-        debugPrint('⚠️ Could not clear AuthCubit: $e');
+        debugPrint('⚠️ Could not update AuthCubit: $e');
       }
 
-      // Clear local state
-      _jwtToken = null;
+      // Step 3: Clear local state variables
+      _jwtToken = null; // WooCommerce JWT (not used, but clear for safety)
       _cartToken = null;
       _authJwtToken = null;
       _authUserData = null;
 
+      // Step 4: Cart token is cleared - no need to create new one
+      // New cart token will be created automatically on next cart API call
+      debugPrint('🛒 Cart token cleared - new token will be created on next cart operation');
+
       debugPrint('✅ Sign out completed successfully');
+      // Emit signed out state - ProfileView will handle navigation
       emit(ProfileSignedOutState());
     } catch (e) {
       debugPrint('❌ Error signing out: $e');

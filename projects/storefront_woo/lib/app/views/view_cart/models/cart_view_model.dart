@@ -119,8 +119,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Response totals: ${response.totals?.toJson()}',
       );
 
-      // Extract and save cart token from response
-      _extractAndSaveCartToken(response);
+      // Note: Cart token is automatically extracted and saved by WooCartTokenInterceptor
+      // No need to manually extract it here
 
       // Convert API response to local cart items
       final cartItems = <CartItem>[];
@@ -680,17 +680,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     }
   }
 
-  /// Extract and save cart token from API response
-  void _extractAndSaveCartToken(dynamic response) {
-    try {
-      // Cart token interceptor zaten response header'dan çıkarıp storage'a kaydediyor
-      debugPrint(
-        '🛒 CartViewModel: Cart token extraction - interceptor handles storage',
-      );
-    } catch (e) {
-      debugPrint('❌ Failed to extract cart token: $e');
-    }
-  }
 
   /// Gets JWT token from storage and formats it with Bearer prefix
   /// Uses WooJwtTokenStorage for consistency with other view models

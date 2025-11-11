@@ -71,6 +71,16 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
       debugPrint('⚠️ Sign Up callback not found - Sign Up is disabled');
     }
 
+    // Configure onSignInSuccess callback for platform-specific token loading
+    final onSignInSuccessTokenLoad = arguments['onSignInSuccessTokenLoad']
+        as Future<void> Function(AuthCubit)?;
+    if (onSignInSuccessTokenLoad != null) {
+      viewModel.onSignInSuccess = onSignInSuccessTokenLoad;
+      debugPrint('✅ onSignInSuccessTokenLoad callback configured');
+    } else {
+      debugPrint('⚠️ onSignInSuccessTokenLoad callback not found');
+    }
+
     // Initialize authentication (loads config, checks auth status, initializes form)
     final result = await viewModel.initializeAuth(
       initialTab: initialTab,

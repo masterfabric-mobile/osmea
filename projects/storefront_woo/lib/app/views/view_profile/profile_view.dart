@@ -10,42 +10,48 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_woo/app/views/view_profile/models/module/states.dart'
     as profile_states;
-// Direct import to ensure extension is available
-import 'package:apis/models/auth/woo_jwt_token.dart';
 
 /// Profile View - Shows user authentication status and token information
-class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
-    profile_states.ProfileState> {
+class ProfileView
+    extends
+        MasterViewHydratedCubit<ProfileViewModel, profile_states.ProfileState> {
   ProfileView({super.key, required super.goRoute, super.bottomNavigationBar})
-      : super(
-          arguments: const {'profile': true},
-          appBarPadding: const AppBarPaddingVisibility.disabled(),
-          verticalPadding: const PaddingVisibility.disabled(),
-          coreAppBar: (context, vm) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(
-              'Profile',
-              textStyle: OsmeaTextStyle.titleLarge(context),
-            ),
-            leading: OsmeaComponents.iconButton(
-              onPressed: () => context.go('/home'),
-              icon: const Icon(Icons.arrow_back),
-              tooltip: 'Back',
-            ),
-            actions: [
-              AppBarAction(
-                type: AppBarActionType.secondary,
-                icon: const Icon(Icons.refresh),
-                onPressed: () => vm.refreshProfile(),
-                tooltip: 'Refresh',
-              ),
-            ],
-            variant: AppBarVariant.standard,
-            size: AppBarSize.standard,
+    : super(
+        arguments: const {'profile': true},
+        appBarPadding: const AppBarPaddingVisibility.disabled(),
+        verticalPadding: const PaddingVisibility.disabled(),
+        navbarSpacer: const SpacerVisibility.disabled(),
+        coreAppBar: (context, vm) => OsmeaComponents.appBar(
+          title: OsmeaComponents.text(
+            'Profile',
+            textStyle: OsmeaTextStyle.titleLarge(context),
           ),
-        );
+          leading: OsmeaComponents.iconButton(
+            onPressed: () => context.go('/home'),
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Back',
+          ),
+          actions: [
+            AppBarAction(
+              type: AppBarActionType.secondary,
+              icon: const Icon(Icons.refresh),
+              onPressed: () => vm.refreshProfile(),
+              tooltip: 'Refresh',
+            ),
+          ],
+          variant: AppBarVariant.standard,
+          size: AppBarSize.standard,
+        ),
+      ) {
+    debugPrint('👤 ProfileView: Constructor called');
+  }
 
   @override
   void initialContent(ProfileViewModel viewModel, BuildContext context) {
+    debugPrint('👤 ProfileView: initialContent called');
+    // Set arguments to ViewModel
+    viewModel.setArguments(arguments);
+    // Load profile - ViewModel handles authentication check internally
     viewModel.loadProfile();
   }
 
@@ -55,24 +61,31 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
     ProfileViewModel viewModel,
     profile_states.ProfileState state,
   ) {
+    // Initial state - show loading (initialContent will trigger loadProfile)
+    if (state is profile_states.ProfileInitialState) {
+      return buildLoading();
+    }
+
     if (state is profile_states.ProfileLoadingState) {
-      return const Center(child: CircularProgressIndicator());
+      return buildLoading();
     }
 
     if (state is profile_states.ProfileErrorState) {
-      return Center(
-        child: OsmeaComponents.text(
-          state.message,
-          textStyle: OsmeaTextStyle.bodyMedium(context),
-        ),
-      );
+      return buildError(state.message, onRetry: () => viewModel.loadProfile());
     }
 
     if (state is profile_states.ProfileSignedOutState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/auth');
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        debugPrint('👤 ProfileView: Sign out completed, navigating to home');
+        // Don't reset state to initial - that would trigger loadProfile() again
+        // Just navigate away - ProfileView will be disposed
+        // Small delay to ensure signout is complete
+        await Future.delayed(const Duration(milliseconds: 100));
+        // Navigate to home page (user doesn't need to go to auth page)
+        context.go('/home');
+        debugPrint('👤 ProfileView: Navigated to /home');
       });
-      return const Center(child: CircularProgressIndicator());
+      return buildLoading();
     }
 
     if (state is profile_states.ProfileLoadedState) {
@@ -91,12 +104,8 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
               OsmeaComponents.sizedBox(height: context.spacing16),
             ],
 
-            // WooCommerce JWT Token Section
-            _buildWooJwtSection(context, state.jwtToken),
-            OsmeaComponents.sizedBox(height: context.spacing16),
-
-            // Core Auth JWT Token Section
-            _buildCoreAuthJwtSection(context, state.authJwtToken),
+            // JWT Token Section (Core Auth JWT - single source of truth)
+            _buildJwtTokenSection(context, state.authJwtToken),
             OsmeaComponents.sizedBox(height: context.spacing16),
 
             // Cart Token Section
@@ -121,18 +130,18 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
     BuildContext context,
     profile_states.ProfileLoadedState state,
   ) {
-    final hasWooJwt = state.jwtToken != null && !state.jwtToken!.isExpired;
-    final hasCoreJwt =
-        state.authJwtToken != null && state.authJwtToken!.isNotEmpty;
+    final hasJwt = state.authJwtToken != null && state.authJwtToken!.isNotEmpty;
     final hasCartToken =
         state.cartToken != null && state.cartToken!.cartToken.isNotEmpty;
 
     return _buildCardWrapper(
       context: context,
-      backgroundColor:
-          state.isAuthenticated ? OsmeaColors.white : OsmeaColors.ash,
-      borderColor:
-          state.isAuthenticated ? OsmeaColors.nordicBlue : OsmeaColors.pewter,
+      backgroundColor: state.isAuthenticated
+          ? OsmeaColors.white
+          : OsmeaColors.ash,
+      borderColor: state.isAuthenticated
+          ? OsmeaColors.nordicBlue
+          : OsmeaColors.pewter,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -165,8 +174,7 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
             ],
           ),
           OsmeaComponents.sizedBox(height: context.spacing8),
-          _buildStatusItem(context, 'WooCommerce JWT', hasWooJwt),
-          _buildStatusItem(context, 'Core Auth JWT', hasCoreJwt),
+          _buildStatusItem(context, 'JWT Token', hasJwt),
           _buildStatusItem(context, 'Cart Token', hasCartToken),
         ],
       ),
@@ -197,20 +205,29 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
             _buildInfoItem(context, 'Email', userData['email'].toString()),
           if (userData['username'] != null)
             _buildInfoItem(
-                context, 'Username', userData['username'].toString()),
+              context,
+              'Username',
+              userData['username'].toString(),
+            ),
           if (userData['displayName'] != null ||
               userData['display_name'] != null)
             _buildInfoItem(
-                context,
-                'Display Name',
-                (userData['displayName'] ?? userData['display_name'])
-                    .toString()),
+              context,
+              'Display Name',
+              (userData['displayName'] ?? userData['display_name']).toString(),
+            ),
           if (userData['firstName'] != null || userData['first_name'] != null)
-            _buildInfoItem(context, 'First Name',
-                (userData['firstName'] ?? userData['first_name']).toString()),
+            _buildInfoItem(
+              context,
+              'First Name',
+              (userData['firstName'] ?? userData['first_name']).toString(),
+            ),
           if (userData['lastName'] != null || userData['last_name'] != null)
-            _buildInfoItem(context, 'Last Name',
-                (userData['lastName'] ?? userData['last_name']).toString()),
+            _buildInfoItem(
+              context,
+              'Last Name',
+              (userData['lastName'] ?? userData['last_name']).toString(),
+            ),
           if (userData['id'] != null)
             _buildInfoItem(context, 'User ID', userData['id'].toString()),
         ],
@@ -218,75 +235,9 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
     );
   }
 
-  Widget _buildWooJwtSection(BuildContext context, WooJwtToken? jwtToken) {
-    if (jwtToken == null) {
-      return _buildEmptySection(
-        context,
-        'WooCommerce JWT Token',
-        'No JWT token found',
-      );
-    }
-
-    final isExpired = jwtToken.isExpired;
-
-    return _buildCardWrapper(
-      context: context,
-      backgroundColor: OsmeaColors.white,
-      borderColor: isExpired ? Colors.red : OsmeaColors.silver,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              OsmeaComponents.text(
-                'WooCommerce JWT Token',
-                textStyle: OsmeaTextStyle.titleMedium(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w700),
-              ),
-              const Spacer(),
-              if (isExpired)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.spacing8,
-                    vertical: context.spacing4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: context.borderRadiusLow,
-                  ),
-                  child: OsmeaComponents.text(
-                    'EXPIRED',
-                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      color: OsmeaColors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          _buildTokenValue(context, 'Access Token', jwtToken.accessToken),
-          if (jwtToken.refreshToken != null)
-            _buildTokenValue(context, 'Refresh Token', jwtToken.refreshToken!),
-          _buildInfoItem(context, 'Token Type', jwtToken.tokenType),
-          _buildInfoItem(
-            context,
-            'Expires At',
-            jwtToken.expiresAt.toIso8601String(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCoreAuthJwtSection(BuildContext context, String? authJwtToken) {
+  Widget _buildJwtTokenSection(BuildContext context, String? authJwtToken) {
     if (authJwtToken == null || authJwtToken.isEmpty) {
-      return _buildEmptySection(
-        context,
-        'Core Auth JWT Token',
-        'No JWT token found',
-      );
+      return _buildEmptySection(context, 'JWT Token', 'No JWT token found');
     }
 
     return _buildCardWrapper(
@@ -297,7 +248,7 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Core Auth JWT Token',
+            'JWT Token',
             textStyle: OsmeaTextStyle.titleMedium(
               context,
             ).copyWith(fontWeight: FontWeight.w700),
@@ -314,7 +265,8 @@ class ProfileView extends MasterViewHydratedCubit<ProfileViewModel,
       return _buildEmptySection(context, 'Cart Token', 'No cart token found');
     }
 
-    final isExpired = cartToken.expiresAt != null &&
+    final isExpired =
+        cartToken.expiresAt != null &&
         DateTime.now().isAfter(cartToken.expiresAt!);
 
     return _buildCardWrapper(
