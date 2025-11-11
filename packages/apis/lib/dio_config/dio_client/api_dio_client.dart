@@ -301,13 +301,49 @@ class ApiDioClient implements ApiBaseClient {
 
   /// 🍪 Clear all cookies (works on both web and mobile)
   static Future<void> clearAllCookies() async {
-    if (kIsWeb) {
-      await webCookieManager.clearCookies();
-    } else {
-      // For mobile, we would need to clear the cookie jar
-      // This is a simplified approach - in practice you might want to
-      // implement a more sophisticated cookie clearing mechanism
-      debugPrint('🍪 Cookie clearing for mobile platforms not implemented yet');
+    try {
+      if (kIsWeb) {
+        await webCookieManager.clearCookies();
+        debugPrint('✅ All cookies cleared (web)');
+      } else {
+        // For mobile, clear the cookie jar
+        try {
+          // Clear all cookies by deleting the storage directory
+          // This is the most reliable way to clear all cookies
+          final Directory appDocDir = await getApplicationDocumentsDirectory();
+          final String appDocPath = appDocDir.path;
+          final cookieDir = Directory("$appDocPath/.cookies/");
+
+          if (await cookieDir.exists()) {
+            await cookieDir.delete(recursive: true);
+            debugPrint('✅ Cookie storage directory cleared (mobile)');
+          }
+
+          // Recreate cookie jar with fresh storage
+          ApiDioClient.cookieJar = CookieManager(PersistCookieJar(
+            ignoreExpires: true,
+            storage: FileStorage("$appDocPath/.cookies/"),
+          ));
+          debugPrint('✅ Cookie jar recreated (mobile)');
+        } catch (e) {
+          debugPrint('⚠️ Error clearing mobile cookies: $e');
+          // Fallback: recreate cookie jar
+          try {
+            final Directory appDocDir =
+                await getApplicationDocumentsDirectory();
+            final String appDocPath = appDocDir.path;
+            ApiDioClient.cookieJar = CookieManager(PersistCookieJar(
+              ignoreExpires: true,
+              storage: FileStorage("$appDocPath/.cookies/"),
+            ));
+            debugPrint('✅ Cookie jar recreated as fallback (mobile)');
+          } catch (e2) {
+            debugPrint('❌ Failed to recreate cookie jar: $e2');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error clearing cookies: $e');
     }
   }
 
