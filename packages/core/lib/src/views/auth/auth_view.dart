@@ -3,7 +3,6 @@ import 'package:core/src/views/auth/widgets/auth_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 /// 🔐 **OSMEA Auth View**
 ///
 /// Combined view for Sign In and Sign Up with TabBar
@@ -20,9 +19,9 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
   final int initialTab; // 0 = Sign In, 1 = Sign Up
   final String?
       defaultRedirectPath; // Default path to redirect after successful sign in
-  
+
   // Track if navigation has been triggered to prevent duplicate calls
-  bool _hasNavigated = false;
+  static bool _hasNavigated = false;
 
   AuthView({
     required super.goRoute,
@@ -41,7 +40,25 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     this.onForgotPasswordTap,
     this.initialTab = 0,
     this.defaultRedirectPath,
-  });
+  }) : super(
+          coreAppBar: (context, cubit) => OsmeaComponents.appBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: OsmeaComponents.iconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  goRoute('/home');
+                }
+              },
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.medium,
+              backgroundColor: Colors.transparent,
+            ),
+          ),
+        );
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -125,7 +142,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         if (state is AuthAuthenticatedState) {
           if (wrappedOnSignInSuccess != null && !_hasNavigated) {
             _hasNavigated = true;
-            debugPrint('✅ AuthView: AuthAuthenticatedState detected, calling navigation callback...');
+            debugPrint(
+                '✅ AuthView: AuthAuthenticatedState detected, calling navigation callback...');
             // Use postFrameCallback to ensure state is fully updated before navigation
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
@@ -149,7 +167,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
               state.currentTab == 0) {
             // Don't navigate here - wait for AuthAuthenticatedState
             // This prevents double navigation
-            debugPrint('✅ AuthView: SignIn success detected, waiting for AuthAuthenticatedState...');
+            debugPrint(
+                '✅ AuthView: SignIn success detected, waiting for AuthAuthenticatedState...');
           } else if (state.operationStatus == AuthOperationStatus.error &&
               state.signInErrorMessage != null &&
               state.currentTab == 0) {
