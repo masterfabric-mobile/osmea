@@ -171,6 +171,7 @@ class AuthWidget extends StatelessWidget {
           child: OsmeaComponents.container(
             color: backgroundColor,
             child: SafeArea(
+              bottom: false,
               child: OsmeaComponents.column(
                 children: [
                   // 📱 Simple header with logo
@@ -338,9 +339,8 @@ class AuthWidget extends StatelessWidget {
                   child: OsmeaComponents.text(
                     _getConfigValue('sign_in', 'tab_sign_in', 'Sign In'),
                     variant: OsmeaTextVariant.titleLarge,
-                    fontWeight: currentTab == 0
-                        ? FontWeight.w600
-                        : FontWeight.w400,
+                    fontWeight:
+                        currentTab == 0 ? FontWeight.w600 : FontWeight.w400,
                     color: currentTab == 0
                         ? primaryColor
                         : OsmeaColors.thunder.withOpacity(0.6),
@@ -371,9 +371,8 @@ class AuthWidget extends StatelessWidget {
                   child: OsmeaComponents.text(
                     _getConfigValue('sign_up', 'tab_sign_up', 'Sign Up'),
                     variant: OsmeaTextVariant.titleLarge,
-                    fontWeight: currentTab == 1
-                        ? FontWeight.w600
-                        : FontWeight.w400,
+                    fontWeight:
+                        currentTab == 1 ? FontWeight.w600 : FontWeight.w400,
                     color: cubit.signUpCallback == null
                         ? OsmeaColors.thunder.withOpacity(0.4)
                         : (currentTab == 1
@@ -413,7 +412,7 @@ class AuthWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing48),
           _buildSignInButton(
               context, formState, cubit, buttonRadius, primaryColor),
-          OsmeaComponents.sizedBox(height: context.spacing64),
+          OsmeaComponents.sizedBox(height: context.spacing16),
         ],
       ),
     );
@@ -455,7 +454,7 @@ class AuthWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing32),
           _buildSignUpButton(
               context, formState, cubit, buttonRadius, primaryColor),
-          OsmeaComponents.sizedBox(height: context.spacing64),
+          OsmeaComponents.sizedBox(height: context.spacing16),
         ],
       ),
     );
@@ -826,7 +825,8 @@ class AuthWidget extends StatelessWidget {
   Widget _buildSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius, Color primaryColor) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    final isEnabled =
+        state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
 
     return OsmeaComponents.button(
       text: isLoading
@@ -836,9 +836,11 @@ class AuthWidget extends StatelessWidget {
       onPressed: isEnabled ? cubit.signUp : null,
       variant: ButtonVariant.secondary,
       size: ButtonSize.large,
-      state: isLoading 
-          ? ButtonState.loading 
-          : (cubit.signUpCallback == null ? ButtonState.disabled : ButtonState.enabled),
+      state: isLoading
+          ? ButtonState.loading
+          : (cubit.signUpCallback == null
+              ? ButtonState.disabled
+              : ButtonState.enabled),
       fullWidth: true,
       backgroundColor: primaryColor,
       textColor: OsmeaColors.white,
