@@ -300,7 +300,7 @@ class AuthWidget extends StatelessWidget {
     );
   }
 
-  /// 📑 Simple tab bar
+  /// 📑 OSMEA Tab Bar
   Widget _buildSimpleTabBar(
     BuildContext context,
     int currentTab,
@@ -315,75 +315,25 @@ class AuthWidget extends StatelessWidget {
         top: context.spacing20,
         bottom: context.spacing16,
       ),
-      child: OsmeaComponents.row(
-        children: [
-          // Sign In Tab
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _switchTab(context, 0, cubit),
-              child: OsmeaComponents.container(
-                padding: EdgeInsets.symmetric(
-                  vertical: context.spacing12,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: currentTab == 0
-                          ? primaryColor
-                          : OsmeaColors.thunder.withOpacity(0.2),
-                      width: currentTab == 0 ? 2.0 : 1.0,
-                    ),
-                  ),
-                ),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.text(
-                    _getConfigValue('sign_in', 'tab_sign_in', 'Sign In'),
-                    variant: OsmeaTextVariant.titleLarge,
-                    fontWeight:
-                        currentTab == 0 ? FontWeight.w600 : FontWeight.w400,
-                    color: currentTab == 0
-                        ? primaryColor
-                        : OsmeaColors.thunder.withOpacity(0.6),
-                  ),
-                ),
-              ),
-            ),
+      child: OsmeaComponents.tabBar(
+        tabs: [
+          TabItem(
+            text: _getConfigValue('sign_in', 'tab_sign_in', 'Sign In'),
+            state: currentTab == 0 ? TabState.active : TabState.inactive,
           ),
-          // Sign Up Tab - Always show, but may be disabled if callback is not available
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _switchTab(context, 1, cubit),
-              child: OsmeaComponents.container(
-                padding: EdgeInsets.symmetric(
-                  vertical: context.spacing12,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: currentTab == 1
-                          ? primaryColor
-                          : OsmeaColors.thunder.withOpacity(0.2),
-                      width: currentTab == 1 ? 2.0 : 1.0,
-                    ),
-                  ),
-                ),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.text(
-                    _getConfigValue('sign_up', 'tab_sign_up', 'Sign Up'),
-                    variant: OsmeaTextVariant.titleLarge,
-                    fontWeight:
-                        currentTab == 1 ? FontWeight.w600 : FontWeight.w400,
-                    color: cubit.signUpCallback == null
-                        ? OsmeaColors.thunder.withOpacity(0.4)
-                        : (currentTab == 1
-                            ? primaryColor
-                            : OsmeaColors.thunder.withOpacity(0.6)),
-                  ),
-                ),
-              ),
-            ),
+          TabItem(
+            text: _getConfigValue('sign_up', 'tab_sign_up', 'Sign Up'),
+            state: currentTab == 1 ? TabState.active : TabState.inactive,
           ),
         ],
+        variant: TabBarVariant.primary,
+        indicatorStyle: TabBarIndicatorStyle.fill,
+        currentIndex: currentTab,
+        onTabTap: (index) => _switchTab(context, index, cubit),
+        backgroundColor: OsmeaColors.ash,
+        activeFillColor: OsmeaColors.snow,
+        activeTextColor: OsmeaColors.thunder,
+        inactiveTextColor: OsmeaColors.thunder,
       ),
     );
   }
