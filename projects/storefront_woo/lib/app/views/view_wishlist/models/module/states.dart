@@ -1,5 +1,25 @@
-import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart'
-    show WishlistItem;
+/// Simple wishlist item model for states
+class WishlistItem {
+  final int id; // product_id
+  final int? itemId; // wishlist item_id (for DELETE by ID)
+  final String? name;
+  final String? imageUrl;
+  final String? regularPrice;
+  final String? salePrice;
+  final String? currencyCode;
+  final bool onSale;
+
+  WishlistItem({
+    required this.id,
+    this.itemId,
+    this.name,
+    this.imageUrl,
+    this.regularPrice,
+    this.salePrice,
+    this.currencyCode,
+    this.onSale = false,
+  });
+}
 
 /// Saved/Wishlist states - mirrors Home states structure
 abstract class WishlistState {}
@@ -15,20 +35,6 @@ class WishlistLoadedState extends WishlistState {
 
   WishlistLoadedState copyWith({List<WishlistItem>? items}) =>
       WishlistLoadedState(items: items ?? this.items);
-
-  Map<String, dynamic> toJson() => {
-    'items': items.map((e) => e.toJson()).toList(),
-  };
-
-  factory WishlistLoadedState.fromJson(Map<String, dynamic> json) {
-    final raw = json['items'] as List<dynamic>? ?? [];
-    return WishlistLoadedState(
-      items: raw
-          .whereType<Map<String, dynamic>>()
-          .map(WishlistItem.fromJson)
-          .toList(),
-    );
-  }
 }
 
 class WishlistErrorState extends WishlistState {

@@ -20,20 +20,31 @@ WishlistItemResponse _$WishlistItemResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WishlistItemResponse {
+  @StringToIntConverter()
   int? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_id')
+  @StringToIntConverter()
   int? get productId => throw _privateConstructorUsedError;
   @JsonKey(name: 'group_id')
+  @StringToIntConverter()
   int? get groupId => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
+  @StringToIntConverter()
   int? get userId => throw _privateConstructorUsedError;
+  @StringToIntConverter()
   int? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'variation_id')
+  @StringToIntConverter()
   int? get variationId => throw _privateConstructorUsedError;
   @JsonKey(name: 'added_at')
   String? get addedAt => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata =>
-      throw _privateConstructorUsedError; // Product details might be included in response
+      throw _privateConstructorUsedError; // Product details from API (direct format)
+  String? get name => throw _privateConstructorUsedError; // API format
+  String? get price => throw _privateConstructorUsedError; // API format
+  String? get image => throw _privateConstructorUsedError; // API format
+  String? get link => throw _privateConstructorUsedError; // API format
+// Product details (legacy format)
   @JsonKey(name: 'product_name')
   String? get productName => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_slug')
@@ -58,14 +69,18 @@ abstract class $WishlistItemResponseCopyWith<$Res> {
       _$WishlistItemResponseCopyWithImpl<$Res, WishlistItemResponse>;
   @useResult
   $Res call(
-      {int? id,
-      @JsonKey(name: 'product_id') int? productId,
-      @JsonKey(name: 'group_id') int? groupId,
-      @JsonKey(name: 'user_id') int? userId,
-      int? quantity,
-      @JsonKey(name: 'variation_id') int? variationId,
+      {@StringToIntConverter() int? id,
+      @JsonKey(name: 'product_id') @StringToIntConverter() int? productId,
+      @JsonKey(name: 'group_id') @StringToIntConverter() int? groupId,
+      @JsonKey(name: 'user_id') @StringToIntConverter() int? userId,
+      @StringToIntConverter() int? quantity,
+      @JsonKey(name: 'variation_id') @StringToIntConverter() int? variationId,
       @JsonKey(name: 'added_at') String? addedAt,
       Map<String, dynamic>? metadata,
+      String? name,
+      String? price,
+      String? image,
+      String? link,
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'product_slug') String? productSlug,
       @JsonKey(name: 'product_price') String? productPrice,
@@ -95,6 +110,10 @@ class _$WishlistItemResponseCopyWithImpl<$Res,
     Object? variationId = freezed,
     Object? addedAt = freezed,
     Object? metadata = freezed,
+    Object? name = freezed,
+    Object? price = freezed,
+    Object? image = freezed,
+    Object? link = freezed,
     Object? productName = freezed,
     Object? productSlug = freezed,
     Object? productPrice = freezed,
@@ -134,6 +153,22 @@ class _$WishlistItemResponseCopyWithImpl<$Res,
           ? _value.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      price: freezed == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      link: freezed == link
+          ? _value.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String?,
       productName: freezed == productName
           ? _value.productName
           : productName // ignore: cast_nullable_to_non_nullable
@@ -167,14 +202,18 @@ abstract class _$$WishlistItemResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int? id,
-      @JsonKey(name: 'product_id') int? productId,
-      @JsonKey(name: 'group_id') int? groupId,
-      @JsonKey(name: 'user_id') int? userId,
-      int? quantity,
-      @JsonKey(name: 'variation_id') int? variationId,
+      {@StringToIntConverter() int? id,
+      @JsonKey(name: 'product_id') @StringToIntConverter() int? productId,
+      @JsonKey(name: 'group_id') @StringToIntConverter() int? groupId,
+      @JsonKey(name: 'user_id') @StringToIntConverter() int? userId,
+      @StringToIntConverter() int? quantity,
+      @JsonKey(name: 'variation_id') @StringToIntConverter() int? variationId,
       @JsonKey(name: 'added_at') String? addedAt,
       Map<String, dynamic>? metadata,
+      String? name,
+      String? price,
+      String? image,
+      String? link,
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'product_slug') String? productSlug,
       @JsonKey(name: 'product_price') String? productPrice,
@@ -201,6 +240,10 @@ class __$$WishlistItemResponseImplCopyWithImpl<$Res>
     Object? variationId = freezed,
     Object? addedAt = freezed,
     Object? metadata = freezed,
+    Object? name = freezed,
+    Object? price = freezed,
+    Object? image = freezed,
+    Object? link = freezed,
     Object? productName = freezed,
     Object? productSlug = freezed,
     Object? productPrice = freezed,
@@ -240,6 +283,22 @@ class __$$WishlistItemResponseImplCopyWithImpl<$Res>
           ? _value._metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      price: freezed == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      link: freezed == link
+          ? _value.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String?,
       productName: freezed == productName
           ? _value.productName
           : productName // ignore: cast_nullable_to_non_nullable
@@ -268,14 +327,18 @@ class __$$WishlistItemResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WishlistItemResponseImpl implements _WishlistItemResponse {
   const _$WishlistItemResponseImpl(
-      {this.id,
-      @JsonKey(name: 'product_id') this.productId,
-      @JsonKey(name: 'group_id') this.groupId,
-      @JsonKey(name: 'user_id') this.userId,
-      this.quantity,
-      @JsonKey(name: 'variation_id') this.variationId,
+      {@StringToIntConverter() this.id,
+      @JsonKey(name: 'product_id') @StringToIntConverter() this.productId,
+      @JsonKey(name: 'group_id') @StringToIntConverter() this.groupId,
+      @JsonKey(name: 'user_id') @StringToIntConverter() this.userId,
+      @StringToIntConverter() this.quantity,
+      @JsonKey(name: 'variation_id') @StringToIntConverter() this.variationId,
       @JsonKey(name: 'added_at') this.addedAt,
       final Map<String, dynamic>? metadata,
+      this.name,
+      this.price,
+      this.image,
+      this.link,
       @JsonKey(name: 'product_name') this.productName,
       @JsonKey(name: 'product_slug') this.productSlug,
       @JsonKey(name: 'product_price') this.productPrice,
@@ -287,20 +350,26 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
       _$$WishlistItemResponseImplFromJson(json);
 
   @override
+  @StringToIntConverter()
   final int? id;
   @override
   @JsonKey(name: 'product_id')
+  @StringToIntConverter()
   final int? productId;
   @override
   @JsonKey(name: 'group_id')
+  @StringToIntConverter()
   final int? groupId;
   @override
   @JsonKey(name: 'user_id')
+  @StringToIntConverter()
   final int? userId;
   @override
+  @StringToIntConverter()
   final int? quantity;
   @override
   @JsonKey(name: 'variation_id')
+  @StringToIntConverter()
   final int? variationId;
   @override
   @JsonKey(name: 'added_at')
@@ -315,7 +384,20 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
     return EqualUnmodifiableMapView(value);
   }
 
-// Product details might be included in response
+// Product details from API (direct format)
+  @override
+  final String? name;
+// API format
+  @override
+  final String? price;
+// API format
+  @override
+  final String? image;
+// API format
+  @override
+  final String? link;
+// API format
+// Product details (legacy format)
   @override
   @JsonKey(name: 'product_name')
   final String? productName;
@@ -334,7 +416,7 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
 
   @override
   String toString() {
-    return 'WishlistItemResponse(id: $id, productId: $productId, groupId: $groupId, userId: $userId, quantity: $quantity, variationId: $variationId, addedAt: $addedAt, metadata: $metadata, productName: $productName, productSlug: $productSlug, productPrice: $productPrice, productImage: $productImage, productStatus: $productStatus)';
+    return 'WishlistItemResponse(id: $id, productId: $productId, groupId: $groupId, userId: $userId, quantity: $quantity, variationId: $variationId, addedAt: $addedAt, metadata: $metadata, name: $name, price: $price, image: $image, link: $link, productName: $productName, productSlug: $productSlug, productPrice: $productPrice, productImage: $productImage, productStatus: $productStatus)';
   }
 
   @override
@@ -353,6 +435,10 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
                 other.variationId == variationId) &&
             (identical(other.addedAt, addedAt) || other.addedAt == addedAt) &&
             const DeepCollectionEquality().equals(other._metadata, _metadata) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.link, link) || other.link == link) &&
             (identical(other.productName, productName) ||
                 other.productName == productName) &&
             (identical(other.productSlug, productSlug) ||
@@ -377,6 +463,10 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
       variationId,
       addedAt,
       const DeepCollectionEquality().hash(_metadata),
+      name,
+      price,
+      image,
+      link,
       productName,
       productSlug,
       productPrice,
@@ -401,46 +491,67 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
 
 abstract class _WishlistItemResponse implements WishlistItemResponse {
   const factory _WishlistItemResponse(
-          {final int? id,
-          @JsonKey(name: 'product_id') final int? productId,
-          @JsonKey(name: 'group_id') final int? groupId,
-          @JsonKey(name: 'user_id') final int? userId,
-          final int? quantity,
-          @JsonKey(name: 'variation_id') final int? variationId,
-          @JsonKey(name: 'added_at') final String? addedAt,
-          final Map<String, dynamic>? metadata,
-          @JsonKey(name: 'product_name') final String? productName,
-          @JsonKey(name: 'product_slug') final String? productSlug,
-          @JsonKey(name: 'product_price') final String? productPrice,
-          @JsonKey(name: 'product_image') final String? productImage,
-          @JsonKey(name: 'product_status') final String? productStatus}) =
-      _$WishlistItemResponseImpl;
+      {@StringToIntConverter() final int? id,
+      @JsonKey(name: 'product_id') @StringToIntConverter() final int? productId,
+      @JsonKey(name: 'group_id') @StringToIntConverter() final int? groupId,
+      @JsonKey(name: 'user_id') @StringToIntConverter() final int? userId,
+      @StringToIntConverter() final int? quantity,
+      @JsonKey(name: 'variation_id')
+      @StringToIntConverter()
+      final int? variationId,
+      @JsonKey(name: 'added_at') final String? addedAt,
+      final Map<String, dynamic>? metadata,
+      final String? name,
+      final String? price,
+      final String? image,
+      final String? link,
+      @JsonKey(name: 'product_name') final String? productName,
+      @JsonKey(name: 'product_slug') final String? productSlug,
+      @JsonKey(name: 'product_price') final String? productPrice,
+      @JsonKey(name: 'product_image') final String? productImage,
+      @JsonKey(name: 'product_status')
+      final String? productStatus}) = _$WishlistItemResponseImpl;
 
   factory _WishlistItemResponse.fromJson(Map<String, dynamic> json) =
       _$WishlistItemResponseImpl.fromJson;
 
   @override
+  @StringToIntConverter()
   int? get id;
   @override
   @JsonKey(name: 'product_id')
+  @StringToIntConverter()
   int? get productId;
   @override
   @JsonKey(name: 'group_id')
+  @StringToIntConverter()
   int? get groupId;
   @override
   @JsonKey(name: 'user_id')
+  @StringToIntConverter()
   int? get userId;
   @override
+  @StringToIntConverter()
   int? get quantity;
   @override
   @JsonKey(name: 'variation_id')
+  @StringToIntConverter()
   int? get variationId;
   @override
   @JsonKey(name: 'added_at')
   String? get addedAt;
   @override
   Map<String, dynamic>? get metadata;
-  @override // Product details might be included in response
+  @override // Product details from API (direct format)
+  String? get name;
+  @override // API format
+  String? get price;
+  @override // API format
+  String? get image;
+  @override // API format
+  String? get link;
+  @override // API format
+// Product details (legacy format)
   @JsonKey(name: 'product_name')
   String? get productName;
   @override

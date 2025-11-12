@@ -7,58 +7,8 @@ import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/a
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/response/wishlist_item_response.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
-import 'package:apis/dio_config/dio_client/api_dio_client.dart';
-import 'package:apis/apis.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
-import 'package:dio/dio.dart';
-
-/// Lightweight DTO persisted for wishlist items
-class WishlistItem {
-  final int id; // product_id
-  final int? itemId; // wishlist item_id (for DELETE by ID)
-  final String? name;
-  final String? imageUrl;
-  final String? regularPrice;
-  final String? salePrice;
-  final String? currencyCode;
-  final bool onSale;
-
-  const WishlistItem({
-    required this.id,
-    this.itemId,
-    this.name,
-    this.imageUrl,
-    this.regularPrice,
-    this.salePrice,
-    this.currencyCode,
-    this.onSale = false,
-  });
-
-  factory WishlistItem.fromJson(Map<String, dynamic> json) => WishlistItem(
-    id: json['id'] as int,
-    itemId: json['itemId'] as int?,
-    name: json['name'] as String?,
-    imageUrl: json['imageUrl'] as String?,
-    regularPrice: json['regularPrice'] as String?,
-    salePrice: json['salePrice'] as String?,
-    currencyCode: json['currencyCode'] as String?,
-    onSale: (json['onSale'] as bool?) ?? false,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'itemId': itemId,
-    'name': name,
-    'imageUrl': imageUrl,
-    'regularPrice': regularPrice,
-    'salePrice': salePrice,
-    'currencyCode': currencyCode,
-    'onSale': onSale,
-  };
-}
-
-// State moved to module/states.dart (SavedInitial/Loading/Loaded/Error)
 
 /// Hydrated wishlist view model that also syncs with Woo Wishlist API
 @injectable
@@ -125,6 +75,61 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     emit(WishlistLoadedState(items: const []));
   }
 
+  /// Sync local wishlist items to server after successful login
+  /// This method should be called after user authentication to merge local and server wishlists
+  Future<void> syncLocalItemsAfterLogin() async {
+    try {
+      final currentState = state;
+
+      // Get local items from current state
+      List<WishlistItem> localItems = [];
+      if (currentState is WishlistLoadedState &&
+          currentState.items.isNotEmpty) {
+        localItems = currentState.items;
+      }
+
+      if (localItems.isEmpty) {
+        debugPrint('💡 No local wishlist items to sync');
+        // Still sync from server to get server wishlist
+        await syncFromServer();
+        return;
+      }
+
+      debugPrint(
+        '💖 Syncing ${localItems.length} local wishlist items to server after login...',
+      );
+
+      // Sync each local item to server using add() method
+      // This will handle both authenticated and unauthenticated cases
+      for (final item in localItems) {
+        try {
+          // Use add() method which handles authentication check internally
+          // If authenticated, it will add to server
+          // If not authenticated, it will add to local state only
+          await add(item);
+          debugPrint('💖 Synced wishlist item: ${item.id} - ${item.name}');
+        } catch (e) {
+          debugPrint('⚠️ Failed to sync wishlist item ${item.id}: $e');
+          // Continue with other items even if one fails
+        }
+      }
+
+      // After syncing all items, sync from server to get merged state
+      // This ensures we have the latest state from server (including itemId values)
+      await syncFromServer();
+      debugPrint('✅ Local wishlist synced to server successfully');
+    } catch (e) {
+      debugPrint('⚠️ Error syncing wishlist after login: $e');
+      // Don't block login if wishlist sync fails
+      // Try to sync from server anyway to get server state
+      try {
+        await syncFromServer();
+      } catch (e2) {
+        debugPrint('⚠️ Failed to sync from server after error: $e2');
+      }
+    }
+  }
+
   // Private implementations
   Future<void> _syncFromServer({int? groupId}) async {
     try {
@@ -148,308 +153,129 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       debugPrint('💖 Wishlist: Fetching wishlist items from server...');
 
-      // API returns items in 'items' field, but WishlistPaginatedResponse expects 'data'
-      // We need to manually parse the raw response
-      List<dynamic> rawItems = [];
+      // Use service to fetch wishlist items
+      List<WishlistItemResponse> items = [];
 
       try {
-        // Try to get raw response using Dio directly
-        // Interceptor will automatically add JWT token if available
-        final dio = ApiDioClient.wooDio();
-        final baseUrl = WooNetwork.baseUrl;
-
-        final queryParams = <String, dynamic>{'page': 1, 'per_page': 100};
-        if (groupId != null) {
-          queryParams['group_id'] = groupId;
-        }
-
-        // Don't manually add Authorization header - let interceptor handle it
-        // Interceptor will add token if available, or proceed without token for wishlist endpoints
-        final headers = <String, dynamic>{
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        };
-
-        final fullUrl = '$baseUrl/wp-json/custom-wishlist/$apiVersion/items';
-        debugPrint('💖 Wishlist: Making direct Dio request to $fullUrl');
-        debugPrint(
-          '💖 Wishlist: JWT token will be added by interceptor if available',
+        final paged = await _wishlistService.getWishlistItems(
+          apiVersion: apiVersion,
+          groupId: groupId,
+          page: 1,
+          perPage: 100,
         );
 
-        final response = await dio.get<Map<String, dynamic>>(
-          fullUrl,
-          queryParameters: queryParams,
-          options: Options(headers: headers),
-        );
-
-        debugPrint('💖 Wishlist: Raw response received: ${response.data}');
-
-        // Parse response - API returns {items: [...], pagination: {...}}
-        if (response.data != null) {
-          final responseData = response.data!;
-
-          // Check if response has 'items' field (actual API format)
-          if (responseData.containsKey('items') &&
-              responseData['items'] is List) {
-            rawItems = responseData['items'] as List<dynamic>;
-            debugPrint(
-              '💖 Wishlist: Found ${rawItems.length} items in response.items',
-            );
-          }
-          // Fallback: check if response has 'data' field (model format)
-          else if (responseData.containsKey('data') &&
-              responseData['data'] is List) {
-            rawItems = responseData['data'] as List<dynamic>;
-            debugPrint(
-              '💖 Wishlist: Found ${rawItems.length} items in response.data',
-            );
-          }
-          // Try to parse as WishlistPaginatedResponse format
-          else {
-            debugPrint(
-              '⚠️ Wishlist: Response does not contain items or data field',
-            );
-            debugPrint(
-              '⚠️ Wishlist: Response keys: ${responseData.keys.toList()}',
-            );
-
-            // Try using service response as fallback
-            try {
-              final paged = await _wishlistService.getWishlistItems(
-                apiVersion: apiVersion,
-                groupId: groupId,
-                page: 1,
-                perPage: 100,
-              );
-              if (paged.data != null && paged.data!.isNotEmpty) {
-                rawItems = paged.data!.map((item) => item).toList();
-                debugPrint(
-                  '💖 Wishlist: Using service response data (${rawItems.length} items)',
-                );
-              }
-            } catch (e) {
-              debugPrint('❌ Wishlist: Fallback service call failed: $e');
-            }
-          }
+        // Service parsed successfully - check if data exists
+        // Support both API format (items) and legacy format (data)
+        if (paged.items != null && paged.items!.isNotEmpty) {
+          debugPrint(
+            '💖 Wishlist: Using API format response (${paged.items!.length} items)',
+          );
+          items = paged.items!;
+        } else if (paged.data != null && paged.data!.isNotEmpty) {
+          debugPrint(
+            '💖 Wishlist: Using legacy format response (${paged.data!.length} items)',
+          );
+          items = paged.data!;
+        } else {
+          debugPrint('💡 Wishlist: Service response has no data');
         }
       } catch (e) {
-        debugPrint('❌ Wishlist: Error fetching raw response: $e');
-        // Fallback to service call
-        try {
-          final paged = await _wishlistService.getWishlistItems(
-            apiVersion: apiVersion,
-            groupId: groupId,
-            page: 1,
-            perPage: 100,
-          );
-          if (paged.data != null && paged.data!.isNotEmpty) {
-            rawItems = paged.data!.map((item) => item).toList();
-            debugPrint(
-              '💖 Wishlist: Using service response data (${rawItems.length} items)',
-            );
-          }
-        } catch (e2) {
-          debugPrint('❌ Wishlist: Service call also failed: $e2');
-        }
+        debugPrint('❌ Wishlist: Service call failed: $e');
+        emit(
+          WishlistErrorState(
+            message: 'Failed to load saved items: ${e.toString()}',
+          ),
+        );
+        return;
       }
 
-      debugPrint('💖 Wishlist: Total raw items to process: ${rawItems.length}');
+      if (items.isEmpty) {
+        debugPrint('💡 Wishlist: No items found');
+        emit(WishlistLoadedState(items: const []));
+        return;
+      }
 
+      // Map WishlistItemResponse to WishlistItem for UI
       final mapped = <WishlistItem>[];
 
-      // Process each wishlist item
-      for (final item in rawItems) {
-        // Handle both WishlistItemResponse and raw Map formats
-        int? productId;
-        int? itemId; // wishlist item_id (for DELETE by ID)
-        String? productName;
-        String? productImage;
-        String? productPrice;
+      for (final itemResponse in items) {
+        try {
+          final itemId = itemResponse.id;
+          final productId = itemResponse.productId;
 
-        if (item is WishlistItemResponse) {
-          itemId = item.id; // wishlist item_id
-          productId = item.productId;
-          productName = item.productName;
-          productImage = item.productImage;
-          productPrice = item.productPrice;
-        } else if (item is Map<String, dynamic>) {
-          // Handle raw API response format: {id: 10, product_id: 96, name: "...", price: "...", image: "..."}
-          // API returns: {id: 10, product_id: 96, name: "...", price: "...", link: "...", image: "..."}
-          // 'id' is the wishlist item_id, 'product_id' is the product ID
-          // Handle both String and num types for id and product_id
-          final idValue = item['id'];
-          if (idValue != null) {
-            if (idValue is num) {
-              itemId = idValue.toInt();
-            } else if (idValue is String) {
-              itemId = int.tryParse(idValue);
-            }
+          if (productId == null || productId == 0) {
+            debugPrint(
+              '⚠️ Wishlist: Skipping item with invalid productId: ${itemResponse.id}',
+            );
+            continue;
           }
 
-          final productIdValue = item['product_id'];
-          if (productIdValue != null) {
-            if (productIdValue is num) {
-              productId = productIdValue.toInt();
-            } else if (productIdValue is String) {
-              productId = int.tryParse(productIdValue);
-            }
-          }
-
-          if (productId == null) {
-            // Fallback: if product_id is not available, use id as productId (legacy)
-            productId = itemId;
-          }
-          productName = item['name'] as String?;
-          productImage = item['image'] as String?;
-          productPrice = item['price']?.toString();
+          // Get fields from response (supports both API format and legacy format)
+          // API format: name, price, image
+          // Legacy format: product_name, product_price, product_image
+          final name = itemResponse.name ?? itemResponse.productName;
+          final price = itemResponse.price ?? itemResponse.productPrice;
+          final image = itemResponse.image ?? itemResponse.productImage;
 
           debugPrint(
-            '💖 Wishlist: Parsed raw item - itemId: $itemId, productId: $productId, name: $productName',
+            '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name',
           );
-        }
 
-        if (productId == null || productId == 0) {
-          debugPrint('⚠️ Wishlist: Skipping item with invalid productId');
-          continue;
-        }
-
-        debugPrint(
-          '💖 Wishlist: Processing item - productId: $productId, name: $productName',
-        );
-
-        // Check if product details are available from wishlist response
-        final hasProductDetails =
-            productName != null &&
-            productName.isNotEmpty &&
-            productImage != null &&
-            productImage.isNotEmpty;
-
-        if (hasProductDetails) {
-          // Even if we have product details from wishlist response,
-          // we should fetch full product details to get currency code and proper pricing
-          // But if ProductService fails, use wishlist response data as fallback
+          // Try to fetch full product details for currency code and proper pricing
           try {
-            debugPrint(
-              '🔄 Wishlist: Fetching product details for currency code - productId: $productId',
-            );
             final product = await _productService.retrieveProduct(
               apiVersion: apiVersion,
               productId: productId,
             );
 
-            // Extract image URL
-            String? imageUrl = productImage;
-            if (product.images != null && product.images!.isNotEmpty) {
-              imageUrl = product.images!.first.src;
-            }
-
-            // Extract prices with currency code
+            // Use product details from ProductService when available
             final prices = product.prices;
-            final regularPrice =
-                prices?.regularPrice ?? prices?.price ?? productPrice;
-            final salePrice = product.onSale == true ? prices?.salePrice : null;
-            final currencyCode = prices?.currencyCode;
+            final imageUrl = product.images?.isNotEmpty == true
+                ? product.images!.first.src
+                : image;
 
             mapped.add(
               WishlistItem(
                 id: productId,
                 itemId: itemId,
-                name: productName,
+                name: product.name ?? name ?? 'Product',
                 imageUrl: imageUrl,
-                regularPrice: regularPrice,
-                salePrice: salePrice,
-                currencyCode: currencyCode,
+                regularPrice: prices?.regularPrice ?? prices?.price ?? price,
+                salePrice: product.onSale == true ? prices?.salePrice : null,
+                currencyCode: prices?.currencyCode,
                 onSale: product.onSale ?? false,
               ),
             );
-            debugPrint(
-              '✅ Wishlist: Added item with currency code from ProductService - ${product.name}',
-            );
           } catch (e) {
             debugPrint(
-              '⚠️ Wishlist: Failed to fetch product for currency, using wishlist data: $e',
+              '⚠️ Wishlist: Failed to fetch product $productId, using API response data: $e',
             );
-            // Fallback: use wishlist response data (without currency code)
+            // Fallback: use wishlist API response data directly
             mapped.add(
               WishlistItem(
                 id: productId,
                 itemId: itemId,
-                name: productName,
-                imageUrl: productImage,
-                regularPrice: productPrice,
-                salePrice: null,
-                currencyCode: null, // Will use default currency
-                onSale: false,
-              ),
-            );
-            debugPrint(
-              '✅ Wishlist: Added item from response data (no currency) - $productName',
-            );
-          }
-        } else {
-          // Fetch product details from ProductService
-          try {
-            debugPrint(
-              '🔄 Wishlist: Fetching product details for productId: $productId',
-            );
-            final product = await _productService.retrieveProduct(
-              apiVersion: apiVersion,
-              productId: productId,
-            );
-
-            // Extract image URL
-            String? imageUrl;
-            if (product.images != null && product.images!.isNotEmpty) {
-              imageUrl = product.images!.first.src;
-            }
-
-            // Extract prices
-            final prices = product.prices;
-            final regularPrice = prices?.regularPrice ?? prices?.price;
-            final salePrice = product.onSale == true ? prices?.salePrice : null;
-            final currencyCode = prices?.currencyCode;
-
-            mapped.add(
-              WishlistItem(
-                id: productId,
-                itemId: itemId,
-                name: product.name,
-                imageUrl: imageUrl,
-                regularPrice: regularPrice,
-                salePrice: salePrice,
-                currencyCode: currencyCode,
-                onSale: product.onSale ?? false,
-              ),
-            );
-            debugPrint(
-              '✅ Wishlist: Added item from ProductService - ${product.name}',
-            );
-          } catch (e) {
-            debugPrint('❌ Wishlist: Failed to fetch product $productId: $e');
-            // Use partial data from wishlist if available
-            mapped.add(
-              WishlistItem(
-                id: productId,
-                itemId: itemId,
-                name: productName ?? 'Product',
-                imageUrl: productImage,
-                regularPrice: productPrice,
+                name: name ?? 'Product',
+                imageUrl: image,
+                regularPrice: price,
                 salePrice: null,
                 currencyCode: null,
                 onSale: false,
               ),
             );
-            debugPrint(
-              '✅ Wishlist: Added item with partial data - ${productName ?? "Product"}',
-            );
           }
+        } catch (e) {
+          debugPrint('❌ Wishlist: Error parsing item: $e');
+          // Continue with next item
+          continue;
         }
       }
 
-      debugPrint('💖 Wishlist: Mapped ${mapped.length} items to WishlistItem');
       emit(WishlistLoadedState(items: mapped));
-    } catch (e) {
+      debugPrint('✅ Wishlist: Loaded ${mapped.length} items from API');
+    } catch (e, stackTrace) {
       debugPrint('❌ Wishlist sync error: $e');
+      debugPrint('❌ Wishlist sync error stack trace: $stackTrace');
       emit(WishlistErrorState(message: 'Failed to load saved items: $e'));
     }
   }
@@ -465,23 +291,6 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   Future<void> _add(WishlistItem item, {int? groupId}) async {
     try {
-      // Check if item is already in local state
-      final currentState = state;
-      if (currentState is WishlistLoadedState) {
-        final alreadyExists = currentState.items.any((w) => w.id == item.id);
-        if (alreadyExists) {
-          debugPrint(
-            '💡 Wishlist: Item already in local state, syncing from server...',
-          );
-          // Item already exists locally, sync from server to ensure consistency
-          final jwt = await _getJwtToken();
-          if (jwt != null && jwt.isNotEmpty) {
-            await _syncFromServer(groupId: groupId);
-          }
-          return;
-        }
-      }
-
       // Sync with server only if authenticated
       final jwt = await _getJwtToken();
       if (jwt == null || jwt.isEmpty) {
@@ -491,6 +300,23 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         final items = s is WishlistLoadedState ? [...s.items, item] : [item];
         emit(WishlistLoadedState(items: items));
         return;
+      }
+
+      // IMPORTANT: First sync from server to get current state
+      // This prevents 400 errors when item already exists on server
+      debugPrint('💖 Wishlist: Syncing from server before adding item...');
+      await _syncFromServer(groupId: groupId);
+
+      // Check if item is already in state after sync
+      final currentState = state;
+      if (currentState is WishlistLoadedState) {
+        final alreadyExists = currentState.items.any((w) => w.id == item.id);
+        if (alreadyExists) {
+          debugPrint(
+            '💡 Wishlist: Item already exists on server, skipping add...',
+          );
+          return;
+        }
       }
 
       final apiVersion = _config.getString(
@@ -512,18 +338,20 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         '💖 Wishlist API response: success=${response.success}, message=${response.message}',
       );
 
-      // Check if item was already in wishlist
+      // Check if item was already in wishlist (from API response)
       final message = response.message?.toLowerCase() ?? '';
       final isAlreadyInWishlist =
           message.contains('already in wishlist') ||
           message.contains('already exists') ||
-          message.contains('already added');
+          message.contains('already added') ||
+          message.contains('400') ||
+          message.contains('bad request');
 
-      if (isAlreadyInWishlist) {
+      if (isAlreadyInWishlist || response.success != true) {
         debugPrint(
-          '💡 Wishlist: Product already in wishlist, syncing from server...',
+          '💡 Wishlist: Product already in wishlist or add failed, syncing from server...',
         );
-        // Product already exists on server, sync from server to get updated state
+        // Product already exists on server or add failed, sync from server to get updated state
         await _syncFromServer(groupId: groupId);
         return;
       }
@@ -535,16 +363,29 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         );
         // Always sync from server after successful add to ensure state consistency
         await _syncFromServer(groupId: groupId);
-      } else {
-        debugPrint(
-          '⚠️ Wishlist: API returned success=false, syncing from server...',
-        );
-        // Sync from server to get accurate state
-        await _syncFromServer(groupId: groupId);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ Wishlist add error: $e');
-      // On error, sync from server to get accurate state
+      debugPrint('❌ Wishlist add error stack trace: $stackTrace');
+
+      // Check if it's a 400 error (duplicate)
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('400') ||
+          errorString.contains('bad request') ||
+          errorString.contains('already') ||
+          errorString.contains('duplicate')) {
+        debugPrint(
+          '💡 Wishlist: 400 error detected (likely duplicate), syncing from server...',
+        );
+        try {
+          await _syncFromServer(groupId: groupId);
+          return;
+        } catch (syncError) {
+          debugPrint('❌ Wishlist sync error after 400: $syncError');
+        }
+      }
+
+      // On other errors, sync from server to get accurate state
       try {
         await _syncFromServer(groupId: groupId);
       } catch (syncError) {
@@ -636,6 +477,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       }
 
       // Fallback: DELETE by product_id + group_id (as per API definition)
+      // Note: This endpoint may return 404 if item doesn't exist on server
+      // (e.g., if item was only in local storage and never synced)
       try {
         debugPrint(
           '💖 Wishlist: Deleting by productId: $productId, groupId: ${groupId ?? 0}',
@@ -667,7 +510,18 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         return;
       } catch (e) {
         debugPrint('❌ Wishlist: deleteItemByProduct failed: $e');
-        // Continue to sync from server anyway
+        // Check if it's a 404 error (item not found on server)
+        // This is OK if item was only in local storage
+        if (e.toString().contains('404') ||
+            e.toString().contains('Not Found')) {
+          debugPrint(
+            '💡 Wishlist: Item not found on server (404) - may have been local only, syncing from server...',
+          );
+          // Sync from server to get accurate state
+          await _syncFromServer(groupId: groupId);
+          return;
+        }
+        // For other errors, continue to sync from server anyway
       }
 
       // Final fallback: sync from server
@@ -729,10 +583,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   }
 
   @override
-  WishlistState? fromJson(Map<String, dynamic> json) =>
-      WishlistLoadedState.fromJson(json);
+  WishlistState? fromJson(Map<String, dynamic> json) {
+    return null; // State will be reconstructed from API
+  }
 
   @override
-  Map<String, dynamic>? toJson(WishlistState state) =>
-      state is WishlistLoadedState ? state.toJson() : null;
+  Map<String, dynamic>? toJson(WishlistState state) {
+    return null; // No need to persist wishlist state
+  }
 }

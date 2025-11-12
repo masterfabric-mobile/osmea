@@ -19,51 +19,6 @@ import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 
-/// Helper function to sync local wishlist to server after login
-/// Takes wishlist items as arguments (better approach than direct ViewModel access)
-Future<void> _syncWishlistAfterLogin({
-  required List<Map<String, dynamic>> wishlistItems,
-}) async {
-  try {
-    if (wishlistItems.isEmpty) {
-      debugPrint('💡 No local wishlist items to sync');
-      // Still sync from server to get server wishlist
-      final wishlistViewModel = GetIt.I<WishlistViewModel>();
-      await wishlistViewModel.syncFromServer();
-      return;
-    }
-
-    debugPrint(
-      '💖 Syncing ${wishlistItems.length} local wishlist items to server...',
-    );
-
-    final wishlistViewModel = GetIt.I<WishlistViewModel>();
-
-    // Convert JSON arguments back to WishlistItem objects
-    final items = wishlistItems
-        .map((json) => WishlistItem.fromJson(json))
-        .toList();
-
-    // Sync each local item to server
-    for (final item in items) {
-      try {
-        await wishlistViewModel.add(item);
-        debugPrint('💖 Synced wishlist item: ${item.id} - ${item.name}');
-      } catch (e) {
-        debugPrint('⚠️ Failed to sync wishlist item ${item.id}: $e');
-        // Continue with other items even if one fails
-      }
-    }
-
-    // After syncing all items, sync from server to get merged state
-    await wishlistViewModel.syncFromServer();
-    debugPrint('✅ Local wishlist synced to server successfully');
-  } catch (e) {
-    debugPrint('⚠️ Error syncing wishlist after login: $e');
-    // Don't block login if wishlist sync fails
-  }
-}
-
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   // Global route configuration
@@ -399,28 +354,12 @@ final GoRouter appRouter = GoRouter(
                 debugPrint('✅ JWT token and user data saved to AuthCubit');
 
                 // Sync local wishlist to server after successful login
-                // Get wishlist items as arguments (better approach than direct GetIt access)
+                // Logic is handled in WishlistViewModel, not in route file
                 try {
                   final wishlistViewModel = GetIt.I<WishlistViewModel>();
-                  final currentState = wishlistViewModel.state;
-
-                  // Prepare wishlist items as arguments
-                  List<Map<String, dynamic>> wishlistItemsJson = [];
-                  if (currentState is WishlistLoadedState &&
-                      currentState.items.isNotEmpty) {
-                    wishlistItemsJson = currentState.items
-                        .map((item) => item.toJson())
-                        .toList();
-                  }
-
-                  // Pass wishlist items as arguments to sync function
-                  await _syncWishlistAfterLogin(
-                    wishlistItems: wishlistItemsJson,
-                  );
+                  await wishlistViewModel.syncLocalItemsAfterLogin();
                 } catch (e) {
-                  debugPrint(
-                    '⚠️ Error preparing wishlist sync after login: $e',
-                  );
+                  debugPrint('⚠️ Error syncing wishlist after login: $e');
                   // Don't block login if wishlist sync fails
                 }
               } else {
@@ -571,9 +510,16 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/orders',
       pageBuilder: (BuildContext context, GoRouterState state) {
+        // Merge route arguments with extra (from navigation)
+        final extra = state.extra as Map<String, dynamic>?;
+        final arguments = <String, dynamic>{
+          'orders': true,
+          if (extra != null) ...extra, // Merge extra arguments
+        };
+
         return CustomTransitionPage(
           child: OrdersView(
-            arguments: const {'orders': true},
+            arguments: arguments,
             goRoute: (String path) {
               if (path.contains('home')) {
                 context.go('/home');
@@ -597,9 +543,17 @@ final GoRouter appRouter = GoRouter(
       path: '/orders/:orderKey',
       pageBuilder: (BuildContext context, GoRouterState state) {
         final orderKey = state.pathParameters['orderKey'] ?? '';
+        // Merge route arguments with extra (from navigation)
+        final extra = state.extra as Map<String, dynamic>?;
+        final arguments = <String, dynamic>{
+          'orderDetail': true,
+          'orderKey': orderKey,
+          if (extra != null) ...extra, // Merge extra arguments
+        };
+
         return CustomTransitionPage(
           child: OrdersView(
-            arguments: {'orderDetail': true, 'orderKey': orderKey},
+            arguments: arguments,
             goRoute: (String path) {
               if (path.contains('orders')) {
                 context.go('/orders');

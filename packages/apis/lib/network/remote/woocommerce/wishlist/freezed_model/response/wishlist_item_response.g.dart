@@ -9,14 +9,18 @@ part of 'wishlist_item_response.dart';
 _$WishlistItemResponseImpl _$$WishlistItemResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$WishlistItemResponseImpl(
-      id: (json['id'] as num?)?.toInt(),
-      productId: (json['product_id'] as num?)?.toInt(),
-      groupId: (json['group_id'] as num?)?.toInt(),
-      userId: (json['user_id'] as num?)?.toInt(),
-      quantity: (json['quantity'] as num?)?.toInt(),
-      variationId: (json['variation_id'] as num?)?.toInt(),
+      id: const StringToIntConverter().fromJson(json['id']),
+      productId: const StringToIntConverter().fromJson(json['product_id']),
+      groupId: const StringToIntConverter().fromJson(json['group_id']),
+      userId: const StringToIntConverter().fromJson(json['user_id']),
+      quantity: const StringToIntConverter().fromJson(json['quantity']),
+      variationId: const StringToIntConverter().fromJson(json['variation_id']),
       addedAt: json['added_at'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
+      name: json['name'] as String?,
+      price: json['price'] as String?,
+      image: json['image'] as String?,
+      link: json['link'] as String?,
       productName: json['product_name'] as String?,
       productSlug: json['product_slug'] as String?,
       productPrice: json['product_price'] as String?,
@@ -34,14 +38,22 @@ Map<String, dynamic> _$$WishlistItemResponseImplToJson(
     }
   }
 
-  writeNotNull('id', instance.id);
-  writeNotNull('product_id', instance.productId);
-  writeNotNull('group_id', instance.groupId);
-  writeNotNull('user_id', instance.userId);
-  writeNotNull('quantity', instance.quantity);
-  writeNotNull('variation_id', instance.variationId);
+  writeNotNull('id', const StringToIntConverter().toJson(instance.id));
+  writeNotNull(
+      'product_id', const StringToIntConverter().toJson(instance.productId));
+  writeNotNull(
+      'group_id', const StringToIntConverter().toJson(instance.groupId));
+  writeNotNull('user_id', const StringToIntConverter().toJson(instance.userId));
+  writeNotNull(
+      'quantity', const StringToIntConverter().toJson(instance.quantity));
+  writeNotNull('variation_id',
+      const StringToIntConverter().toJson(instance.variationId));
   writeNotNull('added_at', instance.addedAt);
   writeNotNull('metadata', instance.metadata);
+  writeNotNull('name', instance.name);
+  writeNotNull('price', instance.price);
+  writeNotNull('image', instance.image);
+  writeNotNull('link', instance.link);
   writeNotNull('product_name', instance.productName);
   writeNotNull('product_slug', instance.productSlug);
   writeNotNull('product_price', instance.productPrice);

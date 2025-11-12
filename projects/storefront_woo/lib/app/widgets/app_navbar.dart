@@ -144,9 +144,9 @@ class _AppNavbarState extends State<AppNavbar> {
           return BlocBuilder<WishlistViewModel, WishlistState>(
             bloc: wishlistViewModel,
             builder: (context, wishlistState) {
-              debugPrint(
+          debugPrint(
                 '📱 Navbar Builder: Building with auth state ${authState.runtimeType}, wishlist state ${wishlistState.runtimeType}',
-              );
+          );
 
               // Determine authentication status
               // Only authenticated if state is AuthAuthenticatedState AND has valid JWT token
@@ -168,13 +168,13 @@ class _AppNavbarState extends State<AppNavbar> {
               }
 
               // Update local state to keep it in sync with AuthCubit
-              if (mounted && _isAuthenticated != isAuthenticated) {
+          if (mounted && _isAuthenticated != isAuthenticated) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (mounted) {
-                    setState(() {
-                      _isAuthenticated = isAuthenticated;
-                      _isLoading = false;
-                    });
+            setState(() {
+              _isAuthenticated = isAuthenticated;
+              _isLoading = false;
+            });
                     debugPrint('📱 Navbar: Local state updated to match AuthCubit');
                   }
                 });
@@ -182,22 +182,22 @@ class _AppNavbarState extends State<AppNavbar> {
 
               // Only trigger initial load once if state is initial (not unauthenticated)
               // Don't load tokens if user just signed out (AuthUnauthenticatedState)
-              // Prevent infinite loop by checking if we've already loaded
+            // Prevent infinite loop by checking if we've already loaded
               if (!_hasLoadedTokens && authState is AuthInitialState) {
-                _hasLoadedTokens =
-                    true; // Mark as loaded to prevent multiple calls
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    debugPrint('📱 Navbar: Loading tokens from storage...');
-                    authCubit.loadTokens();
-                  }
-                });
-              }
+              _hasLoadedTokens =
+                  true; // Mark as loaded to prevent multiple calls
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  debugPrint('📱 Navbar: Loading tokens from storage...');
+                  authCubit.loadTokens();
+                }
+              });
+            }
 
               // If state is AuthAuthenticatedState but jwtToken is null/empty, 
               // this means state was restored from persistence but token was cleared
               // Force signOut to clear invalid state
-              if (authState is AuthAuthenticatedState) {
+            if (authState is AuthAuthenticatedState) {
                 final authStateTyped = authState;
                 // If jwtToken is null/empty, state is invalid - force signOut
                 if (authStateTyped.jwtToken == null || authStateTyped.jwtToken!.isEmpty) {
@@ -221,15 +221,15 @@ class _AppNavbarState extends State<AppNavbar> {
               // Reset flag if we transition from authenticated to unauthenticated (signout)
               // This prevents loadTokens() from being called after signout
               if (authState is AuthUnauthenticatedState) {
-                _hasLoadedTokens =
+              _hasLoadedTokens =
                     true; // Mark as loaded to prevent loadTokens() after signout
                 debugPrint('📱 Navbar: User signed out - state is AuthUnauthenticatedState');
-              }
+            }
 
               return _buildNavbar(context, isAuthenticated, wishlistCount);
             },
           );
-        },
+          },
       );
     } catch (e) {
       // Fallback to AuthStorageHelper if AuthCubit not available

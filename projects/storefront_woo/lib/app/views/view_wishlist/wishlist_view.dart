@@ -53,6 +53,15 @@ class WishlistView
     WishlistViewModel viewModel,
     WishlistState state,
   ) {
+    // Handle initial state - show loading or trigger initial load
+    if (state is WishlistInitialState) {
+      // Trigger initial load if not already loading
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.initial();
+      });
+      return const Center(child: CircularProgressIndicator());
+    }
+
     if (state is WishlistLoadingState) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -165,10 +174,17 @@ class WishlistView
       return _buildList(context, viewModel, state.previousState.items);
     }
 
-    final items = state is WishlistLoadedState
-        ? state.items
-        : const <WishlistItem>[];
-    return _buildList(context, viewModel, items);
+    // Handle WishlistLoadedState - this is the main state for displaying items
+    if (state is WishlistLoadedState) {
+      debugPrint('💖 WishlistView: Rendering ${state.items.length} items');
+      debugPrint('💖 WishlistView: Items: ${state.items.map((e) => '${e.id}:${e.name}').join(', ')}');
+      return _buildList(context, viewModel, state.items);
+    }
+
+    // Fallback: if state is not recognized, show empty list
+    debugPrint('⚠️ WishlistView: Unknown state type: ${state.runtimeType}');
+    debugPrint('⚠️ WishlistView: State details: $state');
+    return _buildList(context, viewModel, const <WishlistItem>[]);
   }
 
   Widget _buildList(

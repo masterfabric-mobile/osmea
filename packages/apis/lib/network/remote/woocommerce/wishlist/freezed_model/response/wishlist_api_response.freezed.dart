@@ -267,13 +267,22 @@ mixin _$WishlistPaginatedResponse<T> {
   bool? get success => throw _privateConstructorUsedError;
   String? get message => throw _privateConstructorUsedError;
   List<T>? get data => throw _privateConstructorUsedError;
+  @JsonKey(name: 'items')
+  List<T>? get items => throw _privateConstructorUsedError; // API format
+  @JsonKey(name: 'pagination')
+  WishlistPaginationInfo? get pagination =>
+      throw _privateConstructorUsedError; // API format
   @JsonKey(name: 'current_page')
+  @StringToIntConverter()
   int? get currentPage => throw _privateConstructorUsedError;
   @JsonKey(name: 'per_page')
+  @StringToIntConverter()
   int? get perPage => throw _privateConstructorUsedError;
   @JsonKey(name: 'total_items')
+  @StringToIntConverter()
   int? get totalItems => throw _privateConstructorUsedError;
   @JsonKey(name: 'total_pages')
+  @StringToIntConverter()
   int? get totalPages => throw _privateConstructorUsedError;
   @JsonKey(name: 'error_code')
   String? get errorCode => throw _privateConstructorUsedError;
@@ -297,12 +306,16 @@ abstract class $WishlistPaginatedResponseCopyWith<T, $Res> {
       {bool? success,
       String? message,
       List<T>? data,
-      @JsonKey(name: 'current_page') int? currentPage,
-      @JsonKey(name: 'per_page') int? perPage,
-      @JsonKey(name: 'total_items') int? totalItems,
-      @JsonKey(name: 'total_pages') int? totalPages,
+      @JsonKey(name: 'items') List<T>? items,
+      @JsonKey(name: 'pagination') WishlistPaginationInfo? pagination,
+      @JsonKey(name: 'current_page') @StringToIntConverter() int? currentPage,
+      @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+      @JsonKey(name: 'total_items') @StringToIntConverter() int? totalItems,
+      @JsonKey(name: 'total_pages') @StringToIntConverter() int? totalPages,
       @JsonKey(name: 'error_code') String? errorCode,
       List<String>? errors});
+
+  $WishlistPaginationInfoCopyWith<$Res>? get pagination;
 }
 
 /// @nodoc
@@ -322,6 +335,8 @@ class _$WishlistPaginatedResponseCopyWithImpl<T, $Res,
     Object? success = freezed,
     Object? message = freezed,
     Object? data = freezed,
+    Object? items = freezed,
+    Object? pagination = freezed,
     Object? currentPage = freezed,
     Object? perPage = freezed,
     Object? totalItems = freezed,
@@ -342,6 +357,14 @@ class _$WishlistPaginatedResponseCopyWithImpl<T, $Res,
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
               as List<T>?,
+      items: freezed == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<T>?,
+      pagination: freezed == pagination
+          ? _value.pagination
+          : pagination // ignore: cast_nullable_to_non_nullable
+              as WishlistPaginationInfo?,
       currentPage: freezed == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
@@ -368,6 +391,18 @@ class _$WishlistPaginatedResponseCopyWithImpl<T, $Res,
               as List<String>?,
     ) as $Val);
   }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WishlistPaginationInfoCopyWith<$Res>? get pagination {
+    if (_value.pagination == null) {
+      return null;
+    }
+
+    return $WishlistPaginationInfoCopyWith<$Res>(_value.pagination!, (value) {
+      return _then(_value.copyWith(pagination: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -383,12 +418,17 @@ abstract class _$$WishlistPaginatedResponseImplCopyWith<T, $Res>
       {bool? success,
       String? message,
       List<T>? data,
-      @JsonKey(name: 'current_page') int? currentPage,
-      @JsonKey(name: 'per_page') int? perPage,
-      @JsonKey(name: 'total_items') int? totalItems,
-      @JsonKey(name: 'total_pages') int? totalPages,
+      @JsonKey(name: 'items') List<T>? items,
+      @JsonKey(name: 'pagination') WishlistPaginationInfo? pagination,
+      @JsonKey(name: 'current_page') @StringToIntConverter() int? currentPage,
+      @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+      @JsonKey(name: 'total_items') @StringToIntConverter() int? totalItems,
+      @JsonKey(name: 'total_pages') @StringToIntConverter() int? totalPages,
       @JsonKey(name: 'error_code') String? errorCode,
       List<String>? errors});
+
+  @override
+  $WishlistPaginationInfoCopyWith<$Res>? get pagination;
 }
 
 /// @nodoc
@@ -407,6 +447,8 @@ class __$$WishlistPaginatedResponseImplCopyWithImpl<T, $Res>
     Object? success = freezed,
     Object? message = freezed,
     Object? data = freezed,
+    Object? items = freezed,
+    Object? pagination = freezed,
     Object? currentPage = freezed,
     Object? perPage = freezed,
     Object? totalItems = freezed,
@@ -427,6 +469,14 @@ class __$$WishlistPaginatedResponseImplCopyWithImpl<T, $Res>
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
               as List<T>?,
+      items: freezed == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<T>?,
+      pagination: freezed == pagination
+          ? _value.pagination
+          : pagination // ignore: cast_nullable_to_non_nullable
+              as WishlistPaginationInfo?,
       currentPage: freezed == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
@@ -463,13 +513,16 @@ class _$WishlistPaginatedResponseImpl<T>
       {this.success,
       this.message,
       final List<T>? data,
-      @JsonKey(name: 'current_page') this.currentPage,
-      @JsonKey(name: 'per_page') this.perPage,
-      @JsonKey(name: 'total_items') this.totalItems,
-      @JsonKey(name: 'total_pages') this.totalPages,
+      @JsonKey(name: 'items') final List<T>? items,
+      @JsonKey(name: 'pagination') this.pagination,
+      @JsonKey(name: 'current_page') @StringToIntConverter() this.currentPage,
+      @JsonKey(name: 'per_page') @StringToIntConverter() this.perPage,
+      @JsonKey(name: 'total_items') @StringToIntConverter() this.totalItems,
+      @JsonKey(name: 'total_pages') @StringToIntConverter() this.totalPages,
       @JsonKey(name: 'error_code') this.errorCode,
       final List<String>? errors})
       : _data = data,
+        _items = items,
         _errors = errors;
 
   factory _$WishlistPaginatedResponseImpl.fromJson(
@@ -490,17 +543,37 @@ class _$WishlistPaginatedResponseImpl<T>
     return EqualUnmodifiableListView(value);
   }
 
+  final List<T>? _items;
+  @override
+  @JsonKey(name: 'items')
+  List<T>? get items {
+    final value = _items;
+    if (value == null) return null;
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+// API format
+  @override
+  @JsonKey(name: 'pagination')
+  final WishlistPaginationInfo? pagination;
+// API format
   @override
   @JsonKey(name: 'current_page')
+  @StringToIntConverter()
   final int? currentPage;
   @override
   @JsonKey(name: 'per_page')
+  @StringToIntConverter()
   final int? perPage;
   @override
   @JsonKey(name: 'total_items')
+  @StringToIntConverter()
   final int? totalItems;
   @override
   @JsonKey(name: 'total_pages')
+  @StringToIntConverter()
   final int? totalPages;
   @override
   @JsonKey(name: 'error_code')
@@ -517,7 +590,7 @@ class _$WishlistPaginatedResponseImpl<T>
 
   @override
   String toString() {
-    return 'WishlistPaginatedResponse<$T>(success: $success, message: $message, data: $data, currentPage: $currentPage, perPage: $perPage, totalItems: $totalItems, totalPages: $totalPages, errorCode: $errorCode, errors: $errors)';
+    return 'WishlistPaginatedResponse<$T>(success: $success, message: $message, data: $data, items: $items, pagination: $pagination, currentPage: $currentPage, perPage: $perPage, totalItems: $totalItems, totalPages: $totalPages, errorCode: $errorCode, errors: $errors)';
   }
 
   @override
@@ -528,6 +601,9 @@ class _$WishlistPaginatedResponseImpl<T>
             (identical(other.success, success) || other.success == success) &&
             (identical(other.message, message) || other.message == message) &&
             const DeepCollectionEquality().equals(other._data, _data) &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.pagination, pagination) ||
+                other.pagination == pagination) &&
             (identical(other.currentPage, currentPage) ||
                 other.currentPage == currentPage) &&
             (identical(other.perPage, perPage) || other.perPage == perPage) &&
@@ -547,6 +623,8 @@ class _$WishlistPaginatedResponseImpl<T>
       success,
       message,
       const DeepCollectionEquality().hash(_data),
+      const DeepCollectionEquality().hash(_items),
+      pagination,
       currentPage,
       perPage,
       totalItems,
@@ -574,10 +652,18 @@ abstract class _WishlistPaginatedResponse<T>
       {final bool? success,
       final String? message,
       final List<T>? data,
-      @JsonKey(name: 'current_page') final int? currentPage,
-      @JsonKey(name: 'per_page') final int? perPage,
-      @JsonKey(name: 'total_items') final int? totalItems,
-      @JsonKey(name: 'total_pages') final int? totalPages,
+      @JsonKey(name: 'items') final List<T>? items,
+      @JsonKey(name: 'pagination') final WishlistPaginationInfo? pagination,
+      @JsonKey(name: 'current_page')
+      @StringToIntConverter()
+      final int? currentPage,
+      @JsonKey(name: 'per_page') @StringToIntConverter() final int? perPage,
+      @JsonKey(name: 'total_items')
+      @StringToIntConverter()
+      final int? totalItems,
+      @JsonKey(name: 'total_pages')
+      @StringToIntConverter()
+      final int? totalPages,
       @JsonKey(name: 'error_code') final String? errorCode,
       final List<String>? errors}) = _$WishlistPaginatedResponseImpl<T>;
 
@@ -592,16 +678,26 @@ abstract class _WishlistPaginatedResponse<T>
   @override
   List<T>? get data;
   @override
+  @JsonKey(name: 'items')
+  List<T>? get items;
+  @override // API format
+  @JsonKey(name: 'pagination')
+  WishlistPaginationInfo? get pagination;
+  @override // API format
   @JsonKey(name: 'current_page')
+  @StringToIntConverter()
   int? get currentPage;
   @override
   @JsonKey(name: 'per_page')
+  @StringToIntConverter()
   int? get perPage;
   @override
   @JsonKey(name: 'total_items')
+  @StringToIntConverter()
   int? get totalItems;
   @override
   @JsonKey(name: 'total_pages')
+  @StringToIntConverter()
   int? get totalPages;
   @override
   @JsonKey(name: 'error_code')
@@ -612,5 +708,226 @@ abstract class _WishlistPaginatedResponse<T>
   @JsonKey(ignore: true)
   _$$WishlistPaginatedResponseImplCopyWith<T,
           _$WishlistPaginatedResponseImpl<T>>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+WishlistPaginationInfo _$WishlistPaginationInfoFromJson(
+    Map<String, dynamic> json) {
+  return _WishlistPaginationInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WishlistPaginationInfo {
+  @StringToIntConverter()
+  int? get total => throw _privateConstructorUsedError;
+  @JsonKey(name: 'per_page')
+  @StringToIntConverter()
+  int? get perPage => throw _privateConstructorUsedError;
+  @StringToIntConverter()
+  int? get current => throw _privateConstructorUsedError;
+  @StringToIntConverter()
+  int? get pages => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $WishlistPaginationInfoCopyWith<WishlistPaginationInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WishlistPaginationInfoCopyWith<$Res> {
+  factory $WishlistPaginationInfoCopyWith(WishlistPaginationInfo value,
+          $Res Function(WishlistPaginationInfo) then) =
+      _$WishlistPaginationInfoCopyWithImpl<$Res, WishlistPaginationInfo>;
+  @useResult
+  $Res call(
+      {@StringToIntConverter() int? total,
+      @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+      @StringToIntConverter() int? current,
+      @StringToIntConverter() int? pages});
+}
+
+/// @nodoc
+class _$WishlistPaginationInfoCopyWithImpl<$Res,
+        $Val extends WishlistPaginationInfo>
+    implements $WishlistPaginationInfoCopyWith<$Res> {
+  _$WishlistPaginationInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = freezed,
+    Object? perPage = freezed,
+    Object? current = freezed,
+    Object? pages = freezed,
+  }) {
+    return _then(_value.copyWith(
+      total: freezed == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int?,
+      perPage: freezed == perPage
+          ? _value.perPage
+          : perPage // ignore: cast_nullable_to_non_nullable
+              as int?,
+      current: freezed == current
+          ? _value.current
+          : current // ignore: cast_nullable_to_non_nullable
+              as int?,
+      pages: freezed == pages
+          ? _value.pages
+          : pages // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WishlistPaginationInfoImplCopyWith<$Res>
+    implements $WishlistPaginationInfoCopyWith<$Res> {
+  factory _$$WishlistPaginationInfoImplCopyWith(
+          _$WishlistPaginationInfoImpl value,
+          $Res Function(_$WishlistPaginationInfoImpl) then) =
+      __$$WishlistPaginationInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@StringToIntConverter() int? total,
+      @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+      @StringToIntConverter() int? current,
+      @StringToIntConverter() int? pages});
+}
+
+/// @nodoc
+class __$$WishlistPaginationInfoImplCopyWithImpl<$Res>
+    extends _$WishlistPaginationInfoCopyWithImpl<$Res,
+        _$WishlistPaginationInfoImpl>
+    implements _$$WishlistPaginationInfoImplCopyWith<$Res> {
+  __$$WishlistPaginationInfoImplCopyWithImpl(
+      _$WishlistPaginationInfoImpl _value,
+      $Res Function(_$WishlistPaginationInfoImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = freezed,
+    Object? perPage = freezed,
+    Object? current = freezed,
+    Object? pages = freezed,
+  }) {
+    return _then(_$WishlistPaginationInfoImpl(
+      total: freezed == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int?,
+      perPage: freezed == perPage
+          ? _value.perPage
+          : perPage // ignore: cast_nullable_to_non_nullable
+              as int?,
+      current: freezed == current
+          ? _value.current
+          : current // ignore: cast_nullable_to_non_nullable
+              as int?,
+      pages: freezed == pages
+          ? _value.pages
+          : pages // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WishlistPaginationInfoImpl implements _WishlistPaginationInfo {
+  const _$WishlistPaginationInfoImpl(
+      {@StringToIntConverter() this.total,
+      @JsonKey(name: 'per_page') @StringToIntConverter() this.perPage,
+      @StringToIntConverter() this.current,
+      @StringToIntConverter() this.pages});
+
+  factory _$WishlistPaginationInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WishlistPaginationInfoImplFromJson(json);
+
+  @override
+  @StringToIntConverter()
+  final int? total;
+  @override
+  @JsonKey(name: 'per_page')
+  @StringToIntConverter()
+  final int? perPage;
+  @override
+  @StringToIntConverter()
+  final int? current;
+  @override
+  @StringToIntConverter()
+  final int? pages;
+
+  @override
+  String toString() {
+    return 'WishlistPaginationInfo(total: $total, perPage: $perPage, current: $current, pages: $pages)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WishlistPaginationInfoImpl &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.perPage, perPage) || other.perPage == perPage) &&
+            (identical(other.current, current) || other.current == current) &&
+            (identical(other.pages, pages) || other.pages == pages));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, total, perPage, current, pages);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WishlistPaginationInfoImplCopyWith<_$WishlistPaginationInfoImpl>
+      get copyWith => __$$WishlistPaginationInfoImplCopyWithImpl<
+          _$WishlistPaginationInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WishlistPaginationInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WishlistPaginationInfo implements WishlistPaginationInfo {
+  const factory _WishlistPaginationInfo(
+      {@StringToIntConverter() final int? total,
+      @JsonKey(name: 'per_page') @StringToIntConverter() final int? perPage,
+      @StringToIntConverter() final int? current,
+      @StringToIntConverter() final int? pages}) = _$WishlistPaginationInfoImpl;
+
+  factory _WishlistPaginationInfo.fromJson(Map<String, dynamic> json) =
+      _$WishlistPaginationInfoImpl.fromJson;
+
+  @override
+  @StringToIntConverter()
+  int? get total;
+  @override
+  @JsonKey(name: 'per_page')
+  @StringToIntConverter()
+  int? get perPage;
+  @override
+  @StringToIntConverter()
+  int? get current;
+  @override
+  @StringToIntConverter()
+  int? get pages;
+  @override
+  @JsonKey(ignore: true)
+  _$$WishlistPaginationInfoImplCopyWith<_$WishlistPaginationInfoImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
