@@ -8,10 +8,14 @@
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 
 /// Products grid widget
 class ProductsGridWidget extends StatelessWidget {
@@ -76,13 +80,45 @@ class ProductsGridWidget extends StatelessWidget {
       itemCount: state.products.length,
       itemBuilder: (context, index) {
         final product = state.products[index];
-        return ProductCardWidget(
-          product: product,
-          onWishlistTap: () {
-            // Delegate to HomeViewModel which uses WishlistCubit
-            viewModel.addProductToWishlist(product.id ?? 0);
+        final productId = product.id ?? 0;
+        
+        // Use BlocBuilder to reactively listen to WishlistViewModel changes
+        return BlocBuilder<WishlistViewModel, WishlistState>(
+          bloc: GetIt.I<WishlistViewModel>(),
+          buildWhen: (previous, current) {
+            // Always rebuild when transitioning to LoadedState from any other state
+            if (previous is! WishlistLoadedState && current is WishlistLoadedState) {
+              return true; // State just loaded, rebuild to show saved status
+            }
+            // Rebuild when state changes between Loaded states (item added/removed)
+            if (previous is WishlistLoadedState && current is WishlistLoadedState) {
+              final prevSaved = previous.items.any((e) => e.id == productId);
+              final currSaved = current.items.any((e) => e.id == productId);
+              return prevSaved != currSaved;
+            }
+            // Also rebuild if previous was LoadedState and current is not (shouldn't happen, but safe)
+            if (previous is WishlistLoadedState && current is! WishlistLoadedState) {
+              return true;
+            }
+            return false; // Don't rebuild for other state changes
           },
-          onTap: () => _navigateToProductDetail(context, viewModel, product),
+          builder: (context, wishlistState) {
+            final wishlistVm = GetIt.I<WishlistViewModel>();
+            // Always check current state, even if it's not LoadedState yet
+            final isSaved = wishlistVm.isSaved(productId);
+            
+            debugPrint('💖 ProductsGrid: Product $productId isSaved: $isSaved (state: ${wishlistState.runtimeType})');
+            
+            return ProductCardWidget(
+              product: product,
+              isSaved: isSaved,
+              onWishlistTap: () {
+                // Delegate to HomeViewModel which uses WishlistViewModel
+                viewModel.addProductToWishlist(productId);
+              },
+              onTap: () => _navigateToProductDetail(context, viewModel, product),
+            );
+          },
         );
       },
     );

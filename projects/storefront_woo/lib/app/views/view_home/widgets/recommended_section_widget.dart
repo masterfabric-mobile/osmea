@@ -215,10 +215,30 @@ class RecommendedSectionWidget extends StatelessWidget {
                   right: 8,
                   child: BlocBuilder<WishlistViewModel, WishlistState>(
                     bloc: GetIt.I<WishlistViewModel>(),
+                    buildWhen: (previous, current) {
+                      // Always rebuild when transitioning to LoadedState from any other state
+                      if (previous is! WishlistLoadedState && current is WishlistLoadedState) {
+                        return true; // State just loaded, rebuild to show saved status
+                      }
+                      // Rebuild when state changes between Loaded states (item added/removed)
+                      if (previous is WishlistLoadedState && current is WishlistLoadedState) {
+                        final prevSaved = previous.items.any((e) => e.id == product.id);
+                        final currSaved = current.items.any((e) => e.id == product.id);
+                        return prevSaved != currSaved;
+                      }
+                      // Also rebuild if previous was LoadedState and current is not (shouldn't happen, but safe)
+                      if (previous is WishlistLoadedState && current is! WishlistLoadedState) {
+                        return true;
+                      }
+                      return false; // Don't rebuild for other state changes
+                    },
                     builder: (context, wishlistState) {
                       final productId = product.id ?? 0;
                       final wishlistVm = GetIt.I<WishlistViewModel>();
+                      // Always check current state, even if it's not LoadedState yet
                       final isSaved = wishlistVm.isSaved(productId);
+                      
+                      debugPrint('💖 RecommendedSection: Product $productId isSaved: $isSaved (state: ${wishlistState.runtimeType})');
                       
                       return GestureDetector(
                         onTap: () {

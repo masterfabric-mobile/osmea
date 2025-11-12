@@ -8,9 +8,14 @@
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 
 /// Deals of the day carousel widget (stateless)
 /// Uses OsmeaComponents.carousel for state/indicator management

@@ -34,11 +34,20 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
   @override
   void initialContent(HomeViewModel viewModel, BuildContext context) {
     viewModel.setArguments(arguments);
+    // ViewModel handles wishlist initialization internally
     viewModel.initial();
   }
 
   @override
   Widget viewContent(
+    BuildContext context,
+    HomeViewModel viewModel,
+    HomeState state,
+  ) {
+    return _buildBody(context, viewModel, state);
+  }
+
+  Widget _buildBody(
     BuildContext context,
     HomeViewModel viewModel,
     HomeState state,

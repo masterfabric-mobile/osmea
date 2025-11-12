@@ -16,6 +16,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 
 @injectable
 class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
@@ -49,8 +50,71 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
 
   // Public trigger functions - HydratedCubit pattern
-  void initial() {
-    loadProducts();
+  Future<void> initial() async {
+    // Initialize wishlist first to ensure state is ready
+    await _initializeWishlist();
+    // Then load products - await to ensure wishlist is loaded first
+    await loadProducts();
+  }
+
+  /// Initializes wishlist if not already loaded
+  /// This ensures wishlist state is ready before checking product status
+  Future<void> _initializeWishlist() async {
+    try {
+      final wishlistViewModel = GetIt.I<WishlistViewModel>();
+      final currentState = wishlistViewModel.state;
+      
+      debugPrint('💖 HomeViewModel: Initializing wishlist (current state: ${currentState.runtimeType})');
+      
+      // Always ensure we have a loaded state before proceeding
+      // Sync if state is initial, loading, error, or empty loaded state
+      if (currentState is WishlistInitialState ||
+          currentState is WishlistLoadingState ||
+          currentState is WishlistErrorState ||
+          (currentState is WishlistLoadedState && currentState.items.isEmpty)) {
+        debugPrint('💖 HomeViewModel: Syncing wishlist from server...');
+        await wishlistViewModel.initial();
+        
+        // Wait a bit to ensure state is updated
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        final updatedState = wishlistViewModel.state;
+        if (updatedState is WishlistLoadedState) {
+          debugPrint('✅ HomeViewModel: Wishlist initialized with ${wishlistViewModel.count} items');
+        } else {
+          debugPrint('⚠️ HomeViewModel: Wishlist state is ${updatedState.runtimeType} after sync, ensuring loaded state...');
+          // Ensure we have loaded state even if sync didn't work
+          wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+        }
+      } else if (currentState is WishlistLoadedState) {
+        debugPrint('✅ HomeViewModel: Wishlist already loaded with ${wishlistViewModel.count} items');
+      } else {
+        // For any other state, ensure we have loaded state
+        debugPrint('⚠️ HomeViewModel: Wishlist in unexpected state (${currentState.runtimeType}), ensuring loaded state...');
+        wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+      }
+      
+      // Final check - ensure state is loaded
+      final finalState = wishlistViewModel.state;
+      if (finalState is! WishlistLoadedState) {
+        debugPrint('⚠️ HomeViewModel: Final check failed, forcing loaded state...');
+        wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ HomeViewModel: Failed to initialize wishlist: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      // Even if sync fails, ensure we have at least an empty loaded state
+      try {
+        final wishlistViewModel = GetIt.I<WishlistViewModel>();
+        final currentState = wishlistViewModel.state;
+        if (currentState is! WishlistLoadedState) {
+          debugPrint('💡 HomeViewModel: Restoring empty wishlist state...');
+          wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+        }
+      } catch (e2) {
+        debugPrint('❌ HomeViewModel: Failed to restore wishlist state: $e2');
+      }
+    }
   }
 
   // Public trigger functions - Business logic handled directly
@@ -106,6 +170,22 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         products,
       ); // Store all products for local filtering
       _hasMore = products.length == _productsPerPage;
+
+      // Ensure wishlist is loaded before emitting state
+      // This ensures isProductSaved() returns correct values when widgets build
+      // Note: initial() already awaits _initializeWishlist(), so wishlist should be loaded
+      // But we double-check here to be safe
+      try {
+        final wishlistVm = GetIt.I<WishlistViewModel>();
+        final wishlistState = wishlistVm.state;
+        if (wishlistState is WishlistLoadedState) {
+          debugPrint('✅ HomeViewModel: Wishlist loaded with ${wishlistVm.count} items before emitting products');
+        } else {
+          debugPrint('⚠️ HomeViewModel: Wishlist not in loaded state (${wishlistState.runtimeType}), but proceeding');
+        }
+      } catch (e) {
+        debugPrint('⚠️ HomeViewModel: Error checking wishlist state: $e');
+      }
 
       emit(
         HomeLoadedState(
@@ -321,7 +401,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   Future<void> addProductToWishlist(int productId) async {
     try {
       debugPrint('💖 HomeViewModel: Toggling wishlist for product $productId');
-      
+
       final product = _allProducts.firstWhere(
         (p) => (p.id ?? 0) == productId,
         orElse: () => ListAllProductsResponseModel(),
@@ -339,24 +419,31 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         currencyCode: product.prices?.currencyCode,
         onSale: product.onSale == true,
       );
-      
+
       // Toggle wishlist - this will update WishlistViewModel state
       await wishlistVm.toggle(item);
-      
-      debugPrint('✅ HomeViewModel: Wishlist toggle completed for product $productId');
-      debugPrint('💖 HomeViewModel: Product is now saved: ${wishlistVm.isSaved(productId)}');
+
+      debugPrint(
+        '✅ HomeViewModel: Wishlist toggle completed for product $productId',
+      );
+      debugPrint(
+        '💖 HomeViewModel: Product is now saved: ${wishlistVm.isSaved(productId)}',
+      );
 
       // Emit current state to trigger UI rebuild
-      // The BlocBuilder in the UI will automatically update based on WishlistViewModel state
-      emit(
-        HomeLoadedState(
-          products: _products,
-          hasMore: _hasMore,
-          currentPage: _currentPage,
-          searchQuery: _searchQuery,
-          selectedCategoryId: _selectedCategoryId,
-        ),
-      );
+      // This ensures ProductCardWidget rebuilds with updated isSaved status
+      final currentState = state;
+      if (currentState is HomeLoadedState) {
+        emit(
+          HomeLoadedState(
+            products: _products,
+            hasMore: _hasMore,
+            currentPage: _currentPage,
+            searchQuery: _searchQuery,
+            selectedCategoryId: _selectedCategoryId,
+          ),
+        );
+      }
     } catch (e, stackTrace) {
       debugPrint('❌ Failed to toggle wishlist: $e');
       debugPrint('❌ Stack trace: $stackTrace');
@@ -365,7 +452,8 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     }
   }
 
-  // Expose saved status for widgets without BlocBuilder
+  // Expose saved status for widgets - directly from WishlistViewModel
+  // isSaved() method already handles state checking internally
   bool isProductSaved(int productId) {
     try {
       final wishlistVm = GetIt.I<WishlistViewModel>();
