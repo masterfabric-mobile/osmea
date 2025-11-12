@@ -7,5 +7,6 @@ enum Routes {
   auth,
   signIn,
   search,
-  signUp
+  signUp,
+  account
 }
