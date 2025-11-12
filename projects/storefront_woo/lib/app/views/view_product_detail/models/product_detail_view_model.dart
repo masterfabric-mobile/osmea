@@ -9,6 +9,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/freezed_model/response/list_product_attribute_terms_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/list_product_attributes_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/retrieve_product_attribute_response_model.dart';
 import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
@@ -29,6 +34,10 @@ class ProductDetailViewModel
   // Dependencies
   final ProductService _productService = GetIt.I<ProductService>();
   final CartService _cartService = GetIt.I<CartService>();
+  final StoreProductAttributeTermsService _attributeTermsService =
+      GetIt.I<StoreProductAttributeTermsService>();
+  final StoreProductAttributesService _attributesService =
+      GetIt.I<StoreProductAttributesService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // Arguments holder for route/widget inputs
@@ -235,6 +244,183 @@ class ProductDetailViewModel
           emit(currentState.copyWith(selectedAttributes: updated));
         }
       });
+
+  // ----------------------------------------------------------------------------
+  // Attribute Terms Loading
+  // ----------------------------------------------------------------------------
+
+  /// Loads attribute terms for a specific attribute ID
+  /// Returns list of attribute terms (e.g., color options, size options)
+  Future<List<ListProductAttributeTermsResponseModel>>
+      loadAttributeTerms({
+    required int attributeId,
+    String apiVersion = 'v1',
+    int? page,
+    int? perPage,
+    String? search,
+  }) async {
+    try {
+      debugPrint(
+        '🔄 Loading attribute terms for attribute ID: $attributeId',
+      );
+      final terms = await _attributeTermsService.listProductAttributeTerms(
+        apiVersion: apiVersion,
+        attributeId: attributeId,
+        page: page,
+        perPage: perPage,
+        search: search,
+      );
+      debugPrint(
+        '✅ Loaded ${terms.length} attribute terms for attribute ID: $attributeId',
+      );
+      return terms;
+    } catch (e) {
+      debugPrint(
+        '❌ Error loading attribute terms for attribute ID $attributeId: $e',
+      );
+      rethrow;
+    }
+  }
+
+  /// Fire-and-forget version
+  void loadAttributeTermsFire({
+    required int attributeId,
+    String apiVersion = 'v1',
+    int? page,
+    int? perPage,
+    String? search,
+  }) {
+    // ignore: discarded_futures
+    loadAttributeTerms(
+      attributeId: attributeId,
+      apiVersion: apiVersion,
+      page: page,
+      perPage: perPage,
+      search: search,
+    );
+  }
+
+  /// Retrieves a single attribute term by ID
+  Future<ListProductAttributeTermsResponseModel> retrieveAttributeTerm({
+    required int attributeId,
+    required int termId,
+    String apiVersion = 'v1',
+  }) async {
+    try {
+      debugPrint(
+        '🔄 Retrieving attribute term ID: $termId for attribute ID: $attributeId',
+      );
+      final term = await _attributeTermsService.retrieveProductAttributeTerm(
+        apiVersion: apiVersion,
+        attributeId: attributeId,
+        termId: termId,
+      );
+      debugPrint(
+        '✅ Retrieved attribute term: ${term.name} (ID: ${term.id})',
+      );
+      return term;
+    } catch (e) {
+      debugPrint(
+        '❌ Error retrieving attribute term $termId for attribute $attributeId: $e',
+      );
+      rethrow;
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Product Attributes Loading
+  // ----------------------------------------------------------------------------
+
+  /// Loads all product attributes (e.g., Color, Size, Material)
+  /// Returns list of all available attributes in the store
+  Future<List<ListProductAttributesResponseModel>> loadProductAttributes({
+    String apiVersion = 'v1',
+    int? page,
+    int? perPage,
+    String? search,
+    List<int>? exclude,
+    List<int>? include,
+    int? offset,
+    String? order,
+    String? orderby,
+    bool? hideEmpty,
+  }) async {
+    try {
+      debugPrint('🔄 Loading product attributes');
+      final attributes = await _attributesService.listProductAttributes(
+        apiVersion: apiVersion,
+        page: page,
+        perPage: perPage,
+        search: search,
+        exclude: exclude,
+        include: include,
+        offset: offset,
+        order: order,
+        orderby: orderby,
+        hideEmpty: hideEmpty,
+      );
+      debugPrint(
+        '✅ Loaded ${attributes.length} product attributes',
+      );
+      return attributes;
+    } catch (e) {
+      debugPrint('❌ Error loading product attributes: $e');
+      rethrow;
+    }
+  }
+
+  /// Fire-and-forget version
+  void loadProductAttributesFire({
+    String apiVersion = 'v1',
+    int? page,
+    int? perPage,
+    String? search,
+    List<int>? exclude,
+    List<int>? include,
+    int? offset,
+    String? order,
+    String? orderby,
+    bool? hideEmpty,
+  }) {
+    // ignore: discarded_futures
+    loadProductAttributes(
+      apiVersion: apiVersion,
+      page: page,
+      perPage: perPage,
+      search: search,
+      exclude: exclude,
+      include: include,
+      offset: offset,
+      order: order,
+      orderby: orderby,
+      hideEmpty: hideEmpty,
+    );
+  }
+
+  /// Retrieves a single product attribute by ID
+  Future<RetrieveProductAttributeResponseModel> retrieveProductAttribute({
+    required int attributeId,
+    String apiVersion = 'v1',
+  }) async {
+    try {
+      debugPrint(
+        '🔄 Retrieving product attribute ID: $attributeId',
+      );
+      final attribute = await _attributesService.retrieveProductAttribute(
+        apiVersion: apiVersion,
+        attributeId: attributeId,
+      );
+      debugPrint(
+        '✅ Retrieved product attribute: ${attribute.name} (ID: ${attribute.id})',
+      );
+      return attribute;
+    } catch (e) {
+      debugPrint(
+        '❌ Error retrieving product attribute $attributeId: $e',
+      );
+      rethrow;
+    }
+  }
 
   // Private methods - HydratedCubit pattern
   Future<void> _loadProduct(int productId) async {

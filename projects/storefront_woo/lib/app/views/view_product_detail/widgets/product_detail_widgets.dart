@@ -354,6 +354,7 @@ class ProductDetailContentWidget extends StatelessWidget {
     final rawAttributes = state.product.attributes!;
 
     // Normalize attributes coming from different Woo APIs
+    // Sadece product API'den gelen veriyi kullan, ekstra API çağrısı yapma
     List<Map<String, dynamic>> normalized = [];
     for (final item in rawAttributes) {
       if (item is Map<String, dynamic>) {
@@ -363,9 +364,10 @@ class ProductDetailContentWidget extends StatelessWidget {
         List<String> options = [];
         final rawOptions = item['options'];
         final rawTerms = item['terms'];
-        if (rawOptions is List) {
+
+        if (rawOptions is List && rawOptions.isNotEmpty) {
           options = rawOptions.map((e) => e.toString()).toList();
-        } else if (rawTerms is List) {
+        } else if (rawTerms is List && rawTerms.isNotEmpty) {
           options = rawTerms
               .map(
                 (e) => e is Map
@@ -375,7 +377,11 @@ class ProductDetailContentWidget extends StatelessWidget {
               .where((e) => e.isNotEmpty)
               .toList();
         }
-        normalized.add({'name': name, 'options': options});
+
+        // Sadece options/terms varsa ekle (boş attribute'ları gösterme)
+        if (options.isNotEmpty) {
+          normalized.add({'name': name, 'options': options});
+        }
       } else {
         // Fallback for typed model with getters `name` and `options`
         try {
@@ -383,54 +389,59 @@ class ProductDetailContentWidget extends StatelessWidget {
           final String name = (dyn.name as String?) ?? '';
           final List<String> options =
               (dyn.options as List?)?.map((e) => e.toString()).toList() ?? [];
-          normalized.add({'name': name, 'options': options});
+
+          // Sadece options varsa ekle
+          if (options.isNotEmpty) {
+            normalized.add({'name': name, 'options': options});
+          }
         } catch (_) {
           // Skip unknown shapes gracefully
         }
       }
     }
 
+    // Eğer hiç attribute yoksa, hiçbir şey gösterme
+    if (normalized.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final attr in normalized)
-          if ((attr['options'] as List).isNotEmpty) ...[
-            OsmeaComponents.text(
-              (attr['name'] as String?) ?? '',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.pewter,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing6),
-            Wrap(
-              spacing: context.spacing8,
-              runSpacing: context.spacing8,
-              children: [
-                for (final opt in (attr['options'] as List<String>))
-                  ChoiceChip(
-                    label: Text(opt),
-                    selected:
-                        state.selectedAttributes[(attr['name'] as String?)] ==
-                        opt,
-                    onSelected: (_) => viewModel.setSelectedAttribute(
-                      (attr['name'] as String?) ?? '',
+        for (final attr in normalized) ...[
+          OsmeaComponents.text(
+            (attr['name'] as String?) ?? '',
+            textStyle: OsmeaTextStyle.bodySmall(
+              context,
+            ).copyWith(color: OsmeaColors.pewter, fontWeight: FontWeight.w500),
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing6),
+          Wrap(
+            spacing: context.spacing8,
+            runSpacing: context.spacing8,
+            children: [
+              for (final opt in (attr['options'] as List<String>))
+                ChoiceChip(
+                  label: Text(opt),
+                  selected:
+                      state.selectedAttributes[(attr['name'] as String?)] ==
                       opt,
-                    ),
-                    selectedColor: OsmeaColors.nordicBlue.withValues(
-                      alpha: 0.12,
-                    ),
-                    shape: StadiumBorder(
-                      side: BorderSide(
-                        color: OsmeaColors.silver.withValues(alpha: 0.4),
-                      ),
-                    ),
-                    labelStyle: OsmeaTextStyle.bodySmall(context),
+                  onSelected: (_) => viewModel.setSelectedAttribute(
+                    (attr['name'] as String?) ?? '',
+                    opt,
                   ),
-              ],
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing16),
-          ],
+                  selectedColor: OsmeaColors.nordicBlue.withValues(alpha: 0.12),
+                  shape: StadiumBorder(
+                    side: BorderSide(
+                      color: OsmeaColors.silver.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  labelStyle: OsmeaTextStyle.bodySmall(context),
+                ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing16),
+        ],
       ],
     );
   }
