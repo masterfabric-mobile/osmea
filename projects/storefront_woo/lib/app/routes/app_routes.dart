@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
@@ -9,11 +10,9 @@ import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
-import 'package:storefront_woo/app/views/view_auth_debug/auth_debug_view.dart';
 import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
 import 'package:storefront_woo/app/views/view_checkout/checkout_view.dart';
 import 'package:storefront_woo/app/views/view_orders/orders_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -26,14 +25,21 @@ final GoRouter appRouter = GoRouter(
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
+        // Use BlocBuilder to reactively listen to WishlistViewModel changes
+        final wishlistViewModel = GetIt.I<WishlistViewModel>();
         return BlocBuilder<WishlistViewModel, WishlistState>(
-          bloc: GetIt.I<WishlistViewModel>(),
+          bloc: wishlistViewModel,
           builder: (context, wishlistState) {
+            // Get wishlist count from state
+            final wishlistCount = wishlistState is WishlistLoadedState
+                ? wishlistState.items.length
+                : wishlistViewModel.count;
+
             return Scaffold(
               body: child,
               bottomNavigationBar: _getNavbarForRoute(
                 state.uri.path,
-                GetIt.I<WishlistViewModel>().count,
+                wishlistCount,
               ),
             );
           },
@@ -371,22 +377,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Auth Debug Route (only visible when authenticated)
-    GoRoute(
-      path: '/auth-debug',
-      builder: (BuildContext context, GoRouterState state) {
-        return AuthDebugView(
-          goRoute: (String path) {
-            if (path.contains('home')) {
-              context.go('/home');
-            } else {
-              context.go('/home');
-            }
-          },
-        );
-      },
-    ),
-
     // Profile Route
     GoRoute(
       path: '/profile',
@@ -598,6 +588,6 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       ); // Profile
     }
   }
-  // No navbar for splash, onboarding, auth, product-detail, auth-debug
+  // No navbar for splash, onboarding, auth, product-detail
   return null;
 }
