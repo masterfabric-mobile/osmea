@@ -11,16 +11,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:storefront_woo/app/views/view_auth_debug/models/auth_debug_view_model.dart'
-    as _i539;
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart'
     as _i892;
-import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart'
-    as _i439;
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
     as _i867;
-import 'package:storefront_woo/app/views/view_orders/models/orders_view_model.dart'
-    as _i336;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
     as _i819;
 import 'package:storefront_woo/app/views/view_profile/models/profile_view_model.dart'
@@ -43,11 +37,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i819.ProductDetailViewModel>(
       () => _i819.ProductDetailViewModel(),
     );
-    gh.factory<_i336.OrdersViewModel>(() => _i336.OrdersViewModel());
     gh.factory<_i867.HomeViewModel>(() => _i867.HomeViewModel());
     gh.factory<_i53.SearchViewModel>(() => _i53.SearchViewModel());
-    gh.factory<_i539.AuthDebugViewModel>(() => _i539.AuthDebugViewModel());
-    gh.factory<_i439.CheckoutViewModel>(() => _i439.CheckoutViewModel());
     return this;
   }
 }

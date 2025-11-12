@@ -11,8 +11,6 @@ import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
 import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
-import 'package:storefront_woo/app/views/view_checkout/checkout_view.dart';
-import 'package:storefront_woo/app/views/view_orders/orders_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -388,11 +386,6 @@ final GoRouter appRouter = GoRouter(
               if (path.contains('home') || path == '/home') {
                 debugPrint('🔀 ProfileView: Navigating to /home');
                 context.go('/home');
-              } else if (path.contains('orders') ||
-                  path == '/orders' ||
-                  path.startsWith('/orders/')) {
-                debugPrint('🔀 ProfileView: Navigating to $path');
-                context.go(path);
               } else if (path.contains('cart') || path == '/cart') {
                 debugPrint('🔀 ProfileView: Navigating to /cart');
                 context.go('/cart');
@@ -459,108 +452,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Checkout Route
-    GoRoute(
-      path: '/checkout',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: CheckoutView(
-            arguments: const {'checkout': true},
-            goRoute: (String path) {
-              if (path.contains('cart')) {
-                context.go('/cart');
-              } else if (path.contains('orders')) {
-                context.go('/orders');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInOutCubic,
-                    ),
-                  ),
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        );
-      },
-    ),
-
-    // Orders Route (List)
-    GoRoute(
-      path: '/orders',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        // Merge route arguments with extra (from navigation)
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = <String, dynamic>{
-          'orders': true,
-          if (extra != null) ...extra, // Merge extra arguments
-        };
-
-        return CustomTransitionPage(
-          child: OrdersView(
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('checkout')) {
-                context.go('/checkout');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Order Detail Route
-    GoRoute(
-      path: '/orders/:orderKey',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final orderKey = state.pathParameters['orderKey'] ?? '';
-        // Merge route arguments with extra (from navigation)
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = <String, dynamic>{
-          'orderDetail': true,
-          'orderKey': orderKey,
-          if (extra != null) ...extra, // Merge extra arguments
-        };
-
-        return CustomTransitionPage(
-          child: OrdersView(
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('orders')) {
-                context.go('/orders');
-              } else if (path.contains('home')) {
-                context.go('/home');
-              } else {
-                context.go('/orders');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
   ],
 );
 

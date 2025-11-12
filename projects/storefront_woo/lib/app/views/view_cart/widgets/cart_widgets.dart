@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 
@@ -45,59 +44,6 @@ class CartContentWidget extends StatelessWidget {
 
           // Order summary
           _buildOrderSummary(context),
-
-          OsmeaComponents.sizedBox(height: 16),
-
-          // Checkout button - Centered in single child area
-          OsmeaComponents.center(
-            child: OsmeaComponents.container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: OsmeaColors.nordicBlue,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    _handleCheckout(context);
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: OsmeaComponents.row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        OsmeaComponents.text(
-                          'Complete Purchase',
-                          textStyle: OsmeaTextStyle.titleMedium(context)
-                              .copyWith(
-                                color: OsmeaColors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        OsmeaComponents.sizedBox(width: 8),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: OsmeaColors.white,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
 
           OsmeaComponents.sizedBox(height: 16),
         ],
@@ -685,34 +631,6 @@ class CartContentWidget extends StatelessWidget {
     );
   }
 
-  /// Handles checkout process with authentication check
-  void _handleCheckout(BuildContext context) async {
-    try {
-      // Check if user is authenticated
-      final authStorage = AuthStorageHelper();
-      final isAuthenticated = await authStorage.isAuthenticated();
-
-      if (!isAuthenticated) {
-        // User not authenticated, emit auth required state
-        viewModel.loadCart(); // Trigger reload to show auth required state
-        return;
-      }
-
-      // User is authenticated, navigate to checkout
-      if (context.mounted) {
-        GoRouter.of(context).push('/checkout');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error checking authentication: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
 }
 
 /// Loading widget for cart view

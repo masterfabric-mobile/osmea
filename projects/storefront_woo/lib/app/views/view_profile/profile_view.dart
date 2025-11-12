@@ -337,17 +337,6 @@ class ProfileView
       child: OsmeaComponents.column(
         children: [
           // Orders Menu Item
-          if (isAuthenticated)
-            _buildMenuItem(
-              context: context,
-              icon: Icons.receipt_long_rounded,
-              title: 'My Orders',
-              subtitle: 'View your order history',
-              onTap: () {
-                goRoute('/orders');
-              },
-              showDivider: true,
-            ),
           // Cart Menu Item
           _buildMenuItem(
             context: context,

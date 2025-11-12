@@ -48,10 +48,10 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
       '🛒 CartView: viewContent called with state: ${state.runtimeType}',
     );
 
-    // Handle auth required state for checkout
+    // Handle auth required state (removed checkout functionality)
     if (state is CartAuthRequiredState) {
+      // Checkout functionality removed - just show message
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        debugPrint('🔒 Auth required for checkout, navigating to auth screen');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(state.message),
@@ -59,10 +59,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
             duration: const Duration(seconds: 2),
           ),
         );
-        // Navigate to auth with return path
-        context.push('/auth?returnTo=/cart');
       });
-      // Show loading while navigating
+      // Show loading while handling
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 8),
