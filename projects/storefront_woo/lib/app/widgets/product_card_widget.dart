@@ -9,22 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
     hide Image;
 import 'package:core/core.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:get_it/get_it.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Product card widget
 class ProductCardWidget extends StatelessWidget {
   final ListAllProductsResponseModel product;
   final VoidCallback onWishlistTap;
   final VoidCallback onTap;
+  final bool isSaved; // Wishlist status passed from parent
 
   const ProductCardWidget({
     super.key,
     required this.product,
     required this.onWishlistTap,
     required this.onTap,
+    this.isSaved = false,
   });
 
   @override
@@ -117,7 +115,7 @@ class ProductCardWidget extends StatelessWidget {
         // Custom image widget with wishlist overlay
         // Note: imageWidget will override imageUrl, so we need to include the image in the widget
         imageWidget: _buildImageWithWishlist(context),
-        
+
         // Price widget - shows sale price and regular price (strikethrough) like home view
         child: _buildPriceWidget(context, prices),
       ),
@@ -130,7 +128,7 @@ class ProductCardWidget extends StatelessWidget {
     final imageUrl = product.images?.isNotEmpty == true
         ? product.images!.first.src
         : null;
-    
+
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
         height: imageHeight,
@@ -208,46 +206,36 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  /// Builds wishlist button widget - listens to WishlistViewModel for real-time updates
+  /// Builds wishlist button widget - uses isSaved prop from parent
   Widget _buildWishlistButton(BuildContext context) {
-    // Listen to WishlistViewModel stream for real-time icon updates
-    return BlocBuilder<WishlistViewModel, WishlistState>(
-      bloc: GetIt.I<WishlistViewModel>(),
-      builder: (context, wishlistState) {
-        final productId = product.id ?? 0;
-        // Use WishlistViewModel's isSaved method for accurate check
-        final wishlistVm = GetIt.I<WishlistViewModel>();
-        final isSaved = wishlistVm.isSaved(productId);
-
-        return Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: OsmeaColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: OsmeaColors.thunder.withOpacity(0.1),
-              width: 0.5,
-            ),
-          ),
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: Icon(
-              isSaved ? Icons.favorite : Icons.favorite_border,
-              size: 16,
-              color: isSaved ? OsmeaColors.nordicBlue : OsmeaColors.thunder,
-            ),
-            onPressed: onWishlistTap,
-          ),
-        );
-      },
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: OsmeaColors.thunder.withOpacity(0.1),
+          width: 0.5,
+        ),
+      ),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        icon: Icon(
+          isSaved ? Icons.favorite : Icons.favorite_border,
+          size: 16,
+          color: isSaved ? OsmeaColors.nordicBlue : OsmeaColors.thunder,
+        ),
+        onPressed: onWishlistTap,
+      ),
     );
   }
 
   /// Builds price widget showing sale price and regular price (strikethrough)
   /// Same format as recommended section widget
   Widget _buildPriceWidget(BuildContext context, dynamic prices) {
-    final hasSale = prices != null &&
+    final hasSale =
+        prices != null &&
         prices.salePrice != null &&
         prices.salePrice!.isNotEmpty &&
         prices.regularPrice != null &&
@@ -261,7 +249,7 @@ class ProductCardWidget extends StatelessWidget {
         prices.regularPrice,
         prices.currencyCode,
       );
-      
+
       return Padding(
         padding: EdgeInsets.only(top: context.spacing8),
         child: OsmeaComponents.row(
@@ -345,4 +333,3 @@ class ProductCardWidget extends StatelessWidget {
         .join(' ');
   }
 }
-

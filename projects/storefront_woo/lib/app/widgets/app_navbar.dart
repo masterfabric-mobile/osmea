@@ -324,7 +324,7 @@ class _AppNavbarState extends State<AppNavbar> {
       ),
       NavbarItem(
         text: 'Saved',
-        icon: Icon(count > 0 ? Icons.favorite : Icons.favorite_outline),
+        icon: _AnimatedFavoriteIcon(count: count),
         onTap: () => context.go('/saved'),
         tooltip: 'Saved Items',
       ),
@@ -378,5 +378,69 @@ class _AppNavbarState extends State<AppNavbar> {
         }
         break;
     }
+  }
+}
+
+/// Animated favorite icon that transitions between empty and filled heart
+class _AnimatedFavoriteIcon extends StatefulWidget {
+  final int count;
+
+  const _AnimatedFavoriteIcon({required this.count});
+
+  @override
+  State<_AnimatedFavoriteIcon> createState() => _AnimatedFavoriteIconState();
+}
+
+class _AnimatedFavoriteIconState extends State<_AnimatedFavoriteIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedFavoriteIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final isFilled = widget.count > 0;
+    final wasFilled = oldWidget.count > 0;
+    
+    // Animate when count changes from 0 to >0 or vice versa
+    if (isFilled != wasFilled) {
+      _controller.forward().then((_) {
+        _controller.reverse();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFilled = widget.count > 0;
+    
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Icon(
+        isFilled ? Icons.favorite : Icons.favorite_outline,
+        color: isFilled ? OsmeaColors.nordicBlue : null,
+      ),
+    );
   }
 }

@@ -177,7 +177,6 @@ class WishlistView
     // Handle WishlistLoadedState - this is the main state for displaying items
     if (state is WishlistLoadedState) {
       debugPrint('💖 WishlistView: Rendering ${state.items.length} items');
-      debugPrint('💖 WishlistView: Items: ${state.items.map((e) => '${e.id}:${e.name}').join(', ')}');
       return _buildList(context, viewModel, state.items);
     }
 

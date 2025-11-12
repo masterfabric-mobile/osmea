@@ -11,6 +11,7 @@ import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
 /// Hydrated wishlist view model that also syncs with Woo Wishlist API
+/// Injectable - registered as singleton in config_di.dart to ensure single instance
 @injectable
 class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   WishlistViewModel() : super(WishlistInitialState());
@@ -136,16 +137,24 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       // If not authenticated, keep local (hydrated) state without erroring
       final jwt = await _getJwtToken();
       if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, using local state');
         final s = state;
         if (s is WishlistLoadedState) {
+          // Keep existing state
           emit(WishlistLoadedState(items: s.items));
+        } else if (s is WishlistInitialState) {
+          // If initial state, try to restore from persisted state
+          // HydratedCubit should handle this, but ensure we have loaded state
+          emit(WishlistLoadedState(items: const []));
         } else {
+          // For any other state (error, etc.), ensure we have loaded state
           emit(WishlistLoadedState(items: const []));
         }
         return;
       }
 
       emit(WishlistLoadingState());
+      debugPrint('💖 Wishlist: Starting sync from server...');
       final apiVersion = _config.getString(
         'woocommerce_configuration.version',
         'v1',
@@ -276,7 +285,19 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     } catch (e, stackTrace) {
       debugPrint('❌ Wishlist sync error: $e');
       debugPrint('❌ Wishlist sync error stack trace: $stackTrace');
-      emit(WishlistErrorState(message: 'Failed to load saved items: $e'));
+
+      // Don't leave in error state - try to restore from persisted state or use empty
+      final currentState = state;
+      if (currentState is WishlistLoadedState) {
+        // Keep existing state if available
+        debugPrint('💡 Wishlist: Sync failed, keeping existing state');
+        emit(WishlistLoadedState(items: currentState.items));
+      } else {
+        // If no existing state, emit empty loaded state (not error state)
+        // This ensures UI can still function
+        debugPrint('💡 Wishlist: Sync failed, using empty state');
+        emit(WishlistLoadedState(items: const []));
+      }
     }
   }
 
@@ -299,6 +320,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         final s = state;
         final items = s is WishlistLoadedState ? [...s.items, item] : [item];
         emit(WishlistLoadedState(items: items));
+        debugPrint('✅ Wishlist: Item added to local state (unauthenticated)');
         return;
       }
 
@@ -316,6 +338,14 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             '💡 Wishlist: Item already exists on server, skipping add...',
           );
           return;
+        }
+      } else {
+        // If state is not loaded after sync, ensure we have at least an empty loaded state
+        debugPrint(
+          '⚠️ Wishlist: State not loaded after sync, ensuring loaded state...',
+        );
+        if (currentState is! WishlistLoadedState) {
+          emit(WishlistLoadedState(items: const []));
         }
       }
 
@@ -431,7 +461,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         );
       }
 
-      // Update local state optimistically
+      // Update local state optimistically (UI updates immediately)
       final items = s is WishlistLoadedState
           ? s.items.where((e) => e.id != productId).toList()
           : const <WishlistItem>[];
@@ -443,6 +473,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       );
 
       // Try DELETE by itemId first (preferred method as per API explorer)
+      bool deleteSuccess = false;
       if (itemToRemove?.itemId != null) {
         try {
           debugPrint(
@@ -457,75 +488,62 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             '💖 Wishlist remove API response (by ID): success=${response.success}, message=${response.message}',
           );
 
-          // Sync from server to get accurate state after removal
           if (response.success == true) {
-            debugPrint(
-              '✅ Wishlist: Item removed successfully by ID, syncing from server...',
-            );
-            await _syncFromServer(groupId: groupId);
-          } else {
-            debugPrint(
-              '⚠️ Wishlist: API returned success=false, syncing from server...',
-            );
-            await _syncFromServer(groupId: groupId);
+            deleteSuccess = true;
+            debugPrint('✅ Wishlist: Item removed successfully by ID');
+            // Optimistic update is already correct, no need to sync
+            // This prevents unnecessary rebuilds
+            return;
           }
-          return;
         } catch (e) {
           debugPrint('❌ Wishlist: deleteItemById failed: $e');
           // Fall through to try deleteItemByProduct
         }
       }
 
-      // Fallback: DELETE by product_id + group_id (as per API definition)
-      // Note: This endpoint may return 404 if item doesn't exist on server
-      // (e.g., if item was only in local storage and never synced)
-      try {
-        debugPrint(
-          '💖 Wishlist: Deleting by productId: $productId, groupId: ${groupId ?? 0}',
-        );
-        final response = await _wishlistService.deleteItemByProduct(
-          apiVersion: apiVersion,
-          request: DeleteWishlistItemRequest(
-            productId: productId,
-            groupId: groupId ?? 0,
-          ),
-        );
-
-        debugPrint(
-          '💖 Wishlist remove API response (by product): success=${response.success}, message=${response.message}',
-        );
-
-        // Sync from server to get accurate state after removal
-        if (response.success == true) {
+      // If deleteItemById didn't work, try deleteItemByProduct
+      if (!deleteSuccess) {
+        try {
           debugPrint(
-            '✅ Wishlist: Item removed successfully by product, syncing from server...',
+            '💖 Wishlist: Deleting by productId: $productId, groupId: ${groupId ?? 0}',
           );
-          await _syncFromServer(groupId: groupId);
-        } else {
+          final response = await _wishlistService.deleteItemByProduct(
+            apiVersion: apiVersion,
+            request: DeleteWishlistItemRequest(
+              productId: productId,
+              groupId: groupId ?? 0,
+            ),
+          );
+
           debugPrint(
-            '⚠️ Wishlist: API returned success=false, syncing from server...',
+            '💖 Wishlist remove API response (by product): success=${response.success}, message=${response.message}',
           );
+
+          if (response.success == true) {
+            deleteSuccess = true;
+            debugPrint('✅ Wishlist: Item removed successfully by product');
+            // Optimistic update is already correct, no need to sync
+            // Background sync only if needed (e.g., for itemId updates)
+            return;
+          } else {
+            // If delete failed, sync to get accurate state
+            await _syncFromServer(groupId: groupId);
+          }
+        } catch (e) {
+          debugPrint('❌ Wishlist: deleteItemByProduct failed: $e');
+          // Check if it's a 404 error (item not found on server)
+          if (e.toString().contains('404') ||
+              e.toString().contains('Not Found')) {
+            debugPrint(
+              '💡 Wishlist: Item not found on server (404) - optimistic update was correct',
+            );
+            // Optimistic update was correct, no need to sync
+            return;
+          }
+          // For other errors, sync to get accurate state
           await _syncFromServer(groupId: groupId);
         }
-        return;
-      } catch (e) {
-        debugPrint('❌ Wishlist: deleteItemByProduct failed: $e');
-        // Check if it's a 404 error (item not found on server)
-        // This is OK if item was only in local storage
-        if (e.toString().contains('404') ||
-            e.toString().contains('Not Found')) {
-          debugPrint(
-            '💡 Wishlist: Item not found on server (404) - may have been local only, syncing from server...',
-          );
-          // Sync from server to get accurate state
-          await _syncFromServer(groupId: groupId);
-          return;
-        }
-        // For other errors, continue to sync from server anyway
       }
-
-      // Final fallback: sync from server
-      await _syncFromServer(groupId: groupId);
     } catch (e) {
       debugPrint('❌ Wishlist remove error: $e');
       // On error, sync from server to get accurate state
@@ -584,11 +602,73 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   @override
   WishlistState? fromJson(Map<String, dynamic> json) {
-    return null; // State will be reconstructed from API
+    try {
+      // Try to restore wishlist state from persisted data
+      if (json.containsKey('items') && json['items'] is List) {
+        final itemsJson = json['items'] as List;
+        final items = itemsJson
+            .map((item) {
+              try {
+                return WishlistItem(
+                  id: item['id'] as int? ?? 0,
+                  itemId: item['itemId'] as int?,
+                  name: item['name'] as String?,
+                  imageUrl: item['imageUrl'] as String?,
+                  regularPrice: item['regularPrice'] as String?,
+                  salePrice: item['salePrice'] as String?,
+                  currencyCode: item['currencyCode'] as String?,
+                  onSale: item['onSale'] as bool? ?? false,
+                );
+              } catch (e) {
+                debugPrint('⚠️ Wishlist: Error parsing item from JSON: $e');
+                return null;
+              }
+            })
+            .whereType<WishlistItem>()
+            .toList();
+
+        debugPrint(
+          '✅ Wishlist: Restored ${items.length} items from persisted state',
+        );
+        return WishlistLoadedState(items: items);
+      }
+      // If no items, return empty loaded state
+      return WishlistLoadedState(items: const []);
+    } catch (e) {
+      debugPrint('⚠️ Wishlist: Error restoring state from JSON: $e');
+      // Return empty loaded state on error
+      return WishlistLoadedState(items: const []);
+    }
   }
 
   @override
   Map<String, dynamic>? toJson(WishlistState state) {
-    return null; // No need to persist wishlist state
+    try {
+      // Persist wishlist state to survive app restarts
+      if (state is WishlistLoadedState) {
+        final itemsJson = state.items.map((item) {
+          return {
+            'id': item.id,
+            'itemId': item.itemId,
+            'name': item.name,
+            'imageUrl': item.imageUrl,
+            'regularPrice': item.regularPrice,
+            'salePrice': item.salePrice,
+            'currencyCode': item.currencyCode,
+            'onSale': item.onSale,
+          };
+        }).toList();
+
+        debugPrint(
+          '✅ Wishlist: Persisting ${state.items.length} items to storage',
+        );
+        return {'items': itemsJson};
+      }
+      // Don't persist other states (loading, error, etc.)
+      return null;
+    } catch (e) {
+      debugPrint('⚠️ Wishlist: Error persisting state to JSON: $e');
+      return null;
+    }
   }
 }
