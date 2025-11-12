@@ -18,6 +18,7 @@ import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 
 @injectable
@@ -53,6 +54,26 @@ class ProductDetailViewModel
   // Product Loading
   // ----------------------------------------------------------------------------
 
+  /// Initializes wishlist and loads product
+  /// This ensures wishlist state is ready before checking product status
+  Future<void> initializeWithProduct(int productId) async {
+    // Initialize wishlist first
+    try {
+      final wishlistViewModel = GetIt.I<WishlistViewModel>();
+      final currentState = wishlistViewModel.state;
+      // Only sync if state is initial or empty
+      if (currentState is WishlistInitialState ||
+          (currentState is WishlistLoadedState && currentState.items.isEmpty)) {
+        await wishlistViewModel.initial();
+        debugPrint('✅ ProductDetailViewModel: Wishlist initialized with ${wishlistViewModel.count} items');
+      }
+    } catch (e) {
+      debugPrint('⚠️ ProductDetailViewModel: Failed to initialize wishlist: $e');
+    }
+    // Load product after wishlist is ready
+    await loadProduct(productId);
+  }
+
   /// Loads product details from API or cache
   /// Fetches product data, images, and checks cart/wishlist status
   /// Returns Future to allow await in calling code
@@ -66,6 +87,7 @@ class ProductDetailViewModel
     // ignore: discarded_futures
     loadProduct(productId);
   }
+
 
   // ----------------------------------------------------------------------------
   // Cart Operations
@@ -99,6 +121,20 @@ class ProductDetailViewModel
     // Fire-and-forget wrapper that sits on top of Future method
     // ignore: discarded_futures
     addProductToWishlist(productId);
+  }
+
+  /// Updates wishlist status in local state (called from view lifecycle)
+  /// This keeps ProductDetailViewModel state in sync with WishlistViewModel
+  void updateWishlistStatus(int productId, bool isInWishlist) {
+    try {
+      final currentState = state;
+      if (currentState is ProductDetailLoadedState &&
+          currentState.product.id == productId) {
+        emit(currentState.copyWith(isInWishlist: isInWishlist));
+      }
+    } catch (e) {
+      debugPrint('❌ ProductDetailViewModel: Failed to update wishlist status: $e');
+    }
   }
 
   // ----------------------------------------------------------------------------
@@ -277,9 +313,19 @@ class ProductDetailViewModel
       }
 
       // Check if product is in wishlist
+      // Ensure wishlist is loaded before checking
       bool isInWishlist = false;
       try {
         final wishlistViewModel = GetIt.I<WishlistViewModel>();
+        final wishlistState = wishlistViewModel.state;
+        
+        // If wishlist is not loaded yet, try to sync first
+        if (wishlistState is! WishlistLoadedState) {
+          debugPrint('💖 ProductDetailViewModel: Wishlist not loaded, syncing...');
+          await wishlistViewModel.initial();
+        }
+        
+        // Now check if product is saved
         isInWishlist = wishlistViewModel.isSaved(productId);
         debugPrint(
           '💖 ProductDetailViewModel: Product $productId isInWishlist: $isInWishlist',
@@ -316,9 +362,7 @@ class ProductDetailViewModel
       Map<String, String> selectedAttributes = {};
       if (currentState is ProductDetailLoadedState) {
         selectedAttributes = currentState.selectedAttributes;
-        debugPrint(
-          '🛒 Selected attributes: $selectedAttributes',
-        );
+        debugPrint('🛒 Selected attributes: $selectedAttributes');
       }
 
       // Build variation array from selectedAttributes if product has attributes
@@ -329,14 +373,15 @@ class ProductDetailViewModel
         final product = currentState is ProductDetailLoadedState
             ? currentState.product
             : null;
-        
+
         if (product?.attributes != null) {
           // Build attribute map: name -> taxonomy
           final Map<String, String> attributeTaxonomyMap = {};
           for (final attr in product!.attributes!) {
             if (attr is Map<String, dynamic>) {
               final name = (attr['name'] ?? attr['label'] ?? '').toString();
-              final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '').toString();
+              final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '')
+                  .toString();
               if (name.isNotEmpty && taxonomy.isNotEmpty) {
                 attributeTaxonomyMap[name] = taxonomy;
               }
@@ -347,46 +392,44 @@ class ProductDetailViewModel
           for (final entry in selectedAttributes.entries) {
             final attributeName = entry.key;
             final attributeValue = entry.value;
-            
+
             // Find taxonomy for this attribute name
-            String taxonomy = attributeTaxonomyMap[attributeName] ?? attributeName;
-            
+            String taxonomy =
+                attributeTaxonomyMap[attributeName] ?? attributeName;
+
             // Ensure taxonomy has 'pa_' prefix if it's a product attribute
-            if (!taxonomy.startsWith('pa_') && !taxonomy.startsWith('attribute_')) {
+            if (!taxonomy.startsWith('pa_') &&
+                !taxonomy.startsWith('attribute_')) {
               // Try to find matching taxonomy from product attributes
-              final matchingAttr = product.attributes?.firstWhere(
-                (attr) {
-                  if (attr is Map<String, dynamic>) {
-                    final name = (attr['name'] ?? attr['label'] ?? '').toString();
-                    return name == attributeName;
-                  }
-                  return false;
-                },
-                orElse: () => null,
-              );
-              
+              final matchingAttr = product.attributes?.firstWhere((attr) {
+                if (attr is Map<String, dynamic>) {
+                  final name = (attr['name'] ?? attr['label'] ?? '').toString();
+                  return name == attributeName;
+                }
+                return false;
+              }, orElse: () => null);
+
               if (matchingAttr is Map<String, dynamic>) {
-                taxonomy = (matchingAttr['taxonomy'] ?? matchingAttr['id'] ?? attributeName).toString();
+                taxonomy =
+                    (matchingAttr['taxonomy'] ??
+                            matchingAttr['id'] ??
+                            attributeName)
+                        .toString();
               } else {
                 // Fallback: use attribute name with pa_ prefix
-                taxonomy = 'pa_${attributeName.toLowerCase().replaceAll(' ', '_')}';
+                taxonomy =
+                    'pa_${attributeName.toLowerCase().replaceAll(' ', '_')}';
               }
             }
-            
-            variation.add({
-              'attribute': taxonomy,
-              'value': attributeValue,
-            });
+
+            variation.add({'attribute': taxonomy, 'value': attributeValue});
           }
-          
+
           debugPrint('🛒 Variation array: $variation');
         } else {
           // If no product attributes, use selectedAttributes directly
           for (final entry in selectedAttributes.entries) {
-            variation.add({
-              'attribute': entry.key,
-              'value': entry.value,
-            });
+            variation.add({'attribute': entry.key, 'value': entry.value});
           }
         }
       }
@@ -527,7 +570,9 @@ class ProductDetailViewModel
       final isCurrentlyInWishlist = wishlistViewModel.isSaved(productId);
       final wasInWishlist = isCurrentlyInWishlist;
 
-      debugPrint('💖 ProductDetailViewModel: Toggling wishlist for product $productId (currently: $isCurrentlyInWishlist)');
+      debugPrint(
+        '💖 ProductDetailViewModel: Toggling wishlist for product $productId (currently: $isCurrentlyInWishlist)',
+      );
 
       // Get product details from current state
       final product = currentState.product;
@@ -544,7 +589,7 @@ class ProductDetailViewModel
       final salePrice = product.onSale == true ? prices?.salePrice : null;
       final currencyCode = prices?.currencyCode;
 
-      // Create WishlistItem from product
+      // Create WishlistItem from product (using states.dart model)
       final wishlistItem = WishlistItem(
         id: productId,
         name: product.name,
@@ -552,7 +597,7 @@ class ProductDetailViewModel
         regularPrice: regularPrice,
         salePrice: salePrice,
         currencyCode: currencyCode,
-        onSale: product.onSale ?? false,
+        onSale: product.onSale == true,
       );
 
       // Toggle wishlist using WishlistViewModel (add or remove)
@@ -561,7 +606,9 @@ class ProductDetailViewModel
       // Get updated wishlist status
       final isNowInWishlist = wishlistViewModel.isSaved(productId);
 
-      debugPrint('✅ ProductDetailViewModel: Wishlist toggled - now: $isNowInWishlist');
+      debugPrint(
+        '✅ ProductDetailViewModel: Wishlist toggled - now: $isNowInWishlist',
+      );
 
       // Update local state to reflect wishlist status
       emit(currentState.copyWith(isInWishlist: isNowInWishlist));

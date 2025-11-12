@@ -40,8 +40,8 @@ class ProductDetailView
   void initialContent(ProductDetailViewModel viewModel, BuildContext context) {
     // Set arguments to ViewModel
     viewModel.setArguments(arguments);
-    // Load product
-    viewModel.loadProduct(productId);
+    // Initialize wishlist and load product - ViewModel handles wishlist sync internally
+    viewModel.initializeWithProduct(productId);
   }
 
   @override
@@ -145,4 +145,3 @@ PreferredSizeWidget productDetailCoreAppBar(
     actions: const [], // Sepet ikonu kaldırıldı
   );
 }
-

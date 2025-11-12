@@ -7,13 +7,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-// removed unused go_router import
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/action_section.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 
 /// Main content widget for product detail view
 class ProductDetailContentWidget extends StatelessWidget {
@@ -30,136 +33,179 @@ class ProductDetailContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        OsmeaComponents.singleChildScrollView(
-          padding: EdgeInsets.only(bottom: context.dynamicHeight(0.12)),
-          child: OsmeaComponents.column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product images with overlay actions
-              _buildProductImages(context, state.imageUrls, goRoute: goRoute, withOverlays: true),
+    final productId = state.product.id ?? 0;
 
-              // Product info section
-              OsmeaComponents.padding(
-                padding: EdgeInsets.fromLTRB(
-                  context.spacing12,
-                  0,
-                  context.spacing12,
-                  0,
-                ),
-                child: OsmeaComponents.column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product name
-                    OsmeaComponents.text(
-                      state.product.name ?? 'Unknown Product',
-                      textStyle: OsmeaTextStyle.headlineLarge(context).copyWith(
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: -0.8,
-                        height: 1.0,
-                        color: OsmeaColors.thunder,
-                      ),
+    // Use BlocBuilder to reactively listen to WishlistViewModel changes
+    return BlocBuilder<WishlistViewModel, WishlistState>(
+      bloc: GetIt.I<WishlistViewModel>(),
+      buildWhen: (previous, current) {
+        // Rebuild when state changes from Initial/Loading to Loaded
+        if (previous is! WishlistLoadedState &&
+            current is WishlistLoadedState) {
+          return true; // State just loaded, rebuild to show saved status
+        }
+        // Rebuild when state changes between Loaded states (item added/removed)
+        if (previous is WishlistLoadedState && current is WishlistLoadedState) {
+          final prevSaved = previous.items.any((e) => e.id == productId);
+          final currSaved = current.items.any((e) => e.id == productId);
+          return prevSaved != currSaved;
+        }
+        return false; // Don't rebuild for other state changes
+      },
+      builder: (context, wishlistState) {
+        final wishlistVm = GetIt.I<WishlistViewModel>();
+        final isInWishlist = wishlistVm.isSaved(productId);
+
+        return Stack(
+          children: [
+            OsmeaComponents.singleChildScrollView(
+              padding: EdgeInsets.only(bottom: context.dynamicHeight(0.12)),
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product images with overlay actions
+                  _buildProductImages(
+                    context,
+                    state.imageUrls,
+                    viewModel: viewModel,
+                    goRoute: goRoute,
+                    withOverlays: true,
+                    isInWishlist: isInWishlist,
+                    productId: productId,
+                  ),
+
+                  // Product info section
+                  OsmeaComponents.padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.spacing12,
+                      0,
+                      context.spacing12,
+                      0,
                     ),
-
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-
-                    // Price
-                    OsmeaComponents.text(
-                      _formatPrice(state.product.prices),
-                      textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                        color: OsmeaColors.nordicBlue,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.5,
-                        height: 1.1,
-                      ),
-                    ),
-
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-
-                    // Attributes
-                    if (state.product.attributes != null &&
-                        state.product.attributes!.isNotEmpty)
-                      _buildAttributes(context, viewModel),
-
-                    OsmeaComponents.sizedBox(height: context.spacing16),
-
-                    // Description
-                    if (state.product.description?.isNotEmpty == true) ...[
-                      OsmeaComponents.text(
-                        'Details',
-                        textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.0,
-                          color: OsmeaColors.thunder.withValues(alpha: 0.8),
+                    child: OsmeaComponents.column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Product name
+                        OsmeaComponents.text(
+                          state.product.name ?? 'Unknown Product',
+                          textStyle: OsmeaTextStyle.headlineLarge(context)
+                              .copyWith(
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: -0.8,
+                                height: 1.0,
+                                color: OsmeaColors.thunder,
+                              ),
                         ),
-                      ),
-                      OsmeaComponents.sizedBox(height: context.spacing8),
-                      DescriptionSection(
-                        description: state.product.description!,
-                        viewModel: viewModel,
-                        state: state,
-                      ),
-                      OsmeaComponents.sizedBox(height: context.spacing16),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
 
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: SafeArea(
-            top: false,
-            child: OsmeaComponents.container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing16,
-                vertical: context.spacing12,
-              ),
-              decoration: BoxDecoration(
-                color: OsmeaColors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: OsmeaColors.black.withValues(alpha: 0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, -6),
+                        OsmeaComponents.sizedBox(height: context.spacing8),
+
+                        // Price
+                        OsmeaComponents.text(
+                          _formatPrice(state.product.prices),
+                          textStyle: OsmeaTextStyle.headlineSmall(context)
+                              .copyWith(
+                                color: OsmeaColors.nordicBlue,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.5,
+                                height: 1.1,
+                              ),
+                        ),
+
+                        OsmeaComponents.sizedBox(height: context.spacing8),
+
+                        // Attributes
+                        if (state.product.attributes != null &&
+                            state.product.attributes!.isNotEmpty)
+                          _buildAttributes(context, viewModel),
+
+                        OsmeaComponents.sizedBox(height: context.spacing16),
+
+                        // Description
+                        if (state.product.description?.isNotEmpty == true) ...[
+                          OsmeaComponents.text(
+                            'Details',
+                            textStyle: OsmeaTextStyle.titleSmall(context)
+                                .copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.0,
+                                  color: OsmeaColors.thunder.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                ),
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing8),
+                          DescriptionSection(
+                            description: state.product.description!,
+                            viewModel: viewModel,
+                            state: state,
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing16),
+                        ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              child: ActionSection(
-                isInWishlist: state.isInWishlist,
-                onToggleWishlist: () {
-                  viewModel.addProductToWishlistFire(state.product.id ?? 0);
-                },
-                isInCart: state.isInCart,
-                onAddToCart: () async {
-                  // Add product to cart
-                  await viewModel.addProductToCart(
-                    state.product.id ?? 0,
-                    quantity: state.selectedQuantity,
-                  );
-                  
-                  // Check if add was successful (check state)
-                  final currentState = viewModel.state;
-                  if (currentState is ProductDetailLoadedState && currentState.isInCart) {
-                    // Show success popup with cart token for navigation
-                    final cartToken = await viewModel.getCartTokenForNavigation();
-                    _showAddToCartSuccessPopup(context, cartToken: cartToken);
-                  }
-                },
-                selectedQuantity: state.selectedQuantity,
-                onUpdateQuantity: (q) => viewModel.updateQuantityFire(q),
-                onShare: () {},
-                showWishlistAndShare: false,
+            ),
+
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: OsmeaComponents.container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.spacing16,
+                    vertical: context.spacing12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: OsmeaColors.black.withValues(alpha: 0.06),
+                        blurRadius: 12,
+                        offset: const Offset(0, -6),
+                      ),
+                    ],
+                  ),
+                  child: ActionSection(
+                    isInWishlist: isInWishlist,
+                    onToggleWishlist: () {
+                      viewModel.addProductToWishlistFire(productId);
+                    },
+                    isInCart: state.isInCart,
+                    onAddToCart: () async {
+                      // Add product to cart
+                      await viewModel.addProductToCart(
+                        state.product.id ?? 0,
+                        quantity: state.selectedQuantity,
+                      );
+
+                      // Check if add was successful (check state)
+                      final currentState = viewModel.state;
+                      if (currentState is ProductDetailLoadedState &&
+                          currentState.isInCart) {
+                        // Show success popup with cart token for navigation
+                        final cartToken = await viewModel
+                            .getCartTokenForNavigation();
+                        _showAddToCartSuccessPopup(
+                          context,
+                          cartToken: cartToken,
+                        );
+                      }
+                    },
+                    selectedQuantity: state.selectedQuantity,
+                    onUpdateQuantity: (q) => viewModel.updateQuantityFire(q),
+                    onShare: () {},
+                    showWishlistAndShare: false,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -208,8 +254,11 @@ class ProductDetailContentWidget extends StatelessWidget {
   Widget _buildProductImages(
     BuildContext context,
     List<String> imageUrls, {
+    required ProductDetailViewModel viewModel,
     required Function(String path) goRoute,
     bool withOverlays = false,
+    bool isInWishlist = false,
+    int productId = 0,
   }) {
     if (imageUrls.isEmpty) {
       return OsmeaComponents.container(
@@ -269,10 +318,8 @@ class ProductDetailContentWidget extends StatelessWidget {
               children: [
                 OsmeaComponents.iconButton(
                   icon: Icon(
-                    state.isInWishlist
-                        ? Icons.favorite
-                        : Icons.favorite_outline,
-                    color: state.isInWishlist
+                    isInWishlist ? Icons.favorite : Icons.favorite_outline,
+                    color: isInWishlist
                         ? OsmeaColors.nordicBlue
                         : OsmeaColors.thunder,
                   ),
@@ -281,7 +328,7 @@ class ProductDetailContentWidget extends StatelessWidget {
                   backgroundColor: OsmeaColors.white.withValues(alpha: 0.9),
                   borderRadius: context.width24,
                   onPressed: () =>
-                      viewModel.addProductToWishlistFire(state.product.id ?? 0),
+                      viewModel.addProductToWishlistFire(productId),
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing8),
                 OsmeaComponents.iconButton(
@@ -320,7 +367,11 @@ class ProductDetailContentWidget extends StatelessWidget {
           options = rawOptions.map((e) => e.toString()).toList();
         } else if (rawTerms is List) {
           options = rawTerms
-              .map((e) => e is Map ? (e['name'] ?? e['value'] ?? '').toString() : e.toString())
+              .map(
+                (e) => e is Map
+                    ? (e['name'] ?? e['value'] ?? '').toString()
+                    : e.toString(),
+              )
               .where((e) => e.isNotEmpty)
               .toList();
         }
@@ -359,7 +410,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                 for (final opt in (attr['options'] as List<String>))
                   ChoiceChip(
                     label: Text(opt),
-                    selected: state.selectedAttributes[(attr['name'] as String?)] == opt,
+                    selected:
+                        state.selectedAttributes[(attr['name'] as String?)] ==
+                        opt,
                     onSelected: (_) => viewModel.setSelectedAttribute(
                       (attr['name'] as String?) ?? '',
                       opt,
@@ -450,9 +503,7 @@ void _showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             // Navigate to cart page with cart token in arguments
             // Use context.go instead of push since cart is in ShellRoute (bottom nav)
             // This prevents duplicate key error in Navigator
-            context.go('/cart', extra: {
-              'cartToken': cartToken,
-            });
+            context.go('/cart', extra: {'cartToken': cartToken});
           },
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
