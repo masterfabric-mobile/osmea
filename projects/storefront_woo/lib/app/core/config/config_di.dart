@@ -3,6 +3,7 @@ import 'package:apis/apis.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/core/config/config_di.config.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:flutter/foundation.dart';
 
 GetIt getIt = GetIt.instance;
@@ -23,6 +24,21 @@ Future<GetIt> configureDependencies({String? environment}) async {
     // Initialize app-specific dependencies
     final result = getIt.init(environment: environment);
     debugPrint('✅ App dependencies initialized');
+
+    // Override WishlistViewModel to be singleton (shared state across app)
+    // This ensures all parts of the app use the same wishlist instance
+    // Note: WishlistViewModel is registered as factory by injectable,
+    // but we override it to be singleton for shared state
+    try {
+      if (getIt.isRegistered<WishlistViewModel>()) {
+        getIt.unregister<WishlistViewModel>();
+      }
+      getIt.registerLazySingleton<WishlistViewModel>(() => WishlistViewModel());
+      debugPrint('✅ WishlistViewModel registered as singleton');
+    } catch (e) {
+      debugPrint('⚠️ Could not register WishlistViewModel as singleton: $e');
+      // Continue - factory registration will be used
+    }
 
     return result;
   } catch (e, stackTrace) {
