@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:core/src/base/base_view_model_hydrated_cubit.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
+import 'package:core/src/helper/local_storage/local_storage_helper.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
 
 /// 🔐 **OSMEA Auth Cubit**
@@ -26,6 +27,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
   final AuthStorageHelper _authStorage = AuthStorageHelper();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+  final LocalStorageHelper _localStorage = LocalStorageHelper();
 
   // Prevent multiple concurrent loadTokens() calls
   bool _isLoadingTokens = false;
@@ -43,7 +45,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     String lastName,
     bool marketingConsent,
   )? signUpCallback;
-  
+
   // Callback for post-sign-in success (platform-specific token loading)
   // This is called after successful sign in, before emitting AuthAuthenticatedState
   // The AuthCubit instance is passed as parameter so the callback can call saveJwtToken
@@ -233,17 +235,28 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       // Clear storage FIRST
       await _authStorage.clearToken();
 
+      // Clear remember me from storage
+      try {
+        await _localStorage.init();
+        await _localStorage.removeItem('remember_me');
+        debugPrint('✅ Remember me cleared from storage');
+      } catch (e) {
+        debugPrint('❌ Error clearing remember me from storage: $e');
+      }
+
       // Update cubit state to unauthenticated
       // This will be persisted by HydratedCubit (toJson returns null for unauthenticated, which clears persistence)
       emit(const AuthUnauthenticatedState());
-      
+
       // Force a state change to ensure HydratedCubit persistence is cleared
       // Emit again to ensure state is properly persisted (or cleared)
       await Future.delayed(const Duration(milliseconds: 10));
       emit(const AuthUnauthenticatedState());
 
-      debugPrint('✅ AuthCubit: Sign out successful - state set to unauthenticated');
-      debugPrint('🔍 AuthCubit: Current state after signOut = ${state.runtimeType}');
+      debugPrint(
+          '✅ AuthCubit: Sign out successful - state set to unauthenticated');
+      debugPrint(
+          '🔍 AuthCubit: Current state after signOut = ${state.runtimeType}');
     } catch (e) {
       debugPrint('❌ AuthCubit: Error signing out: $e');
       // Even on error, emit unauthenticated state
@@ -309,10 +322,26 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         config = null;
       }
 
-      // Initialize form state with config and initial tab
+      // Load remember me state from storage
+      bool rememberMe = false;
+      try {
+        await _localStorage.init();
+        final savedRememberMe = await _localStorage.getItem('remember_me');
+        if (savedRememberMe is bool) {
+          rememberMe = savedRememberMe;
+        } else if (savedRememberMe is String) {
+          rememberMe = savedRememberMe.toLowerCase() == 'true';
+        }
+        debugPrint('✅ Remember me loaded from storage: $rememberMe');
+      } catch (e) {
+        debugPrint('❌ Error loading remember me from storage: $e');
+      }
+
+      // Initialize form state with config, initial tab, and remember me state
       emit(AuthFormState(
         currentTab: initialTab,
         config: config,
+        signInRememberMe: rememberMe,
       ));
 
       debugPrint('✅ AuthCubit: Authentication initialized');
@@ -401,11 +430,22 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   }
 
   /// Toggle remember me
-  void toggleRememberMe() {
+  void toggleRememberMe() async {
     final formState = _formState;
     if (formState != null) {
+      final newValue = !formState.signInRememberMe;
+
+      // Save to local storage
+      try {
+        await _localStorage.init();
+        await _localStorage.setItem('remember_me', newValue);
+        debugPrint('✅ Remember me saved to storage: $newValue');
+      } catch (e) {
+        debugPrint('❌ Error saving remember me to storage: $e');
+      }
+
       emit(formState.copyWith(
-        signInRememberMe: !formState.signInRememberMe,
+        signInRememberMe: newValue,
       ));
     }
   }
@@ -501,14 +541,15 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
               debugPrint('🔄 Calling onSignInSuccess callback...');
               await onSignInSuccess!(this);
               debugPrint('✅ onSignInSuccess callback completed');
-              
+
               // Check if state was updated by onSignInSuccess callback
               // If not, load token from storage and save it
               if (state is! AuthAuthenticatedState) {
-                debugPrint('⚠️ State not updated by onSignInSuccess, loading from storage...');
+                debugPrint(
+                    '⚠️ State not updated by onSignInSuccess, loading from storage...');
                 final token = await _authStorage.getToken();
                 final userData = await _authStorage.getUserData();
-                
+
                 if (token != null && token.isNotEmpty) {
                   // Save token using saveJwtToken which will emit AuthAuthenticatedState
                   await saveJwtToken(
@@ -520,7 +561,8 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
                   emit(const AuthUnauthenticatedState());
                 }
               } else {
-                debugPrint('✅ State already updated to AuthAuthenticatedState by onSignInSuccess');
+                debugPrint(
+                    '✅ State already updated to AuthAuthenticatedState by onSignInSuccess');
               }
             } catch (e) {
               debugPrint('⚠️ Error in onSignInSuccess callback: $e');
@@ -528,7 +570,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
               try {
                 final token = await _authStorage.getToken();
                 final userData = await _authStorage.getUserData();
-                
+
                 if (token != null && token.isNotEmpty) {
                   await saveJwtToken(
                     jwtToken: token,
@@ -544,10 +586,11 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
             }
           } else {
             // No onSignInSuccess callback, load token from storage directly
-            debugPrint('⚠️ No onSignInSuccess callback, loading token from storage...');
+            debugPrint(
+                '⚠️ No onSignInSuccess callback, loading token from storage...');
             final token = await _authStorage.getToken();
             final userData = await _authStorage.getUserData();
-            
+
             if (token != null && token.isNotEmpty) {
               // Save token using saveJwtToken which will emit AuthAuthenticatedState
               await saveJwtToken(
@@ -923,14 +966,15 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       // jwtToken must be non-null and non-empty to be considered authenticated
       final jwtToken = json['jwtToken'] as String?;
       final isAuthenticated = json['isAuthenticated'] as bool? ?? false;
-      
+
       // Only restore authenticated state if jwtToken exists and is not empty
       if (isAuthenticated && jwtToken != null && jwtToken.isNotEmpty) {
         return AuthAuthenticatedState.fromJson(json);
       }
       // If jwtToken is null/empty but state says authenticated, don't restore it
       // This prevents restoring invalid authenticated states after signout
-      debugPrint('⚠️ AuthCubit: Restoring unauthenticated state (jwtToken is null/empty)');
+      debugPrint(
+          '⚠️ AuthCubit: Restoring unauthenticated state (jwtToken is null/empty)');
       return const AuthUnauthenticatedState();
     } catch (e) {
       debugPrint('❌ AuthCubit: Error deserializing state: $e');
