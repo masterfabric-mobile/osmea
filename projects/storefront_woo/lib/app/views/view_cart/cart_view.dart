@@ -7,10 +7,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_widgets.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/cart_app_bar_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/cart_auth_required_widget.dart';
 
 /// CartView displays the shopping cart with items and checkout functionality
 class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
@@ -22,10 +23,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
     required super.goRoute,
-  }) : super(
-         coreAppBar: (context, viewModel) =>
-             _buildCartAppBar(context, viewModel),
-       ) {
+  }) : super(coreAppBar: (context, viewModel) => const CartAppBarWidget()) {
     debugPrint('🛒 CartView: Constructor called');
   }
 
@@ -61,14 +59,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
         );
       });
       // Show loading while handling
-      return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Center(
-            child: CircularProgressIndicator(color: OsmeaColors.nordicBlue),
-          ),
-        ),
-      );
+      return CartAuthRequiredWidget(message: state.message);
     }
 
     return _buildBody(context, viewModel, state);
@@ -120,41 +111,4 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
       ),
     );
   }
-}
-
-/// Builds cart app bar following OSMEA standards
-PreferredSizeWidget _buildCartAppBar(
-  BuildContext context,
-  CartViewModel? viewModel,
-) {
-  return AppBar(
-    title: OsmeaComponents.text(
-      'Shopping Cart',
-      color: OsmeaColors.thunder,
-      textStyle: OsmeaTextStyle.titleLarge(context),
-    ),
-    backgroundColor: OsmeaColors.paperWhite,
-    elevation: 0,
-    foregroundColor: OsmeaColors.thunder,
-    leading: OsmeaComponents.iconButton(
-      onPressed: () => context.go('/home'),
-      icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-    ),
-    actions: [
-      // Clear cart button
-      OsmeaComponents.iconButton(
-        onPressed: () {
-          // TODO: Implement clear cart functionality
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Clear cart feature coming soon!'),
-              backgroundColor: Colors.blue,
-            ),
-          );
-        },
-        icon: Icon(Icons.clear_all, color: OsmeaColors.thunder),
-        tooltip: 'Clear Cart',
-      ),
-    ],
-  );
 }

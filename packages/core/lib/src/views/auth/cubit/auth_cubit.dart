@@ -11,6 +11,7 @@ import 'package:core/src/base/base_view_model_hydrated_cubit.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/local_storage/local_storage_helper.dart';
+import 'package:core/src/helper/local_storage/local_storage_helper.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
 
 /// 🔐 **OSMEA Auth Cubit**
@@ -36,7 +37,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       Duration(seconds: 2); // Minimum 2 seconds between loads
 
   // Callbacks for authentication
-  Future<bool> Function(String email, String password)? signInCallback;
+  Future<bool> Function(String email, String password, {bool? rememberMe})? signInCallback;
   Future<bool> Function(
     String email,
     String password,
@@ -50,6 +51,15 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   // This is called after successful sign in, before emitting AuthAuthenticatedState
   // The AuthCubit instance is passed as parameter so the callback can call saveJwtToken
   Future<void> Function(AuthCubit authCubit)? onSignInSuccess;
+  
+  // Callback for remember me preference changes
+  // This is called when user toggles remember me checkbox
+  Future<void> Function(bool rememberMe)? onRememberMeChanged;
+  
+  // Callback for checklist changes
+  // This is called when user toggles any checklist item
+  // Parameters: checklistId, isChecked
+  Future<void> Function(String checklistId, bool isChecked)? onChecklistChanged;
 
   /// Check if user is authenticated
   bool get isAuthenticated {
@@ -448,6 +458,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         signInRememberMe: newValue,
       ));
     }
+    return null; // Return null if not found
   }
 
   /// Validate sign in email
@@ -523,11 +534,12 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       debugPrint('🔍 Calling sign in service...');
       debugPrint('📧 Email: ${formState.signInEmail}');
 
-      // Call authentication service
+      // Call authentication service with optional rememberMe parameter
       if (signInCallback != null) {
         final success = await signInCallback!(
           formState.signInEmail,
           formState.signInPassword,
+          rememberMe: formState.signInRememberMe,
         );
 
         if (success) {
@@ -743,34 +755,48 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     }
   }
 
-  /// Toggle marketing consent
+  /// Toggle a checklist item by ID
+  Future<void> toggleChecklist(String checklistId) async {
+    final formState = _formState;
+    if (formState != null) {
+      final currentValue = formState.signUpChecklists[checklistId] ?? false;
+      final newValue = !currentValue;
+      
+      final updatedChecklists = Map<String, bool>.from(formState.signUpChecklists);
+      updatedChecklists[checklistId] = newValue;
+      
+      emit(formState.copyWith(
+        signUpChecklists: updatedChecklists,
+      ));
+      
+      // Call custom callback if provided
+      if (onChecklistChanged != null) {
+        try {
+          await onChecklistChanged!(checklistId, newValue);
+          debugPrint('✅ onChecklistChanged callback executed for $checklistId: $newValue');
+        } catch (e) {
+          debugPrint('⚠️ Error in onChecklistChanged callback: $e');
+        }
+      }
+    }
+  }
+
+  /// Toggle marketing consent (backward compatibility)
+  @Deprecated('Use toggleChecklist("marketing_consent") instead')
   void toggleMarketingConsent() {
-    final formState = _formState;
-    if (formState != null) {
-      emit(formState.copyWith(
-        signUpMarketingConsent: !formState.signUpMarketingConsent,
-      ));
-    }
+    toggleChecklist('marketing_consent');
   }
 
-  /// Toggle privacy policy acceptance
+  /// Toggle privacy policy acceptance (backward compatibility)
+  @Deprecated('Use toggleChecklist("privacy_policy") instead')
   void togglePrivacyPolicy() {
-    final formState = _formState;
-    if (formState != null) {
-      emit(formState.copyWith(
-        signUpPrivacyPolicyAccepted: !formState.signUpPrivacyPolicyAccepted,
-      ));
-    }
+    toggleChecklist('privacy_policy');
   }
 
-  /// Toggle terms of service acceptance
+  /// Toggle terms of service acceptance (backward compatibility)
+  @Deprecated('Use toggleChecklist("terms") instead')
   void toggleTerms() {
-    final formState = _formState;
-    if (formState != null) {
-      emit(formState.copyWith(
-        signUpTermsAccepted: !formState.signUpTermsAccepted,
-      ));
-    }
+    toggleChecklist('terms');
   }
 
   /// Validate sign up email
@@ -888,13 +914,16 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
       // Call authentication callback
       if (signUpCallback != null) {
+        // Get marketing consent from checklists (backward compatibility)
+        final marketingConsent = formState.signUpChecklists['marketing_consent'] ?? false;
+        
         final success = await signUpCallback!(
           formState.signUpEmail,
           formState.signUpPassword,
           formState.signUpAuthKey,
           formState.signUpFirstName,
           formState.signUpLastName,
-          formState.signUpMarketingConsent,
+          marketingConsent,
         );
 
         if (success) {

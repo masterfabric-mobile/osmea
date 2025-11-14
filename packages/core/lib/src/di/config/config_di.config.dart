@@ -31,8 +31,8 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final commonLoggerModule = _$CommonLoggerModule();
-    gh.factory<_i508.ImageDetailCubit>(() => _i508.ImageDetailCubit());
     gh.factory<_i674.CommonLogger>(() => commonLoggerModule.commonLogger);
+    gh.factory<_i508.ImageDetailCubit>(() => _i508.ImageDetailCubit());
     gh.singleton<_i481.ICommonLogger>(
         () => _i674.CommonLogger(logger: gh<_i974.Logger>()));
     return this;

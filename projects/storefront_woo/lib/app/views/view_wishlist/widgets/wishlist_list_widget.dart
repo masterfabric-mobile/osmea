@@ -1,8 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_empty_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_item_widget.dart';
 
 class WishlistListWidget extends StatelessWidget {
@@ -18,7 +18,12 @@ class WishlistListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const WishlistEmptyWidget();
+      // Navigate to empty view route
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/empty/wishlist?actionPath=/home');
+      });
+      // Return empty container while navigating
+      return const SizedBox.shrink();
     }
 
     return ListView.separated(

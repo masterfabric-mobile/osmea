@@ -396,12 +396,8 @@ class AuthWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing20),
           _buildSignUpLastNameField(context, formState, cubit),
           OsmeaComponents.sizedBox(height: context.spacing24),
-          _buildMarketingConsentCheckbox(
-              context, formState, cubit, primaryColor),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          _buildPrivacyPolicyCheckbox(context, formState, cubit, primaryColor),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          _buildTermsCheckbox(context, formState, cubit, primaryColor),
+          // Dynamic checklists from config
+          ..._buildDynamicChecklists(context, formState, cubit, primaryColor),
           OsmeaComponents.sizedBox(height: context.spacing32),
           _buildSignUpButton(
               context, formState, cubit, buttonRadius, primaryColor),
@@ -694,83 +690,62 @@ class AuthWidget extends StatelessWidget {
     );
   }
 
-  /// 📧 Marketing Consent Checkbox
-  Widget _buildMarketingConsentCheckbox(BuildContext context,
+  /// 📋 Build dynamic checklists from config
+  List<Widget> _buildDynamicChecklists(BuildContext context,
       AuthFormState state, AuthCubit cubit, Color primaryColor) {
-    return OsmeaComponents.row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.checkbox(
-          value: state.signUpMarketingConsent,
-          onChanged: (value) => cubit.toggleMarketingConsent(),
-          activeColor: primaryColor,
-          size: CheckboxSize.small,
-        ),
-        OsmeaComponents.sizedBox(width: context.spacing8),
-        Expanded(
-          child: OsmeaComponents.text(
-            _getConfigValue(
-              'sign_up',
-              'marketing_consent_label',
-              'I would like to receive promotional emails/SMS',
-            ),
-            variant: OsmeaTextVariant.bodySmall,
-            color: OsmeaColors.thunder,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 📄 Privacy Policy Checkbox
-  Widget _buildPrivacyPolicyCheckbox(BuildContext context, AuthFormState state,
-      AuthCubit cubit, Color primaryColor) {
-    return OsmeaComponents.row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.checkbox(
-          value: state.signUpPrivacyPolicyAccepted,
-          onChanged: (value) => cubit.togglePrivacyPolicy(),
-          activeColor: primaryColor,
-          size: CheckboxSize.small,
-        ),
-        OsmeaComponents.sizedBox(width: context.spacing8),
-        Expanded(
-          child: OsmeaComponents.text(
-            '${_getConfigValue('sign_up', 'privacy_policy_label', 'I have read and accept the Privacy Policy')} *',
-            variant: OsmeaTextVariant.bodySmall,
-            color: OsmeaColors.thunder,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 📜 Terms of Service Checkbox
-  Widget _buildTermsCheckbox(BuildContext context, AuthFormState state,
-      AuthCubit cubit, Color primaryColor) {
-    return OsmeaComponents.row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.checkbox(
-          value: state.signUpTermsAccepted,
-          onChanged: (value) => cubit.toggleTerms(),
-          activeColor: primaryColor,
-          size: CheckboxSize.small,
-        ),
-        OsmeaComponents.sizedBox(width: context.spacing8),
-        Expanded(
-          child: OsmeaComponents.text(
-            '${_getConfigValue('sign_up', 'terms_label', 'I have read and accept the Terms of Service')} *',
-            variant: OsmeaTextVariant.bodySmall,
-            color: OsmeaColors.thunder,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
+    final List<Widget> checklistWidgets = [];
+    
+    try {
+      final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
+      final checklists = signUpConfig?['checklists'] as List<dynamic>?;
+      
+      if (checklists != null && checklists.isNotEmpty) {
+        for (int i = 0; i < checklists.length; i++) {
+          final checklist = checklists[i] as Map<String, dynamic>;
+          final id = checklist['id'] as String?;
+          final label = checklist['label'] as String?;
+          final required = checklist['required'] as bool? ?? false;
+          final enabled = checklist['enabled'] as bool? ?? true;
+          
+          if (id != null && label != null && enabled) {
+            final isChecked = state.signUpChecklists[id] ?? false;
+            final displayLabel = required ? '$label *' : label;
+            
+            checklistWidgets.add(
+              OsmeaComponents.row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OsmeaComponents.checkbox(
+                    value: isChecked,
+                    onChanged: (value) => cubit.toggleChecklist(id),
+                    activeColor: primaryColor,
+                    size: CheckboxSize.small,
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing8),
+                  Expanded(
+                    child: OsmeaComponents.text(
+                      displayLabel,
+                      variant: OsmeaTextVariant.bodySmall,
+                      color: OsmeaColors.thunder,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            );
+            
+            // Add spacing between checklists (except for the last one)
+            if (i < checklists.length - 1) {
+              checklistWidgets.add(OsmeaComponents.sizedBox(height: context.spacing16));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error building dynamic checklists: $e');
+    }
+    
+    return checklistWidgets;
   }
 
   Widget _buildSignUpButton(BuildContext context, AuthFormState state,

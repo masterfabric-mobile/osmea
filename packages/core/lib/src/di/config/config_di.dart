@@ -3,6 +3,7 @@ import 'package:core/src/di/config/config_di.config.dart';
 import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
+import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -29,6 +30,10 @@ Future<GetIt> configureDependencies() async {
 
   if (!getIt.isRegistered<OnboardingCubit>()) {
     getIt.registerFactory<OnboardingCubit>(() => OnboardingCubit());
+  }
+
+  if (!getIt.isRegistered<EmptyViewCubit>()) {
+    getIt.registerFactory<EmptyViewCubit>(() => EmptyViewCubit());
   }
 
   // AuthCubit should be registered as singleton in starter.dart

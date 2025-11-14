@@ -80,10 +80,17 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get defaultMessage => 'An unexpected error occurred. Please try again later.';
 }
 
-/// Flat map(s) containing all translations.
+/// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
+///
+/// The Dart AOT compiler has issues with very large switch statements,
+/// so the map is split into smaller functions (512 entries each).
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
+		return _flatMapFunction$0(path);
+	}
+
+	dynamic _flatMapFunction$0(String path) {
 		switch (path) {
 			case 'localLanguageCode': return 'en_US';
 			case 'appTitle': return 'OSMEA App';

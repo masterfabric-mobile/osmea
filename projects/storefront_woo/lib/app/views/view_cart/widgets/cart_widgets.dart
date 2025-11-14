@@ -6,6 +6,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
@@ -53,55 +54,12 @@ class CartContentWidget extends StatelessWidget {
 
   /// Builds empty cart widget
   Widget _buildEmptyCart(BuildContext context) {
-    return OsmeaComponents.center(
-      child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          OsmeaComponents.container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: OsmeaColors.pewter.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: Icon(
-              Icons.shopping_cart_outlined,
-              size: 60,
-              color: OsmeaColors.pewter,
-            ),
-          ),
-          OsmeaComponents.sizedBox(height: 24),
-          OsmeaComponents.text(
-            'Your cart is empty',
-            textStyle: OsmeaTextStyle.headlineSmall(
-              context,
-            ).copyWith(color: OsmeaColors.thunder, fontWeight: FontWeight.w500),
-          ),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.text(
-            'Add some products to get started',
-            textStyle: OsmeaTextStyle.bodyMedium(
-              context,
-            ).copyWith(color: OsmeaColors.pewter),
-            textAlign: TextAlign.center,
-          ),
-          OsmeaComponents.sizedBox(height: 32),
-          OsmeaComponents.button(
-            onPressed: () {
-              // Navigate to home
-              Navigator.of(context).pop();
-            },
-            backgroundColor: OsmeaColors.nordicBlue,
-            textColor: OsmeaColors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            text: 'Continue Shopping',
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
+    // Navigate to empty view route
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.go('/empty/cart?actionPath=/home');
+    });
+    // Return empty container while navigating
+    return const SizedBox.shrink();
   }
 
   /// Builds cart item with swipe-to-delete functionality

@@ -114,8 +114,58 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Empty View Route (inside ShellRoute for navbar)
+        GoRoute(
+          path: '/empty/:emptyType',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
+            final emptyType = EmptyType.values.firstWhere(
+              (type) => type.name == emptyTypeStr,
+              orElse: () => EmptyType.general,
+            );
+            
+            // Get custom parameters from query
+            final queryParams = state.uri.queryParameters;
+            final customTitle = queryParams['title'];
+            final customDescription = queryParams['description'];
+            final customImagePath = queryParams['imagePath'];
+            final customIconPath = queryParams['iconPath'];
+            final actionPath = queryParams['actionPath'] ?? '/home';
+
+            return CustomTransitionPage(
+              child: EmptyView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('saved')) {
+                    context.go('/saved');
+                  } else {
+                    context.go(path);
+                  }
+                },
+                emptyType: emptyType,
+                customTitle: customTitle,
+                customDescription: customDescription,
+                customImagePath: customImagePath,
+                customIconPath: customIconPath,
+                onActionPressed: () {
+                  context.go(actionPath);
+                },
+                arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -328,11 +378,15 @@ final GoRouter appRouter = GoRouter(
           },
           arguments: {
             'auth': true,
-            'onSignIn': (String email, String password) async {
+            'onSignIn': (String email, String password, {bool? rememberMe}) async {
               final result = await authManager.login(
                 email: email,
                 password: password,
               );
+              // rememberMe parameter is available here for future use if needed
+              if (rememberMe != null) {
+                debugPrint('💾 Remember me preference: $rememberMe');
+              }
               return result.isSuccess;
             },
             'onSignInSuccessTokenLoad': (AuthCubit authCubit) async {
@@ -463,7 +517,8 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/profile') {
+      location == '/profile' ||
+      location.startsWith('/empty/')) {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
     } else if (location == '/search') {
@@ -477,6 +532,16 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
         currentIndex: 4,
         wishlistCount: wishlistCount,
       ); // Profile
+    } else if (location.startsWith('/empty/')) {
+      // Determine navbar index based on empty type
+      final emptyType = location.split('/').last;
+      if (emptyType == 'cart') {
+        return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount);
+      } else if (emptyType == 'wishlist' || emptyType == 'favorites') {
+        return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount);
+      } else {
+        return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount);
+      }
     }
   }
   // No navbar for splash, onboarding, auth, product-detail

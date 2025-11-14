@@ -44,9 +44,8 @@ class AuthFormState extends AuthState {
   final String signUpLastName;
   final bool signUpObscurePassword;
   final bool signUpObscurePasswordConfirm;
-  final bool signUpMarketingConsent;
-  final bool signUpPrivacyPolicyAccepted;
-  final bool signUpTermsAccepted;
+  // Dynamic checklists: Map<checklistId, isChecked>
+  final Map<String, bool> signUpChecklists;
   final String? signUpEmailError;
   final String? signUpPasswordError;
   final String? signUpPasswordConfirmError;
@@ -78,9 +77,7 @@ class AuthFormState extends AuthState {
     this.signUpLastName = '',
     this.signUpObscurePassword = true,
     this.signUpObscurePasswordConfirm = true,
-    this.signUpMarketingConsent = false,
-    this.signUpPrivacyPolicyAccepted = false,
-    this.signUpTermsAccepted = false,
+    this.signUpChecklists = const {},
     this.signUpEmailError,
     this.signUpPasswordError,
     this.signUpPasswordConfirmError,
@@ -110,9 +107,7 @@ class AuthFormState extends AuthState {
     String? signUpLastName,
     bool? signUpObscurePassword,
     bool? signUpObscurePasswordConfirm,
-    bool? signUpMarketingConsent,
-    bool? signUpPrivacyPolicyAccepted,
-    bool? signUpTermsAccepted,
+    Map<String, bool>? signUpChecklists,
     String? signUpEmailError,
     String? signUpPasswordError,
     String? signUpPasswordConfirmError,
@@ -144,11 +139,7 @@ class AuthFormState extends AuthState {
           signUpObscurePassword ?? this.signUpObscurePassword,
       signUpObscurePasswordConfirm:
           signUpObscurePasswordConfirm ?? this.signUpObscurePasswordConfirm,
-      signUpMarketingConsent:
-          signUpMarketingConsent ?? this.signUpMarketingConsent,
-      signUpPrivacyPolicyAccepted:
-          signUpPrivacyPolicyAccepted ?? this.signUpPrivacyPolicyAccepted,
-      signUpTermsAccepted: signUpTermsAccepted ?? this.signUpTermsAccepted,
+      signUpChecklists: signUpChecklists ?? this.signUpChecklists,
       signUpEmailError: signUpEmailError,
       signUpPasswordError: signUpPasswordError,
       signUpPasswordConfirmError: signUpPasswordConfirmError,
@@ -170,22 +161,44 @@ class AuthFormState extends AuthState {
       signInPasswordError == null;
 
   /// Check if sign up form is valid
-  bool get isSignUpValid =>
-      signUpEmail.isNotEmpty &&
-      signUpPassword.isNotEmpty &&
-      signUpPasswordConfirm.isNotEmpty &&
-      signUpAuthKey.isNotEmpty &&
-      signUpFirstName.isNotEmpty &&
-      signUpLastName.isNotEmpty &&
-      signUpPassword == signUpPasswordConfirm &&
-      signUpEmailError == null &&
-      signUpPasswordError == null &&
-      signUpPasswordConfirmError == null &&
-      signUpAuthKeyError == null &&
-      signUpFirstNameError == null &&
-      signUpLastNameError == null &&
-      signUpPrivacyPolicyAccepted &&
-      signUpTermsAccepted;
+  bool get isSignUpValid {
+    // Basic field validations
+    final basicFieldsValid = signUpEmail.isNotEmpty &&
+        signUpPassword.isNotEmpty &&
+        signUpPasswordConfirm.isNotEmpty &&
+        signUpAuthKey.isNotEmpty &&
+        signUpFirstName.isNotEmpty &&
+        signUpLastName.isNotEmpty &&
+        signUpPassword == signUpPasswordConfirm &&
+        signUpEmailError == null &&
+        signUpPasswordError == null &&
+        signUpPasswordConfirmError == null &&
+        signUpAuthKeyError == null &&
+        signUpFirstNameError == null &&
+        signUpLastNameError == null;
+
+    if (!basicFieldsValid) return false;
+
+    // Check required checklists from config
+    final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
+    final checklists = signUpConfig?['checklists'] as List<dynamic>?;
+    
+    if (checklists != null) {
+      for (final checklist in checklists) {
+        final checklistMap = checklist as Map<String, dynamic>;
+        final id = checklistMap['id'] as String?;
+        final required = checklistMap['required'] as bool? ?? false;
+        final enabled = checklistMap['enabled'] as bool? ?? true;
+        
+        if (enabled && required && id != null) {
+          final isChecked = signUpChecklists[id] ?? false;
+          if (!isChecked) return false;
+        }
+      }
+    }
+
+    return true;
+  }
 
   @override
   List<Object?> get props => [
@@ -204,9 +217,7 @@ class AuthFormState extends AuthState {
         signUpLastName,
         signUpObscurePassword,
         signUpObscurePasswordConfirm,
-        signUpMarketingConsent,
-        signUpPrivacyPolicyAccepted,
-        signUpTermsAccepted,
+        signUpChecklists,
         signUpEmailError,
         signUpPasswordError,
         signUpPasswordConfirmError,

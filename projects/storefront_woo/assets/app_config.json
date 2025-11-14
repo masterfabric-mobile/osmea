@@ -301,6 +301,39 @@
         "title": "Reset Password",
         "subtitle": "Enter your email to reset"
       }
+    },
+    "empty_view_configuration": {
+      "style": "enterprise",
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "animation_duration": 400,
+      "primary_color": "#000000",
+      "secondary_color": "#FFFFFF",
+      "enable_haptic_feedback": true,
+      "default_empty_message": "No items found",
+      "show_action_button": true,
+      "empty_pages": [
+        {
+          "title": "Your cart is empty",
+          "description": "Add items to your cart to see them here.",
+          "empty_type": "cart",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Start Shopping"
+        },
+        {
+          "title": "No favorites yet",
+          "description": "Start adding items to your favorites to see them here.",
+          "empty_type": "wishlist",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Explore Products"
+        }
+      ]
     }
 
   }
