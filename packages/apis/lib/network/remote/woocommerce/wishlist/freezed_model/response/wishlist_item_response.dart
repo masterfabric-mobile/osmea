@@ -23,6 +23,24 @@ class StringToIntConverter implements JsonConverter<int?, dynamic> {
   dynamic toJson(int? value) => value;
 }
 
+/// Custom converter to handle dynamic to String conversion
+/// Handles cases where API returns bool, num, or other types instead of String
+class SafeStringConverter implements JsonConverter<String?, dynamic> {
+  const SafeStringConverter();
+
+  @override
+  String? fromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    if (value is bool) return value.toString();
+    if (value is num) return value.toString();
+    return value.toString();
+  }
+
+  @override
+  dynamic toJson(String? value) => value;
+}
+
 @freezed
 class WishlistItemResponse with _$WishlistItemResponse {
   const factory WishlistItemResponse({
@@ -35,16 +53,16 @@ class WishlistItemResponse with _$WishlistItemResponse {
     @JsonKey(name: 'added_at') String? addedAt,
     Map<String, dynamic>? metadata,
     // Product details from API (direct format)
-    String? name, // API format
-    String? price, // API format
-    String? image, // API format
-    String? link, // API format
+    @SafeStringConverter() String? name, // API format
+    @SafeStringConverter() String? price, // API format
+    @SafeStringConverter() String? image, // API format
+    @SafeStringConverter() String? link, // API format
     // Product details (legacy format)
-    @JsonKey(name: 'product_name') String? productName,
-    @JsonKey(name: 'product_slug') String? productSlug,
-    @JsonKey(name: 'product_price') String? productPrice,
-    @JsonKey(name: 'product_image') String? productImage,
-    @JsonKey(name: 'product_status') String? productStatus,
+    @JsonKey(name: 'product_name') @SafeStringConverter() String? productName,
+    @JsonKey(name: 'product_slug') @SafeStringConverter() String? productSlug,
+    @JsonKey(name: 'product_price') @SafeStringConverter() String? productPrice,
+    @JsonKey(name: 'product_image') @SafeStringConverter() String? productImage,
+    @JsonKey(name: 'product_status') @SafeStringConverter() String? productStatus,
   }) = _WishlistItemResponse;
 
   factory WishlistItemResponse.fromJson(Map<String, dynamic> json) =>

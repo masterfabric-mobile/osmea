@@ -40,20 +40,29 @@ mixin _$WishlistItemResponse {
   String? get addedAt => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata =>
       throw _privateConstructorUsedError; // Product details from API (direct format)
+  @SafeStringConverter()
   String? get name => throw _privateConstructorUsedError; // API format
+  @SafeStringConverter()
   String? get price => throw _privateConstructorUsedError; // API format
+  @SafeStringConverter()
   String? get image => throw _privateConstructorUsedError; // API format
+  @SafeStringConverter()
   String? get link => throw _privateConstructorUsedError; // API format
 // Product details (legacy format)
   @JsonKey(name: 'product_name')
+  @SafeStringConverter()
   String? get productName => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_slug')
+  @SafeStringConverter()
   String? get productSlug => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_price')
+  @SafeStringConverter()
   String? get productPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_image')
+  @SafeStringConverter()
   String? get productImage => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_status')
+  @SafeStringConverter()
   String? get productStatus => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -77,15 +86,21 @@ abstract class $WishlistItemResponseCopyWith<$Res> {
       @JsonKey(name: 'variation_id') @StringToIntConverter() int? variationId,
       @JsonKey(name: 'added_at') String? addedAt,
       Map<String, dynamic>? metadata,
-      String? name,
-      String? price,
-      String? image,
-      String? link,
-      @JsonKey(name: 'product_name') String? productName,
-      @JsonKey(name: 'product_slug') String? productSlug,
-      @JsonKey(name: 'product_price') String? productPrice,
-      @JsonKey(name: 'product_image') String? productImage,
-      @JsonKey(name: 'product_status') String? productStatus});
+      @SafeStringConverter() String? name,
+      @SafeStringConverter() String? price,
+      @SafeStringConverter() String? image,
+      @SafeStringConverter() String? link,
+      @JsonKey(name: 'product_name') @SafeStringConverter() String? productName,
+      @JsonKey(name: 'product_slug') @SafeStringConverter() String? productSlug,
+      @JsonKey(name: 'product_price')
+      @SafeStringConverter()
+      String? productPrice,
+      @JsonKey(name: 'product_image')
+      @SafeStringConverter()
+      String? productImage,
+      @JsonKey(name: 'product_status')
+      @SafeStringConverter()
+      String? productStatus});
 }
 
 /// @nodoc
@@ -210,15 +225,21 @@ abstract class _$$WishlistItemResponseImplCopyWith<$Res>
       @JsonKey(name: 'variation_id') @StringToIntConverter() int? variationId,
       @JsonKey(name: 'added_at') String? addedAt,
       Map<String, dynamic>? metadata,
-      String? name,
-      String? price,
-      String? image,
-      String? link,
-      @JsonKey(name: 'product_name') String? productName,
-      @JsonKey(name: 'product_slug') String? productSlug,
-      @JsonKey(name: 'product_price') String? productPrice,
-      @JsonKey(name: 'product_image') String? productImage,
-      @JsonKey(name: 'product_status') String? productStatus});
+      @SafeStringConverter() String? name,
+      @SafeStringConverter() String? price,
+      @SafeStringConverter() String? image,
+      @SafeStringConverter() String? link,
+      @JsonKey(name: 'product_name') @SafeStringConverter() String? productName,
+      @JsonKey(name: 'product_slug') @SafeStringConverter() String? productSlug,
+      @JsonKey(name: 'product_price')
+      @SafeStringConverter()
+      String? productPrice,
+      @JsonKey(name: 'product_image')
+      @SafeStringConverter()
+      String? productImage,
+      @JsonKey(name: 'product_status')
+      @SafeStringConverter()
+      String? productStatus});
 }
 
 /// @nodoc
@@ -335,15 +356,17 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
       @JsonKey(name: 'variation_id') @StringToIntConverter() this.variationId,
       @JsonKey(name: 'added_at') this.addedAt,
       final Map<String, dynamic>? metadata,
-      this.name,
-      this.price,
-      this.image,
-      this.link,
-      @JsonKey(name: 'product_name') this.productName,
-      @JsonKey(name: 'product_slug') this.productSlug,
-      @JsonKey(name: 'product_price') this.productPrice,
-      @JsonKey(name: 'product_image') this.productImage,
-      @JsonKey(name: 'product_status') this.productStatus})
+      @SafeStringConverter() this.name,
+      @SafeStringConverter() this.price,
+      @SafeStringConverter() this.image,
+      @SafeStringConverter() this.link,
+      @JsonKey(name: 'product_name') @SafeStringConverter() this.productName,
+      @JsonKey(name: 'product_slug') @SafeStringConverter() this.productSlug,
+      @JsonKey(name: 'product_price') @SafeStringConverter() this.productPrice,
+      @JsonKey(name: 'product_image') @SafeStringConverter() this.productImage,
+      @JsonKey(name: 'product_status')
+      @SafeStringConverter()
+      this.productStatus})
       : _metadata = metadata;
 
   factory _$WishlistItemResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -386,32 +409,41 @@ class _$WishlistItemResponseImpl implements _WishlistItemResponse {
 
 // Product details from API (direct format)
   @override
+  @SafeStringConverter()
   final String? name;
 // API format
   @override
+  @SafeStringConverter()
   final String? price;
 // API format
   @override
+  @SafeStringConverter()
   final String? image;
 // API format
   @override
+  @SafeStringConverter()
   final String? link;
 // API format
 // Product details (legacy format)
   @override
   @JsonKey(name: 'product_name')
+  @SafeStringConverter()
   final String? productName;
   @override
   @JsonKey(name: 'product_slug')
+  @SafeStringConverter()
   final String? productSlug;
   @override
   @JsonKey(name: 'product_price')
+  @SafeStringConverter()
   final String? productPrice;
   @override
   @JsonKey(name: 'product_image')
+  @SafeStringConverter()
   final String? productImage;
   @override
   @JsonKey(name: 'product_status')
+  @SafeStringConverter()
   final String? productStatus;
 
   @override
@@ -501,15 +533,24 @@ abstract class _WishlistItemResponse implements WishlistItemResponse {
       final int? variationId,
       @JsonKey(name: 'added_at') final String? addedAt,
       final Map<String, dynamic>? metadata,
-      final String? name,
-      final String? price,
-      final String? image,
-      final String? link,
-      @JsonKey(name: 'product_name') final String? productName,
-      @JsonKey(name: 'product_slug') final String? productSlug,
-      @JsonKey(name: 'product_price') final String? productPrice,
-      @JsonKey(name: 'product_image') final String? productImage,
+      @SafeStringConverter() final String? name,
+      @SafeStringConverter() final String? price,
+      @SafeStringConverter() final String? image,
+      @SafeStringConverter() final String? link,
+      @JsonKey(name: 'product_name')
+      @SafeStringConverter()
+      final String? productName,
+      @JsonKey(name: 'product_slug')
+      @SafeStringConverter()
+      final String? productSlug,
+      @JsonKey(name: 'product_price')
+      @SafeStringConverter()
+      final String? productPrice,
+      @JsonKey(name: 'product_image')
+      @SafeStringConverter()
+      final String? productImage,
       @JsonKey(name: 'product_status')
+      @SafeStringConverter()
       final String? productStatus}) = _$WishlistItemResponseImpl;
 
   factory _WishlistItemResponse.fromJson(Map<String, dynamic> json) =
@@ -543,28 +584,37 @@ abstract class _WishlistItemResponse implements WishlistItemResponse {
   @override
   Map<String, dynamic>? get metadata;
   @override // Product details from API (direct format)
+  @SafeStringConverter()
   String? get name;
   @override // API format
+  @SafeStringConverter()
   String? get price;
   @override // API format
+  @SafeStringConverter()
   String? get image;
   @override // API format
+  @SafeStringConverter()
   String? get link;
   @override // API format
 // Product details (legacy format)
   @JsonKey(name: 'product_name')
+  @SafeStringConverter()
   String? get productName;
   @override
   @JsonKey(name: 'product_slug')
+  @SafeStringConverter()
   String? get productSlug;
   @override
   @JsonKey(name: 'product_price')
+  @SafeStringConverter()
   String? get productPrice;
   @override
   @JsonKey(name: 'product_image')
+  @SafeStringConverter()
   String? get productImage;
   @override
   @JsonKey(name: 'product_status')
+  @SafeStringConverter()
   String? get productStatus;
   @override
   @JsonKey(ignore: true)

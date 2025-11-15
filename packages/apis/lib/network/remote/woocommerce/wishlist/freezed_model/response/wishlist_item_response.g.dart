@@ -17,15 +17,16 @@ _$WishlistItemResponseImpl _$$WishlistItemResponseImplFromJson(
       variationId: const StringToIntConverter().fromJson(json['variation_id']),
       addedAt: json['added_at'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
-      name: json['name'] as String?,
-      price: json['price'] as String?,
-      image: json['image'] as String?,
-      link: json['link'] as String?,
-      productName: json['product_name'] as String?,
-      productSlug: json['product_slug'] as String?,
-      productPrice: json['product_price'] as String?,
-      productImage: json['product_image'] as String?,
-      productStatus: json['product_status'] as String?,
+      name: const SafeStringConverter().fromJson(json['name']),
+      price: const SafeStringConverter().fromJson(json['price']),
+      image: const SafeStringConverter().fromJson(json['image']),
+      link: const SafeStringConverter().fromJson(json['link']),
+      productName: const SafeStringConverter().fromJson(json['product_name']),
+      productSlug: const SafeStringConverter().fromJson(json['product_slug']),
+      productPrice: const SafeStringConverter().fromJson(json['product_price']),
+      productImage: const SafeStringConverter().fromJson(json['product_image']),
+      productStatus:
+          const SafeStringConverter().fromJson(json['product_status']),
     );
 
 Map<String, dynamic> _$$WishlistItemResponseImplToJson(
@@ -50,14 +51,19 @@ Map<String, dynamic> _$$WishlistItemResponseImplToJson(
       const StringToIntConverter().toJson(instance.variationId));
   writeNotNull('added_at', instance.addedAt);
   writeNotNull('metadata', instance.metadata);
-  writeNotNull('name', instance.name);
-  writeNotNull('price', instance.price);
-  writeNotNull('image', instance.image);
-  writeNotNull('link', instance.link);
-  writeNotNull('product_name', instance.productName);
-  writeNotNull('product_slug', instance.productSlug);
-  writeNotNull('product_price', instance.productPrice);
-  writeNotNull('product_image', instance.productImage);
-  writeNotNull('product_status', instance.productStatus);
+  writeNotNull('name', const SafeStringConverter().toJson(instance.name));
+  writeNotNull('price', const SafeStringConverter().toJson(instance.price));
+  writeNotNull('image', const SafeStringConverter().toJson(instance.image));
+  writeNotNull('link', const SafeStringConverter().toJson(instance.link));
+  writeNotNull(
+      'product_name', const SafeStringConverter().toJson(instance.productName));
+  writeNotNull(
+      'product_slug', const SafeStringConverter().toJson(instance.productSlug));
+  writeNotNull('product_price',
+      const SafeStringConverter().toJson(instance.productPrice));
+  writeNotNull('product_image',
+      const SafeStringConverter().toJson(instance.productImage));
+  writeNotNull('product_status',
+      const SafeStringConverter().toJson(instance.productStatus));
   return val;
 }

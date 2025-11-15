@@ -222,9 +222,21 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           // Get fields from response (supports both API format and legacy format)
           // API format: name, price, image
           // Legacy format: product_name, product_price, product_image
-          final name = itemResponse.name ?? itemResponse.productName;
-          final price = itemResponse.price ?? itemResponse.productPrice;
-          final image = itemResponse.image ?? itemResponse.productImage;
+          // Helper function to safely convert dynamic to String?
+          String? safeStringFromResponse(dynamic value) {
+            if (value == null) return null;
+            if (value is String) return value;
+            if (value is bool) return value.toString();
+            if (value is num) return value.toString();
+            return value.toString();
+          }
+
+          final name = safeStringFromResponse(itemResponse.name) ?? 
+                       safeStringFromResponse(itemResponse.productName);
+          final price = safeStringFromResponse(itemResponse.price) ?? 
+                        safeStringFromResponse(itemResponse.productPrice);
+          final image = safeStringFromResponse(itemResponse.image) ?? 
+                        safeStringFromResponse(itemResponse.productImage);
 
           debugPrint(
             '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name',
@@ -609,15 +621,44 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         final items = itemsJson
             .map((item) {
               try {
+                // Helper function to safely convert dynamic to String?
+                String? safeString(dynamic value) {
+                  if (value == null) return null;
+                  if (value is String) return value;
+                  if (value is bool) return value.toString();
+                  if (value is num) return value.toString();
+                  return value.toString();
+                }
+
+                // Helper function to safely convert dynamic to int?
+                int? safeInt(dynamic value) {
+                  if (value == null) return null;
+                  if (value is int) return value;
+                  if (value is String) return int.tryParse(value);
+                  if (value is num) return value.toInt();
+                  return null;
+                }
+
+                // Helper function to safely convert dynamic to bool?
+                bool safeBool(dynamic value, {bool defaultValue = false}) {
+                  if (value == null) return defaultValue;
+                  if (value is bool) return value;
+                  if (value is String) {
+                    return value.toLowerCase() == 'true' || value == '1';
+                  }
+                  if (value is num) return value != 0;
+                  return defaultValue;
+                }
+
                 return WishlistItem(
-                  id: item['id'] as int? ?? 0,
-                  itemId: item['itemId'] as int?,
-                  name: item['name'] as String?,
-                  imageUrl: item['imageUrl'] as String?,
-                  regularPrice: item['regularPrice'] as String?,
-                  salePrice: item['salePrice'] as String?,
-                  currencyCode: item['currencyCode'] as String?,
-                  onSale: item['onSale'] as bool? ?? false,
+                  id: safeInt(item['id']) ?? 0,
+                  itemId: safeInt(item['itemId']),
+                  name: safeString(item['name']),
+                  imageUrl: safeString(item['imageUrl']),
+                  regularPrice: safeString(item['regularPrice']),
+                  salePrice: safeString(item['salePrice']),
+                  currencyCode: safeString(item['currencyCode']),
+                  onSale: safeBool(item['onSale'], defaultValue: false),
                 );
               } catch (e) {
                 debugPrint('⚠️ Wishlist: Error parsing item from JSON: $e');
