@@ -44,8 +44,8 @@ class RecommendedSectionWidget extends StatelessWidget {
   List<ListAllProductsResponseModel> _getRecommendedProducts() {
     final config = _loadRecommendedConfig();
     if (config == null) {
-      // Default: show first 10 products
-      return allProducts.take(10).toList();
+      // Default: show first 4 products (for home view)
+      return allProducts.take(4).toList();
     }
 
     // Check if specific product IDs are provided
@@ -55,8 +55,8 @@ class RecommendedSectionWidget extends StatelessWidget {
       return allProducts.where((p) => ids.contains(p.id)).toList();
     }
 
-    // If no specific IDs, show first products
-    final limit = config['limit'] as int? ?? 10;
+    // If no specific IDs, show first 4 products (for home view)
+    final limit = config['limit'] as int? ?? 4;
     return allProducts.take(limit).toList();
   }
 
@@ -74,18 +74,38 @@ class RecommendedSectionWidget extends StatelessWidget {
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header - Figma style (no "See all")
+        // Section header with "See all" button
         OsmeaComponents.padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: OsmeaComponents.text(
-            sectionTitle,
-            textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.w600, // Semi Bold
-              height: 1.0, // line height 20px
-              letterSpacing: -0.2,
-              color: OsmeaColors.thunder,
-            ),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              OsmeaComponents.text(
+                sectionTitle,
+                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600, // Semi Bold
+                  height: 1.0, // line height 20px
+                  letterSpacing: -0.2,
+                  color: OsmeaColors.thunder,
+                ),
+              ),
+              // See all button
+              GestureDetector(
+                onTap: () {
+                  context.push('/products');
+                },
+                child: OsmeaComponents.text(
+                  'See all',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: OsmeaColors.nordicBlue,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),

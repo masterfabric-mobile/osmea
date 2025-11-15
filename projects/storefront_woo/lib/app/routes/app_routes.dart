@@ -11,6 +11,7 @@ import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
 import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
+import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -458,6 +459,31 @@ final GoRouter appRouter = GoRouter(
               state.uri.path,
               GetIt.I<WishlistViewModel>().count,
             ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Product List Route
+    GoRoute(
+      path: '/products',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: ProductListView(
+            arguments: const {'productList': true},
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('product-detail')) {
+                context.go('/product-detail');
+              } else {
+                context.go('/products');
+              }
+            },
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
