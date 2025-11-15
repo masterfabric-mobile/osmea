@@ -6,6 +6,8 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/p
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart';
 import 'package:storefront_woo/app/views/view_search/models/module/states.dart'
     as search_states;
 // JWT and cart tokens are automatically added by interceptors if user is authenticated
@@ -18,23 +20,53 @@ class SearchViewModel
   final ProductService _productService = GetIt.I<ProductService>();
   final StoreProductCategoriesService _categoriesService =
       GetIt.I<StoreProductCategoriesService>();
+  final StoreProductBrandsService _brandsService =
+      GetIt.I<StoreProductBrandsService>();
 
   Future<void> loadCategories() async {
     try {
       // Log token status - interceptors will use these tokens automatically
       await _logTokenStatus('loadCategories');
 
-      final cats = await _categoriesService.listProductCategories(
+      // Start both API calls immediately (they will run in parallel)
+      final categoriesFuture = _categoriesService.listProductCategories(
         apiVersion: 'v1',
         perPage: 100,
         hideEmpty: true,
       );
-      emit(search_states.SearchReadyState(categories: cats));
+      
+      final brandsFuture = _brandsService.listProductBrands(
+        apiVersion: 'v1',
+        perPage: 100,
+        hideEmpty: true,
+      ).catchError((e) {
+        // Brands loading failure is not fatal
+        debugPrint('⚠️ SearchViewModel: Failed to load brands: $e');
+        return <ListProductBrandsResponseModel>[];
+      });
+
+      // Wait for both to complete (they run in parallel)
+      final results = await Future.wait([
+        categoriesFuture,
+        brandsFuture,
+      ]);
+
+      final cats = results[0] as List<ListProductCategoriesResponseModel>;
+      final brands = results[1] as List<ListProductBrandsResponseModel>;
+      
+      debugPrint('✅ SearchViewModel: Loaded ${cats.length} categories and ${brands.length} brands');
+      
+      emit(search_states.SearchReadyState(
+        categories: cats,
+        brands: brands,
+      ));
     } catch (e) {
       // Not fatal; stay in initial state
+      debugPrint('⚠️ SearchViewModel: Failed to load categories: $e');
       emit(
         search_states.SearchReadyState(
           categories: const <ListProductCategoriesResponseModel>[],
+          brands: const [],
         ),
       );
     }
@@ -137,8 +169,7 @@ class SearchViewModel
     final currentState = state;
     
     // If already in SearchReadyState with categories, just emit it again
-    if (currentState is search_states.SearchReadyState &&
-        currentState.categories.isNotEmpty) {
+    if (currentState is search_states.SearchReadyState) {
       emit(currentState);
       return;
     }

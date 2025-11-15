@@ -1,5 +1,6 @@
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart';
 
 abstract class SearchState {}
 
@@ -9,7 +10,11 @@ class SearchLoadingState extends SearchState {}
 
 class SearchReadyState extends SearchState {
   final List<ListProductCategoriesResponseModel> categories;
-  SearchReadyState({required this.categories});
+  final List<ListProductBrandsResponseModel> brands;
+  SearchReadyState({
+    required this.categories,
+    this.brands = const [],
+  });
 }
 
 class SearchLoadedState extends SearchState {

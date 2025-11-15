@@ -1,14 +1,18 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_search/models/search_view_model.dart';
+import 'package:storefront_woo/app/views/view_search/widgets/search_brands_list_widget.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart';
 
 class SearchCategoriesListWidget extends StatelessWidget {
   final List<dynamic> categories;
+  final List<ListProductBrandsResponseModel> brands;
   final SearchViewModel viewModel;
 
   const SearchCategoriesListWidget({
     super.key,
     required this.categories,
+    required this.brands,
     required this.viewModel,
   });
 
@@ -20,6 +24,13 @@ class SearchCategoriesListWidget extends StatelessWidget {
         vertical: context.spacing10,
       ),
       children: [
+        // Brands section
+        SearchBrandsListWidget(
+          brands: brands,
+          viewModel: viewModel,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing16),
+        // Categories section
         OsmeaComponents.text(
           'Categories',
           textStyle: OsmeaTextStyle.titleMedium(context),

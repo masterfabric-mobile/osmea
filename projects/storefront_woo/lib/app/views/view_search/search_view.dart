@@ -9,6 +9,7 @@ import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_mode
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_categories_list_widget.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart';
 
 class SearchView
     extends
@@ -134,8 +135,12 @@ class SearchView
     final categories = state is search_states.SearchReadyState
         ? state.categories
         : const [];
+    final brands = state is search_states.SearchReadyState
+        ? state.brands
+        : const <ListProductBrandsResponseModel>[];
     return SearchCategoriesListWidget(
       categories: categories,
+      brands: brands,
       viewModel: viewModel,
     );
   }
