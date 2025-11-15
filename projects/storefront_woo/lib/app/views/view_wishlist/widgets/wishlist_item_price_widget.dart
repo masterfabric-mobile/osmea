@@ -16,9 +16,11 @@ class WishlistItemPriceWidget extends StatelessWidget {
         item.onSale &&
         item.salePrice != null &&
         item.salePrice!.isNotEmpty &&
+        item.regularPrice != null &&
+        item.regularPrice!.isNotEmpty &&
         item.salePrice != item.regularPrice;
 
-    // Sadece indirimli ürünlerde fiyat göster
+    // İndirimli ürünlerde: sale price + regular price (strikethrough)
     if (hasSale) {
       return OsmeaComponents.row(
         mainAxisSize: MainAxisSize.min,
@@ -42,7 +44,26 @@ class WishlistItemPriceWidget extends StatelessWidget {
       );
     }
 
-    return const SizedBox.shrink();
+    // İndirimli olmayan ürünlerde: sadece regular price göster
+    final regularPrice = item.regularPrice;
+    if (regularPrice != null && regularPrice.isNotEmpty) {
+      return OsmeaComponents.text(
+        _formatPrice(regularPrice, item.currencyCode),
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.nordicBlue,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+
+    // Fiyat yoksa default price göster
+    return OsmeaComponents.text(
+      PriceInfoCurrencyHelper.getDefaultPrice(),
+      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        color: OsmeaColors.pewter,
+        fontWeight: FontWeight.w400,
+      ),
+    );
   }
 
   /// Formats price using PriceInfoCurrencyHelper
