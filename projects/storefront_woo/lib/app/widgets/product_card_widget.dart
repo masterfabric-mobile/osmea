@@ -304,6 +304,7 @@ class ProductCardWidget extends StatelessWidget {
       parsedPrice,
       currencyCode: currencyCode,
       decimalPlaces: 2,
+      removeTrailingZeros: true,
     );
   }
 

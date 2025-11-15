@@ -260,6 +260,7 @@ class CartContentWidget extends StatelessWidget {
                         PriceInfoCurrencyHelper.formatPrice(
                           item.price,
                           currencyCode: state.currencyCode,
+                          removeTrailingZeros: true,
                         ),
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
                           color: OsmeaColors.nordicBlue,
@@ -490,6 +491,7 @@ class CartContentWidget extends StatelessWidget {
                         PriceInfoCurrencyHelper.formatPrice(
                           state.totalPrice,
                           currencyCode: state.currencyCode,
+                          removeTrailingZeros: true,
                         ),
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
                           fontWeight: FontWeight.w700,

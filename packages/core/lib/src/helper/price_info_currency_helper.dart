@@ -53,6 +53,8 @@
 /// String price4 = 1234.56.toCurrency(); // ₺1.234,56
 /// String price5 = 1234.56.toCurrency(currencyCode: 'eur'); // €1.234,56
 /// String price6 = 1234.56.toCurrency(decimalPlaces: 0); // ₺1.235
+/// String price7 = 1000.00.toCurrency(currencyCode: 'gbp'); // £1,000.00
+/// String price8 = 1000.00.toCurrency(currencyCode: 'gbp', removeTrailingZeros: true); // £1,000
 ///
 /// // Parse formatted prices back to numbers
 /// double? amount1 = CurrencyHelper.parsePriceToDouble('₺1.234,56'); // 1234.56
@@ -209,15 +211,19 @@ class PriceInfoCurrencyHelper {
   /// - `currencyCode`: Override currency (optional, uses current if not specified)
   /// - `useAlternateUnit`: Use alternate unit instead of symbol (TL instead of ₺)
   /// - `decimalPlaces`: Number of decimal places (default: 2)
+  /// - `removeTrailingZeros`: Remove trailing zeros from decimal part (default: false)
   ///
   /// **Returns:** Formatted price string or default price on error
   ///
   /// Example: `formatPrice(1234.56, currencyCode: 'try')` → `₺1.234,56`
+  /// Example: `formatPrice(1000.00, currencyCode: 'gbp')` → `£1,000.00`
+  /// Example: `formatPrice(1000.00, currencyCode: 'gbp', removeTrailingZeros: true)` → `£1,000`
   static String formatPrice(
     dynamic amount, {
     String? currencyCode,
     bool useAlternateUnit = false,
     int decimalPlaces = 2,
+    bool removeTrailingZeros = false,
   }) {
     if (amount == null) return getDefaultPrice();
     
@@ -234,6 +240,7 @@ class PriceInfoCurrencyHelper {
       config.thousandSeparator,
       config.decimalSeparator,
       decimalPlaces,
+      removeTrailingZeros: removeTrailingZeros,
     );
     
     final symbol = useAlternateUnit && config.alternateUnit != null
@@ -403,18 +410,24 @@ class PriceInfoCurrencyHelper {
     double amount,
     String thousandSep,
     String decimalSep,
-    int decimalPlaces,
-  ) {
+    int decimalPlaces, {
+    bool removeTrailingZeros = false,
+  }) {
     // Split into integer and decimal parts
     final parts = amount.toStringAsFixed(decimalPlaces).split('.');
     final integerPart = parts[0];
-    final decimalPart = parts.length > 1 ? parts[1] : '';
+    var decimalPart = parts.length > 1 ? parts[1] : '';
+    
+    // Remove trailing zeros if requested
+    if (removeTrailingZeros && decimalPart.isNotEmpty) {
+      decimalPart = decimalPart.replaceAll(RegExp(r'0+$'), '');
+    }
     
     // Add thousand separators
     final formattedInteger = _addThousandSeparators(integerPart, thousandSep);
     
     // Combine parts
-    if (decimalPlaces > 0) {
+    if (decimalPlaces > 0 && decimalPart.isNotEmpty) {
       return '$formattedInteger$decimalSep$decimalPart';
     } else {
       return formattedInteger;
@@ -509,20 +522,25 @@ extension CurrencyExtension on num {
   /// - `currencyCode`: Currency to format as (optional, uses current if not specified)
   /// - `useAlternateUnit`: Use alternate unit instead of symbol
   /// - `decimalPlaces`: Number of decimal places to display
+  /// - `removeTrailingZeros`: Remove trailing zeros from decimal part (default: false)
   ///
   /// **Returns:** Formatted currency string
   ///
   /// Example: `1234.56.toCurrency(currencyCode: 'eur')` → `€1.234,56`
+  /// Example: `1000.00.toCurrency(currencyCode: 'gbp')` → `£1,000.00`
+  /// Example: `1000.00.toCurrency(currencyCode: 'gbp', removeTrailingZeros: true)` → `£1,000`
   String toCurrency({
     String? currencyCode,
     bool useAlternateUnit = false,
     int decimalPlaces = 2,
+    bool removeTrailingZeros = false,
   }) {
     return PriceInfoCurrencyHelper.formatPrice(
       this,
       currencyCode: currencyCode,
       useAlternateUnit: useAlternateUnit,
       decimalPlaces: decimalPlaces,
+      removeTrailingZeros: removeTrailingZeros,
     );
   }
 }

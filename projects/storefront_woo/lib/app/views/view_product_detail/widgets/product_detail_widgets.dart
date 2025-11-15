@@ -242,6 +242,7 @@ class ProductDetailContentWidget extends StatelessWidget {
       parsedPrice,
       currencyCode: prices.currencyCode,
       decimalPlaces: prices.currencyMinorUnit ?? 2,
+      removeTrailingZeros: true,
     );
 
     debugPrint(
