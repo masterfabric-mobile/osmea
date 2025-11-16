@@ -6,6 +6,7 @@
  */
 
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 
 /// Base class for all product detail states
 abstract class ProductDetailState {}
@@ -26,6 +27,7 @@ class ProductDetailLoadedState extends ProductDetailState {
   final bool isInWishlist;
   final bool isDescriptionExpanded;
   final Map<String, String> selectedAttributes;
+  final List<ListProductReviewsResponseModel> reviews;
 
   ProductDetailLoadedState({
     required this.product,
@@ -36,6 +38,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     this.isInWishlist = false,
     this.isDescriptionExpanded = false,
     this.selectedAttributes = const {},
+    this.reviews = const [],
   });
 
   ProductDetailLoadedState copyWith({
@@ -47,6 +50,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     bool? isInWishlist,
     bool? isDescriptionExpanded,
     Map<String, String>? selectedAttributes,
+    List<ListProductReviewsResponseModel>? reviews,
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
@@ -58,6 +62,7 @@ class ProductDetailLoadedState extends ProductDetailState {
       isDescriptionExpanded:
           isDescriptionExpanded ?? this.isDescriptionExpanded,
       selectedAttributes: selectedAttributes ?? this.selectedAttributes,
+      reviews: reviews ?? this.reviews,
     );
   }
 }

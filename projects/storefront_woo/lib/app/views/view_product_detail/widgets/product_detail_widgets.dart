@@ -10,7 +10,8 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart' as product_models;
+import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
@@ -141,6 +142,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                           ),
                           OsmeaComponents.sizedBox(height: context.spacing16),
                         ],
+
+                        // Reviews Section
+                        _buildReviewsSection(context, viewModel, state),
                       ],
                     ),
                   ),
@@ -210,7 +214,7 @@ class ProductDetailContentWidget extends StatelessWidget {
   }
 
   /// Formats price with currency symbol and handles sale prices
-  String _formatPrice(Prices? prices) {
+  String _formatPrice(product_models.Prices? prices) {
     if (prices == null) {
       debugPrint('❌ ProductDetailWidget: Prices is null');
       return PriceInfoCurrencyHelper.getDefaultPrice();
@@ -444,6 +448,233 @@ class ProductDetailContentWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing16),
         ],
       ],
+    );
+  }
+
+  /// Builds reviews section
+  Widget _buildReviewsSection(
+    BuildContext context,
+    ProductDetailViewModel viewModel,
+    ProductDetailLoadedState state,
+  ) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          state.reviews.isEmpty
+              ? 'Reviews'
+              : 'Reviews (${state.reviews.length})',
+          textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.0,
+            color: OsmeaColors.thunder.withValues(alpha: 0.8),
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        if (state.reviews.isEmpty)
+          _buildEmptyReviewsState(context)
+        else ...[
+          ...state.reviews.map((review) => _buildReviewItem(context, review)),
+          OsmeaComponents.sizedBox(height: context.spacing16),
+        ],
+      ],
+    );
+  }
+
+  /// Builds empty reviews state with icon
+  Widget _buildEmptyReviewsState(BuildContext context) {
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(bottom: context.spacing16),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing16,
+        vertical: context.spacing24,
+      ),
+      decoration: BoxDecoration(
+        color: OsmeaColors.grayMaterial[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.grayMaterial[200]!,
+          width: 1,
+        ),
+      ),
+      child: OsmeaComponents.center(
+        child: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.reviews_outlined,
+              size: context.iconSizeHigh,
+              color: OsmeaColors.pewter.withValues(alpha: 0.5),
+            ),
+            OsmeaComponents.sizedBox(height: context.spacing12),
+            OsmeaComponents.text(
+              'No reviews yet',
+              textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                fontWeight: FontWeight.w500,
+                color: OsmeaColors.thunder.withValues(alpha: 0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            OsmeaComponents.sizedBox(height: context.spacing4),
+            OsmeaComponents.text(
+              'No reviews have been made for this product yet.',
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                color: OsmeaColors.pewter,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds individual review item
+  Widget _buildReviewItem(
+    BuildContext context,
+    ListProductReviewsResponseModel review,
+  ) {
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(bottom: context.spacing12),
+      padding: EdgeInsets.all(context.spacing12),
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.grayMaterial[200]!,
+          width: 1,
+        ),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Reviewer info and rating
+          OsmeaComponents.row(
+            children: [
+              // Avatar
+              if (review.reviewerAvatarUrls?.the48 != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    review.reviewerAvatarUrls!.the48!,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.grayMaterial[200],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: OsmeaColors.pewter,
+                          size: 20,
+                        ),
+                      );
+                    },
+                  ),
+                )
+              else
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: OsmeaColors.pewter,
+                    size: 20,
+                  ),
+                ),
+              OsmeaComponents.sizedBox(width: context.spacing12),
+              // Reviewer name and rating
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OsmeaComponents.text(
+                      review.reviewer ?? 'Anonymous',
+                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.thunder,
+                      ),
+                    ),
+                    if (review.rating != null) ...[
+                      OsmeaComponents.sizedBox(height: 4),
+                      OsmeaComponents.row(
+                        children: [
+                          ...List.generate(5, (index) {
+                            return Icon(
+                              index < (review.rating ?? 0)
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: OsmeaColors.nordicBlue,
+                              size: 16,
+                            );
+                          }),
+                          OsmeaComponents.sizedBox(width: 8),
+                          OsmeaComponents.text(
+                            '${review.rating}/5',
+                            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                              color: OsmeaColors.pewter,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              // Verified badge
+              if (review.verified == true)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.spacing8,
+                    vertical: context.spacing4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: OsmeaComponents.text(
+                    'Verified',
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      color: OsmeaColors.nordicBlue,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing8),
+          // Review text
+          if (review.review != null && review.review!.isNotEmpty)
+            OsmeaComponents.text(
+              review.review!,
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.thunder.withValues(alpha: 0.8),
+                height: 1.5,
+              ),
+            ),
+          // Review date
+          if (review.formattedDateCreated != null ||
+              review.dateCreated != null) ...[
+            OsmeaComponents.sizedBox(height: context.spacing8),
+            OsmeaComponents.text(
+              review.formattedDateCreated ?? review.dateCreated ?? '',
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                color: OsmeaColors.pewter,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

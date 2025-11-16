@@ -14,6 +14,8 @@ import 'package:apis/network/remote/woocommerce/store_api/product_attribute_term
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/list_product_attributes_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/retrieve_product_attribute_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/abstract/store_product_reviews_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
@@ -38,6 +40,8 @@ class ProductDetailViewModel
       GetIt.I<StoreProductAttributeTermsService>();
   final StoreProductAttributesService _attributesService =
       GetIt.I<StoreProductAttributesService>();
+  final StoreProductReviewsService _reviewsService =
+      GetIt.I<StoreProductReviewsService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // Arguments holder for route/widget inputs
@@ -521,6 +525,22 @@ class ProductDetailViewModel
         // Continue without wishlist check - not fatal
       }
 
+      // Load product reviews
+      List<ListProductReviewsResponseModel> reviews = [];
+      try {
+        debugPrint('📝 Loading product reviews for product ID: $productId');
+        reviews = await _reviewsService.listProductReviews(
+          apiVersion: 'v1',
+          product: productId,
+          perPage: 50,
+          status: 'approved', // Only show approved reviews
+        );
+        debugPrint('✅ Loaded ${reviews.length} reviews for product ID: $productId');
+      } catch (e) {
+        debugPrint('⚠️ Failed to load product reviews: $e');
+        // Continue without reviews - not fatal
+      }
+
       emit(
         ProductDetailLoadedState(
           product: product,
@@ -528,6 +548,7 @@ class ProductDetailViewModel
           imageUrls: imageUrls,
           currentImageIndex: _currentImageIndex,
           isInCart: isInCart,
+          reviews: reviews,
           isInWishlist: isInWishlist,
           isDescriptionExpanded: false,
         ),
