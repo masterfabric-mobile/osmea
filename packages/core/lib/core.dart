@@ -174,3 +174,10 @@ export 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
 export 'package:core/src/views/search/search_view.dart';
 export 'package:core/src/views/search/cubit/search_cubit.dart';
 export 'package:core/src/views/search/cubit/search_state.dart';
+
+// 👤 Exports the account view and cubit
+export 'package:core/src/views/account/account_view.dart';
+export 'package:core/src/views/account/cubit/account_cubit.dart';
+export 'package:core/src/views/account/cubit/account_state.dart';
+export 'package:core/src/views/account/widgets/account_widget.dart';
+export 'package:core/src/views/account/widgets/orders_list_widget.dart';
