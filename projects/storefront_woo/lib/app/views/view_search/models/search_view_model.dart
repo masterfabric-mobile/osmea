@@ -8,6 +8,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_categories_api
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_search/models/module/states.dart'
     as search_states;
 // JWT and cart tokens are automatically added by interceptors if user is authenticated
@@ -121,45 +122,9 @@ class SearchViewModel
   }
 
   /// Get user-friendly error message from exception
+  /// Uses ApiErrorUtils for consistent error handling
   String _getErrorMessage(dynamic error) {
-    final errorString = error.toString().toLowerCase();
-
-    // Handle timeout errors
-    if (errorString.contains('timeout') ||
-        errorString.contains('operation timed out') ||
-        errorString.contains('timed out')) {
-      return 'Connection timeout. Please check your internet connection and try again.';
-    }
-
-    // Handle network errors
-    if (errorString.contains('network') ||
-        errorString.contains('connection') ||
-        errorString.contains('socketexception')) {
-      return 'Network error. Please check your connection and try again.';
-    }
-
-    // Handle 401 Unauthorized
-    if (errorString.contains('401') ||
-        errorString.contains('unauthorized')) {
-      return 'Authentication required. Please sign in and try again.';
-    }
-
-    // Handle 404 Not Found
-    if (errorString.contains('404') ||
-        errorString.contains('not found')) {
-      return 'Not found. Please try a different search or category.';
-    }
-
-    // Handle 500 Server errors
-    if (errorString.contains('500') ||
-        errorString.contains('502') ||
-        errorString.contains('503') ||
-        errorString.contains('server error')) {
-      return 'Server error. Please try again later.';
-    }
-
-    // Default friendly message
-    return 'Unable to load category. Please try again.';
+    return ApiErrorUtils.getErrorMessage(error);
   }
 
   /// Go back to categories view

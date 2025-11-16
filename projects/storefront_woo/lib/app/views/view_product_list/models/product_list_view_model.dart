@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 
 /// Product filter model for e-commerce filtering
@@ -414,35 +415,9 @@ class ProductListViewModel
   }
 
   /// Get user-friendly error message
+  /// Uses ApiErrorUtils for consistent error handling
   String _getErrorMessage(dynamic error) {
-    final errorString = error.toString().toLowerCase();
-
-    if (errorString.contains('timeout') ||
-        errorString.contains('operation timed out')) {
-      return 'Connection timeout. Please check your internet connection.';
-    }
-
-    if (errorString.contains('network') ||
-        errorString.contains('connection') ||
-        errorString.contains('socketexception')) {
-      return 'Network error. Please check your connection.';
-    }
-
-    if (errorString.contains('401') || errorString.contains('unauthorized')) {
-      return 'Authentication required. Please sign in.';
-    }
-
-    if (errorString.contains('404') || errorString.contains('not found')) {
-      return 'No products found.';
-    }
-
-    if (errorString.contains('500') ||
-        errorString.contains('502') ||
-        errorString.contains('503')) {
-      return 'Server error. Please try again later.';
-    }
-
-    return 'Failed to load products. Please try again.';
+    return ApiErrorUtils.getErrorMessage(error);
   }
 
   @override

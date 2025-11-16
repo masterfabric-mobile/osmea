@@ -112,11 +112,9 @@ class SearchView
       return const Center(child: CircularProgressIndicator());
     }
     if (state is search_states.SearchErrorState) {
-      return Center(
-        child: OsmeaComponents.text(
-          state.message,
-          textStyle: OsmeaTextStyle.bodyMedium(context),
-        ),
+      return buildError(
+        state.message,
+        onRetry: () => viewModel.loadCategories(),
       );
     }
     if (state is search_states.SearchLoadedState) {
