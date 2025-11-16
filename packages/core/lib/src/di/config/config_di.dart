@@ -4,6 +4,7 @@ import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
+import 'package:core/src/views/account/cubit/account_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -41,5 +42,10 @@ Future<GetIt> configureDependencies() async {
   // If not registered, it will be registered in starter.dart
 
   getIt.registerFactory<SearchCubit>(() => SearchCubit());
+
+  if (!getIt.isRegistered<AccountCubit>()) {
+    getIt.registerFactory<AccountCubit>(() => AccountCubit());
+  }
+
   return getIt;
 }
