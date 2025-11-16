@@ -25,7 +25,7 @@ class ProfileView
         navbarSpacer: const SpacerVisibility.disabled(),
         coreAppBar: (context, vm) => OsmeaComponents.appBar(
           title: OsmeaComponents.text(
-            'Profile',
+            'Account',
             textStyle: OsmeaTextStyle.titleLarge(context),
           ),
           leading: OsmeaComponents.iconButton(

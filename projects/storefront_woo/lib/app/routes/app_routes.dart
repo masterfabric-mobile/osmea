@@ -10,8 +10,9 @@ import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
-import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
+import 'package:core/src/views/account/account_view.dart';
 import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
+import 'package:core/src/views/account/widgets/orders_list_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -430,31 +431,379 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Profile Route
+    // Profile/Account Route - Using AccountView with startup style
     GoRoute(
       path: '/profile',
       pageBuilder: (BuildContext context, GoRouterState state) {
         return CustomTransitionPage(
-          child: ProfileView(
+          child: AccountView(
             goRoute: (String path) {
-              debugPrint('🔀 ProfileView: goRoute called with path: $path');
+              debugPrint('🔀 AccountView: goRoute called with path: $path');
               if (path.contains('home') || path == '/home') {
-                debugPrint('🔀 ProfileView: Navigating to /home');
+                debugPrint('🔀 AccountView: Navigating to /home');
                 context.go('/home');
               } else if (path.contains('cart') || path == '/cart') {
-                debugPrint('🔀 ProfileView: Navigating to /cart');
+                debugPrint('🔀 AccountView: Navigating to /cart');
                 context.go('/cart');
               } else if (path.contains('saved') || path == '/saved') {
-                debugPrint('🔀 ProfileView: Navigating to /saved');
+                debugPrint('🔀 AccountView: Navigating to /saved');
                 context.go('/saved');
               } else if (path.contains('auth') || path == '/auth') {
-                debugPrint('🔀 ProfileView: Navigating to /auth');
+                debugPrint('🔀 AccountView: Navigating to /auth');
                 context.go('/auth');
               } else {
-                debugPrint('🔀 ProfileView: Navigating to path: $path');
+                debugPrint('🔀 AccountView: Navigating to path: $path');
                 context.go(path);
               }
             },
+            arguments: {'account': true},
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Account Sub-Routes
+    // Orders Route
+    GoRoute(
+      path: '/orders',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'My Orders',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: const OrdersListWidget(),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Returns Route
+    GoRoute(
+      path: '/returns',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Return Requests',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.assignment_return, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'No return requests yet',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Cancellations Route
+    GoRoute(
+      path: '/cancellations',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Cancellation Requests',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cancel_outlined, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'No cancellation requests yet',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Account Info Route
+    GoRoute(
+      path: '/account-info',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Account Settings',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person_outline, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'Account settings coming soon',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Notifications Route
+    GoRoute(
+      path: '/notifications',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Notification Preferences',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.notifications_outlined, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'Notification preferences coming soon',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Stock Alarms Route
+    GoRoute(
+      path: '/stock-alarms',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Stock Alarms',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.inventory_outlined, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'Stock alarms coming soon',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              GetIt.I<WishlistViewModel>().count,
+            ),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
+    // Price Alarms Route
+    GoRoute(
+      path: '/price-alarms',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: Scaffold(
+            appBar: AppBar(
+              title: OsmeaComponents.text(
+                'Price Alarms',
+                color: OsmeaColors.thunder,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: OsmeaColors.paperWhite,
+              elevation: 0,
+              foregroundColor: OsmeaColors.thunder,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/profile'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OsmeaComponents.center(
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.local_offer_outlined, size: 64, color: OsmeaColors.pewter),
+                      OsmeaComponents.sizedBox(height: 16),
+                      OsmeaComponents.text(
+                        'Price alarms coming soon',
+                        textStyle: OsmeaTextStyle.headlineSmall(context),
+                        color: OsmeaColors.thunder,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             bottomNavigationBar: _getNavbarForRoute(
               state.uri.path,
               GetIt.I<WishlistViewModel>().count,
@@ -538,12 +887,19 @@ final GoRouter appRouter = GoRouter(
 /// Get navbar for specific route
 /// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
 Widget? _getNavbarForRoute(String location, int wishlistCount) {
-  // Show navbar only for main app sections
+  // Show navbar only for main app sections and account sub-routes
   if (location == '/home' ||
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
       location == '/profile' ||
+      location == '/orders' ||
+      location == '/returns' ||
+      location == '/cancellations' ||
+      location == '/account-info' ||
+      location == '/notifications' ||
+      location == '/stock-alarms' ||
+      location == '/price-alarms' ||
       location.startsWith('/empty/')) {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
@@ -553,11 +909,18 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
     } else if (location == '/cart') {
       return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
-    } else if (location == '/profile') {
+    } else if (location == '/profile' ||
+        location == '/orders' ||
+        location == '/returns' ||
+        location == '/cancellations' ||
+        location == '/account-info' ||
+        location == '/notifications' ||
+        location == '/stock-alarms' ||
+        location == '/price-alarms') {
       return AppNavbar(
         currentIndex: 4,
         wishlistCount: wishlistCount,
-      ); // Profile
+      ); // Profile/Account
     } else if (location.startsWith('/empty/')) {
       // Determine navbar index based on empty type
       final emptyType = location.split('/').last;
