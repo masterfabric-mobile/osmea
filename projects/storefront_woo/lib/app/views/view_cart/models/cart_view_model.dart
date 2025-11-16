@@ -9,11 +9,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/abstract/cart_coupons_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/freezed_model/response/list_cart_coupons_response_model.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
-import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:apis/apis.dart';
 
 @injectable
@@ -22,6 +23,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   // Dependencies
   final CartService _cartService = GetIt.I<CartService>();
+  final CartCouponsService _cartCouponsService = GetIt.I<CartCouponsService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // Arguments holder for route/widget inputs
@@ -52,19 +54,24 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       emit(CartLoadingState());
 
       // Get cart token from arguments or storage
-      final token = cartToken ?? 
-          (_arguments['cartToken'] as String?) ?? 
+      final token =
+          cartToken ??
+          (_arguments['cartToken'] as String?) ??
           await _getCartToken();
-      
-      debugPrint('🛒 CartViewModel: Cart token from arguments: ${cartToken != null}');
-      debugPrint('🛒 CartViewModel: Cart token from storage: ${token != null && token != cartToken}');
+
+      debugPrint(
+        '🛒 CartViewModel: Cart token from arguments: ${cartToken != null}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: Cart token from storage: ${token != null && token != cartToken}',
+      );
 
       // Directly call getCart API - WooCommerce handles cart token automatically
       debugPrint('🛒 CartViewModel: Loading cart from API');
       await _loadCartFromAPI();
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error loading cart: $e');
-      emit(CartErrorState(message: 'Failed to load cart: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -94,7 +101,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         debugPrint('🛒 CartViewModel: API error: ${response.errors!.first}');
         emit(
           CartErrorState(
-            message: 'Failed to load cart from API: ${response.errors!.first}',
+            message: ApiErrorUtils.getErrorMessage(response.errors!.first),
           ),
         );
         return;
@@ -104,7 +111,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _processCartResponse(response);
     } catch (e) {
       debugPrint('🛒 CartViewModel: API error: $e');
-      emit(CartErrorState(message: 'Failed to load cart: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -132,7 +139,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           debugPrint(
             '🛒 CartViewModel: Item - ID: ${item.id}, Name: ${item.name}, Quantity: ${item.quantity}, Price: ${item.prices?.price}, Key: ${item.key}',
           );
-          
+
           // Parse variation data from API response
           List<Map<String, String>>? variations;
           if (item.variation != null && item.variation!.isNotEmpty) {
@@ -142,18 +149,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
                 final attribute = (variationItem['attribute'] ?? '').toString();
                 final value = (variationItem['value'] ?? '').toString();
                 if (attribute.isNotEmpty && value.isNotEmpty) {
-                  variations.add({
-                    'attribute': attribute,
-                    'value': value,
-                  });
+                  variations.add({'attribute': attribute, 'value': value});
                 }
               }
             }
-            debugPrint(
-              '🛒 CartViewModel: Item variations: $variations',
-            );
+            debugPrint('🛒 CartViewModel: Item variations: $variations');
           }
-          
+
           cartItems.add(
             CartItem(
               productId: item.id ?? 0,
@@ -186,8 +188,22 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           response.totals?.currencySymbol ??
           PriceInfoCurrencyHelper.getCurrencySymbol(currencyCode: currencyCode);
 
+      // Load coupons from cart coupons API
+      List<ListCartCouponsResponseModel> coupons = [];
+      try {
+        coupons = await _cartCouponsService.getCartCoupons(
+          apiVersion: _configHelper.getString(
+            'woocommerce_configuration.version',
+          ),
+        );
+        debugPrint('🛒 CartViewModel: Loaded ${coupons.length} coupons');
+      } catch (e) {
+        debugPrint('⚠️ CartViewModel: Failed to load coupons: $e');
+        // Coupons loading failure is not fatal
+      }
+
       debugPrint(
-        '🛒 CartViewModel: API cart processed - items: ${cartItems.length}, total: $totalPrice, currency: $currencyCode ($currencySymbol)',
+        '🛒 CartViewModel: API cart processed - items: ${cartItems.length}, total: $totalPrice, currency: $currencyCode ($currencySymbol), coupons: ${coupons.length}',
       );
 
       emit(
@@ -195,7 +211,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           cartItems: cartItems,
           totalPrice: totalPrice,
           totalItems: response.itemsCount ?? 0,
-          coupons: response.coupons ?? [],
+          coupons: coupons,
           shippingAddress: response.shippingAddress,
           billingAddress: response.billingAddress,
           currencyCode: currencyCode,
@@ -204,7 +220,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       );
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error processing cart response: $e');
-      emit(CartErrorState(message: 'Failed to process cart response: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -218,7 +234,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _addItemToAPI(productId, quantity);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error adding item: $e');
-      emit(CartErrorState(message: 'Failed to add item: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -302,7 +318,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           if (response.errors != null && response.errors!.isNotEmpty) {
             emit(
               CartErrorState(
-                message: 'Failed to add item: ${response.errors!.first}',
+                message: ApiErrorUtils.getErrorMessage(response.errors!.first),
               ),
             );
             return;
@@ -310,7 +326,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         } else {
           emit(
             CartErrorState(
-              message: 'Failed to add item: ${response.errors!.first}',
+              message: ApiErrorUtils.getErrorMessage(response.errors!.first),
             ),
           );
           return;
@@ -323,7 +339,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _loadCartFromAPI();
     } catch (e) {
       debugPrint('❌ Failed to add item to API cart: $e');
-      emit(CartErrorState(message: 'Failed to add item to cart: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -333,7 +349,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _removeItemFromAPI(productId);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error removing item: $e');
-      emit(CartErrorState(message: 'Failed to remove item: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -404,7 +420,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         debugPrint('❌ API remove item error: ${response.errors!.first}');
         emit(
           CartErrorState(
-            message: 'Failed to remove item: ${response.errors!.first}',
+            message: ApiErrorUtils.getErrorMessage(response.errors!.first),
           ),
         );
         return;
@@ -415,7 +431,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _loadCartFromAPI();
     } catch (e) {
       debugPrint('❌ Failed to remove item from API cart: $e');
-      emit(CartErrorState(message: 'Failed to remove item from cart: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -428,7 +444,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _updateItemQuantityFromAPI(productId, quantity);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error updating quantity: $e');
-      emit(CartErrorState(message: 'Failed to update quantity: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -498,7 +514,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         debugPrint('❌ API update item error: ${response.errors!.first}');
         emit(
           CartErrorState(
-            message: 'Failed to update item: ${response.errors!.first}',
+            message: ApiErrorUtils.getErrorMessage(response.errors!.first),
           ),
         );
         return;
@@ -509,7 +525,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       await _loadCartFromAPI();
     } catch (e) {
       debugPrint('❌ Failed to update item in API cart: $e');
-      emit(CartErrorState(message: 'Failed to update item quantity: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -530,7 +546,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       );
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error clearing cart: $e');
-      emit(CartErrorState(message: 'Failed to clear cart: $e'));
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -539,59 +555,117 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   Future<void> _applyCoupon(String couponCode) async {
     try {
       final currentState = state;
-      if (currentState is! CartLoadedState) return;
-
-      // Get tokens before API call
-      final cartToken = await _getCartToken();
-      final jwtToken = await _getJwtToken();
-
-      // Log token status
-      debugPrint(
-        '🛒 CartViewModel: applyCoupon - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
-      );
-      debugPrint(
-        '🛒 CartViewModel: applyCoupon - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
-      );
-
-      if (cartToken == null || cartToken.isEmpty) {
-        debugPrint('❌ No cart token available for applyCoupon');
-        emit(CartErrorState(message: 'No cart token available'));
+      if (currentState is! CartLoadedState) {
+        emit(CartErrorState(message: 'Please load your cart first'));
         return;
       }
 
-      // Apply coupon via API
-      final response = await _cartService.applyCoupon(
-        apiVersion: _configHelper.getString(
-          'woocommerce_configuration.version',
-        ),
-        cartToken: cartToken,
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
-        code: couponCode,
-      );
-
-      if (response.errors != null && response.errors!.isNotEmpty) {
+      // Check if cart is empty
+      if (currentState.cartItems.isEmpty) {
         emit(
           CartErrorState(
-            message: 'Failed to apply coupon: ${response.errors!.first}',
+            message:
+                'Your cart is empty. Add items to cart before applying a coupon.',
           ),
         );
         return;
       }
 
-      // Show success message and keep current state
-      final applyState = state;
-      if (applyState is CartLoadedState) {
-        // Just emit the same state to avoid UI issues
-        emit(applyState);
-
-        // Show success message via a different mechanism
-        debugPrint('🎉 Success: Coupon applied successfully!');
-      } else {
-        // If no current state, load cart
-        await _loadCart();
+      if (couponCode.trim().isEmpty) {
+        emit(CartErrorState(message: 'Please enter a coupon code'));
+        return;
       }
+
+      // Check if cart token exists
+      final cartToken = await _getCartToken();
+      if (cartToken == null || cartToken.isEmpty) {
+        debugPrint(
+          '⚠️ CartViewModel: No cart token available, loading cart first...',
+        );
+        await _loadCart();
+        // Try again after loading cart
+        final newCartToken = await _getCartToken();
+        if (newCartToken == null || newCartToken.isEmpty) {
+          emit(
+            CartErrorState(message: 'Unable to load cart. Please try again.'),
+          );
+          return;
+        }
+      }
+
+      debugPrint('🛒 CartViewModel: Applying coupon: $couponCode');
+      debugPrint(
+        '🛒 CartViewModel: Cart token available: ${cartToken != null && cartToken.isNotEmpty}',
+      );
+      debugPrint(
+        '🛒 CartViewModel: Cart items count: ${currentState.cartItems.length}',
+      );
+
+      // Apply coupon via Cart Coupons API
+      final response = await _cartCouponsService.addCartCoupon(
+        apiVersion: _configHelper.getString(
+          'woocommerce_configuration.version',
+        ),
+        couponCode: couponCode.trim(),
+      );
+
+      debugPrint(
+        '🎉 CartViewModel: Coupon applied successfully: ${response.code}',
+      );
+
+      // Reload cart to get updated totals with coupon discount
+      await _loadCart();
     } catch (e) {
-      emit(CartErrorState(message: 'Failed to apply coupon: $e'));
+      debugPrint('❌ CartViewModel: Failed to apply coupon: $e');
+      emit(CartErrorState(message: _getCouponErrorMessage(e)));
+    }
+  }
+
+  /// Get user-friendly error message for coupon operations
+  /// Uses ApiErrorUtils from apis package for consistent error handling
+  String _getCouponErrorMessage(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+
+    // Get base error message from ApiErrorUtils
+    final baseMessage = ApiErrorUtils.getErrorMessage(error);
+
+    // Add coupon-specific error handling
+    if (errorString.contains('400') || errorString.contains('bad request')) {
+      if (errorString.contains('already') || errorString.contains('applied')) {
+        return 'This coupon has already been applied';
+      } else if (errorString.contains('invalid') ||
+          errorString.contains('not found') ||
+          errorString.contains('does not exist')) {
+        return 'Invalid coupon code';
+      } else if (errorString.contains('minimum') ||
+          errorString.contains('amount')) {
+        return 'Coupon requires minimum order amount';
+      }
+      return 'Invalid coupon code. Please check the code and try again.';
+    } else if (errorString.contains('401') ||
+        errorString.contains('unauthorized')) {
+      return 'Please reload your cart and try again';
+    } else if (errorString.contains('403') ||
+        errorString.contains('forbidden')) {
+      return 'Access denied. Please reload your cart';
+    } else if (errorString.contains('404') ||
+        errorString.contains('not found')) {
+      return 'Coupon not found';
+    } else if (errorString.contains('409') ||
+        errorString.contains('conflict')) {
+      return 'This coupon has already been applied';
+    } else if (errorString.contains('422') ||
+        errorString.contains('unprocessable')) {
+      return 'Invalid coupon code or cart is empty';
+    } else if (errorString.contains('already been applied') ||
+        errorString.contains('already applied')) {
+      return 'This coupon has already been applied';
+    } else if (errorString.contains('invalid') ||
+        errorString.contains('not found')) {
+      return 'Invalid coupon code';
+    } else {
+      // Fallback to base message from ApiErrorUtils
+      return baseMessage;
     }
   }
 
@@ -600,57 +674,28 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       final currentState = state;
       if (currentState is! CartLoadedState) return;
 
-      // Get tokens before API call
-      final cartToken = await _getCartToken();
-      final jwtToken = await _getJwtToken();
-
-      // Log token status
-      debugPrint(
-        '🛒 CartViewModel: removeCoupon - JWT Token: ${jwtToken != null ? "Available (Bearer format)" : "Not available"}',
-      );
-      debugPrint(
-        '🛒 CartViewModel: removeCoupon - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
-      );
-
-      if (cartToken == null || cartToken.isEmpty) {
-        debugPrint('❌ No cart token available for removeCoupon');
-        emit(CartErrorState(message: 'No cart token available'));
+      if (couponCode.trim().isEmpty) {
+        emit(CartErrorState(message: 'Invalid coupon code'));
         return;
       }
 
-      // Remove coupon via API
-      final response = await _cartService.removeCoupon(
+      debugPrint('🛒 CartViewModel: Removing coupon: $couponCode');
+
+      // Remove coupon via Cart Coupons API
+      await _cartCouponsService.deleteCartCoupon(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
-        cartToken: cartToken,
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
-        code: couponCode,
+        couponCode: couponCode.trim(),
       );
 
-      if (response.errors != null && response.errors!.isNotEmpty) {
-        emit(
-          CartErrorState(
-            message: 'Failed to remove coupon: ${response.errors!.first}',
-          ),
-        );
-        return;
-      }
+      debugPrint('🎉 CartViewModel: Coupon removed successfully');
 
-      // Show success message and keep current state
-      final removeCouponState = state;
-      if (removeCouponState is CartLoadedState) {
-        // Just emit the same state to avoid UI issues
-        emit(removeCouponState);
-
-        // Show success message via a different mechanism
-        debugPrint('🎉 Success: Coupon removed successfully!');
-      } else {
-        // If no current state, load cart
-        await _loadCart();
-      }
+      // Reload cart to get updated totals without coupon discount
+      await _loadCart();
     } catch (e) {
-      emit(CartErrorState(message: 'Failed to remove coupon: $e'));
+      debugPrint('❌ CartViewModel: Failed to remove coupon: $e');
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -679,7 +724,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       // Fallback to storage
       final wooCartToken = await WooCartTokenStorage.loadCartToken();
-      
+
       if (wooCartToken != null && wooCartToken.cartToken.isNotEmpty) {
         // Check if token has expired
         if (wooCartToken.expiresAt != null &&
@@ -688,13 +733,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           await WooCartTokenStorage.clearCartToken();
           return null;
         }
-        
+
         debugPrint(
           '🛒 CartViewModel: Cart token from storage: ${wooCartToken.cartToken.length > 20 ? wooCartToken.cartToken.substring(0, 20) + "..." : wooCartToken.cartToken}',
         );
         return wooCartToken.cartToken;
       }
-      
+
       debugPrint('⚠️ CartViewModel: No cart token found');
       return null;
     } catch (e) {
@@ -702,7 +747,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       return null;
     }
   }
-
 
   /// Gets JWT token from storage and formats it with Bearer prefix
   /// Uses WooJwtTokenStorage for consistency with other view models
@@ -714,7 +758,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         final token =
             wooToken.authorizationHeader; // Already includes "Bearer " prefix
         debugPrint(
-          '🛒 CartViewModel: JWT token from WooJwtTokenStorage: ${token.length > 30 ? token.substring(0, 30) + "..." : token}',
+          '🛒 CartViewModel: JWT token from WooJwtTokenStorage: ${token.length > 30 ? "${token.substring(0, 30)}..." : token}',
         );
         return token;
       }
@@ -728,7 +772,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
             ? token
             : 'Bearer $token';
         debugPrint(
-          '🛒 CartViewModel: JWT token from AuthStorageHelper: ${formattedToken.length > 30 ? formattedToken.substring(0, 30) + "..." : formattedToken}',
+          '🛒 CartViewModel: JWT token from AuthStorageHelper: ${formattedToken.length > 30 ? "${formattedToken.substring(0, 30)}..." : formattedToken}',
         );
         return formattedToken;
       }

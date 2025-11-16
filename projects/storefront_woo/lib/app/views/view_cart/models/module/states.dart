@@ -5,6 +5,8 @@
  * Simple Dart classes without freezed.
  */
 
+import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/freezed_model/response/list_cart_coupons_response_model.dart';
+
 /// Simple cart item model for states
 class CartItem {
   final int productId;
@@ -67,7 +69,7 @@ class CartLoadedState extends CartState {
   final List<CartItem> cartItems;
   final double totalPrice;
   final int totalItems;
-  final List<dynamic> coupons;
+  final List<ListCartCouponsResponseModel> coupons;
   final dynamic shippingAddress;
   final dynamic billingAddress;
   final String? currencyCode;
@@ -88,7 +90,7 @@ class CartLoadedState extends CartState {
     List<CartItem>? cartItems,
     double? totalPrice,
     int? totalItems,
-    List<dynamic>? coupons,
+    List<ListCartCouponsResponseModel>? coupons,
     dynamic shippingAddress,
     dynamic billingAddress,
     String? currencyCode,
@@ -104,6 +106,17 @@ class CartLoadedState extends CartState {
       currencyCode: currencyCode ?? this.currencyCode,
       currencySymbol: currencySymbol ?? this.currencySymbol,
     );
+  }
+
+  /// Get total discount from all coupons
+  double get totalDiscount {
+    double discount = 0.0;
+    for (final coupon in coupons) {
+      if (coupon.totals?.totalDiscount != null) {
+        discount += double.tryParse(coupon.totals!.totalDiscount!) ?? 0.0;
+      }
+    }
+    return discount;
   }
 }
 

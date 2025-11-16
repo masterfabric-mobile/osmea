@@ -12,7 +12,7 @@ import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 
 /// Main content widget for cart view
-class CartContentWidget extends StatelessWidget {
+class CartContentWidget extends StatefulWidget {
   final CartViewModel viewModel;
   final CartLoadedState state;
 
@@ -23,7 +23,22 @@ class CartContentWidget extends StatelessWidget {
   });
 
   @override
+  State<CartContentWidget> createState() => _CartContentWidgetState();
+}
+
+class _CartContentWidgetState extends State<CartContentWidget> {
+  final TextEditingController _couponController = TextEditingController();
+
+  @override
+  void dispose() {
+    _couponController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final viewModel = widget.viewModel;
+    final state = widget.state;
     if (state.cartItems.isEmpty) {
       return _buildEmptyCart(context);
     }
@@ -33,18 +48,18 @@ class CartContentWidget extends StatelessWidget {
         children: [
           // Cart items with swipe-to-delete
           ...state.cartItems.map(
-            (item) => _buildCartItemWithSwipe(context, item),
+            (item) => _buildCartItemWithSwipe(context, item, viewModel, state),
           ),
 
           OsmeaComponents.sizedBox(height: 8),
 
           // Coupon section
-          _buildCouponSection(context),
+          _buildCouponSection(context, viewModel, state),
 
           OsmeaComponents.sizedBox(height: 8),
 
           // Order summary
-          _buildOrderSummary(context),
+          _buildOrderSummary(context, state),
 
           OsmeaComponents.sizedBox(height: 16),
         ],
@@ -63,7 +78,12 @@ class CartContentWidget extends StatelessWidget {
   }
 
   /// Builds cart item with swipe-to-delete functionality
-  Widget _buildCartItemWithSwipe(BuildContext context, CartItem item) {
+  Widget _buildCartItemWithSwipe(
+    BuildContext context,
+    CartItem item,
+    CartViewModel viewModel,
+    CartLoadedState state,
+  ) {
     return Dismissible(
       key: Key('cart_item_${item.key}'),
       direction: DismissDirection.endToStart,
@@ -164,12 +184,17 @@ class CartContentWidget extends StatelessWidget {
           ),
         );
       },
-      child: _buildCartItem(context, item),
+      child: _buildCartItem(context, item, viewModel, state),
     );
   }
 
   /// Builds individual cart item widget - MINIMAL ELEGANT DESIGN WITH BOTTOM CONTROLS
-  Widget _buildCartItem(BuildContext context, CartItem item) {
+  Widget _buildCartItem(
+    BuildContext context,
+    CartItem item,
+    CartViewModel viewModel,
+    CartLoadedState state,
+  ) {
     return OsmeaComponents.container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -353,67 +378,159 @@ class CartContentWidget extends StatelessWidget {
   }
 
   /// Builds coupon section - MINIMAL ELEGANT DESIGN
-  Widget _buildCouponSection(BuildContext context) {
+  Widget _buildCouponSection(
+    BuildContext context,
+    CartViewModel viewModel,
+    CartLoadedState state,
+  ) {
+    return OsmeaComponents.column(
+      children: [
+        // Applied coupons list
+        if (state.coupons.isNotEmpty) ...[
+          ...state.coupons.map((coupon) => _buildAppliedCoupon(context, coupon, viewModel, state)),
+          OsmeaComponents.sizedBox(height: 8),
+        ],
+        
+        // Coupon input section
+        OsmeaComponents.container(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: OsmeaColors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: OsmeaColors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: OsmeaComponents.padding(
+            padding: const EdgeInsets.all(16),
+            child: OsmeaComponents.row(
+              children: [
+                // Minimal Icon
+                Icon(
+                  Icons.local_offer_outlined,
+                  color: OsmeaColors.nordicBlue.withValues(alpha: 0.7),
+                  size: 20,
+                ),
+                OsmeaComponents.sizedBox(width: 12),
+
+                // Minimal Input Field
+                OsmeaComponents.expanded(
+                  child: OsmeaComponents.textField(
+                    controller: _couponController,
+                    hint: 'Discount code',
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: OsmeaColors.thunder,
+                    ),
+                    onSubmitted: (value) {
+                      if (value.trim().isNotEmpty) {
+                        viewModel.applyCoupon(value.trim());
+                        _couponController.clear();
+                      }
+                    },
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 8),
+
+                // Minimal Apply Button
+                OsmeaComponents.button(
+                  onPressed: () {
+                    final couponCode = _couponController.text.trim();
+                    if (couponCode.isNotEmpty) {
+                      viewModel.applyCoupon(couponCode);
+                      _couponController.clear();
+                    }
+                  },
+                  backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
+                  textColor: OsmeaColors.nordicBlue,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  text: 'Apply',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    color: OsmeaColors.nordicBlue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds applied coupon widget
+  Widget _buildAppliedCoupon(
+    BuildContext context,
+    dynamic coupon,
+    CartViewModel viewModel,
+    CartLoadedState state,
+  ) {
+    final couponCode = coupon.code ?? '';
+    final discount = coupon.totals?.totalDiscount != null
+        ? double.tryParse(coupon.totals!.totalDiscount!) ?? 0.0
+        : 0.0;
+    
     return OsmeaComponents.container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: OsmeaColors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-            spreadRadius: 0,
-          ),
-        ],
+        color: OsmeaColors.nordicBlue.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: OsmeaComponents.padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: OsmeaComponents.row(
           children: [
-            // Minimal Icon
             Icon(
-              Icons.local_offer_outlined,
-              color: OsmeaColors.nordicBlue.withValues(alpha: 0.7),
+              Icons.check_circle,
+              color: OsmeaColors.nordicBlue,
               size: 20,
             ),
-            OsmeaComponents.sizedBox(width: 12),
-
-            // Minimal Input Field
-            OsmeaComponents.expanded(
-              child: OsmeaComponents.textField(
-                hint: 'Discount code',
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: OsmeaColors.thunder,
-                ),
-              ),
-            ),
             OsmeaComponents.sizedBox(width: 8),
-
-            // Minimal Apply Button
-            OsmeaComponents.button(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Apply coupon feature coming soon!'),
-                    backgroundColor: OsmeaColors.nordicBlue,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OsmeaComponents.text(
+                    couponCode.toUpperCase(),
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.nordicBlue,
                     ),
                   ),
-                );
-              },
-              backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
-              textColor: OsmeaColors.nordicBlue,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              text: 'Apply',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.nordicBlue,
-                fontWeight: FontWeight.w600,
+                  if (discount > 0) ...[
+                    OsmeaComponents.sizedBox(height: 2),
+                    OsmeaComponents.text(
+                      'Discount: ${PriceInfoCurrencyHelper.formatPrice(
+                        discount,
+                        currencyCode: state.currencyCode,
+                        removeTrailingZeros: true,
+                      )}',
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        color: OsmeaColors.pewter,
+                      ),
+                    ),
+                  ],
+                ],
               ),
+            ),
+            OsmeaComponents.iconButton(
+              onPressed: () => viewModel.removeCoupon(couponCode),
+              icon: Icon(
+                Icons.close,
+                color: OsmeaColors.red,
+                size: 18,
+              ),
+              backgroundColor: Colors.transparent,
+              tooltip: 'Remove coupon',
             ),
           ],
         ),
@@ -422,7 +539,7 @@ class CartContentWidget extends StatelessWidget {
   }
 
   /// Builds order summary - FRESH E-COMMERCE DESIGN
-  Widget _buildOrderSummary(BuildContext context) {
+  Widget _buildOrderSummary(BuildContext context, CartLoadedState state) {
     return OsmeaComponents.container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -489,7 +606,7 @@ class CartContentWidget extends StatelessWidget {
                       ),
                       OsmeaComponents.text(
                         PriceInfoCurrencyHelper.formatPrice(
-                          state.totalPrice,
+                          state.totalPrice + state.totalDiscount,
                           currencyCode: state.currencyCode,
                           removeTrailingZeros: true,
                         ),
@@ -501,6 +618,34 @@ class CartContentWidget extends StatelessWidget {
                     ],
                   ),
                   OsmeaComponents.sizedBox(height: 12),
+
+                  // Discount (if coupons applied)
+                  if (state.totalDiscount > 0) ...[
+                    OsmeaComponents.row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OsmeaComponents.text(
+                          'Discount',
+                          textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                            color: OsmeaColors.nordicBlue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        OsmeaComponents.text(
+                          '-${PriceInfoCurrencyHelper.formatPrice(
+                            state.totalDiscount,
+                            currencyCode: state.currencyCode,
+                            removeTrailingZeros: true,
+                          )}',
+                          textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                            color: OsmeaColors.nordicBlue,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    OsmeaComponents.sizedBox(height: 12),
+                  ],
 
                   // Shipping
                   OsmeaComponents.row(
