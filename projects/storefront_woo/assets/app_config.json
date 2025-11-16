@@ -25,6 +25,83 @@
     "enable_coupons": true,
     "enable_guest_checkout": true
   },
+  "account_configuration": {
+    "style": "space",
+    "space_style_colors": {
+      "primary_color": "#000000",
+      "secondary_color": "#06060666",
+      "text_color": "#000000",
+      "icon_color": "#000000",
+      "separator_color": "#E5E5E5",
+      "background_color": "#FFFFFF"
+    },
+    "sections": [
+      {
+        "sectionTitle": "Orders & Requests",
+        "items": [
+          {
+            "id": "all_orders",
+            "title": "All My Orders",
+            "iconName": "shopping_bag_outlined",
+            "iconColor": "#4A90E2",
+            "route": "/orders"
+          },
+          {
+            "id": "return_requests",
+            "title": "My Return Requests",
+            "iconName": "schedule",
+            "iconColor": "#4CAF50",
+            "route": "/returns"
+          },
+          {
+            "id": "cancel_requests",
+            "title": "My Cancellation Requests",
+            "iconName": "update",
+            "iconColor": "#FFC107",
+            "route": "/cancellations"
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Account & Preferences",
+        "items": [
+          {
+            "id": "account_settings",
+            "title": "Account Settings",
+            "iconName": "person_outline",
+            "iconColor": "#4A90E2",
+            "route": "/account-info"
+          },
+          {
+            "id": "notification_preferences",
+            "title": "Notification Preferences",
+            "iconName": "notifications_outlined",
+            "iconColor": "#E57373",
+            "route": "/notifications"
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Alarm & Watchlists",
+        "items": [
+          {
+            "id": "stock_alarm",
+            "title": "My Stock Alarm List",
+            "iconName": "inventory_outlined",
+            "iconColor": "#9C27B0",
+            "route": "/stock-alarms"
+          },
+          {
+            "id": "price_alarm",
+            "title": "My Price Alarm List",
+            "iconName": "local_offer_outlined",
+            "iconColor": "#673AB7",
+            "route": "/price-alarms"
+          }
+        ]
+      }
+    ]
+  },
     "firebase_configuration": {
       "analytics_enabled": true,
       "crashlytics_enabled": true,
