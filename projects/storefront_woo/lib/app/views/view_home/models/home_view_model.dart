@@ -63,9 +63,11 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     try {
       final wishlistViewModel = GetIt.I<WishlistViewModel>();
       final currentState = wishlistViewModel.state;
-      
-      debugPrint('💖 HomeViewModel: Initializing wishlist (current state: ${currentState.runtimeType})');
-      
+
+      debugPrint(
+        '💖 HomeViewModel: Initializing wishlist (current state: ${currentState.runtimeType})',
+      );
+
       // Always ensure we have a loaded state before proceeding
       // Sync if state is initial, loading, error, or empty loaded state
       if (currentState is WishlistInitialState ||
@@ -74,30 +76,42 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           (currentState is WishlistLoadedState && currentState.items.isEmpty)) {
         debugPrint('💖 HomeViewModel: Syncing wishlist from server...');
         await wishlistViewModel.initial();
-        
+
         // Wait a bit to ensure state is updated
         await Future.delayed(const Duration(milliseconds: 100));
-        
+
         final updatedState = wishlistViewModel.state;
         if (updatedState is WishlistLoadedState) {
-          debugPrint('✅ HomeViewModel: Wishlist initialized with ${wishlistViewModel.count} items');
+          debugPrint(
+            '✅ HomeViewModel: Wishlist initialized with ${wishlistViewModel.count} items',
+          );
         } else {
-          debugPrint('⚠️ HomeViewModel: Wishlist state is ${updatedState.runtimeType} after sync, ensuring loaded state...');
+          debugPrint(
+            '⚠️ HomeViewModel: Wishlist state is ${updatedState.runtimeType} after sync, ensuring loaded state...',
+          );
           // Ensure we have loaded state even if sync didn't work
-          wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+          wishlistViewModel.restorePrevious(
+            WishlistLoadedState(items: const []),
+          );
         }
       } else if (currentState is WishlistLoadedState) {
-        debugPrint('✅ HomeViewModel: Wishlist already loaded with ${wishlistViewModel.count} items');
+        debugPrint(
+          '✅ HomeViewModel: Wishlist already loaded with ${wishlistViewModel.count} items',
+        );
       } else {
         // For any other state, ensure we have loaded state
-        debugPrint('⚠️ HomeViewModel: Wishlist in unexpected state (${currentState.runtimeType}), ensuring loaded state...');
+        debugPrint(
+          '⚠️ HomeViewModel: Wishlist in unexpected state (${currentState.runtimeType}), ensuring loaded state...',
+        );
         wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
       }
-      
+
       // Final check - ensure state is loaded
       final finalState = wishlistViewModel.state;
       if (finalState is! WishlistLoadedState) {
-        debugPrint('⚠️ HomeViewModel: Final check failed, forcing loaded state...');
+        debugPrint(
+          '⚠️ HomeViewModel: Final check failed, forcing loaded state...',
+        );
         wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
       }
     } catch (e, stackTrace) {
@@ -109,7 +123,9 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         final currentState = wishlistViewModel.state;
         if (currentState is! WishlistLoadedState) {
           debugPrint('💡 HomeViewModel: Restoring empty wishlist state...');
-          wishlistViewModel.restorePrevious(WishlistLoadedState(items: const []));
+          wishlistViewModel.restorePrevious(
+            WishlistLoadedState(items: const []),
+          );
         }
       } catch (e2) {
         debugPrint('❌ HomeViewModel: Failed to restore wishlist state: $e2');
@@ -179,9 +195,13 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         final wishlistVm = GetIt.I<WishlistViewModel>();
         final wishlistState = wishlistVm.state;
         if (wishlistState is WishlistLoadedState) {
-          debugPrint('✅ HomeViewModel: Wishlist loaded with ${wishlistVm.count} items before emitting products');
+          debugPrint(
+            '✅ HomeViewModel: Wishlist loaded with ${wishlistVm.count} items before emitting products',
+          );
         } else {
-          debugPrint('⚠️ HomeViewModel: Wishlist not in loaded state (${wishlistState.runtimeType}), but proceeding');
+          debugPrint(
+            '⚠️ HomeViewModel: Wishlist not in loaded state (${wishlistState.runtimeType}), but proceeding',
+          );
         }
       } catch (e) {
         debugPrint('⚠️ HomeViewModel: Error checking wishlist state: $e');
@@ -417,6 +437,9 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         regularPrice: product.prices?.regularPrice,
         salePrice: product.prices?.salePrice,
         currencyCode: product.prices?.currencyCode,
+        currencyDecimalSeparator: product.prices?.currencyDecimalSeparator,
+        currencyThousandSeparator: product.prices?.currencyThousandSeparator,
+        currencyMinorUnit: product.prices?.currencyMinorUnit,
         onSale: product.onSale == true,
       );
 

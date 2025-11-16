@@ -245,7 +245,8 @@ class ProductListContentWidget extends StatelessWidget {
   /// Formats price for chip display
   String _formatPriceChip(String price) {
     // Try to parse as double and format nicely
-    final parsed = double.tryParse(price);
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    final parsed = PriceInfoCurrencyHelper.parsePriceToDouble(price);
     if (parsed != null) {
       // Remove trailing zeros
       return parsed.toStringAsFixed(

@@ -38,11 +38,21 @@ class ProductCardWidget extends StatelessWidget {
 
     int? discountPct;
     if (hasSale) {
-      final rp = double.tryParse(
-        (prices!.regularPrice ?? '').replaceAll(RegExp(r'[^\d.,]'), ''),
+      // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+      // Use API-provided separators and minor_unit to correctly parse the price format
+      final rp = PriceInfoCurrencyHelper.parsePriceToDouble(
+        prices!.regularPrice,
+        currencyCode: prices.currencyCode,
+        currencyDecimalSeparator: prices.currencyDecimalSeparator,
+        currencyThousandSeparator: prices.currencyThousandSeparator,
+        currencyMinorUnit: prices.currencyMinorUnit,
       );
-      final sp = double.tryParse(
-        (prices.salePrice ?? '').replaceAll(RegExp(r'[^\d.,]'), ''),
+      final sp = PriceInfoCurrencyHelper.parsePriceToDouble(
+        prices.salePrice,
+        currencyCode: prices.currencyCode,
+        currencyDecimalSeparator: prices.currencyDecimalSeparator,
+        currencyThousandSeparator: prices.currencyThousandSeparator,
+        currencyMinorUnit: prices.currencyMinorUnit,
       );
       if (rp != null && sp != null && rp > 0 && sp < rp) {
         discountPct = (((rp - sp) / rp) * 100).round();
@@ -182,6 +192,9 @@ class ProductCardWidget extends StatelessWidget {
                         _formatPrice(
                           prices?.salePrice,
                           currencyCode: prices?.currencyCode,
+                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                           fontSize: 14,
@@ -194,6 +207,9 @@ class ProductCardWidget extends StatelessWidget {
                         _formatPrice(
                           prices?.regularPrice,
                           currencyCode: prices?.currencyCode,
+                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           fontSize: 12,
@@ -208,6 +224,9 @@ class ProductCardWidget extends StatelessWidget {
                     _formatPrice(
                       prices?.regularPrice,
                       currencyCode: prices?.currencyCode,
+                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator: prices?.currencyThousandSeparator,
+                      currencyMinorUnit: prices?.currencyMinorUnit,
                     ),
                     textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                       fontSize: 14,
@@ -253,18 +272,34 @@ class ProductCardWidget extends StatelessWidget {
   }
 
   /// Formats price using PriceInfoCurrencyHelper from core package
-  String _formatPrice(String? priceString, {String? currencyCode}) {
+  String _formatPrice(
+    String? priceString, {
+    String? currencyCode,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
+    int? currencyMinorUnit,
+  }) {
     if (priceString == null || priceString.isEmpty) {
       return PriceInfoCurrencyHelper.getDefaultPrice();
     }
 
-    final cleanPrice = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
-    final parsedPrice = double.tryParse(cleanPrice) ?? 0.0;
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit to correctly parse the price format
+    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
+      priceString,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      currencyMinorUnit: currencyMinorUnit,
+    ) ?? 0.0;
 
+    // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
       currencyCode: currencyCode,
-      decimalPlaces: 2,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      decimalPlaces: currencyMinorUnit ?? 2,
       removeTrailingZeros: true,
     );
   }

@@ -285,6 +285,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
                         PriceInfoCurrencyHelper.formatPrice(
                           item.price,
                           currencyCode: state.currencyCode,
+                          currencyDecimalSeparator: state.currencyDecimalSeparator,
+                          currencyThousandSeparator: state.currencyThousandSeparator,
+                          decimalPlaces: state.currencyMinorUnit ?? 2,
                           removeTrailingZeros: true,
                         ),
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
@@ -471,8 +474,16 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     CartLoadedState state,
   ) {
     final couponCode = coupon.code ?? '';
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit from coupon totals if available
     final discount = coupon.totals?.totalDiscount != null
-        ? double.tryParse(coupon.totals!.totalDiscount!) ?? 0.0
+        ? PriceInfoCurrencyHelper.parsePriceToDouble(
+            coupon.totals!.totalDiscount!,
+            currencyCode: state.currencyCode,
+            currencyDecimalSeparator: coupon.totals?.currencyDecimalSeparator,
+            currencyThousandSeparator: coupon.totals?.currencyThousandSeparator,
+            currencyMinorUnit: coupon.totals?.currencyMinorUnit,
+          ) ?? 0.0
         : 0.0;
     
     return OsmeaComponents.container(
@@ -512,6 +523,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
                       'Discount: ${PriceInfoCurrencyHelper.formatPrice(
                         discount,
                         currencyCode: state.currencyCode,
+                        currencyDecimalSeparator: state.currencyDecimalSeparator,
+                        currencyThousandSeparator: state.currencyThousandSeparator,
+                        decimalPlaces: state.currencyMinorUnit ?? 2,
                         removeTrailingZeros: true,
                       )}',
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
@@ -608,6 +622,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
                         PriceInfoCurrencyHelper.formatPrice(
                           state.totalPrice + state.totalDiscount,
                           currencyCode: state.currencyCode,
+                          currencyDecimalSeparator: state.currencyDecimalSeparator,
+                          currencyThousandSeparator: state.currencyThousandSeparator,
+                          decimalPlaces: state.currencyMinorUnit ?? 2,
                           removeTrailingZeros: true,
                         ),
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
@@ -635,6 +652,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
                           '-${PriceInfoCurrencyHelper.formatPrice(
                             state.totalDiscount,
                             currencyCode: state.currencyCode,
+                            currencyDecimalSeparator: state.currencyDecimalSeparator,
+                            currencyThousandSeparator: state.currencyThousandSeparator,
+                            decimalPlaces: state.currencyMinorUnit ?? 2,
                             removeTrailingZeros: true,
                           )}',
                           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
@@ -717,6 +737,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
                           PriceInfoCurrencyHelper.formatPrice(
                             state.totalPrice,
                             currencyCode: state.currencyCode,
+                            currencyDecimalSeparator: state.currencyDecimalSeparator,
+                            currencyThousandSeparator: state.currencyThousandSeparator,
+                            decimalPlaces: state.currencyMinorUnit ?? 2,
                           ),
                           textStyle: OsmeaTextStyle.titleLarge(context)
                               .copyWith(

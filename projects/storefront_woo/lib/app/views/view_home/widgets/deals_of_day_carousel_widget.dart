@@ -150,7 +150,14 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     double bannerHeight,
   ) {
     final prices = product.prices;
-    final discount = _discountPercent(prices?.regularPrice, prices?.salePrice);
+    final discount = _discountPercent(
+      prices?.regularPrice,
+      prices?.salePrice,
+      currencyCode: prices?.currencyCode,
+      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+      currencyThousandSeparator: prices?.currencyThousandSeparator,
+      currencyMinorUnit: prices?.currencyMinorUnit,
+    );
 
     return GestureDetector(
       onTap: () {
@@ -237,6 +244,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                         _formatPrice(
                           prices.salePrice ?? prices.regularPrice,
                           currencyCode: prices.currencyCode,
+                          currencyDecimalSeparator: prices.currencyDecimalSeparator,
+                          currencyThousandSeparator: prices.currencyThousandSeparator,
+                          currencyMinorUnit: prices.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                           color: OsmeaColors.nordicBlue,
@@ -252,6 +262,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                           _formatPrice(
                             prices.regularPrice,
                             currencyCode: prices.currencyCode,
+                            currencyDecimalSeparator: prices.currencyDecimalSeparator,
+                            currencyThousandSeparator: prices.currencyThousandSeparator,
+                            currencyMinorUnit: prices.currencyMinorUnit,
                           ),
                           textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                             color: OsmeaColors.pewter,
@@ -270,24 +283,61 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     );
   }
 
-  int? _discountPercent(String? regularPrice, String? salePrice) {
+  int? _discountPercent(
+    String? regularPrice,
+    String? salePrice, {
+    String? currencyCode,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
+    int? currencyMinorUnit,
+  }) {
     if (regularPrice == null || salePrice == null) return null;
-    final rp = double.tryParse(regularPrice.replaceAll(RegExp(r'[^\d.,]'), ''));
-    final sp = double.tryParse(salePrice.replaceAll(RegExp(r'[^\d.,]'), ''));
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit to correctly parse the price format
+    final rp = PriceInfoCurrencyHelper.parsePriceToDouble(
+      regularPrice,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      currencyMinorUnit: currencyMinorUnit,
+    );
+    final sp = PriceInfoCurrencyHelper.parsePriceToDouble(
+      salePrice,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      currencyMinorUnit: currencyMinorUnit,
+    );
     if (rp == null || sp == null || rp <= 0 || sp >= rp) return null;
     return (((rp - sp) / rp) * 100).round();
   }
 
-  String _formatPrice(String? priceString, {String? currencyCode}) {
+  String _formatPrice(
+    String? priceString, {
+    String? currencyCode,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
+    int? currencyMinorUnit,
+  }) {
     if (priceString == null || priceString.isEmpty) {
       return PriceInfoCurrencyHelper.getDefaultPrice();
     }
-    final cleanPrice = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
-    final parsedPrice = double.tryParse(cleanPrice) ?? 0.0;
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit to correctly parse the price format
+    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
+      priceString,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      currencyMinorUnit: currencyMinorUnit,
+    ) ?? 0.0;
+    // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
       currencyCode: currencyCode,
-      decimalPlaces: 2,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      decimalPlaces: currencyMinorUnit ?? 2,
       removeTrailingZeros: true,
     );
   }

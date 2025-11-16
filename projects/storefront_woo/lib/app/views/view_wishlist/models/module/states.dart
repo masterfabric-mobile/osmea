@@ -7,6 +7,9 @@ class WishlistItem {
   final String? regularPrice;
   final String? salePrice;
   final String? currencyCode;
+  final String? currencyDecimalSeparator;
+  final String? currencyThousandSeparator;
+  final int? currencyMinorUnit;
   final bool onSale;
 
   WishlistItem({
@@ -17,6 +20,9 @@ class WishlistItem {
     this.regularPrice,
     this.salePrice,
     this.currencyCode,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyMinorUnit,
     this.onSale = false,
   });
 }

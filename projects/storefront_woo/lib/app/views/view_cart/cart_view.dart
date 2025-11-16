@@ -22,6 +22,10 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     super.snackBarFunction,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
+    super.useSafeArea = false,
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(coreAppBar: (context, viewModel) => const CartAppBarWidget()) {
     debugPrint('🛒 CartView: Constructor called');
@@ -73,8 +77,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     // Error state
     if (state is CartErrorState) {
       return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+        child: OsmeaComponents.padding(
+          padding: context.paddingNormal,
           child: CartErrorWidget(
             message: state.message,
             onRetry: () => viewModel.loadCart(),
@@ -86,8 +90,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     // Loading state
     if (state is CartLoadingState) {
       return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+        child: OsmeaComponents.padding(
+          padding: context.paddingNormal,
           child: const CartLoadingWidget(),
         ),
       );
@@ -96,8 +100,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     // Loaded state
     if (state is CartLoadedState) {
       return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+        child: OsmeaComponents.padding(
+          padding: context.paddingNormal,
           child: CartContentWidget(viewModel: viewModel, state: state),
         ),
       );
@@ -105,8 +109,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
 
     // Initial state
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+      child: OsmeaComponents.padding(
+        padding: context.paddingNormal,
         child: const CartLoadingWidget(),
       ),
     );

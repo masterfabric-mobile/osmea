@@ -237,14 +237,23 @@ class ProductDetailContentWidget extends StatelessWidget {
       );
     }
 
-    // Parse the price to double for proper formatting
-    final cleanPrice = priceString!.replaceAll(RegExp(r'[^\d.,]'), '');
-    final parsedPrice = double.tryParse(cleanPrice) ?? 0.0;
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit to correctly parse the price format
+    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
+      priceString!,
+      currencyCode: prices.currencyCode,
+      currencyDecimalSeparator: prices.currencyDecimalSeparator,
+      currencyThousandSeparator: prices.currencyThousandSeparator,
+      currencyMinorUnit: prices.currencyMinorUnit,
+    ) ?? 0.0;
 
     // Use PriceInfoCurrencyHelper for proper formatting
+    // Use API-provided separators to correctly format the price
     final formattedPrice = PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
       currencyCode: prices.currencyCode,
+      currencyDecimalSeparator: prices.currencyDecimalSeparator,
+      currencyThousandSeparator: prices.currencyThousandSeparator,
       decimalPlaces: prices.currencyMinorUnit ?? 2,
       removeTrailingZeros: true,
     );

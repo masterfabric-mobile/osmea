@@ -156,12 +156,24 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
             debugPrint('🛒 CartViewModel: Item variations: $variations');
           }
 
+          // Parse price using PriceInfoCurrencyHelper to handle formatted strings
+          // Use API-provided separators and minor_unit to correctly parse the price format
+          final itemPrice = item.prices?.price != null
+              ? PriceInfoCurrencyHelper.parsePriceToDouble(
+                  item.prices!.price!,
+                  currencyCode: item.prices?.currencyCode,
+                  currencyDecimalSeparator: item.prices?.currencyDecimalSeparator,
+                  currencyThousandSeparator: item.prices?.currencyThousandSeparator,
+                  currencyMinorUnit: item.prices?.currencyMinorUnit,
+                ) ?? 0.0
+              : 0.0;
+
           cartItems.add(
             CartItem(
               productId: item.id ?? 0,
               productName: item.name ?? '',
               quantity: item.quantity ?? 0,
-              price: double.tryParse(item.prices?.price ?? '0') ?? 0.0,
+              price: itemPrice,
               imageUrl: item.images?.isNotEmpty == true
                   ? item.images!.first.src
                   : null,
@@ -176,17 +188,30 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         debugPrint('🛒 CartViewModel: No items in response');
       }
 
-      final totalPrice = response.totals?.totalPrice != null
-          ? double.tryParse(response.totals!.totalPrice!) ?? 0.0
-          : 0.0;
-
-      // Extract currency information from API response totals
+      // Extract currency information from API response totals first
       final currencyCode =
           response.totals?.currencyCode?.toLowerCase() ??
           PriceInfoCurrencyHelper.currentCurrency;
+
+      // Parse total price using PriceInfoCurrencyHelper to handle formatted strings
+      // Use API-provided separators and minor_unit from totals if available
+      final totalPrice = response.totals?.totalPrice != null
+          ? PriceInfoCurrencyHelper.parsePriceToDouble(
+              response.totals!.totalPrice!,
+              currencyCode: currencyCode,
+              currencyDecimalSeparator: response.totals?.currencyDecimalSeparator,
+              currencyThousandSeparator: response.totals?.currencyThousandSeparator,
+              currencyMinorUnit: response.totals?.currencyMinorUnit,
+            ) ?? 0.0
+          : 0.0;
       final currencySymbol =
           response.totals?.currencySymbol ??
           PriceInfoCurrencyHelper.getCurrencySymbol(currencyCode: currencyCode);
+
+      // Extract currency formatting info from API response totals
+      final currencyDecimalSeparator = response.totals?.currencyDecimalSeparator;
+      final currencyThousandSeparator = response.totals?.currencyThousandSeparator;
+      final currencyMinorUnit = response.totals?.currencyMinorUnit;
 
       // Load coupons from cart coupons API
       List<ListCartCouponsResponseModel> coupons = [];
@@ -216,6 +241,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           billingAddress: response.billingAddress,
           currencyCode: currencyCode,
           currencySymbol: currencySymbol,
+          currencyDecimalSeparator: currencyDecimalSeparator,
+          currencyThousandSeparator: currencyThousandSeparator,
+          currencyMinorUnit: currencyMinorUnit,
         ),
       );
     } catch (e) {

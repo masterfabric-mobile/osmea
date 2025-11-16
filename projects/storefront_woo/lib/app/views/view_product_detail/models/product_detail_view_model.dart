@@ -804,6 +804,9 @@ class ProductDetailViewModel
         regularPrice: regularPrice,
         salePrice: salePrice,
         currencyCode: currencyCode,
+        currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+        currencyThousandSeparator: prices?.currencyThousandSeparator,
+        currencyMinorUnit: prices?.currencyMinorUnit,
         onSale: product.onSale == true,
       );
 

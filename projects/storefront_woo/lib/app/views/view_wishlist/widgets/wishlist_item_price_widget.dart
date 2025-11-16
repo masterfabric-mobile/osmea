@@ -72,14 +72,23 @@ class WishlistItemPriceWidget extends StatelessWidget {
       return PriceInfoCurrencyHelper.getDefaultPrice();
     }
 
-    // Clean price string (remove currency symbols, spaces, etc.)
-    final cleanPrice = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
-    final parsedPrice = double.tryParse(cleanPrice) ?? 0.0;
+    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+    // Use API-provided separators and minor_unit to correctly parse the price format
+    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
+      priceString,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: item.currencyDecimalSeparator,
+      currencyThousandSeparator: item.currencyThousandSeparator,
+      currencyMinorUnit: item.currencyMinorUnit,
+    ) ?? 0.0;
 
+    // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
       currencyCode: currencyCode,
-      decimalPlaces: 2,
+      currencyDecimalSeparator: item.currencyDecimalSeparator,
+      currencyThousandSeparator: item.currencyThousandSeparator,
+      decimalPlaces: item.currencyMinorUnit ?? 2,
       removeTrailingZeros: true,
     );
   }

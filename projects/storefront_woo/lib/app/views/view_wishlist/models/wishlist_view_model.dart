@@ -264,6 +264,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                 regularPrice: prices?.regularPrice ?? prices?.price ?? price,
                 salePrice: product.onSale == true ? prices?.salePrice : null,
                 currencyCode: prices?.currencyCode,
+                currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                currencyThousandSeparator: prices?.currencyThousandSeparator,
+                currencyMinorUnit: prices?.currencyMinorUnit,
                 onSale: product.onSale ?? false,
               ),
             );
@@ -658,6 +661,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                   regularPrice: safeString(item['regularPrice']),
                   salePrice: safeString(item['salePrice']),
                   currencyCode: safeString(item['currencyCode']),
+                  currencyDecimalSeparator: safeString(item['currencyDecimalSeparator']),
+                  currencyThousandSeparator: safeString(item['currencyThousandSeparator']),
+                  currencyMinorUnit: safeInt(item['currencyMinorUnit']),
                   onSale: safeBool(item['onSale'], defaultValue: false),
                 );
               } catch (e) {

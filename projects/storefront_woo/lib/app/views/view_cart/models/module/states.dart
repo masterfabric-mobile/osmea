@@ -6,6 +6,7 @@
  */
 
 import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/freezed_model/response/list_cart_coupons_response_model.dart';
+import 'package:core/core.dart';
 
 /// Simple cart item model for states
 class CartItem {
@@ -74,6 +75,9 @@ class CartLoadedState extends CartState {
   final dynamic billingAddress;
   final String? currencyCode;
   final String? currencySymbol;
+  final String? currencyDecimalSeparator;
+  final String? currencyThousandSeparator;
+  final int? currencyMinorUnit;
 
   CartLoadedState({
     required this.cartItems,
@@ -84,6 +88,9 @@ class CartLoadedState extends CartState {
     required this.billingAddress,
     this.currencyCode,
     this.currencySymbol,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyMinorUnit,
   });
 
   CartLoadedState copyWith({
@@ -95,6 +102,9 @@ class CartLoadedState extends CartState {
     dynamic billingAddress,
     String? currencyCode,
     String? currencySymbol,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
+    int? currencyMinorUnit,
   }) {
     return CartLoadedState(
       cartItems: cartItems ?? this.cartItems,
@@ -105,6 +115,9 @@ class CartLoadedState extends CartState {
       billingAddress: billingAddress ?? this.billingAddress,
       currencyCode: currencyCode ?? this.currencyCode,
       currencySymbol: currencySymbol ?? this.currencySymbol,
+      currencyDecimalSeparator: currencyDecimalSeparator ?? this.currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator ?? this.currencyThousandSeparator,
+      currencyMinorUnit: currencyMinorUnit ?? this.currencyMinorUnit,
     );
   }
 
@@ -113,7 +126,15 @@ class CartLoadedState extends CartState {
     double discount = 0.0;
     for (final coupon in coupons) {
       if (coupon.totals?.totalDiscount != null) {
-        discount += double.tryParse(coupon.totals!.totalDiscount!) ?? 0.0;
+        // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
+        // Use API-provided separators and minor_unit from coupon totals if available
+        discount += PriceInfoCurrencyHelper.parsePriceToDouble(
+          coupon.totals!.totalDiscount!,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: coupon.totals?.currencyDecimalSeparator,
+          currencyThousandSeparator: coupon.totals?.currencyThousandSeparator,
+          currencyMinorUnit: coupon.totals?.currencyMinorUnit,
+        ) ?? 0.0;
       }
     }
     return discount;
