@@ -12,8 +12,10 @@ class WishlistView
     super.key,
     super.verticalPadding = const PaddingVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
-    super.backgroundColor = OsmeaColors.white,
     super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+
     required super.goRoute,
     Map<String, dynamic>? arguments,
   }) : super(

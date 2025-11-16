@@ -20,12 +20,11 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     super.arguments,
     super.currentView,
     super.snackBarFunction,
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
-    super.useSafeArea = false,
-    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
-    super.horizontalPadding = const PaddingVisibility.disabled(),
     super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.enabled(),
     required super.goRoute,
   }) : super(coreAppBar: (context, viewModel) => const CartAppBarWidget()) {
     debugPrint('🛒 CartView: Constructor called');
@@ -76,43 +75,23 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
   ) {
     // Error state
     if (state is CartErrorState) {
-      return SafeArea(
-        child: OsmeaComponents.padding(
-          padding: context.paddingNormal,
-          child: CartErrorWidget(
-            message: state.message,
-            onRetry: () => viewModel.loadCart(),
-          ),
-        ),
+      return CartErrorWidget(
+        message: state.message,
+        onRetry: () => viewModel.loadCart(),
       );
     }
 
     // Loading state
     if (state is CartLoadingState) {
-      return SafeArea(
-        child: OsmeaComponents.padding(
-          padding: context.paddingNormal,
-          child: const CartLoadingWidget(),
-        ),
-      );
+      return const CartLoadingWidget();
     }
 
     // Loaded state
     if (state is CartLoadedState) {
-      return SafeArea(
-        child: OsmeaComponents.padding(
-          padding: context.paddingNormal,
-          child: CartContentWidget(viewModel: viewModel, state: state),
-        ),
-      );
+      return CartContentWidget(viewModel: viewModel, state: state);
     }
 
     // Initial state
-    return SafeArea(
-      child: OsmeaComponents.padding(
-        padding: context.paddingNormal,
-        child: const CartLoadingWidget(),
-      ),
-    );
+    return const CartLoadingWidget();
   }
 }
