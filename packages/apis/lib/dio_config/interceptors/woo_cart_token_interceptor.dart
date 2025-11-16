@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
+import 'package:apis/utils/api_error_utils.dart';
 
 /// 🛒 Cart Token Interceptor for WooCommerce API requests
 ///
@@ -37,7 +38,7 @@ class WooCartTokenInterceptor extends Interceptor {
       _dioLogger.printErrorLogs(
         DioException(
           requestOptions: options,
-          error: 'Failed to add cart token to request: $e',
+          error: ApiErrorUtils.getErrorMessage(e),
           type: DioExceptionType.unknown,
         ),
       );
@@ -256,8 +257,12 @@ class WooCartTokenInterceptor extends Interceptor {
   /// 🛒 Handle cart token errors
   Future<void> _handleCartTokenError(DioException err) async {
     try {
+      // Check if error is related to cart token using ApiErrorUtils
+      final errorMessage = ApiErrorUtils.getErrorMessage(err);
+      final statusCode = err.response?.statusCode;
+
       // Check if error is related to cart token
-      if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
+      if (statusCode == 401 || statusCode == 403) {
         // Check if the error is cart token related
         final responseData = err.response?.data;
         if (responseData is Map<String, dynamic>) {
@@ -265,12 +270,23 @@ class WooCartTokenInterceptor extends Interceptor {
           if (message.toLowerCase().contains('cart') ||
               message.toLowerCase().contains('token')) {
             debugPrint('🛒 Cart token error detected, clearing token...');
+            debugPrint('🛒 Error message: $errorMessage');
+            await WooCartTokenStorage.clearCartToken();
+          }
+        } else {
+          // Use ApiErrorUtils to check error message
+          if (errorMessage.toLowerCase().contains('unauthorized') ||
+              errorMessage.toLowerCase().contains('forbidden')) {
+            debugPrint(
+                '🛒 Authentication error detected, clearing cart token...');
+            debugPrint('🛒 Error message: $errorMessage');
             await WooCartTokenStorage.clearCartToken();
           }
         }
       }
     } catch (e) {
-      debugPrint('❌ Error handling cart token error: $e');
+      debugPrint(
+          '❌ Error handling cart token error: ${ApiErrorUtils.getErrorMessage(e)}');
     }
   }
 

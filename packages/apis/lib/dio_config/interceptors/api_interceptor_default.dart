@@ -1,5 +1,6 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
@@ -49,28 +50,15 @@ class ApiInterceptorDefault extends Interceptor {
     // 📥 Log incoming response
     _dioLogger.printOnResponseLogs(response);
     // 🛑 Map common HTTP errors to DioException with friendly messages
-    final errorMessages = <int, String>{
-      400: "Bad Request",
-      401: "Unauthorized",
-      403: "Forbidden",
-      404: "Not Found",
-      405: "Method Not Allowed",
-      406: "Not Acceptable",
-      409: "Conflict",
-      422: "Unprocessable Entity",
-      429: "Too Many Requests",
-      500: "Internal Server Error",
-      503: "Service Unavailable",
-      504: "Gateway Timeout",
-      301: "Moved Permanently",
-    };
+    // Uses ApiErrorUtils for centralized error message mapping
     final statusCode = response.statusCode;
-    if (statusCode != null && errorMessages.containsKey(statusCode)) {
+    final errorMessage = ApiErrorUtils.getErrorMessageForStatusCode(statusCode);
+    if (errorMessage != null) {
       return handler.reject(DioException(
         requestOptions: response.requestOptions,
         response: response,
         type: DioExceptionType.badResponse,
-        error: errorMessages[statusCode],
+        error: errorMessage,
       ));
     }
     super.onResponse(response, handler);

@@ -5,6 +5,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:apis/services/auth/woo_jwt_auth_service.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:core/core.dart';
 
 /// 🔐 JWT Interceptor for WooCommerce API requests
@@ -37,7 +38,7 @@ class WooJwtInterceptor extends Interceptor {
       _dioLogger.printErrorLogs(
         DioException(
           requestOptions: options,
-          error: 'Failed to add JWT token to request: $e',
+          error: ApiErrorUtils.getErrorMessage(e),
           type: DioExceptionType.unknown,
         ),
       );
@@ -254,7 +255,7 @@ class WooJwtEnhancedInterceptor extends Interceptor {
       _dioLogger.printErrorLogs(
         DioException(
           requestOptions: options,
-          error: 'Failed to add authentication to request: $e',
+          error: ApiErrorUtils.getErrorMessage(e),
           type: DioExceptionType.unknown,
         ),
       );

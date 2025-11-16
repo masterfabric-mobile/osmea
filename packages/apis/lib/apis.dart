@@ -17,6 +17,9 @@ export 'models/cart/woo_cart_token.dart';
 export 'dio_config/interceptors/woo_cart_token_interceptor.dart';
 export 'utils/cart_token_utils.dart';
 
+// 🛡️ Error Handling Utilities
+export 'utils/api_error_utils.dart';
+
 // 🚀 GraphQL Annotations
 export 'network/remote/shopify/graphql/annotations/graphql_annotations.dart';
 
