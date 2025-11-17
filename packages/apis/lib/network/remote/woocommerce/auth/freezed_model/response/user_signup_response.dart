@@ -14,8 +14,30 @@ class UserSignUpResponse with _$UserSignUpResponse {
     Map<String, dynamic>? metadata,
   }) = _UserSignUpResponse;
 
-  factory UserSignUpResponse.fromJson(Map<String, dynamic> json) =>
-      _$UserSignUpResponseFromJson(json);
+  factory UserSignUpResponse.fromJson(Map<String, dynamic> json) {
+    // Backend sends "user" field but we expect "data"
+    // Map "user" to "data" if it exists
+    if (json['user'] != null && json['data'] == null) {
+      json = Map<String, dynamic>.from(json);
+      final userMap = json['user'] as Map<String, dynamic>;
+
+      // Transform WordPress user format to our UserSignUpData format
+      json['data'] = {
+        'user_id': userMap['ID']?.toString() ?? '',
+        'email': userMap['user_email'] ?? '',
+        'first_name':
+            (userMap['display_name'] as String?)?.split(' ').first ?? '',
+        'last_name': (userMap['display_name'] as String?)
+                ?.split(' ')
+                .skip(1)
+                .join(' ') ??
+            '',
+        'created_at': userMap['user_registered'],
+      };
+    }
+
+    return _$UserSignUpResponseFromJson(json);
+  }
 }
 
 /// 🔐 User Sign Up Data Model
