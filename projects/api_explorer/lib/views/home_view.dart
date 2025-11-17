@@ -11,6 +11,11 @@ import 'package:apis/apis.dart';
 import 'package:apis/services/store_change_notifier.dart';
 import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:api_explorer/services/app_state_persistence.dart';
+import 'package:api_explorer/services/handlers/woocommerce/auth_handlers/get_users_me_handler.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/get_users_me_response.dart';
+import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
+import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
@@ -45,6 +50,10 @@ class _HomeViewState extends State<HomeView>
 
   // Password update state
   bool _showPasswordUpdate = false;
+
+  // WordPress user state
+  GetUsersMeResponse? _currentWordPressUser;
+  bool _loadingUserInfo = false;
 
   // Scaffold key for drawer control
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -754,10 +763,10 @@ class _HomeViewState extends State<HomeView>
   void _showStoreProfileDialog() {
     OsmeaComponents.showPopup(
       context: context,
-      size: PopupSize.medium,
+      size: PopupSize.large, // Increased size for WordPress user info
       variant: PopupVariant.modal,
       title: 'Store Profile',
-      subtitle: 'Store configuration details',
+      subtitle: 'Store configuration and WordPress user details',
       backgroundColor: OsmeaColors.white,
       child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
@@ -823,6 +832,201 @@ class _HomeViewState extends State<HomeView>
           ),
 
           OsmeaComponents.sizedBox(height: context.spacing20),
+
+          // WordPress User Information Section (only for WooCommerce stores)
+          if (_selectedStore?.platform == 'woocommerce') ...[
+            OsmeaComponents.container(
+              padding: EdgeInsets.all(context.spacing16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    OsmeaColors.deepSea.withValues(alpha: 0.1),
+                    OsmeaColors.forestHeart.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: context.borderRadiusNormal,
+                border: Border.all(
+                  color: OsmeaColors.deepSea.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OsmeaComponents.row(
+                    children: [
+                      OsmeaComponents.container(
+                        padding: EdgeInsets.all(context.spacing8),
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.deepSea.withValues(alpha: 0.15),
+                          borderRadius: context.borderRadiusMinStandard,
+                        ),
+                        child: Icon(
+                          Icons.account_circle_rounded,
+                          color: OsmeaColors.deepSea,
+                          size: 20,
+                        ),
+                      ),
+                      OsmeaComponents.sizedBox(width: context.spacing12),
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.text(
+                          'WordPress User Information',
+                          variant: OsmeaTextVariant.titleSmall,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: OsmeaColors.eclipse,
+                        ),
+                      ),
+                      if (_loadingUserInfo)
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                OsmeaColors.deepSea),
+                          ),
+                        ),
+                    ],
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing12),
+                  
+                  if (_currentWordPressUser != null) ...[
+                    _buildUserInfoRow('Name', _currentWordPressUser!.name ?? 'Unknown', Icons.person),
+                    OsmeaComponents.sizedBox(height: context.spacing8),
+                    _buildUserInfoRow('ID', _currentWordPressUser!.id?.toString() ?? 'Unknown', Icons.fingerprint),
+                    if (_currentWordPressUser!.slug != null) ...[
+                      OsmeaComponents.sizedBox(height: context.spacing8),
+                      _buildUserInfoRow('Slug', _currentWordPressUser!.slug!, Icons.alternate_email),
+                    ],
+                    OsmeaComponents.sizedBox(height: context.spacing8),
+                    _buildUserInfoRow('Super Admin', _currentWordPressUser!.isSuperAdmin == true ? 'Yes' : 'No', 
+                        _currentWordPressUser!.isSuperAdmin == true ? Icons.admin_panel_settings : Icons.person),
+                  ] else if (!_loadingUserInfo) ...[
+                    OsmeaComponents.container(
+                      padding: EdgeInsets.all(context.spacing12),
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.amberFlame.withValues(alpha: 0.1),
+                        borderRadius: context.borderRadiusMinStandard,
+                        border: Border.all(
+                          color: OsmeaColors.amberFlame.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: OsmeaComponents.column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          OsmeaComponents.row(
+                            children: [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: OsmeaColors.amberFlame,
+                                size: 18,
+                              ),
+                              OsmeaComponents.sizedBox(width: context.spacing8),
+                              OsmeaComponents.expanded(
+                                child: OsmeaComponents.text(
+                                  'No WordPress user loaded. Please login first to get JWT token.',
+                                  variant: OsmeaTextVariant.bodySmall,
+                                  fontSize: 12,
+                                  color: OsmeaColors.eclipse,
+                                ),
+                              ),
+                            ],
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing8),
+                          // Quick Login Button
+                          TextButton.icon(
+                            onPressed: () => _showQuickLoginDialog(),
+                            icon: Icon(
+                              Icons.login,
+                              size: 14,
+                              color: OsmeaColors.forestHeart,
+                            ),
+                            label: OsmeaComponents.text(
+                              'Quick Login',
+                              variant: OsmeaTextVariant.bodySmall,
+                              fontSize: 11,
+                              color: OsmeaColors.forestHeart,
+                            ),
+                            style: TextButton.styleFrom(
+                              backgroundColor: OsmeaColors.forestHeart.withValues(alpha: 0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: context.borderRadiusMinStandard,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.spacing8,
+                                vertical: context.spacing4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  
+                  OsmeaComponents.sizedBox(height: context.spacing12),
+                  
+                  // Load User Info & Debug Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton.icon(
+                          onPressed: _loadingUserInfo ? null : () => _loadWordPressUserInfo(),
+                          icon: Icon(
+                            _loadingUserInfo ? Icons.refresh : Icons.download,
+                            size: 16,
+                            color: _loadingUserInfo ? OsmeaColors.silver : OsmeaColors.deepSea,
+                          ),
+                          label: OsmeaComponents.text(
+                            _loadingUserInfo ? 'Loading...' : 'Load User Info',
+                            variant: OsmeaTextVariant.bodySmall,
+                            fontSize: 12,
+                            color: _loadingUserInfo ? OsmeaColors.silver : OsmeaColors.deepSea,
+                          ),
+                          style: TextButton.styleFrom(
+                            backgroundColor: _loadingUserInfo 
+                                ? OsmeaColors.silver.withValues(alpha: 0.1)
+                                : OsmeaColors.deepSea.withValues(alpha: 0.1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: context.borderRadiusMinStandard,
+                            ),
+                          ),
+                        ),
+                      ),
+                      OsmeaComponents.sizedBox(width: context.spacing8),
+                      // Debug JWT Button
+                      TextButton.icon(
+                        onPressed: () => _debugJWTStorage(),
+                        icon: Icon(
+                          Icons.bug_report,
+                          size: 14,
+                          color: OsmeaColors.amberFlame,
+                        ),
+                        label: OsmeaComponents.text(
+                          'Debug JWT',
+                          variant: OsmeaTextVariant.bodySmall,
+                          fontSize: 10,
+                          color: OsmeaColors.amberFlame,
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: OsmeaColors.amberFlame.withValues(alpha: 0.1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: context.borderRadiusMinStandard,
+                          ),
+                          minimumSize: Size(60, 32),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            OsmeaComponents.sizedBox(height: context.spacing20),
+          ],
 
           // Store Details Section
           OsmeaComponents.container(
@@ -1263,6 +1467,338 @@ class _HomeViewState extends State<HomeView>
               ),
             ),
           ),
+      ],
+    );
+  }
+
+  /// 👤 Load WordPress user information using handler
+  Future<void> _loadWordPressUserInfo() async {
+    debugPrint('👤 Loading WordPress user info using handler...');
+    
+    if (mounted) {
+      setState(() {
+        _loadingUserInfo = true;
+      });
+    }
+
+    try {
+      // First debug the storage state
+      debugPrint('🔍 Debugging storage state...');
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      debugPrint('📋 Has token: $hasToken');
+      
+      if (hasToken) {
+        final token = await WooJwtTokenStorage.loadToken();
+        if (token != null) {
+          debugPrint('✅ Token loaded successfully');
+          debugPrint('🔐 Token type: ${token.tokenType}');
+          debugPrint('⏰ Expires in: ${token.expiresIn}');
+          debugPrint('📅 Issued at: ${token.issuedAt}');
+          debugPrint('🔑 Access token preview: ${token.accessToken.length > 20 ? token.accessToken.substring(0, 20) + "..." : token.accessToken}');
+          debugPrint('🔄 Is expired: ${token.isExpired}');
+          
+          if (token.isExpired) {
+            debugPrint('⚠️ Token is expired!');
+          }
+        } else {
+          debugPrint('❌ Token is null despite hasToken=true');
+        }
+      }
+      
+      // Use the GetUsersMeHandler to get user info
+      final handler = GetUsersMeHandler();
+      final result = await handler.handleRequest('GET', {});
+      
+      debugPrint('📡 Handler result: ${result["status"]}');
+      
+      if (result["status"] == "success" && result["user_data"] != null) {
+        // Parse the user data from handler response
+        final userData = result["user_data"] as Map<String, dynamic>;
+        final userResponse = GetUsersMeResponse.fromJson(userData);
+        
+        if (mounted) {
+          setState(() {
+            _currentWordPressUser = userResponse;
+            _loadingUserInfo = false;
+          });
+        }
+        
+        debugPrint('✅ WordPress user loaded: ${userResponse.name}');
+        _showSnackBar('WordPress user information loaded successfully!', isError: false);
+        
+      } else {
+        // Handler returned an error
+        final errorMessage = result["message"] ?? "Failed to load user information";
+        debugPrint('❌ Handler error: $errorMessage');
+        
+        // Show detailed error information from handler
+        if (result["error_details"] != null) {
+          final errorDetails = result["error_details"] as Map<String, dynamic>;
+          debugPrint('🔍 Error details: $errorDetails');
+          
+          // If it's an authentication error, show more helpful message
+          if (errorDetails["type"] == "authentication_error") {
+            final suggestion = errorDetails["suggestion"] ?? errorMessage;
+            _showSnackBar('Authentication required: $suggestion', isError: true);
+          } else {
+            _showSnackBar(errorMessage, isError: true);
+          }
+        } else {
+          _showSnackBar(errorMessage, isError: true);
+        }
+        
+        if (mounted) {
+          setState(() {
+            _currentWordPressUser = null;
+            _loadingUserInfo = false;
+          });
+        }
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Error loading WordPress user: $e');
+      
+      if (mounted) {
+        setState(() {
+          _currentWordPressUser = null;
+          _loadingUserInfo = false;
+        });
+      }
+      
+      _showSnackBar('Error loading user information: ${e.toString()}', isError: true);
+    }
+  }
+
+  /// 🐛 Debug JWT Storage state
+  Future<void> _debugJWTStorage() async {
+    try {
+      debugPrint('🐛 Starting JWT Storage Debug...');
+      
+      // Check basic token presence
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      debugPrint('📋 Has token: $hasToken');
+      
+      // Get storage statistics
+      final stats = await WooJwtTokenStorage.getStorageStats();
+      debugPrint('📊 Storage stats: $stats');
+      
+      // Try to load token
+      final token = await WooJwtTokenStorage.loadToken();
+      if (token != null) {
+        debugPrint('✅ Token found in storage:');
+        debugPrint('  - Token type: ${token.tokenType}');
+        debugPrint('  - Access token length: ${token.accessToken.length}');
+        debugPrint('  - Access token preview: ${token.accessToken.length > 20 ? token.accessToken.substring(0, 20) + "..." : token.accessToken}');
+        debugPrint('  - Expires in: ${token.expiresIn} seconds');
+        debugPrint('  - Issued at: ${token.issuedAt}');
+        debugPrint('  - Expires at: ${token.expiresAt}');
+        debugPrint('  - Is expired: ${token.isExpired}');
+        debugPrint('  - Needs refresh: ${token.needsRefresh}');
+        debugPrint('  - Refresh token: ${token.refreshToken != null ? "Present" : "Not present"}');
+        debugPrint('  - Scope: ${token.scope ?? "None"}');
+        debugPrint('  - User data: ${token.userData != null ? "Present (${token.userData!.keys.length} fields)" : "Not present"}');
+        
+        // Show success message
+        _showSnackBar('JWT Debug: Token found, check console for details', isError: false);
+        
+      } else {
+        debugPrint('❌ No token found in storage');
+        _showSnackBar('JWT Debug: No token found in storage', isError: true);
+      }
+      
+      // Check token expiry
+      final isExpired = await WooJwtTokenStorage.isTokenExpired();
+      debugPrint('⏰ Is expired: $isExpired');
+      
+      // Get token info
+      final tokenInfo = await WooJwtTokenStorage.getTokenInfo();
+      debugPrint('ℹ️ Token info: $tokenInfo');
+      
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error debugging JWT storage: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      _showSnackBar('JWT Debug Error: $e', isError: true);
+    }
+  }
+
+  /// 🚀 Show Quick Login Dialog
+  void _showQuickLoginDialog() {
+    final emailController = TextEditingController(text: 'admin@ticimex.store');
+    final passwordController = TextEditingController(text: 'admin');
+    bool isLoggingIn = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.login, color: OsmeaColors.nordicBlue),
+              OsmeaComponents.sizedBox(width: context.spacing8),
+              OsmeaComponents.text(
+                'WordPress Login',
+                variant: OsmeaTextVariant.titleMedium,
+                color: OsmeaColors.nordicBlue,
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              if (isLoggingIn)
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    OsmeaComponents.sizedBox(width: context.spacing8),
+                    OsmeaComponents.text('Logging in...', fontSize: 12),
+                  ],
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoggingIn ? null : () => Navigator.pop(context),
+              child: OsmeaComponents.text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: isLoggingIn ? null : () async {
+                setDialogState(() => isLoggingIn = true);
+                
+                try {
+                  await _performQuickLogin(
+                    emailController.text.trim(),
+                    passwordController.text.trim(),
+                  );
+                  Navigator.pop(context);
+                  _showSnackBar('Login successful! You can now load user info.', isError: false);
+                } catch (e) {
+                  _showSnackBar('Login failed: ${e.toString()}', isError: true);
+                } finally {
+                  if (mounted) {
+                    setDialogState(() => isLoggingIn = false);
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: OsmeaColors.nordicBlue,
+                foregroundColor: Colors.white,
+              ),
+              child: OsmeaComponents.text('Login'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 🔐 Perform Quick Login
+  Future<void> _performQuickLogin(String email, String password) async {
+    if (email.isEmpty || password.isEmpty) {
+      throw Exception('Email and password are required');
+    }
+
+    try {
+      debugPrint('🔐 Performing quick login for email: $email');
+      
+      // Get the WooAuthService
+      final authService = GetIt.I<WooAuthService>();
+      
+      // Create login request
+      final loginRequest = UserLoginRequest(
+        email: email,
+        password: password,
+      );
+      
+      debugPrint('📡 Sending login request...');
+      final response = await authService.userLogin('ticimex', loginRequest);
+      
+      if (response.success && response.data?.jwt != null && response.data!.jwt!.isNotEmpty) {
+        debugPrint('✅ Login successful, JWT token received');
+        
+        // Create JWT token object
+        final jwtToken = WooJwtToken(
+          accessToken: response.data!.jwt!,
+          tokenType: response.data?.tokenType ?? 'Bearer',
+          expiresIn: response.data?.expiresIn ?? 3600, // Default 1 hour
+          issuedAt: DateTime.now(),
+          refreshToken: response.data?.refreshToken,
+          scope: response.data?.scope,
+          userData: {
+            'user_id': response.data?.user?.id,
+            'user_email': response.data?.user?.email,
+            'user_first_name': response.data?.user?.firstName,
+            'user_last_name': response.data?.user?.lastName,
+            'user_phone': response.data?.user?.phone,
+            'user_company': response.data?.user?.company,
+          },
+        );
+        
+        // Save token to storage
+        await WooJwtTokenStorage.saveToken(jwtToken);
+        debugPrint('💾 JWT token saved to storage successfully');
+        
+      } else {
+        throw Exception('Login failed: ${response.message ?? "No JWT token received from server"}');
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Quick login error: $e');
+      rethrow;
+    }
+  }
+
+  Widget _buildUserInfoRow(String label, String value, IconData icon) {
+    return OsmeaComponents.row(
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: OsmeaColors.deepSea,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing8),
+        OsmeaComponents.text(
+          '$label:',
+          variant: OsmeaTextVariant.bodySmall,
+          fontSize: 11,
+          color: OsmeaColors.slate,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing6),
+        OsmeaComponents.expanded(
+          child: OsmeaComponents.text(
+            value,
+            variant: OsmeaTextVariant.bodySmall,
+            fontSize: 11,
+            color: OsmeaColors.eclipse,
+            fontWeight: FontWeight.w600,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }
