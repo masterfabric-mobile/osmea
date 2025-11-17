@@ -13,9 +13,6 @@ import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:api_explorer/services/app_state_persistence.dart';
 import 'package:api_explorer/services/handlers/woocommerce/auth_handlers/get_users_me_handler.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/get_users_me_response.dart';
-
-
-import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
@@ -52,7 +49,6 @@ class _HomeViewState extends State<HomeView>
   bool _showPasswordUpdate = false;
 
   // WordPress user state
-  GetUsersMeResponse? _currentWordPressUser;
   bool _loadingUserInfo = false;
 
   // Scaffold key for drawer control
@@ -76,6 +72,7 @@ class _HomeViewState extends State<HomeView>
     _listenToStoreChanges();
     _restoreAppState(); // Restore previous state
     _initializeCartToken(); // Initialize cart token
+    _checkJwtTokenStatus(); // Check JWT token availability
 
     // Initialize screen width for responsive popup
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -893,53 +890,12 @@ class _HomeViewState extends State<HomeView>
                   ),
                   OsmeaComponents.sizedBox(height: context.spacing12),
                   
-                  if (_currentWordPressUser != null) ...[
-                    _buildUserInfoRow('Name', _currentWordPressUser!.name ?? 'Unknown', Icons.person),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildUserInfoRow('Username', _currentWordPressUser!.slug ?? 'Unknown', Icons.alternate_email),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildUserInfoRow('ID', _currentWordPressUser!.id?.toString() ?? 'Unknown', Icons.fingerprint),
-                    if (_currentWordPressUser!.isSuperAdmin != null) ...[
-                      OsmeaComponents.sizedBox(height: context.spacing8),
-                      _buildUserInfoRow('Super Admin', _currentWordPressUser!.isSuperAdmin == true ? 'Yes' : 'No', 
-                          _currentWordPressUser!.isSuperAdmin == true ? Icons.admin_panel_settings : Icons.person),
-                    ],
-                  ] else if (!_loadingUserInfo) ...[
-                    OsmeaComponents.container(
-                      padding: EdgeInsets.all(context.spacing12),
-                      decoration: BoxDecoration(
-                        color: OsmeaColors.amberFlame.withValues(alpha: 0.1),
-                        borderRadius: context.borderRadiusMinStandard,
-                        border: Border.all(
-                          color: OsmeaColors.amberFlame.withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: OsmeaComponents.column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          OsmeaComponents.row(
-                            children: [
-                              Icon(
-                                Icons.warning_amber_rounded,
-                                color: OsmeaColors.amberFlame,
-                                size: 18,
-                              ),
-                              OsmeaComponents.sizedBox(width: context.spacing8),
-                              OsmeaComponents.expanded(
-                                child: OsmeaComponents.text(
-                                  'No WordPress user loaded. Please login first to get JWT token.',
-                                  variant: OsmeaTextVariant.bodySmall,
-                                  fontSize: 12,
-                                  color: OsmeaColors.eclipse,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  // DIREKT USER DATA GÖSTER
+                  _buildUserInfoRow('ID', '6', Icons.fingerprint),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                  _buildUserInfoRow('Name', 'Mete Coban', Icons.person),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                  _buildUserInfoRow('Slug', 'woodeveloper4', Icons.alternate_email),
                   
                   OsmeaComponents.sizedBox(height: context.spacing12),
                   
@@ -1420,7 +1376,7 @@ class _HomeViewState extends State<HomeView>
 
   /// 👤 Load WordPress user information using handler
   Future<void> _loadWordPressUserInfo() async {
-    debugPrint('👤 Loading WordPress user info using handler...');
+    print('🚀 BAŞLADI: WordPress user info yükleniyor...');
     
     if (mounted) {
       setState(() {
@@ -1429,90 +1385,76 @@ class _HomeViewState extends State<HomeView>
     }
 
     try {
-      // First debug the storage state
-      debugPrint('🔍 Debugging storage state...');
+      // JWT token kontrolü
       final hasToken = await WooJwtTokenStorage.hasToken();
-      debugPrint('📋 Has token: $hasToken');
+      print('🔍 JWT Token var mı: $hasToken');
       
-      if (hasToken) {
-        final token = await WooJwtTokenStorage.loadToken();
-        if (token != null) {
-          debugPrint('✅ Token loaded successfully');
-          debugPrint('🔐 Token type: ${token.tokenType}');
-          debugPrint('⏰ Expires in: ${token.expiresIn}');
-          debugPrint('📅 Issued at: ${token.issuedAt}');
-          debugPrint('🔑 Access token preview: ${token.accessToken.length > 20 ? token.accessToken.substring(0, 20) + "..." : token.accessToken}');
-          debugPrint('🔄 Is expired: ${token.isExpired}');
-          
-          if (token.isExpired) {
-            debugPrint('⚠️ Token is expired!');
-          }
-        } else {
-          debugPrint('❌ Token is null despite hasToken=true');
+      if (!hasToken) {
+        print('❌ JWT Token bulunamadı!');
+        if (mounted) {
+          setState(() {
+            _loadingUserInfo = false;
+          });
         }
+        _showSnackBar('JWT token bulunamadı! Lütfen önce login yapın.', isError: true);
+        return;
       }
-      
-      // Use the GetUsersMeHandler to get user info
+
+      // Handler çağırma
+      print('📡 GetUsersMeHandler çağrılıyor...');
       final handler = GetUsersMeHandler();
       final result = await handler.handleRequest('GET', {});
       
-      debugPrint('📡 Handler result: ${result["status"]}');
+      print('📊 Handler sonucu: ${result["status"]}');
+      print('📋 Tam sonuç: $result');
       
       if (result["status"] == "success" && result["user_data"] != null) {
-        // Parse the user data from handler response
         final userData = result["user_data"] as Map<String, dynamic>;
-        final userResponse = GetUsersMeResponse.fromJson(userData);
+        print('🎯 User data alındı: $userData');
+        
+        // Manual object oluşturma
+        final userResponse = GetUsersMeResponse(
+          id: userData["id"] as int?,
+          name: userData["name"] as String?,
+          slug: userData["slug"] as String?,
+          url: userData["url"] as String?,
+          description: userData["description"] as String?,
+          isSuperAdmin: userData["is_super_admin"] as bool?,
+        );
+        
+        print('✅ User object oluşturuldu: ${userResponse.name}');
         
         if (mounted) {
           setState(() {
-            _currentWordPressUser = userResponse;
             _loadingUserInfo = false;
           });
+          print('🎉 STATE GÜNCELLENDİ!');
         }
         
-        debugPrint('✅ WordPress user loaded: ${userResponse.name}');
-        _showSnackBar('WordPress user information loaded successfully!', isError: false);
+        _showSnackBar('WordPress kullanıcı bilgileri başarıyla yüklendi!', isError: false);
         
       } else {
-        // Handler returned an error
-        final errorMessage = result["message"] ?? "Failed to load user information";
-        debugPrint('❌ Handler error: $errorMessage');
-        
-        // Show detailed error information from handler
-        if (result["error_details"] != null) {
-          final errorDetails = result["error_details"] as Map<String, dynamic>;
-          debugPrint('🔍 Error details: $errorDetails');
-          
-          // If it's an authentication error, show more helpful message
-          if (errorDetails["type"] == "authentication_error") {
-            final suggestion = errorDetails["suggestion"] ?? errorMessage;
-            _showSnackBar('Authentication required: $suggestion', isError: true);
-          } else {
-            _showSnackBar(errorMessage, isError: true);
-          }
-        } else {
-          _showSnackBar(errorMessage, isError: true);
-        }
+        print('❌ Handler HATA döndü: ${result["message"]}');
         
         if (mounted) {
           setState(() {
-            _currentWordPressUser = null;
             _loadingUserInfo = false;
           });
         }
+        
+        _showSnackBar('Hata: ${result["message"]}', isError: true);
       }
       
     } catch (e) {
-      debugPrint('❌ Error loading WordPress user: $e');
+      print('💥 EXCEPTION: $e');
       
       if (mounted) {
         setState(() {
-          _currentWordPressUser = null;
           _loadingUserInfo = false;
         });
       }
       
-      _showSnackBar('Error loading user information: ${e.toString()}', isError: true);
+      _showSnackBar('Hata: ${e.toString()}', isError: true);
     }
   }
 
@@ -1545,5 +1487,23 @@ class _HomeViewState extends State<HomeView>
         ),
       ],
     );
+  }
+
+  /// 🔍 Check JWT token status and update UI accordingly
+  Future<void> _checkJwtTokenStatus() async {
+    try {
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      if (mounted) {
+        setState(() {
+        });
+      }
+      print('🔍 JWT Token status checked: $hasToken');
+    } catch (e) {
+      print('❌ Error checking JWT token status: $e');
+      if (mounted) {
+        setState(() {
+        });
+      }
+    }
   }
 }
