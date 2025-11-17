@@ -10,9 +10,7 @@ import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
-import 'package:core/src/views/account/account_view.dart';
 import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
-import 'package:core/src/views/account/widgets/orders_list_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -116,8 +114,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -132,7 +130,7 @@ final GoRouter appRouter = GoRouter(
               (type) => type.name == emptyTypeStr,
               orElse: () => EmptyType.general,
             );
-            
+
             // Get custom parameters from query
             final queryParams = state.uri.queryParameters;
             final customTitle = queryParams['title'];
@@ -166,8 +164,8 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -378,8 +376,13 @@ final GoRouter appRouter = GoRouter(
             debugPrint('✅ Sign in successful! Navigating to /home');
             context.go('/home');
           },
+          onSignUpSuccess: () {
+            debugPrint('✅ Sign up successful! Navigating to /home');
+            context.go('/home');
+          },
           arguments: {
             'auth': true,
+            'authCubit': GetIt.I<AuthCubit>(), // Pass AuthCubit instance
             'onSignIn': (String email, String password, {bool? rememberMe}) async {
               final result = await authManager.login(
                 email: email,
@@ -391,6 +394,48 @@ final GoRouter appRouter = GoRouter(
               }
               return result.isSuccess;
             },
+            'onSignUp':
+                (
+                  String email,
+                  String password,
+                  String firstName,
+                  String lastName,
+                  bool marketingConsent,
+                ) async {
+                  // Get auth key from config
+                  final configHelper = AssetConfigHelper();
+                  await configHelper.loadConfig();
+                  final allConfig = configHelper.getAllConfig();
+                  final authKey =
+                      allConfig?['auth_configuration']?['auth_key']
+                          as String? ??
+                      'default-auth-key';
+
+                  debugPrint('🔐 Using auth key from config for sign up');
+
+                  final result = await authManager.signUp(
+                    email: email,
+                    password: password,
+                    authKey: authKey,
+                    firstName: firstName,
+                    lastName: lastName,
+                    acceptTerms: true,
+                    subscribeNewsletter: marketingConsent,
+                  );
+
+                  // After successful sign up, trigger sign in through AuthCubit
+                  // This will properly handle token loading and state management
+                  if (result.isSuccess) {
+                    debugPrint(
+                      '✅ Sign up successful, storing credentials for auto sign-in...',
+                    );
+                    // Store the credentials temporarily so AuthCubit.signIn can use them
+                    // We'll trigger signIn after this callback returns true
+                    return true;
+                  }
+
+                  return false;
+                },
             'onSignInSuccessTokenLoad': (AuthCubit authCubit) async {
               final jwtToken = await WooJwtTokenStorage.loadToken();
               if (jwtToken != null) {
@@ -532,7 +577,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.assignment_return, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.assignment_return,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'No return requests yet',
@@ -584,7 +633,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.cancel_outlined, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.cancel_outlined,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'No cancellation requests yet',
@@ -636,7 +689,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.person_outline, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.person_outline,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'Account settings coming soon',
@@ -688,7 +745,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.notifications_outlined, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.notifications_outlined,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'Notification preferences coming soon',
@@ -740,7 +801,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.inventory_outlined, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.inventory_outlined,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'Stock alarms coming soon',
@@ -792,7 +857,11 @@ final GoRouter appRouter = GoRouter(
                   child: OsmeaComponents.column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.local_offer_outlined, size: 64, color: OsmeaColors.pewter),
+                      Icon(
+                        Icons.local_offer_outlined,
+                        size: 64,
+                        color: OsmeaColors.pewter,
+                      ),
                       OsmeaComponents.sizedBox(height: 16),
                       OsmeaComponents.text(
                         'Price alarms coming soon',
@@ -880,7 +949,6 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
-
   ],
 );
 

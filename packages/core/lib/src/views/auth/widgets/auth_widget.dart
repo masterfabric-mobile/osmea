@@ -390,8 +390,6 @@ class AuthWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing20),
           _buildSignUpPasswordConfirmField(context, formState, cubit),
           OsmeaComponents.sizedBox(height: context.spacing20),
-          _buildSignUpAuthKeyField(context, formState, cubit),
-          OsmeaComponents.sizedBox(height: context.spacing20),
           _buildSignUpFirstNameField(context, formState, cubit),
           OsmeaComponents.sizedBox(height: context.spacing20),
           _buildSignUpLastNameField(context, formState, cubit),
@@ -424,9 +422,13 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_in_email_field'),
           hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
-          onChanged: cubit.updateSignInEmail,
+          onChanged: (value) {
+            debugPrint('✅ SIGN IN EMAIL FIELD ONCHANGED: "$value"');
+            cubit.updateSignInEmail(value);
+          },
           errorText: state.signInEmailError,
           enabled: state.operationStatus != AuthOperationStatus.loading,
         ),
@@ -447,6 +449,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_in_password_field'),
           hint: _getConfigValue(
               'sign_in', 'password_hint', 'Enter your password'),
           obscureText: state.signInObscurePassword,
@@ -543,6 +546,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_up_email_field'),
           hint: _getConfigValue('sign_up', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: cubit.updateSignUpEmail,
@@ -566,6 +570,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_up_password_field'),
           hint: _getConfigValue(
               'sign_up', 'password_hint', 'Enter your password'),
           obscureText: state.signUpObscurePassword,
@@ -600,6 +605,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_up_password_confirm_field'),
           hint: _getConfigValue(
               'sign_up', 'password_confirm_hint', 'Confirm your password'),
           obscureText: state.signUpObscurePasswordConfirm,
@@ -621,29 +627,6 @@ class AuthWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSignUpAuthKeyField(
-      BuildContext context, AuthFormState state, AuthCubit cubit) {
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.text(
-          '${_getConfigValue('sign_up', 'auth_key_label', 'Auth Key')} *',
-          variant: OsmeaTextVariant.bodyMedium,
-          color: OsmeaColors.thunder,
-          fontWeight: FontWeight.w600,
-        ),
-        OsmeaComponents.sizedBox(height: context.spacing8),
-        OsmeaComponents.textField(
-          hint: _getConfigValue(
-              'sign_up', 'auth_key_hint', 'Enter your auth key'),
-          onChanged: cubit.updateSignUpAuthKey,
-          errorText: state.signUpAuthKeyError,
-          enabled: state.operationStatus != AuthOperationStatus.loading,
-        ),
-      ],
-    );
-  }
-
   Widget _buildSignUpFirstNameField(
       BuildContext context, AuthFormState state, AuthCubit cubit) {
     return OsmeaComponents.column(
@@ -657,6 +640,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_up_first_name_field'),
           hint: _getConfigValue(
               'sign_up', 'first_name_hint', 'Enter your first name'),
           onChanged: cubit.updateSignUpFirstName,
@@ -680,6 +664,7 @@ class AuthWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
+          key: const Key('sign_up_last_name_field'),
           hint: _getConfigValue(
               'sign_up', 'last_name_hint', 'Enter your last name'),
           onChanged: cubit.updateSignUpLastName,
@@ -694,11 +679,11 @@ class AuthWidget extends StatelessWidget {
   List<Widget> _buildDynamicChecklists(BuildContext context,
       AuthFormState state, AuthCubit cubit, Color primaryColor) {
     final List<Widget> checklistWidgets = [];
-    
+
     try {
       final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
       final checklists = signUpConfig?['checklists'] as List<dynamic>?;
-      
+
       if (checklists != null && checklists.isNotEmpty) {
         for (int i = 0; i < checklists.length; i++) {
           final checklist = checklists[i] as Map<String, dynamic>;
@@ -706,11 +691,11 @@ class AuthWidget extends StatelessWidget {
           final label = checklist['label'] as String?;
           final required = checklist['required'] as bool? ?? false;
           final enabled = checklist['enabled'] as bool? ?? true;
-          
+
           if (id != null && label != null && enabled) {
             final isChecked = state.signUpChecklists[id] ?? false;
             final displayLabel = required ? '$label *' : label;
-            
+
             checklistWidgets.add(
               OsmeaComponents.row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -733,10 +718,11 @@ class AuthWidget extends StatelessWidget {
                 ],
               ),
             );
-            
+
             // Add spacing between checklists (except for the last one)
             if (i < checklists.length - 1) {
-              checklistWidgets.add(OsmeaComponents.sizedBox(height: context.spacing16));
+              checklistWidgets
+                  .add(OsmeaComponents.sizedBox(height: context.spacing16));
             }
           }
         }
@@ -744,7 +730,7 @@ class AuthWidget extends StatelessWidget {
     } catch (e) {
       debugPrint('⚠️ Error building dynamic checklists: $e');
     }
-    
+
     return checklistWidgets;
   }
 
@@ -753,7 +739,6 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled =
         state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
-
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(

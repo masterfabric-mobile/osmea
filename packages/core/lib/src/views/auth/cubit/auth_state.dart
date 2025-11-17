@@ -39,7 +39,6 @@ class AuthFormState extends AuthState {
   final String signUpEmail;
   final String signUpPassword;
   final String signUpPasswordConfirm;
-  final String signUpAuthKey;
   final String signUpFirstName;
   final String signUpLastName;
   final bool signUpObscurePassword;
@@ -49,7 +48,6 @@ class AuthFormState extends AuthState {
   final String? signUpEmailError;
   final String? signUpPasswordError;
   final String? signUpPasswordConfirmError;
-  final String? signUpAuthKeyError;
   final String? signUpFirstNameError;
   final String? signUpLastNameError;
   final String? signUpErrorMessage;
@@ -72,7 +70,6 @@ class AuthFormState extends AuthState {
     this.signUpEmail = '',
     this.signUpPassword = '',
     this.signUpPasswordConfirm = '',
-    this.signUpAuthKey = '',
     this.signUpFirstName = '',
     this.signUpLastName = '',
     this.signUpObscurePassword = true,
@@ -81,7 +78,6 @@ class AuthFormState extends AuthState {
     this.signUpEmailError,
     this.signUpPasswordError,
     this.signUpPasswordConfirmError,
-    this.signUpAuthKeyError,
     this.signUpFirstNameError,
     this.signUpLastNameError,
     this.signUpErrorMessage,
@@ -102,7 +98,6 @@ class AuthFormState extends AuthState {
     String? signUpEmail,
     String? signUpPassword,
     String? signUpPasswordConfirm,
-    String? signUpAuthKey,
     String? signUpFirstName,
     String? signUpLastName,
     bool? signUpObscurePassword,
@@ -111,7 +106,6 @@ class AuthFormState extends AuthState {
     String? signUpEmailError,
     String? signUpPasswordError,
     String? signUpPasswordConfirmError,
-    String? signUpAuthKeyError,
     String? signUpFirstNameError,
     String? signUpLastNameError,
     String? signUpErrorMessage,
@@ -132,7 +126,6 @@ class AuthFormState extends AuthState {
       signUpPassword: signUpPassword ?? this.signUpPassword,
       signUpPasswordConfirm:
           signUpPasswordConfirm ?? this.signUpPasswordConfirm,
-      signUpAuthKey: signUpAuthKey ?? this.signUpAuthKey,
       signUpFirstName: signUpFirstName ?? this.signUpFirstName,
       signUpLastName: signUpLastName ?? this.signUpLastName,
       signUpObscurePassword:
@@ -143,7 +136,6 @@ class AuthFormState extends AuthState {
       signUpEmailError: signUpEmailError,
       signUpPasswordError: signUpPasswordError,
       signUpPasswordConfirmError: signUpPasswordConfirmError,
-      signUpAuthKeyError: signUpAuthKeyError,
       signUpFirstNameError: signUpFirstNameError,
       signUpLastNameError: signUpLastNameError,
       signUpErrorMessage: signUpErrorMessage,
@@ -166,14 +158,12 @@ class AuthFormState extends AuthState {
     final basicFieldsValid = signUpEmail.isNotEmpty &&
         signUpPassword.isNotEmpty &&
         signUpPasswordConfirm.isNotEmpty &&
-        signUpAuthKey.isNotEmpty &&
         signUpFirstName.isNotEmpty &&
         signUpLastName.isNotEmpty &&
         signUpPassword == signUpPasswordConfirm &&
         signUpEmailError == null &&
         signUpPasswordError == null &&
         signUpPasswordConfirmError == null &&
-        signUpAuthKeyError == null &&
         signUpFirstNameError == null &&
         signUpLastNameError == null;
 
@@ -182,17 +172,19 @@ class AuthFormState extends AuthState {
     // Check required checklists from config
     final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
     final checklists = signUpConfig?['checklists'] as List<dynamic>?;
-    
+
     if (checklists != null) {
       for (final checklist in checklists) {
         final checklistMap = checklist as Map<String, dynamic>;
         final id = checklistMap['id'] as String?;
         final required = checklistMap['required'] as bool? ?? false;
         final enabled = checklistMap['enabled'] as bool? ?? true;
-        
+
         if (enabled && required && id != null) {
           final isChecked = signUpChecklists[id] ?? false;
-          if (!isChecked) return false;
+          if (!isChecked) {
+            return false;
+          }
         }
       }
     }
@@ -212,7 +204,6 @@ class AuthFormState extends AuthState {
         signUpEmail,
         signUpPassword,
         signUpPasswordConfirm,
-        signUpAuthKey,
         signUpFirstName,
         signUpLastName,
         signUpObscurePassword,
@@ -221,7 +212,6 @@ class AuthFormState extends AuthState {
         signUpEmailError,
         signUpPasswordError,
         signUpPasswordConfirmError,
-        signUpAuthKeyError,
         signUpFirstNameError,
         signUpLastNameError,
         signUpErrorMessage,
@@ -261,7 +251,7 @@ class AuthAuthenticatedState extends AuthState {
     // isAuthenticated should be derived from jwtToken, not from JSON
     // This ensures state is never authenticated without a valid token
     final isAuthenticated = jwtToken != null && jwtToken.isNotEmpty;
-    
+
     return AuthAuthenticatedState(
       jwtToken: jwtToken,
       userData: json['userData'] as Map<String, dynamic>?,

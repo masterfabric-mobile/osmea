@@ -37,11 +37,11 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       Duration(seconds: 2); // Minimum 2 seconds between loads
 
   // Callbacks for authentication
-  Future<bool> Function(String email, String password, {bool? rememberMe})? signInCallback;
+  Future<bool> Function(String email, String password, {bool? rememberMe})?
+      signInCallback;
   Future<bool> Function(
     String email,
     String password,
-    String authKey,
     String firstName,
     String lastName,
     bool marketingConsent,
@@ -51,11 +51,11 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   // This is called after successful sign in, before emitting AuthAuthenticatedState
   // The AuthCubit instance is passed as parameter so the callback can call saveJwtToken
   Future<void> Function(AuthCubit authCubit)? onSignInSuccess;
-  
+
   // Callback for remember me preference changes
   // This is called when user toggles remember me checkbox
   Future<void> Function(bool rememberMe)? onRememberMeChanged;
-  
+
   // Callback for checklist changes
   // This is called when user toggles any checklist item
   // Parameters: checklistId, isChecked
@@ -478,9 +478,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     if (password.isEmpty) {
       return null; // Don't show error for empty field until submit
     }
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
     return null;
   }
 
@@ -693,20 +690,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     }
   }
 
-  /// Update sign up auth key field
-  void updateSignUpAuthKey(String authKey) {
-    final formState = _formState;
-    if (formState != null) {
-      emit(formState.copyWith(
-        signUpAuthKey: authKey,
-        signUpAuthKeyError: null, // Clear error while typing
-      ));
-    } else {
-      // If not in form state, initialize with form state
-      emit(AuthFormState(signUpAuthKey: authKey));
-    }
-  }
-
   /// Update sign up first name field
   void updateSignUpFirstName(String firstName) {
     final formState = _formState;
@@ -761,19 +744,21 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     if (formState != null) {
       final currentValue = formState.signUpChecklists[checklistId] ?? false;
       final newValue = !currentValue;
-      
-      final updatedChecklists = Map<String, bool>.from(formState.signUpChecklists);
+
+      final updatedChecklists =
+          Map<String, bool>.from(formState.signUpChecklists);
       updatedChecklists[checklistId] = newValue;
-      
+
       emit(formState.copyWith(
         signUpChecklists: updatedChecklists,
       ));
-      
+
       // Call custom callback if provided
       if (onChecklistChanged != null) {
         try {
           await onChecklistChanged!(checklistId, newValue);
-          debugPrint('✅ onChecklistChanged callback executed for $checklistId: $newValue');
+          debugPrint(
+              '✅ onChecklistChanged callback executed for $checklistId: $newValue');
         } catch (e) {
           debugPrint('⚠️ Error in onChecklistChanged callback: $e');
         }
@@ -812,13 +797,31 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   }
 
   /// Validate sign up password
+  /// - Minimum 8 characters
+  /// - At least one uppercase letter
+  /// - At least one lowercase letter
+  /// - At least one special character
   String? _validateSignUpPassword(String password) {
     if (password.isEmpty) {
       return 'Password is required';
     }
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters';
+
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters';
     }
+
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      return 'Password must contain at least one lowercase letter';
+    }
+
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>\-_+=\[\]\\|/~`]').hasMatch(password)) {
+      return 'Password must contain at least one special character';
+    }
+
     return null;
   }
 
@@ -830,14 +833,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     }
     if (password != passwordConfirm) {
       return 'Passwords do not match';
-    }
-    return null;
-  }
-
-  /// Validate sign up auth key
-  String? _validateSignUpAuthKey(String authKey) {
-    if (authKey.isEmpty) {
-      return 'Auth key is required';
     }
     return null;
   }
@@ -881,7 +876,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         formState.signUpPassword,
         formState.signUpPasswordConfirm,
       );
-      final authKeyError = _validateSignUpAuthKey(formState.signUpAuthKey);
       final firstNameError =
           _validateSignUpFirstName(formState.signUpFirstName);
       final lastNameError = _validateSignUpLastName(formState.signUpLastName);
@@ -890,7 +884,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       if (emailError != null ||
           passwordError != null ||
           passwordConfirmError != null ||
-          authKeyError != null ||
           firstNameError != null ||
           lastNameError != null) {
         debugPrint('❌ Validation failed');
@@ -899,7 +892,6 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
           signUpEmailError: emailError,
           signUpPasswordError: passwordError,
           signUpPasswordConfirmError: passwordConfirmError,
-          signUpAuthKeyError: authKeyError,
           signUpFirstNameError: firstNameError,
           signUpLastNameError: lastNameError,
         ));
@@ -915,12 +907,12 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       // Call authentication callback
       if (signUpCallback != null) {
         // Get marketing consent from checklists (backward compatibility)
-        final marketingConsent = formState.signUpChecklists['marketing_consent'] ?? false;
-        
+        final marketingConsent =
+            formState.signUpChecklists['marketing_consent'] ?? false;
+
         final success = await signUpCallback!(
           formState.signUpEmail,
           formState.signUpPassword,
-          formState.signUpAuthKey,
           formState.signUpFirstName,
           formState.signUpLastName,
           marketingConsent,
@@ -928,10 +920,34 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
         if (success) {
           debugPrint('✅ Sign up successful');
+
+          // After successful sign up, automatically sign in to get JWT token
+          debugPrint('🔄 Auto sign-in after successful sign up...');
+
+          // Store email and password temporarily
+          final email = formState.signUpEmail;
+          final password = formState.signUpPassword;
+
+          // Update form state to show sign up success
           emit(formState.copyWith(
             operationStatus: AuthOperationStatus.success,
             signUpErrorMessage: null,
           ));
+
+          // Wait a moment for UI to update
+          await Future.delayed(const Duration(milliseconds: 100));
+
+          // Now perform auto sign-in
+          // Update form state with sign-in credentials
+          emit(formState.copyWith(
+            currentTab: 0, // Switch to sign in tab (for state tracking)
+            signInEmail: email,
+            signInPassword: password,
+            operationStatus: AuthOperationStatus.loading,
+          ));
+
+          // Call sign in method which will handle token loading
+          await signIn();
         } else {
           debugPrint('❌ Sign up failed');
           final currentFormState = _formState;

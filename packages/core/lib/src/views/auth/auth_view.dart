@@ -69,16 +69,19 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     final signInCallbackRaw = arguments['onSignIn'];
     if (signInCallbackRaw != null) {
       // Check if it's the new signature with optional rememberMe parameter
-      if (signInCallbackRaw is Future<bool> Function(String, String, {bool? rememberMe})) {
+      if (signInCallbackRaw is Future<bool> Function(String, String,
+          {bool? rememberMe})) {
         viewModel.signInCallback = signInCallbackRaw;
         debugPrint('✅ Sign In callback configured (with rememberMe support)');
-      } 
+      }
       // Fallback to old signature (without rememberMe) for backward compatibility
       else if (signInCallbackRaw is Future<bool> Function(String, String)) {
         // Wrap old callback to add optional rememberMe parameter
-        viewModel.signInCallback = (String email, String password, {bool? rememberMe}) async {
+        viewModel.signInCallback =
+            (String email, String password, {bool? rememberMe}) async {
           // ignore: unnecessary_cast
-          return await (signInCallbackRaw as Future<bool> Function(String, String))(email, password);
+          return await (signInCallbackRaw as Future<bool> Function(
+              String, String))(email, password);
         };
         debugPrint('✅ Sign In callback configured (backward compatible)');
       } else {
@@ -91,7 +94,6 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     final signUpCallback = arguments['onSignUp'] as Future<bool> Function(
       String, // email
       String, // password
-      String, // authKey
       String, // firstName
       String, // lastName
       bool, // marketingConsent
@@ -114,23 +116,25 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     }
 
     // Configure onRememberMeChanged callback for custom remember me handling
-    final onRememberMeChanged = arguments['onRememberMeChanged']
-        as Future<void> Function(bool)?;
+    final onRememberMeChanged =
+        arguments['onRememberMeChanged'] as Future<void> Function(bool)?;
     if (onRememberMeChanged != null) {
       viewModel.onRememberMeChanged = onRememberMeChanged;
       debugPrint('✅ onRememberMeChanged callback configured');
     } else {
-      debugPrint('ℹ️ onRememberMeChanged callback not provided (using default behavior)');
+      debugPrint(
+          'ℹ️ onRememberMeChanged callback not provided (using default behavior)');
     }
 
     // Configure onChecklistChanged callback for custom checklist handling
-    final onChecklistChanged = arguments['onChecklistChanged']
-        as Future<void> Function(String checklistId, bool isChecked)?;
+    final onChecklistChanged = arguments['onChecklistChanged'] as Future<void>
+        Function(String checklistId, bool isChecked)?;
     if (onChecklistChanged != null) {
       viewModel.onChecklistChanged = onChecklistChanged;
       debugPrint('✅ onChecklistChanged callback configured');
     } else {
-      debugPrint('ℹ️ onChecklistChanged callback not provided (using default behavior)');
+      debugPrint(
+          'ℹ️ onChecklistChanged callback not provided (using default behavior)');
     }
 
     // Initialize authentication (loads config, checks auth status, initializes form)
