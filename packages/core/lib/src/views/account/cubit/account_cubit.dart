@@ -29,7 +29,7 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
 
   // Public trigger functions
   void initialize() => _initialize();
-  
+
   /// Refresh profile data from auth storage
   /// Call this when user logs in or profile is updated
   void refreshProfile() => _initialize();
@@ -41,8 +41,9 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
       stateChanger(state.copyWith(status: AccountStatus.loading));
 
       // Try to load from app_config.json first
-      final configLoaded = await _configHelper.loadConfig('assets/app_config.json') ||
-          await _configHelper.loadConfig();
+      final configLoaded =
+          await _configHelper.loadConfig('assets/app_config.json') ||
+              await _configHelper.loadConfig();
 
       Map<String, dynamic> accountData;
 
@@ -52,10 +53,12 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         final accountConfig = configData?['account_configuration'];
 
         if (accountConfig != null) {
-          debugPrint('👤 AccountCubit: Loading account data from app_config.json');
+          debugPrint(
+              '👤 AccountCubit: Loading account data from app_config.json');
           accountData = accountConfig as Map<String, dynamic>;
         } else {
-          debugPrint('👤 AccountCubit: No account_configuration found, using mock data');
+          debugPrint(
+              '👤 AccountCubit: No account_configuration found, using mock data');
           accountData = _getMockAccountData();
         }
       } else {
@@ -100,7 +103,8 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
 
   /// Load profile data: Always try Auth Storage first, then use default values
   /// Config is not used for profile data - it's always from auth storage or default
-  Future<AccountProfileData> _loadProfileData(Map<String, dynamic> accountData) async {
+  Future<AccountProfileData> _loadProfileData(
+      Map<String, dynamic> accountData) async {
     try {
       // Always try to load from Auth Storage first
       final authStorage = AuthStorageHelper();
@@ -110,17 +114,20 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         debugPrint('👤 AccountCubit: Loading profile from auth storage');
         debugPrint('👤 AccountCubit: userData keys: ${userData.keys.toList()}');
         debugPrint('👤 AccountCubit: userData: $userData');
-        
+
         // Extract user info from userData
         // UserInfo.toJson() returns: email, first_name, last_name
-        final email = userData['email'] as String? ?? 
-                     userData['user_email'] as String? ?? '';
-        
-        final firstName = userData['first_name'] as String? ?? 
-                         userData['firstName'] as String? ?? '';
-        final lastName = userData['last_name'] as String? ?? 
-                        userData['lastName'] as String? ?? '';
-        
+        final email = userData['email'] as String? ??
+            userData['user_email'] as String? ??
+            '';
+
+        final firstName = userData['first_name'] as String? ??
+            userData['firstName'] as String? ??
+            '';
+        final lastName = userData['last_name'] as String? ??
+            userData['lastName'] as String? ??
+            '';
+
         // Build full name from firstName and lastName
         String fullName;
         if (firstName.isNotEmpty && lastName.isNotEmpty) {
@@ -131,19 +138,20 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
           fullName = lastName;
         } else {
           // Fallback to display_name or name, or use email prefix
-          fullName = userData['display_name'] as String? ?? 
-                    userData['name'] as String? ?? 
-                    (email.isNotEmpty ? email.split('@').first : 'User');
+          fullName = userData['display_name'] as String? ??
+              userData['name'] as String? ??
+              (email.isNotEmpty ? email.split('@').first : 'User');
         }
-        
+
         // Build initials
         String initials = _getInitials(fullName);
-        
+
         // Email should always be available from UserInfo
         final finalEmail = email.isNotEmpty ? email : '';
-        
-        debugPrint('👤 AccountCubit: Extracted - email: $finalEmail, fullName: $fullName, initials: $initials');
-        
+
+        debugPrint(
+            '👤 AccountCubit: Extracted - email: $finalEmail, fullName: $fullName, initials: $initials');
+
         return AccountProfileData(
           fullName: fullName,
           email: finalEmail,
@@ -152,7 +160,8 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
       }
 
       // If no auth storage data, use default values
-      debugPrint('👤 AccountCubit: No auth data found, using default profile data');
+      debugPrint(
+          '👤 AccountCubit: No auth data found, using default profile data');
       return const AccountProfileData(
         fullName: 'username',
         email: 'username@email.com',
@@ -280,6 +289,3 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
     }
   }
 }
-
-
-

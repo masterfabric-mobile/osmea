@@ -47,5 +47,10 @@ Future<GetIt> configureDependencies() async {
     getIt.registerFactory<AccountCubit>(() => AccountCubit());
   }
 
+
+  if (!getIt.isRegistered<AccountCubit>()) {
+    getIt.registerFactory<AccountCubit>(() => AccountCubit());
+  }
+
   return getIt;
 }
