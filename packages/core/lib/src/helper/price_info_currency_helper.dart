@@ -239,8 +239,10 @@ class PriceInfoCurrencyHelper {
     if (numericAmount == null) return getDefaultPrice();
 
     // Use API-provided separators if available, otherwise use currency config
-    final decimalSeparator = currencyDecimalSeparator ?? config.decimalSeparator;
-    final thousandSeparator = currencyThousandSeparator ?? config.thousandSeparator;
+    final decimalSeparator =
+        currencyDecimalSeparator ?? config.decimalSeparator;
+    final thousandSeparator =
+        currencyThousandSeparator ?? config.thousandSeparator;
 
     final formattedNumber = _formatNumber(
       numericAmount,
