@@ -10,7 +10,7 @@ import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
-import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
+import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -111,56 +111,6 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
                 arguments: const {'saved': true},
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-              transitionDuration: const Duration(milliseconds: 300),
-            );
-          },
-        ),
-
-        // Empty View Route (inside ShellRoute for navbar)
-        GoRoute(
-          path: '/empty/:emptyType',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
-            final emptyType = EmptyType.values.firstWhere(
-              (type) => type.name == emptyTypeStr,
-              orElse: () => EmptyType.general,
-            );
-
-            // Get custom parameters from query
-            final queryParams = state.uri.queryParameters;
-            final customTitle = queryParams['title'];
-            final customDescription = queryParams['description'];
-            final customImagePath = queryParams['imagePath'];
-            final customIconPath = queryParams['iconPath'];
-            final actionPath = queryParams['actionPath'] ?? '/home';
-
-            return CustomTransitionPage(
-              child: EmptyView(
-                goRoute: (String path) {
-                  if (path.contains('home')) {
-                    context.go('/home');
-                  } else if (path.contains('cart')) {
-                    context.go('/cart');
-                  } else if (path.contains('saved')) {
-                    context.go('/saved');
-                  } else {
-                    context.go(path);
-                  }
-                },
-                emptyType: emptyType,
-                customTitle: customTitle,
-                customDescription: customDescription,
-                customImagePath: customImagePath,
-                customIconPath: customIconPath,
-                onActionPressed: () {
-                  context.go(actionPath);
-                },
-                arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -376,13 +326,8 @@ final GoRouter appRouter = GoRouter(
             debugPrint('✅ Sign in successful! Navigating to /home');
             context.go('/home');
           },
-          onSignUpSuccess: () {
-            debugPrint('✅ Sign up successful! Navigating to /home');
-            context.go('/home');
-          },
           arguments: {
             'auth': true,
-            'authCubit': GetIt.I<AuthCubit>(), // Pass AuthCubit instance
             'onSignIn': (String email, String password, {bool? rememberMe}) async {
               final result = await authManager.login(
                 email: email,
@@ -394,48 +339,6 @@ final GoRouter appRouter = GoRouter(
               }
               return result.isSuccess;
             },
-            'onSignUp':
-                (
-                  String email,
-                  String password,
-                  String firstName,
-                  String lastName,
-                  bool marketingConsent,
-                ) async {
-                  // Get auth key from config
-                  final configHelper = AssetConfigHelper();
-                  await configHelper.loadConfig();
-                  final allConfig = configHelper.getAllConfig();
-                  final authKey =
-                      allConfig?['auth_configuration']?['auth_key']
-                          as String? ??
-                      'default-auth-key';
-
-                  debugPrint('🔐 Using auth key from config for sign up');
-
-                  final result = await authManager.signUp(
-                    email: email,
-                    password: password,
-                    authKey: authKey,
-                    firstName: firstName,
-                    lastName: lastName,
-                    acceptTerms: true,
-                    subscribeNewsletter: marketingConsent,
-                  );
-
-                  // After successful sign up, trigger sign in through AuthCubit
-                  // This will properly handle token loading and state management
-                  if (result.isSuccess) {
-                    debugPrint(
-                      '✅ Sign up successful, storing credentials for auto sign-in...',
-                    );
-                    // Store the credentials temporarily so AuthCubit.signIn can use them
-                    // We'll trigger signIn after this callback returns true
-                    return true;
-                  }
-
-                  return false;
-                },
             'onSignInSuccessTokenLoad': (AuthCubit authCubit) async {
               final jwtToken = await WooJwtTokenStorage.loadToken();
               if (jwtToken != null) {
@@ -471,437 +374,90 @@ final GoRouter appRouter = GoRouter(
                 debugPrint('⚠️ No JWT token found in storage');
               }
             },
+            'onSignUp':
+                (
+                  String email,
+                  String password,
+                  String firstName,
+                  String lastName,
+                  bool marketingConsent,
+                ) async {
+                  // Get auth key from config
+                  final configHelper = AssetConfigHelper();
+                  final loaded = await configHelper.loadConfig(
+                    'assets/app_config.json',
+                  );
+
+                  debugPrint('📁 Config load result: $loaded');
+                  debugPrint(
+                    '📁 Config path: ${configHelper.getCurrentConfigPath()}',
+                  );
+
+                  final allConfig = configHelper.getAllConfig();
+                  debugPrint('📊 Config keys: ${allConfig?.keys.toList()}');
+
+                  final authKey =
+                      allConfig?['woocommerce_configuration']?['auth_key']
+                          as String? ??
+                      'default-auth-key';
+                      
+                  final result = await authManager.signUp(
+                    email: email,
+                    password: password,
+                    authKey: authKey,
+                    firstName: firstName,
+                    lastName: lastName,
+                    acceptTerms: true,
+                    subscribeNewsletter: marketingConsent,
+                  );
+
+                  // After successful sign up, trigger sign in through AuthCubit
+                  // This will properly handle token loading and state management
+                  if (result.isSuccess) {
+                    debugPrint(
+                      '✅ Sign up successful, storing credentials for auto sign-in...',
+                    );
+                    // Store the credentials temporarily so AuthCubit.signIn can use them
+                    // We'll trigger signIn after this callback returns true
+                    return true;
+                  }
+
+                  return false;
+                },
           },
         );
       },
     ),
 
-    // Profile/Account Route - Using AccountView with startup style
+    // Profile Route
     GoRoute(
       path: '/profile',
       pageBuilder: (BuildContext context, GoRouterState state) {
         return CustomTransitionPage(
-          child: AccountView(
+          child: ProfileView(
             goRoute: (String path) {
-              debugPrint('🔀 AccountView: goRoute called with path: $path');
+              debugPrint('🔀 ProfileView: goRoute called with path: $path');
               if (path.contains('home') || path == '/home') {
-                debugPrint('🔀 AccountView: Navigating to /home');
+                debugPrint('🔀 ProfileView: Navigating to /home');
                 context.go('/home');
               } else if (path.contains('cart') || path == '/cart') {
-                debugPrint('🔀 AccountView: Navigating to /cart');
+                debugPrint('🔀 ProfileView: Navigating to /cart');
                 context.go('/cart');
               } else if (path.contains('saved') || path == '/saved') {
-                debugPrint('🔀 AccountView: Navigating to /saved');
+                debugPrint('🔀 ProfileView: Navigating to /saved');
                 context.go('/saved');
               } else if (path.contains('auth') || path == '/auth') {
-                debugPrint('🔀 AccountView: Navigating to /auth');
+                debugPrint('🔀 ProfileView: Navigating to /auth');
                 context.go('/auth');
               } else {
-                debugPrint('🔀 AccountView: Navigating to path: $path');
+                debugPrint('🔀 ProfileView: Navigating to path: $path');
                 context.go(path);
               }
             },
-            arguments: {'account': true},
             bottomNavigationBar: _getNavbarForRoute(
               state.uri.path,
               GetIt.I<WishlistViewModel>().count,
             ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Account Sub-Routes
-    // Orders Route
-    GoRoute(
-      path: '/orders',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'My Orders',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: const OrdersListWidget(),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Returns Route
-    GoRoute(
-      path: '/returns',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Return Requests',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.assignment_return,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'No return requests yet',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Cancellations Route
-    GoRoute(
-      path: '/cancellations',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Cancellation Requests',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.cancel_outlined,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'No cancellation requests yet',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Account Info Route
-    GoRoute(
-      path: '/account-info',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Account Settings',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person_outline,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'Account settings coming soon',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Notifications Route
-    GoRoute(
-      path: '/notifications',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Notification Preferences',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'Notification preferences coming soon',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Stock Alarms Route
-    GoRoute(
-      path: '/stock-alarms',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Stock Alarms',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.inventory_outlined,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'Stock alarms coming soon',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Price Alarms Route
-    GoRoute(
-      path: '/price-alarms',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: Scaffold(
-            appBar: AppBar(
-              title: OsmeaComponents.text(
-                'Price Alarms',
-                color: OsmeaColors.thunder,
-                textStyle: OsmeaTextStyle.titleLarge(context),
-              ),
-              backgroundColor: OsmeaColors.paperWhite,
-              elevation: 0,
-              foregroundColor: OsmeaColors.thunder,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () => context.go('/profile'),
-                icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
-              ),
-            ),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: OsmeaComponents.center(
-                  child: OsmeaComponents.column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.local_offer_outlined,
-                        size: 64,
-                        color: OsmeaColors.pewter,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                      OsmeaComponents.text(
-                        'Price alarms coming soon',
-                        textStyle: OsmeaTextStyle.headlineSmall(context),
-                        color: OsmeaColors.thunder,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Product List Route
-    GoRoute(
-      path: '/products',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: ProductListView(
-            arguments: const {'productList': true},
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('product-detail')) {
-                context.go('/product-detail');
-              } else {
-                context.go('/products');
-              }
-            },
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
@@ -949,26 +505,67 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
+    // Empty View Route
+    GoRoute(
+      path: '/empty/:emptyType',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
+        final emptyType = EmptyType.values.firstWhere(
+          (type) => type.name == emptyTypeStr,
+          orElse: () => EmptyType.general,
+        );
+
+        // Get custom parameters from query
+        final queryParams = state.uri.queryParameters;
+        final customTitle = queryParams['title'];
+        final customDescription = queryParams['description'];
+        final customImagePath = queryParams['imagePath'];
+        final customIconPath = queryParams['iconPath'];
+        final actionPath = queryParams['actionPath'] ?? '/home';
+
+        return CustomTransitionPage(
+          child: EmptyView(
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('cart')) {
+                context.go('/cart');
+              } else if (path.contains('saved')) {
+                context.go('/saved');
+              } else {
+                context.go(path);
+              }
+            },
+            emptyType: emptyType,
+            customTitle: customTitle,
+            customDescription: customDescription,
+            customImagePath: customImagePath,
+            customIconPath: customIconPath,
+            onActionPressed: () {
+              context.go(actionPath);
+            },
+            arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
   ],
 );
 
 /// Get navbar for specific route
 /// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
 Widget? _getNavbarForRoute(String location, int wishlistCount) {
-  // Show navbar only for main app sections and account sub-routes
+  // Show navbar only for main app sections
   if (location == '/home' ||
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/profile' ||
-      location == '/orders' ||
-      location == '/returns' ||
-      location == '/cancellations' ||
-      location == '/account-info' ||
-      location == '/notifications' ||
-      location == '/stock-alarms' ||
-      location == '/price-alarms' ||
-      location.startsWith('/empty/')) {
+      location == '/profile') {
     if (location == '/home') {
       return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
     } else if (location == '/search') {
@@ -977,28 +574,11 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
     } else if (location == '/cart') {
       return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
-    } else if (location == '/profile' ||
-        location == '/orders' ||
-        location == '/returns' ||
-        location == '/cancellations' ||
-        location == '/account-info' ||
-        location == '/notifications' ||
-        location == '/stock-alarms' ||
-        location == '/price-alarms') {
+    } else if (location == '/profile') {
       return AppNavbar(
         currentIndex: 4,
         wishlistCount: wishlistCount,
-      ); // Profile/Account
-    } else if (location.startsWith('/empty/')) {
-      // Determine navbar index based on empty type
-      final emptyType = location.split('/').last;
-      if (emptyType == 'cart') {
-        return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount);
-      } else if (emptyType == 'wishlist' || emptyType == 'favorites') {
-        return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount);
-      } else {
-        return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount);
-      }
+      ); // Profile
     }
   }
   // No navbar for splash, onboarding, auth, product-detail
