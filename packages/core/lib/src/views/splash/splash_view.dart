@@ -2,7 +2,6 @@ import 'package:core/core.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:core/src/base/widgets/master_scaffold_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_state.dart';
@@ -20,12 +19,6 @@ import 'package:core/src/views/routes.dart';
 ///
 /// Main splash view - Simple timer-based navigation
 /// Uses MasterViewCubit for lifecycle management
-///
-/// ## 🎨 Color Scheme by Style:
-/// - **Startup**: 🟠 Orange status bar and background
-/// - **Space**: 🔵 Blue (Nordic Blue) status bar and background
-/// - **Enterprise**: 🟣 Purple (Deep Sea) status bar and background
-///
 /// {@category Views}
 /// {@subCategory SplashView}
 
@@ -52,19 +45,6 @@ class SplashView extends MasterViewCubit<SplashCubit, SplashState> {
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
     debugPrint('🚀 Splash View Start!');
-
-    // Test: Apply a simple red color immediately
-    debugPrint('🔴 TESTING: Setting RED status bar color');
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.red,
-        statusBarIconBrightness: Brightness.light,
-      ),
-    );
-    debugPrint('🔴 RED color applied');
-
-    // Apply status bar color IMMEDIATELY
-    _applyStatusBarColor(SplashStyle.startup);
 
     // Trigger onStart callback
     onStart?.call();
@@ -96,102 +76,26 @@ class SplashView extends MasterViewCubit<SplashCubit, SplashState> {
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    // Test: Apply blue color immediately in viewContent
-    debugPrint('🔵 TESTING: Setting BLUE status bar color in viewContent');
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.blue,
-        statusBarIconBrightness: Brightness.light,
-      ),
-    );
-    debugPrint('🔵 BLUE color applied in viewContent');
-
     return FutureBuilder<SplashStyle>(
       future: _getSplashStyleFromConfig(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Apply startup color while loading
-          _applyStatusBarColor(SplashStyle.startup);
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
         if (snapshot.hasData) {
-          // Apply status bar color based on splash style
-          _applyStatusBarColor(snapshot.data!);
-
-          // Force immediate application with post frame callback
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _applyStatusBarColor(snapshot.data!);
-          });
-
           // Use the splash style from config
           return _getSplashWidget(snapshot.data!);
         } else {
           // Default to startup style if config not available
           debugPrint(
               '⚠️ Could not get splash style from config, using default');
-          _applyStatusBarColor(SplashStyle.startup);
-
-          // Force immediate application with post frame callback
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _applyStatusBarColor(SplashStyle.startup);
-          });
-
           return _getSplashWidget(SplashStyle.startup);
         }
       },
     );
-  }
-
-  /// 🎨 Apply status bar color based on splash style
-  void _applyStatusBarColor(SplashStyle style) {
-    final statusBarColor = _getStatusBarColorForStyle(style);
-    final iconBrightness = _getIconBrightnessForColor(statusBarColor);
-
-    debugPrint('🎨 Setting status bar color for $style: $statusBarColor');
-    debugPrint('🎨 Icon brightness: $iconBrightness');
-    debugPrint('🎨 Color hex: ${statusBarColor.value.toRadixString(16)}');
-
-    try {
-      // Force immediate application
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(
-          statusBarColor: statusBarColor,
-          statusBarIconBrightness: iconBrightness,
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
-        ),
-      );
-
-      debugPrint('✅ Status bar color applied successfully');
-    } catch (e) {
-      debugPrint('❌ Error applying status bar color: $e');
-    }
-  }
-
-  /// 🎨 Get status bar color for splash style
-  Color _getStatusBarColorForStyle(SplashStyle style) {
-    Color color;
-    switch (style) {
-      case SplashStyle.startup:
-        color = OsmeaColors.orange; // 🟠 Orange for startup
-        break;
-      case SplashStyle.space:
-        color = OsmeaColors.nordicBlue; // 🔵 Blue for space
-        break;
-      case SplashStyle.enterprise:
-        color = OsmeaColors.deepSea; // 🟣 Purple for enterprise
-        break;
-    }
-    debugPrint('🎨 Selected color for $style: $color');
-    return color;
-  }
-
-  /// 🎨 Get appropriate icon brightness for color
-  Brightness _getIconBrightnessForColor(Color color) {
-    return color.computeLuminance() > 0.5 ? Brightness.dark : Brightness.light;
   }
 
   /// Get splash style from config
