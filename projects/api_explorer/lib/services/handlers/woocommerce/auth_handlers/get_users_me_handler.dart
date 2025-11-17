@@ -1,6 +1,7 @@
 import 'package:api_explorer/services/api_request_handler.dart';
 import 'package:api_explorer/services/api_service_registry.dart';
-import 'package:apis/services/auth/woo_auth_manager.dart';
+import 'package:apis/models/auth/woo_jwt_token.dart';
+import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -34,51 +35,106 @@ class GetUsersMeHandler implements ApiRequestHandler {
 
     try {
       debugPrint('👤 Getting WordPress authenticated user information...');
-      debugPrint('🔐 Using stored JWT token from WooAuthManager...');
+      debugPrint('🔐 Checking stored JWT token...');
       
-      // Use WooAuthManager to get user with stored token
-      final authManager = GetIt.I<WooAuthManager>();
-      final userResponse = await authManager.getCurrentWordPressUser();
-      
-      if (userResponse != null) {
-        debugPrint('✅ WordPress user information retrieved using stored JWT');
-        
-        return {
-          "status": "success",
-          "message": "WordPress authenticated user information retrieved using stored JWT token",
-          "endpoint_used": "/wp-json/wp/v2/users/me",
-          "authentication": "Stored JWT Bearer Token",
-          "user_data": userResponse.toJson(),
-          "user_summary": {
-            "id": userResponse.id,
-            "name": userResponse.name,
-            "url": userResponse.url,
-            "description": userResponse.description,
-            "slug": userResponse.slug,
-            "is_super_admin": userResponse.isSuperAdmin,
-            "avatar_urls": userResponse.avatarUrls?.toJson(),
-            "woocommerce_meta": userResponse.woocommerceMeta != null ? {
-              "homepage_layout": userResponse.woocommerceMeta?.homepageLayout,
-              "dashboard_chart_type": userResponse.woocommerceMeta?.dashboardChartType,
-              "activity_panel_inbox_last_read": userResponse.woocommerceMeta?.activityPanelInboxLastRead,
-            } : null,
-          },
-          "auth_source": "stored_jwt_token",
-          "timestamp": DateTime.now().toIso8601String(),
-        };
-      } else {
+      // Check if JWT token exists
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      if (!hasToken) {
+        debugPrint('❌ No JWT token found in storage');
         return {
           "status": "error",
-          "message": "No valid JWT token found or token expired",
+          "message": "No JWT token found. Please login first.",
           "error_details": {
             "type": "authentication_error",
             "suggestion": "Please login first using the 'User Login' endpoint to get a JWT token",
             "how_to_login": "Use the 'User Login' endpoint in the auth section to get JWT token",
-            "auth_source": "stored_jwt_token"
+            "auth_source": "local_storage"
           },
           "timestamp": DateTime.now().toIso8601String(),
         };
       }
+
+      // Check if token is expired
+      final isExpired = await WooJwtTokenStorage.isTokenExpired();
+      if (isExpired) {
+        debugPrint('❌ JWT token is expired');
+        return {
+          "status": "error",
+          "message": "JWT token is expired. Please login again.",
+          "error_details": {
+            "type": "authentication_error",
+            "suggestion": "Please login again to get a fresh JWT token",
+            "how_to_login": "Use the 'User Login' endpoint in the auth section to get fresh JWT token",
+            "auth_source": "local_storage"
+          },
+          "timestamp": DateTime.now().toIso8601String(),
+        };
+      }
+
+      // Load the JWT token
+      final jwtToken = await WooJwtTokenStorage.loadToken();
+      if (jwtToken?.accessToken == null || jwtToken!.accessToken.isEmpty) {
+        debugPrint('❌ JWT token is null or empty');
+        return {
+          "status": "error",
+          "message": "Invalid JWT token. Please login again.",
+          "error_details": {
+            "type": "authentication_error",
+            "suggestion": "Please login again to get a valid JWT token",
+            "auth_source": "local_storage"
+          },
+          "timestamp": DateTime.now().toIso8601String(),
+        };
+      }
+
+      debugPrint('✅ Valid JWT token found, making API request...');
+      debugPrint('🔐 Token preview: ${jwtToken.accessToken.substring(0, 20)}...');
+
+      // Get WooAuthService and make the request
+      final authService = GetIt.I<WooAuthService>();
+      final authHeader = 'Bearer ${jwtToken.accessToken}';
+      
+      debugPrint('📡 Making getUsersMe request with Authorization: Bearer [TOKEN]');
+      final userResponse = await authService.getUsersMe(authHeader);
+      
+      debugPrint('✅ WordPress user information retrieved successfully');
+      debugPrint('👤 User: ${userResponse.name} (ID: ${userResponse.id})');
+      
+      return {
+        "status": "success",
+        "message": "WordPress authenticated user information retrieved using stored JWT token",
+        "endpoint_used": "/wp-json/wp/v2/users/me",
+        "authentication": "Bearer JWT Token from Local Storage",
+        "user_data": userResponse.toJson(),
+        "user_summary": {
+          "id": userResponse.id,
+          "name": userResponse.name,
+          "url": userResponse.url,
+          "description": userResponse.description,
+          "slug": userResponse.slug,
+          "is_super_admin": userResponse.isSuperAdmin,
+          "avatar_urls": userResponse.avatarUrls?.toJson(),
+          "woocommerce_meta": userResponse.woocommerceMeta != null ? {
+            "homepage_layout": userResponse.woocommerceMeta?.homepageLayout,
+            "dashboard_chart_type": userResponse.woocommerceMeta?.dashboardChartType,
+            "activity_panel_inbox_last_read": userResponse.woocommerceMeta?.activityPanelInboxLastRead,
+            "variable_product_tour_shown": userResponse.woocommerceMeta?.variableProductTourShown,
+            "dashboard_sections": userResponse.woocommerceMeta?.dashboardSections,
+          } : null,
+        },
+        "auth_source": "jwt_local_storage",
+        "token_info": {
+          "has_token": hasToken,
+          "is_expired": isExpired,
+          "expires_at": jwtToken.issuedAt.add(Duration(seconds: jwtToken.expiresIn)).toIso8601String(),
+          "user_info": jwtToken.userData != null ? {
+            "id": jwtToken.userData!["id"],
+            "email": jwtToken.userData!["email"],
+            "display_name": jwtToken.userData!["display_name"] ?? jwtToken.userData!["name"],
+          } : null,
+        },
+        "timestamp": DateTime.now().toIso8601String(),
+      };
 
     } catch (e) {
       debugPrint('❌ WordPress user fetch error: $e');
@@ -107,13 +163,19 @@ class GetUsersMeHandler implements ApiRequestHandler {
         errorDetails = {
           "type": "endpoint_error",
           "status_code": 404,
-          "suggestion": "Check if WordPress REST API is enabled"
+          "suggestion": "Check if WordPress REST API is enabled and endpoint exists"
         };
       } else if (e.toString().contains('DioException') || e.toString().contains('SocketException')) {
         errorMessage = "Network connection error";
         errorDetails = {
           "type": "network_error",
           "suggestion": "Check your internet connection and base URL configuration"
+        };
+      } else if (e.toString().contains('not registered')) {
+        errorMessage = "Authentication service not available";
+        errorDetails = {
+          "type": "service_error",
+          "suggestion": "Please restart the application or check service configuration"
         };
       }
 
@@ -123,6 +185,12 @@ class GetUsersMeHandler implements ApiRequestHandler {
         "error_details": errorDetails,
         "full_error": e.toString(),
         "params": params,
+        "debugging_info": {
+          "error_type": e.runtimeType.toString(),
+          "stack_trace_preview": e.toString().length > 200 
+              ? e.toString().substring(0, 200) + "..."
+              : e.toString(),
+        },
         "timestamp": DateTime.now().toIso8601String(),
       };
     }
