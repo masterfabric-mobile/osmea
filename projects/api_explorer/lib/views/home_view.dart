@@ -893,9 +893,9 @@ class _HomeViewState extends State<HomeView>
                   // DIREKT USER DATA GÖSTER
                   _buildUserInfoRow('ID', '6', Icons.fingerprint),
                   OsmeaComponents.sizedBox(height: context.spacing8),
-                  _buildUserInfoRow('Name', 'Mete Coban', Icons.person),
+                  _buildUserInfoRow('Name', 'Me** Co**', Icons.person),
                   OsmeaComponents.sizedBox(height: context.spacing8),
-                  _buildUserInfoRow('Slug', 'woodeveloper4', Icons.alternate_email),
+                  _buildUserInfoRow('Slug', 'woodeveloper', Icons.alternate_email),
                   
                   OsmeaComponents.sizedBox(height: context.spacing12),
                   
