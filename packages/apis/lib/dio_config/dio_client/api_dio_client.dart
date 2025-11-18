@@ -7,12 +7,10 @@ import 'package:apis/dio_config/interceptors/woo_jwt_interceptor.dart';
 import 'package:apis/services/auth/woo_jwt_auth_service.dart';
 import 'package:apis/services/auth/woo_jwt_signin_manager.dart';
 import 'package:apis/models/auth/woo_jwt_token.dart';
+import 'package:dio/io.dart';
 // ignore: depend_on_referenced_packages
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart' if (dart.library.html) 'package:dio/browser.dart';
-import 'package:dio/browser.dart'
-    if (dart.library.html) 'package:dio/browser.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -45,6 +43,10 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json
       ..interceptors.add(ApiInterceptorDefault(
@@ -63,29 +65,12 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
-      ..options.responseType = ResponseType.json
-      ..options.followRedirects = true
-      ..options.validateStatus = (status) => status! < 500;
-
-    // 🍪 Enable cookie support for web platform
-    if (kIsWeb) {
-      try {
-        // Create BrowserHttpClientAdapter explicitly for web platform
-        // This is required for withCredentials to work properly
-        final browserAdapter = BrowserHttpClientAdapter();
-        browserAdapter.withCredentials = true;
-        dio.httpClientAdapter = browserAdapter;
-        debugPrint(
-            '✅ [WebCookieManager] BrowserHttpClientAdapter created with withCredentials=true');
-        debugPrint(
-            '🍪 Web platform: withCredentials enabled for cookie support');
-      } catch (e) {
-        debugPrint('❌ Failed to enable withCredentials: $e');
-        debugPrint(
-            '💡 [WebCookieManager] Make sure dio package supports BrowserHttpClientAdapter');
-      }
-    }
+      ..options.responseType = ResponseType.json;
 
     // 🔐 Add JWT authentication interceptor
     if (useJwtAuth) {
@@ -130,7 +115,12 @@ class ApiDioClient implements ApiBaseClient {
   /// 🔐 Creates a WooCommerce Dio instance specifically for JWT authentication
   static Dio wooJwtAuthDio() {
     final dio = Dio()
-      ..options = BaseOptions()
+      ..options = BaseOptions(
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
+      )
       ..options.responseType = ResponseType.json;
 
     // Add JWT authentication service and interceptor
@@ -157,22 +147,12 @@ class ApiDioClient implements ApiBaseClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Timeout settings to prevent operation timeout errors
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json;
-
-    // 🍪 Enable cookie support for web platform (wooPublicDio)
-    if (kIsWeb) {
-      try {
-        // Create BrowserHttpClientAdapter explicitly for web platform
-        final browserAdapter = BrowserHttpClientAdapter();
-        browserAdapter.withCredentials = true;
-        dio.httpClientAdapter = browserAdapter;
-        debugPrint(
-            '✅ [WebCookieManager] BrowserHttpClientAdapter created with withCredentials=true (public)');
-      } catch (e) {
-        debugPrint('❌ Failed to enable withCredentials (public): $e');
-      }
-    }
 
     // 🍪 Add cookie management based on platform (for session tracking if needed)
     if (kIsWeb) {
@@ -321,13 +301,49 @@ class ApiDioClient implements ApiBaseClient {
 
   /// 🍪 Clear all cookies (works on both web and mobile)
   static Future<void> clearAllCookies() async {
-    if (kIsWeb) {
-      await webCookieManager.clearCookies();
-    } else {
-      // For mobile, we would need to clear the cookie jar
-      // This is a simplified approach - in practice you might want to
-      // implement a more sophisticated cookie clearing mechanism
-      debugPrint('🍪 Cookie clearing for mobile platforms not implemented yet');
+    try {
+      if (kIsWeb) {
+        await webCookieManager.clearCookies();
+        debugPrint('✅ All cookies cleared (web)');
+      } else {
+        // For mobile, clear the cookie jar
+        try {
+          // Clear all cookies by deleting the storage directory
+          // This is the most reliable way to clear all cookies
+          final Directory appDocDir = await getApplicationDocumentsDirectory();
+          final String appDocPath = appDocDir.path;
+          final cookieDir = Directory("$appDocPath/.cookies/");
+
+          if (await cookieDir.exists()) {
+            await cookieDir.delete(recursive: true);
+            debugPrint('✅ Cookie storage directory cleared (mobile)');
+          }
+
+          // Recreate cookie jar with fresh storage
+          ApiDioClient.cookieJar = CookieManager(PersistCookieJar(
+            ignoreExpires: true,
+            storage: FileStorage("$appDocPath/.cookies/"),
+          ));
+          debugPrint('✅ Cookie jar recreated (mobile)');
+        } catch (e) {
+          debugPrint('⚠️ Error clearing mobile cookies: $e');
+          // Fallback: recreate cookie jar
+          try {
+            final Directory appDocDir =
+                await getApplicationDocumentsDirectory();
+            final String appDocPath = appDocDir.path;
+            ApiDioClient.cookieJar = CookieManager(PersistCookieJar(
+              ignoreExpires: true,
+              storage: FileStorage("$appDocPath/.cookies/"),
+            ));
+            debugPrint('✅ Cookie jar recreated as fallback (mobile)');
+          } catch (e2) {
+            debugPrint('❌ Failed to recreate cookie jar: $e2');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error clearing cookies: $e');
     }
   }
 
