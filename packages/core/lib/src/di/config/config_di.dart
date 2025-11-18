@@ -4,7 +4,9 @@ import 'package:core/src/views/search/cubit/search_cubit.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
 import 'package:core/src/views/splash/cubit/splash_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
+import 'package:core/src/views/loading/cubit/loading_cubit.dart';
 import 'package:core/src/views/account/cubit/account_cubit.dart';
+import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -37,19 +39,36 @@ Future<GetIt> configureDependencies() async {
     getIt.registerFactory<EmptyViewCubit>(() => EmptyViewCubit());
   }
 
+  if (!getIt.isRegistered<LoadingViewCubit>()) {
+    getIt.registerFactory<LoadingViewCubit>(() => LoadingViewCubit());
+  }
+
   // AuthCubit should be registered as singleton in starter.dart
   // Don't register here to avoid conflicts - let starter.dart handle it
   // If not registered, it will be registered in starter.dart
 
   getIt.registerFactory<SearchCubit>(() => SearchCubit());
 
+  // Register AccountCubit with AuthCubit dependency if available
+  // Note: getUsersMe callback should be injected in project-specific DI configuration
+  // (e.g., storefront_woo) to avoid core package dependency on apis package
   if (!getIt.isRegistered<AccountCubit>()) {
-    getIt.registerFactory<AccountCubit>(() => AccountCubit());
-  }
+    getIt.registerFactory<AccountCubit>(() {
+      // Try to get AuthCubit from GetIt if registered
+      AuthCubit? authCubit;
+      try {
+        if (getIt.isRegistered<AuthCubit>()) {
+          authCubit = getIt<AuthCubit>();
+        }
+      } catch (e) {
+        // AuthCubit not registered yet, will be null
+        // AccountCubit will work without it, just won't have access to metadata
+      }
 
-
-  if (!getIt.isRegistered<AccountCubit>()) {
-    getIt.registerFactory<AccountCubit>(() => AccountCubit());
+      // getUsersMe callback will be null here - should be injected in project-specific DI
+      // AccountCubit will use metadata fallback if callback is not provided
+      return AccountCubit(authCubit: authCubit);
+    });
   }
 
   return getIt;

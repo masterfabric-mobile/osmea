@@ -117,7 +117,7 @@ class LoadingView extends MasterViewCubit<LoadingViewCubit, LoadingViewState> {
         if (effectiveModel.autoNavigateOnComplete &&
             effectiveModel.targetRoute != null) {
           // Auto navigate to target route
-          // goRoute(effectiveModel.targetRoute!);
+          goRoute(effectiveModel.targetRoute!);
         }
       } else if (state.status == LoadingViewStatus.error) {
         final errorMsg = state.errorMessage ??

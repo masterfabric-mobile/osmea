@@ -17,15 +17,28 @@ import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/views/account/cubit/account_state.dart';
+import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 
 /// 🧠 **OSMEA Account Cubit**
 ///
 /// Manages account view state and data loading
 /// Supports loading from app_config.json or mock data fallback
 class AccountCubit extends BaseViewModelCubit<AccountState> {
-  AccountCubit() : super(const AccountState());
+  AccountCubit({
+    AuthCubit? authCubit,
+    Future<Map<String, dynamic>?> Function()? getUsersMeCallback,
+  }) : super(const AccountState()) {
+    _authCubit = authCubit;
+    _getUsersMeCallback = getUsersMeCallback;
+    debugPrint('🔍 AccountCubit: Constructor called');
+    debugPrint(
+        '🔍 AccountCubit: getUsersMeCallback is null: ${getUsersMeCallback == null}');
+    debugPrint('🔍 AccountCubit: authCubit is null: ${authCubit == null}');
+  }
 
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+  AuthCubit? _authCubit;
+  Future<Map<String, dynamic>?> Function()? _getUsersMeCallback;
 
   // Public trigger functions
   void initialize() => _initialize();
@@ -103,12 +116,68 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
 
   /// Load profile data: Always try Auth Storage first, then use default values
   /// Config is not used for profile data - it's always from auth storage or default
+  /// Also checks AuthCubit metadata for getUsersMe data
   Future<AccountProfileData> _loadProfileData(
       Map<String, dynamic> accountData) async {
     try {
       // Always try to load from Auth Storage first
       final authStorage = AuthStorageHelper();
       final userData = await authStorage.getUserData();
+
+      // Call getUsersMe API to get fresh user data (user can update their info)
+      // Use callback if provided, otherwise fallback to metadata
+      Map<String, dynamic>? getUsersMeData;
+      if (_getUsersMeCallback != null) {
+        try {
+          debugPrint(
+              '👤 AccountCubit: Calling getUsersMe API for fresh user data...');
+          getUsersMeData = await _getUsersMeCallback!();
+          if (getUsersMeData != null) {
+            final apiName = getUsersMeData['name'];
+            debugPrint('✅ AccountCubit: getUsersMe API call successful');
+            debugPrint(
+                '👤 AccountCubit: getUsersMeData keys: ${getUsersMeData.keys.toList()}');
+            debugPrint(
+                '👤 AccountCubit: User name from API: "$apiName" (type: ${apiName.runtimeType})');
+
+            // Check if name is valid (not null and not empty)
+            if (apiName != null && apiName is String && apiName.isNotEmpty) {
+              debugPrint(
+                  '✅ AccountCubit: Valid name found in API response: "$apiName"');
+            } else {
+              debugPrint(
+                  '⚠️ AccountCubit: Name is null or empty in API response');
+              // Don't set to null, keep the data but name will be null
+            }
+          } else {
+            debugPrint('⚠️ AccountCubit: getUsersMe API returned null');
+            getUsersMeData = null;
+          }
+        } catch (e, stackTrace) {
+          debugPrint('⚠️ AccountCubit: Error calling getUsersMe API: $e');
+          debugPrint('⚠️ AccountCubit: Stack trace: $stackTrace');
+          getUsersMeData = null;
+        }
+      } else {
+        debugPrint('⚠️ AccountCubit: getUsersMe callback is null');
+      }
+
+      // Fallback to metadata if callback not provided or failed
+      if (getUsersMeData == null && _authCubit != null) {
+        try {
+          getUsersMeData = _authCubit!
+              .getMetadataValue<Map<String, dynamic>>('get_users_me');
+          if (getUsersMeData != null) {
+            debugPrint(
+                '👤 AccountCubit: Using getUsersMe data from metadata (fallback)');
+            debugPrint(
+                '👤 AccountCubit: Metadata name: "${getUsersMeData['name']}"');
+          }
+        } catch (e) {
+          debugPrint(
+              '⚠️ AccountCubit: Error reading metadata from AuthCubit: $e');
+        }
+      }
 
       if (userData != null && userData.isNotEmpty) {
         debugPrint('👤 AccountCubit: Loading profile from auth storage');
@@ -117,9 +186,29 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
 
         // Extract user info from userData
         // UserInfo.toJson() returns: email, first_name, last_name
-        final email = userData['email'] as String? ??
+        // getUsersMe data may also be in userData (name, display_name, id, slug)
+        String email = userData['email'] as String? ??
             userData['user_email'] as String? ??
             '';
+
+        // If email is still empty, try to get from AuthCubit metadata (JWT token)
+        if (email.isEmpty && _authCubit != null) {
+          try {
+            final authUserData = _authCubit!.userData;
+            if (authUserData != null) {
+              email = authUserData['email'] as String? ??
+                  authUserData['user_email'] as String? ??
+                  email;
+              if (email.isNotEmpty) {
+                debugPrint(
+                    '👤 AccountCubit: Email found in AuthCubit userData: $email');
+              }
+            }
+          } catch (e) {
+            debugPrint(
+                '⚠️ AccountCubit: Error reading email from AuthCubit: $e');
+          }
+        }
 
         final firstName = userData['first_name'] as String? ??
             userData['firstName'] as String? ??
@@ -128,19 +217,68 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
             userData['lastName'] as String? ??
             '';
 
-        // Build full name from firstName and lastName
+        // Build full name: Priority 1) getUsersMe name (DO NOT combine firstName + lastName)
+        // Only use firstName + lastName if getUsersMe name is not available
         String fullName;
-        if (firstName.isNotEmpty && lastName.isNotEmpty) {
-          fullName = '$firstName $lastName';
-        } else if (firstName.isNotEmpty) {
-          fullName = firstName;
-        } else if (lastName.isNotEmpty) {
-          fullName = lastName;
+        final getUsersMeName = getUsersMeData?['name'];
+        debugPrint('🔍 AccountCubit: _loadProfileData - getUsersMeName check:');
+        debugPrint('  - getUsersMeData != null: ${getUsersMeData != null}');
+        debugPrint('  - getUsersMeName: "$getUsersMeName"');
+        debugPrint('  - getUsersMeName != null: ${getUsersMeName != null}');
+        if (getUsersMeName != null) {
+          debugPrint(
+              '  - getUsersMeName is String: ${getUsersMeName is String}');
+          if (getUsersMeName is String) {
+            debugPrint('  - getUsersMeName.isEmpty: ${getUsersMeName.isEmpty}');
+            debugPrint('  - getUsersMeName.length: ${getUsersMeName.length}');
+            debugPrint(
+                '  - getUsersMeName codeUnits: ${getUsersMeName.codeUnits}');
+          }
+        }
+        if (getUsersMeData != null &&
+            getUsersMeName != null &&
+            getUsersMeName is String &&
+            getUsersMeName.isNotEmpty) {
+          // Use name from getUsersMe response directly - NO processing, use as-is
+          // DO NOT combine firstName + lastName when getUsersMe name exists
+          fullName = getUsersMeName;
+          debugPrint(
+              '✅ AccountCubit: Using name from getUsersMe (as-is, NO processing): "$fullName"');
+          debugPrint('✅ AccountCubit: fullName.length: ${fullName.length}');
+          debugPrint(
+              '✅ AccountCubit: fullName.codeUnits: ${fullName.codeUnits}');
         } else {
-          // Fallback to display_name or name, or use email prefix
-          fullName = userData['display_name'] as String? ??
-              userData['name'] as String? ??
-              (email.isNotEmpty ? email.split('@').first : 'User');
+          debugPrint('⚠️ AccountCubit: getUsersMe name check failed');
+          debugPrint('  - getUsersMeData is null: ${getUsersMeData == null}');
+          debugPrint('  - getUsersMeName: $getUsersMeName');
+          debugPrint('  - getUsersMeName type: ${getUsersMeName?.runtimeType}');
+          debugPrint(
+              '  - getUsersMeName is String: ${getUsersMeName is String}');
+          if (getUsersMeName is String) {
+            debugPrint('  - getUsersMeName isEmpty: ${getUsersMeName.isEmpty}');
+          }
+          // Only combine firstName + lastName if getUsersMe name is NOT available
+          debugPrint(
+              '⚠️ AccountCubit: getUsersMe name not available, trying fallbacks...');
+          if (firstName.isNotEmpty && lastName.isNotEmpty) {
+            // Combine firstName and lastName with a single space
+            fullName = '${firstName.trim()} ${lastName.trim()}'.trim();
+            debugPrint(
+                '👤 AccountCubit: Using firstName + lastName: "$fullName"');
+          } else if (firstName.isNotEmpty) {
+            fullName = firstName.trim();
+            debugPrint('👤 AccountCubit: Using firstName only: "$fullName"');
+          } else if (lastName.isNotEmpty) {
+            fullName = lastName.trim();
+            debugPrint('👤 AccountCubit: Using lastName only: "$fullName"');
+          } else {
+            // Fallback to display_name or name from userData, or use email prefix
+            final fallbackName = userData['display_name'] as String? ??
+                userData['name'] as String? ??
+                (email.isNotEmpty ? email.split('@').first : 'User');
+            fullName = fallbackName.trim();
+            debugPrint('👤 AccountCubit: Using fallback name: "$fullName"');
+          }
         }
 
         // Build initials
@@ -149,13 +287,28 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         // Email should always be available from UserInfo
         final finalEmail = email.isNotEmpty ? email : '';
 
+        // Get username from getUsersMe (slug or name)
+        String username = '';
+        if (getUsersMeData != null) {
+          username = getUsersMeData['slug'] as String? ??
+              getUsersMeData['name'] as String? ??
+              '';
+          debugPrint(
+              '👤 AccountCubit: Using username from getUsersMe: $username');
+        } else if (userData['slug'] != null) {
+          username = userData['slug'] as String;
+        } else if (userData['name'] != null) {
+          username = userData['name'] as String;
+        }
+
         debugPrint(
-            '👤 AccountCubit: Extracted - email: $finalEmail, fullName: $fullName, initials: $initials');
+            '👤 AccountCubit: Extracted - email: $finalEmail, fullName: $fullName, username: $username, initials: $initials');
 
         return AccountProfileData(
           fullName: fullName,
           email: finalEmail,
           initials: initials,
+          username: username,
         );
       }
 
@@ -166,6 +319,7 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         fullName: 'username',
         email: 'username@email.com',
         initials: 'UN',
+        username: 'username',
       );
     } catch (e) {
       debugPrint('❌ AccountCubit: Error loading profile data: $e');
@@ -174,6 +328,7 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         fullName: 'username',
         email: 'username@email.com',
         initials: 'UN',
+        username: 'username',
       );
     }
   }
@@ -258,11 +413,12 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
   }
 
   /// Update profile information
-  void updateProfile(String name, String email) {
+  void updateProfile(String name, String email, {String? username}) {
     final updatedProfile = state.profileData.copyWith(
       fullName: name,
       email: email,
       initials: _getInitials(name),
+      username: username,
     );
 
     stateChanger(state.copyWith(profileData: updatedProfile));
@@ -270,9 +426,14 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
 
   /// Get initials from full name
   String _getInitials(String name) {
-    final parts = name.trim().split(' ');
+    // Trim and split, then filter out empty strings
+    final parts = name.trim().split(' ').where((e) => e.isNotEmpty).toList();
     if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts[0][0].toUpperCase();
+    if (parts.length == 1) {
+      // Single word: return first letter
+      return parts[0][0].toUpperCase();
+    }
+    // Multiple words: return first letter of first word + first letter of last word
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 

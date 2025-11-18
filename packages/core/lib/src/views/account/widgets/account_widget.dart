@@ -60,15 +60,15 @@ mixin AccountWidget {
             OsmeaComponents.sizedBox(height: context.spacing24),
 
             // Dynamic Sections from State - Tappable Card Style
-            ...sections.expand((section) => section.items.map((item) => 
-              OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStartupMenuItem(context, item),
-                  OsmeaComponents.sizedBox(height: context.spacing12),
-                ],
-              ),
-            )),
+            ...sections.expand((section) => section.items.map(
+                  (item) => OsmeaComponents.column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStartupMenuItem(context, item),
+                      OsmeaComponents.sizedBox(height: context.spacing12),
+                    ],
+                  ),
+                )),
 
             // Account Details Section (only if authenticated)
             if (_isAuthenticated(context)) ...[
@@ -95,7 +95,7 @@ mixin AccountWidget {
     AccountState state,
   ) {
     final sections = state.sections;
-    
+
     // Get colors from config (default to black/white)
     final configHelper = AssetConfigHelper();
     final primaryColor = configHelper.getColor(
@@ -134,32 +134,32 @@ mixin AccountWidget {
 
               // Dynamic Sections with separators
               ...sections.expand((section) => [
-                ...section.items.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  final isLast = index == section.items.length - 1;
-                  
-                  return OsmeaComponents.column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSpaceMenuItem(
-                        context,
-                        item,
-                        textColor,
-                        iconColor,
-                        separatorColor,
-                      ),
-                      if (!isLast)
-                        Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: separatorColor,
-                        ),
-                    ],
-                  );
-                }),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-              ]),
+                    ...section.items.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      final isLast = index == section.items.length - 1;
+
+                      return OsmeaComponents.column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSpaceMenuItem(
+                            context,
+                            item,
+                            textColor,
+                            iconColor,
+                            separatorColor,
+                          ),
+                          if (!isLast)
+                            Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: separatorColor,
+                            ),
+                        ],
+                      );
+                    }),
+                    OsmeaComponents.sizedBox(height: context.spacing24),
+                  ]),
 
               // Account Details Section (only if authenticated)
               if (_isAuthenticated(context)) ...[
@@ -169,7 +169,8 @@ mixin AccountWidget {
                   color: separatorColor,
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing24),
-                _buildSpaceAccountSection(context, textColor, iconColor, separatorColor),
+                _buildSpaceAccountSection(
+                    context, textColor, iconColor, separatorColor),
                 OsmeaComponents.sizedBox(height: context.spacing24),
               ],
 
@@ -193,21 +194,13 @@ mixin AccountWidget {
     Color iconColor,
   ) {
     final profileData = state.profileData;
-    
-    final displayName = profileData.fullName.isNotEmpty 
-        ? profileData.fullName 
-        : 'Guest';
-    final email = profileData.email.isNotEmpty 
-        ? profileData.email 
-        : 'Not available';
-    final initials = profileData.initials.isNotEmpty 
-        ? profileData.initials
-        : displayName
-            .toString()
-            .split(' ')
-            .map((e) => e.isNotEmpty ? e[0].toUpperCase() : '')
-            .take(2)
-            .join();
+
+    final displayName =
+        profileData.fullName.isNotEmpty ? profileData.fullName : 'Guest';
+    final email = profileData.email.isNotEmpty ? profileData.email : '';
+    // Always calculate initials from displayName (name)
+    // First letter of first word + first letter of last word (if multiple words)
+    final initials = _getInitialsFromName(displayName);
     final isAuthenticated = _isAuthenticated(context);
 
     return OsmeaComponents.column(
@@ -239,20 +232,24 @@ mixin AccountWidget {
               child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Display Name (fullName) - use as-is from API, NO processing
                   OsmeaComponents.text(
-                    displayName.toString(),
+                    displayName,
                     textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                       fontWeight: FontWeight.w700,
                       color: textColor,
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing4),
-                  OsmeaComponents.text(
-                    email,
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: textColor.withOpacity(0.6),
+                  // Email - only show if not empty
+                  if (email.isNotEmpty) ...[
+                    OsmeaComponents.sizedBox(height: context.spacing4),
+                    OsmeaComponents.text(
+                      email,
+                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                        color: textColor.withOpacity(0.6),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -360,14 +357,14 @@ mixin AccountWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox.shrink();
             }
-            
+
             final hasJwtToken = snapshot.data?['jwt'] ?? false;
             final hasCartToken = snapshot.data?['cart'] ?? false;
-            
+
             if (!hasJwtToken && !hasCartToken) {
               return const SizedBox.shrink();
             }
-            
+
             return OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -518,6 +515,11 @@ mixin AccountWidget {
     BuildContext context,
     AccountProfileData profileData,
   ) {
+    final displayName =
+        profileData.fullName.isNotEmpty ? profileData.fullName : 'Guest';
+    // Always calculate initials from displayName (name)
+    final initials = _getInitialsFromName(displayName);
+
     return OsmeaComponents.container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -540,7 +542,7 @@ mixin AccountWidget {
             ),
             child: OsmeaComponents.center(
               child: OsmeaComponents.text(
-                profileData.initials,
+                initials,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: OsmeaColors.white,
@@ -555,24 +557,43 @@ mixin AccountWidget {
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Display Name (fullName)
                 OsmeaComponents.text(
-                  profileData.fullName,
+                  profileData.fullName.isNotEmpty
+                      ? profileData.fullName
+                      : 'Guest',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: OsmeaColors.white,
                 ),
-                OsmeaComponents.sizedBox(height: 4),
-                OsmeaComponents.text(
-                  profileData.email,
-                  fontSize: 14,
-                  color: OsmeaColors.white.withOpacity(0.8),
-                ),
+                // Email - only show if not empty
+                if (profileData.email.isNotEmpty) ...[
+                  OsmeaComponents.sizedBox(height: 4),
+                  OsmeaComponents.text(
+                    profileData.email,
+                    fontSize: 14,
+                    color: OsmeaColors.white.withOpacity(0.8),
+                  ),
+                ],
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// Get initials from name
+  /// Returns first letter of first word + first letter of last word (if multiple words)
+  /// If single word, returns first letter only
+  String _getInitialsFromName(String name) {
+    final parts = name.trim().split(' ').where((e) => e.isNotEmpty).toList();
+    if (parts.isEmpty) return '';
+    if (parts.length == 1) {
+      return parts[0][0].toUpperCase();
+    }
+    // First letter of first word + first letter of last word
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
   Widget _buildSection(BuildContext context, AccountSection section) {
@@ -695,7 +716,6 @@ mixin AccountWidget {
     }
   }
 
-
   /// Navigate using goRoute callback or context.go
   /// Same behavior as enterprise style - routes should work if they exist
   void _navigate(BuildContext context, String route) {
@@ -724,22 +744,14 @@ mixin AccountWidget {
     AccountState state,
   ) {
     final profileData = state.profileData;
-    
+
     // Use profileData from AccountCubit (loaded from AuthStorageHelper)
-    final displayName = profileData.fullName.isNotEmpty 
-        ? profileData.fullName 
-        : 'Guest';
-    final email = profileData.email.isNotEmpty 
-        ? profileData.email 
-        : 'Not available';
-    final initials = profileData.initials.isNotEmpty 
-        ? profileData.initials
-        : displayName
-            .toString()
-            .split(' ')
-            .map((e) => e.isNotEmpty ? e[0].toUpperCase() : '')
-            .take(2)
-            .join();
+    final displayName =
+        profileData.fullName.isNotEmpty ? profileData.fullName : 'Guest';
+    final email = profileData.email.isNotEmpty ? profileData.email : '';
+    // Always calculate initials from displayName (name)
+    // First letter of first word + first letter of last word (if multiple words)
+    final initials = _getInitialsFromName(displayName);
     final isAuthenticated = _isAuthenticated(context);
 
     return _buildCardWrapper(
@@ -783,20 +795,24 @@ mixin AccountWidget {
                 child: OsmeaComponents.column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Display Name (fullName) - use as-is from API, NO processing
                     OsmeaComponents.text(
-                      displayName.toString(),
+                      displayName,
                       textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                         fontWeight: FontWeight.w700,
                         color: OsmeaColors.thunder,
                       ),
                     ),
-                    OsmeaComponents.sizedBox(height: context.spacing4),
-                    OsmeaComponents.text(
-                      email,
-                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                        color: OsmeaColors.pewter,
+                    // Email - only show if not empty
+                    if (email.isNotEmpty) ...[
+                      OsmeaComponents.sizedBox(height: context.spacing4),
+                      OsmeaComponents.text(
+                        email,
+                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: OsmeaColors.pewter,
+                        ),
                       ),
-                    ),
+                    ],
                     OsmeaComponents.sizedBox(height: context.spacing8),
                     // Status Badge
                     Container(
@@ -820,9 +836,7 @@ mixin AccountWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isAuthenticated
-                                ? Icons.check_circle
-                                : Icons.cancel,
+                            isAuthenticated ? Icons.check_circle : Icons.cancel,
                             size: 16,
                             color: isAuthenticated
                                 ? OsmeaColors.nordicBlue
@@ -833,7 +847,8 @@ mixin AccountWidget {
                             isAuthenticated
                                 ? 'Authenticated'
                                 : 'Not Authenticated',
-                            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                            textStyle:
+                                OsmeaTextStyle.bodySmall(context).copyWith(
                               color: isAuthenticated
                                   ? OsmeaColors.nordicBlue
                                   : OsmeaColors.pewter,
@@ -852,7 +867,6 @@ mixin AccountWidget {
       ),
     );
   }
-
 
   /// Build startup style account section
   Widget _buildStartupAccountSection(BuildContext context) {
@@ -878,15 +892,15 @@ mixin AccountWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SizedBox.shrink();
               }
-              
+
               final hasJwtToken = snapshot.data?['jwt'] ?? false;
               final hasCartToken = snapshot.data?['cart'] ?? false;
-              
+
               // If no tokens, don't show anything
               if (!hasJwtToken && !hasCartToken) {
                 return const SizedBox.shrink();
               }
-              
+
               return OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -938,7 +952,7 @@ mixin AccountWidget {
   Future<Map<String, bool>> _checkTokens() async {
     bool hasJwtToken = false;
     bool hasCartToken = false;
-    
+
     try {
       // Check JWT token
       final authStorage = AuthStorageHelper();
@@ -948,7 +962,7 @@ mixin AccountWidget {
     } catch (e) {
       debugPrint('⚠️ AccountWidget: Error checking JWT token: $e');
     }
-    
+
     try {
       // Check Cart token - using dynamic import to avoid dependency issues
       // Cart token check is optional, if package is not available, just skip
@@ -960,7 +974,7 @@ mixin AccountWidget {
       // If cart token check fails, just set to false
       hasCartToken = false;
     }
-    
+
     return {
       'jwt': hasJwtToken,
       'cart': hasCartToken,
@@ -1013,10 +1027,10 @@ mixin AccountWidget {
   ) {
     // Parse color from hex string
     final iconColor = _parseColor(item.iconColor);
-    
+
     // Get description based on item title or route
     final description = _getMenuItemDescription(item.title, item.route);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1093,14 +1107,15 @@ mixin AccountWidget {
   String _getMenuItemDescription(String title, String route) {
     // Try to get description from title
     final titleLower = title.toLowerCase();
-    
+
     if (titleLower.contains('order')) {
       return 'View your orders and order history';
     } else if (titleLower.contains('return')) {
       return 'View your return requests';
     } else if (titleLower.contains('cancel')) {
       return 'View your cancellation requests';
-    } else if (titleLower.contains('account') || titleLower.contains('setting')) {
+    } else if (titleLower.contains('account') ||
+        titleLower.contains('setting')) {
       return 'App settings and preferences';
     } else if (titleLower.contains('notification')) {
       return 'Manage your notification preferences';
@@ -1109,7 +1124,7 @@ mixin AccountWidget {
     } else if (titleLower.contains('price')) {
       return 'Manage your price alerts';
     }
-    
+
     // Default description
     return '';
   }
@@ -1156,7 +1171,7 @@ mixin AccountWidget {
       final authCubit = GetIt.I<AuthCubit>();
       authCubit.resetForm();
       await authCubit.signOut();
-      
+
       // Navigate to home after sign out
       await Future.delayed(const Duration(milliseconds: 150));
       _navigate(context, '/home');
@@ -1190,6 +1205,3 @@ mixin AccountWidget {
     );
   }
 }
-
-
-

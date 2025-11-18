@@ -33,25 +33,29 @@ class AccountProfileData extends Equatable {
   final String fullName;
   final String email;
   final String initials;
+  final String username; // Username from getUsersMe (slug or name)
 
   const AccountProfileData({
     this.fullName = '',
     this.email = '',
     this.initials = '',
+    this.username = '',
   });
 
   @override
-  List<Object> get props => [fullName, email, initials];
+  List<Object> get props => [fullName, email, initials, username];
 
   AccountProfileData copyWith({
     String? fullName,
     String? email,
     String? initials,
+    String? username,
   }) {
     return AccountProfileData(
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       initials: initials ?? this.initials,
+      username: username ?? this.username,
     );
   }
 
@@ -61,6 +65,7 @@ class AccountProfileData extends Equatable {
       fullName: json['fullName'] as String? ?? '',
       email: json['email'] as String? ?? '',
       initials: json['initials'] as String? ?? '',
+      username: json['username'] as String? ?? '',
     );
   }
 
@@ -69,6 +74,7 @@ class AccountProfileData extends Equatable {
       'fullName': fullName,
       'email': email,
       'initials': initials,
+      'username': username,
     };
   }
 }

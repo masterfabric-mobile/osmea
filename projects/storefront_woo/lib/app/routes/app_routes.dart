@@ -5,16 +5,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
+import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/search_view.dart'
     as store_search;
-import 'package:storefront_woo/app/views/view_profile/profile_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
+import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -207,6 +208,34 @@ final GoRouter appRouter = GoRouter(
             );
           },
         ),
+
+        // Products List Page
+        GoRoute(
+          path: '/products',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: ProductListView(
+                arguments: const {'products': true},
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('product-detail')) {
+                    context.go('/product-detail');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
       ],
     ),
 
@@ -343,21 +372,146 @@ final GoRouter appRouter = GoRouter(
               final jwtToken = await WooJwtTokenStorage.loadToken();
               if (jwtToken != null) {
                 // Extract user data - check if it exists and has content
-                Map<String, dynamic>? userData;
+                Map<String, dynamic> userData;
                 if (jwtToken.userData != null &&
                     jwtToken.userData!.isNotEmpty) {
-                  userData = jwtToken.userData;
+                  userData = Map<String, dynamic>.from(jwtToken.userData!);
                   debugPrint(
-                    '✅ User data found in JWT token: ${userData?.keys.toList()}',
+                    '✅ User data found in JWT token: ${userData.keys.toList()}',
                   );
+                  debugPrint('📧 Email in userData: ${userData['email']}');
                 } else {
                   debugPrint('⚠️ No user data in JWT token');
+                  userData = {};
+                }
+
+                // Ensure email is in userData (it should be from UserInfo)
+                // Email might be null in UserInfo, so we need to ensure it's set
+                final emailValue = userData['email'];
+                if (emailValue == null ||
+                    (emailValue is String && emailValue.isEmpty)) {
+                  debugPrint('⚠️ Email not found in userData');
+
+                  // Priority 1: Try to get email from login form (signInEmail)
+                  // This is the email the user entered during login
+                  String? loginEmail;
+                  try {
+                    final formState = authCubit.state;
+                    if (formState is AuthFormState &&
+                        formState.signInEmail.isNotEmpty) {
+                      loginEmail = formState.signInEmail;
+                      debugPrint('📧 Email from login form: $loginEmail');
+                    }
+                  } catch (e) {
+                    debugPrint('⚠️ Error getting email from formState: $e');
+                  }
+
+                  // Priority 2: Try to get email from JWT token's userData
+                  if (loginEmail == null || loginEmail.isEmpty) {
+                    if (jwtToken.userData != null &&
+                        jwtToken.userData!['email'] != null) {
+                      loginEmail = jwtToken.userData!['email'] as String?;
+                      debugPrint(
+                        '📧 Email from JWT token userData: $loginEmail',
+                      );
+                    }
+                  }
+
+                  // Priority 3: Try to get email from AuthCubit userData (if already saved)
+                  if (loginEmail == null || loginEmail.isEmpty) {
+                    try {
+                      final authUserData = authCubit.userData;
+                      if (authUserData != null &&
+                          authUserData['email'] != null) {
+                        loginEmail = authUserData['email'] as String?;
+                        debugPrint(
+                          '📧 Email from AuthCubit userData: $loginEmail',
+                        );
+                      }
+                    } catch (e) {
+                      debugPrint('⚠️ Error getting email from AuthCubit: $e');
+                    }
+                  }
+
+                  // Set email in userData if found
+                  if (loginEmail != null && loginEmail.isNotEmpty) {
+                    userData['email'] = loginEmail;
+                    debugPrint('✅ Email set in userData: ${userData['email']}');
+                  } else {
+                    debugPrint('⚠️ Email not found from any source');
+                  }
+                } else {
+                  debugPrint(
+                    '✅ Email already in userData: ${userData['email']}',
+                  );
+                }
+
+                // Prepare metadata with JWT token info
+                Map<String, dynamic> metadata = {
+                  'woo_jwt_token': jwtToken.toJson(),
+                };
+
+                // Call getUsersMe API to get full user information
+                try {
+                  debugPrint('👤 Calling getUsersMe API...');
+                  final authService = GetIt.I<WooAuthService>();
+                  final authHeader = 'Bearer ${jwtToken.accessToken}';
+
+                  final userMeResponse = await authService.getUsersMe(
+                    authHeader,
+                  );
+                  debugPrint('✅ getUsersMe API call successful');
+                  debugPrint(
+                    '👤 User ID: ${userMeResponse.id}, Name: ${userMeResponse.name}',
+                  );
+
+                  // Add getUsersMe response to metadata
+                  // IMPORTANT: Store name as-is from getUsersMe, do NOT combine firstName + lastName
+                  metadata['get_users_me'] = {
+                    'id': userMeResponse.id,
+                    'name': userMeResponse.name,
+                    'url': userMeResponse.url,
+                    'description': userMeResponse.description,
+                    'link': userMeResponse.link,
+                    'slug': userMeResponse.slug,
+                    'avatar_urls': userMeResponse.avatarUrls?.toJson(),
+                    'is_super_admin': userMeResponse.isSuperAdmin,
+                    'woocommerce_meta': userMeResponse.woocommerceMeta
+                        ?.toJson(),
+                  };
+                  debugPrint(
+                    '👤 Stored getUsersMe name in metadata: "${userMeResponse.name}"',
+                  );
+
+                  // Also merge user data from getUsersMe response if available
+                  if (userMeResponse.name != null ||
+                      userMeResponse.slug != null) {
+                    // userData is already initialized above, no need for ??=
+                    if (userMeResponse.name != null) {
+                      userData['name'] = userMeResponse.name;
+                      userData['display_name'] = userMeResponse.name;
+                    }
+                    if (userMeResponse.id != null) {
+                      userData['id'] = userMeResponse.id;
+                    }
+                    if (userMeResponse.slug != null) {
+                      userData['slug'] = userMeResponse.slug;
+                      userData['username'] =
+                          userMeResponse.slug; // Add username field
+                    }
+                  }
+
+                  debugPrint('✅ getUsersMe data added to metadata');
+                } catch (e) {
+                  debugPrint('⚠️ Error calling getUsersMe API: $e');
+                  // Don't block login if getUsersMe fails
+                  // Continue with login process
                 }
 
                 await authCubit.saveJwtToken(
                   jwtToken: jwtToken.accessToken,
                   userData: userData,
-                  metadata: {'woo_jwt_token': jwtToken.toJson()},
+                  metadata: metadata,
                 );
                 debugPrint('✅ JWT token and user data saved to AuthCubit');
 
@@ -400,7 +554,7 @@ final GoRouter appRouter = GoRouter(
                       allConfig?['woocommerce_configuration']?['auth_key']
                           as String? ??
                       'default-auth-key';
-                      
+
                   final result = await authManager.signUp(
                     email: email,
                     password: password,
@@ -429,28 +583,29 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Profile Route
+    // Profile Route (using AccountView from core package)
     GoRoute(
       path: '/profile',
       pageBuilder: (BuildContext context, GoRouterState state) {
         return CustomTransitionPage(
-          child: ProfileView(
+          child: AccountView(
+            arguments: const {'account': true},
             goRoute: (String path) {
-              debugPrint('🔀 ProfileView: goRoute called with path: $path');
+              debugPrint('🔀 AccountView: goRoute called with path: $path');
               if (path.contains('home') || path == '/home') {
-                debugPrint('🔀 ProfileView: Navigating to /home');
+                debugPrint('🔀 AccountView: Navigating to /home');
                 context.go('/home');
               } else if (path.contains('cart') || path == '/cart') {
-                debugPrint('🔀 ProfileView: Navigating to /cart');
+                debugPrint('🔀 AccountView: Navigating to /cart');
                 context.go('/cart');
               } else if (path.contains('saved') || path == '/saved') {
-                debugPrint('🔀 ProfileView: Navigating to /saved');
+                debugPrint('🔀 AccountView: Navigating to /saved');
                 context.go('/saved');
               } else if (path.contains('auth') || path == '/auth') {
-                debugPrint('🔀 ProfileView: Navigating to /auth');
+                debugPrint('🔀 AccountView: Navigating to /auth');
                 context.go('/auth');
               } else {
-                debugPrint('🔀 ProfileView: Navigating to path: $path');
+                debugPrint('🔀 AccountView: Navigating to path: $path');
                 context.go(path);
               }
             },
@@ -554,6 +709,61 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
+    // Loading View Route
+    GoRoute(
+      path: '/loading/:loadingType',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        final loadingTypeStr = state.pathParameters['loadingType'] ?? 'general';
+        final loadingType = LoadingModelType.values.firstWhere(
+          (type) => type.name == loadingTypeStr,
+          orElse: () => LoadingModelType.general,
+        );
+
+        // Get custom parameters from query
+        final queryParams = state.uri.queryParameters;
+        final customTitle = queryParams['title'];
+        final customDescription = queryParams['description'];
+        final targetRoute = queryParams['targetRoute'];
+
+        return CustomTransitionPage(
+          child: LoadingView(
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('cart')) {
+                context.go('/cart');
+              } else if (path.contains('saved')) {
+                context.go('/saved');
+              } else {
+                context.go(path);
+              }
+            },
+            loadingType: loadingType,
+            loadingPageModel: customTitle != null || customDescription != null
+                ? LoadingPageModel(
+                    title: customTitle ?? 'Loading...',
+                    description: customDescription ?? 'Please wait',
+                    loadingType: loadingType,
+                    autoNavigateOnComplete: targetRoute != null,
+                    targetRoute: targetRoute,
+                  )
+                : null,
+            onCompleted: targetRoute != null
+                ? () {
+                    // Navigate to target route when loading completes
+                    context.go(targetRoute);
+                  }
+                : null,
+            arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
   ],
 );
 
@@ -581,6 +791,6 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       ); // Profile
     }
   }
-  // No navbar for splash, onboarding, auth, product-detail
+  // No navbar for splash, onboarding, auth, product-detail, products
   return null;
 }
