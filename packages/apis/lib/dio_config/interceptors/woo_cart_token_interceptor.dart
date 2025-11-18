@@ -172,30 +172,36 @@ class WooCartTokenInterceptor extends Interceptor {
         final cookies = response.headers['set-cookie'];
         if (cookies != null && cookies.isNotEmpty) {
           debugPrint('🔍 Checking cookies for cart token...');
-          for (final cookie in cookies) {
-            if (cookie.contains('woocommerce_cart_hash') ||
-                cookie.contains('cart_token') ||
-                cookie.contains('wp_woocommerce_session') ||
-                cookie.contains('woocommerce_session')) {
-              // Extract cart token from cookie
-              final cookieParts = cookie.split(';');
-              for (final part in cookieParts) {
-                if (part.contains('=')) {
-                  final keyValue = part.split('=');
-                  if (keyValue.length == 2) {
-                    final key = keyValue[0].trim();
-                    final value = keyValue[1].trim();
-                    if (key.contains('cart') ||
-                        key.contains('token') ||
-                        key.contains('session')) {
-                      cartToken = value;
-                      debugPrint('🛒 Found cart token in cookie: $key');
-                      break;
-                    }
-                  }
+          debugPrint('🔍 Set-Cookie headers: ${cookies.join(", ")}');
+
+          for (final cookieHeader in cookies) {
+            // Parse cookie: name=value; attributes
+            final cookieParts = cookieHeader.split(';');
+            if (cookieParts.isNotEmpty) {
+              final nameValue = cookieParts[0].trim().split('=');
+              if (nameValue.length >= 2) {
+                final cookieName = nameValue[0].trim();
+                // Handle values that might contain '='
+                final cookieValue = cookieHeader
+                    .substring(cookieHeader.indexOf('=') + 1)
+                    .split(';')[0]
+                    .trim();
+
+                debugPrint('🔍 Checking cookie: $cookieName');
+
+                // Check for cart-related cookie names (WooCommerce standard cookie names)
+                // WooCommerce cookies: woocommerce_cart_hash, woocommerce_items_in_cart, wp_woocommerce_session_
+                if (cookieName == 'woocommerce_cart_hash' ||
+                    cookieName == 'woocommerce_items_in_cart' ||
+                    cookieName.startsWith('wp_woocommerce_session_') ||
+                    cookieName.contains('cart_token') ||
+                    cookieName.toLowerCase().contains('cart')) {
+                  cartToken = cookieValue;
+                  debugPrint(
+                      '🛒 Found cart token in cookie: $cookieName=${cookieValue.length > 20 ? cookieValue.substring(0, 20) + "..." : cookieValue}');
+                  break;
                 }
               }
-              if (cartToken != null) break;
             }
           }
         }

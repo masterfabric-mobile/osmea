@@ -3,6 +3,7 @@ import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/passw
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/delete_user_response.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/get_users_me_response.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/password_update_response.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/send_reset_password_response.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/user_login_response.dart';
@@ -43,4 +44,9 @@ abstract class WooAuthService {
   /// Sends email & new_password as query string. JWT is optional and omitted when null.
   Future<PasswordUpdateResponse> updatePasswordPutQuery(
       String brandName, String email, String newPassword, String? jwt);
+
+  /// 👤 Get Users Me
+  /// Gets current authenticated user info from WordPress REST API
+  /// Endpoint: /wp-json/wp/v2/users/me
+  Future<GetUsersMeResponse> getUsersMe(String jwt);
 }
