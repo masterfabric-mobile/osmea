@@ -2,7 +2,6 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_error_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_list_widget.dart';
 // Single source of truth: WishlistViewModel
 
@@ -63,15 +62,18 @@ class WishlistView
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initial();
       });
-      return const Center(child: CircularProgressIndicator());
+      return buildLoading();
     }
 
     if (state is WishlistLoadingState) {
-      return const Center(child: CircularProgressIndicator());
+      return buildLoading();
     }
 
     if (state is WishlistErrorState) {
-      return WishlistErrorWidget(message: state.message, viewModel: viewModel);
+      return buildError(
+        state.message,
+        onRetry: () => viewModel.syncFromServer(),
+      );
     }
 
     if (state is WishlistSuccessState) {
