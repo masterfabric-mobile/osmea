@@ -426,7 +426,6 @@ class AuthWidget extends StatelessWidget {
           hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
-            debugPrint('✅ SIGN IN EMAIL FIELD ONCHANGED: "$value"');
             cubit.updateSignInEmail(value);
           },
           errorText: state.signInEmailError,
@@ -461,7 +460,7 @@ class AuthWidget extends StatelessWidget {
               state.signInObscurePassword
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-              color: OsmeaColors.thunder.withOpacity(0.4),
+              color: OsmeaColors.silver,
               size: context.iconSizeSmall,
             ),
             onPressed: cubit.toggleSignInPasswordVisibility,
@@ -582,7 +581,7 @@ class AuthWidget extends StatelessWidget {
               state.signUpObscurePassword
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-              color: OsmeaColors.thunder.withOpacity(0.4),
+              color: OsmeaColors.silver,
               size: context.iconSizeSmall,
             ),
             onPressed: cubit.toggleSignUpPasswordVisibility,
@@ -617,7 +616,7 @@ class AuthWidget extends StatelessWidget {
               state.signUpObscurePasswordConfirm
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-              color: OsmeaColors.thunder.withOpacity(0.4),
+              color: OsmeaColors.silver,
               size: context.iconSizeSmall,
             ),
             onPressed: cubit.toggleSignUpPasswordConfirmVisibility,
