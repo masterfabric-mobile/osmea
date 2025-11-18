@@ -7,12 +7,10 @@ import 'package:apis/dio_config/interceptors/woo_jwt_interceptor.dart';
 import 'package:apis/services/auth/woo_jwt_auth_service.dart';
 import 'package:apis/services/auth/woo_jwt_signin_manager.dart';
 import 'package:apis/models/auth/woo_jwt_token.dart';
+import 'package:dio/io.dart';
 // ignore: depend_on_referenced_packages
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart' if (dart.library.html) 'package:dio/browser.dart';
-import 'package:dio/browser.dart'
-    if (dart.library.html) 'package:dio/browser.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -72,28 +70,7 @@ class ApiDioClient implements ApiBaseClient {
         receiveTimeout: const Duration(seconds: 60),
         sendTimeout: const Duration(seconds: 60),
       )
-      ..options.responseType = ResponseType.json
-      ..options.followRedirects = true
-      ..options.validateStatus = (status) => status! < 500;
-
-    // 🍪 Enable cookie support for web platform
-    if (kIsWeb) {
-      try {
-        // Create BrowserHttpClientAdapter explicitly for web platform
-        // This is required for withCredentials to work properly
-        final browserAdapter = BrowserHttpClientAdapter();
-        browserAdapter.withCredentials = true;
-        dio.httpClientAdapter = browserAdapter;
-        debugPrint(
-            '✅ [WebCookieManager] BrowserHttpClientAdapter created with withCredentials=true');
-        debugPrint(
-            '🍪 Web platform: withCredentials enabled for cookie support');
-      } catch (e) {
-        debugPrint('❌ Failed to enable withCredentials: $e');
-        debugPrint(
-            '💡 [WebCookieManager] Make sure dio package supports BrowserHttpClientAdapter');
-      }
-    }
+      ..options.responseType = ResponseType.json;
 
     // 🔐 Add JWT authentication interceptor
     if (useJwtAuth) {
@@ -176,20 +153,6 @@ class ApiDioClient implements ApiBaseClient {
         sendTimeout: const Duration(seconds: 60),
       )
       ..options.responseType = ResponseType.json;
-
-    // 🍪 Enable cookie support for web platform (wooPublicDio)
-    if (kIsWeb) {
-      try {
-        // Create BrowserHttpClientAdapter explicitly for web platform
-        final browserAdapter = BrowserHttpClientAdapter();
-        browserAdapter.withCredentials = true;
-        dio.httpClientAdapter = browserAdapter;
-        debugPrint(
-            '✅ [WebCookieManager] BrowserHttpClientAdapter created with withCredentials=true (public)');
-      } catch (e) {
-        debugPrint('❌ Failed to enable withCredentials (public): $e');
-      }
-    }
 
     // 🍪 Add cookie management based on platform (for session tracking if needed)
     if (kIsWeb) {
