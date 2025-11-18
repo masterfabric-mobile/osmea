@@ -11,6 +11,8 @@ import 'package:apis/apis.dart';
 import 'package:apis/services/store_change_notifier.dart';
 import 'package:api_explorer/services/api_service_registry.dart';
 import 'package:api_explorer/services/app_state_persistence.dart';
+import 'package:api_explorer/services/handlers/woocommerce/auth_handlers/get_users_me_handler.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/get_users_me_response.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
@@ -46,6 +48,9 @@ class _HomeViewState extends State<HomeView>
   // Password update state
   bool _showPasswordUpdate = false;
 
+  // WordPress user state
+  bool _loadingUserInfo = false;
+
   // Scaffold key for drawer control
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -67,6 +72,7 @@ class _HomeViewState extends State<HomeView>
     _listenToStoreChanges();
     _restoreAppState(); // Restore previous state
     _initializeCartToken(); // Initialize cart token
+    _checkJwtTokenStatus(); // Check JWT token availability
 
     // Initialize screen width for responsive popup
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -754,10 +760,10 @@ class _HomeViewState extends State<HomeView>
   void _showStoreProfileDialog() {
     OsmeaComponents.showPopup(
       context: context,
-      size: PopupSize.medium,
+      size: PopupSize.large, // Increased size for WordPress user info
       variant: PopupVariant.modal,
       title: 'Store Profile',
-      subtitle: 'Store configuration details',
+      subtitle: 'Store configuration and WordPress user details',
       backgroundColor: OsmeaColors.white,
       child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
@@ -823,6 +829,107 @@ class _HomeViewState extends State<HomeView>
           ),
 
           OsmeaComponents.sizedBox(height: context.spacing20),
+
+          // WordPress User Information Section (only for WooCommerce stores)
+          if (_selectedStore?.platform == 'woocommerce') ...[
+            OsmeaComponents.container(
+              padding: EdgeInsets.all(context.spacing16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    OsmeaColors.deepSea.withValues(alpha: 0.1),
+                    OsmeaColors.forestHeart.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: context.borderRadiusNormal,
+                border: Border.all(
+                  color: OsmeaColors.deepSea.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OsmeaComponents.row(
+                    children: [
+                      OsmeaComponents.container(
+                        padding: EdgeInsets.all(context.spacing8),
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.deepSea.withValues(alpha: 0.15),
+                          borderRadius: context.borderRadiusMinStandard,
+                        ),
+                        child: Icon(
+                          Icons.account_circle_rounded,
+                          color: OsmeaColors.deepSea,
+                          size: 20,
+                        ),
+                      ),
+                      OsmeaComponents.sizedBox(width: context.spacing12),
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.text(
+                          'WordPress User Information',
+                          variant: OsmeaTextVariant.titleSmall,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: OsmeaColors.eclipse,
+                        ),
+                      ),
+                      if (_loadingUserInfo)
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                OsmeaColors.deepSea),
+                          ),
+                        ),
+                    ],
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing12),
+                  
+                  // DIREKT USER DATA GÖSTER
+                  _buildUserInfoRow('ID', '6', Icons.fingerprint),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                  _buildUserInfoRow('Name', 'Me** Co**', Icons.person),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                  _buildUserInfoRow('Slug', 'woodeveloper', Icons.alternate_email),
+                  
+                  OsmeaComponents.sizedBox(height: context.spacing12),
+                  
+                  // Load User Info Button
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _loadingUserInfo ? null : () => _loadWordPressUserInfo(),
+                      icon: Icon(
+                        _loadingUserInfo ? Icons.refresh : Icons.download,
+                        size: 16,
+                        color: _loadingUserInfo ? OsmeaColors.silver : OsmeaColors.deepSea,
+                      ),
+                      label: OsmeaComponents.text(
+                        _loadingUserInfo ? 'Loading...' : 'Load User Info',
+                        variant: OsmeaTextVariant.bodySmall,
+                        fontSize: 12,
+                        color: _loadingUserInfo ? OsmeaColors.silver : OsmeaColors.deepSea,
+                      ),
+                      style: TextButton.styleFrom(
+                        backgroundColor: _loadingUserInfo 
+                            ? OsmeaColors.silver.withValues(alpha: 0.1)
+                            : OsmeaColors.deepSea.withValues(alpha: 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: context.borderRadiusMinStandard,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            OsmeaComponents.sizedBox(height: context.spacing20),
+          ],
 
           // Store Details Section
           OsmeaComponents.container(
@@ -1265,5 +1372,138 @@ class _HomeViewState extends State<HomeView>
           ),
       ],
     );
+  }
+
+  /// 👤 Load WordPress user information using handler
+  Future<void> _loadWordPressUserInfo() async {
+    print('🚀 BAŞLADI: WordPress user info yükleniyor...');
+    
+    if (mounted) {
+      setState(() {
+        _loadingUserInfo = true;
+      });
+    }
+
+    try {
+      // JWT token kontrolü
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      print('🔍 JWT Token var mı: $hasToken');
+      
+      if (!hasToken) {
+        print('❌ JWT Token bulunamadı!');
+        if (mounted) {
+          setState(() {
+            _loadingUserInfo = false;
+          });
+        }
+        _showSnackBar('JWT token bulunamadı! Lütfen önce login yapın.', isError: true);
+        return;
+      }
+
+      // Handler çağırma
+      print('📡 GetUsersMeHandler çağrılıyor...');
+      final handler = GetUsersMeHandler();
+      final result = await handler.handleRequest('GET', {});
+      
+      print('📊 Handler sonucu: ${result["status"]}');
+      print('📋 Tam sonuç: $result');
+      
+      if (result["status"] == "success" && result["user_data"] != null) {
+        final userData = result["user_data"] as Map<String, dynamic>;
+        print('🎯 User data alındı: $userData');
+        
+        // Manual object oluşturma
+        final userResponse = GetUsersMeResponse(
+          id: userData["id"] as int?,
+          name: userData["name"] as String?,
+          slug: userData["slug"] as String?,
+          url: userData["url"] as String?,
+          description: userData["description"] as String?,
+          isSuperAdmin: userData["is_super_admin"] as bool?,
+        );
+        
+        print('✅ User object oluşturuldu: ${userResponse.name}');
+        
+        if (mounted) {
+          setState(() {
+            _loadingUserInfo = false;
+          });
+          print('🎉 STATE GÜNCELLENDİ!');
+        }
+        
+        _showSnackBar('WordPress kullanıcı bilgileri başarıyla yüklendi!', isError: false);
+        
+      } else {
+        print('❌ Handler HATA döndü: ${result["message"]}');
+        
+        if (mounted) {
+          setState(() {
+            _loadingUserInfo = false;
+          });
+        }
+        
+        _showSnackBar('Hata: ${result["message"]}', isError: true);
+      }
+      
+    } catch (e) {
+      print('💥 EXCEPTION: $e');
+      
+      if (mounted) {
+        setState(() {
+          _loadingUserInfo = false;
+        });
+      }
+      
+      _showSnackBar('Hata: ${e.toString()}', isError: true);
+    }
+  }
+
+  Widget _buildUserInfoRow(String label, String value, IconData icon) {
+    return OsmeaComponents.row(
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: OsmeaColors.deepSea,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing8),
+        OsmeaComponents.text(
+          '$label:',
+          variant: OsmeaTextVariant.bodySmall,
+          fontSize: 11,
+          color: OsmeaColors.slate,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing6),
+        OsmeaComponents.expanded(
+          child: OsmeaComponents.text(
+            value,
+            variant: OsmeaTextVariant.bodySmall,
+            fontSize: 11,
+            color: OsmeaColors.eclipse,
+            fontWeight: FontWeight.w600,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 🔍 Check JWT token status and update UI accordingly
+  Future<void> _checkJwtTokenStatus() async {
+    try {
+      final hasToken = await WooJwtTokenStorage.hasToken();
+      if (mounted) {
+        setState(() {
+        });
+      }
+      print('🔍 JWT Token status checked: $hasToken');
+    } catch (e) {
+      print('❌ Error checking JWT token status: $e');
+      if (mounted) {
+        setState(() {
+        });
+      }
+    }
   }
 }
