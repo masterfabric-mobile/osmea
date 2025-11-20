@@ -15,14 +15,17 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
-import 'package:core/src/views/account/cubit/account_cubit.dart';
-import 'package:core/src/views/account/cubit/account_state.dart';
 
 /// Mixin for account widget content
 mixin AccountWidget {
   /// Optional goRoute callback for navigation
   /// If not provided, will use context.go
   Function(String)? get goRouteCallback => null;
+
+  /// Optional onSignOut callback for platform-specific cleanup
+  /// Called during logout to clear cookies, wishlist, cart, etc.
+  /// If not provided, only core cleanup will be performed
+  Future<void> Function()? get onSignOutCallback => null;
 
   Widget buildAccountContent(
     BuildContext context,
@@ -1166,17 +1169,54 @@ mixin AccountWidget {
   }
 
   /// Sign out helper
+  /// Comprehensive logout that clears all user data, tokens, and cached information
+  /// Platform-specific cleanup (cookies, wishlist, cart) is handled via onSignOutCallback
   Future<void> _signOut(BuildContext context, AccountCubit viewModel) async {
     try {
+      debugPrint('🚪 AccountWidget: Starting comprehensive sign out process...');
+
+      // Step 1: Clear AccountCubit state first to prevent showing stale user data
+      viewModel.clearAccountData();
+      debugPrint('✅ AccountWidget: AccountCubit state cleared');
+
+      // Step 2: Call platform-specific cleanup callback if provided
+      // This handles cookies, wishlist, cart, and other platform-specific data
+      if (onSignOutCallback != null) {
+        try {
+          debugPrint('🔄 AccountWidget: Calling platform-specific cleanup callback...');
+          await onSignOutCallback!();
+          debugPrint('✅ AccountWidget: Platform-specific cleanup completed');
+        } catch (e) {
+          debugPrint('⚠️ AccountWidget: Error in platform-specific cleanup: $e');
+          // Continue with core cleanup even if platform cleanup fails
+        }
+      } else {
+        debugPrint('ℹ️ AccountWidget: No platform-specific cleanup callback provided');
+      }
+
+      // Step 3: Sign out from AuthCubit - this will:
+      // - Clear AuthStorageHelper (Core JWT token and userData)
+      // - Clear remember_me preference
+      // - Emit AuthUnauthenticatedState
+      // - Clear HydratedCubit persistence
       final authCubit = GetIt.I<AuthCubit>();
       authCubit.resetForm();
       await authCubit.signOut();
+      debugPrint('✅ AccountWidget: AuthCubit sign out completed');
+
+      // Step 4: Ensure AccountCubit state is cleared again after auth signout
+      // This prevents any cached profile data from being displayed
+      viewModel.clearAccountData();
+      debugPrint('✅ AccountWidget: AccountCubit state cleared again (post-auth signout)');
+
+      debugPrint('✅ AccountWidget: Comprehensive sign out completed successfully');
 
       // Navigate to home after sign out
       await Future.delayed(const Duration(milliseconds: 150));
       _navigate(context, '/home');
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ AccountWidget: Error signing out: $e');
+      debugPrint('❌ AccountWidget: Stack trace: $stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error signing out: $e'),

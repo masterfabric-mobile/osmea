@@ -449,4 +449,12 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         return AccountStyle.enterprise;
     }
   }
+
+  /// Clear account data (called on logout)
+  /// Resets state to initial values to prevent showing stale user data
+  void clearAccountData() {
+    debugPrint('🗑️ AccountCubit: Clearing account data...');
+    stateChanger(const AccountState());
+    debugPrint('✅ AccountCubit: Account data cleared');
+  }
 }

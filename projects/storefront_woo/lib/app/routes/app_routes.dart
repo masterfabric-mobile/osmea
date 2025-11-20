@@ -15,34 +15,58 @@ import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_mode
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
+import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  debugLogDiagnostics: false, // Disable debug route bar to prevent freezing
   // Global route configuration
   routes: <RouteBase>[
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         // Use BlocBuilder to reactively listen to WishlistViewModel changes
-        final wishlistViewModel = GetIt.I<WishlistViewModel>();
-        return BlocBuilder<WishlistViewModel, WishlistState>(
-          bloc: wishlistViewModel,
-          builder: (context, wishlistState) {
-            // Get wishlist count from state
-            final wishlistCount = wishlistState is WishlistLoadedState
-                ? wishlistState.items.length
-                : wishlistViewModel.count;
+        // Use try-catch to prevent freezing on first load
+        try {
+          final wishlistViewModel = GetIt.I<WishlistViewModel>();
+          return BlocBuilder<WishlistViewModel, WishlistState>(
+            bloc: wishlistViewModel,
+            builder: (context, wishlistState) {
+              // Get wishlist count from state with safe fallback
+              int wishlistCount = 0;
+              try {
+                if (wishlistState is WishlistLoadedState) {
+                  wishlistCount = wishlistState.items.length;
+                } else {
+                  // Safe fallback - use count property or default to 0
+                  wishlistCount = wishlistViewModel.count;
+                }
+              } catch (e) {
+                debugPrint('⚠️ Error getting wishlist count: $e');
+                wishlistCount = 0;
+              }
 
-            return Scaffold(
-              body: child,
-              bottomNavigationBar: _getNavbarForRoute(
-                state.uri.path,
-                wishlistCount,
-              ),
-            );
-          },
-        );
+              return Scaffold(
+                body: child,
+                bottomNavigationBar: _getNavbarForRoute(
+                  state.uri.path,
+                  wishlistCount,
+                ),
+              );
+            },
+          );
+        } catch (e) {
+          debugPrint('⚠️ Error initializing ShellRoute builder: $e');
+          // Fallback: return scaffold without navbar if WishlistViewModel fails
+          return Scaffold(
+            body: child,
+            bottomNavigationBar: _getNavbarForRoute(
+              state.uri.path,
+              0, // Default to 0 if wishlist fails
+            ),
+          );
+        }
       },
       routes: [
         // Home Page - Show products directly
@@ -608,6 +632,45 @@ final GoRouter appRouter = GoRouter(
                 debugPrint('🔀 AccountView: Navigating to path: $path');
                 context.go(path);
               }
+            },
+            onSignOut: () async {
+              // Platform-specific cleanup: cookies, wishlist, cart tokens
+              debugPrint('🚪 Route: Starting platform-specific cleanup...');
+
+              // Step 1: Clear WooCommerce JWT token
+              try {
+                await WooJwtTokenStorage.clearToken();
+                debugPrint('✅ Route: WooJWT token cleared');
+              } catch (e) {
+                debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
+              }
+
+              // Step 2: Clear cart token
+              try {
+                await WooCartTokenStorage.clearCartToken();
+                debugPrint('✅ Route: WooCartToken cleared');
+              } catch (e) {
+                debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
+              }
+
+              // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+              try {
+                await ApiDioClient.clearAllCookies();
+                debugPrint('✅ Route: All cookies cleared (including WP cookies)');
+              } catch (e) {
+                debugPrint('⚠️ Route: Failed to clear cookies: $e');
+              }
+
+              // Step 4: Clear wishlist (user-specific data)
+              try {
+                final wishlistViewModel = GetIt.I<WishlistViewModel>();
+                wishlistViewModel.clearAll();
+                debugPrint('✅ Route: Wishlist cleared');
+              } catch (e) {
+                debugPrint('⚠️ Route: Failed to clear wishlist: $e');
+              }
+
+              debugPrint('✅ Route: Platform-specific cleanup completed');
             },
             bottomNavigationBar: _getNavbarForRoute(
               state.uri.path,

@@ -12,12 +12,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
-import 'package:core/src/views/account/cubit/account_cubit.dart';
-import 'package:core/src/views/account/cubit/account_state.dart';
-import 'package:core/src/views/account/widgets/account_widget.dart';
-import 'package:osmea_components/osmea_components.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,6 +39,7 @@ import 'package:core/core.dart';
 class AccountView extends MasterViewCubit<AccountCubit, AccountState>
     with AccountWidget {
   final Function(String)? _goRouteCallback;
+  final Future<void> Function()? _onSignOutCallback;
 
   AccountView({
     super.key,
@@ -55,7 +50,9 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
     super.footerSpacer = const SpacerVisibility.disabled(),
     super.bottomNavigationBar,
     required super.goRoute,
+    Future<void> Function()? onSignOut,
   }) : _goRouteCallback = goRoute,
+        _onSignOutCallback = onSignOut,
         super(
           coreAppBar: (context, viewModel) =>
               _buildAccountAppBar(context, viewModel),
@@ -65,6 +62,9 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
 
   @override
   Function(String)? get goRouteCallback => _goRouteCallback;
+
+  @override
+  Future<void> Function()? get onSignOutCallback => _onSignOutCallback;
 
   @override
   void initialContent(AccountCubit viewModel, BuildContext context) {
