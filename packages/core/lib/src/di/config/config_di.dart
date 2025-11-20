@@ -7,6 +7,7 @@ import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:core/src/views/loading/cubit/loading_cubit.dart';
 import 'package:core/src/views/account/cubit/account_cubit.dart';
 import 'package:core/src/views/auth/cubit/auth_cubit.dart';
+import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -69,6 +70,10 @@ Future<GetIt> configureDependencies() async {
       // AccountCubit will use metadata fallback if callback is not provided
       return AccountCubit(authCubit: authCubit);
     });
+  }
+
+  if (!getIt.isRegistered<ErrorHandlingCubit>()) {
+    getIt.registerFactory<ErrorHandlingCubit>(() => ErrorHandlingCubit());
   }
 
   return getIt;
