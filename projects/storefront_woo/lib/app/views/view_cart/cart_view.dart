@@ -75,15 +75,22 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
   ) {
     // Error state
     if (state is CartErrorState) {
-      return CartErrorWidget(
-        message: state.message,
-        onRetry: () => viewModel.loadCart(),
+      return ErrorHandlingView(
+        goRoute: goRoute,
+        customRetryFunction: () async {
+          viewModel.loadCart();
+          return true;
+        },
       );
     }
 
     // Loading state
     if (state is CartLoadingState) {
-      return const CartLoadingWidget();
+      return LoadingScreen(
+        goRoute: goRoute,
+        loadingType: LoadingModelType.dataLoading,
+        loadingSteps: ['Loading cart...'],
+      );
     }
 
     // Loaded state
@@ -92,6 +99,10 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     }
 
     // Initial state
-    return const CartLoadingWidget();
+    return LoadingScreen(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.dataLoading,
+      loadingSteps: ['Loading cart...'],
+    );
   }
 }
