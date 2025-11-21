@@ -36,32 +36,21 @@ class AppNavbar extends StatelessWidget {
       NavbarItem(
         text: 'Home',
         icon: Icon(Icons.home_outlined),
-        onTap: () => context.go('/home'),
         tooltip: 'Home',
       ),
       NavbarItem(
         text: 'Search',
         icon: Icon(Icons.search_outlined),
-        onTap: () => context.go('/search'),
         tooltip: 'Search Products',
       ),
       NavbarItem(
         text: 'Cart',
         icon: Icon(Icons.shopping_cart_outlined),
-        onTap: () => context.go('/cart'),
         tooltip: 'Shopping Cart',
       ),
       NavbarItem(
         text: 'Wishlist',
         icon: Icon(Icons.favorite_outline),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Wishlist feature coming soon!'),
-              backgroundColor: OsmeaColors.nordicBlue,
-            ),
-          );
-        },
         tooltip: 'Wishlist',
       ),
     ];
@@ -71,18 +60,29 @@ class AppNavbar extends StatelessWidget {
   void _navigateToPage(BuildContext context, int index) {
     switch (index) {
       case 0:
+        // Home
         context.go('/home');
         break;
       case 1:
-        context.go('/cart');
+        // Search
+        context.go('/search');
         break;
       case 2:
+        // Cart
+        context.go('/cart');
+        break;
+      case 3:
+        // Wishlist
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Wishlist feature coming soon!'),
             backgroundColor: OsmeaColors.nordicBlue,
           ),
         );
+        break;
+      default:
+        // Default to home if index is out of range
+        context.go('/home');
         break;
     }
   }
