@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 
@@ -139,8 +140,10 @@ class CartContentWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: 32),
           OsmeaComponents.button(
             onPressed: () {
-              // Navigate to home
-              Navigator.of(context).pop();
+              // Navigate to home using GoRouter
+              if (context.mounted) {
+                context.go('/home');
+              }
             },
             backgroundColor: OsmeaColors.nordicBlue,
             textColor: OsmeaColors.white,
@@ -304,7 +307,7 @@ class CartContentWidget extends StatelessWidget {
 
                 // Delete Button - Text Button for better readability
                 OsmeaComponents.button(
-                  onPressed: () => viewModel.removeItemFromCart(item.productId),
+                  onPressed: () => viewModel.removeItemFromCart(item.productId, context: context),
                   backgroundColor: OsmeaColors.red.withValues(alpha: 0.1),
                   textColor: OsmeaColors.red,
                   padding: const EdgeInsets.symmetric(

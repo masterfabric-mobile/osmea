@@ -273,6 +273,66 @@ void _showCartModal(BuildContext context, CartService cartService) {
   );
 }
 
+/// Shows confirmation dialog before removing item from cart
+void _showRemoveItemConfirmation(
+  BuildContext context,
+  CartService cartService,
+  CartItem item,
+) {
+  showDialog(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: OsmeaComponents.text(
+          'Remove Item',
+          textStyle: OsmeaTextStyle.titleLarge(context),
+          color: OsmeaColors.thunder,
+        ),
+        content: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OsmeaComponents.text(
+              'Are you sure you want to remove "${item.productName}" from your cart?',
+              textStyle: OsmeaTextStyle.bodyMedium(context),
+              color: OsmeaColors.pewter,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: OsmeaComponents.text(
+              'Cancel',
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.pewter,
+              ),
+            ),
+          ),
+          // Remove button
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              cartService.removeItem(item.productId);
+            },
+            child: OsmeaComponents.text(
+              'Remove',
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 /// Cart modal widget
 class CartModal extends StatelessWidget {
   final CartService cartService;
@@ -498,7 +558,7 @@ class CartContentWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(width: 16),
             // Remove button
             OsmeaComponents.iconButton(
-              onPressed: () => cartService.removeItem(item.productId),
+              onPressed: () => _showRemoveItemConfirmation(context, cartService, item),
               icon: Icon(Icons.delete_outline, color: OsmeaColors.red),
               tooltip: 'Remove item',
             ),

@@ -424,14 +424,41 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
               textAlign: TextAlign.center,
             ),
             OsmeaComponents.sizedBox(height: 24),
-            OsmeaComponents.button(
-              onPressed: () => loadProducts(),
-              backgroundColor: OsmeaColors.nordicBlue,
-              textColor: OsmeaColors.paperWhite,
-              text: 'Retry',
-              textStyle: OsmeaTextStyle.titleMedium(
-                context,
-              ).copyWith(color: OsmeaColors.paperWhite),
+            OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Retry button - Primary style
+                OsmeaComponents.button(
+                  onPressed: () => loadProducts(),
+                  backgroundColor: OsmeaColors.nordicBlue,
+                  textColor: OsmeaColors.paperWhite,
+                  text: 'Retry',
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  borderRadius: 8,
+                  textStyle: OsmeaTextStyle.titleMedium(
+                    context,
+                  ).copyWith(
+                    color: OsmeaColors.paperWhite,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 12),
+                // Restart Store button - Outlined style (different from Retry)
+                OsmeaComponents.button(
+                  onPressed: () => restart(),
+                  variant: ButtonVariant.outlined,
+                  text: 'Restart Store',
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  borderRadius: 8,
+                  borderColor: OsmeaColors.nordicBlue,
+                  textStyle: OsmeaTextStyle.titleMedium(
+                    context,
+                  ).copyWith(
+                    color: OsmeaColors.nordicBlue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

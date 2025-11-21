@@ -105,10 +105,19 @@ class ProductDetailViewModel
   }
 
   Future<void> _addToCart(int productId, int quantity) async {
+    final currentState = state;
+    if (currentState is! ProductDetailLoadedState) return;
+
     try {
+      // Set loading state
+      emit(currentState.copyWith(isAddingToCart: true));
+
       debugPrint(
         '🛒 ProductDetailViewModel: Adding product $productId to cart via API',
       );
+
+      // Wait 0.3 seconds for animation
+      await Future.delayed(const Duration(milliseconds: 300));
 
       // Add item to cart via API
       final response = await _cartService.addItem(
@@ -128,6 +137,11 @@ class ProductDetailViewModel
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API add item error: ${response.errors!.first}');
         emit(
+          currentState.copyWith(
+            isAddingToCart: false,
+          ),
+        );
+        emit(
           ProductDetailErrorState(
             message: 'Failed to add item: ${response.errors!.first}',
           ),
@@ -137,13 +151,14 @@ class ProductDetailViewModel
 
       debugPrint('✅ Successfully added product $productId to cart via API');
 
-      // Update state to show product is in cart
-      final currentState = state;
-      if (currentState is ProductDetailLoadedState) {
-        emit(currentState.copyWith(isInCart: true));
-      }
+      // Update state to show product is in cart and stop loading
+      emit(currentState.copyWith(
+        isInCart: true,
+        isAddingToCart: false,
+      ));
     } catch (e) {
       debugPrint('❌ Failed to add to cart: $e');
+      emit(currentState.copyWith(isAddingToCart: false));
       emit(ProductDetailErrorState(message: 'Failed to add to cart: $e'));
     }
   }

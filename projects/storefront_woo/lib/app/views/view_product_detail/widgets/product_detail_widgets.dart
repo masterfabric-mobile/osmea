@@ -166,28 +166,44 @@ class ProductDetailContentWidget extends StatelessWidget {
         OsmeaComponents.expanded(
           child: OsmeaComponents.sizedBox(
             height: 44,
-            child: OsmeaComponents.button(
-              onPressed: state.isInCart
-                  ? null
-                  : () async {
-                      await viewModel.addProductToCart(
-                        state.product.id ?? 0,
-                        quantity: state.selectedQuantity,
-                      );
-                      // Show success popup after adding to cart
-                      _showCartSuccessDialog(context);
-                    },
-              backgroundColor: state.isInCart
-                  ? OsmeaColors.pewter.withOpacity(0.15)
-                  : OsmeaColors.nordicBlue,
-              borderRadius: 22,
-              text: state.isInCart ? 'In Cart' : 'Add to Cart',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.2,
-                color: OsmeaColors.white,
-              ),
-            ),
+            child: state.isAddingToCart
+                ? OsmeaComponents.container(
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.nordicBlue,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: OsmeaComponents.center(
+                      child: OsmeaComponents.loading(
+                        type: LoadingType.circularFade,
+                        color: OsmeaColors.white,
+                        size: 20,
+                      ),
+                    ),
+                  )
+                : OsmeaComponents.button(
+                    onPressed: state.isInCart
+                        ? null
+                        : () async {
+                            await viewModel.addProductToCart(
+                              state.product.id ?? 0,
+                              quantity: state.selectedQuantity,
+                            );
+                            // Show success popup after adding to cart
+                            if (context.mounted) {
+                              _showCartSuccessDialog(context);
+                            }
+                          },
+                    backgroundColor: state.isInCart
+                        ? OsmeaColors.pewter.withOpacity(0.15)
+                        : OsmeaColors.nordicBlue,
+                    borderRadius: 22,
+                    text: state.isInCart ? 'In Cart' : 'Add to Cart',
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                      color: OsmeaColors.white,
+                    ),
+                  ),
           ),
         ),
       ],
