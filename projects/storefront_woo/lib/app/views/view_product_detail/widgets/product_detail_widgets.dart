@@ -638,7 +638,10 @@ void _showCartSuccessDialog(BuildContext context) {
                   child: OsmeaComponents.button(
                     onPressed: () {
                       Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Go back to home
+                      // Use GoRouter to navigate instead of popping
+                      if (context.mounted) {
+                        context.go('/home');
+                      }
                     },
                     backgroundColor: OsmeaColors.grayMaterial[100],
                     textColor: OsmeaColors.thunder,

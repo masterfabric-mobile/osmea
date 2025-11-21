@@ -281,7 +281,10 @@ class CartModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.container(
+    return ListenableBuilder(
+      listenable: cartService,
+      builder: (context, child) {
+        return OsmeaComponents.container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
         color: OsmeaColors.white,
@@ -326,6 +329,8 @@ class CartModal extends StatelessWidget {
         ],
       ),
     );
+      },
+    );
   }
 }
 
@@ -337,78 +342,81 @@ class CartContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartService = CartService();
-
-    if (cartService.itemCount == 0) {
-      return OsmeaComponents.center(
-        child: OsmeaComponents.column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.shopping_cart_outlined, size: 100),
-            OsmeaComponents.sizedBox(height: 16),
-            OsmeaComponents.text('Your cart is empty'),
-            OsmeaComponents.sizedBox(height: 16),
-            OsmeaComponents.text('Add some products to get started'),
-          ],
-        ),
-      );
-    }
-
-    return OsmeaComponents.column(
-      children: [
-        // Cart items
-        OsmeaComponents.expanded(
-          child: OsmeaComponents.singleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+    return ListenableBuilder(
+      listenable: cartService,
+      builder: (context, child) {
+        if (cartService.itemCount == 0) {
+          return OsmeaComponents.center(
             child: OsmeaComponents.column(
-              children: List.generate(cartService.itemCount, (index) {
-                final item = cartService.items[index];
-                return _buildCartItem(item, cartService, context);
-              }),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.shopping_cart_outlined, size: 100),
+                OsmeaComponents.sizedBox(height: 16),
+                OsmeaComponents.text('Your cart is empty'),
+                OsmeaComponents.sizedBox(height: 16),
+                OsmeaComponents.text('Add some products to get started'),
+              ],
             ),
-          ),
-        ),
-        // Cart summary
-        OsmeaComponents.basicCard(
-          padding: const EdgeInsets.all(16.0),
-          backgroundColor: OsmeaColors.white,
-          customContent: OsmeaComponents.column(
-            children: [
-              OsmeaComponents.row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          );
+        }
+
+        return OsmeaComponents.column(
+          children: [
+            // Cart items
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.singleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: OsmeaComponents.column(
+                  children: List.generate(cartService.itemCount, (index) {
+                    final item = cartService.items[index];
+                    return _buildCartItem(item, cartService, context);
+                  }),
+                ),
+              ),
+            ),
+            // Cart summary
+            OsmeaComponents.basicCard(
+              padding: const EdgeInsets.all(16.0),
+              backgroundColor: OsmeaColors.white,
+              customContent: OsmeaComponents.column(
                 children: [
-                  OsmeaComponents.text(
-                    'Total:',
-                    textStyle: OsmeaTextStyle.titleLarge(context),
+                  OsmeaComponents.row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OsmeaComponents.text(
+                        'Total:',
+                        textStyle: OsmeaTextStyle.titleLarge(context),
+                      ),
+                      OsmeaComponents.text(
+                        PriceInfoCurrencyHelper.formatPrice(cartService.totalPrice),
+                        textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                          color: OsmeaColors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  OsmeaComponents.text(
-                    PriceInfoCurrencyHelper.formatPrice(cartService.totalPrice),
-                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                      color: OsmeaColors.blue,
+                  OsmeaComponents.sizedBox(height: 16),
+                  OsmeaComponents.button(
+                    onPressed: () {
+                      // TODO: Implement checkout functionality
+                      Navigator.of(context).pop();
+                    },
+                    backgroundColor: OsmeaColors.blue,
+                    textColor: OsmeaColors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    text: 'Checkout',
+                    textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                      color: OsmeaColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-              OsmeaComponents.sizedBox(height: 16),
-              OsmeaComponents.button(
-                onPressed: () {
-                  // TODO: Implement checkout functionality
-                  Navigator.of(context).pop();
-                },
-                backgroundColor: OsmeaColors.blue,
-                textColor: OsmeaColors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                text: 'Checkout',
-                textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                  color: OsmeaColors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 

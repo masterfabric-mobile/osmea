@@ -8,13 +8,13 @@
       "maintenance_mode": false
     },
     "api_configuration": {
-      "base_url": "https://api.masterfabric.co/woo",
+      "base_url": "https:/www.woocomm.store",
       "timeout_seconds": 45,
       "retry_count": 3,
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://your_store_url.com",
+    "store_url": "http://www.woocomm.store",
     "brand_name": "your_brand_name",
     "auth_key": "YOUR_SPECIAL_AUTH_CODE",
     "version": "v?",
