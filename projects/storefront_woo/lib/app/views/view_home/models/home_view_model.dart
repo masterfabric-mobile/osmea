@@ -138,7 +138,10 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     } catch (e, stackTrace) {
       debugPrint('❌ Error loading products: $e');
       debugPrint('❌ Stack trace: $stackTrace');
-      emit(HomeErrorState(message: 'Failed to load products: $e'));
+      
+      // Check if error is related to placeholder configuration
+      final userMessage = _getUserFriendlyErrorMessage(e);
+      emit(HomeErrorState(message: userMessage));
     }
   }
 
@@ -169,7 +172,9 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         ),
       );
     } catch (e) {
-      emit(HomeErrorState(message: 'Failed to load more products: $e'));
+      // Check if error is related to placeholder configuration
+      final userMessage = _getUserFriendlyErrorMessage(e);
+      emit(HomeErrorState(message: userMessage));
     }
   }
 
@@ -315,7 +320,9 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
       _currentPage = 1;
       await _loadProducts();
     } catch (e) {
-      emit(HomeErrorState(message: 'Failed to refresh products: $e'));
+      // Check if error is related to placeholder configuration
+      final userMessage = _getUserFriendlyErrorMessage(e);
+      emit(HomeErrorState(message: userMessage));
     }
   }
 
@@ -384,29 +391,50 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
 
   /// Builds error state with retry functionality
   Widget _buildErrorState(BuildContext context, HomeErrorState state) {
+    // Check if this is a configuration error
+    final isConfigError = state.message.contains('configure') ||
+        state.message.contains('app configuration') ||
+        state.message.contains('app_config.json');
+    
     return OsmeaComponents.center(
-      child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: OsmeaColors.red),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.text(
-            state.message,
-            textStyle: OsmeaTextStyle.bodyMedium(context),
-            color: OsmeaColors.thunder,
-            textAlign: TextAlign.center,
-          ),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.button(
-            onPressed: () => loadProducts(),
-            backgroundColor: OsmeaColors.nordicBlue,
-            textColor: OsmeaColors.paperWhite,
-            text: 'Retry',
-            textStyle: OsmeaTextStyle.titleMedium(
-              context,
-            ).copyWith(color: OsmeaColors.paperWhite),
-          ),
-        ],
+      child: OsmeaComponents.padding(
+        padding: const EdgeInsets.all(24.0),
+        child: OsmeaComponents.column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isConfigError ? Icons.settings_outlined : Icons.error_outline,
+              size: 64,
+              color: isConfigError ? OsmeaColors.orange : OsmeaColors.red,
+            ),
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.text(
+              isConfigError
+                  ? 'Configuration Required'
+                  : 'Something Went Wrong',
+              textStyle: OsmeaTextStyle.titleLarge(context),
+              color: OsmeaColors.thunder,
+              textAlign: TextAlign.center,
+            ),
+            OsmeaComponents.sizedBox(height: 12),
+            OsmeaComponents.text(
+              state.message,
+              textStyle: OsmeaTextStyle.bodyMedium(context),
+              color: OsmeaColors.pewter,
+              textAlign: TextAlign.center,
+            ),
+            OsmeaComponents.sizedBox(height: 24),
+            OsmeaComponents.button(
+              onPressed: () => loadProducts(),
+              backgroundColor: OsmeaColors.nordicBlue,
+              textColor: OsmeaColors.paperWhite,
+              text: 'Retry',
+              textStyle: OsmeaTextStyle.titleMedium(
+                context,
+              ).copyWith(color: OsmeaColors.paperWhite),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -859,6 +887,50 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
       debugPrint('❌ Failed to get JWT token: $e');
       return null;
     }
+  }
+
+  /// Gets user-friendly error message, detecting placeholder configuration issues
+  String _getUserFriendlyErrorMessage(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+    final storeUrl = WooNetwork.storeUrl.toLowerCase();
+    
+    // Check for placeholder configuration values
+    final hasPlaceholderUrl = storeUrl.contains('your_store_url') ||
+        storeUrl.contains('example.com') ||
+        storeUrl.contains('placeholder');
+    
+    // Check for connection errors related to placeholder URLs
+    final isConnectionError = errorString.contains('failed host lookup') ||
+        errorString.contains('connection error') ||
+        errorString.contains('socketexception') ||
+        errorString.contains('nodename nor servname provided');
+    
+    // Check if the error mentions the placeholder URL
+    final mentionsPlaceholder = errorString.contains('your_store_url') ||
+        errorString.contains('your_brand_name') ||
+        errorString.contains('your_special_auth_code');
+    
+    if ((hasPlaceholderUrl || mentionsPlaceholder) && isConnectionError) {
+      return 'Please configure your WooCommerce store settings in the app configuration.\n\n'
+          'The store URL appears to be using placeholder values. Please update:\n'
+          '• Store URL\n'
+          '• Brand Name\n'
+          '• Authentication settings\n\n'
+          'Check your app_config.json file for proper configuration.';
+    }
+    
+    // Generic connection error
+    if (isConnectionError) {
+      return 'Unable to connect to your store. Please check:\n\n'
+          '• Your internet connection\n'
+          '• Store URL is correct\n'
+          '• Store is accessible\n\n'
+          'If the problem persists, verify your app configuration settings.';
+    }
+    
+    // Default error message
+    return 'Failed to load products. Please try again.\n\n'
+        'If this problem continues, please check your app configuration.';
   }
 
   /// Shows clean cart success dialog
