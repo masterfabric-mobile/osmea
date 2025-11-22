@@ -11,10 +11,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/fre
 class SearchEmptyStateWidget extends StatefulWidget {
   final SearchCubit? searchCubit;
 
-  const SearchEmptyStateWidget({
-    super.key,
-    this.searchCubit,
-  });
+  const SearchEmptyStateWidget({super.key, this.searchCubit});
 
   @override
   State<SearchEmptyStateWidget> createState() => _SearchEmptyStateWidgetState();
@@ -152,9 +149,9 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
               SizedBox(height: context.spacing16),
               OsmeaComponents.text(
                 _error!,
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: OsmeaColors.pewter,
-                ),
+                textStyle: OsmeaTextStyle.bodyMedium(
+                  context,
+                ).copyWith(color: OsmeaColors.pewter),
               ),
               SizedBox(height: context.spacing16),
               OsmeaComponents.button(
@@ -222,17 +219,14 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
             margin: EdgeInsets.only(bottom: context.spacing8),
             title: OsmeaComponents.text(
               category.name ?? 'Category',
-              textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              textStyle: OsmeaTextStyle.titleSmall(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
             ),
             trailing: Icon(Icons.chevron_right, color: OsmeaColors.pewter),
             onTap: () {
               if (category.id != null) {
-                _searchByCategory(
-                  category.id as int,
-                  category.name ?? '',
-                );
+                _searchByCategory(category.id as int, category.name ?? '');
               }
             },
           );
@@ -246,10 +240,7 @@ class _BrandCard extends StatelessWidget {
   final brand_models.ListProductBrandsResponseModel brand;
   final VoidCallback? onTap;
 
-  const _BrandCard({
-    required this.brand,
-    this.onTap,
-  });
+  const _BrandCard({required this.brand, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -310,10 +301,9 @@ class _BrandCard extends StatelessWidget {
           // Brand name
           OsmeaComponents.text(
             brand.name ?? 'Brand',
-            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-              fontWeight: FontWeight.w600,
-              color: OsmeaColors.thunder,
-            ),
+            textStyle: OsmeaTextStyle.bodySmall(
+              context,
+            ).copyWith(fontWeight: FontWeight.w600, color: OsmeaColors.thunder),
             maxLines: 2,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
