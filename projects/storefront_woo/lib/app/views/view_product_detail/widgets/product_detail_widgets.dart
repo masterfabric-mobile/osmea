@@ -227,13 +227,10 @@ class ProductDetailContentWidget extends StatelessWidget {
                             .toSet();
 
                         if (missingAttributes.isNotEmpty) {
-                          // Show snackbar
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Lütfen tüm seçenekleri seçin'),
-                              backgroundColor: OsmeaColors.red,
-                              duration: const Duration(seconds: 2),
-                            ),
+                          // Show snackbar using OsmeaComponents
+                          context.snackbarError(
+                            'Please select all options',
+                            duration: const Duration(seconds: 2),
                           );
 
                           // Highlight missing attributes
@@ -507,7 +504,7 @@ class ProductDetailContentWidget extends StatelessWidget {
       children: [
         for (final attr in normalized) ...[
           OsmeaComponents.text(
-            (attr['name'] as String?) ?? '',
+            ((attr['name'] as String?) ?? '').capitalizeFirst(),
             textStyle: OsmeaTextStyle.bodySmall(
               context,
             ).copyWith(color: OsmeaColors.pewter, fontWeight: FontWeight.w500),
@@ -552,9 +549,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                               : Colors.transparent);
 
                     return ChoiceChip(
-                      label: Text(opt),
+                      label: Text(opt.capitalizeFirst()),
                       selected: isSelected,
-                      onSelected: isAvailable
+                      onSelected: (isAvailable || isSelected)
                           ? (_) {
                               // If already selected, clear the selection; otherwise set it
                               if (isSelected) {
@@ -597,8 +594,10 @@ class ProductDetailContentWidget extends StatelessWidget {
     );
   }
 
+  /// Parses color from option value (hex code or color name)
   /// Checks if an attribute option is available based on selected attributes and variations
   /// All attributes (including color) are filtered the same way based on variations
+  /// If no attributes are selected, all options are available
   bool _isOptionAvailable(
     String attributeName,
     String optionValue,
@@ -622,27 +621,74 @@ class ProductDetailContentWidget extends StatelessWidget {
       return true;
     }
 
-    // Get attribute name to taxonomy mapping
-    final Map<String, String> attributeNameMap = {};
+    // Build comprehensive attribute mapping (name -> taxonomy, taxonomy -> name)
+    final Map<String, String> attributeNameToTaxonomy = {};
+    final Map<String, String> taxonomyToName = {};
     if (product.attributes != null) {
       for (final attr in product.attributes!) {
         if (attr is Map<String, dynamic>) {
-          final name = (attr['name'] ?? attr['label'] ?? '').toString();
-          final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '').toString();
+          final name = (attr['name'] ?? attr['label'] ?? '').toString().trim();
+          final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '')
+              .toString()
+              .trim();
           if (name.isNotEmpty) {
-            attributeNameMap[name] = taxonomy.isNotEmpty ? taxonomy : name;
+            attributeNameToTaxonomy[name] = taxonomy.isNotEmpty
+                ? taxonomy
+                : name;
+            if (taxonomy.isNotEmpty) {
+              taxonomyToName[taxonomy] = name;
+            }
           }
         }
       }
     }
 
-    // Create a test selection WITH the attribute being checked included
-    // This ensures all attributes (including color) are filtered consistently
-    final testSelection = Map<String, String>.from(selectedAttributes);
-    testSelection[attributeName] = optionValue;
+    // Helper function to normalize strings for comparison
+    String normalize(String str) => str.trim().toLowerCase();
 
-    // If no attributes are selected yet, check if this option exists in any variation
+    // Helper function to check if attribute names match
+    bool attributeNamesMatch(String name1, String name2) {
+      final normalized1 = normalize(name1);
+      final normalized2 = normalize(name2);
+
+      // Direct match
+      if (normalized1 == normalized2) return true;
+
+      // Check via taxonomy mapping
+      final taxonomy1 = attributeNameToTaxonomy[name1] ?? '';
+      final taxonomy2 = attributeNameToTaxonomy[name2] ?? '';
+      if (taxonomy1.isNotEmpty &&
+          taxonomy2.isNotEmpty &&
+          normalize(taxonomy1) == normalize(taxonomy2)) {
+        return true;
+      }
+
+      // Check if name1 matches taxonomy2 or vice versa
+      if (taxonomy2.isNotEmpty && normalize(name1) == normalize(taxonomy2))
+        return true;
+      if (taxonomy1.isNotEmpty && normalize(name2) == normalize(taxonomy1))
+        return true;
+
+      return false;
+    }
+
+    // Helper function to check if values match (case-insensitive, trimmed)
+    bool valuesMatch(String value1, String value2) {
+      return normalize(value1) == normalize(value2);
+    }
+
+    // If no attributes are selected yet, all options are available (tüm varyasyonlar gelmeli)
     if (selectedAttributes.isEmpty) {
+      return true;
+    }
+
+    // Create a test selection WITHOUT the attribute being checked
+    // We filter based on OTHER selected attributes, then check if this option exists in matching variations
+    final testSelection = Map<String, String>.from(selectedAttributes);
+    testSelection.remove(attributeName); // Remove the attribute being checked
+
+    // If no other attributes are selected, check if this option exists in any variation
+    if (testSelection.isEmpty) {
       for (final variation in variations) {
         final variationAttrs = variation['attributes'] as List<dynamic>?;
         if (variationAttrs == null) continue;
@@ -654,9 +700,8 @@ class ProductDetailContentWidget extends StatelessWidget {
             final varAttrValue = (varAttr['value'] ?? '').toString();
 
             // Check if this variation has the option value for the attribute being checked
-            if ((varAttrName == attributeName ||
-                    varAttrName == attributeNameMap[attributeName]) &&
-                varAttrValue == optionValue) {
+            if (attributeNamesMatch(varAttrName, attributeName) &&
+                valuesMatch(varAttrValue, optionValue)) {
               return true; // Found a variation with this option
             }
           }
@@ -665,13 +710,13 @@ class ProductDetailContentWidget extends StatelessWidget {
       return false; // No variation found with this option
     }
 
-    // Check if any variation matches the complete test selection (including the attribute being checked)
+    // Check if any variation matches other selected attributes AND contains this option
     for (final variation in variations) {
       final variationAttrs = variation['attributes'] as List<dynamic>?;
       if (variationAttrs == null) continue;
 
-      // Check if variation matches all selected attributes including the one being checked
-      bool matchesAllAttributes = true;
+      // First check if variation matches other selected attributes
+      bool matchesOtherAttributes = true;
       for (final entry in testSelection.entries) {
         final selectedAttrName = entry.key;
         final selectedAttrValue = entry.value;
@@ -683,10 +728,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                 .toString();
             final varAttrValue = (varAttr['value'] ?? '').toString();
 
-            // Match by name or taxonomy
-            if ((varAttrName == selectedAttrName ||
-                    varAttrName == attributeNameMap[selectedAttrName]) &&
-                varAttrValue == selectedAttrValue) {
+            // Match by name or taxonomy with case-insensitive comparison
+            if (attributeNamesMatch(varAttrName, selectedAttrName) &&
+                valuesMatch(varAttrValue, selectedAttrValue)) {
               foundMatch = true;
               break;
             }
@@ -694,13 +738,26 @@ class ProductDetailContentWidget extends StatelessWidget {
         }
 
         if (!foundMatch) {
-          matchesAllAttributes = false;
+          matchesOtherAttributes = false;
           break;
         }
       }
 
-      if (matchesAllAttributes) {
-        return true; // Found a matching variation
+      // If variation matches other attributes, check if it also has this option
+      if (matchesOtherAttributes) {
+        for (final varAttr in variationAttrs) {
+          if (varAttr is Map<String, dynamic>) {
+            final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+                .toString();
+            final varAttrValue = (varAttr['value'] ?? '').toString();
+
+            // Check if this variation has the option value for the attribute being checked
+            if (attributeNamesMatch(varAttrName, attributeName) &&
+                valuesMatch(varAttrValue, optionValue)) {
+              return true; // Found a matching variation
+            }
+          }
+        }
       }
     }
 
