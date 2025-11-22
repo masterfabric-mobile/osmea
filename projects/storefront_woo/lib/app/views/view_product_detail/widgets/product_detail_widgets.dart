@@ -770,13 +770,31 @@ class ProductDetailContentWidget extends StatelessWidget {
     ProductDetailViewModel viewModel,
     ProductDetailLoadedState state,
   ) {
+    // Filter reviews to ensure they belong to the current product (safety check in UI)
+    final currentProductId = state.product.id;
+    final validReviews = state.reviews.where((review) {
+      if (currentProductId == null) return false;
+      final reviewProductId = review.productId;
+      if (reviewProductId == null) {
+        debugPrint('⚠️ Widget: Review has null productId, excluding it');
+        return false;
+      }
+      if (reviewProductId != currentProductId) {
+        debugPrint(
+          '⚠️ Widget: Review productId mismatch! Review productId: $reviewProductId, Current product ID: $currentProductId - EXCLUDING this review',
+        );
+        return false;
+      }
+      return true;
+    }).toList();
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          state.reviews.isEmpty
+          validReviews.isEmpty
               ? 'Reviews'
-              : 'Reviews (${state.reviews.length})',
+              : 'Reviews (${validReviews.length})',
           textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.0,
@@ -784,10 +802,10 @@ class ProductDetailContentWidget extends StatelessWidget {
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing8),
-        if (state.reviews.isEmpty)
+        if (validReviews.isEmpty)
           _buildEmptyReviewsState(context)
         else ...[
-          ...state.reviews.map((review) => _buildReviewItem(context, review)),
+          ...validReviews.map((review) => _buildReviewItem(context, review)),
           OsmeaComponents.sizedBox(height: context.spacing16),
         ],
       ],
