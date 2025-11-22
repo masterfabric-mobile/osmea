@@ -36,7 +36,7 @@ class UserSignUpResponse with _$UserSignUpResponse {
       };
     }
 
-    return _$UserSignUpResponseFromJson(json);
+    return UserSignUpResponse.fromJson(json);
   }
 }
 
