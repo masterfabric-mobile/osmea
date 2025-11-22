@@ -25,6 +25,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -699,7 +700,8 @@ class ProductDetailViewModel
         ),
       );
     } catch (e) {
-      emit(ProductDetailErrorState(message: 'Failed to load product: $e'));
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(ProductDetailErrorState(message: 'Failed to load product: $errorMessage'));
     }
   }
 
@@ -1013,9 +1015,10 @@ class ProductDetailViewModel
           if (response.errors != null && response.errors!.isNotEmpty) {
             // Keep current state if it's a loaded state
             final currentStateForError = state;
+            final errorMessage = ApiErrorUtils.getErrorMessage(response.errors!.first);
             emit(
               ProductDetailErrorState(
-                message: 'Failed to add item: ${response.errors!.first}',
+                message: 'Failed to add item: $errorMessage',
                 previousState: currentStateForError is ProductDetailLoadedState
                     ? currentStateForError
                     : null,
@@ -1026,9 +1029,10 @@ class ProductDetailViewModel
         } else {
           // Keep current state if it's a loaded state
           final currentStateForError = state;
+          final errorMessage = ApiErrorUtils.getErrorMessage(response.errors!.first);
           emit(
             ProductDetailErrorState(
-              message: 'Failed to add item: ${response.errors!.first}',
+              message: 'Failed to add item: $errorMessage',
               previousState: currentStateForError is ProductDetailLoadedState
                   ? currentStateForError
                   : null,
@@ -1084,9 +1088,10 @@ class ProductDetailViewModel
       debugPrint('❌ Failed to add to cart: $e');
       // Keep current state if it's a loaded state
       final currentStateForError = state;
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
       emit(
         ProductDetailErrorState(
-          message: 'Failed to add to cart: $e',
+          message: 'Failed to add to cart: $errorMessage',
           previousState: currentStateForError is ProductDetailLoadedState
               ? currentStateForError
               : null,
@@ -1164,7 +1169,8 @@ class ProductDetailViewModel
       );
     } catch (e) {
       debugPrint('❌ ProductDetailViewModel: Failed to toggle wishlist: $e');
-      emit(ProductDetailErrorState(message: 'Failed to toggle wishlist: $e'));
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(ProductDetailErrorState(message: 'Failed to toggle wishlist: $errorMessage'));
     }
   }
 
@@ -1184,7 +1190,8 @@ class ProductDetailViewModel
       // If not in cart, just update local quantity (will be used when Add to Cart is clicked)
     } catch (e) {
       debugPrint('❌ Failed to change quantity: $e');
-      emit(ProductDetailErrorState(message: 'Failed to change quantity: $e'));
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(ProductDetailErrorState(message: 'Failed to change quantity: $errorMessage'));
     }
   }
 
@@ -1258,7 +1265,8 @@ class ProductDetailViewModel
       emit(currentState.copyWith(imageUrls: _imageUrls));
     } catch (e) {
       debugPrint('❌ Failed to load images: $e');
-      emit(ProductDetailErrorState(message: 'Failed to load images: $e'));
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(ProductDetailErrorState(message: 'Failed to load images: $errorMessage'));
     }
   }
 

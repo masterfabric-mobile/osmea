@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
@@ -110,8 +111,12 @@ class ProductDetailView
       if (isAddToCartError && state.previousState != null) {
         // Show snackbar and recover to previous state
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Use ApiErrorUtils to get user-friendly error message
+          final userFriendlyMessage = ApiErrorUtils.getErrorMessage(
+            state.message,
+          );
           context.snackbarError(
-            'Failed to add product to cart. Please check your selections.',
+            'Failed to add product to cart: $userFriendlyMessage',
             duration: const Duration(seconds: 3),
           );
           // Recover to previous state
