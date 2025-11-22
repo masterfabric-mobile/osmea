@@ -534,6 +534,23 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     return _buildBody(context, viewModel, state);
   }
 
+  // Override buildLoading to use LoadingView instead of CircularProgressIndicator
+  @override
+  Widget buildLoading({Color color = Colors.blue, double size = 50.0}) {
+    return LoadingView(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.initialization,
+      loadingSteps: [
+        'Initializing search...',
+        'Loading configuration...',
+        'Almost ready...',
+      ],
+      stepDuration: const Duration(milliseconds: 400),
+      showProgress: true,
+      showCancelButton: false,
+    );
+  }
+
   // MARK: - Config Helper Methods
 
   /// Get effective elevation value (parameter or config)
@@ -652,84 +669,29 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     return _buildEmptyView(context, state, viewModel);
   }
 
-  /// Loading view using OSMEA components
+  /// Loading view using LoadingView
   Widget _buildLoadingView(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: OsmeaComponents.container(
-            padding: context.paddingNormal,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                OsmeaComponents.progress(
-                  type: ProgressType.linearRounded,
-                  value: 0.0,
-                  size: ProgressSize.medium,
-                  progressColor: OsmeaColors.nordicBlue,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                OsmeaComponents.text(
-                  'Searching...',
-                  variant: OsmeaTextVariant.titleMedium,
-                  color: OsmeaColors.pewter,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return LoadingView(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.networkRequest,
+      loadingSteps: [
+        'Searching products...',
+        'Fetching results...',
+        'Almost there...',
+      ],
+      stepDuration: const Duration(milliseconds: 500),
+      showProgress: true,
+      showCancelButton: false,
     );
   }
 
-  /// Error view using OSMEA components
+  /// Error view using ErrorHandlingView
   Widget _buildErrorView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: OsmeaComponents.container(
-            padding: context.paddingNormal,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Center(
-                  child: Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                OsmeaComponents.text(
-                  'Error: ${state.errorMessage}',
-                  variant: OsmeaTextVariant.titleMedium,
-                  color: Colors.red,
-                  textAlign: TextAlign.center,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                Center(
-                  child: OsmeaComponents.button(
-                    text: 'Try Again',
-                    onPressed: () => viewModel.reset(),
-                    variant: ButtonVariant.outlined,
-                    size: ButtonSize.medium,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return ErrorHandlingView(
+      goRoute: goRoute,
+      onRetrySuccess: () => viewModel.reset(),
+      onGoBack: () => Navigator.of(context).pop(),
     );
   }
 

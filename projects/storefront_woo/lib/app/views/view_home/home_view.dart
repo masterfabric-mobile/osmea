@@ -68,19 +68,30 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
         // Navigate to auth
         context.push('/auth');
       });
-      // Show loading while navigating
-      return Center(
-        child: CircularProgressIndicator(color: OsmeaColors.nordicBlue),
+      // Show LoadingView while navigating
+      return LoadingView(
+        goRoute: goRoute,
+        loadingType: LoadingModelType.authentication,
+        loadingSteps: ['Redirecting to sign in...'],
+        stepDuration: const Duration(milliseconds: 500),
+        showProgress: false,
       );
     }
 
-    // Build content based on state - using core buildError and buildLoading
+    // Build content based on state - using LoadingView
     if (state is HomeErrorState) {
       return buildError(state.message, onRetry: () => viewModel.loadProducts());
     }
 
     if (state is HomeLoadingState) {
-      return buildLoading(color: OsmeaColors.nordicBlue);
+      return LoadingView(
+        goRoute: goRoute,
+        loadingType: LoadingModelType.dataLoading,
+
+        stepDuration: const Duration(milliseconds: 600),
+
+        showCancelButton: false,
+      );
     }
 
     if (state is HomeLoadedState) {
@@ -88,7 +99,10 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     }
 
     // Initial state - show loading
-    return buildLoading(color: OsmeaColors.nordicBlue);
+    return LoadingView(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.initialization,
+    );
   }
 }
 
