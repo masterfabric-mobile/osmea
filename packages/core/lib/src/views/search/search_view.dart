@@ -127,6 +127,16 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 📱 Body widget to display instead of default search body
   final Widget? body;
 
+  /// 🎨 Custom widget builder for search results
+  /// Takes the list of results and returns a widget to display them
+  /// If not provided, default ListView will be used
+  final Widget Function(BuildContext, List<dynamic>)? resultBuilder;
+
+  /// 🏠 Custom widget builder for empty state (before search)
+  /// Use this to show categories, brands, or any initial content
+  /// If not provided, default empty state will be shown
+  final Widget Function(BuildContext)? emptyStateBuilder;
+
   /// 📷 Whether to show barcode scanner action
   final bool showBarcodeScanner;
 
@@ -199,6 +209,8 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.minQueryLength = 2,
     this.initialHistory = const [],
     this.body,
+    this.resultBuilder,
+    this.emptyStateBuilder,
     this.showBarcodeScanner = true,
     this.showVoiceSearch = true,
     this.showClearButton = true,
@@ -699,6 +711,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// Results view using OSMEA components
   Widget _buildResultsView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
+    // Use custom resultBuilder if provided
+    if (resultBuilder != null) {
+      return resultBuilder!(context, state.results);
+    }
+
+    // Default ListView implementation
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: state.results.length,
@@ -764,6 +782,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// Empty state view using OSMEA components
   Widget _buildEmptyView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
+    // Use custom emptyStateBuilder if provided
+    if (emptyStateBuilder != null) {
+      return emptyStateBuilder!(context);
+    }
+
+    // Default empty state
     return Center(
       child: SingleChildScrollView(
         child: Padding(

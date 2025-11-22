@@ -9,8 +9,10 @@ import 'package:storefront_woo/app/views/view_product_list/product_list_view.dar
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
-import 'package:storefront_woo/app/views/view_search/search_view.dart'
-    as store_search;
+import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
+import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
+
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
@@ -98,29 +100,29 @@ final GoRouter appRouter = GoRouter(
         ),
 
         // Search Page
-        GoRoute(
-          path: '/search',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            return CustomTransitionPage(
-              child: store_search.SearchView(
-                goRoute: (String path) {
-                  if (path.contains('home')) {
-                    context.go('/home');
-                  } else if (path.contains('product-detail')) {
-                    context.go('/product-detail');
-                  } else {
-                    context.go('/search');
-                  }
-                },
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-              transitionDuration: const Duration(milliseconds: 300),
-            );
-          },
-        ),
+        // GoRoute(
+        //   path: '/search',
+        //   pageBuilder: (BuildContext context, GoRouterState state) {
+        //     return CustomTransitionPage(
+        //       child: store_search.SearchView(
+        //         goRoute: (String path) {
+        //           if (path.contains('home')) {
+        //             context.go('/home');
+        //           } else if (path.contains('product-detail')) {
+        //             context.go('/product-detail');
+        //           } else {
+        //             context.go('/search');
+        //           }
+        //         },
+        //       ),
+        //       transitionsBuilder:
+        //           (context, animation, secondaryAnimation, child) {
+        //             return FadeTransition(opacity: animation, child: child);
+        //           },
+        //       transitionDuration: const Duration(milliseconds: 300),
+        //     );
+        //   },
+        // ),
 
         // Saved Page
         GoRoute(
@@ -149,41 +151,63 @@ final GoRouter appRouter = GoRouter(
         // Search Page
         GoRoute(
           path: '/search',
-          builder: (BuildContext context, GoRouterState state) {
-            return SearchView(
-              arguments: const {'search': true},
-              goRoute: (String path) {
-                if (path.contains('home')) {
-                  context.go('/home');
-                } else if (path.contains('cart')) {
-                  context.go('/cart');
-                } else if (path.contains('product-detail')) {
-                  context.go('/product-detail');
-                } else {
-                  context.go('/home');
-                }
-              },
-              title: const Text('Search Products'),
-              titleAlignment: AppBarTitleAlignment.center,
-              showTitle: false,
-              searchHint: 'Search for products...',
-              searchBarSize: TextFieldSize.medium,
-              showBackButton: true,
-              showVoiceSearch: true,
-              showBarcodeScanner: true,
-              showSearchIcon: true,
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: SearchView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('product-detail')) {
+                    context.go('/product-detail');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                title: const Text('Search Products'),
+                searchHint: 'Search for products...',
+                showBackButton: true,
+                showTitle: false,
+                onBackPressed: () => context.go('/home'),
 
-              onBackPressed: () => context.go('/home'),
-              // WooCommerce search provider will be integrated here
-              searchProvider: (query) async {
-                // TODO: Integrate with WooCommerce search API
-                await Future.delayed(const Duration(milliseconds: 500));
-                return ['Sample product 1', 'Sample product 2'];
-              },
+                // WooCommerce search provider
+                searchProvider: (query) async {
+                  try {
+                    final productService = GetIt.I<ProductService>();
+                    final products = await productService.listAllProducts(
+                      apiVersion: 'v1',
+                      search: query,
+                      page: 1,
+                      perPage: 20,
+                    );
+                    debugPrint(
+                      '🔍 Found ${products.length} products for query: $query',
+                    );
+                    return products;
+                  } catch (e) {
+                    debugPrint('❌ Search error: $e');
+                    return [];
+                  }
+                },
 
-              onSearchResult: (results) {
-                debugPrint('🔍 Search results: $results');
-              },
+                // Custom result builder for product grid
+                resultBuilder: (context, results) {
+                  return SearchResultsGridWidget(products: results);
+                },
+
+                // Empty state with categories and brands
+                emptyStateBuilder: (context) {
+                  // Get SearchCubit from context to enable category/brand search
+                  final searchCubit = context.read<SearchCubit>();
+                  return SearchEmptyStateWidget(searchCubit: searchCubit);
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
             );
           },
         ),
@@ -656,7 +680,9 @@ final GoRouter appRouter = GoRouter(
               // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
               try {
                 await ApiDioClient.clearAllCookies();
-                debugPrint('✅ Route: All cookies cleared (including WP cookies)');
+                debugPrint(
+                  '✅ Route: All cookies cleared (including WP cookies)',
+                );
               } catch (e) {
                 debugPrint('⚠️ Route: Failed to clear cookies: $e');
               }
