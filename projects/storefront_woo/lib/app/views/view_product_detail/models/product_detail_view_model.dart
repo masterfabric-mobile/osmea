@@ -701,7 +701,11 @@ class ProductDetailViewModel
       );
     } catch (e) {
       final errorMessage = ApiErrorUtils.getErrorMessage(e);
-      emit(ProductDetailErrorState(message: 'Failed to load product: $errorMessage'));
+      emit(
+        ProductDetailErrorState(
+          message: 'Failed to load product: $errorMessage',
+        ),
+      );
     }
   }
 
@@ -1015,7 +1019,9 @@ class ProductDetailViewModel
           if (response.errors != null && response.errors!.isNotEmpty) {
             // Keep current state if it's a loaded state
             final currentStateForError = state;
-            final errorMessage = ApiErrorUtils.getErrorMessage(response.errors!.first);
+            final errorMessage = ApiErrorUtils.getErrorMessage(
+              response.errors!.first,
+            );
             emit(
               ProductDetailErrorState(
                 message: 'Failed to add item: $errorMessage',
@@ -1029,7 +1035,9 @@ class ProductDetailViewModel
         } else {
           // Keep current state if it's a loaded state
           final currentStateForError = state;
-          final errorMessage = ApiErrorUtils.getErrorMessage(response.errors!.first);
+          final errorMessage = ApiErrorUtils.getErrorMessage(
+            response.errors!.first,
+          );
           emit(
             ProductDetailErrorState(
               message: 'Failed to add item: $errorMessage',
@@ -1170,7 +1178,11 @@ class ProductDetailViewModel
     } catch (e) {
       debugPrint('❌ ProductDetailViewModel: Failed to toggle wishlist: $e');
       final errorMessage = ApiErrorUtils.getErrorMessage(e);
-      emit(ProductDetailErrorState(message: 'Failed to toggle wishlist: $errorMessage'));
+      emit(
+        ProductDetailErrorState(
+          message: 'Failed to toggle wishlist: $errorMessage',
+        ),
+      );
     }
   }
 
@@ -1191,7 +1203,11 @@ class ProductDetailViewModel
     } catch (e) {
       debugPrint('❌ Failed to change quantity: $e');
       final errorMessage = ApiErrorUtils.getErrorMessage(e);
-      emit(ProductDetailErrorState(message: 'Failed to change quantity: $errorMessage'));
+      emit(
+        ProductDetailErrorState(
+          message: 'Failed to change quantity: $errorMessage',
+        ),
+      );
     }
   }
 
@@ -1266,7 +1282,11 @@ class ProductDetailViewModel
     } catch (e) {
       debugPrint('❌ Failed to load images: $e');
       final errorMessage = ApiErrorUtils.getErrorMessage(e);
-      emit(ProductDetailErrorState(message: 'Failed to load images: $errorMessage'));
+      emit(
+        ProductDetailErrorState(
+          message: 'Failed to load images: $errorMessage',
+        ),
+      );
     }
   }
 
