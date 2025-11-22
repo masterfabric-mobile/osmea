@@ -360,7 +360,7 @@ class ProductDetailViewModel
   Future<void> setSelectedAttribute(
     String name,
     String value,
-  ) async => Future.microtask(() {
+  ) async {
     final currentState = state;
     if (currentState is ProductDetailLoadedState) {
       final updated = Map<String, String>.from(currentState.selectedAttributes)
@@ -388,19 +388,18 @@ class ProductDetailViewModel
 
       emit(currentState.copyWith(selectedAttributes: cleanedAttributes));
     }
-  });
+  }
 
   /// Clears a selected attribute
-  Future<void> clearSelectedAttribute(String name) async =>
-      Future.microtask(() {
-        final currentState = state;
-        if (currentState is ProductDetailLoadedState) {
-          final updated = Map<String, String>.from(
-            currentState.selectedAttributes,
-          )..remove(name);
-          emit(currentState.copyWith(selectedAttributes: updated));
-        }
-      });
+  Future<void> clearSelectedAttribute(String name) async {
+    final currentState = state;
+    if (currentState is ProductDetailLoadedState) {
+      final updated = Map<String, String>.from(
+        currentState.selectedAttributes,
+      )..remove(name);
+      emit(currentState.copyWith(selectedAttributes: updated));
+    }
+  }
 
   // ----------------------------------------------------------------------------
   // Attribute Terms Loading

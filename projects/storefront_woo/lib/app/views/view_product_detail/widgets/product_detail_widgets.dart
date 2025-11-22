@@ -552,12 +552,12 @@ class ProductDetailContentWidget extends StatelessWidget {
                       label: Text(opt.capitalizeFirst()),
                       selected: isSelected,
                       onSelected: (isAvailable || isSelected)
-                          ? (_) {
+                          ? (_) async {
                               // If already selected, clear the selection; otherwise set it
                               if (isSelected) {
-                                viewModel.clearSelectedAttribute(attrName);
+                                await viewModel.clearSelectedAttribute(attrName);
                               } else {
-                                viewModel.setSelectedAttribute(attrName, opt);
+                                await viewModel.setSelectedAttribute(attrName, opt);
                               }
                             }
                           : null,
