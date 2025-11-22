@@ -64,6 +64,11 @@ class NavbarItem {
     this.badge,
     this.tooltip,
     this.route,
+    this.iconAnimationTrigger,
+    this.animationType = NavbarItemAnimationType.none,
+    this.animationTrigger,
+    this.animationDuration,
+    this.animationCurve = Curves.elasticOut,
   });
 
   /// 📝 Display text for the navbar item
@@ -87,6 +92,28 @@ class NavbarItem {
   /// 🛣️ Route path for navigation
   final String? route;
 
+  /// 🎬 Optional animation trigger value for icon animation
+  /// When this value changes, icon animation will be triggered
+  /// Useful for animated icons like favorite/wishlist icons
+  final int? iconAnimationTrigger;
+
+  /// 🎭 Animation type for the navbar item
+  /// Determines what kind of animation to apply when trigger changes
+  final NavbarItemAnimationType animationType;
+
+  /// 🎯 Animation trigger value
+  /// When this value changes, the animation will be triggered
+  /// Can be any value (int, String, etc.) - any change triggers animation
+  final dynamic animationTrigger;
+
+  /// ⏱️ Custom animation duration
+  /// If null, uses navbar's default animation duration
+  final Duration? animationDuration;
+
+  /// 📈 Animation curve
+  /// Controls the animation easing
+  final Curve animationCurve;
+
   /// Create a copy with modified properties
   NavbarItem copyWith({
     String? text,
@@ -96,6 +123,11 @@ class NavbarItem {
     Widget? badge,
     String? tooltip,
     String? route,
+    int? iconAnimationTrigger,
+    NavbarItemAnimationType? animationType,
+    dynamic animationTrigger,
+    Duration? animationDuration,
+    Curve? animationCurve,
   }) {
     return NavbarItem(
       text: text ?? this.text,
@@ -105,6 +137,11 @@ class NavbarItem {
       badge: badge ?? this.badge,
       tooltip: tooltip ?? this.tooltip,
       route: route ?? this.route,
+      iconAnimationTrigger: iconAnimationTrigger ?? this.iconAnimationTrigger,
+      animationType: animationType ?? this.animationType,
+      animationTrigger: animationTrigger ?? this.animationTrigger,
+      animationDuration: animationDuration ?? this.animationDuration,
+      animationCurve: animationCurve ?? this.animationCurve,
     );
   }
 }
@@ -384,6 +421,18 @@ class OsmeaNavbar extends CoreContainer {
       );
     }
 
+    // Apply animation wrapper if animation is enabled
+    if (item.animationType != NavbarItemAnimationType.none &&
+        item.animationTrigger != null) {
+      child = _AnimatedNavbarItemWrapper(
+        animationType: item.animationType,
+        animationTrigger: item.animationTrigger,
+        duration: item.animationDuration ?? animationDuration ?? context.animationMedium,
+        curve: item.animationCurve,
+        child: child,
+      );
+    }
+
     return AnimatedContainer(
       duration: animationDuration ?? context.animationMedium,
       curve: easeInOutCubic,
@@ -625,4 +674,280 @@ class _NavbarColors {
     required this.inactive,
     required this.border,
   });
+}
+
+/// Internal animated wrapper for navbar items
+class _AnimatedNavbarItemWrapper extends StatefulWidget {
+  final NavbarItemAnimationType animationType;
+  final dynamic animationTrigger;
+  final Duration duration;
+  final Curve curve;
+  final Widget child;
+
+  const _AnimatedNavbarItemWrapper({
+    required this.animationType,
+    required this.animationTrigger,
+    required this.duration,
+    required this.curve,
+    required this.child,
+  });
+
+  @override
+  State<_AnimatedNavbarItemWrapper> createState() =>
+      _AnimatedNavbarItemWrapperState();
+}
+
+class _AnimatedNavbarItemWrapperState
+    extends State<_AnimatedNavbarItemWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: widget.duration,
+      vsync: this,
+    );
+    _setupAnimation();
+  }
+
+  void _setupAnimation() {
+    switch (widget.animationType) {
+      case NavbarItemAnimationType.none:
+        _animation = AlwaysStoppedAnimation(1.0);
+        break;
+      case NavbarItemAnimationType.scale:
+        _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
+          CurvedAnimation(parent: _controller, curve: widget.curve),
+        );
+        break;
+      case NavbarItemAnimationType.bounce:
+        _animation = Tween<double>(begin: 1.0, end: 1.3).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+        );
+        break;
+      case NavbarItemAnimationType.pulse:
+        _animation = Tween<double>(begin: 1.0, end: 1.15).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+        );
+        break;
+      case NavbarItemAnimationType.shake:
+        _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _controller, curve: widget.curve),
+        );
+        break;
+    }
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedNavbarItemWrapper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animationType != widget.animationType) {
+      _setupAnimation();
+    }
+    // Trigger animation when trigger value changes
+    if (oldWidget.animationTrigger != widget.animationTrigger) {
+      _triggerAnimation();
+    }
+  }
+
+  void _triggerAnimation() {
+    if (widget.animationType == NavbarItemAnimationType.none) return;
+
+    switch (widget.animationType) {
+      case NavbarItemAnimationType.scale:
+      case NavbarItemAnimationType.bounce:
+        _controller.forward().then((_) {
+          if (mounted) _controller.reverse();
+        });
+        break;
+      case NavbarItemAnimationType.pulse:
+        _controller.repeat(reverse: true);
+        Future.delayed(widget.duration * 2, () {
+          if (mounted) {
+            _controller.stop();
+            _controller.reset();
+          }
+        });
+        break;
+      case NavbarItemAnimationType.shake:
+        _controller.forward().then((_) {
+          if (mounted) _controller.reset();
+        });
+        break;
+      case NavbarItemAnimationType.none:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    switch (widget.animationType) {
+      case NavbarItemAnimationType.none:
+        return widget.child;
+      case NavbarItemAnimationType.scale:
+      case NavbarItemAnimationType.bounce:
+        return ScaleTransition(
+          scale: _animation,
+          child: widget.child,
+        );
+      case NavbarItemAnimationType.pulse:
+        return AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _animation.value,
+              child: widget.child,
+            );
+          },
+        );
+      case NavbarItemAnimationType.shake:
+        return AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            // Shake animation: horizontal movement
+            final shakeOffset = (widget.animationTrigger is int &&
+                    (widget.animationTrigger as int) > 0)
+                ? (widget.animationTrigger as int) % 2 == 0
+                    ? 4.0
+                    : -4.0
+                : 0.0;
+            return Transform.translate(
+              offset: Offset(
+                shakeOffset * _animation.value,
+                0,
+              ),
+              child: widget.child,
+            );
+          },
+        );
+    }
+  }
+}
+
+/// 🎬 **Animated Navbar Icon**
+///
+/// An animated icon widget that transitions between empty and filled states
+/// with a scale animation. Perfect for favorite/wishlist icons in navigation bars.
+///
+/// **Features:**
+/// - ✨ Smooth scale animation when state changes
+/// - 🎨 Customizable colors for filled and empty states
+/// - ⚡ Automatic animation trigger on value change
+/// - 🎯 Configurable animation duration and curve
+///
+/// **Example:**
+/// ```dart
+/// AnimatedNavbarIcon(
+///   value: wishlistCount,
+///   filledIcon: Icons.favorite,
+///   emptyIcon: Icons.favorite_outline,
+///   filledColor: OsmeaColors.nordicBlue,
+/// )
+/// ```
+class AnimatedNavbarIcon extends StatefulWidget {
+  /// The trigger value that determines if icon should be filled
+  /// When value > 0, shows filled icon; when value == 0, shows empty icon
+  final int value;
+
+  /// Icon to show when value > 0 (filled state)
+  final IconData filledIcon;
+
+  /// Icon to show when value == 0 (empty state)
+  final IconData emptyIcon;
+
+  /// Color for filled icon
+  final Color? filledColor;
+
+  /// Color for empty icon (defaults to theme default)
+  final Color? emptyColor;
+
+  /// Animation duration
+  final Duration duration;
+
+  /// Animation curve
+  final Curve curve;
+
+  /// Scale factor for animation (1.0 = no scale, 1.3 = 30% larger)
+  final double scaleFactor;
+
+  const AnimatedNavbarIcon({
+    super.key,
+    required this.value,
+    this.filledIcon = Icons.favorite,
+    this.emptyIcon = Icons.favorite_outline,
+    this.filledColor,
+    this.emptyColor,
+    this.duration = const Duration(milliseconds: 300),
+    this.curve = Curves.elasticOut,
+    this.scaleFactor = 1.3,
+  });
+
+  @override
+  State<AnimatedNavbarIcon> createState() => _AnimatedNavbarIconState();
+}
+
+class _AnimatedNavbarIconState extends State<AnimatedNavbarIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: widget.duration,
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.scaleFactor,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: widget.curve,
+    ));
+  }
+
+  @override
+  void didUpdateWidget(AnimatedNavbarIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final isFilled = widget.value > 0;
+    final wasFilled = oldWidget.value > 0;
+
+    // Animate when value changes from 0 to >0 or vice versa
+    if (isFilled != wasFilled) {
+      _controller.forward().then((_) {
+        if (mounted) {
+          _controller.reverse();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFilled = widget.value > 0;
+
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Icon(
+        isFilled ? widget.filledIcon : widget.emptyIcon,
+        color: isFilled ? widget.filledColor : widget.emptyColor,
+      ),
+    );
+  }
 }

@@ -14,6 +14,8 @@ export 'src/theme/theme.dart';
 
 // 🧭 Navigation
 export 'src/components/navbar/navbar.dart';
+export 'src/components/navbar/cubit/navbar_cubit.dart';
+export 'src/components/navbar/cubit/navbar_state.dart';
 export 'src/components/tabbar/tabbar.dart';
 
 // 📝 Form Elements
