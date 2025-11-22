@@ -7,10 +7,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_widgets.dart';
-import 'package:storefront_woo/app/views/view_cart/widgets/cart_app_bar_widget.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_auth_required_widget.dart';
 
 /// CartView displays the shopping cart with items and checkout functionality
@@ -26,7 +26,24 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     super.verticalPadding = const PaddingVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.enabled(),
     required super.goRoute,
-  }) : super(coreAppBar: (context, viewModel) => const CartAppBarWidget()) {
+  }) : super(
+         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+           title: OsmeaComponents.text(
+             'Shopping Cart',
+             color: OsmeaColors.thunder,
+             textStyle: OsmeaTextStyle.titleLarge(context),
+           ),
+           backgroundColor: OsmeaColors.paperWhite,
+           elevation: 0,
+           foregroundColor: OsmeaColors.thunder,
+           variant: AppBarVariant.standard,
+           size: AppBarSize.standard,
+           leading: OsmeaComponents.iconButton(
+             onPressed: () => context.go('/home'),
+             icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+           ),
+         ),
+       ) {
     debugPrint('🛒 CartView: Constructor called');
   }
 
