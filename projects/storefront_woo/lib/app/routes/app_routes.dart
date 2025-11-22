@@ -7,14 +7,12 @@ import 'package:storefront_woo/app/views/view_home/home_view.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
-import 'package:storefront_woo/app/widgets/app_navbar.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
@@ -28,47 +26,24 @@ final GoRouter appRouter = GoRouter(
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        // Use BlocBuilder to reactively listen to WishlistViewModel changes
-        // Use try-catch to prevent freezing on first load
+        // Get wishlist count directly without BlocBuilder to prevent rebuild loops
+        // Navbar will handle its own state updates internally
+        int wishlistCount = 0;
         try {
           final wishlistViewModel = GetIt.I<WishlistViewModel>();
-          return BlocBuilder<WishlistViewModel, WishlistState>(
-            bloc: wishlistViewModel,
-            builder: (context, wishlistState) {
-              // Get wishlist count from state with safe fallback
-              int wishlistCount = 0;
-              try {
-                if (wishlistState is WishlistLoadedState) {
-                  wishlistCount = wishlistState.items.length;
-                } else {
-                  // Safe fallback - use count property or default to 0
-                  wishlistCount = wishlistViewModel.count;
-                }
-              } catch (e) {
-                debugPrint('⚠️ Error getting wishlist count: $e');
-                wishlistCount = 0;
-              }
-
-              return Scaffold(
-                body: child,
-                bottomNavigationBar: _getNavbarForRoute(
-                  state.uri.path,
-                  wishlistCount,
-                ),
-              );
-            },
-          );
+          wishlistCount = wishlistViewModel.count;
         } catch (e) {
-          debugPrint('⚠️ Error initializing ShellRoute builder: $e');
-          // Fallback: return scaffold without navbar if WishlistViewModel fails
-          return Scaffold(
-            body: child,
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              0, // Default to 0 if wishlist fails
-            ),
-          );
+          debugPrint('⚠️ Error getting wishlist count: $e');
+          wishlistCount = 0;
         }
+
+        return Scaffold(
+          body: child,
+          bottomNavigationBar: _getNavbarForRoute(
+            state.uri.path,
+            wishlistCount,
+          ),
+        );
       },
       routes: [
         // Home Page - Show products directly
@@ -865,21 +840,190 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
       location == '/cart' ||
       location == '/saved' ||
       location == '/profile') {
+    int currentIndex = 0;
     if (location == '/home') {
-      return AppNavbar(currentIndex: 0, wishlistCount: wishlistCount); // Home
+      currentIndex = 0;
     } else if (location == '/search') {
-      return AppNavbar(currentIndex: 1, wishlistCount: wishlistCount); // Search
+      currentIndex = 1;
     } else if (location == '/saved') {
-      return AppNavbar(currentIndex: 2, wishlistCount: wishlistCount); // Saved
+      currentIndex = 2;
     } else if (location == '/cart') {
-      return AppNavbar(currentIndex: 3, wishlistCount: wishlistCount); // Cart
+      currentIndex = 3;
     } else if (location == '/profile') {
-      return AppNavbar(
-        currentIndex: 4,
-        wishlistCount: wishlistCount,
-      ); // Profile
+      currentIndex = 4;
     }
+
+    // Return a Builder widget to access context
+    // Use BlocBuilder with optimized buildWhen to prevent rebuild loops
+    return Builder(
+      builder: (context) {
+        // Get AuthCubit from GetIt to listen to auth state changes
+        try {
+          final authCubit = GetIt.I<AuthCubit>();
+          // Use BlocBuilder only for reactive updates, with strict buildWhen
+          return BlocBuilder<AuthCubit, AuthState>(
+            bloc: authCubit,
+            buildWhen: (previous, current) {
+              // Only rebuild if authentication status actually changed
+              final prevAuth =
+                  previous is AuthAuthenticatedState &&
+                  previous.isAuthenticated &&
+                  previous.jwtToken != null &&
+                  previous.jwtToken!.isNotEmpty;
+              final currAuth =
+                  current is AuthAuthenticatedState &&
+                  current.isAuthenticated &&
+                  current.jwtToken != null &&
+                  current.jwtToken!.isNotEmpty;
+              // Only rebuild if auth status changed, not on every state change
+              return prevAuth != currAuth;
+            },
+            builder: (context, authState) {
+              // Determine authentication status
+              final isAuthenticated =
+                  authState is AuthAuthenticatedState &&
+                  authState.isAuthenticated &&
+                  authState.jwtToken != null &&
+                  authState.jwtToken!.isNotEmpty;
+
+              // Build navbar items
+              final items = _buildNavbarItems(
+                context,
+                isAuthenticated,
+                wishlistCount,
+              );
+
+              return OsmeaComponents.navbar(
+                variant: NavbarVariant.transparent,
+                size: NavbarSize.medium,
+                position: NavbarPosition.bottom,
+                currentIndex: currentIndex,
+                borderColor: OsmeaColors.silver,
+                elevation: .5,
+                backgroundColor: OsmeaColors.white,
+                items: items,
+                onItemTap: (index) =>
+                    _navigateToPage(context, index, isAuthenticated),
+              );
+            },
+          );
+        } catch (e) {
+          debugPrint('⚠️ AuthCubit not available, using fallback: $e');
+          // Fallback: use direct state check without FutureBuilder (non-blocking)
+          bool isAuthenticated = false;
+          try {
+            final authCubit = GetIt.I<AuthCubit>();
+            final authState = authCubit.state;
+            isAuthenticated =
+                authState is AuthAuthenticatedState &&
+                authState.isAuthenticated &&
+                authState.jwtToken != null &&
+                authState.jwtToken!.isNotEmpty;
+          } catch (_) {
+            // If AuthCubit not available, default to false
+            isAuthenticated = false;
+          }
+
+          final items = _buildNavbarItems(
+            context,
+            isAuthenticated,
+            wishlistCount,
+          );
+
+          return OsmeaComponents.navbar(
+            variant: NavbarVariant.transparent,
+            size: NavbarSize.medium,
+            position: NavbarPosition.bottom,
+            currentIndex: currentIndex,
+            borderColor: OsmeaColors.silver,
+            elevation: .5,
+            backgroundColor: OsmeaColors.white,
+            items: items,
+            onItemTap: (index) =>
+                _navigateToPage(context, index, isAuthenticated),
+          );
+        }
+      },
+    );
   }
   // No navbar for splash, onboarding, auth, product-detail, products
   return null;
+}
+
+/// Build navbar items based on authentication status
+List<NavbarItem> _buildNavbarItems(
+  BuildContext context,
+  bool isAuthenticated,
+  int wishlistCount,
+) {
+  return [
+    NavbarItem(
+      text: 'Home',
+      icon: Icon(Icons.home_outlined),
+      onTap: () => context.go('/home'),
+      tooltip: 'Home',
+    ),
+    NavbarItem(
+      text: 'Search',
+      icon: Icon(Icons.search_outlined),
+      onTap: () => context.go('/search'),
+      tooltip: 'Search',
+    ),
+    NavbarItem(
+      text: 'Saved',
+      icon: AnimatedNavbarIcon(
+        value: wishlistCount,
+        filledIcon: Icons.favorite,
+        emptyIcon: Icons.favorite_outline,
+        filledColor: OsmeaColors.nordicBlue,
+      ),
+      onTap: () => context.go('/saved'),
+      tooltip: 'Saved Items',
+      animationType: NavbarItemAnimationType.scale,
+      animationTrigger: wishlistCount,
+    ),
+    NavbarItem(
+      text: 'Cart',
+      icon: Icon(Icons.shopping_cart_outlined),
+      onTap: () => context.go('/cart'),
+      tooltip: 'Shopping Cart',
+    ),
+    NavbarItem(
+      text: isAuthenticated ? 'Profile' : 'Sign In',
+      icon: Icon(isAuthenticated ? Icons.person_outline : Icons.login_outlined),
+      onTap: () {
+        if (isAuthenticated) {
+          context.go('/profile');
+        } else {
+          context.go('/auth');
+        }
+      },
+      tooltip: isAuthenticated ? 'Profile' : 'Sign In',
+    ),
+  ];
+}
+
+/// Navigate to page based on index
+void _navigateToPage(BuildContext context, int index, bool isAuthenticated) {
+  switch (index) {
+    case 0: // Home
+      context.go('/home');
+      break;
+    case 1: // Search
+      context.go('/search');
+      break;
+    case 2: // Saved
+      context.go('/saved');
+      break;
+    case 3: // Cart
+      context.go('/cart');
+      break;
+    case 4: // Profile/Sign In
+      if (isAuthenticated) {
+        context.go('/profile');
+      } else {
+        context.go('/auth');
+      }
+      break;
+  }
 }
