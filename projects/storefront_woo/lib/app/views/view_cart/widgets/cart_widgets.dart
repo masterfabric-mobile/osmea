@@ -315,6 +315,9 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     CartViewModel viewModel,
     CartLoadedState state,
   ) {
+    // Get cartToken from viewModel arguments
+    final cartToken = viewModel.arguments['cartToken'] as String?;
+
     return OsmeaComponents.container(
       margin: const EdgeInsets.only(left: 16, right: 16),
       decoration: BoxDecoration(
@@ -323,189 +326,203 @@ class _CartContentWidgetState extends State<CartContentWidget> {
           bottom: BorderSide(color: OsmeaColors.grayMaterial[200]!, width: 0.5),
         ),
       ),
-      child: OsmeaComponents.padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: OsmeaComponents.row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image - Compact vertical
-            OsmeaComponents.container(
-              width: 60,
-              height: 75,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: OsmeaColors.grayMaterial[50],
-              ),
-              child: OsmeaComponents.clipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: item.imageUrl != null
-                    ? Image.network(
-                        item.imageUrl!,
-                        fit: BoxFit.cover,
-                        width: 60,
-                        height: 75,
-                        errorBuilder: (context, error, stackTrace) {
-                          return OsmeaComponents.center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: OsmeaColors.pewter.withValues(alpha: 0.3),
-                              size: 28,
-                            ),
-                          );
-                        },
-                      )
-                    : OsmeaComponents.center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          color: OsmeaColors.pewter.withValues(alpha: 0.3),
-                          size: 28,
+      child: InkWell(
+        onTap: () {
+          // Navigate to product detail page
+          context.push(
+            '/product-detail/${item.productId}',
+            extra: cartToken != null ? {'cartToken': cartToken} : null,
+          );
+        },
+        child: OsmeaComponents.padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: OsmeaComponents.row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Image - Compact vertical
+              OsmeaComponents.container(
+                width: 60,
+                height: 75,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: OsmeaColors.grayMaterial[50],
+                ),
+                child: OsmeaComponents.clipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: item.imageUrl != null
+                      ? Image.network(
+                          item.imageUrl!,
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 75,
+                          errorBuilder: (context, error, stackTrace) {
+                            return OsmeaComponents.center(
+                              child: Icon(
+                                Icons.image_outlined,
+                                color: OsmeaColors.pewter.withValues(
+                                  alpha: 0.3,
+                                ),
+                                size: 28,
+                              ),
+                            );
+                          },
+                        )
+                      : OsmeaComponents.center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            color: OsmeaColors.pewter.withValues(alpha: 0.3),
+                            size: 28,
+                          ),
                         ),
-                      ),
+                ),
               ),
-            ),
-            OsmeaComponents.sizedBox(width: 10),
+              OsmeaComponents.sizedBox(width: 10),
 
-            // Product Info - Compact
-            OsmeaComponents.expanded(
-              child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Product Name - Compact
-                  OsmeaComponents.text(
-                    item.productName,
-                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: OsmeaColors.thunder,
-                      height: 1.2,
-                      fontSize: 12,
+              // Product Info - Compact
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Product Name - Compact
+                    OsmeaComponents.text(
+                      item.productName,
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: OsmeaColors.thunder,
+                        height: 1.2,
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
 
-                  // Variations - Attribute names bold, fixed height for alignment
-                  OsmeaComponents.container(
-                    height: 28,
-                    child: item.formattedVariations.isNotEmpty
-                        ? OsmeaComponents.column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    // Variations - Attribute names bold, fixed height for alignment
+                    OsmeaComponents.container(
+                      height: 28,
+                      child: item.formattedVariations.isNotEmpty
+                          ? OsmeaComponents.column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildVariationsWithBoldAttributes(
+                                  context,
+                                  item.formattedVariations,
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+
+                    OsmeaComponents.sizedBox(height: 6),
+
+                    // Price - Left aligned
+                    OsmeaComponents.text(
+                      PriceInfoCurrencyHelper.formatPrice(
+                        item.price,
+                        currencyCode: state.currencyCode,
+                        currencyDecimalSeparator:
+                            state.currencyDecimalSeparator,
+                        currencyThousandSeparator:
+                            state.currencyThousandSeparator,
+                        decimalPlaces: state.currencyMinorUnit ?? 2,
+                        removeTrailingZeros: true,
+                      ),
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        color: OsmeaColors.nordicBlue,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+
+                    OsmeaComponents.sizedBox(height: 6),
+
+                    // Quantity Controls and Remove button - Left and Right
+                    OsmeaComponents.row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Quantity Controls - Left side, Compact
+                        OsmeaComponents.container(
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.grayMaterial[50],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: OsmeaComponents.row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              _buildVariationsWithBoldAttributes(
-                                context,
-                                item.formattedVariations,
+                              // Decrease
+                              OsmeaComponents.iconButton(
+                                onPressed: item.quantity > 1
+                                    ? () => viewModel.updateItemQuantity(
+                                        item.productId,
+                                        item.quantity - 1,
+                                      )
+                                    : null,
+                                icon: Icon(
+                                  Icons.remove_rounded,
+                                  color: item.quantity > 1
+                                      ? OsmeaColors.thunder
+                                      : OsmeaColors.pewter.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                  size: 12,
+                                ),
+                                backgroundColor: Colors.transparent,
+                                size: ButtonSize.extraSmall,
+                              ),
+                              // Quantity
+                              OsmeaComponents.padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                child: OsmeaComponents.text(
+                                  '${item.quantity}',
+                                  textStyle: OsmeaTextStyle.bodySmall(context)
+                                      .copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: OsmeaColors.thunder,
+                                        fontSize: 11,
+                                      ),
+                                ),
+                              ),
+                              // Increase
+                              OsmeaComponents.iconButton(
+                                onPressed: () => viewModel.updateItemQuantity(
+                                  item.productId,
+                                  item.quantity + 1,
+                                ),
+                                icon: Icon(
+                                  Icons.add_rounded,
+                                  color: OsmeaColors.nordicBlue,
+                                  size: 12,
+                                ),
+                                backgroundColor: Colors.transparent,
+                                size: ButtonSize.extraSmall,
                               ),
                             ],
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-
-                  OsmeaComponents.sizedBox(height: 6),
-
-                  // Price - Left aligned
-                  OsmeaComponents.text(
-                    PriceInfoCurrencyHelper.formatPrice(
-                      item.price,
-                      currencyCode: state.currencyCode,
-                      currencyDecimalSeparator: state.currencyDecimalSeparator,
-                      currencyThousandSeparator:
-                          state.currencyThousandSeparator,
-                      decimalPlaces: state.currencyMinorUnit ?? 2,
-                      removeTrailingZeros: true,
+                          ),
+                        ),
+                        // Remove button - Right side
+                        OsmeaComponents.iconButton(
+                          onPressed: () =>
+                              viewModel.removeItemFromCart(item.productId),
+                          icon: Icon(
+                            Icons.delete_outline_rounded,
+                            color: OsmeaColors.red,
+                            size: 18,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          size: ButtonSize.extraSmall,
+                          tooltip: 'Remove item',
+                        ),
+                      ],
                     ),
-                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      color: OsmeaColors.nordicBlue,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-
-                  OsmeaComponents.sizedBox(height: 6),
-
-                  // Quantity Controls and Remove button - Left and Right
-                  OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Quantity Controls - Left side, Compact
-                      OsmeaComponents.container(
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.grayMaterial[50],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: OsmeaComponents.row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Decrease
-                            OsmeaComponents.iconButton(
-                              onPressed: item.quantity > 1
-                                  ? () => viewModel.updateItemQuantity(
-                                      item.productId,
-                                      item.quantity - 1,
-                                    )
-                                  : null,
-                              icon: Icon(
-                                Icons.remove_rounded,
-                                color: item.quantity > 1
-                                    ? OsmeaColors.thunder
-                                    : OsmeaColors.pewter.withValues(alpha: 0.3),
-                                size: 12,
-                              ),
-                              backgroundColor: Colors.transparent,
-                              size: ButtonSize.extraSmall,
-                            ),
-                            // Quantity
-                            OsmeaComponents.padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              child: OsmeaComponents.text(
-                                '${item.quantity}',
-                                textStyle: OsmeaTextStyle.bodySmall(context)
-                                    .copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: OsmeaColors.thunder,
-                                      fontSize: 11,
-                                    ),
-                              ),
-                            ),
-                            // Increase
-                            OsmeaComponents.iconButton(
-                              onPressed: () => viewModel.updateItemQuantity(
-                                item.productId,
-                                item.quantity + 1,
-                              ),
-                              icon: Icon(
-                                Icons.add_rounded,
-                                color: OsmeaColors.nordicBlue,
-                                size: 12,
-                              ),
-                              backgroundColor: Colors.transparent,
-                              size: ButtonSize.extraSmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Remove button - Right side
-                      OsmeaComponents.iconButton(
-                        onPressed: () =>
-                            viewModel.removeItemFromCart(item.productId),
-                        icon: Icon(
-                          Icons.delete_outline_rounded,
-                          color: OsmeaColors.red,
-                          size: 18,
-                        ),
-                        backgroundColor: Colors.transparent,
-                        size: ButtonSize.extraSmall,
-                        tooltip: 'Remove item',
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
