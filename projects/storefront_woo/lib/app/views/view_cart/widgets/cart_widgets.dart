@@ -46,22 +46,37 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     return OsmeaComponents.singleChildScrollView(
       child: OsmeaComponents.column(
         children: [
-          // Cart items with swipe-to-delete
-          ...state.cartItems.map(
-            (item) => _buildCartItemWithSwipe(context, item, viewModel, state),
-          ),
+          OsmeaComponents.sizedBox(height: 12),
 
-          OsmeaComponents.sizedBox(height: 8),
+          // Cart items with swipe-to-delete and dividers
+          ...state.cartItems.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            return OsmeaComponents.column(
+              children: [
+                _buildCartItemWithSwipe(context, item, viewModel, state),
+                // Divider between items (except last)
+                if (index < state.cartItems.length - 1)
+                  OsmeaComponents.container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 1,
+                    color: OsmeaColors.grayMaterial[200],
+                  ),
+              ],
+            );
+          }),
+
+          OsmeaComponents.sizedBox(height: 12),
 
           // Coupon section
           _buildCouponSection(context, viewModel, state),
 
-          OsmeaComponents.sizedBox(height: 8),
+          OsmeaComponents.sizedBox(height: 12),
 
           // Order summary
           _buildOrderSummary(context, state),
 
-          OsmeaComponents.sizedBox(height: 16),
+          OsmeaComponents.sizedBox(height: 12),
         ],
       ),
     );
@@ -77,6 +92,111 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     return const SizedBox.shrink();
   }
 
+  /// Formats variations string for better readability
+  String _formatVariationsForDisplay(String variations) {
+    // Clean up common technical terms and make more readable
+    return variations
+        .replaceAll('Pa ', '') // Remove remaining 'Pa ' if any
+        .replaceAll('pa_', '') // Remove any remaining 'pa_' prefix
+        .replaceAll('_', ' ') // Replace underscores with spaces
+        .split(',')
+        .map((part) {
+          // Clean each part
+          String cleaned = part.trim();
+          // Capitalize first letter of each word
+          cleaned = cleaned
+              .split(' ')
+              .map((word) {
+                if (word.isEmpty) return word;
+                return word[0].toUpperCase() + word.substring(1).toLowerCase();
+              })
+              .join(' ');
+          return cleaned;
+        })
+        .join(', ');
+  }
+
+  /// Builds variations text with bold attribute names
+  Widget _buildVariationsWithBoldAttributes(
+    BuildContext context,
+    String variations,
+  ) {
+    final formatted = _formatVariationsForDisplay(variations);
+    final parts = formatted.split(',');
+
+    final textSpans = <TextSpan>[];
+    for (int i = 0; i < parts.length; i++) {
+      final part = parts[i].trim();
+      if (part.isEmpty) continue;
+
+      // Split by colon to separate attribute name and value
+      final colonIndex = part.indexOf(':');
+      if (colonIndex > 0) {
+        final attributeName = part.substring(0, colonIndex).trim();
+        final value = part.substring(colonIndex + 1).trim();
+
+        // Bold attribute name
+        textSpans.add(
+          TextSpan(
+            text: attributeName,
+            style: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.pewter,
+              fontWeight: FontWeight.w600,
+              height: 1.3,
+              fontSize: 10,
+            ),
+          ),
+        );
+        // Normal value
+        textSpans.add(
+          TextSpan(
+            text: ': $value',
+            style: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.pewter,
+              fontWeight: FontWeight.w400,
+              height: 1.3,
+              fontSize: 10,
+            ),
+          ),
+        );
+      } else {
+        // No colon found, use normal text
+        textSpans.add(
+          TextSpan(
+            text: part,
+            style: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.pewter,
+              fontWeight: FontWeight.w400,
+              height: 1.3,
+              fontSize: 10,
+            ),
+          ),
+        );
+      }
+
+      // Add comma separator (except for last item)
+      if (i < parts.length - 1) {
+        textSpans.add(
+          TextSpan(
+            text: ', ',
+            style: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.pewter,
+              fontWeight: FontWeight.w400,
+              height: 1.3,
+              fontSize: 10,
+            ),
+          ),
+        );
+      }
+    }
+
+    return RichText(
+      text: TextSpan(children: textSpans),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
   /// Builds cart item with swipe-to-delete functionality
   Widget _buildCartItemWithSwipe(
     BuildContext context,
@@ -88,12 +208,12 @@ class _CartContentWidgetState extends State<CartContentWidget> {
       key: Key('cart_item_${item.key}'),
       direction: DismissDirection.endToStart,
       background: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
         alignment: Alignment.centerRight,
         padding: EdgeInsets.only(right: context.spacing20),
         decoration: BoxDecoration(
           color: OsmeaColors.red,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -188,7 +308,7 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     );
   }
 
-  /// Builds individual cart item widget - MINIMAL ELEGANT DESIGN WITH BOTTOM CONTROLS
+  /// Builds individual cart item widget - ULTRA MINIMALIST DESIGN
   Widget _buildCartItem(
     BuildContext context,
     CartItem item,
@@ -196,183 +316,194 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     CartLoadedState state,
   ) {
     return OsmeaComponents.container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(left: 16, right: 16),
       decoration: BoxDecoration(
         color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: OsmeaColors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border(
+          bottom: BorderSide(color: OsmeaColors.grayMaterial[200]!, width: 0.5),
+        ),
       ),
       child: OsmeaComponents.padding(
-        padding: const EdgeInsets.all(12),
-        child: OsmeaComponents.column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: OsmeaComponents.row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Image + Product Info
-            OsmeaComponents.row(
-              children: [
-                // Minimal Product Image
-                OsmeaComponents.container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: OsmeaColors.grayMaterial[50],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: item.imageUrl != null
-                        ? Image.network(
-                            item.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return OsmeaComponents.center(
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: OsmeaColors.pewter.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                  size: 32,
-                                ),
-                              );
-                            },
-                          )
-                        : OsmeaComponents.center(
+            // Product Image - Compact vertical
+            OsmeaComponents.container(
+              width: 60,
+              height: 75,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: OsmeaColors.grayMaterial[50],
+              ),
+              child: OsmeaComponents.clipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: item.imageUrl != null
+                    ? Image.network(
+                        item.imageUrl!,
+                        fit: BoxFit.cover,
+                        width: 60,
+                        height: 75,
+                        errorBuilder: (context, error, stackTrace) {
+                          return OsmeaComponents.center(
                             child: Icon(
                               Icons.image_outlined,
-                              color: OsmeaColors.pewter.withValues(alpha: 0.5),
-                              size: 32,
+                              color: OsmeaColors.pewter.withValues(alpha: 0.3),
+                              size: 28,
                             ),
-                          ),
-                  ),
-                ),
-                OsmeaComponents.sizedBox(width: 12),
-
-                // Minimal Product Info
-                OsmeaComponents.expanded(
-                  child: OsmeaComponents.column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      OsmeaComponents.text(
-                        item.productName,
-                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: OsmeaColors.thunder,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      // Show variations if available
-                      if (item.formattedVariations.isNotEmpty) ...[
-                        OsmeaComponents.sizedBox(height: 4),
-                        OsmeaComponents.text(
-                          item.formattedVariations,
-                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                            color: OsmeaColors.pewter,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                      OsmeaComponents.sizedBox(height: 4),
-                      OsmeaComponents.text(
-                        PriceInfoCurrencyHelper.formatPrice(
-                          item.price,
-                          currencyCode: state.currencyCode,
-                          currencyDecimalSeparator: state.currencyDecimalSeparator,
-                          currencyThousandSeparator: state.currencyThousandSeparator,
-                          decimalPlaces: state.currencyMinorUnit ?? 2,
-                          removeTrailingZeros: true,
-                        ),
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          color: OsmeaColors.nordicBlue,
-                          fontWeight: FontWeight.w600,
+                          );
+                        },
+                      )
+                    : OsmeaComponents.center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          color: OsmeaColors.pewter.withValues(alpha: 0.3),
+                          size: 28,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
+            OsmeaComponents.sizedBox(width: 10),
 
-            OsmeaComponents.sizedBox(height: 12),
-
-            // Bottom Row: Quantity Controls + Delete Button
-            OsmeaComponents.row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Quantity Controls
-                OsmeaComponents.container(
-                  decoration: BoxDecoration(
-                    color: OsmeaColors.grayMaterial[50],
-                    borderRadius: BorderRadius.circular(8),
+            // Product Info - Compact
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Product Name - Compact
+                  OsmeaComponents.text(
+                    item.productName,
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: OsmeaColors.thunder,
+                      height: 1.2,
+                      fontSize: 12,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  child: OsmeaComponents.row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      OsmeaComponents.iconButton(
-                        onPressed: item.quantity > 1
-                            ? () => viewModel.updateItemQuantity(
-                                item.productId,
-                                item.quantity - 1,
-                              )
-                            : null,
-                        icon: Icon(
-                          Icons.remove,
-                          color: OsmeaColors.pewter,
-                          size: 16,
-                        ),
-                        backgroundColor: Colors.transparent,
-                      ),
-                      OsmeaComponents.padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: OsmeaComponents.text(
-                          '${item.quantity}',
-                          textStyle: OsmeaTextStyle.bodyMedium(context)
-                              .copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: OsmeaColors.thunder,
+
+                  // Variations - Attribute names bold, fixed height for alignment
+                  OsmeaComponents.container(
+                    height: 28,
+                    child: item.formattedVariations.isNotEmpty
+                        ? OsmeaComponents.column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildVariationsWithBoldAttributes(
+                                context,
+                                item.formattedVariations,
                               ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+
+                  OsmeaComponents.sizedBox(height: 6),
+
+                  // Price - Left aligned
+                  OsmeaComponents.text(
+                    PriceInfoCurrencyHelper.formatPrice(
+                      item.price,
+                      currencyCode: state.currencyCode,
+                      currencyDecimalSeparator: state.currencyDecimalSeparator,
+                      currencyThousandSeparator:
+                          state.currencyThousandSeparator,
+                      decimalPlaces: state.currencyMinorUnit ?? 2,
+                      removeTrailingZeros: true,
+                    ),
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      color: OsmeaColors.nordicBlue,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+
+                  OsmeaComponents.sizedBox(height: 6),
+
+                  // Quantity Controls and Remove button - Left and Right
+                  OsmeaComponents.row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Quantity Controls - Left side, Compact
+                      OsmeaComponents.container(
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.grayMaterial[50],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: OsmeaComponents.row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Decrease
+                            OsmeaComponents.iconButton(
+                              onPressed: item.quantity > 1
+                                  ? () => viewModel.updateItemQuantity(
+                                      item.productId,
+                                      item.quantity - 1,
+                                    )
+                                  : null,
+                              icon: Icon(
+                                Icons.remove_rounded,
+                                color: item.quantity > 1
+                                    ? OsmeaColors.thunder
+                                    : OsmeaColors.pewter.withValues(alpha: 0.3),
+                                size: 12,
+                              ),
+                              backgroundColor: Colors.transparent,
+                              size: ButtonSize.extraSmall,
+                            ),
+                            // Quantity
+                            OsmeaComponents.padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: OsmeaComponents.text(
+                                '${item.quantity}',
+                                textStyle: OsmeaTextStyle.bodySmall(context)
+                                    .copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: OsmeaColors.thunder,
+                                      fontSize: 11,
+                                    ),
+                              ),
+                            ),
+                            // Increase
+                            OsmeaComponents.iconButton(
+                              onPressed: () => viewModel.updateItemQuantity(
+                                item.productId,
+                                item.quantity + 1,
+                              ),
+                              icon: Icon(
+                                Icons.add_rounded,
+                                color: OsmeaColors.nordicBlue,
+                                size: 12,
+                              ),
+                              backgroundColor: Colors.transparent,
+                              size: ButtonSize.extraSmall,
+                            ),
+                          ],
                         ),
                       ),
+                      // Remove button - Right side
                       OsmeaComponents.iconButton(
-                        onPressed: () => viewModel.updateItemQuantity(
-                          item.productId,
-                          item.quantity + 1,
-                        ),
+                        onPressed: () =>
+                            viewModel.removeItemFromCart(item.productId),
                         icon: Icon(
-                          Icons.add,
-                          color: OsmeaColors.nordicBlue,
-                          size: 16,
+                          Icons.delete_outline_rounded,
+                          color: OsmeaColors.red,
+                          size: 18,
                         ),
                         backgroundColor: Colors.transparent,
+                        size: ButtonSize.extraSmall,
+                        tooltip: 'Remove item',
                       ),
                     ],
                   ),
-                ),
-
-                // Delete Button - Text Button for better readability
-                OsmeaComponents.button(
-                  onPressed: () => viewModel.removeItemFromCart(item.productId),
-                  backgroundColor: OsmeaColors.red.withValues(alpha: 0.1),
-                  textColor: OsmeaColors.red,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  text: 'Remove',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.red,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -380,7 +511,7 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     );
   }
 
-  /// Builds coupon section - MINIMAL ELEGANT DESIGN
+  /// Builds coupon section - MODERN CLEAN DESIGN
   Widget _buildCouponSection(
     BuildContext context,
     CartViewModel viewModel,
@@ -390,83 +521,57 @@ class _CartContentWidgetState extends State<CartContentWidget> {
       children: [
         // Applied coupons list
         if (state.coupons.isNotEmpty) ...[
-          ...state.coupons.map((coupon) => _buildAppliedCoupon(context, coupon, viewModel, state)),
-          OsmeaComponents.sizedBox(height: 8),
-        ],
-        
-        // Coupon input section
-        OsmeaComponents.container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: OsmeaColors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: OsmeaColors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
-              ),
-            ],
+          ...state.coupons.map(
+            (coupon) => _buildAppliedCoupon(context, coupon, viewModel, state),
           ),
-          child: OsmeaComponents.padding(
-            padding: const EdgeInsets.all(16),
-            child: OsmeaComponents.row(
-              children: [
-                // Minimal Icon
-                Icon(
-                  Icons.local_offer_outlined,
-                  color: OsmeaColors.nordicBlue.withValues(alpha: 0.7),
-                  size: 20,
-                ),
-                OsmeaComponents.sizedBox(width: 12),
+          OsmeaComponents.sizedBox(height: 12),
+        ],
 
-                // Minimal Input Field
-                OsmeaComponents.expanded(
-                  child: OsmeaComponents.textField(
-                    controller: _couponController,
-                    hint: 'Discount code',
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      fontWeight: FontWeight.w400,
-                      color: OsmeaColors.thunder,
-                    ),
-                    onSubmitted: (value) {
-                      if (value.trim().isNotEmpty) {
-                        viewModel.applyCoupon(value.trim());
-                        _couponController.clear();
-                      }
-                    },
+        // Coupon input section - Minimalist design
+        OsmeaComponents.container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: OsmeaComponents.row(
+            children: [
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.textField(
+                  controller: _couponController,
+                  hint: 'Discount code',
+                  variant: TextFieldVariant.outlined,
+                  size: TextFieldSize.medium,
+                  prefixIcon: Icon(
+                    Icons.local_offer_outlined,
+                    color: OsmeaColors.pewter,
+                    size: 20,
                   ),
-                ),
-                OsmeaComponents.sizedBox(width: 8),
-
-                // Minimal Apply Button
-                OsmeaComponents.button(
-                  onPressed: () {
-                    final couponCode = _couponController.text.trim();
-                    if (couponCode.isNotEmpty) {
-                      viewModel.applyCoupon(couponCode);
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      viewModel.applyCoupon(value.trim());
                       _couponController.clear();
                     }
                   },
-                  backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
-                  textColor: OsmeaColors.nordicBlue,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  text: 'Apply',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.nordicBlue,
-                    fontWeight: FontWeight.w600,
-                  ),
                 ),
-              ],
-            ),
+              ),
+              OsmeaComponents.sizedBox(width: 8),
+              OsmeaComponents.textButton(
+                text: 'Apply',
+                onPressed: () {
+                  final couponCode = _couponController.text.trim();
+                  if (couponCode.isNotEmpty) {
+                    viewModel.applyCoupon(couponCode);
+                    _couponController.clear();
+                  }
+                },
+                size: ButtonSize.small,
+                variant: ButtonVariant.primary,
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  /// Builds applied coupon widget
+  /// Builds applied coupon widget - MINIMAL DESIGN
   Widget _buildAppliedCoupon(
     BuildContext context,
     dynamic coupon,
@@ -474,74 +579,38 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     CartLoadedState state,
   ) {
     final couponCode = coupon.code ?? '';
-    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
-    // Use API-provided separators and minor_unit from coupon totals if available
-    final discount = coupon.totals?.totalDiscount != null
-        ? PriceInfoCurrencyHelper.parsePriceToDouble(
-            coupon.totals!.totalDiscount!,
-            currencyCode: state.currencyCode,
-            currencyDecimalSeparator: coupon.totals?.currencyDecimalSeparator,
-            currencyThousandSeparator: coupon.totals?.currencyThousandSeparator,
-            currencyMinorUnit: coupon.totals?.currencyMinorUnit,
-          ) ?? 0.0
-        : 0.0;
-    
+
     return OsmeaComponents.container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: OsmeaColors.nordicBlue.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: OsmeaComponents.padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: OsmeaComponents.row(
           children: [
             Icon(
-              Icons.check_circle,
+              Icons.check_circle_rounded,
               color: OsmeaColors.nordicBlue,
-              size: 20,
+              size: 18,
             ),
             OsmeaComponents.sizedBox(width: 8),
             OsmeaComponents.expanded(
-              child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  OsmeaComponents.text(
-                    couponCode.toUpperCase(),
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: OsmeaColors.nordicBlue,
-                    ),
-                  ),
-                  if (discount > 0) ...[
-                    OsmeaComponents.sizedBox(height: 2),
-                    OsmeaComponents.text(
-                      'Discount: ${PriceInfoCurrencyHelper.formatPrice(
-                        discount,
-                        currencyCode: state.currencyCode,
-                        currencyDecimalSeparator: state.currencyDecimalSeparator,
-                        currencyThousandSeparator: state.currencyThousandSeparator,
-                        decimalPlaces: state.currencyMinorUnit ?? 2,
-                        removeTrailingZeros: true,
-                      )}',
-                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        color: OsmeaColors.pewter,
-                      ),
-                    ),
-                  ],
-                ],
+              child: OsmeaComponents.text(
+                couponCode.toUpperCase(),
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.nordicBlue,
+                ),
               ),
             ),
             OsmeaComponents.iconButton(
               onPressed: () => viewModel.removeCoupon(couponCode),
               icon: Icon(
-                Icons.close,
-                color: OsmeaColors.red,
-                size: 18,
+                Icons.close_rounded,
+                color: OsmeaColors.pewter,
+                size: 16,
               ),
               backgroundColor: Colors.transparent,
               tooltip: 'Remove coupon',
@@ -552,206 +621,98 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     );
   }
 
-  /// Builds order summary - FRESH E-COMMERCE DESIGN
+  /// Builds order summary - MINIMAL DESIGN
   Widget _buildOrderSummary(BuildContext context, CartLoadedState state) {
     return OsmeaComponents.container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: OsmeaColors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ],
-        border: Border.all(color: OsmeaColors.grayMaterial[100]!, width: 1),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: OsmeaComponents.padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Modern Header
-            OsmeaComponents.row(
+            // Header - Compact
+            OsmeaComponents.text(
+              'Order Summary',
+              textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                fontWeight: FontWeight.w700,
+                color: OsmeaColors.thunder,
+              ),
+            ),
+            OsmeaComponents.sizedBox(height: 12),
+
+            // Summary Items - Clean list design
+            OsmeaComponents.column(
               children: [
-                Icon(
-                  Icons.receipt_long_outlined,
-                  color: OsmeaColors.nordicBlue,
-                  size: 24,
-                ),
-                OsmeaComponents.sizedBox(width: 8),
-                OsmeaComponents.text(
-                  'Order Summary',
-                  textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: OsmeaColors.thunder,
+                // Subtotal
+                _buildSummaryRow(
+                  context,
+                  'Subtotal',
+                  PriceInfoCurrencyHelper.formatPrice(
+                    state.totalPrice + state.totalDiscount,
+                    currencyCode: state.currencyCode,
+                    currencyDecimalSeparator: state.currencyDecimalSeparator,
+                    currencyThousandSeparator: state.currencyThousandSeparator,
+                    decimalPlaces: state.currencyMinorUnit ?? 2,
+                    removeTrailingZeros: true,
                   ),
+                  isPrimary: false,
+                ),
+                OsmeaComponents.sizedBox(height: 10),
+
+                // Discount (if coupons applied)
+                if (state.totalDiscount > 0) ...[
+                  _buildSummaryRow(
+                    context,
+                    'Discount',
+                    '-${PriceInfoCurrencyHelper.formatPrice(state.totalDiscount, currencyCode: state.currencyCode, currencyDecimalSeparator: state.currencyDecimalSeparator, currencyThousandSeparator: state.currencyThousandSeparator, decimalPlaces: state.currencyMinorUnit ?? 2, removeTrailingZeros: true)}',
+                    isPrimary: false,
+                    isDiscount: true,
+                  ),
+                  OsmeaComponents.sizedBox(height: 10),
+                ],
+
+                // Shipping
+                _buildSummaryRow(
+                  context,
+                  'Shipping',
+                  'Calculated at checkout',
+                  isPrimary: false,
+                  isSecondary: true,
+                ),
+                OsmeaComponents.sizedBox(height: 10),
+
+                // Tax
+                _buildSummaryRow(
+                  context,
+                  'Tax',
+                  'Calculated at checkout',
+                  isPrimary: false,
+                  isSecondary: true,
+                ),
+                OsmeaComponents.sizedBox(height: 12),
+
+                // Divider
+                OsmeaComponents.divider(),
+                OsmeaComponents.sizedBox(height: 12),
+
+                // Total - Prominent display
+                _buildSummaryRow(
+                  context,
+                  'Total',
+                  PriceInfoCurrencyHelper.formatPrice(
+                    state.totalPrice,
+                    currencyCode: state.currencyCode,
+                    currencyDecimalSeparator: state.currencyDecimalSeparator,
+                    currencyThousandSeparator: state.currencyThousandSeparator,
+                    decimalPlaces: state.currencyMinorUnit ?? 2,
+                  ),
+                  isPrimary: true,
                 ),
               ],
-            ),
-            OsmeaComponents.sizedBox(height: 20),
-
-            // Modern Summary Items
-            OsmeaComponents.container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: OsmeaColors.grayMaterial[50],
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: OsmeaColors.grayMaterial[200]!,
-                  width: 1,
-                ),
-              ),
-              child: OsmeaComponents.column(
-                children: [
-                  // Subtotal
-                  OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OsmeaComponents.text(
-                        'Subtotal',
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: OsmeaColors.thunder,
-                        ),
-                      ),
-                      OsmeaComponents.text(
-                        PriceInfoCurrencyHelper.formatPrice(
-                          state.totalPrice + state.totalDiscount,
-                          currencyCode: state.currencyCode,
-                          currencyDecimalSeparator: state.currencyDecimalSeparator,
-                          currencyThousandSeparator: state.currencyThousandSeparator,
-                          decimalPlaces: state.currencyMinorUnit ?? 2,
-                          removeTrailingZeros: true,
-                        ),
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: OsmeaColors.thunder,
-                        ),
-                      ),
-                    ],
-                  ),
-                  OsmeaComponents.sizedBox(height: 12),
-
-                  // Discount (if coupons applied)
-                  if (state.totalDiscount > 0) ...[
-                    OsmeaComponents.row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OsmeaComponents.text(
-                          'Discount',
-                          textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                            color: OsmeaColors.nordicBlue,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        OsmeaComponents.text(
-                          '-${PriceInfoCurrencyHelper.formatPrice(
-                            state.totalDiscount,
-                            currencyCode: state.currencyCode,
-                            currencyDecimalSeparator: state.currencyDecimalSeparator,
-                            currencyThousandSeparator: state.currencyThousandSeparator,
-                            decimalPlaces: state.currencyMinorUnit ?? 2,
-                            removeTrailingZeros: true,
-                          )}',
-                          textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                            color: OsmeaColors.nordicBlue,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    OsmeaComponents.sizedBox(height: 12),
-                  ],
-
-                  // Shipping
-                  OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OsmeaComponents.text(
-                        'Shipping',
-                        textStyle: OsmeaTextStyle.bodyMedium(
-                          context,
-                        ).copyWith(color: OsmeaColors.pewter),
-                      ),
-                      OsmeaComponents.text(
-                        'Calculated at checkout',
-                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.pewter.withValues(alpha: 0.8),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                  OsmeaComponents.sizedBox(height: 12),
-
-                  // Tax
-                  OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OsmeaComponents.text(
-                        'Tax',
-                        textStyle: OsmeaTextStyle.bodyMedium(
-                          context,
-                        ).copyWith(color: OsmeaColors.pewter),
-                      ),
-                      OsmeaComponents.text(
-                        'Calculated at checkout',
-                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.pewter.withValues(alpha: 0.8),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                  OsmeaComponents.sizedBox(height: 8),
-
-                  // Divider
-                  OsmeaComponents.divider(),
-                  OsmeaComponents.sizedBox(height: 8),
-
-                  // Total - Highlighted
-                  OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OsmeaComponents.text(
-                        'Total',
-                        textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: OsmeaColors.thunder,
-                        ),
-                      ),
-                      OsmeaComponents.container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: OsmeaComponents.text(
-                          PriceInfoCurrencyHelper.formatPrice(
-                            state.totalPrice,
-                            currencyCode: state.currencyCode,
-                            currencyDecimalSeparator: state.currencyDecimalSeparator,
-                            currencyThousandSeparator: state.currencyThousandSeparator,
-                            decimalPlaces: state.currencyMinorUnit ?? 2,
-                          ),
-                          textStyle: OsmeaTextStyle.titleLarge(context)
-                              .copyWith(
-                                color: OsmeaColors.nordicBlue,
-                                fontWeight: FontWeight.w800,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -759,6 +720,58 @@ class _CartContentWidgetState extends State<CartContentWidget> {
     );
   }
 
+  /// Helper method to build summary row
+  Widget _buildSummaryRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool isPrimary = false,
+    bool isDiscount = false,
+    bool isSecondary = false,
+  }) {
+    return OsmeaComponents.row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        OsmeaComponents.text(
+          label,
+          textStyle: isPrimary
+              ? OsmeaTextStyle.titleMedium(context).copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: OsmeaColors.thunder,
+                )
+              : OsmeaTextStyle.bodyMedium(context).copyWith(
+                  fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w500,
+                  color: isDiscount
+                      ? OsmeaColors.nordicBlue
+                      : isSecondary
+                      ? OsmeaColors.pewter
+                      : OsmeaColors.thunder,
+                ),
+        ),
+        OsmeaComponents.text(
+          value,
+          textStyle: isPrimary
+              ? OsmeaTextStyle.titleMedium(context).copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: OsmeaColors.nordicBlue,
+                )
+              : isDiscount
+              ? OsmeaTextStyle.bodyMedium(context).copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: OsmeaColors.nordicBlue,
+                )
+              : OsmeaTextStyle.bodySmall(context).copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: isSecondary
+                      ? OsmeaColors.pewter.withValues(alpha: 0.8)
+                      : OsmeaColors.thunder,
+                  fontStyle: isSecondary ? FontStyle.italic : FontStyle.normal,
+                ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Loading widget for cart view
