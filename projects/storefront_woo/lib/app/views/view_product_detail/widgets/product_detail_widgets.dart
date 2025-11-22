@@ -960,15 +960,9 @@ class ProductDetailContentWidget extends StatelessWidget {
             ],
           ),
           OsmeaComponents.sizedBox(height: context.spacing8),
-          // Review text
+          // Review text (HTML formatted)
           if (review.review != null && review.review!.isNotEmpty)
-            OsmeaComponents.text(
-              review.review!,
-              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: OsmeaColors.thunder.withValues(alpha: 0.8),
-                height: 1.5,
-              ),
-            ),
+            WebViewerHelper.html(review.review!),
           // Review date
           if (review.formattedDateCreated != null ||
               review.dateCreated != null) ...[
