@@ -74,8 +74,12 @@ class ProductDetailLoadedState extends ProductDetailState {
 /// Error state when product detail fetching fails
 class ProductDetailErrorState extends ProductDetailState {
   final String message;
+  final ProductDetailLoadedState? previousState; // Previous state to recover to
 
-  ProductDetailErrorState({required this.message});
+  ProductDetailErrorState({
+    required this.message,
+    this.previousState,
+  });
 }
 
 /// Success state when an action is completed successfully

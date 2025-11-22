@@ -99,6 +99,32 @@ class ProductDetailView
 
     // Error state
     if (state is ProductDetailErrorState) {
+      // If error is related to adding to cart (400 error), show snackbar and recover to previous state
+      final errorMessage = state.message.toLowerCase();
+      final isAddToCartError = errorMessage.contains('failed to add') ||
+          errorMessage.contains('add to cart') ||
+          errorMessage.contains('400') ||
+          errorMessage.contains('bad response');
+      
+      if (isAddToCartError && state.previousState != null) {
+        // Show snackbar and recover to previous state
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.snackbarError(
+            'Failed to add product to cart. Please check your selections.',
+            duration: const Duration(seconds: 3),
+          );
+          // Recover to previous state
+          viewModel.stateChanger(state.previousState!);
+        });
+        // Show previous state while snackbar is shown
+        return ProductDetailContentWidget(
+          viewModel: viewModel,
+          state: state.previousState!,
+          goRoute: goRoute,
+        );
+      }
+      
+      // For other errors, show error widget
       return ProductDetailErrorWidget(
         message: state.message,
         onRetry: () => viewModel.loadProduct(productId),

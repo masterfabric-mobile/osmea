@@ -782,16 +782,112 @@ class ProductDetailViewModel
         }
       }
 
-      // Build variation array from selectedAttributes if product has attributes
+      // Try to find matching variation ID first, then build variation array
+      int? variationId;
       List<Map<String, String>>? variation;
-      if (selectedAttributes.isNotEmpty) {
-        variation = [];
-        // Get product attributes to find taxonomy names
-        // currentState is already confirmed to be ProductDetailLoadedState above
 
+      if (selectedAttributes.isNotEmpty &&
+          product.variations != null &&
+          product.variations!.isNotEmpty) {
+        // Build attribute mapping for matching
+        final Map<String, String> attributeNameToTaxonomy = {};
         if (product.attributes != null) {
-          // Build attribute map: name -> taxonomy
-          final Map<String, String> attributeTaxonomyMap = {};
+          for (final attr in product.attributes!) {
+            if (attr is Map<String, dynamic>) {
+              final name = (attr['name'] ?? attr['label'] ?? '')
+                  .toString()
+                  .trim();
+              final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '')
+                  .toString()
+                  .trim();
+              if (name.isNotEmpty) {
+                attributeNameToTaxonomy[name] = taxonomy.isNotEmpty
+                    ? taxonomy
+                    : name;
+              }
+            }
+          }
+        }
+
+        // Helper to normalize strings for comparison
+        String normalize(String str) => str.trim().toLowerCase();
+
+        // Helper to check if attribute names match
+        bool attributeNamesMatch(String name1, String name2) {
+          if (normalize(name1) == normalize(name2)) return true;
+          final taxonomy1 = attributeNameToTaxonomy[name1] ?? '';
+          final taxonomy2 = attributeNameToTaxonomy[name2] ?? '';
+          if (taxonomy1.isNotEmpty &&
+              taxonomy2.isNotEmpty &&
+              normalize(taxonomy1) == normalize(taxonomy2))
+            return true;
+          if (taxonomy2.isNotEmpty && normalize(name1) == normalize(taxonomy2))
+            return true;
+          if (taxonomy1.isNotEmpty && normalize(name2) == normalize(taxonomy1))
+            return true;
+          return false;
+        }
+
+        // Helper to check if values match
+        bool valuesMatch(String value1, String value2) =>
+            normalize(value1) == normalize(value2);
+
+        // Find matching variation by attributes
+        final List<Map<String, dynamic>> variations = [];
+        for (final v in product.variations!) {
+          if (v is Map<String, dynamic>) {
+            variations.add(v);
+          }
+        }
+
+        for (final variationData in variations) {
+          final variationAttrs = variationData['attributes'] as List<dynamic>?;
+          if (variationAttrs == null) continue;
+
+          bool matchesAll = true;
+          for (final entry in selectedAttributes.entries) {
+            final selectedAttrName = entry.key;
+            final selectedAttrValue = entry.value;
+
+            bool foundMatch = false;
+            for (final varAttr in variationAttrs) {
+              if (varAttr is Map<String, dynamic>) {
+                final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+                    .toString();
+                final varAttrValue = (varAttr['value'] ?? '').toString();
+
+                if (attributeNamesMatch(varAttrName, selectedAttrName) &&
+                    valuesMatch(varAttrValue, selectedAttrValue)) {
+                  foundMatch = true;
+                  break;
+                }
+              }
+            }
+
+            if (!foundMatch) {
+              matchesAll = false;
+              break;
+            }
+          }
+
+          if (matchesAll) {
+            // Found matching variation - get its ID
+            final id = variationData['id'];
+            if (id != null) {
+              variationId = int.tryParse(id.toString());
+              debugPrint('🛒 Found matching variation ID: $variationId');
+              break;
+            }
+          }
+        }
+      }
+
+      // If variation ID not found, build variation array from attributes
+      if (variationId == null && selectedAttributes.isNotEmpty) {
+        variation = [];
+        // Build attribute map: name -> taxonomy
+        final Map<String, String> attributeTaxonomyMap = {};
+        if (product.attributes != null) {
           for (final attr in product.attributes!) {
             if (attr is Map<String, dynamic>) {
               final name = (attr['name'] ?? attr['label'] ?? '').toString();
@@ -802,51 +898,46 @@ class ProductDetailViewModel
               }
             }
           }
-
-          // Convert selectedAttributes to variation format
-          for (final entry in selectedAttributes.entries) {
-            final attributeName = entry.key;
-            final attributeValue = entry.value;
-
-            // Find taxonomy for this attribute name
-            String taxonomy =
-                attributeTaxonomyMap[attributeName] ?? attributeName;
-
-            // Ensure taxonomy has 'pa_' prefix if it's a product attribute
-            if (!taxonomy.startsWith('pa_') &&
-                !taxonomy.startsWith('attribute_')) {
-              // Try to find matching taxonomy from product attributes
-              final matchingAttr = product.attributes?.firstWhere((attr) {
-                if (attr is Map<String, dynamic>) {
-                  final name = (attr['name'] ?? attr['label'] ?? '').toString();
-                  return name == attributeName;
-                }
-                return false;
-              }, orElse: () => null);
-
-              if (matchingAttr is Map<String, dynamic>) {
-                taxonomy =
-                    (matchingAttr['taxonomy'] ??
-                            matchingAttr['id'] ??
-                            attributeName)
-                        .toString();
-              } else {
-                // Fallback: use attribute name with pa_ prefix
-                taxonomy =
-                    'pa_${attributeName.toLowerCase().replaceAll(' ', '_')}';
-              }
-            }
-
-            variation.add({'attribute': taxonomy, 'value': attributeValue});
-          }
-
-          debugPrint('🛒 Variation array: $variation');
-        } else {
-          // If no product attributes, use selectedAttributes directly
-          for (final entry in selectedAttributes.entries) {
-            variation.add({'attribute': entry.key, 'value': entry.value});
-          }
         }
+
+        // Convert selectedAttributes to variation format
+        for (final entry in selectedAttributes.entries) {
+          final attributeName = entry.key;
+          final attributeValue = entry.value;
+
+          // Find taxonomy for this attribute name
+          String taxonomy =
+              attributeTaxonomyMap[attributeName] ?? attributeName;
+
+          // Ensure taxonomy has 'pa_' prefix if it's a product attribute
+          if (!taxonomy.startsWith('pa_') &&
+              !taxonomy.startsWith('attribute_')) {
+            // Try to find matching taxonomy from product attributes
+            final matchingAttr = product.attributes?.firstWhere((attr) {
+              if (attr is Map<String, dynamic>) {
+                final name = (attr['name'] ?? attr['label'] ?? '').toString();
+                return name == attributeName;
+              }
+              return false;
+            }, orElse: () => null);
+
+            if (matchingAttr is Map<String, dynamic>) {
+              taxonomy =
+                  (matchingAttr['taxonomy'] ??
+                          matchingAttr['id'] ??
+                          attributeName)
+                      .toString();
+            } else {
+              // Fallback: use attribute name with pa_ prefix
+              taxonomy =
+                  'pa_${attributeName.toLowerCase().replaceAll(' ', '_')}';
+            }
+          }
+
+          variation.add({'attribute': taxonomy, 'value': attributeValue});
+        }
+
+        debugPrint('🛒 Variation array (no ID found): $variation');
       }
 
       // Ensure we have a cart token; if missing, initialize cart first
@@ -866,15 +957,26 @@ class ProductDetailViewModel
       }
 
       // Add item to cart via API (first attempt)
+      // If variation ID found, use it as the id; otherwise use product ID with variation array
+      final itemId = variationId ?? productId;
+      final itemVariation = variationId != null
+          ? null
+          : variation?.cast<dynamic>();
+
+      debugPrint(
+        '🛒 Adding to cart: id=$itemId, variationId=$variationId, variation=$itemVariation',
+      );
+
       var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken ?? '',
         jwtToken: await _getJwtToken(), // Optional JWT token
-        id: productId,
+        id: itemId,
         quantity: quantity,
-        variation: variation?.cast<dynamic>(), // Convert to List<dynamic>
+        variation:
+            itemVariation, // Only send variation array if variation ID not found
       );
 
       debugPrint(
@@ -902,23 +1004,34 @@ class ProductDetailViewModel
             ),
             cartToken: refreshedToken ?? '',
             jwtToken: await _getJwtToken(),
-            id: productId,
+            id: itemId,
             quantity: quantity,
-            variation: variation?.cast<dynamic>(), // Convert to List<dynamic>
+            variation:
+                itemVariation, // Only send variation array if variation ID not found
           );
 
           if (response.errors != null && response.errors!.isNotEmpty) {
+            // Keep current state if it's a loaded state
+            final currentStateForError = state;
             emit(
               ProductDetailErrorState(
                 message: 'Failed to add item: ${response.errors!.first}',
+                previousState: currentStateForError is ProductDetailLoadedState
+                    ? currentStateForError
+                    : null,
               ),
             );
             return;
           }
         } else {
+          // Keep current state if it's a loaded state
+          final currentStateForError = state;
           emit(
             ProductDetailErrorState(
               message: 'Failed to add item: ${response.errors!.first}',
+              previousState: currentStateForError is ProductDetailLoadedState
+                  ? currentStateForError
+                  : null,
             ),
           );
           return;
@@ -969,7 +1082,16 @@ class ProductDetailViewModel
       }
     } catch (e) {
       debugPrint('❌ Failed to add to cart: $e');
-      emit(ProductDetailErrorState(message: 'Failed to add to cart: $e'));
+      // Keep current state if it's a loaded state
+      final currentStateForError = state;
+      emit(
+        ProductDetailErrorState(
+          message: 'Failed to add to cart: $e',
+          previousState: currentStateForError is ProductDetailLoadedState
+              ? currentStateForError
+              : null,
+        ),
+      );
     }
   }
 
