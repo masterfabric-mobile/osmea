@@ -305,7 +305,9 @@ class ProductListFiltersWidget extends StatelessWidget {
             }
 
             // Pass null if empty, otherwise pass the sanitized value
-            onChanged(sanitized.isEmpty ? null : sanitized);
+            final finalValue = sanitized.isEmpty ? null : sanitized;
+            debugPrint('🔍 Price input changed - Label: $label, Raw: $value, Sanitized: $sanitized, Final: $finalValue');
+            onChanged(finalValue);
           },
         ),
       ],

@@ -133,7 +133,8 @@ class ProductListViewModel
   // Pagination
   int _currentPage = 1;
   int _totalPages = 1;
-  final int _perPage = 20;
+  // Increase per_page when using client-side filtering to get more products for filtering
+  final int _perPage = 50; // Increased from default to accommodate client-side filtering
   List<ListAllProductsResponseModel> _allProducts = [];
 
   @override
@@ -170,8 +171,8 @@ class ProductListViewModel
       debugPrint('🔍 ProductListViewModel: Loading products with filters:');
       debugPrint('  - API Version: $apiVersion');
       debugPrint('  - Page: $_currentPage, Per Page: $_perPage');
-      debugPrint('  - Min Price: $minPrice');
-      debugPrint('  - Max Price: $maxPrice');
+      debugPrint('  - Min Price: $minPrice (raw: ${_filters.minPrice})');
+      debugPrint('  - Max Price: $maxPrice (raw: ${_filters.maxPrice})');
       debugPrint('  - On Sale: ${_filters.onSale}');
       debugPrint('  - Stock Status: ${_filters.stockStatus}');
       debugPrint('  - Category: ${_filters.category}');
@@ -189,8 +190,10 @@ class ProductListViewModel
         category: _filters.category,
         tag: _filters.tag,
         onSale: _filters.onSale,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
+        // Note: Store API v1 doesn't reliably support min_price/max_price filtering
+        // We'll implement client-side price filtering below
+        minPrice: null, // Disable server-side price filtering
+        maxPrice: null, // Disable server-side price filtering
         stockStatus: _filters.stockStatus,
         orderBy: _filters.orderBy,
         order: _filters.order,
@@ -198,20 +201,108 @@ class ProductListViewModel
       );
 
       debugPrint('✅ ProductListViewModel: Loaded ${products.length} products');
+      
+      // Debug: Log first 3 product prices to understand format
       if (products.isNotEmpty) {
-        debugPrint('✅ First product: ${products.first.name} (ID: ${products.first.id})');
+        debugPrint('🔍 Sample product prices from API:');
+        for (int i = 0; i < products.length && i < 3; i++) {
+          final product = products[i];
+          if (product.prices != null) {
+            debugPrint('  Product ${i + 1}: ${product.name}');
+            debugPrint('    - price: "${product.prices!.price}"');
+            debugPrint('    - regular_price: "${product.prices!.regularPrice}"');
+            debugPrint('    - sale_price: "${product.prices!.salePrice}"');
+            debugPrint('    - currency_code: "${product.prices!.currencyCode}"');
+            debugPrint('    - currency_symbol: "${product.prices!.currencySymbol}"');
+            debugPrint('    - currency_minor_unit: ${product.prices!.currencyMinorUnit}');
+          }
+        }
+      }
+      
+      // Client-side price filtering (since Store API v1 doesn't support it reliably)
+      List<ListAllProductsResponseModel> filteredProducts = products;
+      if (minPrice != null || maxPrice != null) {
+        final minPriceValue = minPrice != null ? double.tryParse(minPrice) : null;
+        final maxPriceValue = maxPrice != null ? double.tryParse(maxPrice) : null;
+        
+        debugPrint('🔍 Applying client-side price filtering:');
+        debugPrint('  - Min Price: $minPrice (parsed: $minPriceValue)');
+        debugPrint('  - Max Price: $maxPrice (parsed: $maxPriceValue)');
+        
+        filteredProducts = products.where((product) {
+          if (product.prices == null) {
+            debugPrint('  ❌ Product ${product.name} has no prices');
+            return false;
+          }
+          
+          // Get the current price (could be sale price or regular price)
+          final priceString = product.prices!.price;
+          if (priceString == null || priceString.isEmpty) {
+            debugPrint('  ❌ Product ${product.name} has empty price string');
+            return false;
+          }
+          
+          // Parse price (remove currency symbols and convert to double)
+          final priceValue = _parsePrice(priceString, currencyMinorUnit: product.prices!.currencyMinorUnit);
+          if (priceValue == null) {
+            debugPrint('  ❌ Product ${product.name} price parsing failed: $priceString');
+            return false;
+          }
+          
+          debugPrint('  🔍 Product ${product.name}: price=$priceString -> $priceValue');
+          
+          // Check min price
+          if (minPriceValue != null && priceValue < minPriceValue) {
+            debugPrint('    ❌ Below min price: $priceValue < $minPriceValue');
+            return false;
+          }
+          
+          // Check max price
+          if (maxPriceValue != null && priceValue > maxPriceValue) {
+            debugPrint('    ❌ Above max price: $priceValue > $maxPriceValue');
+            return false;
+          }
+          
+          debugPrint('    ✅ Price in range: $priceValue');
+          return true;
+        }).toList();
+        
+        debugPrint('🔍 Client-side filtering result: ${products.length} -> ${filteredProducts.length} products');
+      }
+      
+      if (filteredProducts.isNotEmpty) {
+        debugPrint('✅ First product: ${filteredProducts.first.name} (ID: ${filteredProducts.first.id})');
+        if (filteredProducts.first.prices != null) {
+          debugPrint('✅ First product price: ${filteredProducts.first.prices!.price}');
+          debugPrint('✅ First product regular price: ${filteredProducts.first.prices!.regularPrice}');
+          debugPrint('✅ First product sale price: ${filteredProducts.first.prices!.salePrice}');
+        }
+        // Log all product prices if filtering by price
+        if (minPrice != null || maxPrice != null) {
+          debugPrint('🔍 Price filtering active - checking filtered products:');
+          for (int i = 0; i < filteredProducts.length && i < 5; i++) {
+            final product = filteredProducts[i];
+            if (product.prices != null) {
+              final priceValue = _parsePrice(product.prices!.price, currencyMinorUnit: product.prices!.currencyMinorUnit);
+              debugPrint('  - ${product.name}: price=${product.prices!.price} (parsed: $priceValue)');
+            }
+          }
+        }
       } else {
-        debugPrint('⚠️ ProductListViewModel: No products returned from API');
+        debugPrint('⚠️ ProductListViewModel: No products after filtering');
+        if (minPrice != null || maxPrice != null) {
+          debugPrint('⚠️ This might indicate that no products match the price range: $minPrice - $maxPrice');
+        }
       }
 
       if (refresh || _currentPage == 1) {
-        _allProducts = products;
+        _allProducts = filteredProducts;
       } else {
-        _allProducts.addAll(products);
+        _allProducts.addAll(filteredProducts);
       }
 
       // Calculate total pages (assuming we have at least 1 page if products exist)
-      _totalPages = products.length < _perPage
+      _totalPages = filteredProducts.length < _perPage
           ? _currentPage
           : _currentPage + 1; // Estimate, API doesn't always return total
 
@@ -303,6 +394,63 @@ class ProductListViewModel
     }
   }
 
+  /// Parse price string to double value (handles WooCommerce API format)
+  double? _parsePrice(String? priceString, {int? currencyMinorUnit}) {
+    if (priceString == null || priceString.isEmpty) return null;
+    
+    debugPrint('🔍 Parsing price: $priceString (minor_unit: $currencyMinorUnit)');
+    
+    // WooCommerce API sometimes returns prices in minor units (cents)
+    // Use currency_minor_unit to determine the conversion factor
+    final intValue = int.tryParse(priceString);
+    if (intValue != null && currencyMinorUnit != null && currencyMinorUnit > 0) {
+      // This is likely in minor units, convert to major units
+      double divisor = 1.0;
+      for (int i = 0; i < currencyMinorUnit; i++) {
+        divisor *= 10.0;
+      }
+      final doubleValue = intValue / divisor;
+      debugPrint('🔍 Parsed as minor units: $intValue -> $doubleValue (divisor: $divisor)');
+      return doubleValue;
+    } else if (intValue != null) {
+      // Default to cents conversion if no minor unit info
+      final doubleValue = intValue / 100.0;
+      debugPrint('🔍 Parsed as cents (default): $intValue -> $doubleValue');
+      return doubleValue;
+    }
+    
+    // If not integer, try parsing as decimal string
+    // Remove all non-numeric characters except decimal point
+    String cleaned = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
+    
+    // Handle thousand separators (commas) vs decimal separators
+    if (cleaned.contains(',') && cleaned.contains('.')) {
+      // Both comma and dot present - comma is likely thousand separator
+      cleaned = cleaned.replaceAll(',', '');
+    } else if (cleaned.contains(',') && !cleaned.contains('.')) {
+      // Only comma - could be decimal separator (European format)
+      final commaIndex = cleaned.lastIndexOf(',');
+      if (commaIndex >= cleaned.length - 3) {
+        // Comma is near the end, treat as decimal separator
+        cleaned = cleaned.replaceAll(',', '.');
+      } else {
+        // Comma is not near the end, treat as thousand separator
+        cleaned = cleaned.replaceAll(',', '');
+      }
+    }
+    
+    // Ensure only one decimal point
+    final parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = '${parts[0]}.${parts.sublist(1).join()}';
+    }
+    
+    // Parse to double
+    final result = double.tryParse(cleaned);
+    debugPrint('🔍 Parsed as decimal: $cleaned -> $result');
+    return result;
+  }
+
   /// Clean price string for API - removes currency symbols, thousand separators, keeps only numeric value
   String? _cleanPriceForApi(String? priceString) {
     if (priceString == null || priceString.isEmpty) return null;
@@ -339,6 +487,12 @@ class ProductListViewModel
     final parsed = double.tryParse(cleaned);
     if (parsed == null || parsed < 0) return null;
     
+    // WooCommerce Store API might expect price in cents (integer)
+    // Try converting to cents first, then back to string
+    final priceInCents = (parsed * 100).round();
+    debugPrint('🔍 Price conversion: $priceString -> $cleaned -> $parsed -> ${priceInCents}c');
+    
+    // Return the price as string (WooCommerce Store API typically expects string format)
     return cleaned;
   }
 
