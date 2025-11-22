@@ -28,6 +28,7 @@ class ProductDetailLoadedState extends ProductDetailState {
   final bool isDescriptionExpanded;
   final Map<String, String> selectedAttributes;
   final List<ListProductReviewsResponseModel> reviews;
+  final Set<String> highlightedAttributes; // Attributes to highlight in red
 
   ProductDetailLoadedState({
     required this.product,
@@ -39,6 +40,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     this.isDescriptionExpanded = false,
     this.selectedAttributes = const {},
     this.reviews = const [],
+    this.highlightedAttributes = const {},
   });
 
   ProductDetailLoadedState copyWith({
@@ -51,6 +53,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     bool? isDescriptionExpanded,
     Map<String, String>? selectedAttributes,
     List<ListProductReviewsResponseModel>? reviews,
+    Set<String>? highlightedAttributes,
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
@@ -63,6 +66,7 @@ class ProductDetailLoadedState extends ProductDetailState {
           isDescriptionExpanded ?? this.isDescriptionExpanded,
       selectedAttributes: selectedAttributes ?? this.selectedAttributes,
       reviews: reviews ?? this.reviews,
+      highlightedAttributes: highlightedAttributes ?? this.highlightedAttributes,
     );
   }
 }

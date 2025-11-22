@@ -9,6 +9,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/freezed_model/response/list_product_attribute_terms_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
@@ -78,10 +79,14 @@ class ProductDetailViewModel
       if (currentState is WishlistInitialState ||
           (currentState is WishlistLoadedState && currentState.items.isEmpty)) {
         await wishlistViewModel.initial();
-        debugPrint('✅ ProductDetailViewModel: Wishlist initialized with ${wishlistViewModel.count} items');
+        debugPrint(
+          '✅ ProductDetailViewModel: Wishlist initialized with ${wishlistViewModel.count} items',
+        );
       }
     } catch (e) {
-      debugPrint('⚠️ ProductDetailViewModel: Failed to initialize wishlist: $e');
+      debugPrint(
+        '⚠️ ProductDetailViewModel: Failed to initialize wishlist: $e',
+      );
     }
     // Load product after wishlist is ready
     await loadProduct(productId);
@@ -100,7 +105,6 @@ class ProductDetailViewModel
     // ignore: discarded_futures
     loadProduct(productId);
   }
-
 
   // ----------------------------------------------------------------------------
   // Cart Operations
@@ -146,7 +150,9 @@ class ProductDetailViewModel
         emit(currentState.copyWith(isInWishlist: isInWishlist));
       }
     } catch (e) {
-      debugPrint('❌ ProductDetailViewModel: Failed to update wishlist status: $e');
+      debugPrint(
+        '❌ ProductDetailViewModel: Failed to update wishlist status: $e',
+      );
     }
   }
 
@@ -225,17 +231,163 @@ class ProductDetailViewModel
   // Attribute Selection (e.g., Color, Size)
   // ----------------------------------------------------------------------------
 
-  /// Sets a selected attribute value, e.g. setSelectedAttribute('Color','Red')
-  Future<void> setSelectedAttribute(String name, String value) async =>
-      Future.microtask(() {
-        final currentState = state;
-        if (currentState is ProductDetailLoadedState) {
-          final updated = Map<String, String>.from(
-            currentState.selectedAttributes,
-          )..[name] = value;
-          emit(currentState.copyWith(selectedAttributes: updated));
+  /// Gets available attribute options based on selected attributes and variations
+  /// This filters options to only show those that are available with current selections
+  Map<String, List<String>> _getAvailableAttributeOptions(
+    RetrieveProductResponseModel product,
+    Map<String, String> selectedAttributes,
+  ) {
+    final Map<String, List<String>> availableOptions = {};
+
+    // If no variations, return empty map (no filtering needed)
+    if (product.variations == null || product.variations!.isEmpty) {
+      return availableOptions;
+    }
+
+    // Parse variations
+    final List<Map<String, dynamic>> variations = [];
+    for (final variation in product.variations!) {
+      if (variation is Map<String, dynamic>) {
+        variations.add(variation);
+      }
+    }
+
+    // If no valid variations, return empty map
+    if (variations.isEmpty) {
+      return availableOptions;
+    }
+
+    // Get all attribute names from product attributes
+    final Map<String, String> attributeNameMap = {}; // name -> taxonomy
+    if (product.attributes != null) {
+      for (final attr in product.attributes!) {
+        if (attr is Map<String, dynamic>) {
+          final name = (attr['name'] ?? attr['label'] ?? '').toString();
+          final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '').toString();
+          if (name.isNotEmpty) {
+            attributeNameMap[name] = taxonomy.isNotEmpty ? taxonomy : name;
+          }
         }
-      });
+      }
+    }
+
+    // Find variations that match selected attributes
+    final List<Map<String, dynamic>> matchingVariations = [];
+    for (final variation in variations) {
+      bool matches = true;
+
+      // Check if variation matches all selected attributes
+      for (final entry in selectedAttributes.entries) {
+        final selectedAttrName = entry.key;
+        final selectedAttrValue = entry.value;
+
+        // Get variation attributes
+        final variationAttrs = variation['attributes'] as List<dynamic>?;
+        if (variationAttrs == null) continue;
+
+        bool foundMatch = false;
+        for (final varAttr in variationAttrs) {
+          if (varAttr is Map<String, dynamic>) {
+            final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+                .toString();
+            final varAttrValue = (varAttr['value'] ?? '').toString();
+
+            // Match by name or taxonomy
+            if ((varAttrName == selectedAttrName ||
+                    varAttrName == attributeNameMap[selectedAttrName]) &&
+                varAttrValue == selectedAttrValue) {
+              foundMatch = true;
+              break;
+            }
+          }
+        }
+
+        if (!foundMatch) {
+          matches = false;
+          break;
+        }
+      }
+
+      if (matches) {
+        matchingVariations.add(variation);
+      }
+    }
+
+    // Extract available options for each attribute from matching variations
+    for (final variation in matchingVariations) {
+      final variationAttrs = variation['attributes'] as List<dynamic>?;
+      if (variationAttrs == null) continue;
+
+      for (final varAttr in variationAttrs) {
+        if (varAttr is Map<String, dynamic>) {
+          final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+              .toString();
+          final varAttrValue = (varAttr['value'] ?? '').toString();
+
+          if (varAttrName.isEmpty || varAttrValue.isEmpty) continue;
+
+          // Find the attribute name (might be taxonomy, need to find display name)
+          String displayName = varAttrName;
+          for (final entry in attributeNameMap.entries) {
+            if (entry.value == varAttrName || entry.key == varAttrName) {
+              displayName = entry.key;
+              break;
+            }
+          }
+
+          // Add to available options if not already selected
+          if (!selectedAttributes.containsKey(displayName) ||
+              selectedAttributes[displayName] != varAttrValue) {
+            availableOptions
+                .putIfAbsent(displayName, () => [])
+                .add(varAttrValue);
+          }
+        }
+      }
+    }
+
+    // Remove duplicates and sort
+    for (final key in availableOptions.keys) {
+      availableOptions[key] = availableOptions[key]!.toSet().toList()..sort();
+    }
+
+    return availableOptions;
+  }
+
+  /// Sets a selected attribute value, e.g. setSelectedAttribute('Color','Red')
+  /// Automatically filters available options for other attributes based on variations
+  Future<void> setSelectedAttribute(
+    String name,
+    String value,
+  ) async => Future.microtask(() {
+    final currentState = state;
+    if (currentState is ProductDetailLoadedState) {
+      final updated = Map<String, String>.from(currentState.selectedAttributes)
+        ..[name] = value;
+
+      // Get available options based on new selection
+      final availableOptions = _getAvailableAttributeOptions(
+        currentState.product,
+        updated,
+      );
+
+      // If selecting this attribute makes other attributes invalid, clear them
+      // Check if any selected attribute is no longer available
+      final Map<String, String> cleanedAttributes = Map.from(updated);
+      for (final entry in updated.entries) {
+        if (entry.key != name) {
+          // Check if this attribute value is still available
+          final available = availableOptions[entry.key];
+          if (available != null && !available.contains(entry.value)) {
+            // This attribute value is no longer valid, clear it
+            cleanedAttributes.remove(entry.key);
+          }
+        }
+      }
+
+      emit(currentState.copyWith(selectedAttributes: cleanedAttributes));
+    }
+  });
 
   /// Clears a selected attribute
   Future<void> clearSelectedAttribute(String name) async =>
@@ -255,8 +407,7 @@ class ProductDetailViewModel
 
   /// Loads attribute terms for a specific attribute ID
   /// Returns list of attribute terms (e.g., color options, size options)
-  Future<List<ListProductAttributeTermsResponseModel>>
-      loadAttributeTerms({
+  Future<List<ListProductAttributeTermsResponseModel>> loadAttributeTerms({
     required int attributeId,
     String apiVersion = 'v1',
     int? page,
@@ -264,9 +415,7 @@ class ProductDetailViewModel
     String? search,
   }) async {
     try {
-      debugPrint(
-        '🔄 Loading attribute terms for attribute ID: $attributeId',
-      );
+      debugPrint('🔄 Loading attribute terms for attribute ID: $attributeId');
       final terms = await _attributeTermsService.listProductAttributeTerms(
         apiVersion: apiVersion,
         attributeId: attributeId,
@@ -319,9 +468,7 @@ class ProductDetailViewModel
         attributeId: attributeId,
         termId: termId,
       );
-      debugPrint(
-        '✅ Retrieved attribute term: ${term.name} (ID: ${term.id})',
-      );
+      debugPrint('✅ Retrieved attribute term: ${term.name} (ID: ${term.id})');
       return term;
     } catch (e) {
       debugPrint(
@@ -363,9 +510,7 @@ class ProductDetailViewModel
         orderby: orderby,
         hideEmpty: hideEmpty,
       );
-      debugPrint(
-        '✅ Loaded ${attributes.length} product attributes',
-      );
+      debugPrint('✅ Loaded ${attributes.length} product attributes');
       return attributes;
     } catch (e) {
       debugPrint('❌ Error loading product attributes: $e');
@@ -407,9 +552,7 @@ class ProductDetailViewModel
     String apiVersion = 'v1',
   }) async {
     try {
-      debugPrint(
-        '🔄 Retrieving product attribute ID: $attributeId',
-      );
+      debugPrint('🔄 Retrieving product attribute ID: $attributeId');
       final attribute = await _attributesService.retrieveProductAttribute(
         apiVersion: apiVersion,
         attributeId: attributeId,
@@ -419,9 +562,7 @@ class ProductDetailViewModel
       );
       return attribute;
     } catch (e) {
-      debugPrint(
-        '❌ Error retrieving product attribute $attributeId: $e',
-      );
+      debugPrint('❌ Error retrieving product attribute $attributeId: $e');
       rethrow;
     }
   }
@@ -508,13 +649,15 @@ class ProductDetailViewModel
       try {
         final wishlistViewModel = GetIt.I<WishlistViewModel>();
         final wishlistState = wishlistViewModel.state;
-        
+
         // If wishlist is not loaded yet, try to sync first
         if (wishlistState is! WishlistLoadedState) {
-          debugPrint('💖 ProductDetailViewModel: Wishlist not loaded, syncing...');
+          debugPrint(
+            '💖 ProductDetailViewModel: Wishlist not loaded, syncing...',
+          );
           await wishlistViewModel.initial();
         }
-        
+
         // Now check if product is saved
         isInWishlist = wishlistViewModel.isSaved(productId);
         debugPrint(
@@ -535,7 +678,9 @@ class ProductDetailViewModel
           perPage: 50,
           status: 'approved', // Only show approved reviews
         );
-        debugPrint('✅ Loaded ${reviews.length} reviews for product ID: $productId');
+        debugPrint(
+          '✅ Loaded ${reviews.length} reviews for product ID: $productId',
+        );
       } catch (e) {
         debugPrint('⚠️ Failed to load product reviews: $e');
         // Continue without reviews - not fatal
@@ -566,10 +711,75 @@ class ProductDetailViewModel
 
       // Get current state to check for selected attributes
       final currentState = state;
-      Map<String, String> selectedAttributes = {};
-      if (currentState is ProductDetailLoadedState) {
-        selectedAttributes = currentState.selectedAttributes;
-        debugPrint('🛒 Selected attributes: $selectedAttributes');
+      if (currentState is! ProductDetailLoadedState) {
+        debugPrint('❌ Invalid state for adding to cart');
+        return;
+      }
+
+      final product = currentState.product;
+      Map<String, String> selectedAttributes = currentState.selectedAttributes;
+      debugPrint('🛒 Selected attributes: $selectedAttributes');
+
+      // Validate that all required attributes are selected
+      if (product.attributes != null && product.attributes!.isNotEmpty) {
+        // Get all attribute names that have options
+        final Set<String> requiredAttributes = {};
+        for (final attr in product.attributes!) {
+          if (attr is Map<String, dynamic>) {
+            final name = (attr['name'] ?? attr['label'] ?? '').toString();
+            List<String> options = [];
+            final rawOptions = attr['options'];
+            final rawTerms = attr['terms'];
+
+            if (rawOptions is List && rawOptions.isNotEmpty) {
+              options = rawOptions.map((e) => e.toString()).toList();
+            } else if (rawTerms is List && rawTerms.isNotEmpty) {
+              options = rawTerms
+                  .map(
+                    (e) => e is Map
+                        ? (e['name'] ?? e['value'] ?? '').toString()
+                        : e.toString(),
+                  )
+                  .where((e) => e.isNotEmpty)
+                  .toList();
+            }
+
+            // If attribute has options, it's required
+            if (options.isNotEmpty) {
+              requiredAttributes.add(name);
+            }
+          }
+        }
+
+        // Check which attributes are missing
+        final Set<String> missingAttributes = requiredAttributes
+            .where(
+              (attr) =>
+                  !selectedAttributes.containsKey(attr) ||
+                  selectedAttributes[attr] == null ||
+                  selectedAttributes[attr]!.isEmpty,
+            )
+            .toSet();
+
+        // If there are missing attributes, show snackbar and highlight them
+        if (missingAttributes.isNotEmpty) {
+          debugPrint('❌ Missing required attributes: $missingAttributes');
+
+          // Emit state with highlighted attributes
+          emit(currentState.copyWith(highlightedAttributes: missingAttributes));
+
+          // Reset highlighting after 2 seconds
+          Future.delayed(const Duration(seconds: 2), () {
+            final currentStateAfterDelay = state;
+            if (currentStateAfterDelay is ProductDetailLoadedState) {
+              emit(currentStateAfterDelay.copyWith(highlightedAttributes: {}));
+            }
+          });
+
+          // Return early - don't make API call
+          // The snackbar will be shown in the view layer
+          return;
+        }
       }
 
       // Build variation array from selectedAttributes if product has attributes
@@ -577,14 +787,12 @@ class ProductDetailViewModel
       if (selectedAttributes.isNotEmpty) {
         variation = [];
         // Get product attributes to find taxonomy names
-        final product = currentState is ProductDetailLoadedState
-            ? currentState.product
-            : null;
+        // currentState is already confirmed to be ProductDetailLoadedState above
 
-        if (product?.attributes != null) {
+        if (product.attributes != null) {
           // Build attribute map: name -> taxonomy
           final Map<String, String> attributeTaxonomyMap = {};
-          for (final attr in product!.attributes!) {
+          for (final attr in product.attributes!) {
             if (attr is Map<String, dynamic>) {
               final name = (attr['name'] ?? attr['label'] ?? '').toString();
               final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '')

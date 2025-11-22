@@ -10,7 +10,8 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart' as product_models;
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart'
+    as product_models;
 import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
@@ -180,6 +181,86 @@ class ProductDetailContentWidget extends StatelessWidget {
                     },
                     isInCart: state.isInCart,
                     onAddToCart: () async {
+                      // Check if all required attributes are selected before adding
+                      final product = state.product;
+                      if (product.attributes != null &&
+                          product.attributes!.isNotEmpty) {
+                        final Set<String> requiredAttributes = {};
+                        for (final attr in product.attributes!) {
+                          if (attr is Map<String, dynamic>) {
+                            final name = (attr['name'] ?? attr['label'] ?? '')
+                                .toString();
+                            List<String> options = [];
+                            final rawOptions = attr['options'];
+                            final rawTerms = attr['terms'];
+
+                            if (rawOptions is List && rawOptions.isNotEmpty) {
+                              options = rawOptions
+                                  .map((e) => e.toString())
+                                  .toList();
+                            } else if (rawTerms is List &&
+                                rawTerms.isNotEmpty) {
+                              options = rawTerms
+                                  .map(
+                                    (e) => e is Map
+                                        ? (e['name'] ?? e['value'] ?? '')
+                                              .toString()
+                                        : e.toString(),
+                                  )
+                                  .where((e) => e.isNotEmpty)
+                                  .toList();
+                            }
+
+                            if (options.isNotEmpty) {
+                              requiredAttributes.add(name);
+                            }
+                          }
+                        }
+
+                        final Set<String> missingAttributes = requiredAttributes
+                            .where(
+                              (attr) =>
+                                  !state.selectedAttributes.containsKey(attr) ||
+                                  state.selectedAttributes[attr] == null ||
+                                  state.selectedAttributes[attr]!.isEmpty,
+                            )
+                            .toSet();
+
+                        if (missingAttributes.isNotEmpty) {
+                          // Show snackbar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Lütfen tüm seçenekleri seçin'),
+                              backgroundColor: OsmeaColors.red,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+
+                          // Highlight missing attributes
+                          final currentState = viewModel.state;
+                          if (currentState is ProductDetailLoadedState) {
+                            viewModel.stateChanger(
+                              currentState.copyWith(
+                                highlightedAttributes: missingAttributes,
+                              ),
+                            );
+
+                            // Reset highlighting after 2 seconds
+                            Future.delayed(const Duration(seconds: 2), () {
+                              final stateAfterDelay = viewModel.state;
+                              if (stateAfterDelay is ProductDetailLoadedState) {
+                                viewModel.stateChanger(
+                                  stateAfterDelay.copyWith(
+                                    highlightedAttributes: {},
+                                  ),
+                                );
+                              }
+                            });
+                          }
+                          return;
+                        }
+                      }
+
                       // Add product to cart
                       await viewModel.addProductToCart(
                         state.product.id ?? 0,
@@ -239,13 +320,15 @@ class ProductDetailContentWidget extends StatelessWidget {
 
     // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
     // Use API-provided separators and minor_unit to correctly parse the price format
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString!,
-      currencyCode: prices.currencyCode,
-      currencyDecimalSeparator: prices.currencyDecimalSeparator,
-      currencyThousandSeparator: prices.currencyThousandSeparator,
-      currencyMinorUnit: prices.currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString!,
+          currencyCode: prices.currencyCode,
+          currencyDecimalSeparator: prices.currencyDecimalSeparator,
+          currencyThousandSeparator: prices.currencyThousandSeparator,
+          currencyMinorUnit: prices.currencyMinorUnit,
+        ) ??
+        0.0;
 
     // Use PriceInfoCurrencyHelper for proper formatting
     // Use API-provided separators to correctly format the price
@@ -434,30 +517,194 @@ class ProductDetailContentWidget extends StatelessWidget {
             spacing: context.spacing8,
             runSpacing: context.spacing8,
             children: [
-              for (final opt in (attr['options'] as List<String>))
-                ChoiceChip(
-                  label: Text(opt),
-                  selected:
-                      state.selectedAttributes[(attr['name'] as String?)] ==
+              for (final opt in (attr['options'] as List<String>)) ...[
+                Builder(
+                  builder: (context) {
+                    final attrName = (attr['name'] as String?) ?? '';
+                    final isSelected =
+                        state.selectedAttributes[attrName] == opt;
+                    final isHighlighted =
+                        state.highlightedAttributes.contains(attrName) &&
+                        !isSelected;
+
+                    // Check if this option is available based on other selected attributes
+                    final isAvailable = _isOptionAvailable(
+                      attrName,
                       opt,
-                  onSelected: (_) => viewModel.setSelectedAttribute(
-                    (attr['name'] as String?) ?? '',
-                    opt,
-                  ),
-                  selectedColor: OsmeaColors.nordicBlue.withValues(alpha: 0.12),
-                  shape: StadiumBorder(
-                    side: BorderSide(
-                      color: OsmeaColors.silver.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  labelStyle: OsmeaTextStyle.bodySmall(context),
+                      state.product,
+                      state.selectedAttributes,
+                    );
+
+                    // Determine border color - red if highlighted, otherwise normal
+                    final borderColor = isHighlighted
+                        ? OsmeaColors.red
+                        : (isSelected
+                              ? OsmeaColors.nordicBlue
+                              : (isAvailable
+                                    ? OsmeaColors.silver.withValues(alpha: 0.4)
+                                    : OsmeaColors.grayMaterial[300]!));
+
+                    // Determine background color - red tint if highlighted
+                    final backgroundColor = isHighlighted
+                        ? OsmeaColors.red.withValues(alpha: 0.1)
+                        : (isSelected
+                              ? OsmeaColors.nordicBlue.withValues(alpha: 0.12)
+                              : Colors.transparent);
+
+                    return ChoiceChip(
+                      label: Text(opt),
+                      selected: isSelected,
+                      onSelected: isAvailable
+                          ? (_) {
+                              // If already selected, clear the selection; otherwise set it
+                              if (isSelected) {
+                                viewModel.clearSelectedAttribute(attrName);
+                              } else {
+                                viewModel.setSelectedAttribute(attrName, opt);
+                              }
+                            }
+                          : null,
+                      selectedColor: OsmeaColors.nordicBlue.withValues(
+                        alpha: 0.12,
+                      ),
+                      backgroundColor: backgroundColor,
+                      disabledColor: OsmeaColors.grayMaterial[100],
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: borderColor,
+                          width: isHighlighted ? 2.0 : 1.0,
+                        ),
+                      ),
+                      labelStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        color: isHighlighted
+                            ? OsmeaColors.red
+                            : (isAvailable
+                                  ? OsmeaColors.thunder
+                                  : OsmeaColors.pewter.withValues(alpha: 0.5)),
+                        fontWeight: isHighlighted
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    );
+                  },
                 ),
+              ],
             ],
           ),
           OsmeaComponents.sizedBox(height: context.spacing16),
         ],
       ],
     );
+  }
+
+  /// Checks if an attribute option is available based on selected attributes and variations
+  /// All attributes (including color) are filtered the same way based on variations
+  bool _isOptionAvailable(
+    String attributeName,
+    String optionValue,
+    product_models.RetrieveProductResponseModel product,
+    Map<String, String> selectedAttributes,
+  ) {
+    // If no variations, all options are available
+    if (product.variations == null || product.variations!.isEmpty) {
+      return true;
+    }
+
+    // Parse variations
+    final List<Map<String, dynamic>> variations = [];
+    for (final variation in product.variations!) {
+      if (variation is Map<String, dynamic>) {
+        variations.add(variation);
+      }
+    }
+
+    if (variations.isEmpty) {
+      return true;
+    }
+
+    // Get attribute name to taxonomy mapping
+    final Map<String, String> attributeNameMap = {};
+    if (product.attributes != null) {
+      for (final attr in product.attributes!) {
+        if (attr is Map<String, dynamic>) {
+          final name = (attr['name'] ?? attr['label'] ?? '').toString();
+          final taxonomy = (attr['taxonomy'] ?? attr['id'] ?? '').toString();
+          if (name.isNotEmpty) {
+            attributeNameMap[name] = taxonomy.isNotEmpty ? taxonomy : name;
+          }
+        }
+      }
+    }
+
+    // Create a test selection WITH the attribute being checked included
+    // This ensures all attributes (including color) are filtered consistently
+    final testSelection = Map<String, String>.from(selectedAttributes);
+    testSelection[attributeName] = optionValue;
+
+    // If no attributes are selected yet, check if this option exists in any variation
+    if (selectedAttributes.isEmpty) {
+      for (final variation in variations) {
+        final variationAttrs = variation['attributes'] as List<dynamic>?;
+        if (variationAttrs == null) continue;
+
+        for (final varAttr in variationAttrs) {
+          if (varAttr is Map<String, dynamic>) {
+            final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+                .toString();
+            final varAttrValue = (varAttr['value'] ?? '').toString();
+
+            // Check if this variation has the option value for the attribute being checked
+            if ((varAttrName == attributeName ||
+                    varAttrName == attributeNameMap[attributeName]) &&
+                varAttrValue == optionValue) {
+              return true; // Found a variation with this option
+            }
+          }
+        }
+      }
+      return false; // No variation found with this option
+    }
+
+    // Check if any variation matches the complete test selection (including the attribute being checked)
+    for (final variation in variations) {
+      final variationAttrs = variation['attributes'] as List<dynamic>?;
+      if (variationAttrs == null) continue;
+
+      // Check if variation matches all selected attributes including the one being checked
+      bool matchesAllAttributes = true;
+      for (final entry in testSelection.entries) {
+        final selectedAttrName = entry.key;
+        final selectedAttrValue = entry.value;
+
+        bool foundMatch = false;
+        for (final varAttr in variationAttrs) {
+          if (varAttr is Map<String, dynamic>) {
+            final varAttrName = (varAttr['name'] ?? varAttr['id'] ?? '')
+                .toString();
+            final varAttrValue = (varAttr['value'] ?? '').toString();
+
+            // Match by name or taxonomy
+            if ((varAttrName == selectedAttrName ||
+                    varAttrName == attributeNameMap[selectedAttrName]) &&
+                varAttrValue == selectedAttrValue) {
+              foundMatch = true;
+              break;
+            }
+          }
+        }
+
+        if (!foundMatch) {
+          matchesAllAttributes = false;
+          break;
+        }
+      }
+
+      if (matchesAllAttributes) {
+        return true; // Found a matching variation
+      }
+    }
+
+    return false; // No matching variation found
   }
 
   /// Builds reviews section
@@ -501,10 +748,7 @@ class ProductDetailContentWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: OsmeaColors.grayMaterial[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: OsmeaColors.grayMaterial[200]!,
-          width: 1,
-        ),
+        border: Border.all(color: OsmeaColors.grayMaterial[200]!, width: 1),
       ),
       child: OsmeaComponents.center(
         child: OsmeaComponents.column(
@@ -528,9 +772,9 @@ class ProductDetailContentWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(height: context.spacing4),
             OsmeaComponents.text(
               'No reviews have been made for this product yet.',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.pewter,
-              ),
+              textStyle: OsmeaTextStyle.bodySmall(
+                context,
+              ).copyWith(color: OsmeaColors.pewter),
               textAlign: TextAlign.center,
             ),
           ],
@@ -550,10 +794,7 @@ class ProductDetailContentWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: OsmeaColors.grayMaterial[200]!,
-          width: 1,
-        ),
+        border: Border.all(color: OsmeaColors.grayMaterial[200]!, width: 1),
       ),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -630,9 +871,9 @@ class ProductDetailContentWidget extends StatelessWidget {
                           OsmeaComponents.sizedBox(width: 8),
                           OsmeaComponents.text(
                             '${review.rating}/5',
-                            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                              color: OsmeaColors.pewter,
-                            ),
+                            textStyle: OsmeaTextStyle.bodySmall(
+                              context,
+                            ).copyWith(color: OsmeaColors.pewter),
                           ),
                         ],
                       ),
@@ -677,9 +918,9 @@ class ProductDetailContentWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
               review.formattedDateCreated ?? review.dateCreated ?? '',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.pewter,
-              ),
+              textStyle: OsmeaTextStyle.bodySmall(
+                context,
+              ).copyWith(color: OsmeaColors.pewter),
             ),
           ],
         ],
