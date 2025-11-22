@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/search/cubit/search_state.dart';
 
@@ -12,6 +13,7 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
   SearchCubit({
     this.maxHistoryItems = 10,
     this.minQueryLength = 2,
+    this.debounceDuration = const Duration(milliseconds: 500),
     List<String> initialHistory = const [],
   }) : super(SearchState.initial().copyWith(searchHistory: initialHistory));
 
@@ -20,6 +22,12 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
 
   /// Minimum query length to trigger search
   final int minQueryLength;
+
+  /// Debounce duration for live search
+  final Duration debounceDuration;
+
+  /// Timer for debouncing search
+  Timer? _debounceTimer;
 
   /// Current search query
   String get currentQuery => state.query;
@@ -44,10 +52,11 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
     ));
   }
 
-  /// Perform search with the given query
+  /// Perform search with the given query (with debounce)
   Future<void> performSearch(
     String query, {
     Future<List<dynamic>> Function(String)? searchProvider,
+    bool immediate = false,
   }) async {
     if (query.length < minQueryLength) {
       emit(state.copyWith(
@@ -59,6 +68,25 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
       return;
     }
 
+    // Cancel previous debounce timer
+    _debounceTimer?.cancel();
+
+    if (immediate) {
+      // Execute immediately (e.g., on submit)
+      await _executeSearch(query, searchProvider);
+    } else {
+      // Debounce the search
+      _debounceTimer = Timer(debounceDuration, () async {
+        await _executeSearch(query, searchProvider);
+      });
+    }
+  }
+
+  /// Execute the actual search
+  Future<void> _executeSearch(
+    String query,
+    Future<List<dynamic>> Function(String)? searchProvider,
+  ) async {
     // Start loading
     emit(state.copyWith(
       query: query,
@@ -212,5 +240,11 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
     emit(SearchState.initial().copyWith(
       searchHistory: state.searchHistory, // Keep history
     ));
+  }
+
+  @override
+  Future<void> close() {
+    _debounceTimer?.cancel();
+    return super.close();
   }
 }

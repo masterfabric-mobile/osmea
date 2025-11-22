@@ -336,12 +336,20 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 searchFocusNode: searchFocusNode,
                 onSearch: (query) {
                   viewModel.performSearch(query,
-                      searchProvider: searchProvider);
+                      searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
                 },
                 onSearchChanged: (query) {
                   viewModel.updateQuery(query);
                   onSearchChanged?.call(query);
+
+                  // Trigger search if query length meets minimum requirement
+                  if (query.trim().length >= minQueryLength) {
+                    viewModel.performSearch(query,
+                        searchProvider: searchProvider);
+                  } else if (query.trim().isEmpty) {
+                    viewModel.clearSearch();
+                  }
 
                   if (searchSuggestionProvider != null) {
                     viewModel.getSuggestions(query,
@@ -454,6 +462,14 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                     viewModel.updateQuery(query);
                     onSearchChanged?.call(query);
 
+                    // Trigger search if query length meets minimum requirement
+                    if (query.trim().length >= minQueryLength) {
+                      viewModel.performSearch(query,
+                          searchProvider: searchProvider);
+                    } else if (query.trim().isEmpty) {
+                      viewModel.clearSearch();
+                    }
+
                     if (searchSuggestionProvider != null) {
                       viewModel.getSuggestions(query,
                           suggestionProvider: searchSuggestionProvider);
@@ -461,7 +477,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   },
                   onSubmitted: (query) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider);
+                        searchProvider: searchProvider, immediate: true);
                     onSearchSubmitted?.call(query);
                   },
                   onClear: () {
@@ -502,6 +518,15 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
         onSearchResult!(state.results);
       }
     });
+
+    // Handle system context menu errors (Flutter assertion issue)
+    FlutterError.onError = (FlutterErrorDetails details) {
+      if (details.exception.toString().contains('onDismissSystemContextMenu')) {
+        debugPrint('⚠️ Caught system context menu error - ignoring');
+        return;
+      }
+      FlutterError.presentError(details);
+    };
   }
 
   @override
