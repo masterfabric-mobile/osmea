@@ -34,7 +34,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
       final categoriesService = GetIt.I<StoreProductCategoriesService>();
       final brandsService = GetIt.I<StoreProductBrandsService>();
 
-      // Load categories and brands separately to handle errors properly
       final cats = await categoriesService.listProductCategories(
         apiVersion: 'v1',
         perPage: 100,
@@ -75,12 +74,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   Future<void> _searchByCategory(int categoryId, String categoryName) async {
     if (widget.searchCubit == null) return;
 
-    debugPrint(
-      '📁 Category tapped: $categoryName (ID: $categoryId), loading products...',
-    );
+    debugPrint('📁 Category selected: $categoryName (ID: $categoryId)');
 
     try {
       final productService = GetIt.I<ProductService>();
+
       await widget.searchCubit!.performSearch(
         categoryName,
         searchProvider: (query) async {
@@ -95,36 +93,128 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           );
           return products;
         },
+        immediate: true,
       );
     } catch (e) {
       debugPrint('❌ Error loading category products: $e');
     }
   }
 
-  Future<void> _searchByBrand(String brandName) async {
-    if (widget.searchCubit == null || brandName.isEmpty) return;
+  Future<void> _searchByBrand(String brandName, int? brandId) async {
+    if (widget.searchCubit == null) {
+      debugPrint('⚠️ SearchCubit is null, cannot search');
+      return;
+    }
 
-    debugPrint('🏷️ Brand tapped: $brandName, searching products...');
+    debugPrint('🏷️ Brand selected: $brandName (ID: $brandId)');
 
     try {
       final productService = GetIt.I<ProductService>();
+
       await widget.searchCubit!.performSearch(
         brandName,
         searchProvider: (query) async {
-          final products = await productService.listAllProducts(
-            apiVersion: 'v1',
-            search: query,
-            page: 1,
-            perPage: 20,
-          );
+          debugPrint('🔄 Starting brand product search...');
+          List<dynamic> products = [];
+
+          // Approach 1: Try with brand ID and search query combined
+          if (brandId != null) {
+            debugPrint(
+              '🔍 Approach 1: Trying brand=$brandId + search="$brandName"',
+            );
+            try {
+              products = await productService.listAllProducts(
+                apiVersion: 'v1',
+                brand: brandId.toString(),
+                search: brandName,
+                perPage: 50,
+              );
+              debugPrint('📊 Approach 1 result: ${products.length} products');
+              if (products.isNotEmpty) {
+                debugPrint(
+                  '✅ SUCCESS: Found ${products.length} products using brand=$brandId + search',
+                );
+                return products;
+              }
+            } catch (e) {
+              debugPrint('❌ Approach 1 failed: $e');
+            }
+          }
+
+          // Approach 2: Try with brand ID only
+          if (brandId != null) {
+            debugPrint('🔍 Approach 2: Trying brand=$brandId (as string)');
+            try {
+              products = await productService.listAllProducts(
+                apiVersion: 'v1',
+                brand: brandId.toString(),
+                perPage: 50,
+              );
+              debugPrint('📊 Approach 2 result: ${products.length} products');
+              if (products.isNotEmpty) {
+                debugPrint(
+                  '✅ SUCCESS: Found ${products.length} products using brand=$brandId',
+                );
+                return products;
+              }
+            } catch (e) {
+              debugPrint('❌ Approach 2 failed: $e');
+            }
+          } else {
+            debugPrint('⚠️ Brand ID is null, skipping brand ID approach');
+          }
+
+          // Approach 3: Try with brand slug and search query
+          final brandSlug = brandName.toLowerCase().replaceAll(' ', '-');
           debugPrint(
-            '🔍 Found ${products.length} products for brand: $brandName',
+            '🔍 Approach 3: Trying brand=$brandSlug + search="$brandName"',
           );
-          return products;
+          try {
+            products = await productService.listAllProducts(
+              apiVersion: 'v1',
+              brand: brandSlug,
+              search: brandName,
+              perPage: 50,
+            );
+            debugPrint('📊 Approach 3 result: ${products.length} products');
+            if (products.isNotEmpty) {
+              debugPrint(
+                '✅ SUCCESS: Found ${products.length} products using brand=$brandSlug + search',
+              );
+              return products;
+            }
+          } catch (e) {
+            debugPrint('❌ Approach 3 failed: $e');
+          }
+
+          // Approach 4: Try with search query only
+          debugPrint('🔍 Approach 4: Trying search="$brandName"');
+          try {
+            products = await productService.listAllProducts(
+              apiVersion: 'v1',
+              search: brandName,
+              perPage: 50,
+            );
+            debugPrint('📊 Approach 4 result: ${products.length} products');
+            if (products.isNotEmpty) {
+              debugPrint(
+                '✅ SUCCESS: Found ${products.length} products using search="$brandName"',
+              );
+              return products;
+            }
+          } catch (e) {
+            debugPrint('❌ Approach 4 failed: $e');
+          }
+
+          debugPrint(
+            '❌ NO RESULTS: No products found for brand "$brandName" (ID: $brandId)',
+          );
+          return [];
         },
+        immediate: true,
       );
     } catch (e) {
-      debugPrint('❌ Error searching brand products: $e');
+      debugPrint('❌ CRITICAL ERROR in _searchByBrand: $e');
     }
   }
 
@@ -195,7 +285,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                 final brand = _brands[index];
                 return _BrandCard(
                   brand: brand,
-                  onTap: () => _searchByBrand(brand.name ?? ''),
+                  onTap: () => _searchByBrand(brand.name ?? '', brand.id),
                 );
               },
             ),
