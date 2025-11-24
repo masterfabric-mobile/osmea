@@ -2,7 +2,16 @@
 
 > This changelog is generated from the latest closed pull requests. For a full, always-up-to-date changelog, visit [Closed PRs on GitHub](https://github.com/masterfabric-mobile/osmea/pulls?q=is%3Apr+is%3Aclosed).  
 
-## 📦 APIs – v0.51.11
+## 📦 APIs – v0.54.11
+
+- **[#255 – Package → API → User Info Section API](https://github.com/masterfabric-mobile/osmea/pull/255)**  
+  Adds full integration with the WordPress REST API `/wp-json/wp/v2/users/me` endpoint. Enables retrieval of authenticated user information using JWT, and introduces a dedicated WordPress User Information section in HomeView for in-app authentication and meta data display.
+
+- **[#247 – Package → API → Allow Category Retrieval Without JWT](https://github.com/masterfabric-mobile/osmea/pull/247)**  
+  Makes the JWT token optional for WooCommerce Store API product category endpoints, allowing both unauthenticated and authenticated flows. Method signatures and handlers are refactored for flexibility, with smart logging and full backward compatibility.
+
+- **[#243 – Package → API → Allow Cart Operations Without JWT and Add Cart View](https://github.com/masterfabric-mobile/osmea/pull/243)**  
+  Updates WooCommerce Store API cart endpoints to support optional JWT, enabling unauthenticated users to perform cart operations. Handlers and services are refactored for flexibility and backward compatibility, improving guest user support.
 
 - **[#240 – Package → API → Image Model](https://github.com/masterfabric-mobile/osmea/pull/240)**  
   Refactors product/brand/category models to use a strongly-typed Image model, improving serialization and code safety.
@@ -474,7 +483,28 @@
   Established a modular, scalable UI structure (`lib/src/`), reusable components, enums, design tokens, and core infrastructure for future UI elements.
                                            
 
-## ⚙️ Core – v3.25.4
+## ⚙️ Core – v3.29.7
+
+- **[#253 – Core → Account View](https://github.com/masterfabric-mobile/osmea/pull/253)**  
+  Implements a configurable Account View with dynamic profile data loading, configuration-driven menu sections, and extensible sub-route widgets. Provides theme style support and robust state management for a flexible, user-centric account experience.
+
+- **[#252 – Core – Fix → Search View](https://github.com/masterfabric-mobile/osmea/pull/252)**  
+  Enhances SearchView and SearchBar with improved color configuration, tooltip and prompt customization, and UI/UX refinements. Introduces menu access via AppNavbar and simplifies search input logic for streamlined usability.
+
+- **[#249 – Core → Image Detail View Improvements](https://github.com/masterfabric-mobile/osmea/pull/249)**  
+  Refactors Image Detail View to use storefront-consistent button styling, dynamic responsive layouts, and overflow prevention. Introduces smart image sizing, flexible navigation, and production-ready architecture for cross-device compatibility.
+
+- **[#248 – Core – Fix → Splash View](https://github.com/masterfabric-mobile/osmea/pull/248)**  
+  Removes redundant status bar color logic from SplashView, cleaning up initialization flow and improving reliability and maintainability of the splash screen visual setup.
+
+- **[#245 – Core → MasterView Improvements](https://github.com/masterfabric-mobile/osmea/pull/245)**  
+  Adds granular layout control to MasterView architecture, including customizable background color, safe area, and vertical padding. Enables developers to fine-tune view presentation per screen while maintaining backward compatibility.
+
+- **[#244 – Core → Image Detail View Improvements](https://github.com/masterfabric-mobile/osmea/pull/244)**  
+  Refactors Image Detail View for dynamic sizing and responsive layout. Introduces real-time aspect ratio handling, smooth animated transitions, and overflow protection, ensuring a consistent and user-friendly experience across devices.
+
+- **[#242 – Core → Search View](https://github.com/masterfabric-mobile/osmea/pull/242)**  
+  Enhances SearchView with a fully customizable configuration API, supporting dynamic AppBar, SearchBar, and action button styling. Introduces advanced property management, run-time updates, and backwards compatibility for flexible search UI integration.
 
 - **[#237 – Core → Sign Up Auth View](https://github.com/masterfabric-mobile/osmea/pull/237)**  
   Unifies sign-in and sign-up flows, enhances dependency injection, adds guest mode, configuration improvements, and new UI assets.
