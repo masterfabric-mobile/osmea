@@ -39,25 +39,58 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+
+	/// en: 'en_US'
 	String get localLanguageCode => TranslationOverrides.string(_root.$meta, 'localLanguageCode', {}) ?? 'en_US';
+
+	/// en: 'OSMEA App'
 	String get appTitle => TranslationOverrides.string(_root.$meta, 'appTitle', {}) ?? 'OSMEA App';
+
+	/// en: ''
 	String get emptyText => TranslationOverrides.string(_root.$meta, 'emptyText', {}) ?? '';
+
+	/// en: 'Cancel'
 	String get cancel => TranslationOverrides.string(_root.$meta, 'cancel', {}) ?? 'Cancel';
+
+	/// en: 'Loading...'
 	String get loading => TranslationOverrides.string(_root.$meta, 'loading', {}) ?? 'Loading...';
+
+	/// en: 'An error occurred.'
 	String get error => TranslationOverrides.string(_root.$meta, 'error', {}) ?? 'An error occurred.';
+
+	/// en: 'Maintenance mode.'
 	String get maintenance => TranslationOverrides.string(_root.$meta, 'maintenance', {}) ?? 'Maintenance mode.';
+
+	/// en: 'No data available.'
 	String get empty => TranslationOverrides.string(_root.$meta, 'empty', {}) ?? 'No data available.';
+
+	/// en: 'Unauthorized access.'
 	String get unauthorized => TranslationOverrides.string(_root.$meta, 'unauthorized', {}) ?? 'Unauthorized access.';
+
+	/// en: 'Request timed out.'
 	String get timeout => TranslationOverrides.string(_root.$meta, 'timeout', {}) ?? 'Request timed out.';
+
+	/// en: 'Undo'
 	String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo';
+
+	/// en: 'WebView'
 	String get webview => TranslationOverrides.string(_root.$meta, 'webview', {}) ?? 'WebView';
+
+	/// en: 'An unexpected error occurred. Please try again later.'
 	String get defaultMessage => TranslationOverrides.string(_root.$meta, 'defaultMessage', {}) ?? 'An unexpected error occurred. Please try again later.';
 }
 
-/// Flat map(s) containing all translations.
+/// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
+///
+/// The Dart AOT compiler has issues with very large switch statements,
+/// so the map is split into smaller functions (512 entries each).
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
+		return _flatMapFunction$0(path);
+	}
+
+	dynamic _flatMapFunction$0(String path) {
 		switch (path) {
 			case 'localLanguageCode': return TranslationOverrides.string(_root.$meta, 'localLanguageCode', {}) ?? 'en_US';
 			case 'appTitle': return TranslationOverrides.string(_root.$meta, 'appTitle', {}) ?? 'OSMEA App';
