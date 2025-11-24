@@ -10,8 +10,7 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_cart/widgets/cart_widgets.dart';
-import 'package:storefront_woo/app/views/view_cart/widgets/cart_auth_required_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/cart_content_widget.dart';
 
 /// CartView displays the shopping cart with items and checkout functionality
 class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
@@ -40,7 +39,11 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
            size: AppBarSize.standard,
            leading: OsmeaComponents.iconButton(
              onPressed: () => context.go('/home'),
-             icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+             icon: Icon(
+               Icons.arrow_back,
+               color: OsmeaColors.thunder,
+               size: context.iconSizeNormal,
+             ),
            ),
          ),
        ) {
@@ -68,18 +71,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
 
     // Handle auth required state (removed checkout functionality)
     if (state is CartAuthRequiredState) {
-      // Checkout functionality removed - just show message
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.message),
-            backgroundColor: OsmeaColors.orange,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      });
-      // Show loading while handling
-      return CartAuthRequiredWidget(message: state.message);
+      _showAuthRequiredMessage(context, state.message);
+      return _buildAuthRequiredLoading(context);
     }
 
     return _buildBody(context, viewModel, state);
@@ -120,6 +113,29 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
       goRoute: goRoute,
       loadingType: LoadingModelType.dataLoading,
       loadingSteps: ['Loading cart...'],
+    );
+  }
+
+  /// Shows authentication required message via Osmea Snackbar
+  void _showAuthRequiredMessage(BuildContext context, String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.snackbarWarning(message, duration: context.durationLong);
+    });
+  }
+
+  /// Builds loading widget for authentication required state
+  Widget _buildAuthRequiredLoading(BuildContext context) {
+    return SafeArea(
+      child: OsmeaComponents.container(
+        padding: context.onlyBottomPaddingNormal,
+        child: OsmeaComponents.center(
+          child: OsmeaComponents.loading(
+            type: LoadingType.circularFade,
+            size: context.iconSizeLarge,
+            color: OsmeaColors.nordicBlue,
+          ),
+        ),
+      ),
     );
   }
 }
