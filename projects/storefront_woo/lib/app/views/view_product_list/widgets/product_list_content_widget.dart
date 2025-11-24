@@ -18,6 +18,8 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
+import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 
 /// Main content widget for product list view
 class ProductListContentWidget extends StatelessWidget {
@@ -53,12 +55,15 @@ class ProductListContentWidget extends StatelessWidget {
 
     return OsmeaComponents.column(
       children: [
+        // Toggle buttons for Sort by / Filters
+        _buildToggleButtons(context),
+        
         // Active filter chips
         if (viewModel.filters.hasActiveFilters)
           OsmeaComponents.padding(
             padding: EdgeInsets.fromLTRB(
               context.paddingNormal.left,
-              context.paddingNormal.top,
+              0,
               context.paddingNormal.right,
               context.spacing8,
             ),
@@ -83,6 +88,91 @@ class ProductListContentWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Builds toggle buttons for Sort by / Filters
+  Widget _buildToggleButtons(BuildContext context) {
+    return OsmeaComponents.container(
+      margin: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.shade100,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showSortBottomSheet(context),
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: Colors.transparent,
+                ),
+                child: Center(
+                  child: OsmeaComponents.text(
+                    'Sort by',
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.thunder,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showFiltersBottomSheet(context),
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: OsmeaColors.thunder,
+                ),
+                child: Center(
+                  child: OsmeaComponents.text(
+                    'Filters',
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Shows sort bottom sheet
+  void _showSortBottomSheet(BuildContext context) {
+    viewModel.resetDialogInit();
+    
+    OsmeaBottomSheetHelpers.showModal(
+      context: context,
+      size: BottomSheetSize.medium,
+      title: 'Sort by',
+      child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: true),
+    ).then((_) {
+      viewModel.resetDialogInit();
+    });
+  }
+
+  /// Shows filters bottom sheet
+  void _showFiltersBottomSheet(BuildContext context) {
+    viewModel.resetDialogInit();
+    
+    OsmeaBottomSheetHelpers.showModal(
+      context: context,
+      size: BottomSheetSize.large,
+      title: 'Filters',
+      child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: false),
+    ).then((_) {
+      viewModel.resetDialogInit();
+    });
   }
 
   /// Builds empty view using OSMEA components

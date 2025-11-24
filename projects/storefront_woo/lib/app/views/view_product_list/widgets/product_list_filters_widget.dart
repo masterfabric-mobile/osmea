@@ -11,26 +11,39 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/debug_filter_info_widget.dart';
 
-class ProductListFiltersWidget extends StatelessWidget {
+class ProductListFiltersWidget extends StatefulWidget {
   final ProductListViewModel viewModel;
+  final bool showOnlySort;
 
-  const ProductListFiltersWidget({super.key, required this.viewModel});
+  const ProductListFiltersWidget({
+    super.key, 
+    required this.viewModel,
+    this.showOnlySort = false,
+  });
+
+  @override
+  State<ProductListFiltersWidget> createState() => _ProductListFiltersWidgetState();
+}
+
+class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
+
+  // Getter for easier access to viewModel
+  ProductListViewModel get viewModel => widget.viewModel;
 
   @override
   Widget build(BuildContext context) {
     // Initialize filter dialog when opened - only once per dialog session
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewModel.initFilterDialog();
+      widget.viewModel.initFilterDialog();
     });
 
     return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
+      bloc: widget.viewModel,
       builder: (context, state) {
         // Get temp filters after initialization
-        final tempFilters = viewModel.tempFilters;
+        final tempFilters = widget.viewModel.tempFilters;
         final selectedSortBy = tempFilters.orderBy ?? 'date';
         final selectedOrder = tempFilters.order ?? 'desc';
 
@@ -38,33 +51,39 @@ class ProductListFiltersWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Debug info widget (only in debug mode)
-            DebugFilterInfoWidget(viewModel: viewModel),
+            DebugFilterInfoWidget(viewModel: widget.viewModel),
             
             // Header with actions
             OsmeaComponents.padding(
-              padding: context.paddingNormal,
+              padding: EdgeInsets.all(16),
               child: OsmeaComponents.row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox.shrink(),
+                  OsmeaComponents.text(
+                    widget.showOnlySort ? 'Sort Products' : 'Filter Products',
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
                   OsmeaComponents.row(
                     children: [
-                      if (viewModel.filters.hasActiveFilters)
+                      if (widget.viewModel.filters.hasActiveFilters && !widget.showOnlySort)
                         OsmeaComponents.button(
                           text: 'Clear all',
                           onPressed: () {
-                            viewModel.clearFilters();
+                            widget.viewModel.clearFilters();
                             Navigator.pop(context);
                           },
                           variant: ButtonVariant.outlined,
                           size: ButtonSize.medium,
                         ),
-                      if (viewModel.filters.hasActiveFilters)
-                        OsmeaComponents.sizedBox(width: context.spacing8),
+                      if (widget.viewModel.filters.hasActiveFilters && !widget.showOnlySort)
+                        OsmeaComponents.sizedBox(width: 8),
                       OsmeaComponents.button(
                         text: 'Apply',
                         onPressed: () {
-                          viewModel.applyFilters();
+                          widget.viewModel.applyFilters();
                           Navigator.pop(context);
                         },
                         variant: ButtonVariant.primary,
@@ -75,43 +94,57 @@ class ProductListFiltersWidget extends StatelessWidget {
                 ],
               ),
             ),
-            // Filters content
+            
+            // Content based on showOnlySort parameter
             Flexible(
-              child: SingleChildScrollView(
-                padding: context.paddingNormal,
-                child: OsmeaComponents.column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Sort by
-                    _buildSectionTitle(context, 'Sort by'),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildSortOptions(context, selectedSortBy, selectedOrder),
-                    OsmeaComponents.sizedBox(height: context.spacing24),
-
-                    // Price range
-                    _buildSectionTitle(context, 'Price range'),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildPriceRangeFilter(context),
-                    OsmeaComponents.sizedBox(height: context.spacing24),
-
-                    // On sale filter
-                    _buildSectionTitle(context, 'Special offers'),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildOnSaleFilter(context, tempFilters.onSale == true),
-                    OsmeaComponents.sizedBox(height: context.spacing24),
-
-                    // Stock status
-                    _buildSectionTitle(context, 'Availability'),
-                    OsmeaComponents.sizedBox(height: context.spacing8),
-                    _buildStockStatusFilter(context, tempFilters.stockStatus),
-                  ],
-                ),
-              ),
+              child: widget.showOnlySort
+                  ? _buildSortingContent(context, selectedSortBy, selectedOrder)
+                  : _buildFilteringContent(context, tempFilters),
             ),
           ],
         );
       },
+    );
+  }
+
+  /// Build sorting tab content
+  Widget _buildSortingContent(BuildContext context, String selectedSortBy, String selectedOrder) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSortOptions(context, selectedSortBy, selectedOrder),
+        ],
+      ),
+    );
+  }
+
+  /// Build filtering tab content
+  Widget _buildFilteringContent(BuildContext context, dynamic tempFilters) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Price Range
+          _buildSectionTitle(context, 'Price Range'),
+          OsmeaComponents.sizedBox(height: 16),
+          _buildPriceRangeFilter(context),
+          OsmeaComponents.sizedBox(height: 24),
+          
+          // On Sale Filter
+          _buildSectionTitle(context, 'Sale Status'),
+          OsmeaComponents.sizedBox(height: 16),
+          _buildOnSaleFilter(context, tempFilters.onSale == true),
+          OsmeaComponents.sizedBox(height: 24),
+          
+          // Stock Status
+          _buildSectionTitle(context, 'Stock Status'),
+          OsmeaComponents.sizedBox(height: 16),
+          _buildStockStatusFilter(context, tempFilters.stockStatus),
+        ],
+      ),
     );
   }
 
@@ -273,7 +306,7 @@ class ProductListFiltersWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          viewModel.updateTempFilter(orderBy: orderBy, order: order);
+          widget.viewModel.updateTempFilter(orderBy: orderBy, order: order);
         },
         borderRadius: BorderRadius.circular(context.radiusLow),
         child: OsmeaComponents.container(
@@ -349,9 +382,9 @@ class ProductListFiltersWidget extends StatelessWidget {
                   child: _buildPriceInput(
                     context,
                     'Min price',
-                    viewModel.minPriceController,
+                    widget.viewModel.minPriceController,
                     (value) {
-                      viewModel.updateTempFilter(minPrice: value);
+                      widget.viewModel.updateTempFilter(minPrice: value);
                     },
                     placeholder: priceRange?.minPrice.toString(),
                   ),
@@ -361,9 +394,9 @@ class ProductListFiltersWidget extends StatelessWidget {
                   child: _buildPriceInput(
                     context,
                     'Max price',
-                    viewModel.maxPriceController,
+                    widget.viewModel.maxPriceController,
                     (value) {
-                      viewModel.updateTempFilter(maxPrice: value);
+                      widget.viewModel.updateTempFilter(maxPrice: value);
                     },
                     placeholder: priceRange?.maxPrice.toString(),
                   ),
@@ -429,7 +462,7 @@ class ProductListFiltersWidget extends StatelessWidget {
   Widget _buildOnSaleFilter(BuildContext context, bool isOnSale) {
     return GestureDetector(
       onTap: () {
-        viewModel.updateTempFilter(onSale: isOnSale ? null : true);
+        widget.viewModel.updateTempFilter(onSale: isOnSale ? null : true);
       },
       child: OsmeaComponents.container(
         padding: context.paddingLow,
@@ -458,7 +491,7 @@ class ProductListFiltersWidget extends StatelessWidget {
             OsmeaComponents.checkbox(
               value: isOnSale,
               onChanged: (value) {
-                viewModel.updateTempFilter(onSale: value == true ? true : null);
+                widget.viewModel.updateTempFilter(onSale: value == true ? true : null);
               },
             ),
           ],
