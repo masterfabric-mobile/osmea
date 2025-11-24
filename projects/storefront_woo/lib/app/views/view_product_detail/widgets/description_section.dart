@@ -23,15 +23,15 @@ class DescriptionSection extends StatelessWidget {
         OsmeaComponents.container(
           padding: context.paddingLow,
           decoration: BoxDecoration(
-            color: OsmeaColors.pewter.withOpacity(0.01),
-            borderRadius: BorderRadius.circular(context.radiusNormal),
+            color: OsmeaColors.pewter.withOpacity(context.alpha5),
+            borderRadius: context.borderRadiusNormal,
           ),
           child: state.isDescriptionExpanded
               ? _buildExpandedDescription(context)
               : _buildCollapsedDescription(context),
         ),
         if (_shouldShowButton()) ...[
-          OsmeaComponents.sizedBox(height: context.spacing8),
+          OsmeaComponents.sizedBox(height: context.spacing6),
           OsmeaComponents.center(
             child: GestureDetector(
               onTap: () => viewModel.toggleDescriptionExpandedFire(),
@@ -41,13 +41,15 @@ class DescriptionSection extends StatelessWidget {
                   vertical: context.spacing6,
                 ),
                 decoration: BoxDecoration(
-                  color: OsmeaColors.nordicBlue.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(context.radiusNormal - 1),
+                  color: OsmeaColors.nordicBlue.withOpacity(context.alpha5),
+                  borderRadius: BorderRadius.circular(
+                    context.radiusNormal - context.width1,
+                  ),
                 ),
                 child: OsmeaComponents.text(
                   state.isDescriptionExpanded ? 'Show Less' : 'Show More',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.nordicBlue.withOpacity(0.8),
+                    color: OsmeaColors.nordicBlue.withOpacity(context.alpha80),
                     fontWeight: FontWeight.w400,
                     letterSpacing: 0.5,
                   ),
@@ -85,9 +87,11 @@ class DescriptionSection extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing4),
           OsmeaComponents.text(
             '...',
-            textStyle: OsmeaTextStyle.bodyMedium(
-              context,
-            ).copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+              fontSize:
+                  context.fontSizeExtraSmallMedium * context.textScaleFactor,
+              fontWeight: FontWeight.bold,
+            ),
             color: OsmeaColors.pewter,
           ),
         ],
@@ -142,7 +146,7 @@ class DescriptionSection extends StatelessWidget {
 
   Widget _buildBulletPoint(BuildContext context, String text) {
     return OsmeaComponents.padding(
-      padding: EdgeInsets.only(bottom: context.spacing6),
+      padding: EdgeInsets.only(bottom: context.spacing4),
       child: OsmeaComponents.row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -154,19 +158,20 @@ class DescriptionSection extends StatelessWidget {
               right: context.spacing12,
             ),
             decoration: BoxDecoration(
-              color: OsmeaColors.nordicBlue.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(1.5),
+              color: OsmeaColors.nordicBlue.withOpacity(context.alpha40),
+              borderRadius: BorderRadius.circular(context.spacing2 - 0.5),
             ),
           ),
           OsmeaComponents.expanded(
             child: OsmeaComponents.text(
               text,
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontSize: 13,
+                fontSize:
+                    context.fontSizeExtraSmallMedium * context.textScaleFactor,
                 height: 1.7,
                 fontWeight: FontWeight.w200,
                 letterSpacing: 0.3,
-                color: OsmeaColors.thunder.withOpacity(0.7),
+                color: OsmeaColors.thunder.withOpacity(context.alpha70),
               ),
             ),
           ),

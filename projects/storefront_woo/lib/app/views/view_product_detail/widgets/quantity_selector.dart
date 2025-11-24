@@ -18,11 +18,11 @@ class QuantitySelector extends StatelessWidget {
     return OsmeaComponents.container(
       height: context.dynamicHeight(0.055),
       decoration: BoxDecoration(
-        color: OsmeaColors.pewter.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.radiusMedium - 8),
+        color: OsmeaColors.pewter.withOpacity(context.alpha5),
+        borderRadius: BorderRadius.circular(context.radiusMedium - context.spacing8),
         border: Border.all(
-          color: OsmeaColors.pewter.withOpacity(0.1),
-          width: 1,
+          color: OsmeaColors.pewter.withOpacity(context.alpha10),
+          width: context.width1,
         ),
       ),
       child: OsmeaComponents.row(
@@ -56,15 +56,15 @@ class _InlineButton extends StatelessWidget {
         height: context.dynamicWidth(0.075),
         decoration: BoxDecoration(
           color: onPressed != null
-              ? OsmeaColors.nordicBlue.withOpacity(0.1)
-              : OsmeaColors.pewter.withOpacity(0.05),
+              ? OsmeaColors.nordicBlue.withOpacity(context.alpha10)
+              : OsmeaColors.pewter.withOpacity(context.alpha5),
           borderRadius: BorderRadius.circular(context.radiusLow * 7),
         ),
         child: Icon(
           icon,
           color: onPressed != null
-              ? OsmeaColors.nordicBlue.withOpacity(0.8)
-              : OsmeaColors.pewter.withOpacity(0.3),
+              ? OsmeaColors.nordicBlue.withOpacity(context.alpha80)
+              : OsmeaColors.pewter.withOpacity(context.alpha30),
           size: context.iconSizeExtraSmall,
         ),
       ),

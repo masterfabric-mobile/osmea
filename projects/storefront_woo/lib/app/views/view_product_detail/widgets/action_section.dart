@@ -40,13 +40,13 @@ class ActionSection extends StatelessWidget {
               isInWishlist ? Icons.favorite : Icons.favorite_outline,
               color: isInWishlist
                   ? OsmeaColors.nordicBlue
-                  : OsmeaColors.pewter.withOpacity(0.7),
+                  : OsmeaColors.pewter.withOpacity(context.alpha70),
             ),
             size: ButtonSize.small,
             variant: ButtonVariant.ghost,
             backgroundColor: isInWishlist
-                ? OsmeaColors.nordicBlue.withOpacity(0.08)
-                : OsmeaColors.pewter.withOpacity(0.06),
+                ? OsmeaColors.nordicBlue.withOpacity(context.alpha10)
+                : OsmeaColors.pewter.withOpacity(context.alpha5),
             onPressed: () {
               final bool wasSaved = isInWishlist;
               onToggleWishlist();
@@ -115,7 +115,7 @@ class ActionSection extends StatelessWidget {
             icon: const Icon(Icons.share_outlined),
             size: ButtonSize.small,
             variant: ButtonVariant.ghost,
-            backgroundColor: OsmeaColors.pewter.withOpacity(0.06),
+            backgroundColor: OsmeaColors.pewter.withOpacity(context.alpha5),
             onPressed: onShare ?? () {},
           ),
         if (showWishlistAndShare)

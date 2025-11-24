@@ -12,6 +12,8 @@ import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_loading_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_error_widget.dart';
 import 'package:osmea_components/src/utils/toast_extensions.dart';
 
 /// ProductDetailView displays detailed information about a single product
@@ -74,13 +76,7 @@ class ProductDetailView
     if (state is ProductDetailAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         debugPrint('🔒 Auth required, navigating to auth screen');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.message),
-            backgroundColor: OsmeaColors.orange,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        context.snackbarWarning(state.message, duration: context.durationLong);
         // Reset to previous state to prevent infinite loop
         viewModel.loadProduct(productId);
         // Navigate to auth
@@ -117,7 +113,7 @@ class ProductDetailView
           );
           context.snackbarError(
             'Failed to add product to cart: $userFriendlyMessage',
-            duration: const Duration(seconds: 3),
+            duration: context.durationVeryLong,
           );
           // Recover to previous state
           viewModel.stateChanger(state.previousState!);
