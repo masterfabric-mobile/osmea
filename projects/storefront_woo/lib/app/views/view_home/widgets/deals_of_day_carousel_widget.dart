@@ -66,7 +66,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     // Slides should occupy full width of the carousel with no side gutter
     final double itemWidth = context.allWidth;
     // Banner feel
-    final double bannerHeight = 160;
+    final double bannerHeight = context.height160;
     final bannerItems = discountedTop3
         .map(
           (p) => OsmeaComponents.container(
@@ -82,16 +82,21 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: EdgeInsets.fromLTRB(
+            context.spacing20,
+            0,
+            context.spacing20,
+            0,
+          ),
           child: OsmeaComponents.row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               OsmeaComponents.text(
                 sectionTitle,
                 textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                  fontSize: 20,
+                  fontSize: context.fontSizeNormal * context.textScaleFactor,
                   fontWeight: FontWeight.w600,
-                  height: 1.0,
+                  height: context.lineHeightTight,
                   letterSpacing: -0.2,
                   color: OsmeaColors.thunder,
                 ),
@@ -100,7 +105,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                 OsmeaComponents.text(
                   'See all',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    fontSize: 12,
+                    fontSize: context.fontSizeSmall * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
                     height: 1.17,
                     color: OsmeaColors.pewter,
@@ -109,7 +114,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        OsmeaComponents.sizedBox(height: context.height16),
         // Render completely empty space when no slides — avoids any internal carousel padding/gutters
         if (bannerItems.isEmpty)
           SizedBox(height: bannerHeight)
@@ -129,8 +134,8 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               showIndicators: true,
               showArrows: false,
               autoPlay: CarouselAutoPlay.continuous,
-              autoPlayInterval: const Duration(seconds: 7),
-              animationDuration: Duration(milliseconds: 600),
+              autoPlayInterval: 7.seconds,
+              animationDuration: context.durationSlow,
               indicatorType: CarouselIndicatorType.dot,
               indicatorPosition: CarouselIndicatorPosition.bottomCenter,
             ),
@@ -167,35 +172,40 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: OsmeaColors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(context.spacing16),
           border: Border.all(
-            color: OsmeaColors.silver.withOpacity(0.5),
-            width: 0.5,
+            color: OsmeaColors.silver.withOpacity(context.alpha50),
+            width: context.borderWidth,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing16,
+          vertical: context.spacing12,
+        ),
         child: OsmeaComponents.row(
         children: [
           // Image
           Container(
-            width: 160,
+            width: context.width160,
             height: bannerHeight,
             decoration: BoxDecoration(
               color:
                   OsmeaColors.transparent, // No background/border for image box
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(context.spacing16),
             ),
             child: OsmeaComponents.clipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(context.spacing16),
               child: product.images?.isNotEmpty == true
                   ? FlutterMaterial.Image.network(
                       product.images!.first.src ?? '',
                       fit: BoxFit.cover,
                     )
-                  : Container(color: OsmeaColors.pewter.withOpacity(0.08)),
+                  : Container(
+                      color: OsmeaColors.pewter.withOpacity(context.alpha10),
+                    ),
             ),
           ),
-          const SizedBox(width: 12),
+          OsmeaComponents.sizedBox(width: context.spacing12),
           // Texts
           OsmeaComponents.expanded(
             child: OsmeaComponents.column(
@@ -204,28 +214,28 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               children: [
                 if (discount != null)
                   OsmeaComponents.container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing8,
+                      vertical: context.spacing2,
                     ),
                     decoration: BoxDecoration(
-                      color: OsmeaColors.nordicBlue.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(20),
+                      color: OsmeaColors.nordicBlue.withOpacity(context.alpha10),
+                      borderRadius: BorderRadius.circular(context.spacing20),
                       border: Border.all(
                         color: OsmeaColors.nordicBlue,
-                        width: 0.5,
+                        width: context.borderWidth,
                       ),
                     ),
                     child: OsmeaComponents.text(
                       '$discount% OFF',
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        fontSize: 11,
+                        fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                         color: OsmeaColors.nordicBlue,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                const SizedBox(height: 8),
+                OsmeaComponents.sizedBox(height: context.spacing8),
                 OsmeaComponents.text(
                   product.name ?? 'Product',
                   textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
@@ -257,7 +267,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                           prices.salePrice!.isNotEmpty &&
                           prices.regularPrice != null &&
                           prices.regularPrice!.isNotEmpty) ...[
-                        const SizedBox(width: 6),
+                        OsmeaComponents.sizedBox(width: context.spacing6),
                         OsmeaComponents.text(
                           _formatPrice(
                             prices.regularPrice,
@@ -342,3 +352,4 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     );
   }
 }
+

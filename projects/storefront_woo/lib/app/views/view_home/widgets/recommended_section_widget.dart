@@ -15,7 +15,6 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
-import 'package:osmea_components/src/utils/snackbar_extensions.dart';
 
 /// Recommended section widget
 class RecommendedSectionWidget extends StatelessWidget {
@@ -76,7 +75,12 @@ class RecommendedSectionWidget extends StatelessWidget {
       children: [
         // Section header with "See all" button
         OsmeaComponents.padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: EdgeInsets.fromLTRB(
+            context.spacing20,
+            0,
+            context.spacing20,
+            0,
+          ),
           child: OsmeaComponents.row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,9 +88,9 @@ class RecommendedSectionWidget extends StatelessWidget {
               OsmeaComponents.text(
                 sectionTitle,
                 textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                  fontSize: 20,
+                  fontSize: context.fontSizeNormal * context.textScaleFactor,
                   fontWeight: FontWeight.w600, // Semi Bold
-                  height: 1.0, // line height 20px
+                  height: context.lineHeightTight, // line height 20px
                   letterSpacing: -0.2,
                   color: OsmeaColors.thunder,
                 ),
@@ -99,7 +103,9 @@ class RecommendedSectionWidget extends StatelessWidget {
                 child: OsmeaComponents.text(
                   'See all',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    fontSize: 14,
+                    fontSize:
+                        context.fontSizeExtraSmallMedium *
+                        context.textScaleFactor,
                     fontWeight: FontWeight.w500,
                     color: OsmeaColors.nordicBlue,
                   ),
@@ -108,16 +114,20 @@ class RecommendedSectionWidget extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        OsmeaComponents.sizedBox(height: context.height16),
         // Product grid - 2 columns
         OsmeaComponents.padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
           child: Wrap(
-            spacing: 15,
-            runSpacing: 16,
+            spacing: context.spacing16,
+            runSpacing: context.height16,
             children: recommendedProducts.map((product) {
               return SizedBox(
-                width: (MediaQuery.of(context).size.width - 55) / 2,
+                width:
+                    (context.allWidth -
+                        (context.spacing20 * 2) -
+                        context.spacing16) /
+                    2,
                 child: _buildRecommendedCard(context, product),
               );
             }).toList(),
@@ -162,67 +172,73 @@ class RecommendedSectionWidget extends StatelessWidget {
         children: [
           // Image container
           Container(
-            height: 170,
+            height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter.withOpacity(0.1), // #f5f5f5
-              borderRadius: BorderRadius.circular(13),
+              color: OsmeaColors.pewter.withOpacity(context.alpha10), // #f5f5f5
+              borderRadius: context.borderRadiusNormal,
             ),
             child: Stack(
               children: [
                 // Product image
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: context.borderRadiusNormal,
                   child: product.images?.isNotEmpty == true
                       ? FlutterMaterial.Image.network(
                           product.images!.first.src ?? '',
                           width: double.infinity,
-                          height: 170,
+                          height: context.height160 + context.spacing10,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               width: double.infinity,
-                              height: 170,
-                              color: OsmeaColors.pewter.withOpacity(0.1),
+                              height: context.height160 + context.spacing10,
+                              color: OsmeaColors.pewter.withOpacity(
+                                context.alpha10,
+                              ),
                               alignment: Alignment.center,
                               child: Icon(
                                 Icons.image_outlined,
                                 color: OsmeaColors.pewter,
-                                size: 40,
+                                size: context.iconSizeExtraHigh,
                               ),
                             );
                           },
                         )
                       : Container(
                           width: double.infinity,
-                          height: 170,
-                          color: OsmeaColors.pewter.withOpacity(0.1),
+                          height: context.height160 + context.spacing10,
+                          color: OsmeaColors.pewter.withOpacity(
+                            context.alpha10,
+                          ),
                           alignment: Alignment.center,
                           child: Icon(
                             Icons.image_outlined,
                             color: OsmeaColors.pewter,
-                            size: 40,
+                            size: context.iconSizeExtraHigh,
                           ),
                         ),
                 ),
                 // Discount badge - top left (only when API marks onSale)
                 if (product.onSale == true && discountPct != null)
                   Positioned(
-                    top: 8,
-                    left: 8,
+                    top: context.spacing8,
+                    left: context.spacing8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing6,
+                        vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
                         color: OsmeaColors.nordicBlue,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(context.spacing6),
                       ),
                       child: OsmeaComponents.text(
                         '$discountPct% OFF',
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.white,
-                          fontSize: 10,
+                          fontSize:
+                              context.fontSizeExtraSmall *
+                              context.textScaleFactor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -231,23 +247,30 @@ class RecommendedSectionWidget extends StatelessWidget {
 
                 // Wishlist button - top right (reactive with BlocBuilder)
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: context.spacing8,
+                  right: context.spacing8,
                   child: BlocBuilder<WishlistViewModel, WishlistState>(
                     bloc: GetIt.I<WishlistViewModel>(),
                     buildWhen: (previous, current) {
                       // Always rebuild when transitioning to LoadedState from any other state
-                      if (previous is! WishlistLoadedState && current is WishlistLoadedState) {
+                      if (previous is! WishlistLoadedState &&
+                          current is WishlistLoadedState) {
                         return true; // State just loaded, rebuild to show saved status
                       }
                       // Rebuild when state changes between Loaded states (item added/removed)
-                      if (previous is WishlistLoadedState && current is WishlistLoadedState) {
-                        final prevSaved = previous.items.any((e) => e.id == product.id);
-                        final currSaved = current.items.any((e) => e.id == product.id);
+                      if (previous is WishlistLoadedState &&
+                          current is WishlistLoadedState) {
+                        final prevSaved = previous.items.any(
+                          (e) => e.id == product.id,
+                        );
+                        final currSaved = current.items.any(
+                          (e) => e.id == product.id,
+                        );
                         return prevSaved != currSaved;
                       }
                       // Also rebuild if previous was LoadedState and current is not (shouldn't happen, but safe)
-                      if (previous is WishlistLoadedState && current is! WishlistLoadedState) {
+                      if (previous is WishlistLoadedState &&
+                          current is! WishlistLoadedState) {
                         return true;
                       }
                       return false; // Don't rebuild for other state changes
@@ -257,9 +280,11 @@ class RecommendedSectionWidget extends StatelessWidget {
                       final wishlistVm = GetIt.I<WishlistViewModel>();
                       // Always check current state, even if it's not LoadedState yet
                       final isSaved = wishlistVm.isSaved(productId);
-                      
-                      debugPrint('💖 RecommendedSection: Product $productId isSaved: $isSaved (state: ${wishlistState.runtimeType})');
-                      
+
+                      debugPrint(
+                        '💖 RecommendedSection: Product $productId isSaved: $isSaved (state: ${wishlistState.runtimeType})',
+                      );
+
                       return GestureDetector(
                         onTap: () {
                           final bool wasSaved = isSaved;
@@ -276,7 +301,8 @@ class RecommendedSectionWidget extends StatelessWidget {
                               position: SnackbarPosition.bottom,
                               animation: SnackbarAnimation.slide,
                               actionLabel: 'Undo',
-                              onAction: () => viewModel.addProductToWishlist(productId),
+                              onAction: () =>
+                                  viewModel.addProductToWishlist(productId),
                             );
                           } else {
                             // It was not saved; toggle will add
@@ -288,24 +314,29 @@ class RecommendedSectionWidget extends StatelessWidget {
                               position: SnackbarPosition.bottom,
                               animation: SnackbarAnimation.slide,
                               actionLabel: 'Undo',
-                              onAction: () => viewModel.addProductToWishlist(productId),
+                              onAction: () =>
+                                  viewModel.addProductToWishlist(productId),
                             );
                           }
                         },
                         child: Container(
-                          width: 30,
-                          height: 30,
+                          width: context.width32,
+                          height: context.height32,
                           decoration: BoxDecoration(
                             color: OsmeaColors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(
+                              context.spacing24,
+                            ),
                             border: Border.all(
-                              color: OsmeaColors.thunder.withOpacity(0.1),
-                              width: 0.1,
+                              color: OsmeaColors.thunder.withOpacity(
+                                context.alpha10,
+                              ),
+                              width: context.borderWidth,
                             ),
                           ),
                           child: Icon(
                             isSaved ? Icons.favorite : Icons.favorite_border,
-                            size: 14,
+                            size: context.iconSizeExtraSmall,
                             color: isSaved
                                 ? OsmeaColors.nordicBlue
                                 : OsmeaColors.thunder,
@@ -318,10 +349,10 @@ class RecommendedSectionWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          OsmeaComponents.sizedBox(height: context.spacing8),
           // Product info
           OsmeaComponents.padding(
-            padding: const EdgeInsets.only(left: 8),
+            padding: EdgeInsets.only(left: context.spacing8),
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -333,27 +364,34 @@ class RecommendedSectionWidget extends StatelessWidget {
                         _formatPrice(
                           prices?.salePrice,
                           currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyDecimalSeparator:
+                              prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator:
+                              prices?.currencyThousandSeparator,
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontSize: 14,
+                          fontSize:
+                              context.fontSizeExtraSmallMedium *
+                              context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                           color: OsmeaColors.nordicBlue,
                         ),
                       ),
-                      OsmeaComponents.sizedBox(width: 6),
+                      OsmeaComponents.sizedBox(width: context.spacing6),
                       OsmeaComponents.text(
                         _formatPrice(
                           prices?.regularPrice,
                           currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyDecimalSeparator:
+                              prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator:
+                              prices?.currencyThousandSeparator,
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          fontSize: 12,
+                          fontSize:
+                              context.fontSizeSmall * context.textScaleFactor,
                           color: OsmeaColors.pewter,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -365,43 +403,50 @@ class RecommendedSectionWidget extends StatelessWidget {
                     _formatPrice(
                       prices?.regularPrice,
                       currencyCode: prices?.currencyCode,
-                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                      currencyThousandSeparator: prices?.currencyThousandSeparator,
+                      currencyDecimalSeparator:
+                          prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator:
+                          prices?.currencyThousandSeparator,
                       currencyMinorUnit: prices?.currencyMinorUnit,
                     ),
                     textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                      fontSize: 14,
+                      fontSize:
+                          context.fontSizeExtraSmallMedium *
+                          context.textScaleFactor,
                       fontWeight: FontWeight.w700,
                       color: OsmeaColors.thunder,
                     ),
                   ),
                 ],
-                const SizedBox(height: 4),
+                OsmeaComponents.sizedBox(height: context.spacing4),
                 // Product name
                 OsmeaComponents.text(
                   product.name ?? 'Product',
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    fontSize: 14,
+                    fontSize:
+                        context.fontSizeExtraSmallMedium *
+                        context.textScaleFactor,
                     fontWeight: FontWeight.w500, // Medium
                     height: 1.14, // line height 16px
                     color: OsmeaColors.thunder,
                   ),
-                  maxLines: 2,
+                  maxLines: context.maxLineTwo,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                OsmeaComponents.sizedBox(height: context.spacing2),
                 // Description
                 if (product.shortDescription != null &&
                     product.shortDescription!.isNotEmpty)
                   OsmeaComponents.text(
                     _stripHtml(product.shortDescription!),
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontSize: 10,
+                      fontSize:
+                          context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
                       height: 1.2,
                       color: OsmeaColors.pewter,
                     ),
-                    maxLines: 1,
+                    maxLines: context.maxLineOne,
                     overflow: TextOverflow.ellipsis,
                   ),
               ],
@@ -425,13 +470,15 @@ class RecommendedSectionWidget extends StatelessWidget {
 
     // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
     // Use API-provided separators and minor_unit to correctly parse the price format
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: currencyDecimalSeparator,
-      currencyThousandSeparator: currencyThousandSeparator,
-      currencyMinorUnit: currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: currencyDecimalSeparator,
+          currencyThousandSeparator: currencyThousandSeparator,
+          currencyMinorUnit: currencyMinorUnit,
+        ) ??
+        0.0;
     // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,

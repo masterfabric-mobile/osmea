@@ -58,7 +58,7 @@ class BannerCarouselWidget extends StatelessWidget {
       child: OsmeaComponents.imageCard(
         // Image configuration
         imageUrl: banner.imageUrl,
-        imageHeight: 200,
+        imageHeight: context.height192,
         imageFit: BoxFit.cover,
         imageAlignment: Alignment.center,
         imagePosition: banner.imageUrl != null && banner.imageUrl!.isNotEmpty
@@ -69,9 +69,9 @@ class BannerCarouselWidget extends StatelessWidget {
         variant: ComponentAppearance.filled,
         size: ComponentSize.medium,
         backgroundColor: OsmeaColors.nordicBlue,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.borderRadiusNormal,
         width: double.infinity,
-        height: 200,
+        height: context.height192,
 
         // Content
         title: banner.title,
@@ -81,18 +81,22 @@ class BannerCarouselWidget extends StatelessWidget {
         titleStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
           fontWeight: FontWeight.w700,
           color: OsmeaColors.white,
-          shadows: [Shadow(color: OsmeaColors.thunder, blurRadius: 2)],
+          shadows: [
+            Shadow(color: OsmeaColors.thunder, blurRadius: context.blurRadius2),
+          ],
         ),
         contentStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
           color: OsmeaColors.white,
-          shadows: [Shadow(color: OsmeaColors.thunder, blurRadius: 2)],
+          shadows: [
+            Shadow(color: OsmeaColors.thunder, blurRadius: context.blurRadius2),
+          ],
         ),
 
         // Text overflow control
-        titleMaxLines: 2,
-        contentMaxLines: 3,
+        titleMaxLines: context.maxLineTwo,
+        contentMaxLines: context.maxLineThree,
         textOverflow: TextOverflow.ellipsis,
-        spacing: 12,
+        spacing: context.spacing12,
 
         // Show overlay for better text readability on background images
         showOverlay: banner.imageUrl != null && banner.imageUrl!.isNotEmpty,
@@ -121,20 +125,25 @@ class BannerCarouselWidget extends StatelessWidget {
     // If all banners have images, use imageUrls
     if (imageUrls.length == banners.length) {
       return OsmeaComponents.padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: EdgeInsets.fromLTRB(
+          context.spacing16,
+          0,
+          context.spacing16,
+          context.spacing16,
+        ),
         child: OsmeaComponents.carousel(
           imageUrls: imageUrls,
           variant: CarouselVariant.standard,
           size: CarouselSize.large,
-          height: 200,
+          height: context.height192,
           autoPlay: CarouselAutoPlay.continuous,
-          autoPlayInterval: const Duration(seconds: 4),
+          autoPlayInterval: 4.seconds,
           showIndicators: true,
           showArrows: true,
           loop: true,
           indicatorPosition: CarouselIndicatorPosition.bottomCenter,
           indicatorType: CarouselIndicatorType.dot,
-          borderRadiusValue: BorderRadius.circular(12),
+          borderRadiusValue: context.borderRadiusNormal,
         ),
       );
     }
@@ -143,28 +152,33 @@ class BannerCarouselWidget extends StatelessWidget {
     final items = banners
         .map(
           (b) => OsmeaComponents.container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
+            margin: EdgeInsets.symmetric(horizontal: context.spacing4),
             width: double.infinity,
-            height: 200,
+            height: context.height192,
             child: _buildBannerItem(context, b),
           ),
         )
         .toList();
 
     return OsmeaComponents.padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: EdgeInsets.fromLTRB(
+        context.spacing16,
+        0,
+        context.spacing16,
+        context.spacing16,
+      ),
       child: OsmeaComponents.carousel(
         variant: CarouselVariant.standard,
         size: CarouselSize.large,
-        height: 200,
+        height: context.height192,
         items: items,
         showIndicators: true,
         showArrows: true,
         autoPlay: CarouselAutoPlay.continuous,
-        autoPlayInterval: const Duration(seconds: 4),
+        autoPlayInterval: 4.seconds,
         indicatorType: CarouselIndicatorType.dot,
         indicatorPosition: CarouselIndicatorPosition.bottomCenter,
-        borderRadiusValue: BorderRadius.circular(12),
+        borderRadiusValue: context.borderRadiusNormal,
       ),
     );
   }

@@ -56,12 +56,9 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     if (state is HomeAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         debugPrint('🔒 Auth required, navigating to auth screen');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.message),
-            backgroundColor: OsmeaColors.orange,
-            duration: const Duration(seconds: 2),
-          ),
+        context.snackbarWarning(
+          state.message,
+          duration: context.durationLong,
         );
         // Reset to loading state to prevent infinite loop
         viewModel.restart();
@@ -73,7 +70,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
         goRoute: goRoute,
         loadingType: LoadingModelType.authentication,
         loadingSteps: ['Redirecting to sign in...'],
-        stepDuration: const Duration(milliseconds: 500),
+        stepDuration: context.durationMedium,
         showProgress: false,
       );
     }
@@ -87,9 +84,7 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
       return LoadingView(
         goRoute: goRoute,
         loadingType: LoadingModelType.dataLoading,
-
-        stepDuration: const Duration(milliseconds: 600),
-
+        stepDuration: context.durationSlow,
         showCancelButton: false,
       );
     }
