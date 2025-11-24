@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 
@@ -137,8 +138,176 @@ class ProductListViewModel
   final int _perPage = 50; // Increased from default to accommodate client-side filtering
   List<ListAllProductsResponseModel> _allProducts = [];
 
+  // Filter options from API
+  GetFilterOptionsResponseModel? _filterOptions;
+  GetFilterOptionsResponseModel? get filterOptions => _filterOptions;
+  
+  // Guard to prevent multiple loadFilterOptions calls
+  bool _isLoadingFilterOptions = false;
+
   @override
   String get id => 'product_list_view_model_v1';
+
+  /// Load filter options from API
+  Future<void> loadFilterOptions() async {
+    // Prevent multiple concurrent calls
+    if (_isLoadingFilterOptions) {
+      debugPrint('🚫 loadFilterOptions already in progress, skipping...');
+      return;
+    }
+    
+    _isLoadingFilterOptions = true;
+    debugPrint('🔧 ProductListViewModel.loadFilterOptions called');
+    
+    try {
+      // Get API version with fallback
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+      );
+      
+      final finalApiVersion = apiVersion.isEmpty ? 'v1' : apiVersion;
+      debugPrint('🔧 Loading filter options with API version: $finalApiVersion');
+      
+      // TODO: Uncomment when backend endpoint is ready
+      // final filterOptionsResponse = await _productService.getFilterOptions(apiVersion: finalApiVersion);
+      // _filterOptions = filterOptionsResponse;
+      // debugPrint('✅ Filter options loaded from API: ${filterOptionsResponse.sortOptions.length} sort options');
+      
+      // Temporary mock data with debug info
+      _filterOptions = _createMockFilterOptions();
+      debugPrint('🚧 Using MOCK filter options (API not ready yet)');
+      debugPrint('📊 Mock data contains:');
+      debugPrint('   - Sort options: ${_filterOptions!.sortOptions.length}');
+      debugPrint('   - Stock statuses: ${_filterOptions!.stockStatuses.length}');
+      debugPrint('   - Price range: ${_filterOptions!.priceRange.minPrice} - ${_filterOptions!.priceRange.maxPrice}');
+      
+      // Update current state to include filter options
+      final currentState = state;
+      if (currentState is ProductListLoadedState) {
+        emit(ProductListLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          filterOptions: _filterOptions,
+        ));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ ProductListViewModel: Error loading filter options: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      // Don't emit error state for filter options as it's not critical
+      // Just log the error and continue with static filters
+    } finally {
+      _isLoadingFilterOptions = false;
+    }
+  }
+
+  /// Test method to force load real API data
+  /// Call this from debug UI to test real API
+  Future<void> testRealApiFilterOptions() async {
+    if (!kDebugMode) return;
+    
+    debugPrint('🧪 Testing REAL API filter options...');
+    
+    // Reset loading flag to allow real API test
+    _isLoadingFilterOptions = false;
+    
+    try {
+      // Get API version with fallback
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+      );
+      
+      final finalApiVersion = apiVersion.isEmpty ? 'v1' : apiVersion;
+      debugPrint('🧪 Testing with API version: $finalApiVersion');
+      
+      final filterOptionsResponse = await _productService.getFilterOptions(
+        apiVersion: finalApiVersion,
+      );
+      _filterOptions = filterOptionsResponse;
+      debugPrint('✅ REAL API Success! Filter options loaded');
+      debugPrint('📊 Real API data contains:');
+      debugPrint('   - Sort options: ${filterOptionsResponse.sortOptions.length}');
+      debugPrint('   - Stock statuses: ${filterOptionsResponse.stockStatuses.length}');
+      
+      // Force state update
+      final currentState = state;
+      if (currentState is ProductListLoadedState) {
+        emit(ProductListLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          filterOptions: _filterOptions,
+        ));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ REAL API Error: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      debugPrint('💡 This is expected if backend endpoint is not implemented yet');
+      // Maybe API endpoint doesn't exist yet
+    }
+  }
+
+  /// Create mock filter options (temporary until backend implements the endpoint)
+  GetFilterOptionsResponseModel _createMockFilterOptions() {
+    return const GetFilterOptionsResponseModel(
+      sortOptions: [
+        SortOptionModel(
+          key: 'date',
+          label: 'Date',
+          orders: [
+            OrderOptionModel(key: 'desc', label: 'Newest'),
+            OrderOptionModel(key: 'asc', label: 'Oldest'),
+          ],
+        ),
+        SortOptionModel(
+          key: 'price',
+          label: 'Price',
+          orders: [
+            OrderOptionModel(key: 'asc', label: 'Low to High'),
+            OrderOptionModel(key: 'desc', label: 'High to Low'),
+          ],
+        ),
+        SortOptionModel(
+          key: 'title',
+          label: 'Name',
+          orders: [
+            OrderOptionModel(key: 'asc', label: 'A-Z'),
+            OrderOptionModel(key: 'desc', label: 'Z-A'),
+          ],
+        ),
+        SortOptionModel(
+          key: 'popularity',
+          label: 'Popularity',
+          orders: [
+            OrderOptionModel(key: 'desc', label: 'Most Popular'),
+            OrderOptionModel(key: 'asc', label: 'Least Popular'),
+          ],
+        ),
+        SortOptionModel(
+          key: 'rating',
+          label: 'Rating',
+          orders: [
+            OrderOptionModel(key: 'desc', label: 'Highest Rated'),
+            OrderOptionModel(key: 'asc', label: 'Lowest Rated'),
+          ],
+        ),
+      ],
+      stockStatuses: [
+        StockStatusModel(key: 'instock', label: 'In stock'),
+        StockStatusModel(key: 'outofstock', label: 'Out of stock'),
+        StockStatusModel(key: 'onbackorder', label: 'On backorder'),
+      ],
+      priceRange: PriceRangeModel(
+        minPrice: 0.0,
+        maxPrice: 9999.99,
+        currency: 'USD',
+        currencySymbol: '\$',
+        currencyMinorUnit: 2,
+      ),
+    );
+  }
 
   /// Load products with current filters
   Future<void> loadProducts({bool refresh = false}) async {
@@ -313,6 +482,7 @@ class ProductListViewModel
           hasMore: products.length >= _perPage,
           currentPage: _currentPage,
           totalPages: _totalPages,
+          filterOptions: _filterOptions,
         ),
       );
       debugPrint('✅ ProductListViewModel: State emitted successfully');
@@ -339,10 +509,23 @@ class ProductListViewModel
   /// Initialize filter dialog - sets temp filters and controllers
   void initFilterDialog() {
     if (!_dialogInitialized) {
+      debugPrint('🔧 initFilterDialog called - initializing...');
+      
+      // Load filter options if not loaded yet and not currently loading
+      if (_filterOptions == null && !_isLoadingFilterOptions) {
+        debugPrint('🔧 Filter options not loaded, loading now...');
+        loadFilterOptions();
+      } else if (_filterOptions != null) {
+        debugPrint('✅ Filter options already loaded');
+      } else if (_isLoadingFilterOptions) {
+        debugPrint('⏳ Filter options already loading...');
+      }
+      
       _tempFilters = _filters;
       _minPriceController.text = _filters.minPrice ?? '';
       _maxPriceController.text = _filters.maxPrice ?? '';
       _dialogInitialized = true;
+      
       // Emit to trigger rebuild with initial values
       final currentState = state;
       if (currentState is ProductListLoadedState) {
@@ -351,10 +534,13 @@ class ProductListViewModel
           hasMore: currentState.hasMore,
           currentPage: currentState.currentPage,
           totalPages: currentState.totalPages,
+          filterOptions: _filterOptions,
         ));
       } else {
         emit(currentState);
       }
+    } else {
+      debugPrint('🚫 initFilterDialog already initialized, skipping...');
     }
   }
 
@@ -388,6 +574,7 @@ class ProductListViewModel
         hasMore: currentState.hasMore,
         currentPage: currentState.currentPage,
         totalPages: currentState.totalPages,
+        filterOptions: _filterOptions,
       ));
     } else {
       emit(currentState);

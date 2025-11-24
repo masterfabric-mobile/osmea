@@ -6,10 +6,13 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/debug_filter_info_widget.dart';
 
 class ProductListFiltersWidget extends StatelessWidget {
   final ProductListViewModel viewModel;
@@ -34,6 +37,9 @@ class ProductListFiltersWidget extends StatelessWidget {
         return OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Debug info widget (only in debug mode)
+            DebugFilterInfoWidget(viewModel: viewModel),
+            
             // Header with actions
             OsmeaComponents.padding(
               padding: context.paddingNormal,
@@ -119,6 +125,83 @@ class ProductListFiltersWidget extends StatelessWidget {
   }
 
   Widget _buildSortOptions(
+    BuildContext context,
+    String selectedSortBy,
+    String selectedOrder,
+  ) {
+    return BlocBuilder<ProductListViewModel, ProductListState>(
+      bloc: viewModel,
+      builder: (context, state) {
+        // Get filter options from state
+        final filterOptions = state is ProductListLoadedState 
+            ? state.filterOptions 
+            : null;
+
+        // Debug info for data source
+        Widget dataSourceIndicator = Container();
+        if (kDebugMode) {
+          dataSourceIndicator = Padding(
+            padding: EdgeInsets.only(bottom: context.spacing8),
+            child: Container(
+              padding: context.paddingLow,
+              decoration: BoxDecoration(
+                color: filterOptions?.sortOptions != null 
+                    ? Colors.green.withOpacity(0.1) 
+                    : Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: filterOptions?.sortOptions != null 
+                      ? Colors.green 
+                      : Colors.orange,
+                  width: 1,
+                ),
+              ),
+              child: OsmeaComponents.text(
+                filterOptions?.sortOptions != null 
+                    ? '🌐 Dynamic Data (API)' 
+                    : '📱 Static Fallback',
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                  color: filterOptions?.sortOptions != null 
+                      ? Colors.green.shade700 
+                      : Colors.orange.shade700,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (filterOptions?.sortOptions == null) {
+          return OsmeaComponents.column(
+            children: [
+              dataSourceIndicator,
+              _buildStaticSortOptions(context, selectedSortBy, selectedOrder),
+            ],
+          );
+        }
+
+        return OsmeaComponents.column(
+          children: [
+            dataSourceIndicator,
+            ...filterOptions!.sortOptions
+              .where((sortOption) => sortOption.enabled)
+              .expand((sortOption) => sortOption.orders.map((orderOption) =>
+                  _buildSortOption(
+                    context,
+                    '${sortOption.label} (${orderOption.label})',
+                    sortOption.key,
+                    orderOption.key,
+                    selectedSortBy,
+                    selectedOrder,
+                  )))
+              .toList(),
+          ]
+        );
+      },
+    );
+  }
+
+  Widget _buildStaticSortOptions(
     BuildContext context,
     String selectedSortBy,
     String selectedOrder,
@@ -234,34 +317,62 @@ class ProductListFiltersWidget extends StatelessWidget {
   }
 
   Widget _buildPriceRangeFilter(BuildContext context) {
-    return OsmeaComponents.column(
-      children: [
-        OsmeaComponents.row(
+    return BlocBuilder<ProductListViewModel, ProductListState>(
+      bloc: viewModel,
+      builder: (context, state) {
+        // Get filter options from state
+        final filterOptions = state is ProductListLoadedState 
+            ? state.filterOptions 
+            : null;
+
+        final priceRange = filterOptions?.priceRange;
+        final currencySymbol = priceRange?.currencySymbol ?? '\$';
+        
+        return OsmeaComponents.column(
           children: [
-            Expanded(
-              child: _buildPriceInput(
-                context,
-                'Min price',
-                viewModel.minPriceController,
-                (value) {
-                  viewModel.updateTempFilter(minPrice: value);
-                },
+            if (priceRange != null) ...[
+              // Show price range hint
+              OsmeaComponents.padding(
+                padding: EdgeInsets.only(bottom: context.spacing8),
+                child: OsmeaComponents.text(
+                  'Range: $currencySymbol${priceRange.minPrice.toStringAsFixed(2)} - $currencySymbol${priceRange.maxPrice.toStringAsFixed(2)}',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    color: OsmeaColors.pewter,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ),
-            ),
-            OsmeaComponents.sizedBox(width: context.spacing12),
-            Expanded(
-              child: _buildPriceInput(
-                context,
-                'Max price',
-                viewModel.maxPriceController,
-                (value) {
-                  viewModel.updateTempFilter(maxPrice: value);
-                },
-              ),
+            ],
+            OsmeaComponents.row(
+              children: [
+                Expanded(
+                  child: _buildPriceInput(
+                    context,
+                    'Min price',
+                    viewModel.minPriceController,
+                    (value) {
+                      viewModel.updateTempFilter(minPrice: value);
+                    },
+                    placeholder: priceRange?.minPrice.toString(),
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: context.spacing12),
+                Expanded(
+                  child: _buildPriceInput(
+                    context,
+                    'Max price',
+                    viewModel.maxPriceController,
+                    (value) {
+                      viewModel.updateTempFilter(maxPrice: value);
+                    },
+                    placeholder: priceRange?.maxPrice.toString(),
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -269,8 +380,9 @@ class ProductListFiltersWidget extends StatelessWidget {
     BuildContext context,
     String label,
     TextEditingController controller,
-    Function(String?) onChanged,
-  ) {
+    Function(String?) onChanged, {
+    String? placeholder,
+  }) {
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -284,7 +396,7 @@ class ProductListFiltersWidget extends StatelessWidget {
         OsmeaComponents.textField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          hint: label == 'Min price' ? 'Min' : 'Max',
+          hint: placeholder ?? (label == 'Min price' ? 'Min' : 'Max'),
           variant: TextFieldVariant.outlined,
           size: TextFieldSize.medium,
           onChanged: (value) {
@@ -356,6 +468,35 @@ class ProductListFiltersWidget extends StatelessWidget {
   }
 
   Widget _buildStockStatusFilter(BuildContext context, String? selectedStatus) {
+    return BlocBuilder<ProductListViewModel, ProductListState>(
+      bloc: viewModel,
+      builder: (context, state) {
+        // Get filter options from state
+        final filterOptions = state is ProductListLoadedState 
+            ? state.filterOptions 
+            : null;
+
+        if (filterOptions?.stockStatuses == null) {
+          // Fallback to static options if API data not available
+          return _buildStaticStockStatusFilter(context, selectedStatus);
+        }
+
+        return OsmeaComponents.column(
+          children: filterOptions!.stockStatuses
+              .where((stockStatus) => stockStatus.enabled)
+              .map((stockStatus) => _buildStockStatusOption(
+                    context,
+                    stockStatus.label,
+                    stockStatus.key,
+                    selectedStatus,
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildStaticStockStatusFilter(BuildContext context, String? selectedStatus) {
     return OsmeaComponents.column(
       children: [
         _buildStockStatusOption(context, 'In stock', 'instock', selectedStatus),

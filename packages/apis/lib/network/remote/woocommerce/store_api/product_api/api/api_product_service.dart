@@ -5,6 +5,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_mo
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_by_slug_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_product_variations_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
@@ -84,5 +85,18 @@ abstract class ProductServiceClient implements ProductService {
   Future<List<ListProductVariationsResponseModel>> listAllVariationsByType({
     @Path('api_version') required String apiVersion,
     @Query('type') required String type,
+  });
+
+  /// ⚙️ Get available filter options from WooCommerce Store API
+  /// Note: This is a custom endpoint that may need to be implemented on the backend
+  /// as WooCommerce Store API doesn't provide filter options by default.
+  /// Alternative: Create mock data or derive from existing endpoints.
+  @override
+  @GET('/wp-json/wc/store/{api_version}/products/filter-options')
+  Future<GetFilterOptionsResponseModel> getFilterOptions({
+    @Path('api_version') required String apiVersion,
+    @Query('include_attributes') bool includeAttributes = false,
+    @Query('include_categories') bool includeCategories = false,
+    @Query('include_tags') bool includeTags = false,
   });
 }
