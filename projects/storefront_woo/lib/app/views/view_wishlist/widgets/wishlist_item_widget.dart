@@ -20,11 +20,11 @@ class WishlistItemWidget extends StatelessWidget {
       key: Key('wishlist_item_${item.id}'),
       direction: DismissDirection.endToStart,
       background: OsmeaComponents.container(
-        alignment: centerRight,
-        padding: EdgeInsets.only(right: context.spacing20),
+        alignment: context.centerRight,
+        padding: context.onlyRightPaddingNormal,
         decoration: BoxDecoration(color: OsmeaColors.amberFlame),
         child: OsmeaComponents.row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: context.end,
           children: [
             Icon(
               Icons.delete_outline,
@@ -49,7 +49,7 @@ class WishlistItemWidget extends StatelessWidget {
               title: 'Remove from favorites?',
               subtitle:
                   'Are you sure you want to remove this item from your favorites?',
-              padding: EdgeInsets.all(context.spacing16),
+              padding: context.paddingNormal,
               child: OsmeaComponents.column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -114,18 +114,18 @@ class WishlistItemWidget extends StatelessWidget {
           errorWidget: OsmeaComponents.container(
             width: context.width64,
             height: context.height64,
-            color: OsmeaColors.pewter.withOpacity(0.1),
+            color: OsmeaColors.grayMaterial[50],
             child: Icon(
               Icons.image_outlined,
-              color: OsmeaColors.pewter,
+              color: OsmeaColors.grayMaterial[400],
               size: context.iconSizeNormal,
             ),
           ),
           placeholder: OsmeaComponents.container(
             width: context.width64,
             height: context.height64,
-            color: OsmeaColors.pewter.withOpacity(0.1),
-            alignment: Alignment.center,
+            color: OsmeaColors.grayMaterial[50],
+            alignment: context.center,
             child: CircularProgressIndicator(
               strokeWidth: context.width2,
               valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.nordicBlue),
@@ -144,7 +144,7 @@ class WishlistItemWidget extends StatelessWidget {
               ),
               variant: ButtonVariant.outlined,
               size: ButtonSize.extraSmall,
-              backgroundColor: OsmeaColors.nordicBlue.withOpacity(0.1),
+              backgroundColor: OsmeaColors.nordicBlue,
               borderRadius: context.spacing4,
               onPressed: () => viewModel.promptAddToCartOptions(item),
             ),
@@ -176,7 +176,7 @@ class WishlistItemWidget extends StatelessWidget {
           ],
         ),
         padding: context.paddingLow,
-        margin: EdgeInsets.zero,
+        margin: context.paddingZero,
       ),
     );
   }
