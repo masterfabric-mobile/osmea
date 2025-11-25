@@ -92,54 +92,25 @@ class ProductListContentWidget extends StatelessWidget {
 
   /// Builds toggle buttons for Sort by / Filters
   Widget _buildToggleButtons(BuildContext context) {
-    return OsmeaComponents.container(
-      margin: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade100,
-      ),
-      child: Row(
+    return OsmeaComponents.padding(
+      padding: EdgeInsets.all(16),
+      child: OsmeaComponents.row(
         children: [
           Expanded(
-            child: GestureDetector(
-              onTap: () => _showSortBottomSheet(context),
-              child: OsmeaComponents.container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: Colors.transparent,
-                ),
-                child: Center(
-                  child: OsmeaComponents.text(
-                    'Sort by',
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: OsmeaColors.thunder,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+            child: OsmeaComponents.button(
+              text: 'Sort by',
+              onPressed: () => _showSortBottomSheet(context),
+              variant: ButtonVariant.outlined,
+              size: ButtonSize.medium,
             ),
           ),
+          OsmeaComponents.sizedBox(width: 12),
           Expanded(
-            child: GestureDetector(
-              onTap: () => _showFiltersBottomSheet(context),
-              child: OsmeaComponents.container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: OsmeaColors.thunder,
-                ),
-                child: Center(
-                  child: OsmeaComponents.text(
-                    'Filters',
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+            child: OsmeaComponents.button(
+              text: 'Filters',
+              onPressed: () => _showFiltersBottomSheet(context),
+              variant: ButtonVariant.primary,
+              size: ButtonSize.medium,
             ),
           ),
         ],
