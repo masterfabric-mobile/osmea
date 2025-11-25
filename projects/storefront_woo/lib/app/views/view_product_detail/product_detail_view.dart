@@ -170,6 +170,6 @@ PreferredSizeWidget productDetailCoreAppBar(
       onPressed: () => Navigator.of(context).pop(),
       icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
     ),
-    actions: const [], // Sepet ikonu kaldırıldı
+    actions: const [], // Cart icon removed
   );
 }
