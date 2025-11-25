@@ -71,7 +71,7 @@ class RecommendedSectionWidget extends StatelessWidget {
     if (recommendedProducts.isEmpty) return const SizedBox.shrink();
 
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         // Section header with "See all" button
         OsmeaComponents.padding(
@@ -82,8 +82,8 @@ class RecommendedSectionWidget extends StatelessWidget {
             0,
           ),
           child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: context.spaceBetween,
+            crossAxisAlignment: context.crossCenter,
             children: [
               OsmeaComponents.text(
                 sectionTitle,
@@ -117,7 +117,7 @@ class RecommendedSectionWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.height16),
         // Product grid - 2 columns
         OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: context.horizontalPaddingNormal,
           child: Wrap(
             spacing: context.spacing16,
             runSpacing: context.height16,
@@ -168,13 +168,13 @@ class RecommendedSectionWidget extends StatelessWidget {
         context.push('/product-detail/${product.id ?? 0}');
       },
       child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           // Image container
           Container(
             height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter.withOpacity(context.alpha10), // #f5f5f5
+              color: OsmeaColors.pewter,
               borderRadius: context.borderRadiusNormal,
             ),
             child: Stack(
@@ -192,13 +192,11 @@ class RecommendedSectionWidget extends StatelessWidget {
                             return Container(
                               width: double.infinity,
                               height: context.height160 + context.spacing10,
-                              color: OsmeaColors.pewter.withOpacity(
-                                context.alpha10,
-                              ),
-                              alignment: Alignment.center,
+                              color: OsmeaColors.grayMaterial[50],
+                              alignment: context.center,
                               child: Icon(
                                 Icons.image_outlined,
-                                color: OsmeaColors.pewter,
+                                color: OsmeaColors.grayMaterial[400],
                                 size: context.iconSizeExtraHigh,
                               ),
                             );
@@ -207,13 +205,11 @@ class RecommendedSectionWidget extends StatelessWidget {
                       : Container(
                           width: double.infinity,
                           height: context.height160 + context.spacing10,
-                          color: OsmeaColors.pewter.withOpacity(
-                            context.alpha10,
-                          ),
-                          alignment: Alignment.center,
+                          color: OsmeaColors.grayMaterial[50],
+                          alignment: context.center,
                           child: Icon(
                             Icons.image_outlined,
-                            color: OsmeaColors.pewter,
+                            color: OsmeaColors.grayMaterial[400],
                             size: context.iconSizeExtraHigh,
                           ),
                         ),
@@ -239,7 +235,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                           fontSize:
                               context.fontSizeExtraSmall *
                               context.textScaleFactor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -328,9 +324,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                               context.spacing24,
                             ),
                             border: Border.all(
-                              color: OsmeaColors.thunder.withOpacity(
-                                context.alpha10,
-                              ),
+                              color: OsmeaColors.thunder,
                               width: context.borderWidth,
                             ),
                           ),
@@ -352,9 +346,9 @@ class RecommendedSectionWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing8),
           // Product info
           OsmeaComponents.padding(
-            padding: EdgeInsets.only(left: context.spacing8),
+            padding: context.onlyLeftPaddingLow,
             child: OsmeaComponents.column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: context.crossStart,
               children: [
                 // Price
                 if (hasSale) ...[

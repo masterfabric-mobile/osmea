@@ -60,7 +60,7 @@ class BannerCarouselWidget extends StatelessWidget {
         imageUrl: banner.imageUrl,
         imageHeight: context.height192,
         imageFit: BoxFit.cover,
-        imageAlignment: Alignment.center,
+        imageAlignment: context.center,
         imagePosition: banner.imageUrl != null && banner.imageUrl!.isNotEmpty
             ? ComponentPosition.center
             : ComponentPosition.top,
@@ -101,8 +101,8 @@ class BannerCarouselWidget extends StatelessWidget {
         // Show overlay for better text readability on background images
         showOverlay: banner.imageUrl != null && banner.imageUrl!.isNotEmpty,
         overlayGradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: context.topCenter,
+          end: context.bottomCenter,
           colors: [Colors.transparent, OsmeaColors.thunder],
         ),
       ),

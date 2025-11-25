@@ -70,7 +70,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     final bannerItems = discountedTop3
         .map(
           (p) => OsmeaComponents.container(
-            margin: EdgeInsets.zero,
+            margin: context.paddingZero,
             width: itemWidth,
             height: bannerHeight,
             child: _buildLowPriceBannerCard(context, p, bannerHeight),
@@ -79,7 +79,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
         .toList();
 
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.padding(
           padding: EdgeInsets.fromLTRB(
@@ -89,7 +89,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
             0,
           ),
           child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: context.spaceBetween,
             children: [
               OsmeaComponents.text(
                 sectionTitle,
@@ -129,7 +129,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               height: bannerHeight,
               items: bannerItems,
               width: context.allWidth,
-              customPadding: EdgeInsets.zero,
+              customPadding: context.paddingZero,
               backgroundColor: OsmeaColors.transparent,
               showIndicators: true,
               showArrows: false,
@@ -174,7 +174,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
           color: OsmeaColors.white,
           borderRadius: BorderRadius.circular(context.spacing16),
           border: Border.all(
-            color: OsmeaColors.silver.withOpacity(context.alpha50),
+            color: OsmeaColors.silver,
             width: context.borderWidth,
           ),
         ),
@@ -183,112 +183,126 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
           vertical: context.spacing12,
         ),
         child: OsmeaComponents.row(
-        children: [
-          // Image
-          Container(
-            width: context.width160,
-            height: bannerHeight,
-            decoration: BoxDecoration(
-              color:
-                  OsmeaColors.transparent, // No background/border for image box
-              borderRadius: BorderRadius.circular(context.spacing16),
-            ),
-            child: OsmeaComponents.clipRRect(
-              borderRadius: BorderRadius.circular(context.spacing16),
-              child: product.images?.isNotEmpty == true
-                  ? FlutterMaterial.Image.network(
-                      product.images!.first.src ?? '',
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      color: OsmeaColors.pewter.withOpacity(context.alpha10),
-                    ),
-            ),
-          ),
-          OsmeaComponents.sizedBox(width: context.spacing12),
-          // Texts
-          OsmeaComponents.expanded(
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (discount != null)
-                  OsmeaComponents.container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.spacing8,
-                      vertical: context.spacing2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.nordicBlue.withOpacity(context.alpha10),
-                      borderRadius: BorderRadius.circular(context.spacing20),
-                      border: Border.all(
-                        color: OsmeaColors.nordicBlue,
-                        width: context.borderWidth,
-                      ),
-                    ),
-                    child: OsmeaComponents.text(
-                      '$discount% OFF',
-                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
-                        color: OsmeaColors.nordicBlue,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                OsmeaComponents.sizedBox(height: context.spacing8),
-                OsmeaComponents.text(
-                  product.name ?? 'Product',
-                  textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                    color: OsmeaColors.thunder,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                if (prices != null)
-                  OsmeaComponents.row(
-                    children: [
-                      OsmeaComponents.text(
-                        _formatPrice(
-                          prices.salePrice ?? prices.regularPrice,
-                          currencyCode: prices.currencyCode,
-                          currencyDecimalSeparator: prices.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices.currencyThousandSeparator,
-                          currencyMinorUnit: prices.currencyMinorUnit,
+          children: [
+            // Image
+            Container(
+              width: context.width160,
+              height: bannerHeight,
+              decoration: BoxDecoration(
+                color: OsmeaColors
+                    .transparent, // No background/border for image box
+                borderRadius: BorderRadius.circular(context.spacing16),
+              ),
+              child: OsmeaComponents.clipRRect(
+                borderRadius: BorderRadius.circular(context.spacing16),
+                child: product.images?.isNotEmpty == true
+                    ? FlutterMaterial.Image.network(
+                        product.images!.first.src ?? '',
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        color: OsmeaColors.grayMaterial[50],
+                        alignment: context.center,
+                        child: Icon(
+                          Icons.image_outlined,
+                          color: OsmeaColors.grayMaterial[400],
+                          size: context.iconSizeExtraHigh,
                         ),
-                        textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                      ),
+              ),
+            ),
+            OsmeaComponents.sizedBox(width: context.spacing12),
+            // Texts
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.column(
+                mainAxisAlignment: context.centerMain,
+                crossAxisAlignment: context.crossStart,
+                children: [
+                  if (discount != null)
+                    OsmeaComponents.container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing8,
+                        vertical: context.spacing2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.nordicBlue,
+                        borderRadius: BorderRadius.circular(context.spacing20),
+                        border: Border.all(
                           color: OsmeaColors.nordicBlue,
+                          width: context.borderWidth,
+                        ),
+                      ),
+                      child: OsmeaComponents.text(
+                        '$discount% OFF',
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          fontSize:
+                              context.fontSizeExtraSmall *
+                              context.textScaleFactor,
+                          color: OsmeaColors.white,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      if (prices.salePrice != null &&
-                          prices.salePrice!.isNotEmpty &&
-                          prices.regularPrice != null &&
-                          prices.regularPrice!.isNotEmpty) ...[
-                        OsmeaComponents.sizedBox(width: context.spacing6),
+                    ),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                  OsmeaComponents.text(
+                    product.name ?? 'Product',
+                    textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                      color: OsmeaColors.thunder,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  if (prices != null)
+                    OsmeaComponents.row(
+                      children: [
                         OsmeaComponents.text(
                           _formatPrice(
-                            prices.regularPrice,
+                            prices.salePrice ?? prices.regularPrice,
                             currencyCode: prices.currencyCode,
-                            currencyDecimalSeparator: prices.currencyDecimalSeparator,
-                            currencyThousandSeparator: prices.currencyThousandSeparator,
+                            currencyDecimalSeparator:
+                                prices.currencyDecimalSeparator,
+                            currencyThousandSeparator:
+                                prices.currencyThousandSeparator,
                             currencyMinorUnit: prices.currencyMinorUnit,
                           ),
-                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                            color: OsmeaColors.pewter,
-                            decoration: TextDecoration.lineThrough,
-                          ),
+                          textStyle: OsmeaTextStyle.titleSmall(context)
+                              .copyWith(
+                                color: OsmeaColors.nordicBlue,
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
+                        if (prices.salePrice != null &&
+                            prices.salePrice!.isNotEmpty &&
+                            prices.regularPrice != null &&
+                            prices.regularPrice!.isNotEmpty) ...[
+                          OsmeaComponents.sizedBox(width: context.spacing6),
+                          OsmeaComponents.text(
+                            _formatPrice(
+                              prices.regularPrice,
+                              currencyCode: prices.currencyCode,
+                              currencyDecimalSeparator:
+                                  prices.currencyDecimalSeparator,
+                              currencyThousandSeparator:
+                                  prices.currencyThousandSeparator,
+                              currencyMinorUnit: prices.currencyMinorUnit,
+                            ),
+                            textStyle: OsmeaTextStyle.bodySmall(context)
+                                .copyWith(
+                                  color: OsmeaColors.pewter,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-              ],
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -334,13 +348,15 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     }
     // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
     // Use API-provided separators and minor_unit to correctly parse the price format
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: currencyDecimalSeparator,
-      currencyThousandSeparator: currencyThousandSeparator,
-      currencyMinorUnit: currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: currencyDecimalSeparator,
+          currencyThousandSeparator: currencyThousandSeparator,
+          currencyMinorUnit: currencyMinorUnit,
+        ) ??
+        0.0;
     // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
@@ -352,4 +368,3 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     );
   }
 }
-
