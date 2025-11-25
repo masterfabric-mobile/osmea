@@ -66,32 +66,32 @@ class ProductCardWidget extends StatelessWidget {
         children: [
           // Image container
           OsmeaComponents.container(
-            height: 170,
+            height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(13),
+              color: OsmeaColors.grayMaterial[50],
+              borderRadius: context.borderRadiusNormal,
             ),
             child: Stack(
               children: [
                 // Product image
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: context.borderRadiusNormal,
                   child: product.images?.isNotEmpty == true
                       ? FlutterMaterial.Image.network(
                           product.images!.first.src ?? '',
                           width: double.infinity,
-                          height: 170,
+                          height: context.height160 + context.spacing10,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return OsmeaComponents.container(
                               width: double.infinity,
-                              height: 170,
-                              color: OsmeaColors.pewter.withOpacity(0.1),
+                              height: context.height160 + context.spacing10,
+                              color: OsmeaColors.grayMaterial[50],
                               alignment: Alignment.center,
                               child: Icon(
                                 Icons.image_outlined,
-                                color: OsmeaColors.pewter,
-                                size: 40,
+                                color: OsmeaColors.grayMaterial[400],
+                                size: context.iconSizeExtraHigh,
                               ),
                             );
                           },
@@ -99,11 +99,11 @@ class ProductCardWidget extends StatelessWidget {
                             if (loadingProgress == null) return child;
                             return OsmeaComponents.container(
                               width: double.infinity,
-                              height: 170,
-                              color: OsmeaColors.pewter.withOpacity(0.1),
+                              height: context.height160 + context.spacing10,
+                              color: OsmeaColors.grayMaterial[50],
                               alignment: Alignment.center,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
+                                strokeWidth: context.width2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   OsmeaColors.nordicBlue,
                                 ),
@@ -113,60 +113,60 @@ class ProductCardWidget extends StatelessWidget {
                         )
                       : OsmeaComponents.container(
                           width: double.infinity,
-                          height: 170,
-                          color: OsmeaColors.pewter.withOpacity(0.1),
+                          height: context.height160 + context.spacing10,
+                          color: OsmeaColors.grayMaterial[50],
                           alignment: Alignment.center,
                           child: Icon(
                             Icons.image_outlined,
-                            color: OsmeaColors.pewter,
-                            size: 40,
+                            color: OsmeaColors.grayMaterial[400],
+                            size: context.iconSizeExtraHigh,
                           ),
                         ),
                 ),
                 // Discount badge - top left (only when API marks onSale)
                 if (product.onSale == true && discountPct != null)
                   Positioned(
-                    top: 8,
-                    left: 8,
+                    top: context.spacing8,
+                    left: context.spacing8,
                     child: OsmeaComponents.container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing6,
+                        vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
                         color: OsmeaColors.nordicBlue,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(context.spacing6),
                       ),
                       child: OsmeaComponents.text(
                         '$discountPct% OFF',
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                          fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ),
                 // Wishlist button - top right
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: context.spacing8,
+                  right: context.spacing8,
                   child: GestureDetector(
                     onTap: onWishlistTap,
                     child: OsmeaComponents.container(
-                      width: 30,
-                      height: 30,
+                      width: context.iconSizeNormal * 1.25,
+                      height: context.iconSizeNormal * 1.25,
                       decoration: BoxDecoration(
                         color: OsmeaColors.white,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(context.spacing24),
                         border: Border.all(
-                          color: OsmeaColors.thunder.withOpacity(0.1),
-                          width: 0.1,
+                          color: OsmeaColors.silver,
+                          width: context.borderWidth,
                         ),
                       ),
                       child: Icon(
                         isSaved ? Icons.favorite : Icons.favorite_border,
-                        size: 14,
+                        size: context.iconSizeExtraSmall,
                         color: isSaved
                             ? OsmeaColors.nordicBlue
                             : OsmeaColors.thunder,
@@ -177,10 +177,10 @@ class ProductCardWidget extends StatelessWidget {
               ],
             ),
           ),
-          OsmeaComponents.sizedBox(height: 8),
+          OsmeaComponents.sizedBox(height: context.spacing8),
           // Product info
           OsmeaComponents.padding(
-            padding: const EdgeInsets.only(left: 8),
+            padding: EdgeInsets.only(left: context.spacing8),
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -197,12 +197,12 @@ class ProductCardWidget extends StatelessWidget {
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontSize: 14,
+                          fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                           color: OsmeaColors.nordicBlue,
                         ),
                       ),
-                      OsmeaComponents.sizedBox(width: 6),
+                      OsmeaComponents.sizedBox(width: context.spacing6),
                       OsmeaComponents.text(
                         _formatPrice(
                           prices?.regularPrice,
@@ -212,7 +212,7 @@ class ProductCardWidget extends StatelessWidget {
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          fontSize: 12,
+                          fontSize: context.fontSizeSmall * context.textScaleFactor,
                           color: OsmeaColors.pewter,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -229,35 +229,35 @@ class ProductCardWidget extends StatelessWidget {
                       currencyMinorUnit: prices?.currencyMinorUnit,
                     ),
                     textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                      fontSize: 14,
+                      fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                       fontWeight: FontWeight.w700,
                       color: OsmeaColors.thunder,
                     ),
                   ),
                 ],
-                OsmeaComponents.sizedBox(height: 4),
+                OsmeaComponents.sizedBox(height: context.spacing4),
                 // Product name
                 OsmeaComponents.text(
                   product.name ?? 'Product',
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    fontSize: 14,
+                    fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    height: 1.14,
+                    height: context.lineHeightSnug,
                     color: OsmeaColors.thunder,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                OsmeaComponents.sizedBox(height: 2),
+                OsmeaComponents.sizedBox(height: context.spacing2),
                 // Description
                 if (product.shortDescription != null &&
                     product.shortDescription!.isNotEmpty)
                   OsmeaComponents.text(
                     _stripHtml(product.shortDescription!),
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontSize: 10,
+                      fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
-                      height: 1.2,
+                      height: context.lineHeightNormal,
                       color: OsmeaColors.pewter,
                     ),
                     maxLines: 1,
