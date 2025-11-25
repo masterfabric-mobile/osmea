@@ -231,12 +231,15 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             return value.toString();
           }
 
-          final name = safeStringFromResponse(itemResponse.name) ?? 
-                       safeStringFromResponse(itemResponse.productName);
-          final price = safeStringFromResponse(itemResponse.price) ?? 
-                        safeStringFromResponse(itemResponse.productPrice);
-          final image = safeStringFromResponse(itemResponse.image) ?? 
-                        safeStringFromResponse(itemResponse.productImage);
+          final name =
+              safeStringFromResponse(itemResponse.name) ??
+              safeStringFromResponse(itemResponse.productName);
+          final price =
+              safeStringFromResponse(itemResponse.price) ??
+              safeStringFromResponse(itemResponse.productPrice);
+          final image =
+              safeStringFromResponse(itemResponse.image) ??
+              safeStringFromResponse(itemResponse.productImage);
 
           debugPrint(
             '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name',
@@ -661,8 +664,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                   regularPrice: safeString(item['regularPrice']),
                   salePrice: safeString(item['salePrice']),
                   currencyCode: safeString(item['currencyCode']),
-                  currencyDecimalSeparator: safeString(item['currencyDecimalSeparator']),
-                  currencyThousandSeparator: safeString(item['currencyThousandSeparator']),
+                  currencyDecimalSeparator: safeString(
+                    item['currencyDecimalSeparator'],
+                  ),
+                  currencyThousandSeparator: safeString(
+                    item['currencyThousandSeparator'],
+                  ),
                   currencyMinorUnit: safeInt(item['currencyMinorUnit']),
                   onSale: safeBool(item['onSale'], defaultValue: false),
                 );

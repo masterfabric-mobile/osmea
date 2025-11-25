@@ -26,24 +26,23 @@ class WishlistListWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return ListView.separated(
+    return OsmeaComponents.singleChildScrollView(
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing16,
-        vertical: context.spacing12,
+        horizontal: context.spacing12,
+        vertical: context.spacing8,
       ),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return WishlistItemWidget(
-          item: item,
-          viewModel: viewModel,
-        );
-      },
-      separatorBuilder: (_, __) => OsmeaComponents.divider(),
-      itemCount: items.length,
+      child: OsmeaComponents.column(
+        children: [
+          for (int i = 0; i < items.length; i++) ...[
+            WishlistItemWidget(item: items[i], viewModel: viewModel),
+            if (i < items.length - 1)
+              OsmeaComponents.divider(
+                color: OsmeaColors.platinum,
+                height: context.height1,
+              ),
+          ],
+        ],
+      ),
     );
   }
 }
-
-
-
-

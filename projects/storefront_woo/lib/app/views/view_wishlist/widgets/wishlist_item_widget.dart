@@ -22,49 +22,58 @@ class WishlistItemWidget extends StatelessWidget {
       background: OsmeaComponents.container(
         alignment: centerRight,
         padding: EdgeInsets.only(right: context.spacing20),
-        decoration: BoxDecoration(color: OsmeaColors.red),
-        child: Row(
+        decoration: BoxDecoration(color: OsmeaColors.amberFlame),
+        child: OsmeaComponents.row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Icon(Icons.delete_outline, color: OsmeaColors.white, size: 24),
-            SizedBox(width: context.spacing8),
-            Text(
+            Icon(
+              Icons.delete_outline,
+              color: OsmeaColors.white,
+              size: context.iconSizeNormal,
+            ),
+            OsmeaComponents.sizedBox(width: context.spacing8),
+            OsmeaComponents.text(
               'Remove',
-              style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: OsmeaColors.white,
-                fontWeight: FontWeight.w600,
-              ),
+              textStyle: OsmeaTextStyle.bodyMedium(
+                context,
+              ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
             ),
           ],
         ),
       ),
       confirmDismiss: (direction) async {
         // Show confirmation dialog
-        return await showDialog<bool>(
+        return await OsmeaComponents.showPopup<bool>(
               context: context,
-              builder: (BuildContext dialogContext) {
-                return AlertDialog(
-                  title: Text('Remove from favorites?'),
-                  content: Text(
-                    'Are you sure you want to remove this item from your favorites?',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.of(dialogContext).pop(false),
-                      child: Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.of(dialogContext).pop(true),
-                      style: TextButton.styleFrom(
-                        foregroundColor: OsmeaColors.red,
+              variant: PopupVariant.dialog,
+              title: 'Remove from favorites?',
+              subtitle:
+                  'Are you sure you want to remove this item from your favorites?',
+              padding: EdgeInsets.all(context.spacing16),
+              child: OsmeaComponents.column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OsmeaComponents.row(
+                    children: [
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.button(
+                          text: 'Cancel',
+                          variant: ButtonVariant.outlined,
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
                       ),
-                      child: Text('Remove'),
-                    ),
-                  ],
-                );
-              },
+                      OsmeaComponents.sizedBox(width: context.spacing8),
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.button(
+                          text: 'Remove',
+                          variant: ButtonVariant.primary,
+                          onPressed: () => Navigator.of(context).pop(true),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ) ??
             false;
       },
@@ -83,119 +92,92 @@ class WishlistItemWidget extends StatelessWidget {
           onAction: () => viewModel.toggle(item),
         );
       },
-      child: OsmeaComponents.container(
-        padding: context.paddingLow,
-        child: OsmeaComponents.row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      child: OsmeaComponents.listItem(
+        variant: ListItemVariant.standard,
+        size: ListItemSize.medium,
+        title: OsmeaComponents.text(
+          item.name ?? 'Product',
+          textStyle: OsmeaTextStyle.titleSmall(
+            context,
+          ).copyWith(color: OsmeaColors.thunder, fontWeight: FontWeight.w600),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: WishlistItemPriceWidget(item: item),
+        leading: OsmeaComponents.image(
+          imageUrl: item.imageUrl,
+          width: context.width64,
+          height: context.height64,
+          fit: BoxFit.cover,
+          borderRadius: BorderRadius.circular(context.radiusLow),
+          variant: ImageVariant.normal,
+          errorWidget: OsmeaComponents.container(
+            width: context.width64,
+            height: context.height64,
+            color: OsmeaColors.pewter.withOpacity(0.1),
+            child: Icon(
+              Icons.image_outlined,
+              color: OsmeaColors.pewter,
+              size: context.iconSizeNormal,
+            ),
+          ),
+          placeholder: OsmeaComponents.container(
+            width: context.width64,
+            height: context.height64,
+            color: OsmeaColors.pewter.withOpacity(0.1),
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              strokeWidth: context.width2,
+              valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.nordicBlue),
+            ),
+          ),
+        ),
+        trailing: OsmeaComponents.row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Image
-            OsmeaComponents.image(
-              imageUrl: item.imageUrl,
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-              borderRadius: BorderRadius.circular(context.radiusLow),
-              variant: ImageVariant.normal,
-              errorWidget: Container(
-                width: 80,
-                height: 80,
-                color: OsmeaColors.pewter.withOpacity(0.1),
-                child: Icon(
-                  Icons.image_outlined,
-                  color: OsmeaColors.pewter,
-                  size: 32,
-                ),
+            // Cart button
+            OsmeaComponents.iconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                size: context.iconSizeSmall,
+                color: OsmeaColors.nordicBlue,
               ),
-              placeholder: Container(
-                width: 80,
-                height: 80,
-                color: OsmeaColors.pewter.withOpacity(0.1),
-                alignment: Alignment.center,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    OsmeaColors.nordicBlue,
-                  ),
-                ),
-              ),
+              variant: ButtonVariant.outlined,
+              size: ButtonSize.extraSmall,
+              backgroundColor: OsmeaColors.nordicBlue.withOpacity(0.1),
+              borderRadius: context.spacing4,
+              onPressed: () => viewModel.promptAddToCartOptions(item),
             ),
-            SizedBox(width: context.spacing12),
-
-            // Title + price
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OsmeaComponents.text(
-                    item.name ?? 'Product',
-                    textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                      color: OsmeaColors.thunder,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: context.spacing6),
-                  WishlistItemPriceWidget(item: item),
-                ],
+            OsmeaComponents.sizedBox(width: context.spacing4),
+            // Favorite button
+            OsmeaComponents.iconButton(
+              icon: Icon(
+                Icons.favorite,
+                color: OsmeaColors.nordicBlue,
+                size: context.iconSizeSmall,
               ),
-            ),
-
-            SizedBox(width: context.spacing8),
-
-            // Actions
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Cart button
-                OsmeaComponents.iconButton(
-                  icon: Icon(
-                    Icons.shopping_cart_outlined,
-                    size: context.iconSizeSmall,
-                    color: OsmeaColors.nordicBlue,
-                  ),
-                  variant: ButtonVariant.outlined,
-                  size: ButtonSize.extraSmall,
-                  backgroundColor: OsmeaColors.nordicBlue.withOpacity(0.1),
-                  borderRadius: 4,
-                  onPressed: () => viewModel.promptAddToCartOptions(item),
-                ),
-                CoreSpacer(CoreSpacerType.horizontal),
-                // Favorite button
-                OsmeaComponents.iconButton(
-                  icon: Icon(
-                    Icons.favorite,
-                    color: OsmeaColors.nordicBlue,
-                    size: context.iconSizeSmall,
-                  ),
-                  size: ButtonSize.extraSmall,
-                  borderRadius: 4,
-                  variant: ButtonVariant.outlined,
-                  onPressed: () {
-                    viewModel.remove(item.id);
-                    context.showSnackbar(
-                      title: 'Removed from favorites',
-                      message: 'Item was removed from your favorites',
-                      type: SnackbarType.error,
-                      style: SnackbarStyle.minimal,
-                      position: SnackbarPosition.bottom,
-                      animation: SnackbarAnimation.slide,
-                      actionLabel: 'Undo',
-                      onAction: () => viewModel.toggle(item),
-                    );
-                  },
-                ),
-              ],
+              size: ButtonSize.extraSmall,
+              borderRadius: context.spacing4,
+              variant: ButtonVariant.outlined,
+              onPressed: () {
+                viewModel.remove(item.id);
+                context.showSnackbar(
+                  title: 'Removed from favorites',
+                  message: 'Item was removed from your favorites',
+                  type: SnackbarType.error,
+                  style: SnackbarStyle.minimal,
+                  position: SnackbarPosition.bottom,
+                  animation: SnackbarAnimation.slide,
+                  actionLabel: 'Undo',
+                  onAction: () => viewModel.toggle(item),
+                );
+              },
             ),
           ],
         ),
+        padding: context.paddingLow,
+        margin: EdgeInsets.zero,
       ),
     );
   }
 }
-
-
-
-

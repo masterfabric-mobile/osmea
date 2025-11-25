@@ -5,10 +5,7 @@ import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart
 class WishlistItemPriceWidget extends StatelessWidget {
   final WishlistItem item;
 
-  const WishlistItemPriceWidget({
-    super.key,
-    required this.item,
-  });
+  const WishlistItemPriceWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +17,7 @@ class WishlistItemPriceWidget extends StatelessWidget {
         item.regularPrice!.isNotEmpty &&
         item.salePrice != item.regularPrice;
 
-    // İndirimli ürünlerde: sale price + regular price (strikethrough)
+    // For products on sale: show sale price + regular price (strikethrough)
     if (hasSale) {
       return OsmeaComponents.row(
         mainAxisSize: MainAxisSize.min,
@@ -32,7 +29,7 @@ class WishlistItemPriceWidget extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(width: context.spacing6),
+          OsmeaComponents.sizedBox(width: context.spacing6),
           OsmeaComponents.text(
             _formatPrice(item.regularPrice, item.currencyCode),
             textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
@@ -44,25 +41,23 @@ class WishlistItemPriceWidget extends StatelessWidget {
       );
     }
 
-    // İndirimli olmayan ürünlerde: sadece regular price göster
+    // For products not on sale: show only regular price
     final regularPrice = item.regularPrice;
     if (regularPrice != null && regularPrice.isNotEmpty) {
       return OsmeaComponents.text(
         _formatPrice(regularPrice, item.currencyCode),
-        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-          color: OsmeaColors.nordicBlue,
-          fontWeight: FontWeight.w600,
-        ),
+        textStyle: OsmeaTextStyle.bodyMedium(
+          context,
+        ).copyWith(color: OsmeaColors.nordicBlue, fontWeight: FontWeight.w600),
       );
     }
 
-    // Fiyat yoksa default price göster
+    // If no price, show default price
     return OsmeaComponents.text(
       PriceInfoCurrencyHelper.getDefaultPrice(),
-      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-        color: OsmeaColors.pewter,
-        fontWeight: FontWeight.w400,
-      ),
+      textStyle: OsmeaTextStyle.bodyMedium(
+        context,
+      ).copyWith(color: OsmeaColors.pewter, fontWeight: FontWeight.w400),
     );
   }
 
@@ -74,13 +69,15 @@ class WishlistItemPriceWidget extends StatelessWidget {
 
     // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
     // Use API-provided separators and minor_unit to correctly parse the price format
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: item.currencyDecimalSeparator,
-      currencyThousandSeparator: item.currencyThousandSeparator,
-      currencyMinorUnit: item.currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: item.currencyDecimalSeparator,
+          currencyThousandSeparator: item.currencyThousandSeparator,
+          currencyMinorUnit: item.currencyMinorUnit,
+        ) ??
+        0.0;
 
     // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
@@ -93,7 +90,3 @@ class WishlistItemPriceWidget extends StatelessWidget {
     );
   }
 }
-
-
-
-
