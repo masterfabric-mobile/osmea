@@ -23,3 +23,5 @@ class ProductDetailLoadingWidget extends StatelessWidget {
   }
 }
 
+
+

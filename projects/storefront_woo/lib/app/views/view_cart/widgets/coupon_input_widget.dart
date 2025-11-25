@@ -65,7 +65,7 @@ class CouponInputWidget extends StatelessWidget {
     final couponCode = value.trim();
     if (couponCode.isNotEmpty) {
       viewModel.applyCoupon(couponCode);
-      // OsmeaComponents.textField'ın kendi oluşturduğu TextFieldCubit'e eriş
+      // Access the TextFieldCubit created by OsmeaComponents.textField
       final cubit = context.read<TextFieldCubit>();
       cubit.clear();
     }

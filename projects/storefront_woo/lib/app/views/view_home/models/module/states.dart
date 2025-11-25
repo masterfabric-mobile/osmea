@@ -24,7 +24,7 @@ class HomeLoadedState extends HomeState {
   final String? searchQuery;
   final int? selectedCategoryId;
   final ListAllProductsResponseModel?
-  selectedProduct; // Seçilen product bilgisi
+  selectedProduct; // Selected product information
 
   HomeLoadedState({
     required this.products,
