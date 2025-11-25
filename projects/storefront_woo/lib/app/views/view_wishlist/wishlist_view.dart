@@ -94,7 +94,7 @@ class WishlistView
           variant: PopupVariant.dialog,
           title: 'Add to cart?',
           subtitle: 'Choose what to do with this saved item.',
-          padding: EdgeInsets.all(context.spacing16),
+          padding: context.paddingNormal,
           child: OsmeaComponents.column(
             mainAxisSize: MainAxisSize.min,
             children: [
