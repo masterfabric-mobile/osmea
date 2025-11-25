@@ -61,7 +61,7 @@ class ProductDetailContentWidget extends StatelessWidget {
             OsmeaComponents.singleChildScrollView(
               padding: EdgeInsets.only(bottom: context.dynamicHeight(0.10)),
               child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: context.crossStart,
                 children: [
                   // Product images with overlay actions
                   ProductImagesWidget(

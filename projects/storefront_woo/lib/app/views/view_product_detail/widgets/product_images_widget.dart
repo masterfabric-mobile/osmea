@@ -74,7 +74,7 @@ class ProductImagesWidget extends StatelessWidget {
                 width: context.infinity,
                 height: height,
                 fit: BoxFit.contain,
-                alignment: Alignment.center,
+                alignment: context.center,
                 placeholder: OsmeaComponents.container(
                   color: OsmeaColors.white,
                   child: OsmeaComponents.center(

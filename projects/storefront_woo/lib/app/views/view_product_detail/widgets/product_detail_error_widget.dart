@@ -22,7 +22,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return OsmeaComponents.center(
       child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: context.centerMain,
         children: [
           Icon(
             Icons.error_outline,

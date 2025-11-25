@@ -18,7 +18,7 @@ class DescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.container(
           padding: context.paddingLow,
@@ -67,7 +67,7 @@ class DescriptionSection extends StatelessWidget {
   Widget _buildExpandedDescription(BuildContext context) {
     final structuredItems = _parseDescriptionToBulletPoints();
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         ...structuredItems.map((item) => _buildBulletPoint(context, item)),
       ],
@@ -80,7 +80,7 @@ class DescriptionSection extends StatelessWidget {
     final hasMoreItems = structuredItems.length > 2;
 
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         ...itemsToShow.map((item) => _buildBulletPoint(context, item)),
         if (hasMoreItems) ...[
@@ -146,9 +146,9 @@ class DescriptionSection extends StatelessWidget {
 
   Widget _buildBulletPoint(BuildContext context, String text) {
     return OsmeaComponents.padding(
-      padding: EdgeInsets.only(bottom: context.spacing4),
+      padding: context.onlyBottomPaddingZero,
       child: OsmeaComponents.row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           OsmeaComponents.container(
             width: 3,

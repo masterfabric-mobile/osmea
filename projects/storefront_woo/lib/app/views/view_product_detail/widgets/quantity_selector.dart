@@ -26,7 +26,7 @@ class QuantitySelector extends StatelessWidget {
         ),
       ),
       child: OsmeaComponents.row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: context.spaceEvenly,
         children: [
           _InlineButton(icon: Icons.remove, onPressed: onDecrement),
           OsmeaComponents.text(

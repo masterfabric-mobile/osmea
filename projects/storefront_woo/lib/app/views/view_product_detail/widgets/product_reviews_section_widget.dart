@@ -39,7 +39,7 @@ class ProductReviewsSectionWidget extends StatelessWidget {
     }).toList();
 
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.text(
           validReviews.isEmpty ? 'Reviews' : 'Reviews (${validReviews.length})',
@@ -66,7 +66,7 @@ class _EmptyReviewsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.container(
-      margin: EdgeInsets.only(bottom: context.spacing12),
+      margin: context.onlyBottomPaddingNormal,
       padding: EdgeInsets.symmetric(
         horizontal: context.spacing12,
         vertical: context.spacing16,
@@ -82,7 +82,7 @@ class _EmptyReviewsWidget extends StatelessWidget {
       child: OsmeaComponents.center(
         child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: context.crossCenter,
           children: [
             Icon(
               Icons.reviews_outlined,

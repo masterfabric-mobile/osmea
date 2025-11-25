@@ -73,7 +73,7 @@ class ProductAttributesWidget extends StatelessWidget {
     }
 
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: context.crossStart,
       children: [
         for (final attr in normalized) ...[
           OsmeaComponents.text(

@@ -33,7 +33,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
         vertical: context.spacing8,
       ),
       child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           // Product name
           OsmeaComponents.text(

@@ -20,8 +20,8 @@ class ReviewItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.container(
-      margin: EdgeInsets.only(bottom: context.spacing8),
-      padding: EdgeInsets.all(context.spacing10),
+      margin: context.onlyBottomPaddingLow,
+      padding: context.paddingLow,
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: context.borderRadiusNormal,
@@ -31,7 +31,7 @@ class ReviewItemWidget extends StatelessWidget {
         ),
       ),
       child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           // Reviewer info and rating
           OsmeaComponents.row(
@@ -82,7 +82,7 @@ class ReviewItemWidget extends StatelessWidget {
               // Reviewer name and rating
               OsmeaComponents.expanded(
                 child: OsmeaComponents.column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: context.crossStart,
                   children: [
                     OsmeaComponents.text(
                       review.reviewer ?? 'Anonymous',
