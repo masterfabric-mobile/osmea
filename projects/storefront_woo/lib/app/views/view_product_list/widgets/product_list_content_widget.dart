@@ -93,7 +93,7 @@ class ProductListContentWidget extends StatelessWidget {
   /// Builds toggle buttons for Sort by / Filters
   Widget _buildToggleButtons(BuildContext context) {
     return OsmeaComponents.padding(
-      padding: EdgeInsets.all(16),
+      padding: context.paddingNormal,
       child: OsmeaComponents.row(
         children: [
           Expanded(
@@ -151,14 +151,14 @@ class ProductListContentWidget extends StatelessWidget {
     return OsmeaComponents.center(
       child: OsmeaComponents.singleChildScrollView(
         child: OsmeaComponents.column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: context.centerMain,
+          crossAxisAlignment: context.crossCenter,
           children: [
             OsmeaComponents.container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                color: OsmeaColors.nordicBlue,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -208,7 +208,7 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.minPrice != null && filters.minPrice!.isNotEmpty) {
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: context.onlyRightPaddingLow,
           child: OsmeaComponents.chips(
             text: 'Min: ${_formatPriceChip(filters.minPrice!)}',
             variant: ChipsVariant.warning,
@@ -226,7 +226,7 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.maxPrice != null && filters.maxPrice!.isNotEmpty) {
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: context.onlyRightPaddingLow,
           child: OsmeaComponents.chips(
             text: 'Max: ${_formatPriceChip(filters.maxPrice!)}',
             variant: ChipsVariant.warning,
@@ -244,7 +244,7 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.onSale == true) {
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: context.onlyRightPaddingLow,
           child: OsmeaComponents.chips(
             text: 'On Sale',
             variant: ChipsVariant.primary,
@@ -262,7 +262,7 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.featured == true) {
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: context.onlyRightPaddingLow,
           child: OsmeaComponents.chips(
             text: 'Featured',
             variant: ChipsVariant.secondary,
@@ -280,7 +280,7 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.stockStatus != null) {
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: context.onlyRightPaddingLow,
           child: OsmeaComponents.chips(
             text: _formatStockStatus(filters.stockStatus!),
             variant: ChipsVariant.info,

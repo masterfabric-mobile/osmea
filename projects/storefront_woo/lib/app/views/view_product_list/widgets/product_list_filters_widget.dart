@@ -55,9 +55,9 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
             
             // Header with actions
             OsmeaComponents.padding(
-              padding: EdgeInsets.all(16),
+              padding: context.paddingNormal,
               child: OsmeaComponents.row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: context.spaceBetween,
                 children: [
                   OsmeaComponents.text(
                     widget.showOnlySort ? 'Sort Products' : 'Filter Products',
@@ -110,9 +110,9 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
   /// Build sorting tab content
   Widget _buildSortingContent(BuildContext context, String selectedSortBy, String selectedOrder) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: context.paddingNormal,
       child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           _buildSortOptions(context, selectedSortBy, selectedOrder),
         ],
@@ -123,9 +123,9 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
   /// Build filtering tab content
   Widget _buildFilteringContent(BuildContext context, dynamic tempFilters) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: context.paddingNormal,
       child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           // Price Range
           _buildSectionTitle(context, 'Price Range'),
@@ -179,8 +179,8 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
               padding: context.paddingLow,
               decoration: BoxDecoration(
                 color: filterOptions?.sortOptions != null 
-                    ? Colors.green.withOpacity(0.1) 
-                    : Colors.orange.withOpacity(0.1),
+                    ? Colors.green 
+                    : Colors.orange,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: filterOptions?.sortOptions != null 
@@ -311,21 +311,21 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
         borderRadius: BorderRadius.circular(context.radiusLow),
         child: OsmeaComponents.container(
           padding: context.paddingLow,
-          margin: EdgeInsets.only(bottom: context.spacing8),
+          margin: context.onlyBottomPaddingLow,
           decoration: BoxDecoration(
             color: isSelected
-                ? OsmeaColors.nordicBlue.withOpacity(0.1)
+                ? OsmeaColors.nordicBlue
                 : OsmeaColors.transparent,
             border: Border.all(
               color: isSelected
                   ? OsmeaColors.nordicBlue
-                  : OsmeaColors.silver.withOpacity(0.3),
+                  : OsmeaColors.silver,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(context.radiusLow),
           ),
           child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: context.spaceBetween,
             children: [
               OsmeaComponents.text(
                 label,
@@ -417,7 +417,7 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
     String? placeholder,
   }) {
     return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.text(
           label,
@@ -468,12 +468,12 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
         padding: context.paddingLow,
         decoration: BoxDecoration(
           color: isOnSale
-              ? OsmeaColors.nordicBlue.withOpacity(0.1)
+              ? OsmeaColors.nordicBlue
               : OsmeaColors.transparent,
           border: Border.all(
             color: isOnSale
                 ? OsmeaColors.nordicBlue
-                : OsmeaColors.silver.withOpacity(0.3),
+                : OsmeaColors.silver,
             width: 1,
           ),
           borderRadius: BorderRadius.circular(context.radiusLow),
@@ -565,12 +565,12 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
         margin: EdgeInsets.only(bottom: context.spacing8),
         decoration: BoxDecoration(
           color: isSelected
-              ? OsmeaColors.nordicBlue.withOpacity(0.1)
+              ? OsmeaColors.nordicBlue
               : OsmeaColors.transparent,
           border: Border.all(
             color: isSelected
                 ? OsmeaColors.nordicBlue
-                : OsmeaColors.silver.withOpacity(0.3),
+                : OsmeaColors.silver,
             width: 1,
           ),
           borderRadius: BorderRadius.circular(context.radiusLow),

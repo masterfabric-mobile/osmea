@@ -42,21 +42,21 @@ class DebugFilterInfoWidget extends StatelessWidget {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: context.crossStart,
                 children: [
-                  _buildDebugRow('Data Source', 
+                  _buildDebugRow(context, 'Data Source', 
                     filterOptions != null ? '🌐 Dynamic (API/Mock)' : '📱 Static Fallback'),
-                  _buildDebugRow('Sort Options Count', 
+                  _buildDebugRow(context, 'Sort Options Count', 
                     filterOptions?.sortOptions != null ? '${filterOptions!.sortOptions.length}' : "Static: 6"),
-                  _buildDebugRow('Stock Statuses Count', 
+                  _buildDebugRow(context, 'Stock Statuses Count', 
                     filterOptions?.stockStatuses != null ? '${filterOptions!.stockStatuses.length}' : "Static: 3"),
-                  _buildDebugRow('Price Range', _getPriceRangeText(filterOptions)),
+                  _buildDebugRow(context, 'Price Range', _getPriceRangeText(filterOptions)),
                   if (filterOptions?.categories != null)
-                    _buildDebugRow('Categories', '${filterOptions!.categories!.length} available'),
+                    _buildDebugRow(context, 'Categories', '${filterOptions!.categories!.length} available'),
                   if (filterOptions?.tags != null)
-                    _buildDebugRow('Tags', '${filterOptions!.tags!.length} available'),
+                    _buildDebugRow(context, 'Tags', '${filterOptions!.tags!.length} available'),
                   if (filterOptions?.availableAttributes != null)
-                    _buildDebugRow('Attributes', '${filterOptions!.availableAttributes!.length} available'),
+                    _buildDebugRow(context, 'Attributes', '${filterOptions!.availableAttributes!.length} available'),
                 ],
               ),
             ),
@@ -94,11 +94,11 @@ class DebugFilterInfoWidget extends StatelessWidget {
     return '$symbol${priceRange.minPrice} - $symbol${priceRange.maxPrice}';
   }
 
-  Widget _buildDebugRow(String label, String value) {
+  Widget _buildDebugRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: context.crossStart,
         children: [
           SizedBox(
             width: 120,
