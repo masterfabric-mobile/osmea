@@ -43,7 +43,7 @@ class CartItemSwipeWidget extends StatelessWidget {
         right: context.spacing16,
       ),
       alignment: context.centerRight,
-      padding: EdgeInsets.only(right: context.spacing20),
+      padding: context.onlyRightPaddingNormal,
       decoration: BoxDecoration(
         color: OsmeaColors.amberFlame,
         borderRadius: context.borderRadiusNormal,

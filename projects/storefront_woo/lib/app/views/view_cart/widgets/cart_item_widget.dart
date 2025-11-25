@@ -98,7 +98,7 @@ class CartItemWidget extends StatelessWidget {
     return OsmeaComponents.center(
       child: Icon(
         Icons.image_outlined,
-        color: OsmeaColors.pewter.withValues(alpha: context.alpha30),
+        color: OsmeaColors.grayMaterial[400],
         size: context.iconSizeMedium,
       ),
     );
@@ -196,14 +196,14 @@ class CartItemWidget extends StatelessWidget {
               Icons.remove_rounded,
               color: item.quantity > 1
                   ? OsmeaColors.thunder
-                  : OsmeaColors.pewter.withValues(alpha: context.alpha30),
+                  : OsmeaColors.pewter,
               size: context.iconSizeExtraSmall,
             ),
             backgroundColor: Colors.transparent,
             size: ButtonSize.extraSmall,
           ),
           OsmeaComponents.padding(
-            padding: EdgeInsets.symmetric(horizontal: context.spacing8),
+            padding: context.horizontalPaddingLow,
             child: OsmeaComponents.text(
               '${item.quantity}',
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(

@@ -26,7 +26,7 @@ class OrderSummaryWidget extends StatelessWidget {
         borderRadius: context.borderRadiusNormal,
       ),
       child: OsmeaComponents.padding(
-        padding: EdgeInsets.all(context.spacing16),
+        padding: context.paddingNormal,
         child: OsmeaComponents.column(
           crossAxisAlignment: context.crossStart,
           children: [
@@ -156,7 +156,7 @@ class _SummaryRowWidget extends StatelessWidget {
                   : OsmeaTextStyle.bodySmall(context).copyWith(
                       fontWeight: FontWeight.w500,
                       color: isSecondary
-                          ? OsmeaColors.pewter.withValues(alpha: context.alpha80)
+                          ? OsmeaColors.pewter
                           : OsmeaColors.thunder,
                       fontStyle:
                           isSecondary ? FontStyle.italic : FontStyle.normal,

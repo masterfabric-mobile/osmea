@@ -29,11 +29,11 @@ class AppliedCouponWidget extends StatelessWidget {
         vertical: context.spacing4,
       ),
       decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue.withValues(alpha: context.alpha5),
+        color: OsmeaColors.nordicBlue,
         borderRadius: context.borderRadiusNormal,
       ),
       child: OsmeaComponents.padding(
-        padding: EdgeInsets.all(context.spacing10),
+        padding: context.paddingLow,
         child: OsmeaComponents.row(
           children: [
             Icon(
