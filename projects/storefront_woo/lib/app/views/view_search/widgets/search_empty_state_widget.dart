@@ -227,14 +227,14 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
     if (_error != null) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(context.spacing24),
+          padding: context.paddingHigh,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: context.centerMain,
             children: [
               Icon(
                 Icons.error_outline,
                 size: 64,
-                color: OsmeaColors.pewter.withOpacity(0.5),
+                color: OsmeaColors.pewter,
               ),
               SizedBox(height: context.spacing16),
               OsmeaComponents.text(
@@ -277,7 +277,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
             height: 140,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: context.spacing4),
+              padding: context.horizontalPaddingZero,
               itemCount: _brands.length,
               separatorBuilder: (context, index) =>
                   SizedBox(width: context.spacing8),
@@ -306,7 +306,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
               horizontal: context.spacing12,
               vertical: context.spacing10,
             ),
-            margin: EdgeInsets.only(bottom: context.spacing8),
+            margin: context.onlyBottomPaddingLow,
             title: OsmeaComponents.text(
               category.name ?? 'Category',
               textStyle: OsmeaTextStyle.titleSmall(
@@ -340,12 +340,12 @@ class _BrandCard extends StatelessWidget {
       variant: ComponentAppearance.outlined,
       size: ComponentSize.small,
       borderRadius: BorderRadius.circular(12),
-      padding: EdgeInsets.all(context.spacing8),
-      margin: EdgeInsets.zero,
+      padding: context.paddingLow,
+      margin: context.paddingZero,
       onTap: onTap,
       customContent: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: context.centerMain,
+        crossAxisAlignment: context.crossCenter,
         children: [
           // Brand image or placeholder
           if (brand.image?.thumbnail != null || brand.image?.src != null)
@@ -361,7 +361,7 @@ class _BrandCard extends StatelessWidget {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: OsmeaColors.pewter.withOpacity(0.1),
+                      color: OsmeaColors.pewter,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -378,7 +378,7 @@ class _BrandCard extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: OsmeaColors.pewter.withOpacity(0.1),
+                color: OsmeaColors.pewter,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

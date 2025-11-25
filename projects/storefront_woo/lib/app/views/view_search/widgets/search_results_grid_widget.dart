@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
+import 'package:core/core.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
@@ -16,11 +17,11 @@ class SearchResultsGridWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // Use Wrap widget exactly like Recommended section for same spacing behavior
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 16,
-        bottom: 0,
+      padding: EdgeInsets.fromLTRB(
+        context.spacing20,
+        context.height16,
+        context.spacing20,
+        0,
       ), // Same padding as Recommended section
       child: Wrap(
         spacing: 15, // Same as Recommended section horizontal spacing
