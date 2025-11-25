@@ -359,10 +359,8 @@ class ProductListViewModel
         category: _filters.category,
         tag: _filters.tag,
         onSale: _filters.onSale,
-        // Note: Store API v1 doesn't reliably support min_price/max_price filtering
-        // We'll implement client-side price filtering below
-        minPrice: null, // Disable server-side price filtering
-        maxPrice: null, // Disable server-side price filtering
+        minPrice: minPrice,
+        maxPrice: maxPrice,
         stockStatus: _filters.stockStatus,
         orderBy: _filters.orderBy,
         order: _filters.order,
@@ -388,90 +386,23 @@ class ProductListViewModel
         }
       }
       
-      // Client-side price filtering (since Store API v1 doesn't support it reliably)
-      List<ListAllProductsResponseModel> filteredProducts = products;
-      if (minPrice != null || maxPrice != null) {
-        final minPriceValue = minPrice != null ? double.tryParse(minPrice) : null;
-        final maxPriceValue = maxPrice != null ? double.tryParse(maxPrice) : null;
-        
-        debugPrint('🔍 Applying client-side price filtering:');
-        debugPrint('  - Min Price: $minPrice (parsed: $minPriceValue)');
-        debugPrint('  - Max Price: $maxPrice (parsed: $maxPriceValue)');
-        
-        filteredProducts = products.where((product) {
-          if (product.prices == null) {
-            debugPrint('  ❌ Product ${product.name} has no prices');
-            return false;
-          }
-          
-          // Get the current price (could be sale price or regular price)
-          final priceString = product.prices!.price;
-          if (priceString == null || priceString.isEmpty) {
-            debugPrint('  ❌ Product ${product.name} has empty price string');
-            return false;
-          }
-          
-          // Parse price (remove currency symbols and convert to double)
-          final priceValue = _parsePrice(priceString, currencyMinorUnit: product.prices!.currencyMinorUnit);
-          if (priceValue == null) {
-            debugPrint('  ❌ Product ${product.name} price parsing failed: $priceString');
-            return false;
-          }
-          
-          debugPrint('  🔍 Product ${product.name}: price=$priceString -> $priceValue');
-          
-          // Check min price
-          if (minPriceValue != null && priceValue < minPriceValue) {
-            debugPrint('    ❌ Below min price: $priceValue < $minPriceValue');
-            return false;
-          }
-          
-          // Check max price
-          if (maxPriceValue != null && priceValue > maxPriceValue) {
-            debugPrint('    ❌ Above max price: $priceValue > $maxPriceValue');
-            return false;
-          }
-          
-          debugPrint('    ✅ Price in range: $priceValue');
-          return true;
-        }).toList();
-        
-        debugPrint('🔍 Client-side filtering result: ${products.length} -> ${filteredProducts.length} products');
-      }
-      
-      if (filteredProducts.isNotEmpty) {
-        debugPrint('✅ First product: ${filteredProducts.first.name} (ID: ${filteredProducts.first.id})');
-        if (filteredProducts.first.prices != null) {
-          debugPrint('✅ First product price: ${filteredProducts.first.prices!.price}');
-          debugPrint('✅ First product regular price: ${filteredProducts.first.prices!.regularPrice}');
-          debugPrint('✅ First product sale price: ${filteredProducts.first.prices!.salePrice}');
-        }
-        // Log all product prices if filtering by price
-        if (minPrice != null || maxPrice != null) {
-          debugPrint('🔍 Price filtering active - checking filtered products:');
-          for (int i = 0; i < filteredProducts.length && i < 5; i++) {
-            final product = filteredProducts[i];
-            if (product.prices != null) {
-              final priceValue = _parsePrice(product.prices!.price, currencyMinorUnit: product.prices!.currencyMinorUnit);
-              debugPrint('  - ${product.name}: price=${product.prices!.price} (parsed: $priceValue)');
-            }
-          }
-        }
-      } else {
-        debugPrint('⚠️ ProductListViewModel: No products after filtering');
-        if (minPrice != null || maxPrice != null) {
-          debugPrint('⚠️ This might indicate that no products match the price range: $minPrice - $maxPrice');
+      if (products.isNotEmpty) {
+        debugPrint('✅ First product: ${products.first.name} (ID: ${products.first.id})');
+        if (products.first.prices != null) {
+          debugPrint('✅ First product price: ${products.first.prices!.price}');
+          debugPrint('✅ First product regular price: ${products.first.prices!.regularPrice}');
+          debugPrint('✅ First product sale price: ${products.first.prices!.salePrice}');
         }
       }
 
       if (refresh || _currentPage == 1) {
-        _allProducts = filteredProducts;
+        _allProducts = products;
       } else {
-        _allProducts.addAll(filteredProducts);
+        _allProducts.addAll(products);
       }
 
       // Calculate total pages (assuming we have at least 1 page if products exist)
-      _totalPages = filteredProducts.length < _perPage
+      _totalPages = products.length < _perPage
           ? _currentPage
           : _currentPage + 1; // Estimate, API doesn't always return total
 
@@ -579,63 +510,6 @@ class ProductListViewModel
     } else {
       emit(currentState);
     }
-  }
-
-  /// Parse price string to double value (handles WooCommerce API format)
-  double? _parsePrice(String? priceString, {int? currencyMinorUnit}) {
-    if (priceString == null || priceString.isEmpty) return null;
-    
-    debugPrint('🔍 Parsing price: $priceString (minor_unit: $currencyMinorUnit)');
-    
-    // WooCommerce API sometimes returns prices in minor units (cents)
-    // Use currency_minor_unit to determine the conversion factor
-    final intValue = int.tryParse(priceString);
-    if (intValue != null && currencyMinorUnit != null && currencyMinorUnit > 0) {
-      // This is likely in minor units, convert to major units
-      double divisor = 1.0;
-      for (int i = 0; i < currencyMinorUnit; i++) {
-        divisor *= 10.0;
-      }
-      final doubleValue = intValue / divisor;
-      debugPrint('🔍 Parsed as minor units: $intValue -> $doubleValue (divisor: $divisor)');
-      return doubleValue;
-    } else if (intValue != null) {
-      // Default to cents conversion if no minor unit info
-      final doubleValue = intValue / 100.0;
-      debugPrint('🔍 Parsed as cents (default): $intValue -> $doubleValue');
-      return doubleValue;
-    }
-    
-    // If not integer, try parsing as decimal string
-    // Remove all non-numeric characters except decimal point
-    String cleaned = priceString.replaceAll(RegExp(r'[^\d.,]'), '');
-    
-    // Handle thousand separators (commas) vs decimal separators
-    if (cleaned.contains(',') && cleaned.contains('.')) {
-      // Both comma and dot present - comma is likely thousand separator
-      cleaned = cleaned.replaceAll(',', '');
-    } else if (cleaned.contains(',') && !cleaned.contains('.')) {
-      // Only comma - could be decimal separator (European format)
-      final commaIndex = cleaned.lastIndexOf(',');
-      if (commaIndex >= cleaned.length - 3) {
-        // Comma is near the end, treat as decimal separator
-        cleaned = cleaned.replaceAll(',', '.');
-      } else {
-        // Comma is not near the end, treat as thousand separator
-        cleaned = cleaned.replaceAll(',', '');
-      }
-    }
-    
-    // Ensure only one decimal point
-    final parts = cleaned.split('.');
-    if (parts.length > 2) {
-      cleaned = '${parts[0]}.${parts.sublist(1).join()}';
-    }
-    
-    // Parse to double
-    final result = double.tryParse(cleaned);
-    debugPrint('🔍 Parsed as decimal: $cleaned -> $result');
-    return result;
   }
 
   /// Clean price string for API - removes currency symbols, thousand separators, keeps only numeric value
