@@ -12,21 +12,18 @@ import 'package:injectable/injectable.dart';
 /// {@subCategory SearchView}
 @injectable
 class SearchCubit extends BaseViewModelCubit<SearchState> {
-  SearchCubit({
-    this.maxHistoryItems = 10,
-    this.minQueryLength = 2,
-    this.debounceDuration = const Duration(milliseconds: 500),
-    List<String> initialHistory = const [],
-  }) : super(SearchState.initial().copyWith(searchHistory: initialHistory));
+  SearchCubit() : super(SearchState.initial());
 
   /// Maximum number of search history items to keep
-  final int maxHistoryItems;
+  /// Can be configured via initializeSearch method
+  int maxHistoryItems = 10;
 
   /// Minimum query length to trigger search
-  final int minQueryLength;
+  /// Can be configured via initializeSearch method
+  int minQueryLength = 2;
 
   /// Debounce duration for live search
-  final Duration debounceDuration;
+  final Duration debounceDuration = const Duration(milliseconds: 500);
 
   /// Timer for debouncing search
   Timer? _debounceTimer;
@@ -229,11 +226,19 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
   }
 
   /// Initialize search with configuration
+  /// This method should be called after SearchCubit is created to configure it
   Future<void> initializeSearch({
-    int maxHistoryItems = 10,
-    int minQueryLength = 2,
+    int? maxHistoryItems,
+    int? minQueryLength,
     List<String> initialHistory = const [],
   }) async {
+    // Update configuration if provided
+    if (maxHistoryItems != null) {
+      this.maxHistoryItems = maxHistoryItems;
+    }
+    if (minQueryLength != null) {
+      this.minQueryLength = minQueryLength;
+    }
     emit(state.copyWith(searchHistory: initialHistory));
   }
 

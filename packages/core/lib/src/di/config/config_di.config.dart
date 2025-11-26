@@ -52,6 +52,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i525.LoadingViewCubit>(() => _i525.LoadingViewCubit());
     gh.factory<_i182.OnboardingCubit>(() => _i182.OnboardingCubit());
     gh.factory<_i874.PermissionsCubit>(() => _i874.PermissionsCubit());
+    gh.factory<_i925.SearchCubit>(() => _i925.SearchCubit());
     gh.factory<_i33.SplashCubit>(() => _i33.SplashCubit());
     gh.singleton<_i974.Logger>(() => commonLoggerModule.logger);
     gh.singleton<_i651.AuthCubit>(() => _i651.AuthCubit());
@@ -60,12 +61,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit(
           authCubit: gh<_i651.AuthCubit>(),
           getUsersMeCallback: gh<_i111.GetUsersMeCallback>(),
-        ));
-    gh.factory<_i925.SearchCubit>(() => _i925.SearchCubit(
-          maxHistoryItems: gh<int>(),
-          minQueryLength: gh<int>(),
-          debounceDuration: gh<Duration>(),
-          initialHistory: gh<List<String>>(),
         ));
     return this;
   }

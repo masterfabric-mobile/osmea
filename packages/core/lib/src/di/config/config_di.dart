@@ -10,8 +10,9 @@ GetIt getIt = GetIt.instance;
 @InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies() async {
   // 🔄 Run the generated initialization (includes all @injectable annotated classes)
-  // All cubits including AccountCubit are now registered automatically via @injectable annotation
+  // All cubits including AccountCubit and SearchCubit are now registered automatically via @injectable annotation
   // AccountCubit will automatically inject AuthCubit from GetIt if available
+  // SearchCubit uses nullable parameters with default values, so injectable will ignore them
   // Logger is provided via CommonLoggerModule
   // Note: getUsersMe callback should be injected in project-specific DI configuration
   // (e.g., storefront_woo) to avoid core package dependency on apis package
