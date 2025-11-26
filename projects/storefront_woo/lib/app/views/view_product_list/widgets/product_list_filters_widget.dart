@@ -6,98 +6,54 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_product_list/widgets/debug_filter_info_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/filter_header_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/sort_options_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/price_range_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/on_sale_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/stock_status_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/categories_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/tags_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/attributes_filter_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/collapsible_section_widget.dart';
 
-class ProductListFiltersWidget extends StatefulWidget {
+class ProductListFiltersWidget extends StatelessWidget {
   final ProductListViewModel viewModel;
   final bool showOnlySort;
 
   const ProductListFiltersWidget({
-    super.key, 
+    super.key,
     required this.viewModel,
     this.showOnlySort = false,
   });
 
   @override
-  State<ProductListFiltersWidget> createState() => _ProductListFiltersWidgetState();
-}
-
-class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
-
-  // Getter for easier access to viewModel
-  ProductListViewModel get viewModel => widget.viewModel;
-
-  @override
   Widget build(BuildContext context) {
     // Initialize filter dialog when opened - only once per dialog session
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.initFilterDialog();
+      viewModel.initFilterDialog();
     });
 
     return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: widget.viewModel,
+      bloc: viewModel,
       builder: (context, state) {
         // Get temp filters after initialization
-        final tempFilters = widget.viewModel.tempFilters;
+        final tempFilters = viewModel.tempFilters;
         final selectedSortBy = tempFilters.orderBy ?? 'date';
         final selectedOrder = tempFilters.order ?? 'desc';
 
         return OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Debug info widget (only in debug mode)
-            DebugFilterInfoWidget(viewModel: widget.viewModel),
-            
-            // Header with actions
-            OsmeaComponents.padding(
-              padding: context.paddingNormal,
-              child: OsmeaComponents.row(
-                mainAxisAlignment: context.spaceBetween,
-                children: [
-                  OsmeaComponents.text(
-                    widget.showOnlySort ? 'Sort Products' : 'Filter Products',
-                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: OsmeaColors.thunder,
-                    ),
-                  ),
-                  OsmeaComponents.row(
-                    children: [
-                      if (widget.viewModel.filters.hasActiveFilters && !widget.showOnlySort)
-                        OsmeaComponents.button(
-                          text: 'Clear all',
-                          onPressed: () {
-                            widget.viewModel.clearFilters();
-                            Navigator.pop(context);
-                          },
-                          variant: ButtonVariant.outlined,
-                          size: ButtonSize.medium,
-                        ),
-                      if (widget.viewModel.filters.hasActiveFilters && !widget.showOnlySort)
-                        OsmeaComponents.sizedBox(width: 8),
-                      OsmeaComponents.button(
-                        text: 'Apply',
-                        onPressed: () {
-                          widget.viewModel.applyFilters();
-                          Navigator.pop(context);
-                        },
-                        variant: ButtonVariant.primary,
-                        size: ButtonSize.medium,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            FilterHeaderWidget(
+              viewModel: viewModel,
+              showOnlySort: showOnlySort,
             ),
-            
-            // Content based on showOnlySort parameter
             Flexible(
-              child: widget.showOnlySort
+              child: showOnlySort
                   ? _buildSortingContent(context, selectedSortBy, selectedOrder)
                   : _buildFilteringContent(context, tempFilters),
             ),
@@ -108,13 +64,21 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
   }
 
   /// Build sorting tab content
-  Widget _buildSortingContent(BuildContext context, String selectedSortBy, String selectedOrder) {
+  Widget _buildSortingContent(
+    BuildContext context,
+    String selectedSortBy,
+    String selectedOrder,
+  ) {
     return SingleChildScrollView(
       padding: context.paddingNormal,
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
-          _buildSortOptions(context, selectedSortBy, selectedOrder),
+          SortOptionsWidget(
+            viewModel: viewModel,
+            selectedSortBy: selectedSortBy,
+            selectedOrder: selectedOrder,
+          ),
         ],
       ),
     );
@@ -127,470 +91,60 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
-          // Price Range
-          _buildSectionTitle(context, 'Price Range'),
-          OsmeaComponents.sizedBox(height: 16),
-          _buildPriceRangeFilter(context),
-          OsmeaComponents.sizedBox(height: 24),
-          
-          // On Sale Filter
-          _buildSectionTitle(context, 'Sale Status'),
-          OsmeaComponents.sizedBox(height: 16),
-          _buildOnSaleFilter(context, tempFilters.onSale == true),
-          OsmeaComponents.sizedBox(height: 24),
-          
-          // Stock Status
-          _buildSectionTitle(context, 'Stock Status'),
-          OsmeaComponents.sizedBox(height: 16),
-          _buildStockStatusFilter(context, tempFilters.stockStatus),
+          // Price Range - Always visible (not collapsible)
+          PriceRangeFilterWidget(viewModel: viewModel),
+          OsmeaComponents.sizedBox(height: context.spacing16),
+
+          // Attributes - Collapsible (each attribute as separate panel)
+          AttributesFilterWidget(
+            viewModel: viewModel,
+            selectedAttributes: tempFilters.selectedAttributes ?? {},
+          ),
+
+          // Categories - Collapsible
+          CollapsibleSectionWidget(
+            viewModel: viewModel,
+            title: 'Categories',
+            sectionKey: 'categories',
+            child: CategoriesFilterWidget(
+              viewModel: viewModel,
+              selectedCategories: tempFilters.selectedCategories ?? [],
+            ),
+          ),
+
+          // Tags - Collapsible
+          CollapsibleSectionWidget(
+            viewModel: viewModel,
+            title: 'Tags',
+            sectionKey: 'tags',
+            child: TagsFilterWidget(
+              viewModel: viewModel,
+              selectedTags: tempFilters.selectedTags ?? [],
+            ),
+          ),
+
+          // Sale Status - Collapsible (at the bottom)
+          CollapsibleSectionWidget(
+            viewModel: viewModel,
+            title: 'Sale Status',
+            sectionKey: 'sale_status',
+            child: OnSaleFilterWidget(
+              viewModel: viewModel,
+              isOnSale: tempFilters.onSale == true,
+            ),
+          ),
+
+          // Stock Status - Collapsible (at the bottom, using chips)
+          CollapsibleSectionWidget(
+            viewModel: viewModel,
+            title: 'Stock Status',
+            sectionKey: 'stock_status',
+            child: StockStatusFilterWidget(
+              viewModel: viewModel,
+              selectedStatus: tempFilters.stockStatus,
+            ),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return OsmeaComponents.text(
-      title,
-      textStyle: OsmeaTextStyle.titleMedium(
-        context,
-      ).copyWith(fontWeight: FontWeight.w600, color: OsmeaColors.thunder),
-    );
-  }
-
-  Widget _buildSortOptions(
-    BuildContext context,
-    String selectedSortBy,
-    String selectedOrder,
-  ) {
-    return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
-      builder: (context, state) {
-        // Get filter options from state
-        final filterOptions = state is ProductListLoadedState 
-            ? state.filterOptions 
-            : null;
-
-        // Debug info for data source
-        Widget dataSourceIndicator = Container();
-        if (kDebugMode) {
-          dataSourceIndicator = Padding(
-            padding: EdgeInsets.only(bottom: context.spacing8),
-            child: Container(
-              padding: context.paddingLow,
-              decoration: BoxDecoration(
-                color: filterOptions?.sortOptions != null 
-                    ? Colors.green 
-                    : Colors.orange,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: filterOptions?.sortOptions != null 
-                      ? Colors.green 
-                      : Colors.orange,
-                  width: 1,
-                ),
-              ),
-              child: OsmeaComponents.text(
-                filterOptions?.sortOptions != null 
-                    ? '🌐 Dynamic Data (API)' 
-                    : '📱 Static Fallback',
-                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                  color: filterOptions?.sortOptions != null 
-                      ? Colors.green.shade700 
-                      : Colors.orange.shade700,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          );
-        }
-
-        if (filterOptions?.sortOptions == null) {
-          return OsmeaComponents.column(
-            children: [
-              dataSourceIndicator,
-              _buildStaticSortOptions(context, selectedSortBy, selectedOrder),
-            ],
-          );
-        }
-
-        return OsmeaComponents.column(
-          children: [
-            dataSourceIndicator,
-            ...filterOptions!.sortOptions
-              .where((sortOption) => sortOption.enabled)
-              .expand((sortOption) => sortOption.orders.map((orderOption) =>
-                  _buildSortOption(
-                    context,
-                    '${sortOption.label} (${orderOption.label})',
-                    sortOption.key,
-                    orderOption.key,
-                    selectedSortBy,
-                    selectedOrder,
-                  )))
-              .toList(),
-          ]
-        );
-      },
-    );
-  }
-
-  Widget _buildStaticSortOptions(
-    BuildContext context,
-    String selectedSortBy,
-    String selectedOrder,
-  ) {
-    return OsmeaComponents.column(
-      children: [
-        _buildSortOption(
-          context,
-          'Date (Newest)',
-          'date',
-          'desc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-        _buildSortOption(
-          context,
-          'Date (Oldest)',
-          'date',
-          'asc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-        _buildSortOption(
-          context,
-          'Price (Low to High)',
-          'price',
-          'asc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-        _buildSortOption(
-          context,
-          'Price (High to Low)',
-          'price',
-          'desc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-        _buildSortOption(
-          context,
-          'Name (A-Z)',
-          'title',
-          'asc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-        _buildSortOption(
-          context,
-          'Name (Z-A)',
-          'title',
-          'desc',
-          selectedSortBy,
-          selectedOrder,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSortOption(
-    BuildContext context,
-    String label,
-    String orderBy,
-    String order,
-    String selectedSortBy,
-    String selectedOrder,
-  ) {
-    final isSelected = selectedSortBy == orderBy && selectedOrder == order;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          widget.viewModel.updateTempFilter(orderBy: orderBy, order: order);
-        },
-        borderRadius: BorderRadius.circular(context.radiusLow),
-        child: OsmeaComponents.container(
-          padding: context.paddingLow,
-          margin: context.onlyBottomPaddingLow,
-          decoration: BoxDecoration(
-            color: isSelected
-                ? OsmeaColors.nordicBlue
-                : OsmeaColors.transparent,
-            border: Border.all(
-              color: isSelected
-                  ? OsmeaColors.nordicBlue
-                  : OsmeaColors.silver,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(context.radiusLow),
-          ),
-          child: OsmeaComponents.row(
-            mainAxisAlignment: context.spaceBetween,
-            children: [
-              OsmeaComponents.text(
-                label,
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: isSelected
-                      ? OsmeaColors.nordicBlue
-                      : OsmeaColors.thunder,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-              if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  color: OsmeaColors.nordicBlue,
-                  size: 20,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceRangeFilter(BuildContext context) {
-    return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
-      builder: (context, state) {
-        // Get filter options from state
-        final filterOptions = state is ProductListLoadedState 
-            ? state.filterOptions 
-            : null;
-
-        final priceRange = filterOptions?.priceRange;
-        final currencySymbol = priceRange?.currencySymbol ?? '\$';
-        
-        return OsmeaComponents.column(
-          children: [
-            if (priceRange != null) ...[
-              // Show price range hint
-              OsmeaComponents.padding(
-                padding: EdgeInsets.only(bottom: context.spacing8),
-                child: OsmeaComponents.text(
-                  'Range: $currencySymbol${priceRange.minPrice.toStringAsFixed(2)} - $currencySymbol${priceRange.maxPrice.toStringAsFixed(2)}',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.pewter,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            ],
-            OsmeaComponents.row(
-              children: [
-                Expanded(
-                  child: _buildPriceInput(
-                    context,
-                    'Min price',
-                    widget.viewModel.minPriceController,
-                    (value) {
-                      widget.viewModel.updateTempFilter(minPrice: value);
-                    },
-                    placeholder: priceRange?.minPrice.toString(),
-                  ),
-                ),
-                OsmeaComponents.sizedBox(width: context.spacing12),
-                Expanded(
-                  child: _buildPriceInput(
-                    context,
-                    'Max price',
-                    widget.viewModel.maxPriceController,
-                    (value) {
-                      widget.viewModel.updateTempFilter(maxPrice: value);
-                    },
-                    placeholder: priceRange?.maxPrice.toString(),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildPriceInput(
-    BuildContext context,
-    String label,
-    TextEditingController controller,
-    Function(String?) onChanged, {
-    String? placeholder,
-  }) {
-    return OsmeaComponents.column(
-        crossAxisAlignment: context.crossStart,
-      children: [
-        OsmeaComponents.text(
-          label,
-          textStyle: OsmeaTextStyle.bodySmall(
-            context,
-          ).copyWith(color: OsmeaColors.pewter),
-        ),
-        OsmeaComponents.sizedBox(height: context.spacing4),
-        OsmeaComponents.textField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          hint: placeholder ?? (label == 'Min price' ? 'Min' : 'Max'),
-          variant: TextFieldVariant.outlined,
-          size: TextFieldSize.medium,
-          onChanged: (value) {
-            // Clean the input - only allow numbers and decimal point
-            final cleaned = value.replaceAll(RegExp(r'[^\d.]'), '');
-            // Ensure only one decimal point
-            final parts = cleaned.split('.');
-            final sanitized = parts.length > 2
-                ? '${parts[0]}.${parts.sublist(1).join()}'
-                : cleaned;
-
-            // Update controller text if it changed
-            if (controller.text != sanitized) {
-              controller.value = TextEditingValue(
-                text: sanitized,
-                selection: TextSelection.collapsed(offset: sanitized.length),
-              );
-            }
-
-            // Pass null if empty, otherwise pass the sanitized value
-            final finalValue = sanitized.isEmpty ? null : sanitized;
-            debugPrint('🔍 Price input changed - Label: $label, Raw: $value, Sanitized: $sanitized, Final: $finalValue');
-            onChanged(finalValue);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOnSaleFilter(BuildContext context, bool isOnSale) {
-    return GestureDetector(
-      onTap: () {
-        widget.viewModel.updateTempFilter(onSale: isOnSale ? null : true);
-      },
-      child: OsmeaComponents.container(
-        padding: context.paddingLow,
-        decoration: BoxDecoration(
-          color: isOnSale
-              ? OsmeaColors.nordicBlue
-              : OsmeaColors.transparent,
-          border: Border.all(
-            color: isOnSale
-                ? OsmeaColors.nordicBlue
-                : OsmeaColors.silver,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(context.radiusLow),
-        ),
-        child: OsmeaComponents.row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OsmeaComponents.text(
-              'On sale only',
-              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: isOnSale ? OsmeaColors.nordicBlue : OsmeaColors.thunder,
-                fontWeight: isOnSale ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
-            OsmeaComponents.checkbox(
-              value: isOnSale,
-              onChanged: (value) {
-                widget.viewModel.updateTempFilter(onSale: value == true ? true : null);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStockStatusFilter(BuildContext context, String? selectedStatus) {
-    return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
-      builder: (context, state) {
-        // Get filter options from state
-        final filterOptions = state is ProductListLoadedState 
-            ? state.filterOptions 
-            : null;
-
-        if (filterOptions?.stockStatuses == null) {
-          // Fallback to static options if API data not available
-          return _buildStaticStockStatusFilter(context, selectedStatus);
-        }
-
-        return OsmeaComponents.column(
-          children: filterOptions!.stockStatuses
-              .where((stockStatus) => stockStatus.enabled)
-              .map((stockStatus) => _buildStockStatusOption(
-                    context,
-                    stockStatus.label,
-                    stockStatus.key,
-                    selectedStatus,
-                  ))
-              .toList(),
-        );
-      },
-    );
-  }
-
-  Widget _buildStaticStockStatusFilter(BuildContext context, String? selectedStatus) {
-    return OsmeaComponents.column(
-      children: [
-        _buildStockStatusOption(context, 'In stock', 'instock', selectedStatus),
-        _buildStockStatusOption(
-          context,
-          'Out of stock',
-          'outofstock',
-          selectedStatus,
-        ),
-        _buildStockStatusOption(
-          context,
-          'On backorder',
-          'onbackorder',
-          selectedStatus,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStockStatusOption(
-    BuildContext context,
-    String label,
-    String value,
-    String? selectedStatus,
-  ) {
-    final isSelected = selectedStatus == value;
-    return GestureDetector(
-      onTap: () {
-        viewModel.updateTempFilter(stockStatus: isSelected ? null : value);
-      },
-      child: OsmeaComponents.container(
-        padding: context.paddingLow,
-        margin: EdgeInsets.only(bottom: context.spacing8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? OsmeaColors.nordicBlue
-              : OsmeaColors.transparent,
-          border: Border.all(
-            color: isSelected
-                ? OsmeaColors.nordicBlue
-                : OsmeaColors.silver,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(context.radiusLow),
-        ),
-        child: OsmeaComponents.row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OsmeaComponents.text(
-              label,
-              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: isSelected
-                    ? OsmeaColors.nordicBlue
-                    : OsmeaColors.thunder,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: OsmeaColors.nordicBlue, size: 20),
-          ],
-        ),
       ),
     );
   }

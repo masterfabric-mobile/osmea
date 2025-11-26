@@ -55,17 +55,16 @@ class ProductListContentWidget extends StatelessWidget {
 
     return OsmeaComponents.column(
       children: [
-        // Toggle buttons for Sort by / Filters
-        _buildToggleButtons(context),
+        // Icon buttons for Sort by / Filters
+        _buildActionButtons(context),
         
         // Active filter chips
         if (viewModel.filters.hasActiveFilters)
           OsmeaComponents.padding(
-            padding: EdgeInsets.fromLTRB(
-              context.paddingNormal.left,
-              0,
-              context.paddingNormal.right,
-              context.spacing8,
+            padding: EdgeInsets.only(
+              left: context.spacing20,
+              right: context.spacing20,
+              bottom: context.spacing8,
             ),
             child: _buildActiveFilterChips(context),
           ),
@@ -90,28 +89,53 @@ class ProductListContentWidget extends StatelessWidget {
     );
   }
 
-  /// Builds toggle buttons for Sort by / Filters
-  Widget _buildToggleButtons(BuildContext context) {
+  /// Builds icon buttons for Sort by / Filters
+  Widget _buildActionButtons(BuildContext context) {
     return OsmeaComponents.padding(
-      padding: context.paddingNormal,
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing20,
+        vertical: context.spacing12,
+      ),
       child: OsmeaComponents.row(
+        mainAxisAlignment: context.spaceBetween,
         children: [
-          Expanded(
-            child: OsmeaComponents.button(
-              text: 'Sort by',
-              onPressed: () => _showSortBottomSheet(context),
-              variant: ButtonVariant.outlined,
-              size: ButtonSize.medium,
+          OsmeaComponents.iconButton(
+            onPressed: () => _showSortBottomSheet(context),
+            icon: Icon(
+              Icons.sort,
+              color: OsmeaColors.thunder,
+              size: context.iconSizeNormal,
             ),
+            backgroundColor: OsmeaColors.transparent,
+            tooltip: 'Sort by',
           ),
-          OsmeaComponents.sizedBox(width: 12),
-          Expanded(
-            child: OsmeaComponents.button(
-              text: 'Filters',
-              onPressed: () => _showFiltersBottomSheet(context),
-              variant: ButtonVariant.primary,
-              size: ButtonSize.medium,
+          OsmeaComponents.iconButton(
+            onPressed: () => _showFiltersBottomSheet(context),
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.filter_list,
+                  color: OsmeaColors.thunder,
+                  size: context.iconSizeNormal,
+                ),
+                if (viewModel.filters.hasActiveFilters)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.nordicBlue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
             ),
+            backgroundColor: OsmeaColors.transparent,
+            tooltip: 'Filters',
           ),
         ],
       ),
@@ -126,6 +150,7 @@ class ProductListContentWidget extends StatelessWidget {
       context: context,
       size: BottomSheetSize.medium,
       title: 'Sort by',
+      backgroundColor: OsmeaColors.white,
       child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: true),
     ).then((_) {
       viewModel.resetDialogInit();
@@ -140,6 +165,7 @@ class ProductListContentWidget extends StatelessWidget {
       context: context,
       size: BottomSheetSize.large,
       title: 'Filters',
+      backgroundColor: OsmeaColors.white,
       child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: false),
     ).then((_) {
       viewModel.resetDialogInit();
@@ -204,42 +230,7 @@ class ProductListContentWidget extends StatelessWidget {
     final filters = viewModel.filters;
     final chips = <Widget>[];
 
-    // Price range filter chips
-    if (filters.minPrice != null && filters.minPrice!.isNotEmpty) {
-      chips.add(
-        OsmeaComponents.padding(
-          padding: context.onlyRightPaddingLow,
-          child: OsmeaComponents.chips(
-            text: 'Min: ${_formatPriceChip(filters.minPrice!)}',
-            variant: ChipsVariant.warning,
-            style: ChipsStyle.normal,
-            selected: true,
-            closable: true,
-            onClose: () {
-              viewModel.updateFilter(minPrice: null);
-            },
-          ),
-        ),
-      );
-    }
-
-    if (filters.maxPrice != null && filters.maxPrice!.isNotEmpty) {
-      chips.add(
-        OsmeaComponents.padding(
-          padding: context.onlyRightPaddingLow,
-          child: OsmeaComponents.chips(
-            text: 'Max: ${_formatPriceChip(filters.maxPrice!)}',
-            variant: ChipsVariant.warning,
-            style: ChipsStyle.normal,
-            selected: true,
-            closable: true,
-            onClose: () {
-              viewModel.updateFilter(maxPrice: null);
-            },
-          ),
-        ),
-      );
-    }
+    // Price range filter chips - REMOVED as requested
 
     if (filters.onSale == true) {
       chips.add(
@@ -303,20 +294,6 @@ class ProductListContentWidget extends StatelessWidget {
     );
   }
 
-  /// Formats price for chip display
-  String _formatPriceChip(String price) {
-    // Try to parse as double and format nicely
-    // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
-    final parsed = PriceInfoCurrencyHelper.parsePriceToDouble(price);
-    if (parsed != null) {
-      // Remove trailing zeros
-      return parsed.toStringAsFixed(
-        parsed.truncateToDouble() == parsed ? 0 : 2,
-      );
-    }
-    return price;
-  }
-
   /// Formats stock status for display
   String _formatStockStatus(String status) {
     switch (status.toLowerCase()) {
@@ -338,7 +315,10 @@ class ProductListContentWidget extends StatelessWidget {
     final double mainAxisSpacing = 16;
 
     return GridView.builder(
-      padding: context.paddingNormal,
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing20,
+        vertical: context.spacing12,
+      ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isTablet ? 3 : 2,
         childAspectRatio: isTablet ? 0.68 : 0.58,

@@ -33,11 +33,11 @@ class WishlistView
              elevation: 0,
              surfaceTintColor: OsmeaColors.transparent,
              shadowColor: OsmeaColors.transparent,
-             leading: OsmeaComponents.iconButton(
-               icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
-               onPressed: () => Navigator.of(context).maybePop(),
-               backgroundColor: OsmeaColors.transparent,
-             ),
+            leading: OsmeaComponents.iconButton(
+              icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
+              onPressed: () => Navigator.of(context).maybePop(),
+              backgroundColor: OsmeaColors.transparent,
+            ),
              centerTitle: false,
            ),
          ),

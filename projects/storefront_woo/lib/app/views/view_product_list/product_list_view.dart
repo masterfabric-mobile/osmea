@@ -6,14 +6,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
-import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
-import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
 
 /// ProductListView displays a filtered list of products
 class ProductListView
@@ -23,9 +20,9 @@ class ProductListView
     super.arguments,
     super.currentView,
     super.snackBarFunction,
-    super.appBarPadding = const AppBarPaddingVisibility.enabled(),
-    super.navbarSpacer = const SpacerVisibility.enabled(),
-    super.footerSpacer = const SpacerVisibility.enabled(),
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
     super.verticalPadding = const PaddingVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
@@ -41,6 +38,8 @@ class ProductListView
     viewModel.setArguments(arguments);
     debugPrint('🚀 Calling loadProducts(refresh: true)');
     viewModel.loadProducts(refresh: true);
+    // Pre-load filter options in background
+    viewModel.loadFilterOptions();
     debugPrint('🚀 loadProducts call completed');
   }
 
@@ -78,7 +77,7 @@ class ProductListView
   }
 }
 
-/// Builds product list app bar with filter button
+/// Builds product list app bar
 PreferredSizeWidget _buildProductListAppBar(
   BuildContext context,
   ProductListViewModel? viewModel,
@@ -101,53 +100,6 @@ PreferredSizeWidget _buildProductListAppBar(
       backgroundColor: OsmeaColors.transparent,
       tooltip: 'Back',
     ),
-    actions: viewModel != null
-        ? [
-            AppBarAction(
-              icon: Stack(
-                children: [
-                  Icon(Icons.filter_list, color: OsmeaColors.thunder),
-                  if (viewModel.filters.hasActiveFilters)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.nordicBlue,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              onPressed: () {
-                _showFiltersBottomSheet(context, viewModel);
-              },
-              type: AppBarActionType.filter,
-              tooltip: 'Filters',
-            ),
-          ]
-        : const [],
   );
 }
 
-/// Shows filters bottom sheet
-void _showFiltersBottomSheet(
-  BuildContext context,
-  ProductListViewModel viewModel,
-) {
-  // Reset dialog init flag before opening
-  viewModel.resetDialogInit();
-
-  OsmeaBottomSheetHelpers.showModal(
-    context: context,
-    size: BottomSheetSize.large,
-    title: 'Filters',
-    child: ProductListFiltersWidget(viewModel: viewModel),
-  ).then((_) {
-    // Reset when dialog closes
-    viewModel.resetDialogInit();
-  });
-}
