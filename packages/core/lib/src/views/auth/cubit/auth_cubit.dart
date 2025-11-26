@@ -23,9 +23,9 @@ import 'package:injectable/injectable.dart';
 /// {@category ViewModels}
 /// {@subCategory AuthCubit}
 
-@singleton
+@injectable
 class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
-  AuthCubit() : super(const AuthInitialState());
+  AuthCubit() : super(AuthState.initialState());
 
   final AuthStorageHelper _authStorage = AuthStorageHelper();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
@@ -36,6 +36,9 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   DateTime? _lastLoadTime;
   static const Duration _loadDebounceDuration =
       Duration(seconds: 2); // Minimum 2 seconds between loads
+
+  // Prevent recursive sign in calls during sign up auto sign-in
+  bool _isAutoSigningIn = false;
 
   // Callbacks for authentication
   Future<bool> Function(String email, String password, {bool? rememberMe})?
@@ -911,13 +914,29 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         final marketingConsent =
             formState.signUpChecklists['marketing_consent'] ?? false;
 
-        final success = await signUpCallback!(
-          formState.signUpEmail,
-          formState.signUpPassword,
-          formState.signUpFirstName,
-          formState.signUpLastName,
-          marketingConsent,
-        );
+        bool success = false;
+        try {
+          debugPrint('📞 AuthCubit: Calling sign up callback...');
+          success = await signUpCallback!(
+            formState.signUpEmail,
+            formState.signUpPassword,
+            formState.signUpFirstName,
+            formState.signUpLastName,
+            marketingConsent,
+          );
+          debugPrint('📞 AuthCubit: Sign up callback returned: $success');
+        } catch (e, stackTrace) {
+          debugPrint(
+              '❌ AuthCubit: Exception in sign up callback: ${e.runtimeType}');
+          debugPrint('❌ AuthCubit: Error: $e');
+          debugPrint('❌ AuthCubit: Stack trace: $stackTrace');
+          // Emit error state instead of continuing
+          emit(formState.copyWith(
+            operationStatus: AuthOperationStatus.error,
+            signUpErrorMessage: 'Sign up failed: ${e.toString()}',
+          ));
+          return; // Exit early to prevent further processing
+        }
 
         if (success) {
           debugPrint('✅ Sign up successful');
@@ -938,6 +957,13 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
           // Wait a moment for UI to update
           await Future.delayed(const Duration(milliseconds: 100));
 
+          // Prevent recursive calls - check flag before auto sign-in
+          if (_isAutoSigningIn) {
+            debugPrint(
+                '⏸️ AuthCubit: Already auto-signing in, skipping duplicate call...');
+            return;
+          }
+
           // Now perform auto sign-in
           // Update form state with sign-in credentials
           emit(formState.copyWith(
@@ -947,8 +973,68 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
             operationStatus: AuthOperationStatus.loading,
           ));
 
-          // Call sign in method which will handle token loading
-          await signIn();
+          // Set flag to prevent recursive calls
+          _isAutoSigningIn = true;
+          try {
+            debugPrint('🔄 AuthCubit: Starting auto sign-in after sign up...');
+            debugPrint('📧 Auto sign-in email: $email');
+            // Call sign in method which will handle token loading
+            await signIn();
+            debugPrint('✅ AuthCubit: Auto sign-in completed');
+
+            // Check if AuthAuthenticatedState was emitted
+            final currentState = state;
+            debugPrint(
+                '🔍 AuthCubit: State after auto sign-in: ${currentState.runtimeType}');
+            if (currentState is! AuthAuthenticatedState) {
+              debugPrint(
+                  '⚠️ AuthCubit: AuthAuthenticatedState not emitted after auto sign-in!');
+              debugPrint('⚠️ AuthCubit: Current state: $currentState');
+
+              // Try to load token manually as fallback
+              try {
+                final token = await _authStorage.getToken();
+                final userData = await _authStorage.getUserData();
+                debugPrint(
+                    '🔍 AuthCubit: Token from storage: ${token != null ? "exists" : "null"}');
+
+                if (token != null && token.isNotEmpty) {
+                  debugPrint(
+                      '🔄 AuthCubit: Manually saving token after auto sign-in...');
+                  await saveJwtToken(
+                    jwtToken: token,
+                    userData: userData,
+                  );
+                  debugPrint(
+                      '✅ AuthCubit: Token saved manually, state should be AuthAuthenticatedState now');
+                } else {
+                  debugPrint(
+                      '❌ AuthCubit: No token found in storage after auto sign-in');
+                }
+              } catch (e) {
+                debugPrint('❌ AuthCubit: Error loading token manually: $e');
+              }
+            } else {
+              debugPrint(
+                  '✅ AuthCubit: AuthAuthenticatedState successfully emitted after auto sign-in');
+            }
+          } catch (e, stackTrace) {
+            debugPrint('❌ AuthCubit: Error during auto sign-in: $e');
+            debugPrint('❌ Stack trace: $stackTrace');
+            // Emit error state
+            final currentFormState = _formState;
+            if (currentFormState != null) {
+              emit(currentFormState.copyWith(
+                operationStatus: AuthOperationStatus.error,
+                signInErrorMessage:
+                    'Auto sign-in failed after sign up. Please sign in manually.',
+              ));
+            }
+          } finally {
+            // Always reset flag after sign in completes (success or failure)
+            _isAutoSigningIn = false;
+            debugPrint('🔄 AuthCubit: Auto sign-in flag reset');
+          }
         } else {
           debugPrint('❌ Sign up failed');
           final currentFormState = _formState;

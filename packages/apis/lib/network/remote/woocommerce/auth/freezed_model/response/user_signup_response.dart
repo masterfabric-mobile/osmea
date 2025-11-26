@@ -17,12 +17,12 @@ class UserSignUpResponse with _$UserSignUpResponse {
   factory UserSignUpResponse.fromJson(Map<String, dynamic> json) {
     // Backend sends "user" field but we expect "data"
     // Map "user" to "data" if it exists
-    if (json['user'] != null && json['data'] == null) {
-      json = Map<String, dynamic>.from(json);
-      final userMap = json['user'] as Map<String, dynamic>;
+    final transformedJson = Map<String, dynamic>.from(json);
+    if (transformedJson['user'] != null && transformedJson['data'] == null) {
+      final userMap = transformedJson['user'] as Map<String, dynamic>;
 
       // Transform WordPress user format to our UserSignUpData format
-      json['data'] = {
+      transformedJson['data'] = {
         'user_id': userMap['ID']?.toString() ?? '',
         'email': userMap['user_email'] ?? '',
         'first_name':
@@ -36,7 +36,16 @@ class UserSignUpResponse with _$UserSignUpResponse {
       };
     }
 
-    return UserSignUpResponse.fromJson(json);
+    // Use Freezed constructor directly instead of recursive call
+    return UserSignUpResponse(
+      success: transformedJson['success'] as bool? ?? false,
+      message: transformedJson['message'] as String?,
+      data: transformedJson['data'] != null
+          ? UserSignUpData.fromJson(transformedJson['data'] as Map<String, dynamic>)
+          : null,
+      error: transformedJson['error'] as String?,
+      metadata: transformedJson['metadata'] as Map<String, dynamic>?,
+    );
   }
 }
 

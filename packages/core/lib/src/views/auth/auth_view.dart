@@ -23,6 +23,12 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
   // Track if navigation has been triggered to prevent duplicate calls
   static bool _hasNavigated = false;
 
+  /// Reset navigation flag (useful for testing or re-authentication)
+  static void resetNavigationFlag() {
+    _hasNavigated = false;
+    debugPrint('🔄 AuthView: Navigation flag reset');
+  }
+
   AuthView({
     required super.goRoute,
     super.arguments = const {'auth': true},
@@ -170,25 +176,35 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
       };
     }
 
+    // Use the same AuthCubit instance from BaseViewHydratedCubit (GetIt singleton)
+    // This ensures we're listening to the same instance used throughout the app
     return BlocListener<AuthCubit, AuthState>(
+      bloc:
+          viewModel, // Explicitly use the viewModel from BaseViewHydratedCubit
       listener: (context, state) {
         // Handle authentication state changes
         // Only navigate once when AuthAuthenticatedState is reached
-        // This is the primary navigation trigger after successful signin
+        // This is the primary navigation trigger after successful signin/signup
         if (state is AuthAuthenticatedState) {
           if (wrappedOnSignInSuccess != null && !_hasNavigated) {
             _hasNavigated = true;
             debugPrint(
-                '✅ AuthView: AuthAuthenticatedState detected, calling navigation callback...');
+                '✅ AuthView: AuthAuthenticatedState detected (after sign in/sign up), calling navigation callback...');
             // Use postFrameCallback to ensure state is fully updated before navigation
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
                 wrappedOnSignInSuccess?.call();
-                debugPrint('✅ AuthView: Navigation callback executed');
+                debugPrint(
+                    '✅ AuthView: Navigation callback executed - navigating to home');
               } catch (e) {
                 debugPrint('❌ AuthView: Error in navigation callback: $e');
+                // Reset flag on error so user can try again
+                _hasNavigated = false;
               }
             });
+          } else if (_hasNavigated) {
+            debugPrint(
+                '⏸️ AuthView: Navigation already triggered, skipping...');
           }
           return;
         }
@@ -213,17 +229,41 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
           }
 
           // Handle Sign Up success/error
-          if (state.operationStatus == AuthOperationStatus.success &&
-              state.currentTab == 1) {
-            if (onSignUpSuccess != null) {
-              debugPrint('✅ Calling onSignUpSuccess callback...');
-              onSignUpSuccess?.call();
+          // Note: After sign up success, currentTab changes to 0 for auto sign-in
+          // So we check for sign up success by checking if we just came from sign up tab
+          // or by checking sign up success message
+          if (state.operationStatus == AuthOperationStatus.success) {
+            // Check if this is sign up success (either currentTab is 1 or we have sign up email)
+            final isSignUpSuccess = state.currentTab == 1 ||
+                (state.signUpEmail.isNotEmpty && state.signInEmail.isEmpty);
+
+            if (isSignUpSuccess) {
+              debugPrint(
+                  '✅ AuthView: Sign up success detected, auto sign-in will follow...');
+              if (onSignUpSuccess != null) {
+                debugPrint('✅ Calling onSignUpSuccess callback...');
+                onSignUpSuccess?.call();
+              }
+              // Don't navigate here - wait for AuthAuthenticatedState after auto sign-in
+              // This prevents double navigation
+            } else if (state.currentTab == 0) {
+              // Sign in success - wait for AuthAuthenticatedState
+              debugPrint(
+                  '✅ AuthView: SignIn success detected, waiting for AuthAuthenticatedState...');
             }
-          } else if (state.operationStatus == AuthOperationStatus.error &&
-              state.signUpErrorMessage != null &&
-              state.currentTab == 1) {
-            if (onSignUpError != null) {
-              onSignUpError?.call(state.signUpErrorMessage!);
+          } else if (state.operationStatus == AuthOperationStatus.error) {
+            // Handle sign up error
+            if (state.signUpErrorMessage != null &&
+                (state.currentTab == 1 || state.signUpEmail.isNotEmpty)) {
+              if (onSignUpError != null) {
+                onSignUpError?.call(state.signUpErrorMessage!);
+              }
+            }
+            // Handle sign in error
+            if (state.signInErrorMessage != null && state.currentTab == 0) {
+              if (onSignInError != null) {
+                onSignInError?.call(state.signInErrorMessage!);
+              }
             }
           }
         }

@@ -12,6 +12,9 @@ import 'package:equatable/equatable.dart';
 abstract class AuthState extends Equatable {
   const AuthState();
 
+  /// Factory method to create initial state
+  static AuthState initialState() => const AuthUnauthenticatedState();
+
   @override
   List<Object?> get props => [];
 }

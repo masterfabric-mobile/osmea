@@ -559,47 +559,59 @@ final GoRouter appRouter = GoRouter(
                   String lastName,
                   bool marketingConsent,
                 ) async {
-                  // Get auth key from config
-                  final configHelper = AssetConfigHelper();
-                  final loaded = await configHelper.loadConfig(
-                    'assets/app_config.json',
-                  );
-
-                  debugPrint('📁 Config load result: $loaded');
-                  debugPrint(
-                    '📁 Config path: ${configHelper.getCurrentConfigPath()}',
-                  );
-
-                  final allConfig = configHelper.getAllConfig();
-                  debugPrint('📊 Config keys: ${allConfig?.keys.toList()}');
-
-                  final authKey =
-                      allConfig?['woocommerce_configuration']?['auth_key']
-                          as String? ??
-                      'default-auth-key';
-
-                  final result = await authManager.signUp(
-                    email: email,
-                    password: password,
-                    authKey: authKey,
-                    firstName: firstName,
-                    lastName: lastName,
-                    acceptTerms: true,
-                    subscribeNewsletter: marketingConsent,
-                  );
-
-                  // After successful sign up, trigger sign in through AuthCubit
-                  // This will properly handle token loading and state management
-                  if (result.isSuccess) {
-                    debugPrint(
-                      '✅ Sign up successful, storing credentials for auto sign-in...',
+                  try {
+                    // Get auth key from config
+                    final configHelper = AssetConfigHelper();
+                    final loaded = await configHelper.loadConfig(
+                      'assets/app_config.json',
                     );
-                    // Store the credentials temporarily so AuthCubit.signIn can use them
-                    // We'll trigger signIn after this callback returns true
-                    return true;
-                  }
 
-                  return false;
+                    debugPrint('📁 Config load result: $loaded');
+                    debugPrint(
+                      '📁 Config path: ${configHelper.getCurrentConfigPath()}',
+                    );
+
+                    final allConfig = configHelper.getAllConfig();
+                    debugPrint('📊 Config keys: ${allConfig?.keys.toList()}');
+
+                    final authKey =
+                        allConfig?['woocommerce_configuration']?['auth_key']
+                            as String? ??
+                        'default-auth-key';
+
+                    debugPrint('📞 Calling authManager.signUp...');
+                    final result = await authManager.signUp(
+                      email: email,
+                      password: password,
+                      authKey: authKey,
+                      firstName: firstName,
+                      lastName: lastName,
+                      acceptTerms: true,
+                      subscribeNewsletter: marketingConsent,
+                    );
+
+                    debugPrint('📞 authManager.signUp returned: isSuccess=${result.isSuccess}');
+                    debugPrint('📞 Result message: ${result.message}');
+                    debugPrint('📞 Result error: ${result.error}');
+
+                    // After successful sign up, trigger sign in through AuthCubit
+                    // This will properly handle token loading and state management
+                    if (result.isSuccess) {
+                      debugPrint(
+                        '✅ Sign up successful, storing credentials for auto sign-in...',
+                      );
+                      // Store the credentials temporarily so AuthCubit.signIn can use them
+                      // We'll trigger signIn after this callback returns true
+                      return true;
+                    } else {
+                      debugPrint('❌ Sign up failed: ${result.message}');
+                      return false;
+                    }
+                  } catch (e, stackTrace) {
+                    debugPrint('❌ Sign up error in callback: $e');
+                    debugPrint('❌ Stack trace: $stackTrace');
+                    return false;
+                  }
                 },
           },
         );
