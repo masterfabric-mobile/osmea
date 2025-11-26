@@ -4,11 +4,12 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/response/wishlist_item_response.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
+import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 
 /// Hydrated wishlist view model that also syncs with Woo Wishlist API
 /// Injectable - registered as singleton in config_di.dart to ensure single instance
@@ -19,6 +20,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   // Dependencies (resolved via DI)
   final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
   final ProductService _productService = GetIt.I<ProductService>();
+  final CartService _cartService = GetIt.I<CartService>();
   final AssetConfigHelper _config = AssetConfigHelper();
 
   // Optional route/view arguments holder (to align with other views)
@@ -212,44 +214,51 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           final itemId = itemResponse.id;
           final productId = itemResponse.productId;
 
-          if (productId == null || productId == 0) {
-            debugPrint(
-              '⚠️ Wishlist: Skipping item with invalid productId: ${itemResponse.id}',
-            );
-            continue;
-          }
-
-          // Get fields from response (supports both API format and legacy format)
-          // API format: name, price, image
-          // Legacy format: product_name, product_price, product_image
-          // Helper function to safely convert dynamic to String?
-          String? safeStringFromResponse(dynamic value) {
-            if (value == null) return null;
-            if (value is String) return value;
-            if (value is bool) return value.toString();
-            if (value is num) return value.toString();
-            return value.toString();
-          }
-
-          final name =
-              safeStringFromResponse(itemResponse.name) ??
-              safeStringFromResponse(itemResponse.productName);
-          final price =
-              safeStringFromResponse(itemResponse.price) ??
-              safeStringFromResponse(itemResponse.productPrice);
-          final image =
-              safeStringFromResponse(itemResponse.image) ??
-              safeStringFromResponse(itemResponse.productImage);
-
+        if (productId == null || productId == 0) {
           debugPrint(
-            '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name',
+            '⚠️ Wishlist: Skipping item with invalid productId: ${itemResponse.id}',
           );
+          continue;
+        }
+
+        // Get fields from response (supports both API format and legacy format)
+        // API format: name, price, image
+        // Legacy format: product_name, product_price, product_image
+        // Helper function to safely convert dynamic to String?
+        String? safeStringFromResponse(dynamic value) {
+          if (value == null) return null;
+          if (value is String) return value;
+          if (value is bool) return value.toString();
+          if (value is num) return value.toString();
+          return value.toString();
+        }
+
+        final name =
+            safeStringFromResponse(itemResponse.name) ??
+            safeStringFromResponse(itemResponse.productName);
+        final price =
+            safeStringFromResponse(itemResponse.price) ??
+            safeStringFromResponse(itemResponse.productPrice);
+        final image =
+            safeStringFromResponse(itemResponse.image) ??
+            safeStringFromResponse(itemResponse.productImage);
+
+        debugPrint(
+          '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name, price: $price',
+        );
 
           // Try to fetch full product details for currency code and proper pricing
           try {
+            debugPrint(
+              '💖 Wishlist: Fetching product details for productId: $productId',
+            );
             final product = await _productService.retrieveProduct(
               apiVersion: apiVersion,
               productId: productId,
+            );
+
+            debugPrint(
+              '💖 Wishlist: Product fetched - name: ${product.name}, prices: ${product.prices?.toJson()}',
             );
 
             // Use product details from ProductService when available
@@ -258,13 +267,23 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                 ? product.images!.first.src
                 : image;
 
+            final productName = product.name ?? name ?? 'Product';
+            final productPrice = prices?.regularPrice ?? 
+                                 prices?.price ?? 
+                                 price ?? 
+                                 '0.00';
+
+            debugPrint(
+              '💖 Wishlist: Creating WishlistItem - name: $productName, price: $productPrice',
+            );
+
             mapped.add(
               WishlistItem(
                 id: productId,
                 itemId: itemId,
-                name: product.name ?? name ?? 'Product',
+                name: productName,
                 imageUrl: imageUrl,
-                regularPrice: prices?.regularPrice ?? prices?.price ?? price,
+                regularPrice: productPrice,
                 salePrice: product.onSale == true ? prices?.salePrice : null,
                 currencyCode: prices?.currencyCode,
                 currencyDecimalSeparator: prices?.currencyDecimalSeparator,
@@ -273,18 +292,28 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                 onSale: product.onSale ?? false,
               ),
             );
-          } catch (e) {
+          } catch (e, stackTrace) {
             debugPrint(
               '⚠️ Wishlist: Failed to fetch product $productId, using API response data: $e',
             );
+            debugPrint('⚠️ Stack trace: $stackTrace');
+            
             // Fallback: use wishlist API response data directly
+            // Ensure we have at least some data
+            final fallbackName = name ?? 'Product';
+            final fallbackPrice = price ?? '0.00';
+            
+            debugPrint(
+              '💖 Wishlist: Using fallback data - name: $fallbackName, price: $fallbackPrice',
+            );
+            
             mapped.add(
               WishlistItem(
                 id: productId,
                 itemId: itemId,
-                name: name ?? 'Product',
+                name: fallbackName,
                 imageUrl: image,
-                regularPrice: price,
+                regularPrice: fallbackPrice,
                 salePrice: null,
                 currencyCode: null,
                 onSale: false,
@@ -586,9 +615,65 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   Future<void> _addItemToCartFromWishlist(int productId) async {
     try {
-      // Delegate to CartViewModel via DI
-      final cartVm = GetIt.I<CartViewModel>();
-      cartVm.addItemToCart(productId, quantity: 1);
+      debugPrint('🛒 WishlistViewModel: Adding product $productId to cart via API');
+
+      // First, check if product is variable and get first variation if needed
+      int? variationId;
+      try {
+        final product = await _productService.retrieveProduct(
+          apiVersion: _config.getString(
+            'woocommerce_configuration.version',
+            'v1',
+          ),
+          productId: productId,
+        );
+
+        // Check if product is variable and has variations
+        if (product.type == 'variable' && 
+            product.variations != null && 
+            product.variations!.isNotEmpty) {
+          // Get first variation ID
+          final firstVariation = product.variations!.first;
+          if (firstVariation is Map<String, dynamic>) {
+            final id = firstVariation['id'];
+            if (id != null) {
+              variationId = int.tryParse(id.toString());
+              debugPrint('🛒 Found first variation ID: $variationId for variable product');
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Could not fetch product details, proceeding with product ID: $e');
+      }
+
+      // Add item to cart via API directly (like HomeViewModel)
+      // Use variation ID if found, otherwise use product ID
+      final response = await _cartService.addItem(
+        apiVersion: _config.getString(
+          'woocommerce_configuration.version',
+          'v1',
+        ),
+        cartToken: await _getCartToken() ?? '',
+        jwtToken: await _getJwtToken(), // Optional JWT token
+        id: variationId ?? productId,
+        quantity: 1,
+      );
+
+      debugPrint(
+        '🛒 WishlistViewModel: AddItem API response: ${response.toJson()}',
+      );
+
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        debugPrint('❌ API add item error: ${response.errors!.first}');
+        emit(
+          WishlistErrorState(
+            message: 'Failed to add item: ${response.errors!.first}',
+          ),
+        );
+        return;
+      }
+
+      debugPrint('✅ Successfully added product $productId to cart via API');
 
       // Emit success message for the view to display
       final cur = state;
@@ -598,6 +683,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         );
       }
     } catch (e) {
+      debugPrint('❌ Failed to add to cart: $e');
       emit(WishlistErrorState(message: 'Failed to add to cart: $e'));
     }
   }
@@ -614,6 +700,44 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       final auth = AuthStorageHelper();
       return await auth.getToken();
     } catch (_) {
+      return null;
+    }
+  }
+
+  /// Gets cart token from storage
+  /// Interceptor automatically adds token to request headers,
+  /// but ViewModel needs token for direct API calls
+  Future<String?> _getCartToken() async {
+    try {
+      // First try to get from arguments (route params)
+      final argsToken = _arguments['cartToken'] as String?;
+      if (argsToken != null && argsToken.isNotEmpty) {
+        debugPrint('🛒 WishlistViewModel: Cart token from arguments');
+        return argsToken;
+      }
+
+      // Fallback to storage
+      final wooCartToken = await WooCartTokenStorage.loadCartToken();
+
+      if (wooCartToken != null && wooCartToken.cartToken.isNotEmpty) {
+        // Check if token has expired
+        if (wooCartToken.expiresAt != null &&
+            DateTime.now().isAfter(wooCartToken.expiresAt!)) {
+          debugPrint('⚠️ Cart token has expired');
+          await WooCartTokenStorage.clearCartToken();
+          return null;
+        }
+
+        debugPrint(
+          '🛒 WishlistViewModel: Cart token from storage: ${wooCartToken.cartToken.length > 20 ? wooCartToken.cartToken.substring(0, 20) + "..." : wooCartToken.cartToken}',
+        );
+        return wooCartToken.cartToken;
+      }
+
+      debugPrint('⚠️ WishlistViewModel: No cart token found');
+      return null;
+    } catch (e) {
+      debugPrint('❌ Failed to get cart token: $e');
       return null;
     }
   }

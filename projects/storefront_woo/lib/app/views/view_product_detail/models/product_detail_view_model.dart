@@ -60,7 +60,6 @@ class ProductDetailViewModel
   int _selectedQuantity = 1;
   List<String> _imageUrls = [];
   final int _currentImageIndex = 0;
-  int? _currentProductId; // Track current product to detect changes
 
   // ============================================================================
   // Public API Methods - Structured Pattern: Future first, then Fire (void)
@@ -73,18 +72,6 @@ class ProductDetailViewModel
   /// Initializes wishlist and loads product
   /// This ensures wishlist state is ready before checking product status
   Future<void> initializeWithProduct(int productId) async {
-    // Check if we're loading a different product - if so, reset state first
-    if (_currentProductId != null && _currentProductId != productId) {
-      debugPrint(
-        '🔄 ProductDetailViewModel: Product changed from $_currentProductId to $productId, resetting state',
-      );
-      // Reset state to ensure old data doesn't persist
-      emit(ProductDetailLoadingState());
-      _selectedQuantity = 1;
-      _imageUrls = [];
-    }
-    _currentProductId = productId;
-    
     // Initialize wishlist first
     try {
       final wishlistViewModel = GetIt.I<WishlistViewModel>();
@@ -373,7 +360,7 @@ class ProductDetailViewModel
   Future<void> setSelectedAttribute(
     String name,
     String value,
-  ) async {
+  ) async => Future.microtask(() {
     final currentState = state;
     if (currentState is ProductDetailLoadedState) {
       final updated = Map<String, String>.from(currentState.selectedAttributes)
@@ -401,18 +388,19 @@ class ProductDetailViewModel
 
       emit(currentState.copyWith(selectedAttributes: cleanedAttributes));
     }
-  }
+  });
 
   /// Clears a selected attribute
-  Future<void> clearSelectedAttribute(String name) async {
-    final currentState = state;
-    if (currentState is ProductDetailLoadedState) {
-      final updated = Map<String, String>.from(
-        currentState.selectedAttributes,
-      )..remove(name);
-      emit(currentState.copyWith(selectedAttributes: updated));
-    }
-  }
+  Future<void> clearSelectedAttribute(String name) async =>
+      Future.microtask(() {
+        final currentState = state;
+        if (currentState is ProductDetailLoadedState) {
+          final updated = Map<String, String>.from(
+            currentState.selectedAttributes,
+          )..remove(name);
+          emit(currentState.copyWith(selectedAttributes: updated));
+        }
+      });
 
   // ----------------------------------------------------------------------------
   // Attribute Terms Loading
@@ -583,12 +571,7 @@ class ProductDetailViewModel
   // Private methods - HydratedCubit pattern
   Future<void> _loadProduct(int productId) async {
     try {
-      // Clear state first to ensure old data doesn't persist
       emit(ProductDetailLoadingState());
-      
-      // Reset local variables to ensure clean state
-      _selectedQuantity = 1;
-      _imageUrls = [];
 
       // First try to get selected product from HomeViewModel if available
       // This provides faster loading with cached data
@@ -610,7 +593,7 @@ class ProductDetailViewModel
       }
 
       // Always fetch fresh data from API for complete details
-      debugPrint('🔄 Fetching fresh product details from API for product ID: $productId');
+      debugPrint('🔄 Fetching fresh product details from API');
       final product = await _productService.retrieveProduct(
         apiVersion: 'v1',
         productId: productId,
@@ -686,81 +669,22 @@ class ProductDetailViewModel
         // Continue without wishlist check - not fatal
       }
 
-      // Load product reviews - ALWAYS use product.id from API response to ensure correct product
-      // This is critical: we must use the product.id from the API response, not the parameter
+      // Load product reviews
       List<ListProductReviewsResponseModel> reviews = [];
       try {
-        // CRITICAL: Use product.id from the API response, not the parameter
-        // This ensures we always get reviews for the exact product that was loaded
-        final actualProductId = product.id;
-        
-        // Validate product ID before making API call
-        if (actualProductId == null || actualProductId <= 0) {
-          debugPrint(
-            '❌ Invalid product.id for reviews: $actualProductId (parameter productId: $productId, product name: ${product.name})',
-          );
-          reviews = [];
-        } else {
-          // Double-check: ensure parameter productId matches product.id
-          if (productId != actualProductId) {
-            debugPrint(
-              '⚠️ WARNING: Parameter productId ($productId) does not match product.id ($actualProductId). Using product.id for reviews.',
-            );
-          }
-          
-          debugPrint(
-            '📝 Loading product reviews for product ID: $actualProductId (product name: ${product.name})',
-          );
-          
-          // Make API call with the actual product ID from the API response
-          final reviewsForProduct = await _reviewsService.listProductReviews(
-            apiVersion: 'v1',
-            product: actualProductId, // CRITICAL: Use product.id from API response
-            perPage: 50,
-            status: 'approved', // Only show approved reviews
-          );
-          
-          debugPrint(
-            '✅ API returned ${reviewsForProduct.length} reviews for product ID: $actualProductId',
-          );
-          
-          // CRITICAL: Filter reviews to ensure they belong to THIS product
-          // This is a safety check in case the API returns reviews for other products
-          reviews = reviewsForProduct.where((review) {
-            final reviewProductId = review.productId;
-            if (reviewProductId == null) {
-              debugPrint(
-                '⚠️ WARNING: Review has null productId, excluding it (review ID: ${review.id})',
-              );
-              return false;
-            }
-            if (reviewProductId != actualProductId) {
-              debugPrint(
-                '⚠️ WARNING: Review productId mismatch! Review productId: $reviewProductId, Expected: $actualProductId, Review ID: ${review.id} - EXCLUDING this review',
-              );
-              return false;
-            }
-            return true;
-          }).toList();
-          
-          debugPrint(
-            '✅ After filtering: ${reviews.length} reviews for product ID: $actualProductId (product name: ${product.name})',
-          );
-          
-          // Final verification: log each review's productId for debugging
-          for (final review in reviews) {
-            debugPrint(
-              '  ✓ Review ID: ${review.id}, Product ID: ${review.productId}, Reviewer: ${review.reviewer}',
-            );
-          }
-        }
-      } catch (e, stackTrace) {
-        debugPrint(
-          '❌ Failed to load product reviews for product ID ${product.id}: $e',
+        debugPrint('📝 Loading product reviews for product ID: $productId');
+        reviews = await _reviewsService.listProductReviews(
+          apiVersion: 'v1',
+          product: productId,
+          perPage: 50,
+          status: 'approved', // Only show approved reviews
         );
-        debugPrint('Stack trace: $stackTrace');
-        // Continue without reviews - not fatal, but ensure empty list
-        reviews = [];
+        debugPrint(
+          '✅ Loaded ${reviews.length} reviews for product ID: $productId',
+        );
+      } catch (e) {
+        debugPrint('⚠️ Failed to load product reviews: $e');
+        // Continue without reviews - not fatal
       }
 
       emit(

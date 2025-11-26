@@ -38,7 +38,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   // Public trigger functions - HydratedCubit pattern
   void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
-  void addItemToCart(int productId, {int quantity = 1}) =>
+  Future<void> addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
   void removeItemFromCart(int productId) => _removeItemFromCart(productId);
   void updateItemQuantity(int productId, int quantity) =>
@@ -160,12 +160,15 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           // Use API-provided separators and minor_unit to correctly parse the price format
           final itemPrice = item.prices?.price != null
               ? PriceInfoCurrencyHelper.parsePriceToDouble(
-                  item.prices!.price!,
-                  currencyCode: item.prices?.currencyCode,
-                  currencyDecimalSeparator: item.prices?.currencyDecimalSeparator,
-                  currencyThousandSeparator: item.prices?.currencyThousandSeparator,
-                  currencyMinorUnit: item.prices?.currencyMinorUnit,
-                ) ?? 0.0
+                      item.prices!.price!,
+                      currencyCode: item.prices?.currencyCode,
+                      currencyDecimalSeparator:
+                          item.prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator:
+                          item.prices?.currencyThousandSeparator,
+                      currencyMinorUnit: item.prices?.currencyMinorUnit,
+                    ) ??
+                    0.0
               : 0.0;
 
           cartItems.add(
@@ -197,20 +200,25 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       // Use API-provided separators and minor_unit from totals if available
       final totalPrice = response.totals?.totalPrice != null
           ? PriceInfoCurrencyHelper.parsePriceToDouble(
-              response.totals!.totalPrice!,
-              currencyCode: currencyCode,
-              currencyDecimalSeparator: response.totals?.currencyDecimalSeparator,
-              currencyThousandSeparator: response.totals?.currencyThousandSeparator,
-              currencyMinorUnit: response.totals?.currencyMinorUnit,
-            ) ?? 0.0
+                  response.totals!.totalPrice!,
+                  currencyCode: currencyCode,
+                  currencyDecimalSeparator:
+                      response.totals?.currencyDecimalSeparator,
+                  currencyThousandSeparator:
+                      response.totals?.currencyThousandSeparator,
+                  currencyMinorUnit: response.totals?.currencyMinorUnit,
+                ) ??
+                0.0
           : 0.0;
       final currencySymbol =
           response.totals?.currencySymbol ??
           PriceInfoCurrencyHelper.getCurrencySymbol(currencyCode: currencyCode);
 
       // Extract currency formatting info from API response totals
-      final currencyDecimalSeparator = response.totals?.currencyDecimalSeparator;
-      final currencyThousandSeparator = response.totals?.currencyThousandSeparator;
+      final currencyDecimalSeparator =
+          response.totals?.currencyDecimalSeparator;
+      final currencyThousandSeparator =
+          response.totals?.currencyThousandSeparator;
       final currencyMinorUnit = response.totals?.currencyMinorUnit;
 
       // Load coupons from cart coupons API
@@ -285,23 +293,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: addItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
       );
 
-      // Ensure cart token exists; if not, initialize cart first
-      if (cartToken == null || cartToken.isEmpty) {
-        debugPrint(
-          '🛒 CartViewModel: No cart token found. Initializing with getCart...',
-        );
-        await _cartService.getCart(
-          apiVersion: _configHelper.getString(
-            'woocommerce_configuration.version',
-          ),
-          jwtToken: jwtToken, // Use same JWT token for consistency
-        );
-        cartToken = await _getCartToken();
-        debugPrint(
-          '🛒 CartViewModel: Cart initialized with JWT: ${jwtToken != null ? "Yes" : "No"}',
-        );
-      }
-
+      // Use empty string if cart token is null - API will handle it
+      // Don't call getCart() here as it causes nonce issues with JWT
       var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
@@ -318,47 +311,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API add item error: ${response.errors!.first}');
-        final errorText = response.errors!.first.toString().toLowerCase();
-        if (errorText.contains('401') ||
-            errorText.contains('unauthorized') ||
-            errorText.contains('token')) {
-          debugPrint(
-            '🛒 CartViewModel: Retrying addItem after refreshing cart token',
-          );
-          final retryJwtToken = await _getJwtToken();
-          await _cartService.getCart(
-            apiVersion: _configHelper.getString(
-              'woocommerce_configuration.version',
-            ),
-            jwtToken: retryJwtToken,
-          );
-          final refreshed = await _getCartToken();
-          response = await _cartService.addItem(
-            apiVersion: _configHelper.getString(
-              'woocommerce_configuration.version',
-            ),
-            cartToken: refreshed ?? '',
-            jwtToken: retryJwtToken, // Use same JWT token for consistency
-            id: productId,
-            quantity: quantity,
-          );
-
-          if (response.errors != null && response.errors!.isNotEmpty) {
-            emit(
-              CartErrorState(
-                message: ApiErrorUtils.getErrorMessage(response.errors!.first),
-              ),
-            );
-            return;
-          }
-        } else {
-          emit(
-            CartErrorState(
-              message: ApiErrorUtils.getErrorMessage(response.errors!.first),
-            ),
-          );
-          return;
-        }
+        emit(
+          CartErrorState(
+            message: ApiErrorUtils.getErrorMessage(response.errors!.first),
+          ),
+        );
+        return;
       }
 
       debugPrint('✅ Successfully added item to API cart');
