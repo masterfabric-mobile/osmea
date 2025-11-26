@@ -40,7 +40,84 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
   Future<void> addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
-  void removeItemFromCart(int productId) => _removeItemFromCart(productId);
+  void removeItemFromCart(int productId, {BuildContext? context}) {
+    if (context != null) {
+      _showRemoveConfirmationDialog(context, productId);
+    } else {
+      _removeItemFromCart(productId);
+    }
+  }
+  
+  /// Show confirmation dialog before removing item
+  void _showRemoveConfirmationDialog(BuildContext context, int productId) {
+    // Get product name for the dialog
+    final currentState = state;
+    String productName = 'this item';
+    if (currentState is CartLoadedState) {
+      try {
+        final item = currentState.cartItems.firstWhere(
+          (item) => item.productId == productId,
+        );
+        productName = item.productName;
+      } catch (e) {
+        // Item not found, use default name
+        productName = 'this item';
+      }
+    }
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: OsmeaComponents.text(
+            'Remove Item',
+            textStyle: OsmeaTextStyle.titleLarge(context),
+            color: OsmeaColors.thunder,
+          ),
+          content: OsmeaComponents.column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OsmeaComponents.text(
+                'Are you sure you want to remove "$productName" from your cart?',
+                textStyle: OsmeaTextStyle.bodyMedium(context),
+                color: OsmeaColors.pewter,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            // Cancel button
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: OsmeaComponents.text(
+                'Cancel',
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  color: OsmeaColors.pewter,
+                ),
+              ),
+            ),
+            // Remove button
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _removeItemFromCart(productId);
+              },
+              child: OsmeaComponents.text(
+                'Remove',
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  color: OsmeaColors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
   void updateItemQuantity(int productId, int quantity) =>
       _updateItemQuantity(productId, quantity);
   void clearCart() => _clearCart();

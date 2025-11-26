@@ -710,20 +710,27 @@ class ProductDetailViewModel
   }
 
   Future<void> _addToCart(int productId, int quantity) async {
+    // Ensure we are in a valid loaded state before proceeding
+    if (state is! ProductDetailLoadedState) return;
+    final currentState = state as ProductDetailLoadedState;
+
     try {
+      // We could emit a dedicated \"adding to cart\" state here if needed.
+      // For now, keep the existing loaded state and proceed with the API call.
+
       debugPrint(
         '🛒 ProductDetailViewModel: Adding product $productId to cart via API',
       );
 
       // Get current state to check for selected attributes
-      final currentState = state;
-      if (currentState is! ProductDetailLoadedState) {
+      final latestState = state;
+      if (latestState is! ProductDetailLoadedState) {
         debugPrint('❌ Invalid state for adding to cart');
         return;
       }
 
-      final product = currentState.product;
-      Map<String, String> selectedAttributes = currentState.selectedAttributes;
+      final product = latestState.product;
+      Map<String, String> selectedAttributes = latestState.selectedAttributes;
       debugPrint('🛒 Selected attributes: $selectedAttributes');
 
       // Validate that all required attributes are selected

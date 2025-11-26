@@ -219,7 +219,10 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     } catch (e, stackTrace) {
       debugPrint('❌ Error loading products: $e');
       debugPrint('❌ Stack trace: $stackTrace');
-      emit(HomeErrorState(message: 'Failed to load products: $e'));
+
+      // Get user-friendly error message
+      final userMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(HomeErrorState(message: userMessage));
     }
   }
 
