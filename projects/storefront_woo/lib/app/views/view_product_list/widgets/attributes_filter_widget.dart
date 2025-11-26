@@ -13,12 +13,10 @@ import 'package:storefront_woo/app/views/view_product_list/widgets/collapsible_s
 
 class AttributesFilterWidget extends StatelessWidget {
   final ProductListViewModel viewModel;
-  final Map<int, List<int>> selectedAttributes;
 
   const AttributesFilterWidget({
     super.key,
     required this.viewModel,
-    required this.selectedAttributes,
   });
 
   @override
@@ -26,33 +24,27 @@ class AttributesFilterWidget extends StatelessWidget {
     return BlocBuilder<ProductListViewModel, ProductListState>(
       bloc: viewModel,
       builder: (context, state) {
-        final filterOptions = state is ProductListLoadedState
-            ? state.filterOptions
-            : null;
+        // Get filterOptions from any state that has it
+        final filterOptions = state.filterOptions;
+        
+        // Get selectedAttributes from viewModel.tempFilters to ensure it's always up-to-date
+        final selectedAttributes = viewModel.tempFilters.selectedAttributes ?? {};
 
         if (filterOptions?.availableAttributes == null ||
             filterOptions!.availableAttributes!.isEmpty) {
-          return CollapsibleSectionWidget(
-            viewModel: viewModel,
-            title: 'Attributes',
-            sectionKey: 'attributes',
-            child: OsmeaComponents.text(
-              'No attributes available',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.pewter,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
+        // Return each attribute as a separate collapsible section (Beden, Renk, etc.)
+        // No "Attributes" parent section - each attribute is shown directly
         return OsmeaComponents.column(
           children: filterOptions.availableAttributes!
-              .expand((attribute) {
+              .map((attribute) {
                 final selectedTerms = selectedAttributes[attribute.id] ?? [];
                 
-                return [
-                  CollapsibleSectionWidget(
+                return Padding(
+                  padding: EdgeInsets.only(bottom: context.spacing24),
+                  child: CollapsibleSectionWidget(
                     viewModel: viewModel,
                     title: attribute.name,
                     sectionKey: 'attribute_${attribute.id}',
@@ -90,7 +82,7 @@ class AttributesFilterWidget extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
-                ];
+                );
               })
               .toList(),
         );

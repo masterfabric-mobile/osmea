@@ -35,7 +35,7 @@ class CollapsibleSectionWidget extends StatelessWidget {
           mode: CollapseBehaviorMode.multiple,
           children: [
             OsmeaCollapsePanel(
-              header: title,
+              header: OsmeaComponents.text(title),
               value: sectionKey,
               body: OsmeaComponents.padding(
                 padding: EdgeInsets.only(

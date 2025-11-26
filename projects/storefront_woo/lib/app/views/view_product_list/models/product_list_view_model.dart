@@ -1,5 +1,5 @@
 import 'package:core/core.dart' as core;
-import 'package:flutter/foundation.dart';
+import 'package:core/core.dart' show PriceInfoCurrencyHelper;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -16,16 +16,19 @@ import 'package:storefront_woo/app/views/view_product_list/models/module/states.
 /// Product filter model for e-commerce filtering
 class ProductFilters {
   final String? search;
-  final int? category; // Single category for API (uses first from selectedCategories)
+  final int?
+  category; // Single category for API (uses first from selectedCategories)
   final int? tag; // Single tag for API (uses first from selectedTags)
   final List<int>? selectedCategories; // Multiple categories selection
   final List<int>? selectedTags; // Multiple tags selection
-  final Map<int, List<int>>? selectedAttributes; // Map of attributeId -> list of termIds
+  final Map<int, List<int>>?
+  selectedAttributes; // Map of attributeId -> list of termIds
   final bool? onSale;
   final String? minPrice;
   final String? maxPrice;
   final String? stockStatus;
-  final String? orderBy; // 'date', 'id', 'title', 'price', 'popularity', 'rating'
+  final String?
+  orderBy; // 'date', 'id', 'title', 'price', 'popularity', 'rating'
   final String? order; // 'asc' or 'desc'
   final bool? featured;
 
@@ -74,27 +77,60 @@ class ProductFilters {
     bool clearFeatured = false,
   }) {
     // Use first selected category/tag for API compatibility
-    final apiCategory = clearSelectedCategories 
-        ? null 
-        : (selectedCategories?.isNotEmpty == true 
-            ? selectedCategories!.first 
-            : (clearCategory ? null : (category ?? (this.selectedCategories?.isNotEmpty == true ? this.selectedCategories!.first : this.category))));
-    final apiTag = clearSelectedTags 
-        ? null 
-        : (selectedTags?.isNotEmpty == true 
-            ? selectedTags!.first 
-            : (clearTag ? null : (tag ?? (this.selectedTags?.isNotEmpty == true ? this.selectedTags!.first : this.tag))));
-    
+    final apiCategory = clearSelectedCategories
+        ? null
+        : (selectedCategories?.isNotEmpty == true
+              ? selectedCategories!.first
+              : (clearCategory
+                    ? null
+                    : (category ??
+                          (this.selectedCategories?.isNotEmpty == true
+                              ? this.selectedCategories!.first
+                              : this.category))));
+    final apiTag = clearSelectedTags
+        ? null
+        : (selectedTags?.isNotEmpty == true
+              ? selectedTags!.first
+              : (clearTag
+                    ? null
+                    : (tag ??
+                          (this.selectedTags?.isNotEmpty == true
+                              ? this.selectedTags!.first
+                              : this.tag))));
+
+    // Handle minPrice and maxPrice: empty string should be treated as null
+    final String? finalMinPrice = clearMinPrice
+        ? null
+        : (minPrice != null
+              ? (minPrice.isEmpty ? null : minPrice)
+              : this.minPrice);
+    final String? finalMaxPrice = clearMaxPrice
+        ? null
+        : (maxPrice != null
+              ? (maxPrice.isEmpty ? null : maxPrice)
+              : this.maxPrice);
+
+    // Handle selectedAttributes: empty map {} should be kept, not converted to null
+    final Map<int, List<int>>? finalSelectedAttributes = clearSelectedAttributes
+        ? null
+        : (selectedAttributes != null
+              ? (selectedAttributes.isEmpty ? {} : selectedAttributes)
+              : this.selectedAttributes);
+
     return ProductFilters(
       search: clearSearch ? null : (search ?? this.search),
       category: apiCategory,
       tag: apiTag,
-      selectedCategories: clearSelectedCategories ? null : (selectedCategories ?? this.selectedCategories),
-      selectedTags: clearSelectedTags ? null : (selectedTags ?? this.selectedTags),
-      selectedAttributes: clearSelectedAttributes ? null : (selectedAttributes ?? this.selectedAttributes),
+      selectedCategories: clearSelectedCategories
+          ? null
+          : (selectedCategories ?? this.selectedCategories),
+      selectedTags: clearSelectedTags
+          ? null
+          : (selectedTags ?? this.selectedTags),
+      selectedAttributes: finalSelectedAttributes,
       onSale: clearOnSale ? null : (onSale ?? this.onSale),
-      minPrice: clearMinPrice ? null : (minPrice ?? this.minPrice),
-      maxPrice: clearMaxPrice ? null : (maxPrice ?? this.maxPrice),
+      minPrice: finalMinPrice,
+      maxPrice: finalMaxPrice,
       stockStatus: clearStockStatus ? null : (stockStatus ?? this.stockStatus),
       orderBy: clearOrderBy ? null : (orderBy ?? this.orderBy),
       order: clearOrder ? null : (order ?? this.order),
@@ -130,12 +166,16 @@ class ProductListViewModel
   ProductListViewModel() : super(ProductListInitialState());
 
   final ProductService _productService = GetIt.I<ProductService>();
-  final StoreProductCategoriesService _categoriesService = GetIt.I<StoreProductCategoriesService>();
-  final StoreProductTagsService _tagsService = GetIt.I<StoreProductTagsService>();
-  final StoreProductAttributesService _attributesService = GetIt.I<StoreProductAttributesService>();
-  final StoreProductAttributeTermsService _attributeTermsService = GetIt.I<StoreProductAttributeTermsService>();
+  final StoreProductCategoriesService _categoriesService =
+      GetIt.I<StoreProductCategoriesService>();
+  final StoreProductTagsService _tagsService =
+      GetIt.I<StoreProductTagsService>();
+  final StoreProductAttributesService _attributesService =
+      GetIt.I<StoreProductAttributesService>();
+  final StoreProductAttributeTermsService _attributeTermsService =
+      GetIt.I<StoreProductAttributeTermsService>();
   final core.AssetConfigHelper _config = core.AssetConfigHelper();
-  
+
   // Optional route/view arguments holder
   final Map<String, dynamic> _arguments = {};
   void setArguments(Map<String, dynamic> args) {
@@ -173,15 +213,22 @@ class ProductListViewModel
   int _currentPage = 1;
   int _totalPages = 1;
   // Increase per_page when using client-side filtering to get more products for filtering
-  final int _perPage = 50; // Increased from default to accommodate client-side filtering
+  final int _perPage =
+      50; // Increased from default to accommodate client-side filtering
   List<ListAllProductsResponseModel> _allProducts = [];
 
   // Filter options from API
   GetFilterOptionsResponseModel? _filterOptions;
   GetFilterOptionsResponseModel? get filterOptions => _filterOptions;
-  
+
   // Guard to prevent multiple loadFilterOptions calls
   bool _isLoadingFilterOptions = false;
+
+  // Guard to prevent multiple loadProducts calls
+  bool _isLoadingProducts = false;
+
+  // Track if initial load has been completed
+  bool _hasInitialLoadCompleted = false;
 
   // Expanded sections state for filter UI
   final Set<String> _expandedSections = {};
@@ -193,12 +240,8 @@ class ProductListViewModel
       _expandedSections.remove(sectionKey);
     } else {
       _expandedSections.add(sectionKey);
-      // Load filter options when section is expanded
-      if (sectionKey == 'categories' || sectionKey == 'tags') {
-        if (_filterOptions == null) {
-          loadFilterOptions();
-        }
-      }
+      // Don't call loadFilterOptions here - it's already called in initFilterDialog
+      // This prevents infinite loop
     }
     // Emit current state to trigger UI rebuild
     final currentState = state;
@@ -221,33 +264,42 @@ class ProductListViewModel
     final hasPrice = temp.minPrice != null || temp.maxPrice != null;
     final hasOnSale = temp.onSale == true;
     final hasStockStatus = temp.stockStatus != null;
-    
-    return hasCategories || hasTags || hasAttributes || hasPrice || hasOnSale || hasStockStatus;
+
+    return hasCategories ||
+        hasTags ||
+        hasAttributes ||
+        hasPrice ||
+        hasOnSale ||
+        hasStockStatus;
   }
 
   @override
   String get id => 'product_list_view_model_v1';
 
   /// Load filter options from API
+  /// This method loads all filter options from APIs without any mock data
   Future<void> loadFilterOptions() async {
     // Prevent multiple concurrent calls
     if (_isLoadingFilterOptions) {
       debugPrint('🚫 loadFilterOptions already in progress, skipping...');
       return;
     }
-    
+
     _isLoadingFilterOptions = true;
     debugPrint('🔧 ProductListViewModel.loadFilterOptions called');
-    
+
+    // Emit loading state for filter options
+    _emitFilterOptionsLoading();
+
     try {
       // Get API version with fallback
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-      );
-      
+      final apiVersion = _config.getString('woocommerce_configuration.version');
+
       final finalApiVersion = apiVersion.isEmpty ? 'v1' : apiVersion;
-      debugPrint('🔧 Loading filter options with API version: $finalApiVersion');
-      
+      debugPrint(
+        '🔧 Loading filter options with API version: $finalApiVersion',
+      );
+
       // Try to load from getFilterOptions API first
       GetFilterOptionsResponseModel? filterOptionsResponse;
       try {
@@ -259,7 +311,9 @@ class ProductListViewModel
         );
         debugPrint('✅ Filter options loaded from getFilterOptions API');
       } catch (apiError) {
-        debugPrint('⚠️ getFilterOptions API failed, loading from individual APIs: $apiError');
+        debugPrint(
+          '⚠️ getFilterOptions API failed, loading from individual APIs: $apiError',
+        );
       }
 
       // If getFilterOptions doesn't have categories/tags/attributes, load them separately
@@ -268,31 +322,45 @@ class ProductListViewModel
       List<FilterAttributeModel>? attributes;
 
       // Load categories if not available in filterOptionsResponse
-      if (filterOptionsResponse == null || filterOptionsResponse.categories == null || filterOptionsResponse.categories!.isEmpty) {
+      if (filterOptionsResponse == null ||
+          filterOptionsResponse.categories == null ||
+          filterOptionsResponse.categories!.isEmpty) {
         try {
           debugPrint('📂 Loading categories from API...');
+          // Only load parent categories (parent: 0) to avoid showing parent then children
           final categoriesList = await _categoriesService.listProductCategories(
             apiVersion: finalApiVersion,
             hideEmpty: true,
             perPage: 100,
+            parent: 0, // Only get top-level categories
           );
-          categories = categoriesList.map((cat) => FilterCategoryModel(
-            id: cat.id ?? 0,
-            name: cat.name ?? '',
-            slug: cat.slug ?? '',
-            count: cat.count,
-          )).toList();
-          debugPrint('✅ Loaded ${categories.length} categories from API');
+          categories = categoriesList
+              .map(
+                (cat) => FilterCategoryModel(
+                  id: cat.id ?? 0,
+                  name: cat.name ?? '',
+                  slug: cat.slug ?? '',
+                  count: cat.count,
+                ),
+              )
+              .toList();
+          debugPrint(
+            '✅ Loaded ${categories.length} parent categories from API',
+          );
         } catch (e) {
           debugPrint('❌ Error loading categories: $e');
         }
       } else {
         categories = filterOptionsResponse.categories;
-        debugPrint('✅ Using categories from getFilterOptions API: ${categories?.length ?? 0}');
+        debugPrint(
+          '✅ Using categories from getFilterOptions API: ${categories?.length ?? 0}',
+        );
       }
 
       // Load tags if not available in filterOptionsResponse
-      if (filterOptionsResponse == null || filterOptionsResponse.tags == null || filterOptionsResponse.tags!.isEmpty) {
+      if (filterOptionsResponse == null ||
+          filterOptionsResponse.tags == null ||
+          filterOptionsResponse.tags!.isEmpty) {
         try {
           debugPrint('🏷️ Loading tags from API...');
           final tagsList = await _tagsService.listProductTags(
@@ -300,23 +368,31 @@ class ProductListViewModel
             hideEmpty: true,
             perPage: 100,
           );
-          tags = tagsList.map((tag) => FilterTagModel(
-            id: tag.id ?? 0,
-            name: tag.name ?? '',
-            slug: tag.slug ?? '',
-            count: tag.count,
-          )).toList();
+          tags = tagsList
+              .map(
+                (tag) => FilterTagModel(
+                  id: tag.id ?? 0,
+                  name: tag.name ?? '',
+                  slug: tag.slug ?? '',
+                  count: tag.count,
+                ),
+              )
+              .toList();
           debugPrint('✅ Loaded ${tags.length} tags from API');
         } catch (e) {
           debugPrint('❌ Error loading tags: $e');
         }
       } else {
         tags = filterOptionsResponse.tags;
-        debugPrint('✅ Using tags from getFilterOptions API: ${tags?.length ?? 0}');
+        debugPrint(
+          '✅ Using tags from getFilterOptions API: ${tags?.length ?? 0}',
+        );
       }
 
       // Load attributes if not available in filterOptionsResponse
-      if (filterOptionsResponse == null || filterOptionsResponse.availableAttributes == null || filterOptionsResponse.availableAttributes!.isEmpty) {
+      if (filterOptionsResponse == null ||
+          filterOptionsResponse.availableAttributes == null ||
+          filterOptionsResponse.availableAttributes!.isEmpty) {
         try {
           debugPrint('🎨 Loading attributes from API...');
           final attributesList = await _attributesService.listProductAttributes(
@@ -324,307 +400,317 @@ class ProductListViewModel
             hideEmpty: true,
             perPage: 100,
           );
-          debugPrint('📋 Found ${attributesList.length} attributes, loading terms...');
-          
+          debugPrint(
+            '📋 Found ${attributesList.length} attributes, loading terms...',
+          );
+
           // Load terms for each attribute
           final attributesWithTerms = <FilterAttributeModel>[];
           for (final attr in attributesList) {
             try {
-              debugPrint('  🔍 Loading terms for attribute: ${attr.name} (ID: ${attr.id})');
-              final termsList = await _attributeTermsService.listProductAttributeTerms(
-                apiVersion: finalApiVersion,
-                attributeId: attr.id ?? 0,
-                hideEmpty: true,
-                perPage: 100,
+              debugPrint(
+                '  🔍 Loading terms for attribute: ${attr.name} (ID: ${attr.id})',
               );
-              debugPrint('  ✅ Loaded ${termsList.length} terms for attribute ${attr.name}');
-              attributesWithTerms.add(FilterAttributeModel(
-                id: attr.id ?? 0,
-                name: attr.name ?? '',
-                slug: attr.taxonomy ?? '',
-                terms: termsList.map((term) => FilterTermModel(
-                  id: term.id ?? 0,
-                  name: term.name ?? '',
-                  slug: term.slug ?? '',
-                  count: term.count,
-                )).toList(),
-              ));
+              final termsList = await _attributeTermsService
+                  .listProductAttributeTerms(
+                    apiVersion: finalApiVersion,
+                    attributeId: attr.id ?? 0,
+                    hideEmpty: true,
+                    perPage: 100,
+                  );
+              debugPrint(
+                '  ✅ Loaded ${termsList.length} terms for attribute ${attr.name}',
+              );
+              attributesWithTerms.add(
+                FilterAttributeModel(
+                  id: attr.id ?? 0,
+                  name: attr.name ?? '',
+                  slug: attr.taxonomy ?? '',
+                  terms: termsList
+                      .map(
+                        (term) => FilterTermModel(
+                          id: term.id ?? 0,
+                          name: term.name ?? '',
+                          slug: term.slug ?? '',
+                          count: term.count,
+                        ),
+                      )
+                      .toList(),
+                ),
+              );
             } catch (e) {
-              debugPrint('❌ Error loading terms for attribute ${attr.id} (${attr.name}): $e');
+              debugPrint(
+                '❌ Error loading terms for attribute ${attr.id} (${attr.name}): $e',
+              );
             }
           }
           attributes = attributesWithTerms;
-          debugPrint('✅ Loaded ${attributes.length} attributes with terms from API');
+          debugPrint(
+            '✅ Loaded ${attributes.length} attributes with terms from API',
+          );
         } catch (e) {
           debugPrint('❌ Error loading attributes: $e');
         }
       } else {
         attributes = filterOptionsResponse.availableAttributes;
-        debugPrint('✅ Using attributes from getFilterOptions API: ${attributes?.length ?? 0}');
+        debugPrint(
+          '✅ Using attributes from getFilterOptions API: ${attributes?.length ?? 0}',
+        );
       }
 
       // Build final filter options response
+      // IMPORTANT: Only use real data from API - NO MOCK DATA
       if (filterOptionsResponse != null) {
+        // We have a response from getFilterOptions API
         _filterOptions = GetFilterOptionsResponseModel(
           sortOptions: filterOptionsResponse.sortOptions,
           stockStatuses: filterOptionsResponse.stockStatuses,
           priceRange: filterOptionsResponse.priceRange,
           categories: categories ?? filterOptionsResponse.categories,
           tags: tags ?? filterOptionsResponse.tags,
-          availableAttributes: attributes ?? filterOptionsResponse.availableAttributes,
+          availableAttributes:
+              attributes ?? filterOptionsResponse.availableAttributes,
         );
       } else {
-        // If getFilterOptions completely failed, use mock data but with real categories/tags/attributes
-        _filterOptions = _createMockFilterOptions(
+        // getFilterOptions API failed or doesn't exist
+        // Create filter options from individual API data with default sort/stock/price range
+        // This is acceptable because sort options and stock statuses are standard in WooCommerce
+        debugPrint(
+          '⚠️ getFilterOptions API not available, creating filter options from individual APIs',
+        );
+
+        // Create filter options with default/standard values for sort, stock, and price
+        // These are standard WooCommerce values that work with the Store API
+        _filterOptions = GetFilterOptionsResponseModel(
+          sortOptions: const [
+            SortOptionModel(
+              key: 'date',
+              label: 'Date',
+              orders: [
+                OrderOptionModel(key: 'desc', label: 'Newest'),
+                OrderOptionModel(key: 'asc', label: 'Oldest'),
+              ],
+            ),
+            SortOptionModel(
+              key: 'price',
+              label: 'Price',
+              orders: [
+                OrderOptionModel(key: 'asc', label: 'Low to High'),
+                OrderOptionModel(key: 'desc', label: 'High to Low'),
+              ],
+            ),
+            SortOptionModel(
+              key: 'title',
+              label: 'Name',
+              orders: [
+                OrderOptionModel(key: 'asc', label: 'A to Z'),
+                OrderOptionModel(key: 'desc', label: 'Z to A'),
+              ],
+            ),
+            SortOptionModel(
+              key: 'popularity',
+              label: 'Popularity',
+              orders: [
+                OrderOptionModel(key: 'desc', label: 'Most Popular'),
+                OrderOptionModel(key: 'asc', label: 'Least Popular'),
+              ],
+            ),
+            SortOptionModel(
+              key: 'rating',
+              label: 'Rating',
+              orders: [
+                OrderOptionModel(key: 'desc', label: 'Highest Rated'),
+                OrderOptionModel(key: 'asc', label: 'Lowest Rated'),
+              ],
+            ),
+          ],
+          stockStatuses: const [
+            StockStatusModel(key: 'instock', label: 'In stock', enabled: true),
+            StockStatusModel(
+              key: 'outofstock',
+              label: 'Out of stock',
+              enabled: true,
+            ),
+            StockStatusModel(
+              key: 'onbackorder',
+              label: 'On backorder',
+              enabled: true,
+            ),
+          ],
+          priceRange: const PriceRangeModel(
+            minPrice: 0.0,
+            maxPrice: 999999.99,
+            currency: 'USD',
+            currencySymbol: '\$',
+            currencyMinorUnit: 2,
+          ),
           categories: categories,
           tags: tags,
-          attributes: attributes,
+          availableAttributes: attributes,
         );
+
+        debugPrint(
+          '✅ Created filter options from individual APIs with default sort/stock/price',
+        );
+      }
+
+      // Validate we have at least some filter options
+      if (_filterOptions == null) {
+        debugPrint('❌ No filter data available from API');
+        _emitFilterOptionsError('No filter options available from API');
+        return;
       }
 
       debugPrint('✅ Final filter options:');
       debugPrint('   - Categories: ${_filterOptions!.categories?.length ?? 0}');
       debugPrint('   - Tags: ${_filterOptions!.tags?.length ?? 0}');
-      debugPrint('   - Attributes: ${_filterOptions!.availableAttributes?.length ?? 0}');
-      
-      // Update current state to include filter options
-      final currentState = state;
-      if (currentState is ProductListLoadedState) {
-        emit(ProductListLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          filterOptions: _filterOptions,
-        ));
-      }
+      debugPrint(
+        '   - Attributes: ${_filterOptions!.availableAttributes?.length ?? 0}',
+      );
+
+      // Emit success state with filter options
+      _emitFilterOptionsLoaded();
     } catch (e, stackTrace) {
       debugPrint('❌ ProductListViewModel: Error loading filter options: $e');
       debugPrint('❌ Stack trace: $stackTrace');
-      // Don't emit error state for filter options as it's not critical
-      // Just log the error and continue with static filters
+      _emitFilterOptionsError(_getErrorMessage(e));
     } finally {
       _isLoadingFilterOptions = false;
     }
   }
 
-  /// Test method to force load real API data
-  /// Call this from debug UI to test real API
-  Future<void> testRealApiFilterOptions() async {
-    if (!kDebugMode) return;
-    
-    debugPrint('🧪 Testing REAL API filter options...');
-    
-    // Reset loading flag to allow real API test
-    _isLoadingFilterOptions = false;
-    
-    try {
-      // Get API version with fallback
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-      );
-      
-      final finalApiVersion = apiVersion.isEmpty ? 'v1' : apiVersion;
-      debugPrint('🧪 Testing with API version: $finalApiVersion');
-      
-      final filterOptionsResponse = await _productService.getFilterOptions(
-        apiVersion: finalApiVersion,
-      );
-      _filterOptions = filterOptionsResponse;
-      debugPrint('✅ REAL API Success! Filter options loaded');
-      debugPrint('📊 Real API data contains:');
-      debugPrint('   - Sort options: ${filterOptionsResponse.sortOptions.length}');
-      debugPrint('   - Stock statuses: ${filterOptionsResponse.stockStatuses.length}');
-      
-      // Force state update
-      final currentState = state;
-      if (currentState is ProductListLoadedState) {
-        emit(ProductListLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          filterOptions: _filterOptions,
-        ));
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ REAL API Error: $e');
-      debugPrint('❌ Stack trace: $stackTrace');
-      debugPrint('💡 This is expected if backend endpoint is not implemented yet');
-      // Maybe API endpoint doesn't exist yet
-    }
+  /// Helper method to emit filter options loading state
+  void _emitFilterOptionsLoading() {
+    final currentState = state;
+    emit(
+      ProductListFilterOptionsLoadingState(
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        filterOptions: currentState.filterOptions,
+        isLoadingProducts: currentState.isLoadingProducts,
+        productsError: currentState.productsError,
+      ),
+    );
   }
 
-  /// Create mock filter options (temporary until backend implements the endpoint)
-  GetFilterOptionsResponseModel _createMockFilterOptions({
-    List<FilterCategoryModel>? categories,
-    List<FilterTagModel>? tags,
-    List<FilterAttributeModel>? attributes,
-  }) {
-    return GetFilterOptionsResponseModel(
-      sortOptions: const [
-        SortOptionModel(
-          key: 'date',
-          label: 'Date',
-          orders: [
-            OrderOptionModel(key: 'desc', label: 'Newest'),
-            OrderOptionModel(key: 'asc', label: 'Oldest'),
-          ],
-        ),
-        SortOptionModel(
-          key: 'price',
-          label: 'Price',
-          orders: [
-            OrderOptionModel(key: 'asc', label: 'Low to High'),
-            OrderOptionModel(key: 'desc', label: 'High to Low'),
-          ],
-        ),
-        SortOptionModel(
-          key: 'title',
-          label: 'Name',
-          orders: [
-            OrderOptionModel(key: 'asc', label: 'A-Z'),
-            OrderOptionModel(key: 'desc', label: 'Z-A'),
-          ],
-        ),
-        SortOptionModel(
-          key: 'popularity',
-          label: 'Popularity',
-          orders: [
-            OrderOptionModel(key: 'desc', label: 'Most Popular'),
-            OrderOptionModel(key: 'asc', label: 'Least Popular'),
-          ],
-        ),
-        SortOptionModel(
-          key: 'rating',
-          label: 'Rating',
-          orders: [
-            OrderOptionModel(key: 'desc', label: 'Highest Rated'),
-            OrderOptionModel(key: 'asc', label: 'Lowest Rated'),
-          ],
-        ),
-      ],
-      stockStatuses: const [
-        StockStatusModel(key: 'instock', label: 'In stock'),
-        StockStatusModel(key: 'outofstock', label: 'Out of stock'),
-        StockStatusModel(key: 'onbackorder', label: 'On backorder'),
-      ],
-      priceRange: const PriceRangeModel(
-        minPrice: 0.0,
-        maxPrice: 9999.99,
-        currency: 'USD',
-        currencySymbol: '\$',
-        currencyMinorUnit: 2,
+  /// Helper method to emit filter options loaded state
+  void _emitFilterOptionsLoaded() {
+    final currentState = state;
+    emit(
+      ProductListFilterOptionsLoadedState(
+        filterOptions: _filterOptions!,
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        isLoadingProducts: currentState.isLoadingProducts,
+        productsError: currentState.productsError,
       ),
-      categories: categories ?? [
-        const FilterCategoryModel(
-          id: 1,
-          name: 'Electronics',
-          slug: 'electronics',
-          count: 15,
-        ),
-        const FilterCategoryModel(
-          id: 2,
-          name: 'Clothing',
-          slug: 'clothing',
-          count: 23,
-        ),
-        const FilterCategoryModel(
-          id: 3,
-          name: 'Home & Garden',
-          slug: 'home-garden',
-          count: 8,
-        ),
-        const FilterCategoryModel(
-          id: 4,
-          name: 'Sports',
-          slug: 'sports',
-          count: 12,
-        ),
-        const FilterCategoryModel(
-          id: 5,
-          name: 'Books',
-          slug: 'books',
-          count: 5,
-        ),
-      ],
-      tags: tags ?? [
-        const FilterTagModel(
-          id: 1,
-          name: 'Sale',
-          slug: 'sale',
-          count: 20,
-        ),
-        const FilterTagModel(
-          id: 2,
-          name: 'New',
-          slug: 'new',
-          count: 15,
-        ),
-        const FilterTagModel(
-          id: 3,
-          name: 'Featured',
-          slug: 'featured',
-          count: 10,
-        ),
-        const FilterTagModel(
-          id: 4,
-          name: 'Best Seller',
-          slug: 'best-seller',
-          count: 8,
-        ),
-      ],
-      availableAttributes: attributes ?? [
-        FilterAttributeModel(
-          id: 1,
-          name: 'Color',
-          slug: 'color',
-          terms: const [
-            FilterTermModel(id: 1, name: 'Red', slug: 'red', count: 5),
-            FilterTermModel(id: 2, name: 'Blue', slug: 'blue', count: 7),
-            FilterTermModel(id: 3, name: 'Green', slug: 'green', count: 4),
-            FilterTermModel(id: 4, name: 'Black', slug: 'black', count: 12),
-            FilterTermModel(id: 5, name: 'White', slug: 'white', count: 9),
-          ],
-        ),
-        FilterAttributeModel(
-          id: 2,
-          name: 'Size',
-          slug: 'size',
-          terms: const [
-            FilterTermModel(id: 6, name: 'Small', slug: 'small', count: 8),
-            FilterTermModel(id: 7, name: 'Medium', slug: 'medium', count: 15),
-            FilterTermModel(id: 8, name: 'Large', slug: 'large', count: 10),
-            FilterTermModel(id: 9, name: 'X-Large', slug: 'x-large', count: 6),
-          ],
-        ),
-        FilterAttributeModel(
-          id: 3,
-          name: 'Material',
-          slug: 'material',
-          terms: const [
-            FilterTermModel(id: 10, name: 'Cotton', slug: 'cotton', count: 14),
-            FilterTermModel(id: 11, name: 'Polyester', slug: 'polyester', count: 9),
-            FilterTermModel(id: 12, name: 'Leather', slug: 'leather', count: 5),
-            FilterTermModel(id: 13, name: 'Wool', slug: 'wool', count: 3),
-          ],
-        ),
-      ],
+    );
+  }
+
+  /// Helper method to emit filter options error state
+  void _emitFilterOptionsError(String message) {
+    final currentState = state;
+    emit(
+      ProductListFilterOptionsErrorState(
+        message: message,
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        filterOptions: currentState.filterOptions,
+        isLoadingProducts: currentState.isLoadingProducts,
+        productsError: currentState.productsError,
+      ),
+    );
+  }
+
+  /// Helper method to emit products loading state
+  void _emitProductsLoading() {
+    final currentState = state;
+    emit(
+      ProductListLoadingState(
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        filterOptions: currentState.filterOptions,
+        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
+        filterOptionsError: currentState.filterOptionsError,
+      ),
+    );
+  }
+
+  /// Helper method to emit products loaded state
+  void _emitProductsLoaded() {
+    final currentState = state;
+    emit(
+      ProductListLoadedState(
+        products: _allProducts,
+        hasMore: _allProducts.length >= _perPage,
+        currentPage: _currentPage,
+        totalPages: _totalPages,
+        filterOptions: currentState.filterOptions ?? _filterOptions,
+        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
+        filterOptionsError: currentState.filterOptionsError,
+      ),
+    );
+  }
+
+  /// Helper method to emit products error state
+  void _emitProductsError(String message) {
+    final currentState = state;
+    emit(
+      ProductListErrorState(
+        message: message,
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        filterOptions: currentState.filterOptions,
+        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
+        filterOptionsError: currentState.filterOptionsError,
+      ),
     );
   }
 
   /// Load products with current filters
   Future<void> loadProducts({bool refresh = false}) async {
-    debugPrint('🚀 ProductListViewModel.loadProducts called (refresh: $refresh)');
+    // Prevent multiple concurrent calls
+    if (_isLoadingProducts) {
+      debugPrint(
+        '🚫 loadProducts already in progress (refresh: $refresh), skipping...',
+      );
+      return;
+    }
+
+    // If not refreshing and we already have products loaded, don't reload
+    if (!refresh && _hasInitialLoadCompleted) {
+      debugPrint(
+        '🚫 Products already loaded (has ${_allProducts.length} products), skipping...',
+      );
+      return;
+    }
+
+    debugPrint(
+      '🚀 ProductListViewModel.loadProducts called (refresh: $refresh, hasInitialLoad: $_hasInitialLoadCompleted, productsCount: ${_allProducts.length})',
+    );
+
+    _isLoadingProducts = true;
+
     try {
       if (refresh) {
         _currentPage = 1;
         _allProducts = [];
-        emit(ProductListLoadingState());
+        _hasInitialLoadCompleted = false;
+        _emitProductsLoading();
       } else {
         final currentState = state;
         if (currentState is! ProductListLoadedState) {
-          emit(ProductListLoadingState());
+          _emitProductsLoading();
         }
       }
 
@@ -633,18 +719,39 @@ class ProductListViewModel
         'v1',
       );
 
-      // Prepare price filters - use directly as they're already cleaned in applyFilters
-      // Only clean if they're not already in the correct format (safety check)
-      String? minPrice = _filters.minPrice != null && _filters.minPrice!.isNotEmpty
-          ? _filters.minPrice
-          : null;
-      String? maxPrice = _filters.maxPrice != null && _filters.maxPrice!.isNotEmpty
-          ? _filters.maxPrice
-          : null;
+      // Prepare price filters - ensure they're cleaned and valid
+      // WooCommerce Store API expects price as string in the same format as product prices
+      // Product prices are typically stored as strings like "2.00" or "100.50"
+      // We need to match the exact format that products use
+      String? minPrice;
+      String? maxPrice;
+
+      // Get currency info from first product or filter options to determine format
+      int? currencyMinorUnit;
+      if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
+        currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
+      } else if (_filterOptions?.priceRange != null) {
+        currencyMinorUnit = _filterOptions!.priceRange.currencyMinorUnit;
+      }
+
+      if (_filters.minPrice != null && _filters.minPrice!.isNotEmpty) {
+        minPrice = _cleanPriceForApi(_filters.minPrice, currencyMinorUnit);
+        if (minPrice == null || minPrice.isEmpty) {
+          minPrice = null;
+        }
+      }
+
+      if (_filters.maxPrice != null && _filters.maxPrice!.isNotEmpty) {
+        maxPrice = _cleanPriceForApi(_filters.maxPrice, currencyMinorUnit);
+        if (maxPrice == null || maxPrice.isEmpty) {
+          maxPrice = null;
+        }
+      }
 
       // Get category - use first from selectedCategories if available
       int? categoryId;
-      if (_filters.selectedCategories != null && _filters.selectedCategories!.isNotEmpty) {
+      if (_filters.selectedCategories != null &&
+          _filters.selectedCategories!.isNotEmpty) {
         categoryId = _filters.selectedCategories!.first;
       } else if (_filters.category != null) {
         categoryId = _filters.category;
@@ -659,14 +766,77 @@ class ProductListViewModel
       }
 
       // Get first attribute and term for API (API supports single attribute/term)
+      // WooCommerce Store API only supports filtering by one attribute and one term at a time
+      // IMPORTANT: WooCommerce Store API expects attribute as taxonomy slug (e.g., "pa_color") not ID
       String? attributeId;
       String? attributeTermId;
-      if (_filters.selectedAttributes != null && _filters.selectedAttributes!.isNotEmpty) {
+      if (_filters.selectedAttributes != null &&
+          _filters.selectedAttributes!.isNotEmpty) {
         final firstAttribute = _filters.selectedAttributes!.entries.first;
-        attributeId = firstAttribute.key.toString();
-        if (firstAttribute.value.isNotEmpty) {
-          attributeTermId = firstAttribute.value.first.toString();
+        final selectedAttributeId = firstAttribute.key;
+
+        // Find the attribute in filter options to get its slug/taxonomy
+        if (_filterOptions?.availableAttributes != null) {
+          try {
+            final matchingAttribute = _filterOptions!.availableAttributes!
+                .firstWhere((attr) => attr.id == selectedAttributeId);
+
+            // Use attribute slug (taxonomy) instead of ID for API
+            // WooCommerce Store API expects taxonomy like "pa_color" or "pa_size"
+            attributeId = matchingAttribute.slug;
+
+            if (firstAttribute.value.isNotEmpty) {
+              // Find the term to verify it exists
+              final selectedTermId = firstAttribute.value.first;
+              final matchingTerm = matchingAttribute.terms.firstWhere(
+                (term) => term.id == selectedTermId,
+                orElse: () => throw StateError(
+                  'Term ID $selectedTermId not found in attribute ${matchingAttribute.name}',
+                ),
+              );
+              // WooCommerce Store API expects term as ID (string), not slug
+              // Use term ID as string for API compatibility
+              attributeTermId = matchingTerm.id.toString();
+
+              debugPrint(
+                '🔍 Attribute filter: Found ${_filters.selectedAttributes!.length} attributes',
+              );
+              debugPrint(
+                '  - Selected attribute: ${matchingAttribute.name} (ID: ${matchingAttribute.id}, Slug: ${matchingAttribute.slug})',
+              );
+              debugPrint(
+                '  - Selected term: ${matchingTerm.name} (ID: ${matchingTerm.id})',
+              );
+              debugPrint('  - Using attribute slug for API: $attributeId');
+              debugPrint('  - Using term ID for API: $attributeTermId');
+            }
+          } catch (e) {
+            debugPrint('❌ Error finding attribute/term in filter options: $e');
+            debugPrint('  - Selected attribute ID: $selectedAttributeId');
+            debugPrint(
+              '  - Available attributes: ${_filterOptions!.availableAttributes!.map((a) => '${a.name} (ID: ${a.id}, Slug: ${a.slug})').join(', ')}',
+            );
+            // Fallback: use ID as string (might not work but worth trying)
+            attributeId = selectedAttributeId.toString();
+            if (firstAttribute.value.isNotEmpty) {
+              attributeTermId = firstAttribute.value.first.toString();
+            }
+            debugPrint(
+              '  - ⚠️ Fallback: Using attribute ID as string: $attributeId',
+            );
+          }
+        } else {
+          // No filter options available, use ID as fallback
+          attributeId = selectedAttributeId.toString();
+          if (firstAttribute.value.isNotEmpty) {
+            attributeTermId = firstAttribute.value.first.toString();
+          }
+          debugPrint(
+            '⚠️ No filter options available, using attribute ID as fallback: $attributeId',
+          );
         }
+      } else {
+        debugPrint('🔍 Attribute filter: No attributes selected');
       }
 
       debugPrint('🔍 ProductListViewModel: Loading products with filters:');
@@ -676,9 +846,13 @@ class ProductListViewModel
       debugPrint('  - Max Price: $maxPrice (raw: ${_filters.maxPrice})');
       debugPrint('  - On Sale: ${_filters.onSale}');
       debugPrint('  - Stock Status: ${_filters.stockStatus}');
-      debugPrint('  - Category: $categoryId (from selected: ${_filters.selectedCategories})');
+      debugPrint(
+        '  - Category: $categoryId (from selected: ${_filters.selectedCategories})',
+      );
       debugPrint('  - Tag: $tagId (from selected: ${_filters.selectedTags})');
-      debugPrint('  - Attribute: $attributeId, Term: $attributeTermId (from selected: ${_filters.selectedAttributes})');
+      debugPrint(
+        '  - Attribute: $attributeId, Term: $attributeTermId (from selected: ${_filters.selectedAttributes})',
+      );
       debugPrint('  - Order By: ${_filters.orderBy}');
       debugPrint('  - Order: ${_filters.order}');
       debugPrint('  - Featured: ${_filters.featured}');
@@ -703,7 +877,7 @@ class ProductListViewModel
       );
 
       debugPrint('✅ ProductListViewModel: Loaded ${products.length} products');
-      
+
       // Debug: Log first 3 product prices to understand format
       if (products.isNotEmpty) {
         debugPrint('🔍 Sample product prices from API:');
@@ -712,21 +886,35 @@ class ProductListViewModel
           if (product.prices != null) {
             debugPrint('  Product ${i + 1}: ${product.name}');
             debugPrint('    - price: "${product.prices!.price}"');
-            debugPrint('    - regular_price: "${product.prices!.regularPrice}"');
+            debugPrint(
+              '    - regular_price: "${product.prices!.regularPrice}"',
+            );
             debugPrint('    - sale_price: "${product.prices!.salePrice}"');
-            debugPrint('    - currency_code: "${product.prices!.currencyCode}"');
-            debugPrint('    - currency_symbol: "${product.prices!.currencySymbol}"');
-            debugPrint('    - currency_minor_unit: ${product.prices!.currencyMinorUnit}');
+            debugPrint(
+              '    - currency_code: "${product.prices!.currencyCode}"',
+            );
+            debugPrint(
+              '    - currency_symbol: "${product.prices!.currencySymbol}"',
+            );
+            debugPrint(
+              '    - currency_minor_unit: ${product.prices!.currencyMinorUnit}',
+            );
           }
         }
       }
-      
+
       if (products.isNotEmpty) {
-        debugPrint('✅ First product: ${products.first.name} (ID: ${products.first.id})');
+        debugPrint(
+          '✅ First product: ${products.first.name} (ID: ${products.first.id})',
+        );
         if (products.first.prices != null) {
           debugPrint('✅ First product price: ${products.first.prices!.price}');
-          debugPrint('✅ First product regular price: ${products.first.prices!.regularPrice}');
-          debugPrint('✅ First product sale price: ${products.first.prices!.salePrice}');
+          debugPrint(
+            '✅ First product regular price: ${products.first.prices!.regularPrice}',
+          );
+          debugPrint(
+            '✅ First product sale price: ${products.first.prices!.salePrice}',
+          );
         }
       }
 
@@ -741,29 +929,32 @@ class ProductListViewModel
           ? _currentPage
           : _currentPage + 1; // Estimate, API doesn't always return total
 
-      debugPrint('📦 ProductListViewModel: Emitting loaded state with ${_allProducts.length} products');
-      emit(
-        ProductListLoadedState(
-          products: _allProducts,
-          hasMore: products.length >= _perPage,
-          currentPage: _currentPage,
-          totalPages: _totalPages,
-          filterOptions: _filterOptions,
-        ),
+      debugPrint(
+        '📦 ProductListViewModel: Emitting loaded state with ${_allProducts.length} products',
       );
+      _hasInitialLoadCompleted = true;
+      _emitProductsLoaded();
       debugPrint('✅ ProductListViewModel: State emitted successfully');
     } catch (e, stackTrace) {
       debugPrint('❌ ProductListViewModel: Error loading products: $e');
       debugPrint('❌ Error type: ${e.runtimeType}');
       debugPrint('❌ Stack trace: $stackTrace');
-      emit(ProductListErrorState(message: _getErrorMessage(e)));
+      _emitProductsError(_getErrorMessage(e));
+    } finally {
+      _isLoadingProducts = false;
     }
   }
 
   /// Load more products (pagination)
   Future<void> loadMore() async {
+    // Prevent loading more if already loading
+    if (_isLoadingProducts) {
+      debugPrint('🚫 loadMore: Already loading products, skipping...');
+      return;
+    }
+
     final currentState = state;
-    if (currentState is ProductListLoadedState && currentState.hasMore) {
+    if (currentState.hasMore && !_isLoadingProducts) {
       _currentPage++;
       await loadProducts();
     }
@@ -774,37 +965,30 @@ class ProductListViewModel
 
   /// Initialize filter dialog - sets temp filters and controllers
   void initFilterDialog() {
-    if (!_dialogInitialized) {
+    if (!_dialogInitialized && !_isLoadingFilterOptions) {
       debugPrint('🔧 initFilterDialog called - initializing...');
-      
+
       // Always load filter options when dialog opens to ensure fresh data
-      if (!_isLoadingFilterOptions) {
+      // Only load if not already loading and not already loaded
+      if (_filterOptions == null && !_isLoadingFilterOptions) {
         debugPrint('🔧 Loading filter options...');
         loadFilterOptions();
       } else {
-        debugPrint('⏳ Filter options already loading...');
+        debugPrint('⏳ Filter options already loaded or loading...');
       }
-      
+
       _tempFilters = _filters;
       _minPriceController.text = _filters.minPrice ?? '';
       _maxPriceController.text = _filters.maxPrice ?? '';
       _dialogInitialized = true;
-      
-      // Emit to trigger rebuild with initial values
-      final currentState = state;
-      if (currentState is ProductListLoadedState) {
-        emit(ProductListLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          filterOptions: _filterOptions,
-        ));
-      } else {
-        emit(currentState);
-      }
+
+      // Don't emit state here - it causes infinite rebuild loop
+      // State will be updated when loadFilterOptions completes
+      debugPrint('✅ Filter dialog initialized');
     } else {
-      debugPrint('🚫 initFilterDialog already initialized, skipping...');
+      debugPrint(
+        '🚫 initFilterDialog already initialized or loading, skipping... (initialized: $_dialogInitialized, loading: $_isLoadingFilterOptions)',
+      );
     }
   }
 
@@ -814,6 +998,8 @@ class ProductListViewModel
   }
 
   /// Update temp filter (for filter dialog)
+  /// Note: When a parameter is provided (even if null), it will update the filter
+  /// When a parameter is not provided (omitted), it keeps the existing value
   void updateTempFilter({
     String? minPrice,
     String? maxPrice,
@@ -825,6 +1011,17 @@ class ProductListViewModel
     List<int>? selectedTags,
     Map<int, List<int>>? selectedAttributes,
   }) {
+    // Create a new map to track which parameters were explicitly provided
+    // For Map and List, we need to handle them specially since null can mean "clear" or "don't change"
+    // We'll use a wrapper approach: if parameter is provided in the function call, update it
+
+    // For selectedAttributes: if provided (even if empty map), update it
+    // If not provided, keep existing
+    final Map<int, List<int>>? finalSelectedAttributes =
+        selectedAttributes != null
+        ? (selectedAttributes.isEmpty ? {} : selectedAttributes)
+        : _tempFilters.selectedAttributes;
+
     _tempFilters = _tempFilters.copyWith(
       minPrice: minPrice,
       maxPrice: maxPrice,
@@ -834,93 +1031,127 @@ class ProductListViewModel
       order: order,
       selectedCategories: selectedCategories,
       selectedTags: selectedTags,
-      selectedAttributes: selectedAttributes,
+      selectedAttributes: finalSelectedAttributes,
     );
+
+    debugPrint('🔍 updateTempFilter called:');
+    debugPrint(
+      '  - selectedAttributes provided: ${selectedAttributes != null}',
+    );
+    debugPrint('  - finalSelectedAttributes: $finalSelectedAttributes');
+    debugPrint(
+      '  - _tempFilters.selectedAttributes after: ${_tempFilters.selectedAttributes}',
+    );
+
     // Emit current state to trigger rebuild in filter dialog
     final currentState = state;
+    // Preserve current state structure
     if (currentState is ProductListLoadedState) {
-      emit(ProductListLoadedState(
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        filterOptions: _filterOptions,
-      ));
+      emit(
+        ProductListLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          filterOptions: currentState.filterOptions ?? _filterOptions,
+          isLoadingFilterOptions: currentState.isLoadingFilterOptions,
+          filterOptionsError: currentState.filterOptionsError,
+        ),
+      );
+    } else if (currentState is ProductListFilterOptionsLoadedState) {
+      emit(
+        ProductListFilterOptionsLoadedState(
+          filterOptions: currentState.filterOptions ?? _filterOptions!,
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          isLoadingProducts: currentState.isLoadingProducts,
+          productsError: currentState.productsError,
+        ),
+      );
     } else {
       emit(currentState);
     }
   }
 
-  /// Clean price string for API - removes currency symbols, thousand separators, keeps only numeric value
-  /// Returns price as plain numeric string (e.g., "2" or "100.50")
-  /// WooCommerce Store API expects price as string in the same currency format as products
-  String? _cleanPriceForApi(String? priceString) {
+  /// Clean price string for API - uses PriceInfoCurrencyHelper for consistent parsing
+  /// Returns price as plain numeric string matching product price format
+  /// WooCommerce Store API expects price as string in the same format as product prices
+  /// Product prices come as String from API (e.g., "2.00", "100.50", "1,234.56")
+  /// We need to parse user input and return in the same format as products use
+  String? _cleanPriceForApi(String? priceString, int? currencyMinorUnit) {
     if (priceString == null || priceString.isEmpty) return null;
-    
-    // Remove all whitespace
-    String cleaned = priceString.trim();
-    if (cleaned.isEmpty) return null;
-    
-    // Try to parse directly as number first (handles "2", "100", "2.5", etc.)
-    final directParse = double.tryParse(cleaned);
-    if (directParse != null && directParse >= 0) {
-      debugPrint('🔍 Price conversion (direct): "$priceString" -> "$cleaned" -> $directParse');
-      // Return as string without unnecessary decimal places
-      if (directParse == directParse.truncateToDouble()) {
-        return directParse.toInt().toString();
-      }
-      return directParse.toString();
+
+    // Get currency info from first product (most accurate) or filter options
+    String? currencyCode;
+    String? currencyDecimalSeparator;
+    String? currencyThousandSeparator;
+    int? finalCurrencyMinorUnit = currencyMinorUnit;
+
+    if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
+      final productPrices = _allProducts.first.prices!;
+      currencyCode = productPrices.currencyCode?.toLowerCase();
+      currencyDecimalSeparator = productPrices.currencyDecimalSeparator;
+      currencyThousandSeparator = productPrices.currencyThousandSeparator;
+      finalCurrencyMinorUnit ??= productPrices.currencyMinorUnit;
+    } else if (_filterOptions?.priceRange != null) {
+      final priceRange = _filterOptions!.priceRange;
+      currencyCode = priceRange.currency?.toLowerCase();
+      finalCurrencyMinorUnit ??= priceRange.currencyMinorUnit;
     }
-    
-    // Remove all non-numeric characters except decimal point and comma
-    cleaned = cleaned.replaceAll(RegExp(r'[^\d.,]'), '');
-    if (cleaned.isEmpty) return null;
-    
-    // Handle thousand separators (commas) vs decimal separators
-    if (cleaned.contains(',') && cleaned.contains('.')) {
-      // Both comma and dot present - comma is likely thousand separator
-      cleaned = cleaned.replaceAll(',', '');
-    } else if (cleaned.contains(',') && !cleaned.contains('.')) {
-      // Only comma - check position to determine if decimal or thousand separator
-      final commaIndex = cleaned.lastIndexOf(',');
-      if (commaIndex >= cleaned.length - 3) {
-        // Comma is near the end, treat as decimal separator
-        cleaned = cleaned.replaceAll(',', '.');
-      } else {
-        // Comma is not near the end, treat as thousand separator
-        cleaned = cleaned.replaceAll(',', '');
-      }
-    }
-    
-    // Ensure only one decimal point
-    final parts = cleaned.split('.');
-    if (parts.length > 2) {
-      cleaned = '${parts[0]}.${parts.sublist(1).join()}';
-    }
-    
-    // Validate it's a valid number
-    if (cleaned.isEmpty) return null;
-    final parsed = double.tryParse(cleaned);
-    if (parsed == null || parsed < 0) {
-      debugPrint('⚠️ Price conversion failed: "$priceString" -> "$cleaned" (invalid)');
+
+    finalCurrencyMinorUnit ??= 2;
+
+    // Use PriceInfoCurrencyHelper to parse the price (handles all formats)
+    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
+      priceString,
+      currencyCode: currencyCode,
+      currencyDecimalSeparator: currencyDecimalSeparator,
+      currencyThousandSeparator: currencyThousandSeparator,
+      currencyMinorUnit: finalCurrencyMinorUnit,
+    );
+
+    if (parsedPrice == null || parsedPrice < 0) {
+      debugPrint(
+        '⚠️ Price conversion failed: "$priceString" -> null (invalid)',
+      );
       return null;
     }
-    
-    debugPrint('🔍 Price conversion: "$priceString" -> "$cleaned" -> $parsed');
-    
-    // Return the price as plain numeric string
-    // Remove unnecessary decimal places (e.g., "2.0" -> "2", "100.50" -> "100.5" or "100.50")
-    if (parsed == parsed.truncateToDouble()) {
-      return parsed.toInt().toString();
-    }
-    return cleaned;
+
+    // Return as plain numeric string with decimal point
+    // IMPORTANT: Match product price format exactly
+    // Product prices from API are plain numeric strings like "2.00" or "100.50"
+    // Always use dot as decimal separator for API (WooCommerce standard)
+    // Keep all decimal places to match product format
+    final formatted = parsedPrice.toStringAsFixed(finalCurrencyMinorUnit);
+
+    debugPrint(
+      '🔍 Price conversion: "$priceString" -> $parsedPrice -> "$formatted" (minorUnit: $finalCurrencyMinorUnit)',
+    );
+
+    return formatted;
   }
 
   /// Apply filters and reload products
   Future<void> applyFilters() async {
+    // Get currency info for price formatting
+    int? currencyMinorUnit;
+    if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
+      currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
+    } else if (_filterOptions?.priceRange != null) {
+      currencyMinorUnit = _filterOptions!.priceRange.currencyMinorUnit;
+    }
+
     // Clean price values for API
-    final cleanMinPrice = _cleanPriceForApi(_tempFilters.minPrice);
-    final cleanMaxPrice = _cleanPriceForApi(_tempFilters.maxPrice);
+    final cleanMinPrice = _cleanPriceForApi(
+      _tempFilters.minPrice,
+      currencyMinorUnit,
+    );
+    final cleanMaxPrice = _cleanPriceForApi(
+      _tempFilters.maxPrice,
+      currencyMinorUnit,
+    );
 
     debugPrint('🔍 ProductListViewModel: Applying filters:');
     debugPrint('  - Temp Min Price: ${_tempFilters.minPrice}');
@@ -930,11 +1161,35 @@ class ProductListViewModel
     debugPrint('  - Selected Categories: ${_tempFilters.selectedCategories}');
     debugPrint('  - Selected Tags: ${_tempFilters.selectedTags}');
     debugPrint('  - Selected Attributes: ${_tempFilters.selectedAttributes}');
+    debugPrint('  - On Sale: ${_tempFilters.onSale}');
+    debugPrint('  - Stock Status: ${_tempFilters.stockStatus}');
+    debugPrint('  - Order By: ${_tempFilters.orderBy}');
+    debugPrint('  - Order: ${_tempFilters.order}');
 
+    // Copy ALL filters from tempFilters to filters, including cleaned prices
+    // Explicitly copy all filters to ensure they're properly transferred
     _filters = _tempFilters.copyWith(
       minPrice: cleanMinPrice,
       maxPrice: cleanMaxPrice,
+      selectedCategories: _tempFilters.selectedCategories,
+      selectedTags: _tempFilters.selectedTags,
+      selectedAttributes: _tempFilters.selectedAttributes,
+      onSale: _tempFilters.onSale,
+      stockStatus: _tempFilters.stockStatus,
+      orderBy: _tempFilters.orderBy,
+      order: _tempFilters.order,
+      // All other filters are already in _tempFilters, so they'll be copied
+      // by copyWith's default behavior (using ?? operator)
     );
+
+    debugPrint('🔍 ProductListViewModel: After applyFilters:');
+    debugPrint(
+      '  - _filters.selectedAttributes: ${_filters.selectedAttributes}',
+    );
+    debugPrint(
+      '  - _filters.selectedCategories: ${_filters.selectedCategories}',
+    );
+    debugPrint('  - _filters.selectedTags: ${_filters.selectedTags}');
     _currentPage = 1;
     _allProducts = [];
     await loadProducts(refresh: true);
@@ -991,12 +1246,13 @@ class ProductListViewModel
 
   /// Clear all filters
   Future<void> clearFilters() async {
-    _filters = const ProductFilters(
-      orderBy: 'date',
-      order: 'desc',
-    );
+    _filters = const ProductFilters(orderBy: 'date', order: 'desc');
+    _tempFilters = const ProductFilters(orderBy: 'date', order: 'desc');
+    _minPriceController.clear();
+    _maxPriceController.clear();
     _currentPage = 1;
     _allProducts = [];
+    _hasInitialLoadCompleted = false; // Reset flag to allow reload
     await loadProducts(refresh: true);
   }
 
@@ -1018,4 +1274,3 @@ class ProductListViewModel
     return null;
   }
 }
-

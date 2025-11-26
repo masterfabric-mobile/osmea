@@ -35,9 +35,8 @@ class SortOptionsWidget extends StatelessWidget {
         final sortOptions = filterOptions?.sortOptions;
 
         if (sortOptions == null || sortOptions.isEmpty) {
-          if (viewModel.filterOptions == null) {
-            viewModel.loadFilterOptions();
-          }
+          // Don't call loadFilterOptions here - it's already called in initFilterDialog
+          // This prevents infinite loop
           return _StaticSortOptions(
             viewModel: viewModel,
             selectedSortBy: selectedSortBy,

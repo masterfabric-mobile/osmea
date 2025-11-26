@@ -25,9 +25,8 @@ class CategoriesFilterWidget extends StatelessWidget {
     return BlocBuilder<ProductListViewModel, ProductListState>(
       bloc: viewModel,
       builder: (context, state) {
-        final filterOptions = state is ProductListLoadedState
-            ? state.filterOptions
-            : null;
+        // Get filterOptions from any state that has it
+        final filterOptions = state.filterOptions;
 
         if (filterOptions?.categories == null ||
             filterOptions!.categories!.isEmpty) {

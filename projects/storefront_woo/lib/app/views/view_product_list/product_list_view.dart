@@ -38,8 +38,7 @@ class ProductListView
     viewModel.setArguments(arguments);
     debugPrint('🚀 Calling loadProducts(refresh: true)');
     viewModel.loadProducts(refresh: true);
-    // Pre-load filter options in background
-    viewModel.loadFilterOptions();
+    // Filter options will be loaded when filter dialog is opened (in initFilterDialog)
     debugPrint('🚀 loadProducts call completed');
   }
 
@@ -102,4 +101,3 @@ PreferredSizeWidget _buildProductListAppBar(
     ),
   );
 }
-

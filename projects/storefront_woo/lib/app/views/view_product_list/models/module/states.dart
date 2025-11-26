@@ -1,40 +1,129 @@
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 
-abstract class ProductListState {}
-
-class ProductListInitialState extends ProductListState {}
-
-class ProductListLoadingState extends ProductListState {}
-
-class ProductListLoadedState extends ProductListState {
+/// Base state for product list
+abstract class ProductListState {
+  /// Current products list (may be empty during loading)
   final List<ListAllProductsResponseModel> products;
+
+  /// Pagination info
   final bool hasMore;
   final int currentPage;
   final int totalPages;
-  final GetFilterOptionsResponseModel? filterOptions; // Available filter options
-  
-  ProductListLoadedState({
-    required this.products,
-    required this.hasMore,
-    required this.currentPage,
-    required this.totalPages,
+
+  /// Filter options from API (null if not loaded yet)
+  final GetFilterOptionsResponseModel? filterOptions;
+
+  /// Whether products are currently loading
+  final bool isLoadingProducts;
+
+  /// Whether filter options are currently loading
+  final bool isLoadingFilterOptions;
+
+  /// Error message for products loading (null if no error)
+  final String? productsError;
+
+  /// Error message for filter options loading (null if no error)
+  final String? filterOptionsError;
+
+  const ProductListState({
+    this.products = const [],
+    this.hasMore = false,
+    this.currentPage = 1,
+    this.totalPages = 1,
     this.filterOptions,
+    this.isLoadingProducts = false,
+    this.isLoadingFilterOptions = false,
+    this.productsError,
+    this.filterOptionsError,
   });
 }
 
+/// Initial state - nothing loaded yet
+class ProductListInitialState extends ProductListState {
+  const ProductListInitialState() : super();
+}
+
+/// Products are loading
+class ProductListLoadingState extends ProductListState {
+  const ProductListLoadingState({
+    super.products,
+    super.hasMore,
+    super.currentPage,
+    super.totalPages,
+    super.filterOptions,
+    super.isLoadingFilterOptions,
+    super.filterOptionsError,
+  }) : super(isLoadingProducts: true);
+}
+
+/// Products loaded successfully
+class ProductListLoadedState extends ProductListState {
+  const ProductListLoadedState({
+    required super.products,
+    required super.hasMore,
+    required super.currentPage,
+    required super.totalPages,
+    super.filterOptions,
+    super.isLoadingFilterOptions,
+    super.filterOptionsError,
+  }) : super(isLoadingProducts: false);
+}
+
+/// Error loading products
 class ProductListErrorState extends ProductListState {
   final String message;
-  ProductListErrorState({required this.message});
+
+  const ProductListErrorState({
+    required this.message,
+    super.products,
+    super.hasMore,
+    super.currentPage,
+    super.totalPages,
+    super.filterOptions,
+    super.isLoadingFilterOptions,
+    super.filterOptionsError,
+  }) : super(isLoadingProducts: false, productsError: message);
 }
 
-// New states for filter options loading
-class ProductListFilterOptionsLoadingState extends ProductListState {}
+/// Filter options are loading
+class ProductListFilterOptionsLoadingState extends ProductListState {
+  const ProductListFilterOptionsLoadingState({
+    super.products,
+    super.hasMore,
+    super.currentPage,
+    super.totalPages,
+    super.filterOptions,
+    super.isLoadingProducts,
+    super.productsError,
+  }) : super(isLoadingFilterOptions: true);
+}
 
+/// Filter options loaded successfully
+class ProductListFilterOptionsLoadedState extends ProductListState {
+  const ProductListFilterOptionsLoadedState({
+    required super.filterOptions,
+    super.products,
+    super.hasMore,
+    super.currentPage,
+    super.totalPages,
+    super.isLoadingProducts,
+    super.productsError,
+  }) : super(isLoadingFilterOptions: false);
+}
+
+/// Error loading filter options
 class ProductListFilterOptionsErrorState extends ProductListState {
   final String message;
-  ProductListFilterOptionsErrorState({required this.message});
+
+  const ProductListFilterOptionsErrorState({
+    required this.message,
+    super.products,
+    super.hasMore,
+    super.currentPage,
+    super.totalPages,
+    super.filterOptions,
+    super.isLoadingProducts,
+    super.productsError,
+  }) : super(isLoadingFilterOptions: false, filterOptionsError: message);
 }
-
-
-

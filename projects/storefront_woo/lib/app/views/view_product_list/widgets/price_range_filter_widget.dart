@@ -23,9 +23,8 @@ class PriceRangeFilterWidget extends StatelessWidget {
     return BlocBuilder<ProductListViewModel, ProductListState>(
       bloc: viewModel,
       builder: (context, state) {
-        final filterOptions = state is ProductListLoadedState
-            ? state.filterOptions
-            : null;
+        // Get filterOptions from any state that has it
+        final filterOptions = state.filterOptions;
 
         final priceRange = filterOptions?.priceRange;
         final currencyCode = priceRange?.currency?.toLowerCase() ?? 'usd';
@@ -117,11 +116,42 @@ class _PriceInputWidget extends StatelessWidget {
       variant: TextFieldVariant.outlined,
       size: TextFieldSize.medium,
       onChanged: (value) {
-        final cleaned = value.replaceAll(RegExp(r'[^\d.]'), '');
-        final parts = cleaned.split('.');
-        final sanitized = parts.length > 2
-            ? '${parts[0]}.${parts.sublist(1).join()}'
-            : cleaned;
+        // Allow digits, dot, and comma (for different decimal formats)
+        // Codebase uses PriceInfoCurrencyHelper which handles both formats
+        final cleaned = value.replaceAll(RegExp(r'[^\d.,]'), '');
+        
+        // Handle multiple decimal separators - keep only the last one
+        final dotIndex = cleaned.lastIndexOf('.');
+        final commaIndex = cleaned.lastIndexOf(',');
+        
+        String sanitized = cleaned;
+        if (dotIndex != -1 && commaIndex != -1) {
+          // Both present - use the one that appears later (more likely to be decimal)
+          if (dotIndex > commaIndex) {
+            // Dot is later - treat comma as thousand separator
+            sanitized = cleaned.replaceAll(',', '');
+          } else {
+            // Comma is later - treat dot as thousand separator
+            sanitized = cleaned.replaceAll('.', '').replaceAll(',', '.');
+          }
+        } else if (commaIndex != -1 && dotIndex == -1) {
+          // Only comma - check if it's likely decimal (near end) or thousand separator
+          if (commaIndex >= cleaned.length - 3) {
+            // Comma near end - treat as decimal separator
+            sanitized = cleaned.replaceAll(',', '.');
+          } else {
+            // Comma not near end - treat as thousand separator, remove it
+            sanitized = cleaned.replaceAll(',', '');
+          }
+        } else if (dotIndex != -1) {
+          // Only dot - ensure only one decimal point
+          final parts = cleaned.split('.');
+          if (parts.length > 2) {
+            sanitized = '${parts[0]}.${parts.sublist(1).join()}';
+          } else {
+            sanitized = cleaned;
+          }
+        }
 
         if (controller.text != sanitized) {
           controller.value = TextEditingValue(
