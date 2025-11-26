@@ -18,27 +18,51 @@ import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/views/account/cubit/account_state.dart';
 import 'package:core/src/views/auth/cubit/auth_cubit.dart';
+import 'package:injectable/injectable.dart';
+import 'package:get_it/get_it.dart';
+
+/// Typedef for getUsersMe callback function
+/// This allows injectable to properly resolve the function type
+typedef GetUsersMeCallback = Future<Map<String, dynamic>?> Function();
 
 /// 🧠 **OSMEA Account Cubit**
 ///
 /// Manages account view state and data loading
 /// Supports loading from app_config.json or mock data fallback
+@injectable
 class AccountCubit extends BaseViewModelCubit<AccountState> {
   AccountCubit({
     AuthCubit? authCubit,
-    Future<Map<String, dynamic>?> Function()? getUsersMeCallback,
+    GetUsersMeCallback? getUsersMeCallback,
   }) : super(const AccountState()) {
-    _authCubit = authCubit;
+    // Try to get AuthCubit from GetIt if not provided
+    if (authCubit == null) {
+      try {
+        if (GetIt.instance.isRegistered<AuthCubit>()) {
+          _authCubit = GetIt.instance<AuthCubit>();
+          debugPrint('✅ AccountCubit: AuthCubit injected from GetIt');
+        } else {
+          _authCubit = null;
+          debugPrint('⚠️ AccountCubit: AuthCubit not registered in GetIt');
+        }
+      } catch (e) {
+        _authCubit = null;
+        debugPrint('⚠️ AccountCubit: Could not get AuthCubit from GetIt: $e');
+      }
+    } else {
+      _authCubit = authCubit;
+    }
+    
     _getUsersMeCallback = getUsersMeCallback;
     debugPrint('🔍 AccountCubit: Constructor called');
     debugPrint(
         '🔍 AccountCubit: getUsersMeCallback is null: ${getUsersMeCallback == null}');
-    debugPrint('🔍 AccountCubit: authCubit is null: ${authCubit == null}');
+    debugPrint('🔍 AccountCubit: authCubit is null: ${_authCubit == null}');
   }
 
   final AssetConfigHelper _configHelper = AssetConfigHelper();
   AuthCubit? _authCubit;
-  Future<Map<String, dynamic>?> Function()? _getUsersMeCallback;
+  GetUsersMeCallback? _getUsersMeCallback;
 
   // Public trigger functions
   void initialize() => _initialize();

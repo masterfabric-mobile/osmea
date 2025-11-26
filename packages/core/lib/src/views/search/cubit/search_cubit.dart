@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/search/cubit/search_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🔍 **Search Cubit**
 ///
@@ -9,6 +10,7 @@ import 'package:core/src/views/search/cubit/search_state.dart';
 ///
 /// {@category Cubits}
 /// {@subCategory SearchView}
+@injectable
 class SearchCubit extends BaseViewModelCubit<SearchState> {
   SearchCubit({
     this.maxHistoryItems = 10,

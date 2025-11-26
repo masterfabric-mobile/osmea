@@ -11,8 +11,8 @@ import 'package:core/src/base/base_view_model_hydrated_cubit.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/local_storage/local_storage_helper.dart';
-import 'package:core/src/helper/local_storage/local_storage_helper.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🔐 **OSMEA Auth Cubit**
 ///
@@ -23,6 +23,7 @@ import 'package:core/src/views/auth/cubit/auth_state.dart';
 /// {@category ViewModels}
 /// {@subCategory AuthCubit}
 
+@singleton
 class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
   AuthCubit() : super(const AuthInitialState());
 

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/models/info_models.dart';
 import 'package:core/src/views/info_bottom_sheet/cubit/info_bottom_sheet_state.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🎯 **OSMEA Info Bottom Sheet Cubit**
 ///
@@ -15,6 +16,7 @@ import 'package:core/src/helper/asset_config_helper.dart';
 /// {@category Cubit}
 /// {@subCategory InfoBottomSheetCubit}
 
+@injectable
 class InfoBottomSheetCubit extends Cubit<InfoBottomSheetState> {
   final AssetConfigHelper _configHelper = AssetConfigHelper();
   Timer? _autoDismissTimer;

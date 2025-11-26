@@ -1,8 +1,10 @@
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/helper/permission_handler_helper/permission_handler_helper.dart';
 import 'package:core/src/helper/permission_handler_helper/models/permission_models.dart';
+import 'package:injectable/injectable.dart';
 import 'permissions_state.dart';
 
+@injectable
 class PermissionsCubit extends BaseViewModelCubit<PermissionsState> {
   PermissionsCubit() : super(const PermissionsState());
 

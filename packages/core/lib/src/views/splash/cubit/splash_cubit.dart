@@ -5,6 +5,7 @@ import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/onboarding_helper.dart';
 import 'package:core/src/views/splash/cubit/splash_state.dart';
 import 'package:core/src/models/splash_models.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🚀 **OSMEA Splash Cubit**
 ///
@@ -16,6 +17,7 @@ import 'package:core/src/models/splash_models.dart';
 /// {@category ViewModels}
 /// {@subCategory SplashCubit}
 
+@injectable
 class SplashCubit extends BaseViewModelCubit<SplashState> {
   SplashCubit() : super(const SplashState());
 

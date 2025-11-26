@@ -5,6 +5,7 @@ import 'package:core/src/models/onboarding_models.dart';
 import 'package:core/src/helper/onboarding_helper.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/views/onboarding/cubit/onboarding_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🎯 **OSMEA Onboarding Cubit**
 ///
@@ -16,6 +17,7 @@ import 'package:core/src/views/onboarding/cubit/onboarding_state.dart';
 /// {@category ViewModels}
 /// {@subCategory OnboardingCubit}
 
+@injectable
 class OnboardingCubit extends BaseViewModelCubit<OnboardingState> {
   OnboardingCubit() : super(const OnboardingState());
 

@@ -1,4 +1,3 @@
-
 import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -6,7 +5,10 @@ import 'package:logger/logger.dart';
 
 @module
 abstract class CommonLoggerModule {
-  CommonLogger get commonLogger => CommonLogger(logger: Logger());
+  @singleton
+  Logger get logger => Logger();
+
+  CommonLogger get commonLogger => CommonLogger(logger: logger);
 }
 
 @Singleton(as: ICommonLogger)
@@ -111,5 +113,4 @@ class CommonLogger extends ICommonLogger {
       logger.log(Level.debug, logMessages.join("\n"));
     }
   }
-
 }

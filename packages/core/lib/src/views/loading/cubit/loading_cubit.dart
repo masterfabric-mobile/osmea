@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/views/loading/cubit/loading_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🔄 **OSMEA Loading View Cubit**
 ///
@@ -13,6 +14,7 @@ import 'package:core/src/views/loading/cubit/loading_state.dart';
 /// {@category ViewModels}
 /// {@subCategory LoadingViewCubit}
 
+@injectable
 class LoadingViewCubit extends BaseViewModelCubit<LoadingViewState> {
   LoadingViewCubit() : super(const LoadingViewState());
 

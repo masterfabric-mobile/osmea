@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🎯 **OSMEA Empty View Cubit**
 ///
@@ -14,6 +15,7 @@ import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
 /// {@category ViewModels}
 /// {@subCategory EmptyViewCubit}
 
+@injectable
 class EmptyViewCubit extends BaseViewModelCubit<EmptyViewState> {
   EmptyViewCubit() : super(const EmptyViewState());
 
