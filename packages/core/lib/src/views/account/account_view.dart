@@ -13,8 +13,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:get_it/get_it.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart';
 
 /// 👤 **OSMEA Account View**
@@ -83,29 +81,10 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
       '👤 AccountView: viewContent called with status: ${state.status}',
     );
 
-    // Listen to AuthCubit state changes and refresh profile when authenticated
-    // This handles the case where AccountView loads before AuthCubit state is updated after signin
-    try {
-      final authCubit = GetIt.I<AuthCubit>();
-      return BlocListener<AuthCubit, AuthState>(
-        bloc: authCubit,
-        listener: (context, authState) {
-          // If AuthCubit becomes authenticated, refresh profile data
-          if (authState is AuthAuthenticatedState) {
-            debugPrint(
-              '👤 AccountView: AuthCubit authenticated, refreshing profile...',
-            );
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              viewModel.refreshProfile();
-            });
-          }
-        },
-        child: _buildBody(context, viewModel, state),
-      );
-    } catch (e) {
-      debugPrint('⚠️ AccountView: Could not access AuthCubit: $e');
-      return _buildBody(context, viewModel, state);
-    }
+    // Note: AuthCubit state listening should be handled by platform-specific implementations
+    // Core package should not depend on AuthCubit directly
+    // AccountCubit loads data from AuthStorageHelper, which is platform-agnostic
+    return _buildBody(context, viewModel, state);
   }
 
   Widget _buildBody(

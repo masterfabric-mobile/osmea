@@ -17,9 +17,7 @@ import 'package:core/src/base/base_view_model_cubit.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/views/account/cubit/account_state.dart';
-import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:injectable/injectable.dart';
-import 'package:get_it/get_it.dart';
 
 /// Typedef for getUsersMe callback function
 /// This allows injectable to properly resolve the function type
@@ -29,39 +27,21 @@ typedef GetUsersMeCallback = Future<Map<String, dynamic>?> Function();
 ///
 /// Manages account view state and data loading
 /// Supports loading from app_config.json or mock data fallback
+/// 
+/// Note: This cubit is platform-agnostic and only uses AuthStorageHelper
+/// for user data. It does not depend on AuthCubit to maintain core package independence.
 @injectable
 class AccountCubit extends BaseViewModelCubit<AccountState> {
   AccountCubit({
-    AuthCubit? authCubit,
     GetUsersMeCallback? getUsersMeCallback,
   }) : super(const AccountState()) {
-    // Try to get AuthCubit from GetIt if not provided
-    if (authCubit == null) {
-      try {
-        if (GetIt.instance.isRegistered<AuthCubit>()) {
-          _authCubit = GetIt.instance<AuthCubit>();
-          debugPrint('✅ AccountCubit: AuthCubit injected from GetIt');
-        } else {
-          _authCubit = null;
-          debugPrint('⚠️ AccountCubit: AuthCubit not registered in GetIt');
-        }
-      } catch (e) {
-        _authCubit = null;
-        debugPrint('⚠️ AccountCubit: Could not get AuthCubit from GetIt: $e');
-      }
-    } else {
-      _authCubit = authCubit;
-    }
-    
     _getUsersMeCallback = getUsersMeCallback;
     debugPrint('🔍 AccountCubit: Constructor called');
     debugPrint(
         '🔍 AccountCubit: getUsersMeCallback is null: ${getUsersMeCallback == null}');
-    debugPrint('🔍 AccountCubit: authCubit is null: ${_authCubit == null}');
   }
 
   final AssetConfigHelper _configHelper = AssetConfigHelper();
-  AuthCubit? _authCubit;
   GetUsersMeCallback? _getUsersMeCallback;
 
   // Public trigger functions
@@ -186,22 +166,8 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         debugPrint('⚠️ AccountCubit: getUsersMe callback is null');
       }
 
-      // Fallback to metadata if callback not provided or failed
-      if (getUsersMeData == null && _authCubit != null) {
-        try {
-          getUsersMeData = _authCubit!
-              .getMetadataValue<Map<String, dynamic>>('get_users_me');
-          if (getUsersMeData != null) {
-            debugPrint(
-                '👤 AccountCubit: Using getUsersMe data from metadata (fallback)');
-            debugPrint(
-                '👤 AccountCubit: Metadata name: "${getUsersMeData['name']}"');
-          }
-        } catch (e) {
-          debugPrint(
-              '⚠️ AccountCubit: Error reading metadata from AuthCubit: $e');
-        }
-      }
+      // Note: Metadata fallback removed - AccountCubit should not depend on AuthCubit
+      // Platform-specific implementations can provide getUsersMeCallback if needed
 
       if (userData != null && userData.isNotEmpty) {
         debugPrint('👤 AccountCubit: Loading profile from auth storage');
@@ -215,24 +181,8 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
             userData['user_email'] as String? ??
             '';
 
-        // If email is still empty, try to get from AuthCubit metadata (JWT token)
-        if (email.isEmpty && _authCubit != null) {
-          try {
-            final authUserData = _authCubit!.userData;
-            if (authUserData != null) {
-              email = authUserData['email'] as String? ??
-                  authUserData['user_email'] as String? ??
-                  email;
-              if (email.isNotEmpty) {
-                debugPrint(
-                    '👤 AccountCubit: Email found in AuthCubit userData: $email');
-              }
-            }
-          } catch (e) {
-            debugPrint(
-                '⚠️ AccountCubit: Error reading email from AuthCubit: $e');
-          }
-        }
+        // Note: AuthCubit fallback removed - AccountCubit should only use AuthStorageHelper
+        // All user data should be stored in AuthStorageHelper by platform-specific implementations
 
         final firstName = userData['first_name'] as String? ??
             userData['firstName'] as String? ??

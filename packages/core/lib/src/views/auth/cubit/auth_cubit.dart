@@ -13,6 +13,7 @@ import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/helper/local_storage/local_storage_helper.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
 import 'package:injectable/injectable.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 /// 🔐 **OSMEA Auth Cubit**
 ///
@@ -246,34 +247,64 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
     try {
       debugPrint('🚪 AuthCubit: Signing out...');
 
-      // Clear storage FIRST
+      // Step 1: Clear storage FIRST (before state change)
       await _authStorage.clearToken();
+      debugPrint('✅ AuthCubit: Token cleared from storage');
 
-      // Clear remember me from storage
+      // Step 2: Clear remember me from storage
       try {
         await _localStorage.init();
         await _localStorage.removeItem('remember_me');
-        debugPrint('✅ Remember me cleared from storage');
+        debugPrint('✅ AuthCubit: Remember me cleared from storage');
       } catch (e) {
-        debugPrint('❌ Error clearing remember me from storage: $e');
+        debugPrint('❌ AuthCubit: Error clearing remember me from storage: $e');
       }
 
-      // Update cubit state to unauthenticated
+      // Step 3: Clear HydratedBloc persisted state manually
+      try {
+        // HydratedBloc uses the cubit's runtimeType as the storage key
+        final cubitId = runtimeType.toString();
+        await HydratedBloc.storage.delete(cubitId);
+        debugPrint('✅ AuthCubit: HydratedBloc storage cleared for $cubitId');
+      } catch (e) {
+        debugPrint('⚠️ AuthCubit: Error clearing HydratedBloc storage: $e');
+        // Continue even if storage clear fails
+      }
+
+      // Step 4: Reset form state to clear any form data
+      resetForm();
+      debugPrint('✅ AuthCubit: Form state reset');
+
+      // Step 5: Update cubit state to unauthenticated
       // This will be persisted by HydratedCubit (toJson returns null for unauthenticated, which clears persistence)
       emit(const AuthUnauthenticatedState());
+      debugPrint('✅ AuthCubit: AuthUnauthenticatedState emitted');
 
-      // Force a state change to ensure HydratedCubit persistence is cleared
+      // Step 6: Force a state change to ensure HydratedCubit persistence is cleared
       // Emit again to ensure state is properly persisted (or cleared)
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 100));
       emit(const AuthUnauthenticatedState());
+      debugPrint(
+          '✅ AuthCubit: AuthUnauthenticatedState emitted again (persistence cleared)');
+
+      // Step 7: Verify state is correct
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (state is! AuthUnauthenticatedState) {
+        debugPrint('⚠️ AuthCubit: State is not unauthenticated, forcing again...');
+        emit(const AuthUnauthenticatedState());
+      }
 
       debugPrint(
           '✅ AuthCubit: Sign out successful - state set to unauthenticated');
       debugPrint(
           '🔍 AuthCubit: Current state after signOut = ${state.runtimeType}');
-    } catch (e) {
+      debugPrint(
+          '🔍 AuthCubit: isAuthenticated = ${state is AuthAuthenticatedState}');
+    } catch (e, stackTrace) {
       debugPrint('❌ AuthCubit: Error signing out: $e');
-      // Even on error, emit unauthenticated state
+      debugPrint('❌ AuthCubit: Stack trace: $stackTrace');
+      // Even on error, emit unauthenticated state and clear form
+      resetForm();
       emit(const AuthUnauthenticatedState());
     }
   }

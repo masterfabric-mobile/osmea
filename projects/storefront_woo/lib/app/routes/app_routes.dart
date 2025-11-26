@@ -590,7 +590,9 @@ final GoRouter appRouter = GoRouter(
                       subscribeNewsletter: marketingConsent,
                     );
 
-                    debugPrint('📞 authManager.signUp returned: isSuccess=${result.isSuccess}');
+                    debugPrint(
+                      '📞 authManager.signUp returned: isSuccess=${result.isSuccess}',
+                    );
                     debugPrint('📞 Result message: ${result.message}');
                     debugPrint('📞 Result error: ${result.error}');
 
@@ -622,72 +624,100 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/profile',
       pageBuilder: (BuildContext context, GoRouterState state) {
+        // Get AccountCubit and AuthCubit for platform-specific auth state listening
+        final accountCubit = GetIt.I<AccountCubit>();
+        final authCubit = GetIt.I<AuthCubit>();
+
         return CustomTransitionPage(
-          child: AccountView(
-            arguments: const {'account': true},
-            goRoute: (String path) {
-              debugPrint('🔀 AccountView: goRoute called with path: $path');
-              if (path.contains('home') || path == '/home') {
-                debugPrint('🔀 AccountView: Navigating to /home');
-                context.go('/home');
-              } else if (path.contains('cart') || path == '/cart') {
-                debugPrint('🔀 AccountView: Navigating to /cart');
-                context.go('/cart');
-              } else if (path.contains('saved') || path == '/saved') {
-                debugPrint('🔀 AccountView: Navigating to /saved');
-                context.go('/saved');
-              } else if (path.contains('auth') || path == '/auth') {
-                debugPrint('🔀 AccountView: Navigating to /auth');
-                context.go('/auth');
-              } else {
-                debugPrint('🔀 AccountView: Navigating to path: $path');
-                context.go(path);
-              }
-            },
-            onSignOut: () async {
-              // Platform-specific cleanup: cookies, wishlist, cart tokens
-              debugPrint('🚪 Route: Starting platform-specific cleanup...');
-
-              // Step 1: Clear WooCommerce JWT token
-              try {
-                await WooJwtTokenStorage.clearToken();
-                debugPrint('✅ Route: WooJWT token cleared');
-              } catch (e) {
-                debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
-              }
-
-              // Step 2: Clear cart token
-              try {
-                await WooCartTokenStorage.clearCartToken();
-                debugPrint('✅ Route: WooCartToken cleared');
-              } catch (e) {
-                debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
-              }
-
-              // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
-              try {
-                await ApiDioClient.clearAllCookies();
+          child: BlocListener<AuthCubit, AuthState>(
+            bloc: authCubit,
+            listener: (context, authState) {
+              // If AuthCubit becomes authenticated, refresh profile data
+              if (authState is AuthAuthenticatedState) {
                 debugPrint(
-                  '✅ Route: All cookies cleared (including WP cookies)',
+                  '👤 Route: AuthCubit authenticated, refreshing profile...',
                 );
-              } catch (e) {
-                debugPrint('⚠️ Route: Failed to clear cookies: $e');
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  accountCubit.refreshProfile();
+                });
               }
-
-              // Step 4: Clear wishlist (user-specific data)
-              try {
-                final wishlistViewModel = GetIt.I<WishlistViewModel>();
-                wishlistViewModel.clearAll();
-                debugPrint('✅ Route: Wishlist cleared');
-              } catch (e) {
-                debugPrint('⚠️ Route: Failed to clear wishlist: $e');
-              }
-
-              debugPrint('✅ Route: Platform-specific cleanup completed');
             },
-            bottomNavigationBar: _getNavbarForRoute(
-              state.uri.path,
-              GetIt.I<WishlistViewModel>().count,
+            child: AccountView(
+              arguments: const {'account': true},
+              goRoute: (String path) {
+                debugPrint('🔀 AccountView: goRoute called with path: $path');
+                if (path.contains('home') || path == '/home') {
+                  debugPrint('🔀 AccountView: Navigating to /home');
+                  context.go('/home');
+                } else if (path.contains('cart') || path == '/cart') {
+                  debugPrint('🔀 AccountView: Navigating to /cart');
+                  context.go('/cart');
+                } else if (path.contains('saved') || path == '/saved') {
+                  debugPrint('🔀 AccountView: Navigating to /saved');
+                  context.go('/saved');
+                } else if (path.contains('auth') || path == '/auth') {
+                  debugPrint('🔀 AccountView: Navigating to /auth');
+                  context.go('/auth');
+                } else {
+                  debugPrint('🔀 AccountView: Navigating to path: $path');
+                  context.go(path);
+                }
+              },
+              onSignOut: () async {
+                // Platform-specific cleanup: cookies, wishlist, cart tokens
+                debugPrint('🚪 Route: Starting platform-specific cleanup...');
+
+                // Step 1: Clear WooCommerce JWT token
+                try {
+                  await WooJwtTokenStorage.clearToken();
+                  debugPrint('✅ Route: WooJWT token cleared');
+                } catch (e) {
+                  debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
+                }
+
+                // Step 2: Clear cart token
+                try {
+                  await WooCartTokenStorage.clearCartToken();
+                  debugPrint('✅ Route: WooCartToken cleared');
+                } catch (e) {
+                  debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
+                }
+
+                // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+                try {
+                  await ApiDioClient.clearAllCookies();
+                  debugPrint(
+                    '✅ Route: All cookies cleared (including WP cookies)',
+                  );
+                } catch (e) {
+                  debugPrint('⚠️ Route: Failed to clear cookies: $e');
+                }
+
+                // Step 4: Clear wishlist (user-specific data)
+                try {
+                  final wishlistViewModel = GetIt.I<WishlistViewModel>();
+                  wishlistViewModel.clearAll();
+                  debugPrint('✅ Route: Wishlist cleared');
+                } catch (e) {
+                  debugPrint('⚠️ Route: Failed to clear wishlist: $e');
+                }
+
+                debugPrint('✅ Route: Platform-specific cleanup completed');
+
+                // Step 5: Navigate to home after sign out
+                await Future.delayed(const Duration(milliseconds: 300));
+                if (context.mounted) {
+                  debugPrint('🔀 Route: Navigating to /home after sign out...');
+                  context.go('/home');
+                  debugPrint('✅ Route: Navigation to /home completed');
+                } else {
+                  debugPrint('⚠️ Route: Context not mounted, cannot navigate');
+                }
+              },
+              bottomNavigationBar: _getNavbarForRoute(
+                state.uri.path,
+                GetIt.I<WishlistViewModel>().count,
+              ),
             ),
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {

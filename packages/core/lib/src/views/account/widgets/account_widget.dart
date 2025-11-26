@@ -1211,9 +1211,20 @@ mixin AccountWidget {
 
       debugPrint('✅ AccountWidget: Comprehensive sign out completed successfully');
 
-      // Navigate to home after sign out
-      await Future.delayed(const Duration(milliseconds: 150));
-      _navigate(context, '/home');
+      // Step 5: Verify sign out was successful
+      final authCubitAfterSignOut = GetIt.I<AuthCubit>();
+      final authStateAfterSignOut = authCubitAfterSignOut.state;
+      debugPrint('🔍 AccountWidget: Auth state after sign out: ${authStateAfterSignOut.runtimeType}');
+      
+      if (authStateAfterSignOut is! AuthUnauthenticatedState) {
+        debugPrint('⚠️ AccountWidget: State is not unauthenticated after sign out! Retrying sign out...');
+        // Retry sign out if state is not correct
+        await authCubitAfterSignOut.signOut();
+        debugPrint('✅ AccountWidget: Sign out retried');
+      }
+
+      // Note: Navigation should be handled by the platform-specific implementation
+      // Core package only handles the sign out logic, not navigation
     } catch (e, stackTrace) {
       debugPrint('❌ AccountWidget: Error signing out: $e');
       debugPrint('❌ AccountWidget: Stack trace: $stackTrace');

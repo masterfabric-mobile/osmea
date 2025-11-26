@@ -58,10 +58,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i974.Logger>(() => commonLoggerModule.logger);
     gh.singleton<_i481.ICommonLogger>(
         () => _i674.CommonLogger(logger: gh<_i974.Logger>()));
-    gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit(
-          authCubit: gh<_i651.AuthCubit>(),
-          getUsersMeCallback: gh<_i111.GetUsersMeCallback>(),
-        ));
+    gh.factory<_i111.AccountCubit>(() =>
+        _i111.AccountCubit(getUsersMeCallback: gh<_i111.GetUsersMeCallback>()));
     return this;
   }
 }

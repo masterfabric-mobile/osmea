@@ -110,7 +110,6 @@ Future<GetIt> configureDependencies({String? environment}) async {
 
         debugPrint('🔍 storefront_woo DI: Creating AccountCubit with callback...');
         final accountCubit = AccountCubit(
-          authCubit: authCubit,
           getUsersMeCallback: getUsersMeCallback,
         );
         debugPrint('✅ storefront_woo DI: AccountCubit created with callback');
