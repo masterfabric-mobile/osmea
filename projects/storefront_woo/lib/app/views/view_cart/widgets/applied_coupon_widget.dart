@@ -26,37 +26,48 @@ class AppliedCouponWidget extends StatelessWidget {
     return OsmeaComponents.container(
       margin: EdgeInsets.symmetric(
         horizontal: context.spacing16,
-        vertical: context.spacing4,
+        vertical: context.spacing8,
       ),
       decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue,
+        color: OsmeaColors.snow,
         borderRadius: context.borderRadiusNormal,
+        border: Border.all(
+          color: OsmeaColors.silver,
+          width: 1,
+        ),
       ),
       child: OsmeaComponents.padding(
-        padding: context.paddingLow,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing12,
+          vertical: context.spacing10,
+        ),
         child: OsmeaComponents.row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: OsmeaColors.nordicBlue,
-              size: context.iconSizeSmall,
-            ),
-            OsmeaComponents.sizedBox(width: context.spacing8),
-            OsmeaComponents.expanded(
-              child: OsmeaComponents.text(
-                couponCode.toUpperCase(),
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: OsmeaColors.nordicBlue,
+            OsmeaComponents.row(
+              children: [
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: OsmeaColors.forestHeart,
+                  size: context.iconSizeSmall,
                 ),
-              ),
+                OsmeaComponents.sizedBox(width: context.spacing8),
+                OsmeaComponents.text(
+                  couponCode.toUpperCase(),
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: OsmeaColors.thunder,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
             OsmeaComponents.iconButton(
               onPressed: () => viewModel.removeCoupon(couponCode),
               icon: Icon(
                 Icons.close_rounded,
                 color: OsmeaColors.pewter,
-                size: context.iconSizeExtraSmall,
+                size: context.iconSizeSmall,
               ),
               backgroundColor: Colors.transparent,
               tooltip: 'Remove coupon',
