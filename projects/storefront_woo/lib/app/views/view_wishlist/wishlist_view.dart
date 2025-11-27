@@ -121,8 +121,7 @@ class WishlistView
                       variant: ButtonVariant.secondary,
                       onPressed: () {
                         Navigator.of(context).pop();
-                        viewModel.addItemToCartFromWishlist(state.item.id);
-                        viewModel.remove(state.item.id);
+                        viewModel.addItemToCartAndRemoveFromWishlist(state.item.id);
                       },
                     ),
                   ),
