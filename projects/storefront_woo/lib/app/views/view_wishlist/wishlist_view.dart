@@ -63,11 +63,21 @@ class WishlistView
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initial();
       });
-      return buildLoading();
+      return LoadingView(
+        goRoute: goRoute,
+        loadingType: LoadingModelType.dataLoading,
+        stepDuration: context.durationSlow,
+        showCancelButton: false,
+      );
     }
 
     if (state is WishlistLoadingState) {
-      return buildLoading();
+      return LoadingView(
+        goRoute: goRoute,
+        loadingType: LoadingModelType.dataLoading,
+        stepDuration: context.durationSlow,
+        showCancelButton: false,
+      );
     }
 
     if (state is WishlistErrorState) {
