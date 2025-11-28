@@ -106,6 +106,7 @@ class WishlistView
                       variant: ButtonVariant.primary,
                       onPressed: () {
                         Navigator.of(context).pop('add_keep');
+                        // addItemToCartFromWishlist will preserve the wishlist state
                         viewModel.addItemToCartFromWishlist(state.item.id);
                       },
                     ),
