@@ -9,6 +9,7 @@ import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/d
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/response/wishlist_item_response.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
+import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 
 /// Hydrated wishlist view model that also syncs with Woo Wishlist API
@@ -75,44 +76,75 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       debugPrint('🛒 WishlistViewModel: Starting add to cart and remove from wishlist for product $productId');
       
       // Store the current wishlist items before any operation
+      // Handle case where state might be WishlistActionPromptState (popup is open)
       final currentState = state;
-      final currentItems = currentState is WishlistLoadedState 
-          ? List<WishlistItem>.from(currentState.items)
-          : <WishlistItem>[];
+      WishlistLoadedState? loadedState;
       
-      debugPrint('💾 WishlistViewModel: Stored ${currentItems.length} items before operations');
-      
-      // First add to cart - but don't rely on state changes for flow control
-      bool cartSuccess = false;
-      try {
+      if (currentState is WishlistActionPromptState) {
+        // If popup is open, use previousState
+        debugPrint('💡 WishlistViewModel: State is WishlistActionPromptState, using previousState');
+        loadedState = currentState.previousState;
+      } else if (currentState is WishlistLoadedState) {
+        loadedState = currentState;
+      } else {
+        debugPrint('⚠️ WishlistViewModel: Current state is not WishlistLoadedState, cannot remove item');
+        // Try to add to cart anyway
         await _addItemToCartFromWishlist(productId);
-        cartSuccess = true;
-        debugPrint('✅ WishlistViewModel: Cart addition completed successfully');
-      } catch (e) {
-        debugPrint('❌ WishlistViewModel: Cart addition failed: $e');
-        // Don't proceed with removal if cart addition failed
         return;
       }
       
-      // If cart addition was successful, remove from wishlist
-      if (cartSuccess) {
-        debugPrint('🗑️ WishlistViewModel: Starting removal from wishlist');
-        
-        // Remove the item manually from local state without server sync
-        final updatedItems = currentItems.where((item) => item.id != productId).toList();
-        debugPrint('📝 WishlistViewModel: Updated items count: ${updatedItems.length} (removed product $productId)');
-        
-        // Emit the updated state immediately
-        emit(WishlistLoadedState(items: updatedItems));
-        
-        // Optionally try to remove from server in background (don't await)
-        _removeFromServerInBackground(productId);
-        
-        debugPrint('✅ WishlistViewModel: Add to cart and remove from wishlist completed');
+      final currentItems = List<WishlistItem>.from(loadedState.items);
+      debugPrint('💾 WishlistViewModel: Stored ${currentItems.length} items before operations');
+      debugPrint('💾 WishlistViewModel: Current items IDs: ${currentItems.map((e) => e.id).toList()}');
+      
+      // First add to cart - throw exception if it fails
+      try {
+        await _addItemToCartFromWishlist(productId);
+        debugPrint('✅ WishlistViewModel: Cart addition completed successfully');
+      } catch (e) {
+        debugPrint('❌ WishlistViewModel: Cart addition failed: $e');
+        // Re-throw exception so UI can show error
+        final errorMessage = ApiErrorUtils.getErrorMessage(e);
+        emit(WishlistErrorState(message: 'Failed to add to cart: $errorMessage'));
+        rethrow;
       }
+      
+      // Re-check state after cart addition (in case it changed)
+      final stateAfterCart = state;
+      final itemsAfterCart = stateAfterCart is WishlistLoadedState
+          ? List<WishlistItem>.from(stateAfterCart.items)
+          : currentItems;
+      
+      debugPrint('🗑️ WishlistViewModel: Starting removal from wishlist');
+      debugPrint('🗑️ WishlistViewModel: Items after cart addition: ${itemsAfterCart.length}');
+      debugPrint('🗑️ WishlistViewModel: Removing product ID: $productId');
+      
+      // Remove the item manually from local state without server sync
+      final updatedItems = itemsAfterCart.where((item) {
+        final shouldKeep = item.id != productId;
+        if (!shouldKeep) {
+          debugPrint('🗑️ WishlistViewModel: Filtering out item with id=${item.id} (matches productId=$productId)');
+        }
+        return shouldKeep;
+      }).toList();
+      
+      debugPrint('📝 WishlistViewModel: Updated items count: ${updatedItems.length} (removed product $productId)');
+      debugPrint('📝 WishlistViewModel: Remaining items IDs: ${updatedItems.map((e) => e.id).toList()}');
+      
+      // Emit the updated state immediately
+      emit(WishlistLoadedState(items: updatedItems));
+      
+      // Optionally try to remove from server in background (don't await)
+      _removeFromServerInBackground(productId);
+      
+      debugPrint('✅ WishlistViewModel: Add to cart and remove from wishlist completed');
     } catch (e) {
       debugPrint('❌ Failed to add to cart and remove from wishlist: $e');
-      emit(WishlistErrorState(message: 'Failed to complete operation: $e'));
+      // Error state already emitted in catch block above, don't emit again
+      if (state is! WishlistErrorState) {
+        final errorMessage = ApiErrorUtils.getErrorMessage(e);
+        emit(WishlistErrorState(message: 'Failed to complete operation: $errorMessage'));
+      }
     }
   }
   
@@ -127,19 +159,69 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       
       final apiVersion = _config.getString('woocommerce_configuration.version', 'v1');
       
-      // Create the request object
-      final request = DeleteWishlistItemRequest(
-        productId: productId,
-        groupId: 0, // Default group for most implementations
-      );
+      // Find the item to get itemId if available
+      final s = state;
+      WishlistItem? itemToRemove;
+      WishlistLoadedState? loadedState;
       
-      // Try to remove from server without affecting UI state
-      final response = await _wishlistService.deleteItemByProduct(
-        apiVersion: apiVersion,
-        request: request,
-      );
+      if (s is WishlistActionPromptState) {
+        // If popup is open, use previousState
+        loadedState = s.previousState;
+      } else if (s is WishlistLoadedState) {
+        loadedState = s;
+      }
       
-      debugPrint('🔄 Background remove: Server removal response - success: ${response.success}');
+      if (loadedState != null) {
+        itemToRemove = loadedState.items.firstWhere(
+          (e) => e.id == productId,
+          orElse: () => WishlistItem(id: productId),
+        );
+      }
+      
+      // Try DELETE by itemId first (preferred method)
+      bool deleteSuccess = false;
+      if (itemToRemove?.itemId != null) {
+        try {
+          debugPrint(
+            '💖 Background remove: Deleting by itemId: ${itemToRemove!.itemId}',
+          );
+          final response = await _wishlistService.deleteItemById(
+            apiVersion: apiVersion,
+            itemId: itemToRemove.itemId!,
+          );
+
+          if (response.success == true) {
+            deleteSuccess = true;
+            debugPrint('✅ Background remove: Item removed successfully by ID');
+            return;
+          }
+        } catch (e) {
+          debugPrint('❌ Background remove: deleteItemById failed: $e');
+          // Fall through to try deleteItemByProduct
+        }
+      }
+
+      // If deleteItemById didn't work, try deleteItemByProduct
+      if (!deleteSuccess) {
+        try {
+          debugPrint(
+            '💖 Background remove: Deleting by productId: $productId, groupId: 0',
+          );
+          final request = DeleteWishlistItemRequest(
+            productId: productId,
+            groupId: 0, // Default group for most implementations
+          );
+          
+          final response = await _wishlistService.deleteItemByProduct(
+            apiVersion: apiVersion,
+            request: request,
+          );
+          
+          debugPrint('🔄 Background remove: Server removal response - success: ${response.success}');
+        } catch (e) {
+          debugPrint('⚠️ Background remove: Server removal failed: $e (UI state not affected)');
+        }
+      }
     } catch (e) {
       debugPrint('⚠️ Background remove: Server removal failed: $e (UI state not affected)');
     }
@@ -681,101 +763,127 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   }
 
   Future<void> _addItemToCartFromWishlist(int productId) async {
+    debugPrint(
+      '🛒 WishlistViewModel: Adding product $productId to cart via API',
+    );
+
+    // First, check if product is variable and get first variation if needed
+    int? variationId;
+    
     try {
-      debugPrint('🛒 WishlistViewModel: Starting add to cart for product $productId');
-      
-      // Store current state before cart operation
-      final beforeCartState = state;
-      final beforeCartItems = beforeCartState is WishlistLoadedState 
-          ? beforeCartState.items.length 
-          : 0;
-      debugPrint('📊 WishlistViewModel: Before cart - Wishlist has $beforeCartItems items');
-
-      // First, check if product is variable and get first variation if needed
-      int? variationId;
-      try {
-        final product = await _productService.retrieveProduct(
-          apiVersion: _config.getString(
-            'woocommerce_configuration.version',
-            'v1',
-          ),
-          productId: productId,
-        );
-
-        // Check if product is variable and has variations
-        if (product.type == 'variable' && 
-            product.variations != null && 
-            product.variations!.isNotEmpty) {
-          // Get first variation ID
-          final firstVariation = product.variations!.first;
-          if (firstVariation is Map<String, dynamic>) {
-            final id = firstVariation['id'];
-            if (id != null) {
-              variationId = int.tryParse(id.toString());
-              debugPrint('🛒 Found first variation ID: $variationId for variable product');
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint('⚠️ Could not fetch product details, proceeding with product ID: $e');
-      }
-
-      // Add item to cart via API directly (like HomeViewModel)
-      // Use variation ID if found, otherwise use product ID
-      final response = await _cartService.addItem(
+      final product = await _productService.retrieveProduct(
         apiVersion: _config.getString(
           'woocommerce_configuration.version',
           'v1',
         ),
-        cartToken: await _getCartToken() ?? '',
-        jwtToken: await _getJwtToken(), // Optional JWT token
-        id: variationId ?? productId,
-        quantity: 1,
+        productId: productId,
       );
 
-      debugPrint(
-        '🛒 WishlistViewModel: AddItem API response: ${response.toJson()}',
-      );
-
-      if (response.errors != null && response.errors!.isNotEmpty) {
-        debugPrint('❌ API add item error: ${response.errors!.first}');
-        emit(
-          WishlistErrorState(
-            message: 'Failed to add item: ${response.errors!.first}',
-          ),
-        );
-        return;
-      }
-
-      debugPrint('✅ Successfully added product $productId to cart via API');
-
-      // Check final state after cart operation
-      final afterCartState = state;
-      final afterCartItems = afterCartState is WishlistLoadedState 
-          ? afterCartState.items.length 
-          : 0;
-      debugPrint('📊 WishlistViewModel: After cart - Wishlist has $afterCartItems items');
-
-      // Emit success message for the view to display
-      final cur = state;
-      if (cur is WishlistLoadedState) {
-        debugPrint('📤 WishlistViewModel: Emitting success state with ${cur.items.length} items');
-        emit(
-          WishlistSuccessState(message: 'Added to cart', previousState: cur),
-        );
-        // Immediately restore to loaded state after success message
-        Future.delayed(Duration(milliseconds: 50), () {
-          if (state is WishlistSuccessState) {
-            debugPrint('🔄 WishlistViewModel: Auto-restoring to loaded state');
-            final successState = state as WishlistSuccessState;
-            emit(successState.previousState);
+      // Check if product is variable and has variations
+      if (product.type == 'variable' && 
+          product.variations != null && 
+          product.variations!.isNotEmpty) {
+        // Get first variation ID (for wishlist, we use first available variation)
+        final firstVariation = product.variations!.first;
+        if (firstVariation is Map<String, dynamic>) {
+          final id = firstVariation['id'];
+          if (id != null) {
+            variationId = int.tryParse(id.toString());
+            debugPrint('🛒 Found first variation ID: $variationId for variable product');
           }
-        });
+        }
       }
     } catch (e) {
-      debugPrint('❌ Failed to add to cart: $e');
-      emit(WishlistErrorState(message: 'Failed to add to cart: $e'));
+      debugPrint('⚠️ Could not fetch product details, proceeding with product ID: $e');
     }
+
+    // Ensure we have a cart token; if missing, initialize cart first
+    String? cartToken = await _getCartToken();
+    if (cartToken == null || cartToken.isEmpty) {
+      debugPrint('🛒 No cart token found. Initializing cart via getCart...');
+      await _cartService.getCart(
+        apiVersion: _config.getString(
+          'woocommerce_configuration.version',
+          'v1',
+        ),
+        jwtToken: await _getJwtToken(),
+      );
+      cartToken = await _getCartToken();
+      debugPrint(
+        '🛒 Cart token after init: ${cartToken != null && cartToken.isNotEmpty}',
+      );
+    }
+
+    // Add item to cart via API (first attempt)
+    // If variation ID found, use it as the id; otherwise use product ID
+    final itemId = variationId ?? productId;
+
+    debugPrint(
+      '🛒 Adding to cart: id=$itemId, variationId=$variationId',
+    );
+
+    var response = await _cartService.addItem(
+      apiVersion: _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      ),
+      cartToken: cartToken ?? '',
+      jwtToken: await _getJwtToken(), // Optional JWT token
+      id: itemId,
+      quantity: 1,
+    );
+
+    debugPrint(
+      '🛒 WishlistViewModel: AddItem API response: ${response.toJson()}',
+    );
+
+    if (response.errors != null && response.errors!.isNotEmpty) {
+      debugPrint('❌ API add item error: ${response.errors!.first}');
+      // If unauthorized or token-related, try to refresh cart and retry once
+      final errorText = response.errors!.first.toString().toLowerCase();
+      if (errorText.contains('401') ||
+          errorText.contains('unauthorized') ||
+          errorText.contains('token')) {
+        debugPrint('🛒 Retrying addItem after refreshing cart token...');
+        await _cartService.getCart(
+          apiVersion: _config.getString(
+            'woocommerce_configuration.version',
+            'v1',
+          ),
+          jwtToken: await _getJwtToken(),
+        );
+        final refreshedToken = await _getCartToken();
+        response = await _cartService.addItem(
+          apiVersion: _config.getString(
+            'woocommerce_configuration.version',
+            'v1',
+          ),
+          cartToken: refreshedToken ?? '',
+          jwtToken: await _getJwtToken(),
+          id: itemId,
+          quantity: 1,
+        );
+
+        if (response.errors != null && response.errors!.isNotEmpty) {
+          final errorMessage = ApiErrorUtils.getErrorMessage(
+            response.errors!.first,
+          );
+          // Throw exception so calling code knows it failed
+          throw Exception('Failed to add item: $errorMessage');
+        }
+      } else {
+        final errorMessage = ApiErrorUtils.getErrorMessage(
+          response.errors!.first,
+        );
+        // Throw exception so calling code knows it failed
+        throw Exception('Failed to add item: $errorMessage');
+      }
+    }
+
+    // Cart token is automatically handled by WooCartTokenInterceptor
+    // No need to manually save token - interceptor extracts from response headers
+
+    debugPrint('✅ Successfully added product $productId to cart via API');
   }
 
   void _promptAddToCartOptions(WishlistItem item) {

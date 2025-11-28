@@ -89,7 +89,7 @@ class WishlistView
 
     if (state is WishlistActionPromptState) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await OsmeaComponents.showPopup(
+        final result = await OsmeaComponents.showPopup(
           context: context,
           variant: PopupVariant.dialog,
           title: 'Add to cart?',
@@ -105,7 +105,7 @@ class WishlistView
                       text: 'Add & keep saved',
                       variant: ButtonVariant.primary,
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop('add_keep');
                         viewModel.addItemToCartFromWishlist(state.item.id);
                       },
                     ),
@@ -120,7 +120,7 @@ class WishlistView
                       text: 'Add & remove from saved',
                       variant: ButtonVariant.secondary,
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop('add_remove');
                         viewModel.addItemToCartAndRemoveFromWishlist(state.item.id);
                       },
                     ),
@@ -131,12 +131,15 @@ class WishlistView
               OsmeaComponents.button(
                 text: 'Cancel',
                 variant: ButtonVariant.ghost,
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(context).pop('cancel'),
               ),
             ],
           ),
         );
-        viewModel.restorePrevious(state.previousState);
+        // Only restore previous state if user cancelled (not if they added to cart)
+        if (result == 'cancel' || result == null) {
+          viewModel.restorePrevious(state.previousState);
+        }
       });
       return WishlistListWidget(
         items: state.previousState.items,

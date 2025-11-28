@@ -13,6 +13,7 @@ import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
@@ -26,22 +27,10 @@ final GoRouter appRouter = GoRouter(
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        // Get wishlist count directly without BlocBuilder to prevent rebuild loops
-        // Navbar will handle its own state updates internally
-        int wishlistCount = 0;
-        try {
-          final wishlistViewModel = GetIt.I<WishlistViewModel>();
-          wishlistCount = wishlistViewModel.count;
-        } catch (e) {
-          debugPrint('⚠️ Error getting wishlist count: $e');
-          wishlistCount = 0;
-        }
-
         return Scaffold(
           body: child,
           bottomNavigationBar: _getNavbarForRoute(
             state.uri.path,
-            wishlistCount,
           ),
         );
       },
@@ -716,7 +705,6 @@ final GoRouter appRouter = GoRouter(
               },
               bottomNavigationBar: _getNavbarForRoute(
                 state.uri.path,
-                GetIt.I<WishlistViewModel>().count,
               ),
             ),
           ),
@@ -875,7 +863,7 @@ final GoRouter appRouter = GoRouter(
 
 /// Get navbar for specific route
 /// Navbar indexes: 0=Home, 1=Search, 2=Saved, 3=Cart, 4=Profile/Sign In
-Widget? _getNavbarForRoute(String location, int wishlistCount) {
+Widget? _getNavbarForRoute(String location) {
   // Show navbar only for main app sections
   if (location == '/home' ||
       location == '/search' ||
@@ -899,36 +887,91 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
     // Use BlocBuilder with optimized buildWhen to prevent rebuild loops
     return Builder(
       builder: (context) {
-        // Get AuthCubit from GetIt to listen to auth state changes
-        try {
-          final authCubit = GetIt.I<AuthCubit>();
-          // Use BlocBuilder only for reactive updates, with strict buildWhen
-          return BlocBuilder<AuthCubit, AuthState>(
-            bloc: authCubit,
-            buildWhen: (previous, current) {
-              // Only rebuild if authentication status actually changed
-              final prevAuth =
-                  previous is AuthAuthenticatedState &&
-                  previous.isAuthenticated &&
-                  previous.jwtToken != null &&
-                  previous.jwtToken!.isNotEmpty;
-              final currAuth =
-                  current is AuthAuthenticatedState &&
-                  current.isAuthenticated &&
-                  current.jwtToken != null &&
-                  current.jwtToken!.isNotEmpty;
-              // Only rebuild if auth status changed, not on every state change
-              return prevAuth != currAuth;
-            },
-            builder: (context, authState) {
-              // Determine authentication status
-              final isAuthenticated =
-                  authState is AuthAuthenticatedState &&
-                  authState.isAuthenticated &&
-                  authState.jwtToken != null &&
-                  authState.jwtToken!.isNotEmpty;
+        // Listen to WishlistViewModel for count updates
+        return BlocBuilder<WishlistViewModel, WishlistState>(
+          bloc: GetIt.I<WishlistViewModel>(),
+          buildWhen: (previous, current) {
+            // Rebuild when wishlist count changes
+            final prevCount = previous is WishlistLoadedState 
+                ? previous.items.length 
+                : 0;
+            final currCount = current is WishlistLoadedState 
+                ? current.items.length 
+                : 0;
+            return prevCount != currCount;
+          },
+          builder: (context, wishlistState) {
+            final wishlistCount = wishlistState is WishlistLoadedState 
+                ? wishlistState.items.length 
+                : 0;
+            
+            // Get AuthCubit from GetIt to listen to auth state changes
+            try {
+              final authCubit = GetIt.I<AuthCubit>();
+              // Use BlocBuilder only for reactive updates, with strict buildWhen
+              return BlocBuilder<AuthCubit, AuthState>(
+                bloc: authCubit,
+                buildWhen: (previous, current) {
+                  // Only rebuild if authentication status actually changed
+                  final prevAuth =
+                      previous is AuthAuthenticatedState &&
+                      previous.isAuthenticated &&
+                      previous.jwtToken != null &&
+                      previous.jwtToken!.isNotEmpty;
+                  final currAuth =
+                      current is AuthAuthenticatedState &&
+                      current.isAuthenticated &&
+                      current.jwtToken != null &&
+                      current.jwtToken!.isNotEmpty;
+                  // Only rebuild if auth status changed, not on every state change
+                  return prevAuth != currAuth;
+                },
+                builder: (context, authState) {
+                  // Determine authentication status
+                  final isAuthenticated =
+                      authState is AuthAuthenticatedState &&
+                      authState.isAuthenticated &&
+                      authState.jwtToken != null &&
+                      authState.jwtToken!.isNotEmpty;
 
-              // Build navbar items
+                  // Build navbar items
+                  final items = _buildNavbarItems(
+                    context,
+                    isAuthenticated,
+                    wishlistCount,
+                  );
+
+                  return OsmeaComponents.navbar(
+                    variant: NavbarVariant.transparent,
+                    size: NavbarSize.medium,
+                    position: NavbarPosition.bottom,
+                    currentIndex: currentIndex,
+                    borderColor: OsmeaColors.silver,
+                    elevation: .5,
+                    backgroundColor: OsmeaColors.white,
+                    items: items,
+                    onItemTap: (index) =>
+                        _navigateToPage(context, index, isAuthenticated),
+                  );
+                },
+              );
+            } catch (e) {
+              debugPrint('⚠️ AuthCubit not available, using fallback: $e');
+              // Fallback: use direct state check without FutureBuilder (non-blocking)
+              bool isAuthenticated = false;
+              try {
+                final authCubit = GetIt.I<AuthCubit>();
+                final authState = authCubit.state;
+                isAuthenticated =
+                    authState is AuthAuthenticatedState &&
+                    authState.isAuthenticated &&
+                    authState.jwtToken != null &&
+                    authState.jwtToken!.isNotEmpty;
+              } catch (_) {
+                // If AuthCubit not available, default to false
+                isAuthenticated = false;
+              }
+
               final items = _buildNavbarItems(
                 context,
                 isAuthenticated,
@@ -947,44 +990,9 @@ Widget? _getNavbarForRoute(String location, int wishlistCount) {
                 onItemTap: (index) =>
                     _navigateToPage(context, index, isAuthenticated),
               );
-            },
-          );
-        } catch (e) {
-          debugPrint('⚠️ AuthCubit not available, using fallback: $e');
-          // Fallback: use direct state check without FutureBuilder (non-blocking)
-          bool isAuthenticated = false;
-          try {
-            final authCubit = GetIt.I<AuthCubit>();
-            final authState = authCubit.state;
-            isAuthenticated =
-                authState is AuthAuthenticatedState &&
-                authState.isAuthenticated &&
-                authState.jwtToken != null &&
-                authState.jwtToken!.isNotEmpty;
-          } catch (_) {
-            // If AuthCubit not available, default to false
-            isAuthenticated = false;
-          }
-
-          final items = _buildNavbarItems(
-            context,
-            isAuthenticated,
-            wishlistCount,
-          );
-
-          return OsmeaComponents.navbar(
-            variant: NavbarVariant.transparent,
-            size: NavbarSize.medium,
-            position: NavbarPosition.bottom,
-            currentIndex: currentIndex,
-            borderColor: OsmeaColors.silver,
-            elevation: .5,
-            backgroundColor: OsmeaColors.white,
-            items: items,
-            onItemTap: (index) =>
-                _navigateToPage(context, index, isAuthenticated),
-          );
-        }
+            }
+          },
+        );
       },
     );
   }
@@ -1023,6 +1031,7 @@ List<NavbarItem> _buildNavbarItems(
       tooltip: 'Saved Items',
       animationType: NavbarItemAnimationType.scale,
       animationTrigger: wishlistCount,
+      iconAnimationTrigger: wishlistCount,
     ),
     NavbarItem(
       text: 'Cart',
