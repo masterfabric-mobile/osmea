@@ -5,7 +5,6 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_mo
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_by_slug_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_product_variations_response_model.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
