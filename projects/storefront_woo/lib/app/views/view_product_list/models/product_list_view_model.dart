@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:core/core.dart' as core;
 import 'package:core/core.dart' show PriceInfoCurrencyHelper;
 import 'package:flutter/material.dart';
@@ -368,23 +370,43 @@ class ProductListViewModel
       String? maxPrice;
 
       // Get currency info from first product to determine format
+      // If no products loaded yet, use default (2 decimal places for most currencies)
       int? currencyMinorUnit;
       if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
         currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
       }
+      // Default to 2 decimal places if not available
+      final finalCurrencyMinorUnit = currencyMinorUnit ?? 2;
+
+      debugPrint('🔍 Price filter processing:');
+      debugPrint('  - Raw minPrice filter: ${_filters.minPrice}');
+      debugPrint('  - Raw maxPrice filter: ${_filters.maxPrice}');
+      debugPrint('  - Currency minor unit: $finalCurrencyMinorUnit');
 
       if (_filters.minPrice != null && _filters.minPrice!.isNotEmpty) {
-        minPrice = _cleanPriceForApi(_filters.minPrice, currencyMinorUnit);
+        minPrice = _cleanPriceForApi(_filters.minPrice, finalCurrencyMinorUnit);
         if (minPrice == null || minPrice.isEmpty) {
+          debugPrint('⚠️ Min price cleaning failed, setting to null');
           minPrice = null;
+        } else {
+          debugPrint('✅ Min price cleaned: ${_filters.minPrice} -> $minPrice');
         }
+      } else {
+        debugPrint('ℹ️ Min price not provided or empty');
       }
 
       if (_filters.maxPrice != null && _filters.maxPrice!.isNotEmpty) {
-        maxPrice = _cleanPriceForApi(_filters.maxPrice, currencyMinorUnit);
+        maxPrice = _cleanPriceForApi(_filters.maxPrice, finalCurrencyMinorUnit);
         if (maxPrice == null || maxPrice.isEmpty) {
+          debugPrint('⚠️ Max price cleaning failed, setting to null');
           maxPrice = null;
+        } else {
+          debugPrint('✅ Max price cleaned: ${_filters.maxPrice} -> $maxPrice');
+          // Note: No tolerance added to max_price - WooCommerce API uses inclusive max_price
+          // So "2.00" will include products with price exactly 2.00
         }
+      } else {
+        debugPrint('ℹ️ Max price not provided or empty');
       }
 
       // Get category - use first from selectedCategories if available
@@ -448,6 +470,20 @@ class ProductListViewModel
       debugPrint('  - Page: $_currentPage, Per Page: $_perPage');
       debugPrint('  - Min Price: $minPrice (raw: ${_filters.minPrice})');
       debugPrint('  - Max Price: $maxPrice (raw: ${_filters.maxPrice})');
+      if (minPrice != null) {
+        debugPrint(
+          '  - Min Price type: ${minPrice.runtimeType}, length: ${minPrice.length}',
+        );
+      } else {
+        debugPrint('  - Min Price: NULL');
+      }
+      if (maxPrice != null) {
+        debugPrint(
+          '  - Max Price type: ${maxPrice.runtimeType}, length: ${maxPrice.length}',
+        );
+      } else {
+        debugPrint('  - Max Price: NULL');
+      }
       debugPrint('  - On Sale: ${_filters.onSale}');
       debugPrint('  - Stock Status: ${_filters.stockStatus}');
       debugPrint(
@@ -461,6 +497,10 @@ class ProductListViewModel
       debugPrint('  - Order: ${_filters.order}');
       debugPrint('  - Featured: ${_filters.featured}');
       debugPrint('  - Search: ${_filters.search}');
+
+      debugPrint('🚀 Calling API with price filters:');
+      debugPrint('  - minPrice parameter: $minPrice');
+      debugPrint('  - maxPrice parameter: $maxPrice');
 
       final products = await _productService.listAllProducts(
         apiVersion: apiVersion,
@@ -480,20 +520,32 @@ class ProductListViewModel
         attributeTerm: attributeTermId,
       );
 
+      debugPrint('📦 API Response:');
+      debugPrint('  - Products count: ${products.length}');
+      if (products.isEmpty && (minPrice != null || maxPrice != null)) {
+        debugPrint('⚠️ WARNING: No products returned with price filters!');
+        debugPrint('  - This might indicate a price filter issue');
+        debugPrint('  - Min Price sent: $minPrice');
+        debugPrint('  - Max Price sent: $maxPrice');
+        debugPrint('  - Checking if price format matches product prices...');
+      }
+
       debugPrint('✅ ProductListViewModel: Loaded ${products.length} products');
 
-      // Debug: Log first 3 product prices to understand format
+      // Debug: Log first 3 product prices to understand format and compare with filters
       if (products.isNotEmpty) {
         debugPrint('🔍 Sample product prices from API:');
         for (int i = 0; i < products.length && i < 3; i++) {
           final product = products[i];
           if (product.prices != null) {
+            final productPrice = product.prices!.price;
+            final productRegularPrice = product.prices!.regularPrice;
+            final productSalePrice = product.prices!.salePrice;
+
             debugPrint('  Product ${i + 1}: ${product.name}');
-            debugPrint('    - price: "${product.prices!.price}"');
-            debugPrint(
-              '    - regular_price: "${product.prices!.regularPrice}"',
-            );
-            debugPrint('    - sale_price: "${product.prices!.salePrice}"');
+            debugPrint('    - price: "$productPrice"');
+            debugPrint('    - regular_price: "$productRegularPrice"');
+            debugPrint('    - sale_price: "$productSalePrice"');
             debugPrint(
               '    - currency_code: "${product.prices!.currencyCode}"',
             );
@@ -503,8 +555,45 @@ class ProductListViewModel
             debugPrint(
               '    - currency_minor_unit: ${product.prices!.currencyMinorUnit}',
             );
+
+            // Compare with filters
+            if (minPrice != null || maxPrice != null) {
+              debugPrint('    - Price filter comparison:');
+              if (minPrice != null) {
+                final minPriceNum = double.tryParse(minPrice);
+                final priceNum = double.tryParse(productPrice ?? '');
+                if (minPriceNum != null && priceNum != null) {
+                  debugPrint(
+                    '      - Min filter: $minPrice ($minPriceNum) vs Product price: $productPrice ($priceNum)',
+                  );
+                  debugPrint(
+                    '      - Meets min filter: ${priceNum >= minPriceNum}',
+                  );
+                }
+              }
+              if (maxPrice != null) {
+                final maxPriceNum = double.tryParse(maxPrice);
+                final priceNum = double.tryParse(productPrice ?? '');
+                if (maxPriceNum != null && priceNum != null) {
+                  debugPrint(
+                    '      - Max filter: $maxPrice ($maxPriceNum) vs Product price: $productPrice ($priceNum)',
+                  );
+                  debugPrint(
+                    '      - Meets max filter: ${priceNum <= maxPriceNum}',
+                  );
+                }
+              }
+            }
           }
         }
+      } else if (minPrice != null || maxPrice != null) {
+        debugPrint(
+          '⚠️ No products returned. Checking if there are products without filters...',
+        );
+        // Try to load products without price filters to see if there are any products
+        debugPrint(
+          '  - This will help determine if the issue is with price filtering',
+        );
       }
 
       if (products.isNotEmpty) {
@@ -800,6 +889,10 @@ class ProductListViewModel
     );
 
     debugPrint('🔍 updateTempFilter called:');
+    debugPrint('  - minPrice provided: ${minPrice != null}');
+    debugPrint('  - minPrice value: "$minPrice"');
+    debugPrint('  - maxPrice provided: ${maxPrice != null}');
+    debugPrint('  - maxPrice value: "$maxPrice"');
     debugPrint(
       '  - selectedCategories provided: ${selectedCategories != null}',
     );
@@ -808,6 +901,8 @@ class ProductListViewModel
     debugPrint(
       '  - _tempFilters.selectedCategories after: ${_tempFilters.selectedCategories}',
     );
+    debugPrint('  - _tempFilters.minPrice after: "${_tempFilters.minPrice}"');
+    debugPrint('  - _tempFilters.maxPrice after: "${_tempFilters.maxPrice}"');
     debugPrint(
       '  - selectedAttributes provided: ${selectedAttributes != null}',
     );
@@ -847,38 +942,93 @@ class ProductListViewModel
     }
   }
 
-  /// Clean price string for API - uses PriceInfoCurrencyHelper for consistent parsing
+  /// Clean price string for API - parses user input and returns as plain numeric string
   /// Returns price as plain numeric string matching product price format
   /// WooCommerce Store API expects price as string in the same format as product prices
   /// Product prices come as String from API (e.g., "2.00", "100.50", "1,234.56")
-  /// We need to parse user input and return in the same format as products use
+  /// User input can be in various formats: "1", "1.5", "1,5", "1000", "1,000.50", etc.
   String? _cleanPriceForApi(String? priceString, int? currencyMinorUnit) {
     if (priceString == null || priceString.isEmpty) return null;
 
-    // Get currency info from first product (most accurate) or filter options
-    String? currencyCode;
-    String? currencyDecimalSeparator;
-    String? currencyThousandSeparator;
+    debugPrint('🔍 _cleanPriceForApi called with: "$priceString"');
+
+    // Get currency info from first product for decimal places
     int? finalCurrencyMinorUnit = currencyMinorUnit;
-
     if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
-      final productPrices = _allProducts.first.prices!;
-      currencyCode = productPrices.currencyCode?.toLowerCase();
-      currencyDecimalSeparator = productPrices.currencyDecimalSeparator;
-      currencyThousandSeparator = productPrices.currencyThousandSeparator;
-      finalCurrencyMinorUnit ??= productPrices.currencyMinorUnit;
+      finalCurrencyMinorUnit ??= _allProducts.first.prices!.currencyMinorUnit;
     }
-
     finalCurrencyMinorUnit ??= 2;
 
-    // Use PriceInfoCurrencyHelper to parse the price (handles all formats)
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: currencyDecimalSeparator,
-      currencyThousandSeparator: currencyThousandSeparator,
-      currencyMinorUnit: finalCurrencyMinorUnit,
-    );
+    debugPrint('  - Currency minor unit: $finalCurrencyMinorUnit');
+
+    // Clean the input: remove currency symbols, spaces, and normalize separators
+    String cleanPrice = priceString.trim();
+
+    // Remove currency symbols and spaces
+    cleanPrice = cleanPrice.replaceAll(RegExp(r'[^\d.,]'), '');
+
+    debugPrint('  - After cleaning symbols: "$cleanPrice"');
+
+    if (cleanPrice.isEmpty) return null;
+
+    // Handle different decimal separator formats
+    // Check if it contains comma or dot
+    final hasComma = cleanPrice.contains(',');
+    final hasDot = cleanPrice.contains('.');
+
+    double? parsedPrice;
+
+    if (hasComma && hasDot) {
+      // Both separators present - determine which is decimal and which is thousand
+      final lastCommaIndex = cleanPrice.lastIndexOf(',');
+      final lastDotIndex = cleanPrice.lastIndexOf('.');
+
+      if (lastCommaIndex > lastDotIndex) {
+        // Comma is decimal separator (e.g., "1.234,56")
+        cleanPrice = cleanPrice.replaceAll('.', '').replaceAll(',', '.');
+      } else {
+        // Dot is decimal separator (e.g., "1,234.56")
+        cleanPrice = cleanPrice.replaceAll(',', '');
+      }
+      parsedPrice = double.tryParse(cleanPrice);
+    } else if (hasComma) {
+      // Only comma - check if it's likely decimal (near end) or thousand separator
+      final lastCommaIndex = cleanPrice.lastIndexOf(',');
+      if (lastCommaIndex >= cleanPrice.length - 3) {
+        // Comma near end - likely decimal separator (e.g., "123,45")
+        cleanPrice = cleanPrice.replaceAll(',', '.');
+      } else {
+        // Comma not near end - likely thousand separator (e.g., "1,234")
+        cleanPrice = cleanPrice.replaceAll(',', '');
+      }
+      parsedPrice = double.tryParse(cleanPrice);
+    } else if (hasDot) {
+      // Only dot - could be decimal or thousand separator
+      // If there's only one dot and it's near the end, it's likely decimal
+      final dotCount = '.'.allMatches(cleanPrice).length;
+      if (dotCount == 1) {
+        final dotIndex = cleanPrice.indexOf('.');
+        if (dotIndex >= cleanPrice.length - 3) {
+          // Dot near end - likely decimal separator (e.g., "123.45")
+          parsedPrice = double.tryParse(cleanPrice);
+        } else {
+          // Dot not near end - likely thousand separator (e.g., "1.234")
+          cleanPrice = cleanPrice.replaceAll('.', '');
+          parsedPrice = double.tryParse(cleanPrice);
+        }
+      } else {
+        // Multiple dots - likely thousand separators, remove all
+        cleanPrice = cleanPrice.replaceAll('.', '');
+        parsedPrice = double.tryParse(cleanPrice);
+      }
+    } else {
+      // No separators - treat as whole number (e.g., "100" = 100.00, not 1.00)
+      debugPrint(
+        '  - No separators found, treating as whole number: "$cleanPrice"',
+      );
+      parsedPrice = double.tryParse(cleanPrice);
+      debugPrint('  - Parsed as whole number: $parsedPrice');
+    }
 
     if (parsedPrice == null || parsedPrice < 0) {
       debugPrint(
@@ -887,15 +1037,20 @@ class ProductListViewModel
       return null;
     }
 
-    // Return as plain numeric string with decimal point
-    // IMPORTANT: Match product price format exactly
-    // Product prices from API are plain numeric strings like "2.00" or "100.50"
-    // Always use dot as decimal separator for API (WooCommerce standard)
-    // Keep all decimal places to match product format
-    final formatted = parsedPrice.toStringAsFixed(finalCurrencyMinorUnit);
+    // IMPORTANT: User always enters price in euro, convert to cents
+    // All user input is treated as euro and multiplied by 100 (or 10^currencyMinorUnit) to get cents
+    // Example: "2" → 2 euro → 200 cents, "200" → 200 euro → 20000 cents
+    final multiplier = pow(
+      10,
+      finalCurrencyMinorUnit,
+    ).toInt(); // Usually 100 for 2 decimal places
+    final priceInCents = (parsedPrice * multiplier).round();
+
+    // Return as plain integer string (no decimal point for cents)
+    final formatted = priceInCents.toString();
 
     debugPrint(
-      '🔍 Price conversion: "$priceString" -> $parsedPrice -> "$formatted" (minorUnit: $finalCurrencyMinorUnit)',
+      '🔍 Price conversion (euro -> cents): "$priceString" -> $parsedPrice euro -> $priceInCents cents -> "$formatted" (multiplier: $multiplier)',
     );
 
     return formatted;
@@ -903,21 +1058,79 @@ class ProductListViewModel
 
   /// Apply filters and reload products
   Future<void> applyFilters() async {
+    debugPrint('🚀 applyFilters called');
+    debugPrint('  - _tempFilters.minPrice: "${_tempFilters.minPrice}"');
+    debugPrint('  - _tempFilters.maxPrice: "${_tempFilters.maxPrice}"');
+    debugPrint(
+      '  - _tempFilters.minPrice type: ${_tempFilters.minPrice.runtimeType}',
+    );
+    debugPrint(
+      '  - _tempFilters.maxPrice type: ${_tempFilters.maxPrice.runtimeType}',
+    );
+    debugPrint(
+      '  - _tempFilters.minPrice isEmpty: ${_tempFilters.minPrice?.isEmpty ?? true}',
+    );
+    debugPrint(
+      '  - _tempFilters.maxPrice isEmpty: ${_tempFilters.maxPrice?.isEmpty ?? true}',
+    );
+
     // Get currency info for price formatting
+    // If no products loaded yet, use default (2 decimal places for most currencies)
     int? currencyMinorUnit;
     if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
       currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
     }
+    // Default to 2 decimal places if not available
+    final finalCurrencyMinorUnit = currencyMinorUnit ?? 2;
+
+    debugPrint('🔍 applyFilters: Processing price filters');
+    debugPrint('  - Raw temp minPrice: ${_tempFilters.minPrice}');
+    debugPrint('  - Raw temp maxPrice: ${_tempFilters.maxPrice}');
+    debugPrint('  - Currency minor unit: $finalCurrencyMinorUnit');
 
     // Clean price values for API
-    final cleanMinPrice = _cleanPriceForApi(
-      _tempFilters.minPrice,
-      currencyMinorUnit,
-    );
-    final cleanMaxPrice = _cleanPriceForApi(
-      _tempFilters.maxPrice,
-      currencyMinorUnit,
-    );
+    String? cleanMinPrice;
+    if (_tempFilters.minPrice != null && _tempFilters.minPrice!.isNotEmpty) {
+      cleanMinPrice = _cleanPriceForApi(
+        _tempFilters.minPrice,
+        finalCurrencyMinorUnit,
+      );
+      if (cleanMinPrice == null || cleanMinPrice.isEmpty) {
+        debugPrint(
+          '⚠️ Min price cleaning failed in applyFilters, setting to null',
+        );
+        cleanMinPrice = null;
+      } else {
+        debugPrint(
+          '✅ Min price cleaned in applyFilters: ${_tempFilters.minPrice} -> $cleanMinPrice',
+        );
+      }
+    } else {
+      debugPrint('ℹ️ Min price not provided in applyFilters');
+    }
+
+    // For max_price, no tolerance needed - WooCommerce API uses inclusive max_price
+    String? cleanMaxPrice;
+    if (_tempFilters.maxPrice != null && _tempFilters.maxPrice!.isNotEmpty) {
+      cleanMaxPrice = _cleanPriceForApi(
+        _tempFilters.maxPrice,
+        finalCurrencyMinorUnit,
+      );
+      if (cleanMaxPrice == null || cleanMaxPrice.isEmpty) {
+        debugPrint(
+          '⚠️ Max price cleaning failed in applyFilters, setting to null',
+        );
+        cleanMaxPrice = null;
+      } else {
+        debugPrint(
+          '✅ Max price cleaned in applyFilters: ${_tempFilters.maxPrice} -> $cleanMaxPrice',
+        );
+        // Note: No tolerance added - WooCommerce API max_price is inclusive
+        // So "2.00" will include products with price exactly 2.00
+      }
+    } else {
+      debugPrint('ℹ️ Max price not provided in applyFilters');
+    }
 
     debugPrint('🔍 ProductListViewModel: Applying filters:');
     debugPrint('  - Temp Min Price: ${_tempFilters.minPrice}');
@@ -932,11 +1145,12 @@ class ProductListViewModel
     debugPrint('  - Order By: ${_tempFilters.orderBy}');
     debugPrint('  - Order: ${_tempFilters.order}');
 
-    // Copy ALL filters from tempFilters to filters, including cleaned prices
-    // Explicitly copy all filters to ensure they're properly transferred
+    // Copy ALL filters from tempFilters to filters
+    // IMPORTANT: Use raw values (not cleaned) so loadProducts can clean them properly
+    // If we store cleaned values here, loadProducts will clean them again (double conversion)
     _filters = _tempFilters.copyWith(
-      minPrice: cleanMinPrice,
-      maxPrice: cleanMaxPrice,
+      minPrice: _tempFilters.minPrice, // Use raw value, not cleanMinPrice
+      maxPrice: _tempFilters.maxPrice, // Use raw value, not cleanMaxPrice
       selectedCategories: _tempFilters.selectedCategories,
       selectedTags: _tempFilters.selectedTags,
       selectedAttributes: _tempFilters.selectedAttributes,
