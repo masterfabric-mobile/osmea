@@ -2,7 +2,6 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_mo
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_by_slug_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_product_variations_response_model.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 
 /// 🔑 Abstract contract for WooCommerce Store API Product Service
 /// Implement this to fetch products from WooCommerce Store API! 🌐
@@ -102,19 +101,5 @@ abstract class ProductService {
   Future<List<ListProductVariationsResponseModel>> listAllVariationsByType({
     required String apiVersion,
     required String type,
-  });
-
-  /// ⚙️ Fetches available filter options from the WooCommerce Store API.
-  /// Returns supported sort options, stock statuses, price range, and other filter metadata.
-  ///
-  /// [apiVersion]: The API version to use (e.g., 'v1').
-  /// [includeAttributes]: Whether to include product attributes in response (default: false).
-  /// [includeCategories]: Whether to include categories in response (default: false).
-  /// [includeTags]: Whether to include tags in response (default: false).
-  Future<GetFilterOptionsResponseModel> getFilterOptions({
-    required String apiVersion,
-    bool includeAttributes = false,
-    bool includeCategories = false,
-    bool includeTags = false,
   });
 }
