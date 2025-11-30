@@ -7,6 +7,8 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/p
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
@@ -168,6 +170,8 @@ class ProductListViewModel
       GetIt.I<StoreProductAttributesService>();
   final StoreProductAttributeTermsService _attributeTermsService =
       GetIt.I<StoreProductAttributeTermsService>();
+  final StoreProductCategoriesService _categoriesService =
+      GetIt.I<StoreProductCategoriesService>();
   final core.AssetConfigHelper _config = core.AssetConfigHelper();
 
   // Optional route/view arguments holder
@@ -214,7 +218,10 @@ class ProductListViewModel
   // Attributes with terms for filtering
   List<AttributeWithTerms> _attributesWithTerms = [];
 
-
+  // Categories
+  List<ListProductCategoriesResponseModel> _categories = [];
+  List<ListProductCategoriesResponseModel> get categories =>
+      List.unmodifiable(_categories);
 
   // Guard to prevent multiple loadProducts calls
   bool _isLoadingProducts = false;
@@ -268,10 +275,6 @@ class ProductListViewModel
   @override
   String get id => 'product_list_view_model_v1';
 
-
-
-
-
   /// Helper method to emit products loading state
   void _emitProductsLoading() {
     emit(
@@ -281,6 +284,7 @@ class ProductListViewModel
         currentPage: state.currentPage,
         totalPages: state.totalPages,
         attributesWithTerms: state.attributesWithTerms,
+        categories: state.categories,
       ),
     );
   }
@@ -294,6 +298,7 @@ class ProductListViewModel
         currentPage: _currentPage,
         totalPages: _totalPages,
         attributesWithTerms: state.attributesWithTerms,
+        categories: _categories,
       ),
     );
   }
@@ -308,6 +313,7 @@ class ProductListViewModel
         currentPage: state.currentPage,
         totalPages: state.totalPages,
         attributesWithTerms: state.attributesWithTerms,
+        categories: state.categories,
       ),
     );
   }
@@ -407,7 +413,7 @@ class ProductListViewModel
           _filters.selectedAttributes!.isNotEmpty) {
         final firstAttribute = _filters.selectedAttributes!.entries.first;
         final selectedAttributeId = firstAttribute.key;
-        
+
         // Find the attribute from loaded attributes to get its taxonomy
         AttributeWithTerms? attributeWithTerms;
         try {
@@ -419,11 +425,12 @@ class ProductListViewModel
             '⚠️ Attribute $selectedAttributeId not found in loaded attributes, using ID as fallback',
           );
         }
-        
+
         // Use taxonomy if available, otherwise fall back to ID as string
-        attributeId = attributeWithTerms?.attribute.taxonomy ??
+        attributeId =
+            attributeWithTerms?.attribute.taxonomy ??
             selectedAttributeId.toString();
-        
+
         if (firstAttribute.value.isNotEmpty) {
           final selectedTermId = firstAttribute.value.first;
           // Find the term to get its ID (already have it, but ensure it's correct)
@@ -576,6 +583,11 @@ class ProductListViewModel
       if (!_attributesLoaded && !_isLoadingAttributes) {
         loadAttributes();
       }
+
+      // Load categories if not already loaded
+      if (_categories.isEmpty) {
+        loadCategories();
+      }
     } else {
       debugPrint('🚫 initFilterDialog already initialized, skipping...');
     }
@@ -598,7 +610,7 @@ class ProductListViewModel
     try {
       _isLoadingAttributes = true;
       debugPrint('🔍 Loading attributes...');
-      
+
       // Emit loading state only if we have products loaded
       final currentState = state;
       if (currentState is ProductListLoadedState) {
@@ -643,17 +655,15 @@ class ProductListViewModel
       for (final attribute in attributes) {
         if (attribute.id != null) {
           try {
-            final terms = await _attributeTermsService.listProductAttributeTerms(
-              apiVersion: apiVersion,
-              attributeId: attribute.id!,
-              perPage: 100,
-              hideEmpty: true,
-            );
+            final terms = await _attributeTermsService
+                .listProductAttributeTerms(
+                  apiVersion: apiVersion,
+                  attributeId: attribute.id!,
+                  perPage: 100,
+                  hideEmpty: true,
+                );
             attributesWithTermsList.add(
-              AttributeWithTerms(
-                attribute: attribute,
-                terms: terms,
-              ),
+              AttributeWithTerms(attribute: attribute, terms: terms),
             );
             debugPrint(
               '✅ Loaded ${terms.length} terms for attribute: ${attribute.name}',
@@ -664,10 +674,7 @@ class ProductListViewModel
             );
             // Add attribute without terms if loading fails
             attributesWithTermsList.add(
-              AttributeWithTerms(
-                attribute: attribute,
-                terms: [],
-              ),
+              AttributeWithTerms(attribute: attribute, terms: []),
             );
           }
         }
@@ -705,7 +712,7 @@ class ProductListViewModel
     } catch (e, stackTrace) {
       debugPrint('❌ Error loading attributes: $e');
       debugPrint('❌ Stack trace: $stackTrace');
-      
+
       // Emit error state - preserve products state
       final currentState = state;
       if (currentState is ProductListLoadedState) {
@@ -717,7 +724,8 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             isLoadingFilterOptions: false,
-            filterOptionsError: 'Failed to load attributes: ${_getErrorMessage(e)}',
+            filterOptionsError:
+                'Failed to load attributes: ${_getErrorMessage(e)}',
           ),
         );
       } else {
@@ -767,6 +775,12 @@ class ProductListViewModel
         ? (selectedAttributes.isEmpty ? {} : selectedAttributes)
         : _tempFilters.selectedAttributes;
 
+    // For selectedCategories: if provided (even if empty list), update it
+    // If not provided, keep existing
+    final List<int>? finalSelectedCategories = selectedCategories != null
+        ? (selectedCategories.isEmpty ? [] : selectedCategories)
+        : _tempFilters.selectedCategories;
+
     _tempFilters = _tempFilters.copyWith(
       minPrice: minPrice,
       maxPrice: maxPrice,
@@ -774,12 +788,20 @@ class ProductListViewModel
       stockStatus: stockStatus,
       orderBy: orderBy,
       order: order,
-      selectedCategories: selectedCategories,
+      selectedCategories: finalSelectedCategories,
       selectedTags: selectedTags,
       selectedAttributes: finalSelectedAttributes,
     );
 
     debugPrint('🔍 updateTempFilter called:');
+    debugPrint(
+      '  - selectedCategories provided: ${selectedCategories != null}',
+    );
+    debugPrint('  - selectedCategories value: $selectedCategories');
+    debugPrint('  - finalSelectedCategories: $finalSelectedCategories');
+    debugPrint(
+      '  - _tempFilters.selectedCategories after: ${_tempFilters.selectedCategories}',
+    );
     debugPrint(
       '  - selectedAttributes provided: ${selectedAttributes != null}',
     );
@@ -789,32 +811,7 @@ class ProductListViewModel
     );
 
     // Emit current state to trigger rebuild in filter dialog
-    // Preserve products and other state while updating filter options
-    final currentState = state;
-    if (currentState is ProductListLoadedState) {
-      emit(
-        ProductListLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          attributesWithTerms: currentState.attributesWithTerms,
-        ),
-      );
-    } else if (currentState is ProductListFilterOptionsLoadedState) {
-      emit(
-        ProductListFilterOptionsLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          attributesWithTerms: currentState.attributesWithTerms,
-        ),
-      );
-    } else {
-      // Fallback: emit current state as-is
-      emit(currentState);
-    }
+    emit(state);
   }
 
   /// Clean price string for API - uses PriceInfoCurrencyHelper for consistent parsing
@@ -990,6 +987,67 @@ class ProductListViewModel
     _allProducts = [];
     _hasInitialLoadCompleted = false; // Reset flag to allow reload
     await loadProducts(refresh: true);
+  }
+
+  /// Load categories from API
+  Future<void> loadCategories() async {
+    try {
+      debugPrint('📂 ProductListViewModel: Loading categories...');
+
+      // Emit loading state for filter options
+      final currentState = state;
+      emit(
+        ProductListFilterOptionsLoadingState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          categories: currentState.categories,
+        ),
+      );
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
+      final categories = await _categoriesService.listProductCategories(
+        apiVersion: apiVersion,
+        perPage: 100, // Get all categories
+        hideEmpty: true, // Only get categories with products
+      );
+
+      _categories = categories;
+      debugPrint(
+        '✅ ProductListViewModel: Loaded ${categories.length} categories',
+      );
+
+      // Emit loaded state with categories
+      emit(
+        ProductListFilterOptionsLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          categories: _categories,
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ ProductListViewModel: Error loading categories: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+
+      final currentState = state;
+      emit(
+        ProductListFilterOptionsErrorState(
+          message: _getErrorMessage(e),
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          categories: currentState.categories,
+        ),
+      );
+    }
   }
 
   /// Get user-friendly error message

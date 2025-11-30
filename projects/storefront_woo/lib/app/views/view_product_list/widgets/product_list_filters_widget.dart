@@ -125,10 +125,7 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
             viewModel: widget.viewModel,
             title: 'Categories',
             sectionKey: 'categories',
-            child: CategoriesFilterWidget(
-              viewModel: widget.viewModel,
-              selectedCategories: tempFilters.selectedCategories ?? [],
-            ),
+            child: CategoriesFilterWidget(viewModel: widget.viewModel),
           ),
 
           // Tags - Collapsible

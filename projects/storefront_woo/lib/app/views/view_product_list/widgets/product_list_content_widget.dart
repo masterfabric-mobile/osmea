@@ -12,6 +12,7 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
@@ -57,7 +58,7 @@ class ProductListContentWidget extends StatelessWidget {
       children: [
         // Icon buttons for Sort by / Filters
         _buildActionButtons(context),
-        
+
         // Active filter chips
         if (viewModel.filters.hasActiveFilters)
           OsmeaComponents.padding(
@@ -145,7 +146,7 @@ class ProductListContentWidget extends StatelessWidget {
   /// Shows sort bottom sheet
   void _showSortBottomSheet(BuildContext context) {
     viewModel.resetDialogInit();
-    
+
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.medium,
@@ -160,13 +161,16 @@ class ProductListContentWidget extends StatelessWidget {
   /// Shows filters bottom sheet
   void _showFiltersBottomSheet(BuildContext context) {
     viewModel.resetDialogInit();
-    
+
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.large,
       title: 'Filters',
       backgroundColor: OsmeaColors.white,
-      child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: false),
+      child: ProductListFiltersWidget(
+        viewModel: viewModel,
+        showOnlySort: false,
+      ),
     ).then((_) {
       viewModel.resetDialogInit();
     });
@@ -231,6 +235,45 @@ class ProductListContentWidget extends StatelessWidget {
     final chips = <Widget>[];
 
     // Price range filter chips - REMOVED as requested
+
+    // Category filter chips
+    if (filters.selectedCategories != null &&
+        filters.selectedCategories!.isNotEmpty) {
+      // Get category names from state
+      final state = viewModel.state;
+      for (final categoryId in filters.selectedCategories!) {
+        final category = state.categories.firstWhere(
+          (cat) => cat.id == categoryId,
+          orElse: () =>
+              const ListProductCategoriesResponseModel(id: null, name: null),
+        );
+
+        final categoryName = category.name ?? 'Category $categoryId';
+        chips.add(
+          OsmeaComponents.padding(
+            padding: context.onlyRightPaddingLow,
+            child: OsmeaComponents.chips(
+              text: categoryName,
+              variant: ChipsVariant.primary,
+              style: ChipsStyle.normal,
+              selected: true,
+              closable: true,
+              onClose: () {
+                final newSelectedCategories = List<int>.from(
+                  filters.selectedCategories!,
+                );
+                newSelectedCategories.remove(categoryId);
+                viewModel.updateFilter(
+                  selectedCategories: newSelectedCategories.isEmpty
+                      ? null
+                      : newSelectedCategories,
+                );
+              },
+            ),
+          ),
+        );
+      }
+    }
 
     if (filters.onSale == true) {
       chips.add(

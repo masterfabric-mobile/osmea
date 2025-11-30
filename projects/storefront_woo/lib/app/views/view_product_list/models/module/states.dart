@@ -1,16 +1,14 @@
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/list_product_attributes_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/freezed_model/response/list_product_attribute_terms_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 
 /// Model to hold attribute with its terms
 class AttributeWithTerms {
   final ListProductAttributesResponseModel attribute;
   final List<ListProductAttributeTermsResponseModel> terms;
 
-  const AttributeWithTerms({
-    required this.attribute,
-    required this.terms,
-  });
+  const AttributeWithTerms({required this.attribute, required this.terms});
 }
 
 /// Base state for product list
@@ -38,6 +36,9 @@ abstract class ProductListState {
   /// Attributes with their terms for filtering
   final List<AttributeWithTerms> attributesWithTerms;
 
+  /// Available categories for filtering
+  final List<ListProductCategoriesResponseModel> categories;
+
   const ProductListState({
     this.products = const [],
     this.hasMore = false,
@@ -48,6 +49,7 @@ abstract class ProductListState {
     this.productsError,
     this.filterOptionsError,
     this.attributesWithTerms = const [],
+    this.categories = const [],
   });
 }
 
@@ -66,6 +68,7 @@ class ProductListLoadingState extends ProductListState {
     super.isLoadingFilterOptions,
     super.filterOptionsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingProducts: true);
 }
 
@@ -79,6 +82,7 @@ class ProductListLoadedState extends ProductListState {
     super.isLoadingFilterOptions,
     super.filterOptionsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingProducts: false);
 }
 
@@ -95,6 +99,7 @@ class ProductListErrorState extends ProductListState {
     super.isLoadingFilterOptions,
     super.filterOptionsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingProducts: false, productsError: message);
 }
 
@@ -108,6 +113,7 @@ class ProductListFilterOptionsLoadingState extends ProductListState {
     super.isLoadingProducts,
     super.productsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingFilterOptions: true);
 }
 
@@ -121,6 +127,7 @@ class ProductListFilterOptionsLoadedState extends ProductListState {
     super.isLoadingProducts,
     super.productsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingFilterOptions: false);
 }
 
@@ -137,5 +144,6 @@ class ProductListFilterOptionsErrorState extends ProductListState {
     super.isLoadingProducts,
     super.productsError,
     super.attributesWithTerms,
+    super.categories,
   }) : super(isLoadingFilterOptions: false, filterOptionsError: message);
 }
