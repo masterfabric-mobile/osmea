@@ -1027,7 +1027,7 @@ class ProductListViewModel
     try {
       debugPrint('📂 ProductListViewModel: Loading categories...');
 
-      // Emit loading state for filter options
+      // Keep the current state type to preserve products visibility
       final currentState = state;
       if (currentState is ProductListLoadedState) {
         emit(
@@ -1070,28 +1070,58 @@ class ProductListViewModel
         '✅ ProductListViewModel: Loaded ${categories.length} categories',
       );
 
-      // Emit loaded state with categories - preserve products and attributes
-      final updatedState = state;
-      if (updatedState is ProductListLoadedState) {
+      // Emit state with updated categories, preserving the current state type
+      if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
-            products: updatedState.products,
-            hasMore: updatedState.hasMore,
-            currentPage: updatedState.currentPage,
-            totalPages: updatedState.totalPages,
-            attributesWithTerms: updatedState.attributesWithTerms,
-            categories: _categories,
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
             isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: _categories,
+          ),
+        );
+      } else if (currentState is ProductListLoadingState) {
+        emit(
+          ProductListLoadingState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: _categories,
+          ),
+        );
+      } else if (currentState is ProductListErrorState) {
+        emit(
+          ProductListErrorState(
+            message: currentState.message,
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: _categories,
           ),
         );
       } else {
+        // Fallback to FilterOptionsLoadedState if state type is unknown
         emit(
           ProductListFilterOptionsLoadedState(
-            products: updatedState.products,
-            hasMore: updatedState.hasMore,
-            currentPage: updatedState.currentPage,
-            totalPages: updatedState.totalPages,
-            attributesWithTerms: updatedState.attributesWithTerms,
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingProducts: currentState.isLoadingProducts,
+            productsError: currentState.productsError,
+            attributesWithTerms: currentState.attributesWithTerms,
             categories: _categories,
           ),
         );
@@ -1100,6 +1130,7 @@ class ProductListViewModel
       debugPrint('❌ ProductListViewModel: Error loading categories: $e');
       debugPrint('❌ Stack trace: $stackTrace');
 
+      // Preserve current state type even on error
       final currentState = state;
       if (currentState is ProductListLoadedState) {
         emit(
@@ -1111,21 +1142,52 @@ class ProductListViewModel
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
             isLoadingFilterOptions: false,
-            filterOptionsError: 'Failed to load categories: ${_getErrorMessage(e)}',
+            filterOptionsError:
+                'Failed to load categories: ${_getErrorMessage(e)}',
           ),
         );
       } else {
-        emit(
-          ProductListFilterOptionsErrorState(
-            message: 'Failed to load categories: ${_getErrorMessage(e)}',
-            products: currentState.products,
-            hasMore: currentState.hasMore,
-            currentPage: currentState.currentPage,
-            totalPages: currentState.totalPages,
-            attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-          ),
-        );
+        if (currentState is ProductListLoadedState) {
+          emit(
+            ProductListLoadedState(
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              isLoadingFilterOptions: false,
+              filterOptionsError: _getErrorMessage(e),
+              attributesWithTerms: currentState.attributesWithTerms,
+              categories: currentState.categories,
+            ),
+          );
+        } else if (currentState is ProductListLoadingState) {
+          emit(
+            ProductListLoadingState(
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              isLoadingFilterOptions: false,
+              filterOptionsError: _getErrorMessage(e),
+              attributesWithTerms: currentState.attributesWithTerms,
+              categories: currentState.categories,
+            ),
+          );
+        } else {
+          emit(
+            ProductListFilterOptionsErrorState(
+              message: 'Failed to load categories: ${_getErrorMessage(e)}',
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              attributesWithTerms: currentState.attributesWithTerms,
+              isLoadingProducts: currentState.isLoadingProducts,
+              productsError: currentState.productsError,
+              categories: currentState.categories,
+            ),
+          );
+        }
       }
     }
   }
