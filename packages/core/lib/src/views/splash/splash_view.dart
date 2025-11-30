@@ -1,16 +1,8 @@
 import 'package:core/core.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:core/src/views/splash/cubit/splash_cubit.dart';
-import 'package:core/src/views/splash/cubit/splash_state.dart';
-import 'package:core/src/models/splash_models.dart';
 import 'package:core/src/views/splash/widgets/splash_startup_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_space_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_enterprise_widget.dart';
-import 'package:core/src/helper/asset_config_helper.dart';
-import 'package:core/src/views/routes.dart';
 
 /// 🚀 **OSMEA Splash View**
 ///
@@ -49,29 +41,50 @@ class SplashView extends MasterViewCubit<SplashCubit, SplashState> {
     // Trigger onStart callback
     onStart?.call();
 
-    // Initialize the splash cubit with app configuration
-    await viewModel.initializeSplash();
-
-    // Get duration and navigation settings from AppConfig
+    // Get auto-navigation setting from config
     final configHelper = AssetConfigHelper();
     await configHelper.loadConfig();
-
-    final durationMs =
-        configHelper.getInt('splash_configuration.duration_milliseconds', 3000);
     final shouldAutoNavigate =
         configHelper.getBool('splash_configuration.auto_navigate', true);
 
-    // Setup auto-navigation if enabled
-    if (shouldAutoNavigate) {
-      Timer(Duration(milliseconds: durationMs), () {
+    // Listen to state changes for navigation
+    // This ensures we navigate when the cubit determines the target
+    bool hasNavigated = false;
+
+    // Helper function to handle navigation
+    void handleNavigation(SplashState state) {
+      if (shouldAutoNavigate &&
+          state.status == SplashStatus.completed &&
+          state.navigationTarget != null &&
+          !hasNavigated) {
+        hasNavigated = true;
+        debugPrint('🧭 Navigating to: ${state.navigationTarget}');
+
         // Trigger onComplete callback
         onComplete?.call();
 
-        final currentState = viewModel.state;
-        final target = currentState.navigationTarget ?? '/home';
-        goRoute(target);
-      });
+        // Use postFrameCallback to ensure state is fully updated before navigation
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            goRoute(state.navigationTarget!);
+          } catch (e) {
+            debugPrint('❌ Error navigating from splash: $e');
+            // Fallback to home on error
+            goRoute('/home');
+          }
+        });
+      }
     }
+
+    // Check initial state in case it's already completed
+    handleNavigation(viewModel.state);
+
+    // Listen to future state changes
+    viewModel.stream.listen(handleNavigation);
+
+    // Initialize the splash cubit with app configuration
+    // This will trigger the timer and navigation target determination
+    await viewModel.initializeSplash();
   }
 
   @override
