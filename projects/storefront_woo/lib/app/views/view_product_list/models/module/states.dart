@@ -1,5 +1,4 @@
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
 
 /// Base state for product list
 abstract class ProductListState {
@@ -10,9 +9,6 @@ abstract class ProductListState {
   final bool hasMore;
   final int currentPage;
   final int totalPages;
-
-  /// Filter options from API (null if not loaded yet)
-  final GetFilterOptionsResponseModel? filterOptions;
 
   /// Whether products are currently loading
   final bool isLoadingProducts;
@@ -31,7 +27,6 @@ abstract class ProductListState {
     this.hasMore = false,
     this.currentPage = 1,
     this.totalPages = 1,
-    this.filterOptions,
     this.isLoadingProducts = false,
     this.isLoadingFilterOptions = false,
     this.productsError,
@@ -51,7 +46,6 @@ class ProductListLoadingState extends ProductListState {
     super.hasMore,
     super.currentPage,
     super.totalPages,
-    super.filterOptions,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
   }) : super(isLoadingProducts: true);
@@ -64,7 +58,6 @@ class ProductListLoadedState extends ProductListState {
     required super.hasMore,
     required super.currentPage,
     required super.totalPages,
-    super.filterOptions,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
   }) : super(isLoadingProducts: false);
@@ -80,7 +73,6 @@ class ProductListErrorState extends ProductListState {
     super.hasMore,
     super.currentPage,
     super.totalPages,
-    super.filterOptions,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
   }) : super(isLoadingProducts: false, productsError: message);
@@ -93,7 +85,6 @@ class ProductListFilterOptionsLoadingState extends ProductListState {
     super.hasMore,
     super.currentPage,
     super.totalPages,
-    super.filterOptions,
     super.isLoadingProducts,
     super.productsError,
   }) : super(isLoadingFilterOptions: true);
@@ -102,7 +93,6 @@ class ProductListFilterOptionsLoadingState extends ProductListState {
 /// Filter options loaded successfully
 class ProductListFilterOptionsLoadedState extends ProductListState {
   const ProductListFilterOptionsLoadedState({
-    required super.filterOptions,
     super.products,
     super.hasMore,
     super.currentPage,
@@ -122,7 +112,6 @@ class ProductListFilterOptionsErrorState extends ProductListState {
     super.hasMore,
     super.currentPage,
     super.totalPages,
-    super.filterOptions,
     super.isLoadingProducts,
     super.productsError,
   }) : super(isLoadingFilterOptions: false, filterOptionsError: message);

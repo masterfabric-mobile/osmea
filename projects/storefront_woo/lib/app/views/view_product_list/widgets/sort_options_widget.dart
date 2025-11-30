@@ -6,9 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
-import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/sort_option_widget.dart';
 
 class SortOptionsWidget extends StatelessWidget {
@@ -18,62 +16,6 @@ class SortOptionsWidget extends StatelessWidget {
 
   const SortOptionsWidget({
     super.key,
-    required this.viewModel,
-    required this.selectedSortBy,
-    required this.selectedOrder,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
-      builder: (context, state) {
-        final filterOptions = state is ProductListLoadedState
-            ? state.filterOptions
-            : null;
-
-        final sortOptions = filterOptions?.sortOptions;
-
-        if (sortOptions == null || sortOptions.isEmpty) {
-          // Don't call loadFilterOptions here - it's already called in initFilterDialog
-          // This prevents infinite loop
-          return _StaticSortOptions(
-            viewModel: viewModel,
-            selectedSortBy: selectedSortBy,
-            selectedOrder: selectedOrder,
-          );
-        }
-
-        return OsmeaComponents.column(
-          children: [
-            ...sortOptions
-                .where((sortOption) => sortOption.enabled)
-                .expand(
-                  (sortOption) => sortOption.orders.map(
-                    (orderOption) => SortOptionWidget(
-                      viewModel: viewModel,
-                      label: '${sortOption.label} (${orderOption.label})',
-                      orderBy: sortOption.key,
-                      order: orderOption.key,
-                      selectedSortBy: selectedSortBy,
-                      selectedOrder: selectedOrder,
-                    ),
-                  ),
-                )
-                .toList(),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _StaticSortOptions extends StatelessWidget {
-  final ProductListViewModel viewModel;
-  final String selectedSortBy;
-  final String selectedOrder;
-
-  const _StaticSortOptions({
     required this.viewModel,
     required this.selectedSortBy,
     required this.selectedOrder,

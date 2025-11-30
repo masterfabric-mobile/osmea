@@ -5,11 +5,8 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/get_filter_options_response_model.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_tags_api/abstract/store_product_tags_service.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
+
+
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 
@@ -166,14 +163,6 @@ class ProductListViewModel
   ProductListViewModel() : super(ProductListInitialState());
 
   final ProductService _productService = GetIt.I<ProductService>();
-  final StoreProductCategoriesService _categoriesService =
-      GetIt.I<StoreProductCategoriesService>();
-  final StoreProductTagsService _tagsService =
-      GetIt.I<StoreProductTagsService>();
-  final StoreProductAttributesService _attributesService =
-      GetIt.I<StoreProductAttributesService>();
-  final StoreProductAttributeTermsService _attributeTermsService =
-      GetIt.I<StoreProductAttributeTermsService>();
   final core.AssetConfigHelper _config = core.AssetConfigHelper();
 
   // Optional route/view arguments holder
@@ -217,12 +206,7 @@ class ProductListViewModel
       50; // Increased from default to accommodate client-side filtering
   List<ListAllProductsResponseModel> _allProducts = [];
 
-  // Filter options from API
-  GetFilterOptionsResponseModel? _filterOptions;
-  GetFilterOptionsResponseModel? get filterOptions => _filterOptions;
 
-  // Guard to prevent multiple loadFilterOptions calls
-  bool _isLoadingFilterOptions = false;
 
   // Guard to prevent multiple loadProducts calls
   bool _isLoadingProducts = false;
@@ -276,403 +260,43 @@ class ProductListViewModel
   @override
   String get id => 'product_list_view_model_v1';
 
-  /// Load filter options from API
-  /// This method loads all filter options from APIs without any mock data
-  Future<void> loadFilterOptions() async {
-    // Prevent multiple concurrent calls
-    if (_isLoadingFilterOptions) {
-      debugPrint('🚫 loadFilterOptions already in progress, skipping...');
-      return;
-    }
 
-    _isLoadingFilterOptions = true;
-    debugPrint('🔧 ProductListViewModel.loadFilterOptions called');
 
-    // Emit loading state for filter options
-    _emitFilterOptionsLoading();
 
-    try {
-      // Get API version with fallback
-      final apiVersion = _config.getString('woocommerce_configuration.version');
-
-      final finalApiVersion = apiVersion.isEmpty ? 'v1' : apiVersion;
-      debugPrint(
-        '🔧 Loading filter options with API version: $finalApiVersion',
-      );
-
-      // Try to load from getFilterOptions API first
-      GetFilterOptionsResponseModel? filterOptionsResponse;
-      try {
-        filterOptionsResponse = await _productService.getFilterOptions(
-          apiVersion: finalApiVersion,
-          includeAttributes: true,
-          includeCategories: true,
-          includeTags: true,
-        );
-        debugPrint('✅ Filter options loaded from getFilterOptions API');
-      } catch (apiError) {
-        debugPrint(
-          '⚠️ getFilterOptions API failed, loading from individual APIs: $apiError',
-        );
-      }
-
-      // If getFilterOptions doesn't have categories/tags/attributes, load them separately
-      List<FilterCategoryModel>? categories;
-      List<FilterTagModel>? tags;
-      List<FilterAttributeModel>? attributes;
-
-      // Load categories if not available in filterOptionsResponse
-      if (filterOptionsResponse == null ||
-          filterOptionsResponse.categories == null ||
-          filterOptionsResponse.categories!.isEmpty) {
-        try {
-          debugPrint('📂 Loading categories from API...');
-          // Only load parent categories (parent: 0) to avoid showing parent then children
-          final categoriesList = await _categoriesService.listProductCategories(
-            apiVersion: finalApiVersion,
-            hideEmpty: true,
-            perPage: 100,
-            parent: 0, // Only get top-level categories
-          );
-          categories = categoriesList
-              .map(
-                (cat) => FilterCategoryModel(
-                  id: cat.id ?? 0,
-                  name: cat.name ?? '',
-                  slug: cat.slug ?? '',
-                  count: cat.count,
-                ),
-              )
-              .toList();
-          debugPrint(
-            '✅ Loaded ${categories.length} parent categories from API',
-          );
-        } catch (e) {
-          debugPrint('❌ Error loading categories: $e');
-        }
-      } else {
-        categories = filterOptionsResponse.categories;
-        debugPrint(
-          '✅ Using categories from getFilterOptions API: ${categories?.length ?? 0}',
-        );
-      }
-
-      // Load tags if not available in filterOptionsResponse
-      if (filterOptionsResponse == null ||
-          filterOptionsResponse.tags == null ||
-          filterOptionsResponse.tags!.isEmpty) {
-        try {
-          debugPrint('🏷️ Loading tags from API...');
-          final tagsList = await _tagsService.listProductTags(
-            apiVersion: finalApiVersion,
-            hideEmpty: true,
-            perPage: 100,
-          );
-          tags = tagsList
-              .map(
-                (tag) => FilterTagModel(
-                  id: tag.id ?? 0,
-                  name: tag.name ?? '',
-                  slug: tag.slug ?? '',
-                  count: tag.count,
-                ),
-              )
-              .toList();
-          debugPrint('✅ Loaded ${tags.length} tags from API');
-        } catch (e) {
-          debugPrint('❌ Error loading tags: $e');
-        }
-      } else {
-        tags = filterOptionsResponse.tags;
-        debugPrint(
-          '✅ Using tags from getFilterOptions API: ${tags?.length ?? 0}',
-        );
-      }
-
-      // Load attributes if not available in filterOptionsResponse
-      if (filterOptionsResponse == null ||
-          filterOptionsResponse.availableAttributes == null ||
-          filterOptionsResponse.availableAttributes!.isEmpty) {
-        try {
-          debugPrint('🎨 Loading attributes from API...');
-          final attributesList = await _attributesService.listProductAttributes(
-            apiVersion: finalApiVersion,
-            hideEmpty: true,
-            perPage: 100,
-          );
-          debugPrint(
-            '📋 Found ${attributesList.length} attributes, loading terms...',
-          );
-
-          // Load terms for each attribute
-          final attributesWithTerms = <FilterAttributeModel>[];
-          for (final attr in attributesList) {
-            try {
-              debugPrint(
-                '  🔍 Loading terms for attribute: ${attr.name} (ID: ${attr.id})',
-              );
-              final termsList = await _attributeTermsService
-                  .listProductAttributeTerms(
-                    apiVersion: finalApiVersion,
-                    attributeId: attr.id ?? 0,
-                    hideEmpty: true,
-                    perPage: 100,
-                  );
-              debugPrint(
-                '  ✅ Loaded ${termsList.length} terms for attribute ${attr.name}',
-              );
-              attributesWithTerms.add(
-                FilterAttributeModel(
-                  id: attr.id ?? 0,
-                  name: attr.name ?? '',
-                  slug: attr.taxonomy ?? '',
-                  terms: termsList
-                      .map(
-                        (term) => FilterTermModel(
-                          id: term.id ?? 0,
-                          name: term.name ?? '',
-                          slug: term.slug ?? '',
-                          count: term.count,
-                        ),
-                      )
-                      .toList(),
-                ),
-              );
-            } catch (e) {
-              debugPrint(
-                '❌ Error loading terms for attribute ${attr.id} (${attr.name}): $e',
-              );
-            }
-          }
-          attributes = attributesWithTerms;
-          debugPrint(
-            '✅ Loaded ${attributes.length} attributes with terms from API',
-          );
-        } catch (e) {
-          debugPrint('❌ Error loading attributes: $e');
-        }
-      } else {
-        attributes = filterOptionsResponse.availableAttributes;
-        debugPrint(
-          '✅ Using attributes from getFilterOptions API: ${attributes?.length ?? 0}',
-        );
-      }
-
-      // Build final filter options response
-      // IMPORTANT: Only use real data from API - NO MOCK DATA
-      if (filterOptionsResponse != null) {
-        // We have a response from getFilterOptions API
-        _filterOptions = GetFilterOptionsResponseModel(
-          sortOptions: filterOptionsResponse.sortOptions,
-          stockStatuses: filterOptionsResponse.stockStatuses,
-          priceRange: filterOptionsResponse.priceRange,
-          categories: categories ?? filterOptionsResponse.categories,
-          tags: tags ?? filterOptionsResponse.tags,
-          availableAttributes:
-              attributes ?? filterOptionsResponse.availableAttributes,
-        );
-      } else {
-        // getFilterOptions API failed or doesn't exist
-        // Create filter options from individual API data with default sort/stock/price range
-        // This is acceptable because sort options and stock statuses are standard in WooCommerce
-        debugPrint(
-          '⚠️ getFilterOptions API not available, creating filter options from individual APIs',
-        );
-
-        // Create filter options with default/standard values for sort, stock, and price
-        // These are standard WooCommerce values that work with the Store API
-        _filterOptions = GetFilterOptionsResponseModel(
-          sortOptions: const [
-            SortOptionModel(
-              key: 'date',
-              label: 'Date',
-              orders: [
-                OrderOptionModel(key: 'desc', label: 'Newest'),
-                OrderOptionModel(key: 'asc', label: 'Oldest'),
-              ],
-            ),
-            SortOptionModel(
-              key: 'price',
-              label: 'Price',
-              orders: [
-                OrderOptionModel(key: 'asc', label: 'Low to High'),
-                OrderOptionModel(key: 'desc', label: 'High to Low'),
-              ],
-            ),
-            SortOptionModel(
-              key: 'title',
-              label: 'Name',
-              orders: [
-                OrderOptionModel(key: 'asc', label: 'A to Z'),
-                OrderOptionModel(key: 'desc', label: 'Z to A'),
-              ],
-            ),
-            SortOptionModel(
-              key: 'popularity',
-              label: 'Popularity',
-              orders: [
-                OrderOptionModel(key: 'desc', label: 'Most Popular'),
-                OrderOptionModel(key: 'asc', label: 'Least Popular'),
-              ],
-            ),
-            SortOptionModel(
-              key: 'rating',
-              label: 'Rating',
-              orders: [
-                OrderOptionModel(key: 'desc', label: 'Highest Rated'),
-                OrderOptionModel(key: 'asc', label: 'Lowest Rated'),
-              ],
-            ),
-          ],
-          stockStatuses: const [
-            StockStatusModel(key: 'instock', label: 'In stock', enabled: true),
-            StockStatusModel(
-              key: 'outofstock',
-              label: 'Out of stock',
-              enabled: true,
-            ),
-            StockStatusModel(
-              key: 'onbackorder',
-              label: 'On backorder',
-              enabled: true,
-            ),
-          ],
-          priceRange: const PriceRangeModel(
-            minPrice: 0.0,
-            maxPrice: 999999.99,
-            currency: 'USD',
-            currencySymbol: '\$',
-            currencyMinorUnit: 2,
-          ),
-          categories: categories,
-          tags: tags,
-          availableAttributes: attributes,
-        );
-
-        debugPrint(
-          '✅ Created filter options from individual APIs with default sort/stock/price',
-        );
-      }
-
-      // Validate we have at least some filter options
-      if (_filterOptions == null) {
-        debugPrint('❌ No filter data available from API');
-        _emitFilterOptionsError('No filter options available from API');
-        return;
-      }
-
-      debugPrint('✅ Final filter options:');
-      debugPrint('   - Categories: ${_filterOptions!.categories?.length ?? 0}');
-      debugPrint('   - Tags: ${_filterOptions!.tags?.length ?? 0}');
-      debugPrint(
-        '   - Attributes: ${_filterOptions!.availableAttributes?.length ?? 0}',
-      );
-
-      // Emit success state with filter options
-      _emitFilterOptionsLoaded();
-    } catch (e, stackTrace) {
-      debugPrint('❌ ProductListViewModel: Error loading filter options: $e');
-      debugPrint('❌ Stack trace: $stackTrace');
-      _emitFilterOptionsError(_getErrorMessage(e));
-    } finally {
-      _isLoadingFilterOptions = false;
-    }
-  }
-
-  /// Helper method to emit filter options loading state
-  void _emitFilterOptionsLoading() {
-    final currentState = state;
-    emit(
-      ProductListFilterOptionsLoadingState(
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        filterOptions: currentState.filterOptions,
-        isLoadingProducts: currentState.isLoadingProducts,
-        productsError: currentState.productsError,
-      ),
-    );
-  }
-
-  /// Helper method to emit filter options loaded state
-  void _emitFilterOptionsLoaded() {
-    final currentState = state;
-    emit(
-      ProductListFilterOptionsLoadedState(
-        filterOptions: _filterOptions!,
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        isLoadingProducts: currentState.isLoadingProducts,
-        productsError: currentState.productsError,
-      ),
-    );
-  }
-
-  /// Helper method to emit filter options error state
-  void _emitFilterOptionsError(String message) {
-    final currentState = state;
-    emit(
-      ProductListFilterOptionsErrorState(
-        message: message,
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        filterOptions: currentState.filterOptions,
-        isLoadingProducts: currentState.isLoadingProducts,
-        productsError: currentState.productsError,
-      ),
-    );
-  }
 
   /// Helper method to emit products loading state
   void _emitProductsLoading() {
-    final currentState = state;
     emit(
       ProductListLoadingState(
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        filterOptions: currentState.filterOptions,
-        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
-        filterOptionsError: currentState.filterOptionsError,
+        products: state.products,
+        hasMore: state.hasMore,
+        currentPage: state.currentPage,
+        totalPages: state.totalPages,
       ),
     );
   }
 
   /// Helper method to emit products loaded state
   void _emitProductsLoaded() {
-    final currentState = state;
     emit(
       ProductListLoadedState(
         products: _allProducts,
         hasMore: _allProducts.length >= _perPage,
         currentPage: _currentPage,
         totalPages: _totalPages,
-        filterOptions: currentState.filterOptions ?? _filterOptions,
-        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
-        filterOptionsError: currentState.filterOptionsError,
       ),
     );
   }
 
   /// Helper method to emit products error state
   void _emitProductsError(String message) {
-    final currentState = state;
     emit(
       ProductListErrorState(
         message: message,
-        products: currentState.products,
-        hasMore: currentState.hasMore,
-        currentPage: currentState.currentPage,
-        totalPages: currentState.totalPages,
-        filterOptions: currentState.filterOptions,
-        isLoadingFilterOptions: currentState.isLoadingFilterOptions,
-        filterOptionsError: currentState.filterOptionsError,
+        products: state.products,
+        hasMore: state.hasMore,
+        currentPage: state.currentPage,
+        totalPages: state.totalPages,
       ),
     );
   }
@@ -726,12 +350,10 @@ class ProductListViewModel
       String? minPrice;
       String? maxPrice;
 
-      // Get currency info from first product or filter options to determine format
+      // Get currency info from first product to determine format
       int? currencyMinorUnit;
       if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
         currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
-      } else if (_filterOptions?.priceRange != null) {
-        currencyMinorUnit = _filterOptions!.priceRange.currencyMinorUnit;
       }
 
       if (_filters.minPrice != null && _filters.minPrice!.isNotEmpty) {
@@ -767,74 +389,19 @@ class ProductListViewModel
 
       // Get first attribute and term for API (API supports single attribute/term)
       // WooCommerce Store API only supports filtering by one attribute and one term at a time
-      // IMPORTANT: WooCommerce Store API expects attribute as taxonomy slug (e.g., "pa_color") not ID
       String? attributeId;
       String? attributeTermId;
       if (_filters.selectedAttributes != null &&
           _filters.selectedAttributes!.isNotEmpty) {
         final firstAttribute = _filters.selectedAttributes!.entries.first;
         final selectedAttributeId = firstAttribute.key;
-
-        // Find the attribute in filter options to get its slug/taxonomy
-        if (_filterOptions?.availableAttributes != null) {
-          try {
-            final matchingAttribute = _filterOptions!.availableAttributes!
-                .firstWhere((attr) => attr.id == selectedAttributeId);
-
-            // Use attribute slug (taxonomy) instead of ID for API
-            // WooCommerce Store API expects taxonomy like "pa_color" or "pa_size"
-            attributeId = matchingAttribute.slug;
-
-            if (firstAttribute.value.isNotEmpty) {
-              // Find the term to verify it exists
-              final selectedTermId = firstAttribute.value.first;
-              final matchingTerm = matchingAttribute.terms.firstWhere(
-                (term) => term.id == selectedTermId,
-                orElse: () => throw StateError(
-                  'Term ID $selectedTermId not found in attribute ${matchingAttribute.name}',
-                ),
-              );
-              // WooCommerce Store API expects term as ID (string), not slug
-              // Use term ID as string for API compatibility
-              attributeTermId = matchingTerm.id.toString();
-
-              debugPrint(
-                '🔍 Attribute filter: Found ${_filters.selectedAttributes!.length} attributes',
-              );
-              debugPrint(
-                '  - Selected attribute: ${matchingAttribute.name} (ID: ${matchingAttribute.id}, Slug: ${matchingAttribute.slug})',
-              );
-              debugPrint(
-                '  - Selected term: ${matchingTerm.name} (ID: ${matchingTerm.id})',
-              );
-              debugPrint('  - Using attribute slug for API: $attributeId');
-              debugPrint('  - Using term ID for API: $attributeTermId');
-            }
-          } catch (e) {
-            debugPrint('❌ Error finding attribute/term in filter options: $e');
-            debugPrint('  - Selected attribute ID: $selectedAttributeId');
-            debugPrint(
-              '  - Available attributes: ${_filterOptions!.availableAttributes!.map((a) => '${a.name} (ID: ${a.id}, Slug: ${a.slug})').join(', ')}',
-            );
-            // Fallback: use ID as string (might not work but worth trying)
-            attributeId = selectedAttributeId.toString();
-            if (firstAttribute.value.isNotEmpty) {
-              attributeTermId = firstAttribute.value.first.toString();
-            }
-            debugPrint(
-              '  - ⚠️ Fallback: Using attribute ID as string: $attributeId',
-            );
-          }
-        } else {
-          // No filter options available, use ID as fallback
-          attributeId = selectedAttributeId.toString();
-          if (firstAttribute.value.isNotEmpty) {
-            attributeTermId = firstAttribute.value.first.toString();
-          }
-          debugPrint(
-            '⚠️ No filter options available, using attribute ID as fallback: $attributeId',
-          );
+        
+        // Use ID as fallback since we don't have filter options
+        attributeId = selectedAttributeId.toString();
+        if (firstAttribute.value.isNotEmpty) {
+          attributeTermId = firstAttribute.value.first.toString();
         }
+        debugPrint('🔍 Attribute filter: Using attribute ID $attributeId with term $attributeTermId');
       } else {
         debugPrint('🔍 Attribute filter: No attributes selected');
       }
@@ -965,30 +532,15 @@ class ProductListViewModel
 
   /// Initialize filter dialog - sets temp filters and controllers
   void initFilterDialog() {
-    if (!_dialogInitialized && !_isLoadingFilterOptions) {
+    if (!_dialogInitialized) {
       debugPrint('🔧 initFilterDialog called - initializing...');
-
-      // Always load filter options when dialog opens to ensure fresh data
-      // Only load if not already loading and not already loaded
-      if (_filterOptions == null && !_isLoadingFilterOptions) {
-        debugPrint('🔧 Loading filter options...');
-        loadFilterOptions();
-      } else {
-        debugPrint('⏳ Filter options already loaded or loading...');
-      }
-
       _tempFilters = _filters;
       _minPriceController.text = _filters.minPrice ?? '';
       _maxPriceController.text = _filters.maxPrice ?? '';
       _dialogInitialized = true;
-
-      // Don't emit state here - it causes infinite rebuild loop
-      // State will be updated when loadFilterOptions completes
       debugPrint('✅ Filter dialog initialized');
     } else {
-      debugPrint(
-        '🚫 initFilterDialog already initialized or loading, skipping... (initialized: $_dialogInitialized, loading: $_isLoadingFilterOptions)',
-      );
+      debugPrint('🚫 initFilterDialog already initialized, skipping...');
     }
   }
 
@@ -1044,35 +596,7 @@ class ProductListViewModel
     );
 
     // Emit current state to trigger rebuild in filter dialog
-    final currentState = state;
-    // Preserve current state structure
-    if (currentState is ProductListLoadedState) {
-      emit(
-        ProductListLoadedState(
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          filterOptions: currentState.filterOptions ?? _filterOptions,
-          isLoadingFilterOptions: currentState.isLoadingFilterOptions,
-          filterOptionsError: currentState.filterOptionsError,
-        ),
-      );
-    } else if (currentState is ProductListFilterOptionsLoadedState) {
-      emit(
-        ProductListFilterOptionsLoadedState(
-          filterOptions: currentState.filterOptions ?? _filterOptions!,
-          products: currentState.products,
-          hasMore: currentState.hasMore,
-          currentPage: currentState.currentPage,
-          totalPages: currentState.totalPages,
-          isLoadingProducts: currentState.isLoadingProducts,
-          productsError: currentState.productsError,
-        ),
-      );
-    } else {
-      emit(currentState);
-    }
+    emit(state);
   }
 
   /// Clean price string for API - uses PriceInfoCurrencyHelper for consistent parsing
@@ -1095,10 +619,6 @@ class ProductListViewModel
       currencyDecimalSeparator = productPrices.currencyDecimalSeparator;
       currencyThousandSeparator = productPrices.currencyThousandSeparator;
       finalCurrencyMinorUnit ??= productPrices.currencyMinorUnit;
-    } else if (_filterOptions?.priceRange != null) {
-      final priceRange = _filterOptions!.priceRange;
-      currencyCode = priceRange.currency?.toLowerCase();
-      finalCurrencyMinorUnit ??= priceRange.currencyMinorUnit;
     }
 
     finalCurrencyMinorUnit ??= 2;
@@ -1139,8 +659,6 @@ class ProductListViewModel
     int? currencyMinorUnit;
     if (_allProducts.isNotEmpty && _allProducts.first.prices != null) {
       currencyMinorUnit = _allProducts.first.prices!.currencyMinorUnit;
-    } else if (_filterOptions?.priceRange != null) {
-      currencyMinorUnit = _filterOptions!.priceRange.currencyMinorUnit;
     }
 
     // Clean price values for API

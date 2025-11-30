@@ -6,9 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
-import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 
 class PriceRangeFilterWidget extends StatelessWidget {
   final ProductListViewModel viewModel;
@@ -20,76 +18,34 @@ class PriceRangeFilterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProductListViewModel, ProductListState>(
-      bloc: viewModel,
-      builder: (context, state) {
-        // Get filterOptions from any state that has it
-        final filterOptions = state.filterOptions;
-
-        final priceRange = filterOptions?.priceRange;
-        final currencyCode = priceRange?.currency?.toLowerCase() ?? 'usd';
-        final currencyMinorUnit = priceRange?.currencyMinorUnit ?? 2;
-
-        String? minPriceHint;
-        String? maxPriceHint;
-        
-        if (priceRange != null) {
-          minPriceHint = PriceInfoCurrencyHelper.formatPrice(
-            priceRange.minPrice,
-            currencyCode: currencyCode,
-            decimalPlaces: currencyMinorUnit,
-            removeTrailingZeros: true,
-          );
-          maxPriceHint = PriceInfoCurrencyHelper.formatPrice(
-            priceRange.maxPrice,
-            currencyCode: currencyCode,
-            decimalPlaces: currencyMinorUnit,
-            removeTrailingZeros: true,
-          );
-        }
-
-        return OsmeaComponents.column(
+    return OsmeaComponents.column(
+      children: [
+        OsmeaComponents.row(
           children: [
-            if (priceRange != null) ...[
-              OsmeaComponents.padding(
-                padding: EdgeInsets.only(bottom: context.spacing8),
-                child: OsmeaComponents.text(
-                  'Range: $minPriceHint - $maxPriceHint',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.pewter,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+            Expanded(
+              child: _PriceInputWidget(
+                label: 'Min price',
+                controller: viewModel.minPriceController,
+                onChanged: (value) {
+                  viewModel.updateTempFilter(minPrice: value);
+                },
+                placeholder: 'Min',
               ),
-            ],
-            OsmeaComponents.row(
-              children: [
-                Expanded(
-                  child: _PriceInputWidget(
-                    label: 'Min price',
-                    controller: viewModel.minPriceController,
-                    onChanged: (value) {
-                      viewModel.updateTempFilter(minPrice: value);
-                    },
-                    placeholder: minPriceHint,
-                  ),
-                ),
-                OsmeaComponents.sizedBox(width: context.spacing12),
-                Expanded(
-                  child: _PriceInputWidget(
-                    label: 'Max price',
-                    controller: viewModel.maxPriceController,
-                    onChanged: (value) {
-                      viewModel.updateTempFilter(maxPrice: value);
-                    },
-                    placeholder: maxPriceHint,
-                  ),
-                ),
-              ],
+            ),
+            OsmeaComponents.sizedBox(width: context.spacing12),
+            Expanded(
+              child: _PriceInputWidget(
+                label: 'Max price',
+                controller: viewModel.maxPriceController,
+                onChanged: (value) {
+                  viewModel.updateTempFilter(maxPrice: value);
+                },
+                placeholder: 'Max',
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }
