@@ -1,4 +1,17 @@
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/freezed_model/response/list_product_attributes_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/freezed_model/response/list_product_attribute_terms_response_model.dart';
+
+/// Model to hold attribute with its terms
+class AttributeWithTerms {
+  final ListProductAttributesResponseModel attribute;
+  final List<ListProductAttributeTermsResponseModel> terms;
+
+  const AttributeWithTerms({
+    required this.attribute,
+    required this.terms,
+  });
+}
 
 /// Base state for product list
 abstract class ProductListState {
@@ -22,6 +35,9 @@ abstract class ProductListState {
   /// Error message for filter options loading (null if no error)
   final String? filterOptionsError;
 
+  /// Attributes with their terms for filtering
+  final List<AttributeWithTerms> attributesWithTerms;
+
   const ProductListState({
     this.products = const [],
     this.hasMore = false,
@@ -31,6 +47,7 @@ abstract class ProductListState {
     this.isLoadingFilterOptions = false,
     this.productsError,
     this.filterOptionsError,
+    this.attributesWithTerms = const [],
   });
 }
 
@@ -48,6 +65,7 @@ class ProductListLoadingState extends ProductListState {
     super.totalPages,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
+    super.attributesWithTerms,
   }) : super(isLoadingProducts: true);
 }
 
@@ -60,6 +78,7 @@ class ProductListLoadedState extends ProductListState {
     required super.totalPages,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
+    super.attributesWithTerms,
   }) : super(isLoadingProducts: false);
 }
 
@@ -75,6 +94,7 @@ class ProductListErrorState extends ProductListState {
     super.totalPages,
     super.isLoadingFilterOptions,
     super.filterOptionsError,
+    super.attributesWithTerms,
   }) : super(isLoadingProducts: false, productsError: message);
 }
 
@@ -87,6 +107,7 @@ class ProductListFilterOptionsLoadingState extends ProductListState {
     super.totalPages,
     super.isLoadingProducts,
     super.productsError,
+    super.attributesWithTerms,
   }) : super(isLoadingFilterOptions: true);
 }
 
@@ -99,6 +120,7 @@ class ProductListFilterOptionsLoadedState extends ProductListState {
     super.totalPages,
     super.isLoadingProducts,
     super.productsError,
+    super.attributesWithTerms,
   }) : super(isLoadingFilterOptions: false);
 }
 
@@ -114,5 +136,6 @@ class ProductListFilterOptionsErrorState extends ProductListState {
     super.totalPages,
     super.isLoadingProducts,
     super.productsError,
+    super.attributesWithTerms,
   }) : super(isLoadingFilterOptions: false, filterOptionsError: message);
 }

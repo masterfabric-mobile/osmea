@@ -5,7 +5,8 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
-
+import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api/abstract/store_product_attributes_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
 
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
@@ -163,6 +164,10 @@ class ProductListViewModel
   ProductListViewModel() : super(ProductListInitialState());
 
   final ProductService _productService = GetIt.I<ProductService>();
+  final StoreProductAttributesService _attributesService =
+      GetIt.I<StoreProductAttributesService>();
+  final StoreProductAttributeTermsService _attributeTermsService =
+      GetIt.I<StoreProductAttributeTermsService>();
   final core.AssetConfigHelper _config = core.AssetConfigHelper();
 
   // Optional route/view arguments holder
@@ -205,6 +210,9 @@ class ProductListViewModel
   final int _perPage =
       50; // Increased from default to accommodate client-side filtering
   List<ListAllProductsResponseModel> _allProducts = [];
+
+  // Attributes with terms for filtering
+  List<AttributeWithTerms> _attributesWithTerms = [];
 
 
 
@@ -272,6 +280,7 @@ class ProductListViewModel
         hasMore: state.hasMore,
         currentPage: state.currentPage,
         totalPages: state.totalPages,
+        attributesWithTerms: state.attributesWithTerms,
       ),
     );
   }
@@ -284,6 +293,7 @@ class ProductListViewModel
         hasMore: _allProducts.length >= _perPage,
         currentPage: _currentPage,
         totalPages: _totalPages,
+        attributesWithTerms: state.attributesWithTerms,
       ),
     );
   }
@@ -297,6 +307,7 @@ class ProductListViewModel
         hasMore: state.hasMore,
         currentPage: state.currentPage,
         totalPages: state.totalPages,
+        attributesWithTerms: state.attributesWithTerms,
       ),
     );
   }
@@ -389,6 +400,7 @@ class ProductListViewModel
 
       // Get first attribute and term for API (API supports single attribute/term)
       // WooCommerce Store API only supports filtering by one attribute and one term at a time
+      // We need to use taxonomy name for attribute, not ID
       String? attributeId;
       String? attributeTermId;
       if (_filters.selectedAttributes != null &&
@@ -396,12 +408,30 @@ class ProductListViewModel
         final firstAttribute = _filters.selectedAttributes!.entries.first;
         final selectedAttributeId = firstAttribute.key;
         
-        // Use ID as fallback since we don't have filter options
-        attributeId = selectedAttributeId.toString();
-        if (firstAttribute.value.isNotEmpty) {
-          attributeTermId = firstAttribute.value.first.toString();
+        // Find the attribute from loaded attributes to get its taxonomy
+        AttributeWithTerms? attributeWithTerms;
+        try {
+          attributeWithTerms = _attributesWithTerms.firstWhere(
+            (attr) => attr.attribute.id == selectedAttributeId,
+          );
+        } catch (e) {
+          debugPrint(
+            '⚠️ Attribute $selectedAttributeId not found in loaded attributes, using ID as fallback',
+          );
         }
-        debugPrint('🔍 Attribute filter: Using attribute ID $attributeId with term $attributeTermId');
+        
+        // Use taxonomy if available, otherwise fall back to ID as string
+        attributeId = attributeWithTerms?.attribute.taxonomy ??
+            selectedAttributeId.toString();
+        
+        if (firstAttribute.value.isNotEmpty) {
+          final selectedTermId = firstAttribute.value.first;
+          // Find the term to get its ID (already have it, but ensure it's correct)
+          attributeTermId = selectedTermId.toString();
+        }
+        debugPrint(
+          '🔍 Attribute filter: Using attribute taxonomy/ID "$attributeId" with term $attributeTermId',
+        );
       } else {
         debugPrint('🔍 Attribute filter: No attributes selected');
       }
@@ -529,6 +559,9 @@ class ProductListViewModel
 
   // Track if dialog is initialized to prevent multiple initializations
   bool _dialogInitialized = false;
+  // Track if attributes are being loaded to prevent multiple loads
+  bool _isLoadingAttributes = false;
+  bool _attributesLoaded = false;
 
   /// Initialize filter dialog - sets temp filters and controllers
   void initFilterDialog() {
@@ -539,8 +572,168 @@ class ProductListViewModel
       _maxPriceController.text = _filters.maxPrice ?? '';
       _dialogInitialized = true;
       debugPrint('✅ Filter dialog initialized');
+      // Load attributes if not already loaded
+      if (!_attributesLoaded && !_isLoadingAttributes) {
+        loadAttributes();
+      }
     } else {
       debugPrint('🚫 initFilterDialog already initialized, skipping...');
+    }
+  }
+
+  /// Load attributes and their terms for filtering
+  Future<void> loadAttributes() async {
+    // Prevent multiple concurrent loads
+    if (_isLoadingAttributes) {
+      debugPrint('🚫 loadAttributes already in progress, skipping...');
+      return;
+    }
+
+    // If already loaded, skip
+    if (_attributesLoaded && _attributesWithTerms.isNotEmpty) {
+      debugPrint('✅ Attributes already loaded, skipping...');
+      return;
+    }
+
+    try {
+      _isLoadingAttributes = true;
+      debugPrint('🔍 Loading attributes...');
+      
+      // Emit loading state only if we have products loaded
+      final currentState = state;
+      if (currentState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            isLoadingFilterOptions: true,
+          ),
+        );
+      } else {
+        emit(
+          ProductListFilterOptionsLoadingState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+          ),
+        );
+      }
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
+      // Load all attributes
+      final attributes = await _attributesService.listProductAttributes(
+        apiVersion: apiVersion,
+        perPage: 100,
+        hideEmpty: true,
+      );
+
+      debugPrint('✅ Loaded ${attributes.length} attributes');
+
+      // Load terms for each attribute
+      final List<AttributeWithTerms> attributesWithTermsList = [];
+      for (final attribute in attributes) {
+        if (attribute.id != null) {
+          try {
+            final terms = await _attributeTermsService.listProductAttributeTerms(
+              apiVersion: apiVersion,
+              attributeId: attribute.id!,
+              perPage: 100,
+              hideEmpty: true,
+            );
+            attributesWithTermsList.add(
+              AttributeWithTerms(
+                attribute: attribute,
+                terms: terms,
+              ),
+            );
+            debugPrint(
+              '✅ Loaded ${terms.length} terms for attribute: ${attribute.name}',
+            );
+          } catch (e) {
+            debugPrint(
+              '⚠️ Failed to load terms for attribute ${attribute.id}: $e',
+            );
+            // Add attribute without terms if loading fails
+            attributesWithTermsList.add(
+              AttributeWithTerms(
+                attribute: attribute,
+                terms: [],
+              ),
+            );
+          }
+        }
+      }
+
+      _attributesWithTerms = attributesWithTermsList;
+      _attributesLoaded = true;
+
+      // Emit loaded state - preserve products state
+      final updatedState = state;
+      if (updatedState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: updatedState.products,
+            hasMore: updatedState.hasMore,
+            currentPage: updatedState.currentPage,
+            totalPages: updatedState.totalPages,
+            attributesWithTerms: _attributesWithTerms,
+            isLoadingFilterOptions: false,
+          ),
+        );
+      } else {
+        emit(
+          ProductListFilterOptionsLoadedState(
+            products: updatedState.products,
+            hasMore: updatedState.hasMore,
+            currentPage: updatedState.currentPage,
+            totalPages: updatedState.totalPages,
+            attributesWithTerms: _attributesWithTerms,
+          ),
+        );
+      }
+
+      debugPrint('✅ Attributes loaded successfully');
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error loading attributes: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      
+      // Emit error state - preserve products state
+      final currentState = state;
+      if (currentState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            isLoadingFilterOptions: false,
+            filterOptionsError: 'Failed to load attributes: ${_getErrorMessage(e)}',
+          ),
+        );
+      } else {
+        emit(
+          ProductListFilterOptionsErrorState(
+            message: 'Failed to load attributes: ${_getErrorMessage(e)}',
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+          ),
+        );
+      }
+    } finally {
+      _isLoadingAttributes = false;
     }
   }
 
@@ -596,7 +789,32 @@ class ProductListViewModel
     );
 
     // Emit current state to trigger rebuild in filter dialog
-    emit(state);
+    // Preserve products and other state while updating filter options
+    final currentState = state;
+    if (currentState is ProductListLoadedState) {
+      emit(
+        ProductListLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          attributesWithTerms: currentState.attributesWithTerms,
+        ),
+      );
+    } else if (currentState is ProductListFilterOptionsLoadedState) {
+      emit(
+        ProductListFilterOptionsLoadedState(
+          products: currentState.products,
+          hasMore: currentState.hasMore,
+          currentPage: currentState.currentPage,
+          totalPages: currentState.totalPages,
+          attributesWithTerms: currentState.attributesWithTerms,
+        ),
+      );
+    } else {
+      // Fallback: emit current state as-is
+      emit(currentState);
+    }
   }
 
   /// Clean price string for API - uses PriceInfoCurrencyHelper for consistent parsing

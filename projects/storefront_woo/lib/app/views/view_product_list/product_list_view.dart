@@ -38,7 +38,8 @@ class ProductListView
     viewModel.setArguments(arguments);
     debugPrint('🚀 Calling loadProducts(refresh: true)');
     viewModel.loadProducts(refresh: true);
-    // Filter options will be loaded when filter dialog is opened (in initFilterDialog)
+    // Load attributes early so they're available when filter dialog opens
+    viewModel.loadAttributes();
     debugPrint('🚀 loadProducts call completed');
   }
 
