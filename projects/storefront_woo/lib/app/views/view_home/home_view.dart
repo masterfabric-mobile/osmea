@@ -56,48 +56,35 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     if (state is HomeAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         debugPrint('🔒 Auth required, navigating to auth screen');
-        context.snackbarWarning(
-          state.message,
-          duration: context.durationLong,
-        );
+        context.snackbarWarning(state.message, duration: context.durationLong);
         // Reset to loading state to prevent infinite loop
         viewModel.restart();
         // Navigate to auth
         context.push('/auth');
       });
-      // Show LoadingView while navigating
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.authentication,
-        loadingSteps: ['Redirecting to sign in...'],
-        stepDuration: context.durationMedium,
-        showProgress: false,
-      );
+      // Show simple loading indicator while navigating
+      return const Center(child: CircularProgressIndicator());
     }
 
-    // Build content based on state - using LoadingView
+    // Build content based on state - using simple loading indicator
     if (state is HomeErrorState) {
       return buildError(state.message, onRetry: () => viewModel.loadProducts());
     }
 
     if (state is HomeLoadingState) {
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        stepDuration: context.durationSlow,
-        showCancelButton: false,
-      );
+      // Use simple loading indicator instead of LoadingView to prevent blocking
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state is HomeLoadedState) {
-      return HomeContentWidget(state: state, viewModel: viewModel);
+      // Use RepaintBoundary and lazy loading to prevent blocking
+      return RepaintBoundary(
+        child: HomeContentWidget(state: state, viewModel: viewModel),
+      );
     }
 
-    // Initial state - show loading
-    return LoadingView(
-      goRoute: goRoute,
-      loadingType: LoadingModelType.initialization,
-    );
+    // Initial state - show simple loading indicator
+    return const Center(child: CircularProgressIndicator());
   }
 }
 

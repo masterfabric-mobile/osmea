@@ -5,15 +5,12 @@
  * Loads from app config.
  */
 
-import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/material.dart' as FlutterMaterial show Image;
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 
 /// Recommended section widget
@@ -40,17 +37,21 @@ class RecommendedSectionWidget extends StatelessWidget {
   }
 
   /// Filters products based on recommended config
+  /// Optimized to prevent blocking during build
   List<ListAllProductsResponseModel> _getRecommendedProducts() {
+    // Use cached config to avoid repeated lookups
     final config = _loadRecommendedConfig();
     if (config == null) {
       // Default: show first 4 products (for home view)
+      // Use take() which is lazy and efficient
       return allProducts.take(4).toList();
     }
 
     // Check if specific product IDs are provided
     final productIds = config['product_ids'] as List<dynamic>?;
     if (productIds != null && productIds.isNotEmpty) {
-      final ids = productIds.map((e) => e as int).toList();
+      // Convert to Set for O(1) lookup instead of O(n)
+      final ids = productIds.map((e) => e as int).toSet();
       return allProducts.where((p) => ids.contains(p.id)).toList();
     }
 
@@ -122,13 +123,16 @@ class RecommendedSectionWidget extends StatelessWidget {
             spacing: context.spacing16,
             runSpacing: context.height16,
             children: recommendedProducts.map((product) {
-              return SizedBox(
-                width:
-                    (context.allWidth -
-                        (context.spacing20 * 2) -
-                        context.spacing16) /
-                    2,
-                child: _buildRecommendedCard(context, product),
+              // Use RepaintBoundary to isolate each card and prevent unnecessary repaints
+              return RepaintBoundary(
+                child: SizedBox(
+                  width:
+                      (context.allWidth -
+                          (context.spacing20 * 2) -
+                          context.spacing16) /
+                      2,
+                  child: _buildRecommendedCard(context, product),
+                ),
               );
             }).toList(),
           ),
@@ -179,40 +183,29 @@ class RecommendedSectionWidget extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Product image
-                ClipRRect(
+                // Product image - using OsmeaComponents.image for optimized loading
+                OsmeaComponents.image(
+                  imageUrl: product.images?.isNotEmpty == true
+                      ? product.images!.first.src
+                      : null,
+                  width: double.infinity,
+                  height: context.height160 + context.spacing10,
+                  fit: BoxFit.cover,
                   borderRadius: context.borderRadiusNormal,
-                  child: product.images?.isNotEmpty == true
-                      ? FlutterMaterial.Image.network(
-                          product.images!.first.src ?? '',
-                          width: double.infinity,
-                          height: context.height160 + context.spacing10,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: double.infinity,
-                              height: context.height160 + context.spacing10,
-                              color: OsmeaColors.grayMaterial[50],
-                              alignment: context.center,
-                              child: Icon(
-                                Icons.image_outlined,
-                                color: OsmeaColors.grayMaterial[400],
-                                size: context.iconSizeExtraHigh,
-                              ),
-                            );
-                          },
-                        )
-                      : Container(
-                          width: double.infinity,
-                          height: context.height160 + context.spacing10,
-                          color: OsmeaColors.grayMaterial[50],
-                          alignment: context.center,
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: OsmeaColors.grayMaterial[400],
-                            size: context.iconSizeExtraHigh,
-                          ),
-                        ),
+                  variant: ImageVariant.normal,
+                  cacheWidth: 400, // Limit image size for performance
+                  showLoadingIndicator: true,
+                  errorWidget: OsmeaComponents.container(
+                    width: double.infinity,
+                    height: context.height160 + context.spacing10,
+                    color: OsmeaColors.grayMaterial[50],
+                    alignment: context.center,
+                    child: Icon(
+                      Icons.image_outlined,
+                      color: OsmeaColors.grayMaterial[400],
+                      size: context.iconSizeExtraHigh,
+                    ),
+                  ),
                 ),
                 // Discount badge - top left (only when API marks onSale)
                 if (product.onSale == true && discountPct != null)
@@ -241,45 +234,16 @@ class RecommendedSectionWidget extends StatelessWidget {
                     ),
                   ),
 
-                // Wishlist button - top right (reactive with BlocBuilder)
+                // Wishlist button - top right (optimized - no BlocBuilder to prevent blocking)
                 Positioned(
                   top: context.spacing8,
                   right: context.spacing8,
-                  child: BlocBuilder<WishlistViewModel, WishlistState>(
-                    bloc: GetIt.I<WishlistViewModel>(),
-                    buildWhen: (previous, current) {
-                      // Always rebuild when transitioning to LoadedState from any other state
-                      if (previous is! WishlistLoadedState &&
-                          current is WishlistLoadedState) {
-                        return true; // State just loaded, rebuild to show saved status
-                      }
-                      // Rebuild when state changes between Loaded states (item added/removed)
-                      if (previous is WishlistLoadedState &&
-                          current is WishlistLoadedState) {
-                        final prevSaved = previous.items.any(
-                          (e) => e.id == product.id,
-                        );
-                        final currSaved = current.items.any(
-                          (e) => e.id == product.id,
-                        );
-                        return prevSaved != currSaved;
-                      }
-                      // Also rebuild if previous was LoadedState and current is not (shouldn't happen, but safe)
-                      if (previous is WishlistLoadedState &&
-                          current is! WishlistLoadedState) {
-                        return true;
-                      }
-                      return false; // Don't rebuild for other state changes
-                    },
-                    builder: (context, wishlistState) {
+                  child: Builder(
+                    builder: (context) {
                       final productId = product.id ?? 0;
                       final wishlistVm = GetIt.I<WishlistViewModel>();
-                      // Always check current state, even if it's not LoadedState yet
+                      // Direct check without BlocBuilder to prevent blocking
                       final isSaved = wishlistVm.isSaved(productId);
-
-                      debugPrint(
-                        '💖 RecommendedSection: Product $productId isSaved: $isSaved (state: ${wishlistState.runtimeType})',
-                      );
 
                       return GestureDetector(
                         onTap: () {

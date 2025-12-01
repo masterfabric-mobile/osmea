@@ -38,30 +38,29 @@ class ReviewItemWidget extends StatelessWidget {
             children: [
               // Avatar
               if (review.reviewerAvatarUrls?.the48 != null)
-                ClipRRect(
+                OsmeaComponents.image(
+                  imageUrl: review.reviewerAvatarUrls!.the48,
+                  width: context.width40,
+                  height: context.height40,
+                  fit: BoxFit.cover,
                   borderRadius: BorderRadius.circular(context.spacing20),
-                  child: Image.network(
-                    review.reviewerAvatarUrls!.the48!,
+                  variant: ImageVariant.normal,
+                  cacheWidth: 80, // Limit image size for performance
+                  showLoadingIndicator: true,
+                  errorWidget: Container(
                     width: context.width40,
                     height: context.height40,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: context.width40,
-                        height: context.height40,
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.grayMaterial[200],
-                          borderRadius: BorderRadius.circular(
-                            context.spacing20,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: OsmeaColors.pewter,
-                          size: context.iconSizeSmall,
-                        ),
-                      );
-                    },
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[200],
+                      borderRadius: BorderRadius.circular(
+                        context.spacing20,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      color: OsmeaColors.pewter,
+                      size: context.iconSizeSmall,
+                    ),
                   ),
                 )
               else

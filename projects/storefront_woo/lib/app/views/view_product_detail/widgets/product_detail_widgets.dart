@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
@@ -16,7 +15,6 @@ import 'package:storefront_woo/app/views/view_product_detail/widgets/product_ima
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_info_section_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 
 /// Main content widget for product detail view
 class ProductDetailContentWidget extends StatelessWidget {
@@ -35,26 +33,9 @@ class ProductDetailContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final productId = state.product.id ?? 0;
 
-    // Use BlocBuilder to reactively listen to WishlistViewModel changes
-    return BlocBuilder<WishlistViewModel, WishlistState>(
-      bloc: GetIt.I<WishlistViewModel>(),
-      buildWhen: (previous, current) {
-        // Rebuild when state changes from Initial/Loading to Loaded
-        if (previous is! WishlistLoadedState &&
-            current is WishlistLoadedState) {
-          return true; // State just loaded, rebuild to show saved status
-        }
-        // Rebuild when state changes between Loaded states (item added/removed)
-        if (previous is WishlistLoadedState && current is WishlistLoadedState) {
-          final prevSaved = previous.items.any((e) => e.id == productId);
-          final currSaved = current.items.any((e) => e.id == productId);
-          return prevSaved != currSaved;
-        }
-        return false; // Don't rebuild for other state changes
-      },
-      builder: (context, wishlistState) {
-        final wishlistVm = GetIt.I<WishlistViewModel>();
-        final isInWishlist = wishlistVm.isSaved(productId);
+    // Direct check without BlocBuilder to prevent blocking
+    final wishlistVm = GetIt.I<WishlistViewModel>();
+    final isInWishlist = wishlistVm.isSaved(productId);
 
         return Stack(
           children: [
@@ -213,7 +194,5 @@ class ProductDetailContentWidget extends StatelessWidget {
             ),
           ],
         );
-      },
-    );
   }
 }

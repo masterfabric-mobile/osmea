@@ -189,31 +189,20 @@ class CartContentWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     color: OsmeaColors.grayMaterial[50],
                   ),
-                  child: ClipRRect(
+                  child: OsmeaComponents.image(
+                    imageUrl: item.imageUrl,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(12),
-                    child: item.imageUrl != null
-                        ? Image.network(
-                            item.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return OsmeaComponents.center(
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: OsmeaColors.pewter.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                  size: 32,
-                                ),
-                              );
-                            },
-                          )
-                        : OsmeaComponents.center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: OsmeaColors.pewter.withValues(alpha: 0.5),
-                              size: 32,
-                            ),
-                          ),
+                    variant: ImageVariant.normal,
+                    cacheWidth: 200, // Limit image size for performance
+                    showLoadingIndicator: true,
+                    errorWidget: OsmeaComponents.center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: OsmeaColors.pewter.withValues(alpha: 0.5),
+                        size: 32,
+                      ),
+                    ),
                   ),
                 ),
                 OsmeaComponents.sizedBox(width: 12),
@@ -307,7 +296,10 @@ class CartContentWidget extends StatelessWidget {
 
                 // Delete Button - Text Button for better readability
                 OsmeaComponents.button(
-                  onPressed: () => viewModel.removeItemFromCart(item.productId, context: context),
+                  onPressed: () => viewModel.removeItemFromCart(
+                    item.productId,
+                    context: context,
+                  ),
                   backgroundColor: OsmeaColors.red.withValues(alpha: 0.1),
                   textColor: OsmeaColors.red,
                   padding: const EdgeInsets.symmetric(

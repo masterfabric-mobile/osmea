@@ -9,7 +9,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
@@ -17,7 +16,6 @@ import 'package:storefront_woo/app/views/view_product_list/models/product_list_v
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
@@ -390,34 +388,17 @@ class ProductListContentWidget extends StatelessWidget {
         final product = state.products[index];
         final productId = product.id ?? 0;
 
-        return BlocBuilder<WishlistViewModel, WishlistState>(
-          bloc: GetIt.I<WishlistViewModel>(),
-          buildWhen: (previous, current) {
-            if (previous is! WishlistLoadedState &&
-                current is WishlistLoadedState) {
-              return true;
-            }
-            if (previous is WishlistLoadedState &&
-                current is WishlistLoadedState) {
-              final prevSaved = previous.items.any((e) => e.id == productId);
-              final currSaved = current.items.any((e) => e.id == productId);
-              return prevSaved != currSaved;
-            }
-            return false;
-          },
-          builder: (context, wishlistState) {
-            final wishlistVm = GetIt.I<WishlistViewModel>();
-            final isSaved = wishlistVm.isSaved(productId);
+        // Direct check without BlocBuilder to prevent blocking
+        final wishlistVm = GetIt.I<WishlistViewModel>();
+        final isSaved = wishlistVm.isSaved(productId);
 
-            return ProductCardWidget(
-              product: product,
-              isSaved: isSaved,
-              onWishlistTap: () {
-                GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-              },
-              onTap: () => context.push('/product-detail/$productId'),
-            );
+        return ProductCardWidget(
+          product: product,
+          isSaved: isSaved,
+          onWishlistTap: () {
+            GetIt.I<HomeViewModel>().addProductToWishlist(productId);
           },
+          onTap: () => context.push('/product-detail/$productId'),
         );
       },
     );

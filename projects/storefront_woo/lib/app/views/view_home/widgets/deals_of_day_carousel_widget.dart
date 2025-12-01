@@ -5,8 +5,7 @@
  * Loads from app config.
  */
 
-import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/material.dart' as FlutterMaterial show Image;
+import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
@@ -52,6 +51,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     // Show an empty carousel when there are no products (as requested)
 
     // Use all discounted products for the Low Price banner carousel
+    // Optimized filtering - limit to first 3 to prevent blocking
     final discountedTop3 = saleProducts
         .where(
           (p) =>
@@ -59,6 +59,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               (p.prices?.salePrice?.isNotEmpty ?? false) &&
               p.prices?.salePrice != p.prices?.regularPrice,
         )
+        .take(3) // Limit to 3 items to prevent blocking
         .toList();
 
     // Intentionally allow empty bannerItems to render an empty carousel
@@ -193,22 +194,28 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                     .transparent, // No background/border for image box
                 borderRadius: BorderRadius.circular(context.spacing16),
               ),
-              child: OsmeaComponents.clipRRect(
+              child: OsmeaComponents.image(
+                imageUrl: product.images?.isNotEmpty == true
+                    ? product.images!.first.src
+                    : null,
+                width: context.width160,
+                height: bannerHeight,
+                fit: BoxFit.cover,
                 borderRadius: BorderRadius.circular(context.spacing16),
-                child: product.images?.isNotEmpty == true
-                    ? FlutterMaterial.Image.network(
-                        product.images!.first.src ?? '',
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: OsmeaColors.grayMaterial[50],
-                        alignment: context.center,
-                        child: Icon(
-                          Icons.image_outlined,
-                          color: OsmeaColors.grayMaterial[400],
-                          size: context.iconSizeExtraHigh,
-                        ),
-                      ),
+                variant: ImageVariant.normal,
+                cacheWidth: 400, // Limit image size for performance
+                showLoadingIndicator: true,
+                errorWidget: OsmeaComponents.container(
+                  width: context.width160,
+                  height: bannerHeight,
+                  color: OsmeaColors.grayMaterial[50],
+                  alignment: context.center,
+                  child: Icon(
+                    Icons.image_outlined,
+                    color: OsmeaColors.grayMaterial[400],
+                    size: context.iconSizeExtraHigh,
+                  ),
+                ),
               ),
             ),
             OsmeaComponents.sizedBox(width: context.spacing12),

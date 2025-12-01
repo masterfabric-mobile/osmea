@@ -77,19 +77,16 @@ class CartItemWidget extends StatelessWidget {
         borderRadius: context.borderRadiusNormal,
         color: OsmeaColors.grayMaterial[50],
       ),
-      child: OsmeaComponents.clipRRect(
+      child: OsmeaComponents.image(
+        imageUrl: item.imageUrl,
+        width: imageWidth,
+        height: imageHeight,
+        fit: BoxFit.cover,
         borderRadius: context.borderRadiusNormal,
-        child: item.imageUrl != null
-            ? Image.network(
-                item.imageUrl!,
-                fit: context.cover,
-                width: imageWidth,
-                height: imageHeight,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildImagePlaceholder(context);
-                },
-              )
-            : _buildImagePlaceholder(context),
+        variant: ImageVariant.normal,
+        cacheWidth: 200, // Limit image size for performance
+        showLoadingIndicator: true,
+        errorWidget: _buildImagePlaceholder(context),
       ),
     );
   }

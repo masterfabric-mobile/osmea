@@ -349,28 +349,27 @@ class _BrandCard extends StatelessWidget {
         children: [
           // Brand image or placeholder
           if (brand.image?.thumbnail != null || brand.image?.src != null)
-            ClipRRect(
+            OsmeaComponents.image(
+              imageUrl: brand.image?.thumbnail ?? brand.image?.src,
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                brand.image?.thumbnail ?? brand.image?.src ?? '',
+              variant: ImageVariant.normal,
+              cacheWidth: 120, // Limit image size for performance
+              showLoadingIndicator: true,
+              errorWidget: Container(
                 width: 60,
                 height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.pewter,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.branding_watermark,
-                      color: OsmeaColors.pewter,
-                      size: 30,
-                    ),
-                  );
-                },
+                decoration: BoxDecoration(
+                  color: OsmeaColors.pewter,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.branding_watermark,
+                  color: OsmeaColors.pewter,
+                  size: 30,
+                ),
               ),
             )
           else
