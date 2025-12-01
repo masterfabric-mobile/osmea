@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/views/splash/widgets/splash_startup_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_space_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_enterprise_widget.dart';
@@ -41,73 +43,64 @@ class SplashView extends MasterViewCubit<SplashCubit, SplashState> {
     // Trigger onStart callback
     onStart?.call();
 
-    // Get auto-navigation setting from config
-    final configHelper = AssetConfigHelper();
-    await configHelper.loadConfig();
-    final shouldAutoNavigate =
-        configHelper.getBool('splash_configuration.auto_navigate', true);
-
-    // Listen to state changes for navigation
-    // This ensures we navigate when the cubit determines the target
-    bool hasNavigated = false;
-
-    // Helper function to handle navigation
-    void handleNavigation(SplashState state) {
-      if (shouldAutoNavigate &&
-          state.status == SplashStatus.completed &&
-          state.navigationTarget != null &&
-          !hasNavigated) {
-        hasNavigated = true;
-        debugPrint('🧭 Navigating to: ${state.navigationTarget}');
-
-        // Trigger onComplete callback
-        onComplete?.call();
-
-        // Use postFrameCallback to ensure state is fully updated before navigation
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            goRoute(state.navigationTarget!);
-          } catch (e) {
-            debugPrint('❌ Error navigating from splash: $e');
-            // Fallback to home on error
-            goRoute('/home');
-          }
-        });
-      }
-    }
-
-    // Check initial state in case it's already completed
-    handleNavigation(viewModel.state);
-
-    // Listen to future state changes
-    viewModel.stream.listen(handleNavigation);
-
     // Initialize the splash cubit with app configuration
     // This will trigger the timer and navigation target determination
-    await viewModel.initializeSplash();
+    // Don't await to prevent blocking
+    viewModel.initializeSplash();
   }
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return FutureBuilder<SplashStyle>(
-      future: _getSplashStyleFromConfig(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+    // Get auto-navigation setting from config (synchronous access)
+    final configHelper = AssetConfigHelper();
+    final shouldAutoNavigate =
+        configHelper.getBool('splash_configuration.auto_navigate', true);
 
-        if (snapshot.hasData) {
-          // Use the splash style from config
-          return _getSplashWidget(snapshot.data!);
-        } else {
-          // Default to startup style if config not available
-          debugPrint(
-              '⚠️ Could not get splash style from config, using default');
-          return _getSplashWidget(SplashStyle.startup);
+    return BlocListener<SplashCubit, SplashState>(
+      listener: (context, state) {
+        // Handle navigation when splash completes
+        if (shouldAutoNavigate &&
+            state.status == SplashStatus.completed &&
+            state.navigationTarget != null) {
+          debugPrint('🧭 Navigating to: ${state.navigationTarget}');
+
+          // Trigger onComplete callback
+          onComplete?.call();
+
+          // Use postFrameCallback to ensure state is fully updated before navigation
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              try {
+                goRoute(state.navigationTarget!);
+              } catch (e) {
+                debugPrint('❌ Error navigating from splash: $e');
+                // Fallback to home on error
+                goRoute('/home');
+              }
+            }
+          });
         }
       },
+      child: FutureBuilder<SplashStyle>(
+        future: _getSplashStyleFromConfig(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasData) {
+            // Use the splash style from config
+            return _getSplashWidget(snapshot.data!);
+          } else {
+            // Default to startup style if config not available
+            debugPrint(
+                '⚠️ Could not get splash style from config, using default');
+            return _getSplashWidget(SplashStyle.startup);
+          }
+        },
+      ),
     );
   }
 
