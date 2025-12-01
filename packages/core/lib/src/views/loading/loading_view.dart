@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:core/src/views/loading/cubit/loading_cubit.dart';
 import 'package:core/src/views/loading/cubit/loading_state.dart';
@@ -110,23 +112,6 @@ class LoadingView extends MasterViewCubit<LoadingViewCubit, LoadingViewState> {
     // Get effective loading configuration
     final effectiveModel = _getEffectiveLoadingModel();
 
-    // Listen for loading state changes
-    viewModel.stream.listen((state) {
-      if (state.status == LoadingViewStatus.completed) {
-        onCompleted?.call();
-        if (effectiveModel.autoNavigateOnComplete &&
-            effectiveModel.targetRoute != null) {
-          // Auto navigate to target route
-          // goRoute(effectiveModel.targetRoute!);
-        }
-      } else if (state.status == LoadingViewStatus.error) {
-        final errorMsg = state.errorMessage ??
-            effectiveModel.errorMessage ??
-            'Unknown loading error';
-        onError?.call(errorMsg);
-      }
-    });
-
     // Start loading simulation based on model or fallback
     final steps = effectiveModel.loadingSteps ?? loadingSteps;
     if (steps != null && steps.isNotEmpty) {
@@ -204,32 +189,57 @@ class LoadingView extends MasterViewCubit<LoadingViewCubit, LoadingViewState> {
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return Scaffold(
-      body: SafeArea(
-        child: FutureBuilder<LoadingStyle>(
-          future: _getLoadingStyleFromConfig(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+    // Get effective loading configuration for listener
+    final effectiveModel = _getEffectiveLoadingModel();
 
-            // Get effective loading model
-            final effectiveModel = _getEffectiveLoadingModel();
+    return BlocListener<LoadingViewCubit, LoadingViewState>(
+      listener: (context, state) {
+        // Handle state changes with proper lifecycle management
+        if (state.status == LoadingViewStatus.completed) {
+          onCompleted?.call();
+          if (effectiveModel.autoNavigateOnComplete &&
+              effectiveModel.targetRoute != null) {
+            // Use postFrameCallback to ensure navigation happens after frame
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                goRoute(effectiveModel.targetRoute!);
+              }
+            });
+          }
+        } else if (state.status == LoadingViewStatus.error) {
+          final errorMsg = state.errorMessage ??
+              effectiveModel.errorMessage ??
+              'Unknown loading error';
+          onError?.call(errorMsg);
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: FutureBuilder<LoadingStyle>(
+            future: _getLoadingStyleFromConfig(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-            if (snapshot.hasData) {
-              // Use the loading style from config or model
-              return _getLoadingWidget(
-                  snapshot.data!, effectiveModel, viewModel);
-            } else {
-              // Default to startup style if config not available
-              debugPrint(
-                  '⚠️ Could not get loading style from config, using default');
-              return _getLoadingWidget(
-                  LoadingStyle.startup, effectiveModel, viewModel);
-            }
-          },
+              // Get effective loading model
+              final effectiveModel = _getEffectiveLoadingModel();
+
+              if (snapshot.hasData) {
+                // Use the loading style from config or model
+                return _getLoadingWidget(
+                    snapshot.data!, effectiveModel, viewModel);
+              } else {
+                // Default to startup style if config not available
+                debugPrint(
+                    '⚠️ Could not get loading style from config, using default');
+                return _getLoadingWidget(
+                    LoadingStyle.startup, effectiveModel, viewModel);
+              }
+            },
+          ),
         ),
       ),
     );

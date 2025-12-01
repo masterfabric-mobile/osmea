@@ -12,13 +12,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
-import 'package:core/src/views/account/cubit/account_cubit.dart';
-import 'package:core/src/views/account/cubit/account_state.dart';
-import 'package:core/src/views/account/widgets/account_widget.dart';
-import 'package:osmea_components/osmea_components.dart';
 import 'package:go_router/go_router.dart';
+import 'package:core/core.dart';
 
 /// 👤 **OSMEA Account View**
 ///
@@ -41,6 +36,9 @@ import 'package:go_router/go_router.dart';
 /// ```
 class AccountView extends MasterViewCubit<AccountCubit, AccountState>
     with AccountWidget {
+  final Function(String)? _goRouteCallback;
+  final Future<void> Function()? _onSignOutCallback;
+
   AccountView({
     super.key,
     super.arguments,
@@ -48,13 +46,23 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
     super.snackBarFunction,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
+    super.bottomNavigationBar,
     required super.goRoute,
-  }) : super(
+    Future<void> Function()? onSignOut,
+  }) : _goRouteCallback = goRoute,
+        _onSignOutCallback = onSignOut,
+        super(
           coreAppBar: (context, viewModel) =>
               _buildAccountAppBar(context, viewModel),
         ) {
     debugPrint('👤 AccountView: Constructor called');
   }
+
+  @override
+  Function(String)? get goRouteCallback => _goRouteCallback;
+
+  @override
+  Future<void> Function()? get onSignOutCallback => _onSignOutCallback;
 
   @override
   void initialContent(AccountCubit viewModel, BuildContext context) {
@@ -73,6 +81,9 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
       '👤 AccountView: viewContent called with status: ${state.status}',
     );
 
+    // Note: AuthCubit state listening should be handled by platform-specific implementations
+    // Core package should not depend on AuthCubit directly
+    // AccountCubit loads data from AuthStorageHelper, which is platform-agnostic
     return _buildBody(context, viewModel, state);
   }
 
@@ -106,12 +117,7 @@ class AccountView extends MasterViewCubit<AccountCubit, AccountState>
 
     // Ready state
     if (state.isReady) {
-      return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: buildAccountContent(context, viewModel, state),
-        ),
-      );
+      return buildAccountContent(context, viewModel, state);
     }
 
     // Initial state

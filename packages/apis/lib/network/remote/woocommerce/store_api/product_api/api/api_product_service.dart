@@ -59,6 +59,7 @@ abstract class ProductServiceClient implements ProductService {
     @Query('average_rating') double? averageRating,
     @Query('min_rating') double? minRating,
     @Query('max_rating') double? maxRating,
+    @Query('brand') String? brand,
   });
 
   /// 🔍 Get a single product by ID from WooCommerce Store API

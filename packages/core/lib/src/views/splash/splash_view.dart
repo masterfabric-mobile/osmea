@@ -1,16 +1,10 @@
-import 'package:core/core.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/base/widgets/master_scaffold_widget.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:core/src/views/splash/cubit/splash_cubit.dart';
-import 'package:core/src/views/splash/cubit/splash_state.dart';
-import 'package:core/src/models/splash_models.dart';
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/views/splash/widgets/splash_startup_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_space_widget.dart';
 import 'package:core/src/views/splash/widgets/splash_enterprise_widget.dart';
-import 'package:core/src/helper/asset_config_helper.dart';
-import 'package:core/src/views/routes.dart';
 
 /// 🚀 **OSMEA Splash View**
 ///
@@ -50,51 +44,63 @@ class SplashView extends MasterViewCubit<SplashCubit, SplashState> {
     onStart?.call();
 
     // Initialize the splash cubit with app configuration
-    await viewModel.initializeSplash();
-
-    // Get duration and navigation settings from AppConfig
-    final configHelper = AssetConfigHelper();
-    await configHelper.loadConfig();
-
-    final durationMs =
-        configHelper.getInt('splash_configuration.duration_milliseconds', 3000);
-    final shouldAutoNavigate =
-        configHelper.getBool('splash_configuration.auto_navigate', true);
-
-    // Setup auto-navigation if enabled
-    if (shouldAutoNavigate) {
-      Timer(Duration(milliseconds: durationMs), () {
-        // Trigger onComplete callback
-        onComplete?.call();
-
-        final currentState = viewModel.state;
-        final target = currentState.navigationTarget ?? '/home';
-        goRoute(target);
-      });
-    }
+    // This will trigger the timer and navigation target determination
+    // Don't await to prevent blocking
+    viewModel.initializeSplash();
   }
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return FutureBuilder<SplashStyle>(
-      future: _getSplashStyleFromConfig(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+    // Get auto-navigation setting from config (synchronous access)
+    final configHelper = AssetConfigHelper();
+    final shouldAutoNavigate =
+        configHelper.getBool('splash_configuration.auto_navigate', true);
 
-        if (snapshot.hasData) {
-          // Use the splash style from config
-          return _getSplashWidget(snapshot.data!);
-        } else {
-          // Default to startup style if config not available
-          debugPrint(
-              '⚠️ Could not get splash style from config, using default');
-          return _getSplashWidget(SplashStyle.startup);
+    return BlocListener<SplashCubit, SplashState>(
+      listener: (context, state) {
+        // Handle navigation when splash completes
+        if (shouldAutoNavigate &&
+            state.status == SplashStatus.completed &&
+            state.navigationTarget != null) {
+          debugPrint('🧭 Navigating to: ${state.navigationTarget}');
+
+          // Trigger onComplete callback
+          onComplete?.call();
+
+          // Use postFrameCallback to ensure state is fully updated before navigation
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              try {
+                goRoute(state.navigationTarget!);
+              } catch (e) {
+                debugPrint('❌ Error navigating from splash: $e');
+                // Fallback to home on error
+                goRoute('/home');
+              }
+            }
+          });
         }
       },
+      child: FutureBuilder<SplashStyle>(
+        future: _getSplashStyleFromConfig(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasData) {
+            // Use the splash style from config
+            return _getSplashWidget(snapshot.data!);
+          } else {
+            // Default to startup style if config not available
+            debugPrint(
+                '⚠️ Could not get splash style from config, using default');
+            return _getSplashWidget(SplashStyle.startup);
+          }
+        },
+      ),
     );
   }
 

@@ -1,4 +1,3 @@
-
 /// 💰 **OSMEA Currency Helper**
 ///
 /// Copyright (c) 2025, OSMEA Team
@@ -53,6 +52,8 @@
 /// String price4 = 1234.56.toCurrency(); // ₺1.234,56
 /// String price5 = 1234.56.toCurrency(currencyCode: 'eur'); // €1.234,56
 /// String price6 = 1234.56.toCurrency(decimalPlaces: 0); // ₺1.235
+/// String price7 = 1000.00.toCurrency(currencyCode: 'gbp'); // £1,000.00
+/// String price8 = 1000.00.toCurrency(currencyCode: 'gbp', removeTrailingZeros: true); // £1,000
 ///
 /// // Parse formatted prices back to numbers
 /// double? amount1 = CurrencyHelper.parsePriceToDouble('₺1.234,56'); // 1234.56
@@ -81,7 +82,7 @@ class PriceInfoCurrencyHelper {
   // ============================================================================
 
   static String? _currentCurrencyCode;
-  
+
   /// 🌍 **Set Global Currency**
   ///
   /// Sets the current currency code for the application.
@@ -90,7 +91,7 @@ class PriceInfoCurrencyHelper {
   static void setCurrency(String currencyCode) {
     _currentCurrencyCode = currencyCode.toLowerCase();
   }
-  
+
   /// 🌍 **Get Current Currency**
   ///
   /// Returns the currently set currency code, defaults to Turkish Lira.
@@ -101,7 +102,7 @@ class PriceInfoCurrencyHelper {
   // ============================================================================
   // ⚙️ CURRENCY CONFIGURATION MAP
   // ============================================================================
-  
+
   /// ⚙️ **Currency Configuration Database**
   ///
   /// Comprehensive configuration for all supported currencies including:
@@ -207,39 +208,54 @@ class PriceInfoCurrencyHelper {
   /// **Parameters:**
   /// - `amount`: Numeric value to format (int, double, or string)
   /// - `currencyCode`: Override currency (optional, uses current if not specified)
+  /// - `currencyDecimalSeparator`: Decimal separator from API (e.g., ".", ",") - overrides currency config
+  /// - `currencyThousandSeparator`: Thousand separator from API (e.g., ",", ".", " ") - overrides currency config
   /// - `useAlternateUnit`: Use alternate unit instead of symbol (TL instead of ₺)
   /// - `decimalPlaces`: Number of decimal places (default: 2)
+  /// - `removeTrailingZeros`: Remove trailing zeros from decimal part (default: false)
   ///
   /// **Returns:** Formatted price string or default price on error
   ///
   /// Example: `formatPrice(1234.56, currencyCode: 'try')` → `₺1.234,56`
+  /// Example: `formatPrice(1000.00, currencyCode: 'gbp')` → `£1,000.00`
+  /// Example: `formatPrice(668.67, currencyCode: 'gbp', currencyDecimalSeparator: ',', currencyThousandSeparator: '.')` → `£668,67`
   static String formatPrice(
     dynamic amount, {
     String? currencyCode,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
     bool useAlternateUnit = false,
     int decimalPlaces = 2,
+    bool removeTrailingZeros = false,
   }) {
     if (amount == null) return getDefaultPrice();
-    
+
     final currency = currencyCode?.toLowerCase() ?? currentCurrency;
     final config = _currencyConfigs[currency];
-    
+
     if (config == null) return getDefaultPrice();
-    
+
     final numericAmount = _parseAmount(amount);
     if (numericAmount == null) return getDefaultPrice();
-    
+
+    // Use API-provided separators if available, otherwise use currency config
+    final decimalSeparator =
+        currencyDecimalSeparator ?? config.decimalSeparator;
+    final thousandSeparator =
+        currencyThousandSeparator ?? config.thousandSeparator;
+
     final formattedNumber = _formatNumber(
       numericAmount,
-      config.thousandSeparator,
-      config.decimalSeparator,
+      thousandSeparator,
+      decimalSeparator,
       decimalPlaces,
+      removeTrailingZeros: removeTrailingZeros,
     );
-    
+
     final symbol = useAlternateUnit && config.alternateUnit != null
         ? config.alternateUnit!
         : config.symbol;
-    
+
     return config.symbolPosition == CurrencySymbolPosition.prefix
         ? '$symbol$formattedNumber'
         : '$formattedNumber $symbol';
@@ -263,9 +279,9 @@ class PriceInfoCurrencyHelper {
   }) {
     final currency = currencyCode?.toLowerCase() ?? currentCurrency;
     final config = _currencyConfigs[currency];
-    
+
     if (config == null) return '₺';
-    
+
     return useAlternateUnit && config.alternateUnit != null
         ? config.alternateUnit!
         : config.symbol;
@@ -282,28 +298,45 @@ class PriceInfoCurrencyHelper {
   /// and applies regional formatting rules for parsing.
   ///
   /// **Parameters:**
-  /// - `priceString`: Formatted price string to parse
+  /// - `priceString`: Formatted price string to parse (can be formatted like "1.234,56" or unformatted like "123456")
   /// - `currencyCode`: Currency format to use for parsing (optional)
+  /// - `currencyDecimalSeparator`: Decimal separator from API (e.g., ".", ",") - overrides currency config
+  /// - `currencyThousandSeparator`: Thousand separator from API (e.g., ",", ".", " ") - overrides currency config
+  /// - `currencyMinorUnit`: Number of decimal places from API (e.g., 2) - used for unformatted strings
   /// - `multiplier`: Conversion multiplier for currency exchange (default: 1.0)
   ///
   /// **Returns:** Parsed double value or null if parsing fails
   ///
   /// Example: `parsePriceToDouble('₺1.234,56')` → `1234.56`
+  /// Example: `parsePriceToDouble('1,999,999.00', currencyDecimalSeparator: '.', currencyThousandSeparator: ',')` → `1999999.0`
+  /// Example: `parsePriceToDouble('66867', currencyMinorUnit: 2)` → `668.67` (unformatted string)
   static double? parsePriceToDouble(
     String? priceString, {
     String? currencyCode,
+    String? currencyDecimalSeparator,
+    String? currencyThousandSeparator,
+    int? currencyMinorUnit,
     double multiplier = 1.0,
   }) {
     if (priceString == null || priceString.isEmpty) return null;
-    
-    final currency = currencyCode?.toLowerCase() ?? currentCurrency;
-    final config = _currencyConfigs[currency];
-    
-    if (config == null) return null;
-    
+
+    // Use API-provided separators if available, otherwise use currency config
+    String? decimalSeparator = currencyDecimalSeparator;
+    String? thousandSeparator = currencyThousandSeparator;
+
+    if (decimalSeparator == null || thousandSeparator == null) {
+      final currency = currencyCode?.toLowerCase() ?? currentCurrency;
+      final config = _currencyConfigs[currency];
+
+      if (config == null) return null;
+
+      decimalSeparator ??= config.decimalSeparator;
+      thousandSeparator ??= config.thousandSeparator;
+    }
+
     // Remove currency symbols and clean the string
     String cleanPrice = priceString;
-    
+
     // Remove common currency symbols
     final currencySymbols = _currencyConfigs.values
         .map((c) => [c.symbol, c.alternateUnit])
@@ -311,20 +344,61 @@ class PriceInfoCurrencyHelper {
         .where((s) => s != null)
         .map((s) => RegExp.escape(s!))
         .join('|');
-    
+
     cleanPrice = cleanPrice.replaceAll(RegExp('[$currencySymbols]'), '');
     cleanPrice = cleanPrice.replaceAll(RegExp(r'\s+'), ''); // Remove spaces
-    cleanPrice = cleanPrice.replaceAll('\u00A0', ''); // Remove non-breaking spaces
+    cleanPrice =
+        cleanPrice.replaceAll('\u00A0', ''); // Remove non-breaking spaces
     cleanPrice = cleanPrice.replaceAll('\u200F', ''); // Remove RTL marks
-    
-    // Handle thousand separators and decimal separators
-    if (config.thousandSeparator != config.decimalSeparator) {
-      // Remove thousand separators first
-      cleanPrice = cleanPrice.replaceAll(config.thousandSeparator, '');
-      // Replace decimal separator with standard dot
-      cleanPrice = cleanPrice.replaceAll(config.decimalSeparator, '.');
+
+    // Check if the string contains any separators (formatted) or is unformatted
+    final hasDecimalSeparator = cleanPrice.contains(decimalSeparator);
+    final hasThousandSeparator = cleanPrice.contains(thousandSeparator);
+    final hasAnySeparator = hasDecimalSeparator || hasThousandSeparator;
+
+    // If string is unformatted (no separators) and we have minor_unit info, apply it
+    if (!hasAnySeparator &&
+        currencyMinorUnit != null &&
+        currencyMinorUnit > 0) {
+      // Unformatted string like "66867" with minor_unit=2 should be "668.67"
+      final minorUnit = currencyMinorUnit;
+      if (cleanPrice.length > minorUnit) {
+        // Split into integer and decimal parts
+        final integerPart =
+            cleanPrice.substring(0, cleanPrice.length - minorUnit);
+        final decimalPart = cleanPrice.substring(cleanPrice.length - minorUnit);
+        cleanPrice = '$integerPart.$decimalPart';
+      } else {
+        // If string is shorter than minor_unit, pad with zeros
+        final padded = cleanPrice.padLeft(minorUnit, '0');
+        cleanPrice = '0.$padded';
+      }
+    } else if (hasAnySeparator) {
+      // Handle formatted strings with separators
+      if (thousandSeparator != decimalSeparator) {
+        // Remove thousand separators first
+        cleanPrice =
+            cleanPrice.replaceAll(RegExp.escape(thousandSeparator), '');
+        // Replace decimal separator with standard dot
+        cleanPrice =
+            cleanPrice.replaceAll(RegExp.escape(decimalSeparator), '.');
+      } else {
+        // If separators are the same, try to detect based on position
+        // If separator appears near the end (last 3 chars), it's likely decimal
+        final lastSeparatorIndex = cleanPrice.lastIndexOf(decimalSeparator);
+        if (lastSeparatorIndex >= 0 &&
+            lastSeparatorIndex >= cleanPrice.length - 3) {
+          // Likely decimal separator - replace with dot
+          cleanPrice =
+              cleanPrice.replaceAll(RegExp.escape(decimalSeparator), '.');
+        } else {
+          // Likely thousand separator - remove it
+          cleanPrice =
+              cleanPrice.replaceAll(RegExp.escape(decimalSeparator), '');
+        }
+      }
     }
-    
+
     try {
       final amount = double.parse(cleanPrice);
       return amount * multiplier;
@@ -403,18 +477,24 @@ class PriceInfoCurrencyHelper {
     double amount,
     String thousandSep,
     String decimalSep,
-    int decimalPlaces,
-  ) {
+    int decimalPlaces, {
+    bool removeTrailingZeros = false,
+  }) {
     // Split into integer and decimal parts
     final parts = amount.toStringAsFixed(decimalPlaces).split('.');
     final integerPart = parts[0];
-    final decimalPart = parts.length > 1 ? parts[1] : '';
-    
+    var decimalPart = parts.length > 1 ? parts[1] : '';
+
+    // Remove trailing zeros if requested
+    if (removeTrailingZeros && decimalPart.isNotEmpty) {
+      decimalPart = decimalPart.replaceAll(RegExp(r'0+$'), '');
+    }
+
     // Add thousand separators
     final formattedInteger = _addThousandSeparators(integerPart, thousandSep);
-    
+
     // Combine parts
-    if (decimalPlaces > 0) {
+    if (decimalPlaces > 0 && decimalPart.isNotEmpty) {
       return '$formattedInteger$decimalSep$decimalPart';
     } else {
       return formattedInteger;
@@ -427,17 +507,17 @@ class PriceInfoCurrencyHelper {
   /// Efficiently handles large numbers with proper separator placement.
   static String _addThousandSeparators(String number, String separator) {
     if (number.length <= 3) return number;
-    
+
     final buffer = StringBuffer();
     final reversed = number.split('').reversed.toList();
-    
+
     for (int i = 0; i < reversed.length; i++) {
       if (i != 0 && i % 3 == 0) {
         buffer.write(separator);
       }
       buffer.write(reversed[i]);
     }
-    
+
     return buffer.toString().split('').reversed.join();
   }
 }
@@ -475,7 +555,7 @@ class CurrencyConfig {
 
 /// 📊 **Currency Symbol Position Enum**
 ///
-/// Defines whether currency symbols should appear before (prefix) or after (suffix) 
+/// Defines whether currency symbols should appear before (prefix) or after (suffix)
 /// the monetary amount according to regional standards.
 ///
 /// **Values:**
@@ -509,20 +589,25 @@ extension CurrencyExtension on num {
   /// - `currencyCode`: Currency to format as (optional, uses current if not specified)
   /// - `useAlternateUnit`: Use alternate unit instead of symbol
   /// - `decimalPlaces`: Number of decimal places to display
+  /// - `removeTrailingZeros`: Remove trailing zeros from decimal part (default: false)
   ///
   /// **Returns:** Formatted currency string
   ///
   /// Example: `1234.56.toCurrency(currencyCode: 'eur')` → `€1.234,56`
+  /// Example: `1000.00.toCurrency(currencyCode: 'gbp')` → `£1,000.00`
+  /// Example: `1000.00.toCurrency(currencyCode: 'gbp', removeTrailingZeros: true)` → `£1,000`
   String toCurrency({
     String? currencyCode,
     bool useAlternateUnit = false,
     int decimalPlaces = 2,
+    bool removeTrailingZeros = false,
   }) {
     return PriceInfoCurrencyHelper.formatPrice(
       this,
       currencyCode: currencyCode,
       useAlternateUnit: useAlternateUnit,
       decimalPlaces: decimalPlaces,
+      removeTrailingZeros: removeTrailingZeros,
     );
   }
 }

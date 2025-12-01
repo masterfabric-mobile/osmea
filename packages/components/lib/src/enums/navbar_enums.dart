@@ -202,3 +202,56 @@ enum NavbarItemState {
   /// - Desktop interaction
   hovered,
 }
+
+/// 🎬 **Navbar Item Animation Types**
+///
+/// Defines different animation types for navbar items.
+/// Controls how items animate when their trigger value changes.
+///
+/// **Animation Guidelines:**
+/// - `none`: No animation
+/// - `scale`: Scale up/down animation
+/// - `bounce`: Bouncing animation
+/// - `pulse`: Pulsing animation
+/// - `shake`: Shake animation
+///
+/// **Usage:**
+/// ```dart
+/// NavbarItem(
+///   text: 'Saved',
+///   icon: Icon(Icons.favorite),
+///   animationType: NavbarItemAnimationType.scale,
+///   animationTrigger: wishlistCount,
+/// )
+/// ```
+enum NavbarItemAnimationType {
+  /// ⏹️ **None** - No animation
+  /// - No animation effect
+  /// - Standard item behavior
+  /// - Use for: Static items, performance optimization
+  none,
+
+  /// 📏 **Scale** - Scale up/down animation
+  /// - Smooth scale transition
+  /// - Elastic bounce effect
+  /// - Use for: Favorite icons, notification badges
+  scale,
+
+  /// 🎾 **Bounce** - Bouncing animation
+  /// - Bouncy spring effect
+  /// - Attention-grabbing
+  /// - Use for: Important updates, alerts
+  bounce,
+
+  /// 💓 **Pulse** - Pulsing animation
+  /// - Gentle pulsing effect
+  /// - Subtle attention
+  /// - Use for: Status indicators, live updates
+  pulse,
+
+  /// 📳 **Shake** - Shake animation
+  /// - Horizontal shake effect
+  /// - Error/warning indication
+  /// - Use for: Error states, validation feedback
+  shake,
+}

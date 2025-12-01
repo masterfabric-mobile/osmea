@@ -40,6 +40,7 @@ abstract class ProductService {
   /// [averageRating]: Limit result set to products with a specific average rating.
   /// [minRating]: Limit result set to products with a minimum rating.
   /// [maxRating]: Limit result set to products with a maximum rating.
+  /// [brand]: Filter by brand ID or slug (as string).
   Future<List<ListAllProductsResponseModel>> listAllProducts({
     required String apiVersion,
     int page = 1,
@@ -72,6 +73,7 @@ abstract class ProductService {
     double? averageRating,
     double? minRating,
     double? maxRating,
+    String? brand,
   });
 
   /// 🔍 Fetches a single product by ID from the WooCommerce Store API.

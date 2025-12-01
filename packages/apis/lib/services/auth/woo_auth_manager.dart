@@ -5,7 +5,6 @@ import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.d
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_login_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/user_signup_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/delete_user_request.dart';
-import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/send_reset_password_request.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/user_login_response.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/user_signup_response.dart';
 import 'package:apis/network/remote/woocommerce/auth/freezed_model/response/delete_user_response.dart';
@@ -162,13 +161,41 @@ class WooAuthManager {
       final response =
           await _authService.userSignUp(WooNetwork.storeName, request);
 
-      if (response.success && response.data != null) {
+      debugPrint('📡 Sign up response received: success=${response.success}');
+      debugPrint('📡 Response data: ${response.data}');
+      debugPrint('📡 Response message: ${response.message}');
+
+      // Check if sign up was successful
+      if (response.success) {
+        // Response might have data field or we need to check the response structure
+        // Some APIs return user data directly in the response
+        UserSignUpData? userData = response.data;
+        
+        // If data is null but response is successful, try to extract from response
+        // This handles cases where the API structure is different
+        if (userData == null) {
+          debugPrint('⚠️ Response data is null but success is true, checking response structure...');
+          // Response might be successful but data parsing failed
+          // In this case, we still consider it successful since the API returned success
+          debugPrint('✅ Sign up successful (API confirmed), but data parsing returned null');
+          // Return success even without data - the user was created
+          return WooAuthResult.success(
+            data: UserSignUpData(
+              userId: '0', // Placeholder - will be set during sign in
+              email: email,
+              firstName: firstName,
+              lastName: lastName,
+            ),
+            message: response.message ?? 'Sign up successful',
+          );
+        }
+
         debugPrint('✅ User sign up successful');
-        debugPrint('👤 User ID: ${response.data!.userId}');
-        debugPrint('📧 Email: ${response.data!.email}');
+        debugPrint('👤 User ID: ${userData.userId}');
+        debugPrint('📧 Email: ${userData.email}');
 
         return WooAuthResult.success(
-          data: response.data!,
+          data: userData,
           message: response.message ?? 'Sign up successful',
         );
       } else {

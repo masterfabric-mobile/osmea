@@ -1,5 +1,6 @@
 import 'package:storefront_woo/app/routes/app_routes.dart';
 import 'package:storefront_woo/app/core/config/config_di.dart';
+import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -68,6 +69,84 @@ launchApp({String environment = 'dev'}) async {
 
   // Configure dependency injection for the application
   await configureDependencies(environment: environment);
+
+  // Initialize AuthCubit and register in GetIt as SINGLETON (not factory!)
+  // This ensures all parts of the app use the same AuthCubit instance
+  // CRITICAL: AuthCubit must be singleton to avoid state desync issues
+  // NOTE: HydratedCubit automatically restores state from storage on construction
+  // We only need to call loadTokens() if state is not already authenticated
+  try {
+    if (GetIt.instance.isRegistered<AuthCubit>()) {
+      // Already registered - ensure it's the same instance everywhere
+      try {
+        final existing = GetIt.I<AuthCubit>();
+        debugPrint('✅ AuthCubit already registered in GetIt (singleton)');
+        debugPrint('🔍 AuthCubit current state: ${existing.state.runtimeType}');
+        
+        // Only load tokens if state is initial or unauthenticated
+        // HydratedCubit may have already restored authenticated state
+        if (existing.state is AuthInitialState || existing.state is AuthUnauthenticatedState) {
+          debugPrint('🔄 AuthCubit: Loading tokens from storage...');
+          await existing.loadTokens();
+          debugPrint('✅ AuthCubit tokens loaded');
+        } else if (existing.state is AuthAuthenticatedState) {
+          final authState = existing.state as AuthAuthenticatedState;
+          debugPrint('✅ AuthCubit: Already authenticated (restored from storage)');
+          debugPrint('🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}');
+          // Verify token is still valid in storage
+          final authStorage = AuthStorageHelper();
+          final storageToken = await authStorage.getToken();
+          if (storageToken == null || storageToken.isEmpty || storageToken != authState.jwtToken) {
+            debugPrint('⚠️ AuthCubit: Token mismatch, reloading from storage...');
+            await existing.loadTokens();
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Error accessing existing AuthCubit: $e');
+        // If there's an issue, unregister and re-register as singleton
+        try {
+          GetIt.instance.unregister<AuthCubit>();
+        } catch (_) {}
+        final authCubit = AuthCubit();
+        GetIt.instance.registerSingleton<AuthCubit>(authCubit);
+        // HydratedCubit may have already restored state, check before loading
+        if (authCubit.state is AuthInitialState || authCubit.state is AuthUnauthenticatedState) {
+          await authCubit.loadTokens();
+        }
+        debugPrint('✅ AuthCubit re-registered as singleton');
+      }
+    } else {
+      // AuthCubit not registered - register it now as singleton
+      debugPrint('⚠️ AuthCubit not in GetIt, registering as singleton...');
+      final authCubit = AuthCubit();
+      GetIt.instance.registerSingleton<AuthCubit>(authCubit);
+      debugPrint('🔍 AuthCubit initial state: ${authCubit.state.runtimeType}');
+      
+      // HydratedCubit automatically restores state from storage on construction
+      // Only load tokens if state is not already authenticated
+      if (authCubit.state is AuthInitialState || authCubit.state is AuthUnauthenticatedState) {
+        debugPrint('🔄 AuthCubit: Loading tokens from storage...');
+        await authCubit.loadTokens();
+        debugPrint('✅ AuthCubit tokens loaded');
+      } else if (authCubit.state is AuthAuthenticatedState) {
+        final authState = authCubit.state as AuthAuthenticatedState;
+        debugPrint('✅ AuthCubit: Already authenticated (restored from HydratedCubit storage)');
+        debugPrint('🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}');
+        // Verify token is still valid in storage
+        final authStorage = AuthStorageHelper();
+        final storageToken = await authStorage.getToken();
+        if (storageToken == null || storageToken.isEmpty || storageToken != authState.jwtToken) {
+          debugPrint('⚠️ AuthCubit: Token mismatch, reloading from storage...');
+          await authCubit.loadTokens();
+        } else {
+          debugPrint('✅ AuthCubit: Token verified, state is valid');
+        }
+      }
+      debugPrint('✅ AuthCubit registered as singleton and initialized');
+    }
+  } catch (e) {
+    debugPrint('⚠️ Error initializing AuthCubit: $e');
+  }
 
   // 🎨 Get UI configuration from config helpers
   bool debugMode = configLoaded

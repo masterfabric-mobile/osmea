@@ -1,0 +1,147 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🛍️ Storefront Woo - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_woo/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_woo",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🛍️ Storefront Woo - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_woo/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_woo",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🛍️ Storefront Woo - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_woo/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_woo",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🛍️ Storefront Woo - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_woo/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_woo",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🎛️ Admin Dashboard - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/admin_dashboard/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/admin_dashboard",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🎛️ Admin Dashboard - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/admin_dashboard/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/admin_dashboard",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🎛️ Admin Dashboard - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/admin_dashboard/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/admin_dashboard",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🎛️ Admin Dashboard - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/admin_dashboard/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/admin_dashboard",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🔍 API Explorer - Run",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/api_explorer/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/api_explorer"
+    },
+    {
+      "name": "🔍 API Explorer - Debug",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/api_explorer/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/api_explorer",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "🔍 API Explorer - Release",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/api_explorer/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/api_explorer",
+      "flutterMode": "release"
+    },
+    {
+      "name": "🧩 Components App - Run",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/components_app"
+    },
+    {
+      "name": "🧩 Components App - Debug",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/components_app",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "🧩 Components App - Release",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/components_app",
+      "flutterMode": "release"
+    },
+    {
+      "name": "📚 Storybook - Run",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storybook/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/storybook"
+    },
+    {
+      "name": "📚 Storybook - Debug",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storybook/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/storybook",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "📚 Storybook - Release",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storybook/lib/main.dart",
+      "cwd": "${workspaceFolder}/projects/storybook",
+      "flutterMode": "release"
+    }
+  ]
+}
+

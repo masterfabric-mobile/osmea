@@ -14,10 +14,6 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-UserSignUpResponse _$UserSignUpResponseFromJson(Map<String, dynamic> json) {
-  return _UserSignUpResponse.fromJson(json);
-}
-
 /// @nodoc
 mixin _$UserSignUpResponse {
   bool get success => throw _privateConstructorUsedError;
@@ -27,7 +23,6 @@ mixin _$UserSignUpResponse {
   String? get error => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $UserSignUpResponseCopyWith<UserSignUpResponse> get copyWith =>
       throw _privateConstructorUsedError;
@@ -167,7 +162,7 @@ class __$$UserSignUpResponseImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$UserSignUpResponseImpl implements _UserSignUpResponse {
   const _$UserSignUpResponseImpl(
       {required this.success,
@@ -176,9 +171,6 @@ class _$UserSignUpResponseImpl implements _UserSignUpResponse {
       this.error,
       final Map<String, dynamic>? metadata})
       : _metadata = metadata;
-
-  factory _$UserSignUpResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserSignUpResponseImplFromJson(json);
 
   @override
   final bool success;
@@ -216,7 +208,6 @@ class _$UserSignUpResponseImpl implements _UserSignUpResponse {
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
-  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, success, message, data, error,
       const DeepCollectionEquality().hash(_metadata));
@@ -227,13 +218,6 @@ class _$UserSignUpResponseImpl implements _UserSignUpResponse {
   _$$UserSignUpResponseImplCopyWith<_$UserSignUpResponseImpl> get copyWith =>
       __$$UserSignUpResponseImplCopyWithImpl<_$UserSignUpResponseImpl>(
           this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserSignUpResponseImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _UserSignUpResponse implements UserSignUpResponse {
@@ -243,9 +227,6 @@ abstract class _UserSignUpResponse implements UserSignUpResponse {
       final UserSignUpData? data,
       final String? error,
       final Map<String, dynamic>? metadata}) = _$UserSignUpResponseImpl;
-
-  factory _UserSignUpResponse.fromJson(Map<String, dynamic> json) =
-      _$UserSignUpResponseImpl.fromJson;
 
   @override
   bool get success;

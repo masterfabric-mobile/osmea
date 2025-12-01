@@ -182,6 +182,7 @@
       "password_label": "Password",
       "password_hint": "Enter your password",
       "remember_me_label": "Remember me",
+      "remember_me_default": true,
       "forgot_password_label": "Forgot Password?",
       "sign_in_button": "Continue",
       "sign_in_button_loading": "Signing in...",
@@ -206,7 +207,27 @@
       "sign_up_button_loading": "Creating account...",
       "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
       "logo_width": 120,
-      "logo_height": 120
+      "logo_height": 120,
+      "checklists": [
+        {
+          "id": "marketing_consent",
+          "label": "I would like to receive promotional emails/SMS",
+          "required": false,
+          "enabled": true
+        },
+        {
+          "id": "privacy_policy",
+          "label": "I have read and accept the Privacy Policy",
+          "required": true,
+          "enabled": true
+        },
+        {
+          "id": "terms",
+          "label": "I have read and accept the Terms of Service",
+          "required": true,
+          "enabled": true
+        }
+      ]
     },
     "forgot_password": {
       "title": "Reset Password",
@@ -410,5 +431,148 @@
         "error_code": null
       }
     }
+  },
+  "empty_view_configuration": {
+    "style": "startup",
+    "background_color": "#FFFFFF",
+    "text_color": "#1F2937",
+    "animation_duration": 400,
+    "primary_color": "#2196F3",
+    "secondary_color": "#FFC107",
+    "enable_haptic_feedback": true,
+    "default_empty_message": "No items found",
+    "show_action_button": true,
+    "empty_pages": [
+      {
+        "title": "No items found",
+        "description": "There are no items to display at the moment.",
+        "empty_type": "general",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": null
+      },
+      {
+        "title": "Your cart is empty",
+        "description": "Add items to your cart to see them here.",
+        "empty_type": "cart",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Start Shopping"
+      },
+      {
+        "title": "No results found",
+        "description": "Try adjusting your search terms or browse our categories.",
+        "empty_type": "search",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Browse Categories"
+      },
+      {
+        "title": "No favorites yet",
+        "description": "Start adding items to your favorites to see them here.",
+        "empty_type": "favorites",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Explore Products"
+      },
+      {
+        "title": "Your wishlist is empty",
+        "description": "Add items to your wishlist to save them for later.",
+        "empty_type": "wishlist",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Browse Products"
+      },
+      {
+        "title": "No products available",
+        "description": "There are no products to display at the moment.",
+        "empty_type": "products",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": null
+      },
+      {
+        "title": "No orders yet",
+        "description": "Your order history will appear here once you make a purchase.",
+        "empty_type": "orders",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Start Shopping"
+      },
+      {
+        "title": "No notifications",
+        "description": "You're all caught up! New notifications will appear here.",
+        "empty_type": "notifications",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": null
+      },
+      {
+        "title": "No messages",
+        "description": "Your messages will appear here when you receive them.",
+        "empty_type": "messages",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": null
+      },
+      {
+        "title": "No history",
+        "description": "Your browsing history will appear here.",
+        "empty_type": "history",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": null
+      },
+      {
+        "title": "No reviews yet",
+        "description": "Your reviews will appear here once you write them.",
+        "empty_type": "reviews",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Write a Review"
+      },
+      {
+        "title": "No addresses saved",
+        "description": "Add an address to make checkout faster.",
+        "empty_type": "addresses",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Add Address"
+      },
+      {
+        "title": "No payment methods",
+        "description": "Add a payment method to make checkout easier.",
+        "empty_type": "payments",
+        "icon_path": null,
+        "image_path": null,
+        "background_color": "#FFFFFF",
+        "text_color": "#374151",
+        "action_button_text": "Add Payment Method"
+      }
+    ]
   }
 }

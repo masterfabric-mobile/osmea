@@ -24,40 +24,75 @@ class LocalStorageHelper implements LocalStorage {
   // SharedPreferences instance for web
   SharedPreferences? _sharedPreferences;
 
+  // Initialization flag to prevent multiple initializations
+  bool _isInitialized = false;
+  bool _isInitializing = false;
+
   // A simple encryption key
   final String _encryptionKey = 'osmea_secure_storage_key';
 
   // Initialization method
   @override
   Future<void> init() async {
-    debugPrint("🔄 Initializing LocalStorageHelper...");
+    // Return early if already initialized
+    if (_isInitialized) {
+      return;
+    }
 
-    if (kIsWeb) {
-      // Initialize SharedPreferences for web
-      _sharedPreferences = await SharedPreferences.getInstance();
-      debugPrint("✅ SharedPreferences initialized successfully.");
-      debugPrint("🌐 Platform detected: Web. SharedPreferences loaded.");
-    } else {
-      // Get the database path for sqflite
-      var databasesPath = await getDatabasesPath();
-      debugPrint("📁 Database path retrieved: $databasesPath");
-      String path = join(databasesPath, 'local_storage_osmea_core.db');
-      debugPrint("📍 Full database path: $path");
+    // Prevent concurrent initialization
+    if (_isInitializing) {
+      // Wait for ongoing initialization to complete
+      while (_isInitializing) {
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+      return;
+    }
 
-      // Open the database
-      _database = await openDatabase(path, version: 1,
-          onCreate: (Database db, int version) async {
-        debugPrint("🛠️ Creating storage table...");
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS storage (
-            key TEXT PRIMARY KEY,
-            value TEXT
-          )
-        ''');
-        debugPrint("✅ Storage table created successfully.");
-      });
-      debugPrint("✅ LocalStorageHelper initialized successfully.");
-      debugPrint("📱 Platform detected: Mobile. SQLite database loaded.");
+    _isInitializing = true;
+
+    try {
+      if (kIsWeb) {
+        // Initialize SharedPreferences for web
+        if (_sharedPreferences == null) {
+          debugPrint("🔄 Initializing LocalStorageHelper (Web)...");
+          _sharedPreferences = await SharedPreferences.getInstance();
+          debugPrint("✅ SharedPreferences initialized successfully.");
+          debugPrint("🌐 Platform detected: Web. SharedPreferences loaded.");
+        }
+      } else {
+        // Return early if database already exists
+        if (_database != null) {
+          _isInitializing = false;
+          _isInitialized = true;
+          return;
+        }
+
+        debugPrint("🔄 Initializing LocalStorageHelper (Mobile)...");
+        // Get the database path for sqflite
+        var databasesPath = await getDatabasesPath();
+        debugPrint("📁 Database path retrieved: $databasesPath");
+        String path = join(databasesPath, 'local_storage_osmea_core.db');
+        debugPrint("📍 Full database path: $path");
+
+        // Open the database
+        _database = await openDatabase(path, version: 1,
+            onCreate: (Database db, int version) async {
+          debugPrint("🛠️ Creating storage table...");
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS storage (
+              key TEXT PRIMARY KEY,
+              value TEXT
+            )
+          ''');
+          debugPrint("✅ Storage table created successfully.");
+        });
+        debugPrint("✅ LocalStorageHelper initialized successfully.");
+        debugPrint("📱 Platform detected: Mobile. SQLite database loaded.");
+      }
+
+      _isInitialized = true;
+    } finally {
+      _isInitializing = false;
     }
   }
 
@@ -98,7 +133,10 @@ class LocalStorageHelper implements LocalStorage {
       if (_database == null) {
         throw Exception("Database not initialized. Call init() first.");
       }
-      debugPrint("Getting item from sqflite: $key");
+      // Only log in debug mode and for important keys
+      if (key.contains('auth') || key.contains('token')) {
+        debugPrint("Getting item from sqflite: $key");
+      }
       List<Map<String, dynamic>> maps = await _database!.query(
         'storage',
         columns: ['value'],
@@ -106,10 +144,16 @@ class LocalStorageHelper implements LocalStorage {
         whereArgs: [key],
       );
       if (maps.isNotEmpty) {
-        debugPrint("Item retrieved successfully from sqflite: $key");
+        // Only log in debug mode and for important keys
+        if (key.contains('auth') || key.contains('token')) {
+          debugPrint("Item retrieved successfully from sqflite: $key");
+        }
         return maps.first['value']; // Return as string
       }
-      debugPrint("Item not found in sqflite: $key");
+      // Only log in debug mode and for important keys
+      if (key.contains('auth') || key.contains('token')) {
+        debugPrint("Item not found in sqflite: $key");
+      }
       return null;
     }
   }
@@ -253,13 +297,15 @@ class LocalStorageHelper implements LocalStorage {
   @override
   Future<void> setEncryptedItem(String key, String value) async {
     final encryptedValue = encrypt(value);
-    await setItem('osmeaEncrypted_$key', encryptedValue); // Add prefix to the key
+    await setItem(
+        'osmeaEncrypted_$key', encryptedValue); // Add prefix to the key
   }
 
   // Retrieve and decrypt a value using the prefixed key
   @override
   Future<String?> getEncryptedItem(String key) async {
-    final encryptedValue = await getItem('osmeaEncrypted_$key'); // Add prefix to the key
+    final encryptedValue =
+        await getItem('osmeaEncrypted_$key'); // Add prefix to the key
     if (encryptedValue != null) {
       return decrypt(encryptedValue);
     }
@@ -274,7 +320,8 @@ class LocalStorageHelper implements LocalStorage {
     final Map<String, String> decryptedItems = {};
 
     for (var entry in allItems.entries) {
-      if (entry.key.startsWith('osmeaEncrypted_')) { // Check for prefixed keys
+      if (entry.key.startsWith('osmeaEncrypted_')) {
+        // Check for prefixed keys
         try {
           final decryptedValue = decrypt(entry.value);
           decryptedItems[entry.key] = decryptedValue;

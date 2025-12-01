@@ -22,16 +22,20 @@ class WishlistApiResponse<T> with _$WishlistApiResponse<T> {
 }
 
 /// Paginated response wrapper for wishlist data
+/// Supports API format: {items: [...], pagination: {...}}
 @Freezed(genericArgumentFactories: true)
 class WishlistPaginatedResponse<T> with _$WishlistPaginatedResponse<T> {
   const factory WishlistPaginatedResponse({
     bool? success,
     String? message,
     List<T>? data,
-    @JsonKey(name: 'current_page') int? currentPage,
-    @JsonKey(name: 'per_page') int? perPage,
-    @JsonKey(name: 'total_items') int? totalItems,
-    @JsonKey(name: 'total_pages') int? totalPages,
+    @JsonKey(name: 'items') List<T>? items, // API format
+    @JsonKey(name: 'pagination')
+    WishlistPaginationInfo? pagination, // API format
+    @JsonKey(name: 'current_page') @StringToIntConverter() int? currentPage,
+    @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+    @JsonKey(name: 'total_items') @StringToIntConverter() int? totalItems,
+    @JsonKey(name: 'total_pages') @StringToIntConverter() int? totalPages,
     @JsonKey(name: 'error_code') String? errorCode,
     List<String>? errors,
   }) = _WishlistPaginatedResponse<T>;
@@ -41,4 +45,38 @@ class WishlistPaginatedResponse<T> with _$WishlistPaginatedResponse<T> {
     T Function(Object? json) fromJsonT,
   ) =>
       _$WishlistPaginatedResponseFromJson(json, fromJsonT);
+}
+
+/// Custom converter to handle string to int conversion
+class StringToIntConverter implements JsonConverter<int?, dynamic> {
+  const StringToIntConverter();
+
+  @override
+  int? fromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      if (value.isEmpty) return null;
+      return int.tryParse(value);
+    }
+    if (value is num) return value.toInt();
+    return null;
+  }
+
+  @override
+  dynamic toJson(int? value) => value;
+}
+
+/// Pagination info from API response
+@freezed
+class WishlistPaginationInfo with _$WishlistPaginationInfo {
+  const factory WishlistPaginationInfo({
+    @StringToIntConverter() int? total,
+    @JsonKey(name: 'per_page') @StringToIntConverter() int? perPage,
+    @StringToIntConverter() int? current,
+    @StringToIntConverter() int? pages,
+  }) = _WishlistPaginationInfo;
+
+  factory WishlistPaginationInfo.fromJson(Map<String, dynamic> json) =>
+      _$WishlistPaginationInfoFromJson(json);
 }

@@ -25,9 +25,9 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    gh.factory<_i604.OnboardingViewModel>(() => _i604.OnboardingViewModel());
     gh.factory<_i601.SplashViewModel>(() => _i601.SplashViewModel());
     gh.factory<_i860.WelcomeViewModel>(() => _i860.WelcomeViewModel());
-    gh.factory<_i604.OnboardingViewModel>(() => _i604.OnboardingViewModel());
     return this;
   }
 }

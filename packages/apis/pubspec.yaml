@@ -42,7 +42,7 @@ dependencies:
       url: https://github.com/masterfabric-mobile/osmea.git
       ref: dev
       path: packages/core
-      
+
   # Code generation and annotations
   json_annotation: ^4.9.0
   freezed_annotation: 2.4.4

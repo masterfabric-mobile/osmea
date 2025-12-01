@@ -51,6 +51,7 @@ class _ProductServiceClient implements ProductServiceClient {
     double? averageRating,
     double? minRating,
     double? maxRating,
+    String? brand,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -84,6 +85,7 @@ class _ProductServiceClient implements ProductServiceClient {
       r'average_rating': averageRating,
       r'min_rating': minRating,
       r'max_rating': maxRating,
+      r'brand': brand,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

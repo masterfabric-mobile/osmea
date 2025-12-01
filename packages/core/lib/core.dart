@@ -156,15 +156,19 @@ export 'package:core/src/helper/auth_storage_helper.dart';
 
 // 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
 export 'package:core/src/views/auth/auth_view.dart';
-export 'package:core/src/views/auth/auth_widget.dart';
 
-// 🔐 Exports the sign in view, cubit and state
-export 'package:core/src/views/auth/sign_in/sign_in_view.dart';
-export 'package:core/src/views/auth/sign_in/cubit/sign_in_cubit.dart';
-export 'package:core/src/views/auth/sign_in/cubit/sign_in_state.dart';
-export 'package:core/src/views/auth/sign_up/sign_up_view.dart';
-export 'package:core/src/views/auth/sign_up/cubit/sign_up_cubit.dart';
-export 'package:core/src/views/auth/sign_up/cubit/sign_up_state.dart';
+
+// 🔐 Exports the auth cubit and state (base implementation)
+export 'package:core/src/views/auth/cubit/auth_cubit.dart';
+export 'package:core/src/views/auth/cubit/auth_state.dart';
+
+// 📭 Exports the empty view models
+export 'package:core/src/models/empty_view_models.dart';
+
+// 📭 Exports the empty view and cubit
+export 'package:core/src/views/empty_view/empty_view.dart';
+export 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
+export 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
 
 // 🔍 Exports the search view and cubit
 export 'package:core/src/views/search/search_view.dart';

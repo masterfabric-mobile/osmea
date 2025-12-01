@@ -5,6 +5,8 @@ import 'package:apis/apis.dart';
 import 'package:apis/models/auth/woo_jwt_token.dart';
 import 'package:apis/services/auth/woo_jwt_auth_service.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
+import 'package:apis/utils/api_error_utils.dart';
+import 'package:core/core.dart';
 
 /// 🔐 JWT Interceptor for WooCommerce API requests
 class WooJwtInterceptor extends Interceptor {
@@ -36,7 +38,7 @@ class WooJwtInterceptor extends Interceptor {
       _dioLogger.printErrorLogs(
         DioException(
           requestOptions: options,
-          error: 'Failed to add JWT token to request: $e',
+          error: ApiErrorUtils.getErrorMessage(e),
           type: DioExceptionType.unknown,
         ),
       );
@@ -91,13 +93,34 @@ class WooJwtInterceptor extends Interceptor {
         return;
       }
 
-      // Get current token
-      final token = await WooJwtTokenStorage.loadToken();
+      // Check if this is a wishlist endpoint - JWT is optional for wishlist
+      final isWishlistEndpoint = _isWishlistEndpoint(options.path);
 
+      // First try to get token from WooJwtTokenStorage (legacy)
+      WooJwtToken? token = await WooJwtTokenStorage.loadToken();
+
+      // Always check Core Auth JWT first (preferred over WooJWT)
+      // This ensures we use the latest authenticated token
+      try {
+        final authStorage = AuthStorageHelper();
+        final coreJwtToken = await authStorage.getToken();
+
+        if (coreJwtToken != null && coreJwtToken.isNotEmpty) {
+          // Use Core Auth JWT token (preferred)
+          options.headers['Authorization'] = 'Bearer $coreJwtToken';
+          debugPrint(
+              '🔐 Core Auth JWT token added to request (path: ${options.path})');
+          return;
+        }
+      } catch (e) {
+        debugPrint('⚠️ Could not get Core Auth JWT token: $e');
+      }
+
+      // Only use WooJWT if Core Auth JWT is not available
       if (token != null && !token.isExpired) {
         // Add JWT token to Authorization header
         options.headers['Authorization'] = token.authorizationHeader;
-        debugPrint('🔐 JWT token added to request');
+        debugPrint('🔐 WooJWT token added to request (path: ${options.path})');
       } else if (token != null && token.needsRefresh) {
         // Try to refresh token
         debugPrint('🔄 Token needs refresh, attempting auto-refresh...');
@@ -107,14 +130,31 @@ class WooJwtInterceptor extends Interceptor {
           options.headers['Authorization'] = refreshedToken.authorizationHeader;
           debugPrint('✅ Token refreshed and added to request');
         } else {
-          debugPrint('⚠️ Token refresh failed, proceeding without token');
+          // For wishlist endpoints, proceed without token (local storage mode)
+          if (isWishlistEndpoint) {
+            debugPrint(
+                '💡 Wishlist endpoint: proceeding without token (local storage mode)');
+          } else {
+            debugPrint('⚠️ Token refresh failed, proceeding without token');
+          }
         }
       } else {
-        debugPrint('⚠️ No valid JWT token available');
+        // For wishlist endpoints, proceed without token (local storage mode)
+        if (isWishlistEndpoint) {
+          debugPrint(
+              '💡 Wishlist endpoint: no token available, using local storage mode');
+        } else {
+          debugPrint('⚠️ No valid JWT token available');
+        }
       }
     } catch (e) {
       debugPrint('❌ Error adding JWT token to request: $e');
     }
+  }
+
+  /// 🔍 Check if the request is to a wishlist endpoint
+  bool _isWishlistEndpoint(String path) {
+    return path.contains('/custom-wishlist/') || path.contains('wishlist');
   }
 
   /// 🔄 Attempt to refresh the JWT token
@@ -215,7 +255,7 @@ class WooJwtEnhancedInterceptor extends Interceptor {
       _dioLogger.printErrorLogs(
         DioException(
           requestOptions: options,
-          error: 'Failed to add authentication to request: $e',
+          error: ApiErrorUtils.getErrorMessage(e),
           type: DioExceptionType.unknown,
         ),
       );
@@ -278,12 +318,33 @@ class WooJwtEnhancedInterceptor extends Interceptor {
         return;
       }
 
-      // Get current token
-      final token = await WooJwtTokenStorage.loadToken();
+      // Check if this is a wishlist endpoint - JWT is optional for wishlist
+      final isWishlistEndpoint = _isWishlistEndpoint(options.path);
 
+      // First try to get token from WooJwtTokenStorage (legacy)
+      WooJwtToken? token = await WooJwtTokenStorage.loadToken();
+
+      // Always check Core Auth JWT first (preferred over WooJWT)
+      // This ensures we use the latest authenticated token
+      try {
+        final authStorage = AuthStorageHelper();
+        final coreJwtToken = await authStorage.getToken();
+
+        if (coreJwtToken != null && coreJwtToken.isNotEmpty) {
+          // Use Core Auth JWT token (preferred)
+          options.headers['Authorization'] = 'Bearer $coreJwtToken';
+          debugPrint(
+              '🔐 Core Auth JWT token added to request (path: ${options.path})');
+          return;
+        }
+      } catch (e) {
+        debugPrint('⚠️ Could not get Core Auth JWT token: $e');
+      }
+
+      // Only use WooJWT if Core Auth JWT is not available
       if (token != null && !token.isExpired) {
         options.headers['Authorization'] = token.authorizationHeader;
-        debugPrint('🔐 JWT token added to request');
+        debugPrint('🔐 WooJWT token added to request (path: ${options.path})');
       } else if (token != null && token.needsRefresh) {
         debugPrint('🔄 Token needs refresh, attempting auto-refresh...');
         final refreshedToken = await _authService.autoRefreshIfNeeded();
@@ -292,20 +353,41 @@ class WooJwtEnhancedInterceptor extends Interceptor {
           options.headers['Authorization'] = refreshedToken.authorizationHeader;
           debugPrint('✅ Token refreshed and added to request');
         } else {
-          debugPrint('⚠️ Token refresh failed, falling back to Basic Auth');
+          // For wishlist endpoints, proceed without token (local storage mode)
+          if (isWishlistEndpoint) {
+            debugPrint(
+                '💡 Wishlist endpoint: proceeding without token (local storage mode)');
+          } else {
+            debugPrint('⚠️ Token refresh failed, falling back to Basic Auth');
+            _useJwtAuth = false;
+            _addBasicAuthToRequest(options);
+          }
+        }
+      } else {
+        // For wishlist endpoints, proceed without token (local storage mode)
+        if (isWishlistEndpoint) {
+          debugPrint(
+              '💡 Wishlist endpoint: no token available, using local storage mode');
+        } else {
+          debugPrint(
+              '⚠️ No valid JWT token available, falling back to Basic Auth');
           _useJwtAuth = false;
           _addBasicAuthToRequest(options);
         }
-      } else {
-        debugPrint(
-            '⚠️ No valid JWT token available, falling back to Basic Auth');
-        _useJwtAuth = false;
-        _addBasicAuthToRequest(options);
       }
     } catch (e) {
       debugPrint('❌ Error adding JWT token to request: $e');
-      _addBasicAuthToRequest(options);
+      // Only fallback to Basic Auth if not a wishlist endpoint
+      final isWishlistEndpoint = _isWishlistEndpoint(options.path);
+      if (!isWishlistEndpoint) {
+        _addBasicAuthToRequest(options);
+      }
     }
+  }
+
+  /// 🔍 Check if the request is to a wishlist endpoint
+  bool _isWishlistEndpoint(String path) {
+    return path.contains('/custom-wishlist/') || path.contains('wishlist');
   }
 
   /// 🔑 Add Basic Auth to request headers

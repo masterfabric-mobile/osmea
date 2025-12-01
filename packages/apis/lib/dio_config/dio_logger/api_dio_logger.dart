@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 /// 🌐 Open Source API Logger
 /// Logs API requests, responses, and errors in a developer-friendly way.
 /// Uses [Logger] for pretty output.
-/// 
+///
 /// Contribute or customize as you wish! 🚀
 @Singleton(as: ApiBaseLogger)
 class ApiDioLogger extends ApiBaseLogger {

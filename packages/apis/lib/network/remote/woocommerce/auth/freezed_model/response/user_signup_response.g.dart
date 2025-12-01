@@ -6,37 +6,6 @@ part of 'user_signup_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserSignUpResponseImpl _$$UserSignUpResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UserSignUpResponseImpl(
-      success: json['success'] as bool,
-      message: json['message'] as String?,
-      data: json['data'] == null
-          ? null
-          : UserSignUpData.fromJson(json['data'] as Map<String, dynamic>),
-      error: json['error'] as String?,
-      metadata: json['metadata'] as Map<String, dynamic>?,
-    );
-
-Map<String, dynamic> _$$UserSignUpResponseImplToJson(
-    _$UserSignUpResponseImpl instance) {
-  final val = <String, dynamic>{
-    'success': instance.success,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('message', instance.message);
-  writeNotNull('data', instance.data?.toJson());
-  writeNotNull('error', instance.error);
-  writeNotNull('metadata', instance.metadata);
-  return val;
-}
-
 _$UserSignUpDataImpl _$$UserSignUpDataImplFromJson(Map<String, dynamic> json) =>
     _$UserSignUpDataImpl(
       userId: json['user_id'] as String,

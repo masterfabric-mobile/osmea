@@ -6,6 +6,7 @@
  */
 
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
 
 /// Base class for all product detail states
 abstract class ProductDetailState {}
@@ -24,7 +25,10 @@ class ProductDetailLoadedState extends ProductDetailState {
   final int currentImageIndex;
   final bool isInCart;
   final bool isInWishlist;
-  final bool isAddingToCart;
+  final bool isDescriptionExpanded;
+  final Map<String, String> selectedAttributes;
+  final List<ListProductReviewsResponseModel> reviews;
+  final Set<String> highlightedAttributes; // Attributes to highlight in red
 
   ProductDetailLoadedState({
     required this.product,
@@ -33,7 +37,10 @@ class ProductDetailLoadedState extends ProductDetailState {
     this.currentImageIndex = 0,
     this.isInCart = false,
     this.isInWishlist = false,
-    this.isAddingToCart = false,
+    this.isDescriptionExpanded = false,
+    this.selectedAttributes = const {},
+    this.reviews = const [],
+    this.highlightedAttributes = const {},
   });
 
   ProductDetailLoadedState copyWith({
@@ -43,7 +50,10 @@ class ProductDetailLoadedState extends ProductDetailState {
     int? currentImageIndex,
     bool? isInCart,
     bool? isInWishlist,
-    bool? isAddingToCart,
+    bool? isDescriptionExpanded,
+    Map<String, String>? selectedAttributes,
+    List<ListProductReviewsResponseModel>? reviews,
+    Set<String>? highlightedAttributes,
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
@@ -52,7 +62,11 @@ class ProductDetailLoadedState extends ProductDetailState {
       currentImageIndex: currentImageIndex ?? this.currentImageIndex,
       isInCart: isInCart ?? this.isInCart,
       isInWishlist: isInWishlist ?? this.isInWishlist,
-      isAddingToCart: isAddingToCart ?? this.isAddingToCart,
+      isDescriptionExpanded:
+          isDescriptionExpanded ?? this.isDescriptionExpanded,
+      selectedAttributes: selectedAttributes ?? this.selectedAttributes,
+      reviews: reviews ?? this.reviews,
+      highlightedAttributes: highlightedAttributes ?? this.highlightedAttributes,
     );
   }
 }
@@ -60,8 +74,12 @@ class ProductDetailLoadedState extends ProductDetailState {
 /// Error state when product detail fetching fails
 class ProductDetailErrorState extends ProductDetailState {
   final String message;
+  final ProductDetailLoadedState? previousState; // Previous state to recover to
 
-  ProductDetailErrorState({required this.message});
+  ProductDetailErrorState({
+    required this.message,
+    this.previousState,
+  });
 }
 
 /// Success state when an action is completed successfully

@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:core/src/models/error_handling_models.dart';
 import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:core/src/views/error_handling/cubit/error_handling_state.dart';
+import 'package:injectable/injectable.dart';
 
 /// 🎯 **OSMEA Error Handling Cubit**
 ///
@@ -15,6 +16,7 @@ import 'package:core/src/views/error_handling/cubit/error_handling_state.dart';
 /// {@category ViewModels}
 /// {@subCategory ErrorHandlingCubit}
 
+@injectable
 class ErrorHandlingCubit extends BaseViewModelCubit<ErrorHandlingState> {
   ErrorHandlingCubit() : super(const ErrorHandlingState());
 

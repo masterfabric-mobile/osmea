@@ -127,6 +127,16 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// 📱 Body widget to display instead of default search body
   final Widget? body;
 
+  /// 🎨 Custom widget builder for search results
+  /// Takes the list of results and returns a widget to display them
+  /// If not provided, default ListView will be used
+  final Widget Function(BuildContext, List<dynamic>)? resultBuilder;
+
+  /// 🏠 Custom widget builder for empty state (before search)
+  /// Use this to show categories, brands, or any initial content
+  /// If not provided, default empty state will be shown
+  final Widget Function(BuildContext)? emptyStateBuilder;
+
   /// 📷 Whether to show barcode scanner action
   final bool showBarcodeScanner;
 
@@ -199,6 +209,8 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     this.minQueryLength = 2,
     this.initialHistory = const [],
     this.body,
+    this.resultBuilder,
+    this.emptyStateBuilder,
     this.showBarcodeScanner = true,
     this.showVoiceSearch = true,
     this.showClearButton = true,
@@ -324,12 +336,20 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 searchFocusNode: searchFocusNode,
                 onSearch: (query) {
                   viewModel.performSearch(query,
-                      searchProvider: searchProvider);
+                      searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
                 },
                 onSearchChanged: (query) {
                   viewModel.updateQuery(query);
                   onSearchChanged?.call(query);
+
+                  // Trigger search if query length meets minimum requirement
+                  if (query.trim().length >= minQueryLength) {
+                    viewModel.performSearch(query,
+                        searchProvider: searchProvider);
+                  } else if (query.trim().isEmpty) {
+                    viewModel.clearSearch();
+                  }
 
                   if (searchSuggestionProvider != null) {
                     viewModel.getSuggestions(query,
@@ -442,6 +462,14 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                     viewModel.updateQuery(query);
                     onSearchChanged?.call(query);
 
+                    // Trigger search if query length meets minimum requirement
+                    if (query.trim().length >= minQueryLength) {
+                      viewModel.performSearch(query,
+                          searchProvider: searchProvider);
+                    } else if (query.trim().isEmpty) {
+                      viewModel.clearSearch();
+                    }
+
                     if (searchSuggestionProvider != null) {
                       viewModel.getSuggestions(query,
                           suggestionProvider: searchSuggestionProvider);
@@ -449,7 +477,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   },
                   onSubmitted: (query) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider);
+                        searchProvider: searchProvider, immediate: true);
                     onSearchSubmitted?.call(query);
                   },
                   onClear: () {
@@ -490,11 +518,37 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
         onSearchResult!(state.results);
       }
     });
+
+    // Handle system context menu errors (Flutter assertion issue)
+    FlutterError.onError = (FlutterErrorDetails details) {
+      if (details.exception.toString().contains('onDismissSystemContextMenu')) {
+        debugPrint('⚠️ Caught system context menu error - ignoring');
+        return;
+      }
+      FlutterError.presentError(details);
+    };
   }
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
     return _buildBody(context, viewModel, state);
+  }
+
+  // Override buildLoading to use LoadingView instead of CircularProgressIndicator
+  @override
+  Widget buildLoading({Color color = Colors.blue, double size = 50.0}) {
+    return LoadingView(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.initialization,
+      loadingSteps: [
+        'Initializing search...',
+        'Loading configuration...',
+        'Almost ready...',
+      ],
+      stepDuration: const Duration(milliseconds: 400),
+      showProgress: true,
+      showCancelButton: false,
+    );
   }
 
   // MARK: - Config Helper Methods
@@ -615,90 +669,41 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
     return _buildEmptyView(context, state, viewModel);
   }
 
-  /// Loading view using OSMEA components
+  /// Loading view using LoadingView
   Widget _buildLoadingView(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: OsmeaComponents.container(
-            padding: context.paddingNormal,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                OsmeaComponents.progress(
-                  type: ProgressType.linearRounded,
-                  value: 0.0,
-                  size: ProgressSize.medium,
-                  progressColor: OsmeaColors.nordicBlue,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                OsmeaComponents.text(
-                  'Searching...',
-                  variant: OsmeaTextVariant.titleMedium,
-                  color: OsmeaColors.pewter,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return LoadingView(
+      goRoute: goRoute,
+      loadingType: LoadingModelType.networkRequest,
+      loadingSteps: [
+        'Searching products...',
+        'Fetching results...',
+        'Almost there...',
+      ],
+      stepDuration: const Duration(milliseconds: 500),
+      showProgress: true,
+      showCancelButton: false,
     );
   }
 
-  /// Error view using OSMEA components
+  /// Error view using ErrorHandlingView
   Widget _buildErrorView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: OsmeaComponents.container(
-            padding: context.paddingNormal,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Center(
-                  child: Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                OsmeaComponents.text(
-                  'Error: ${state.errorMessage}',
-                  variant: OsmeaTextVariant.titleMedium,
-                  color: Colors.red,
-                  textAlign: TextAlign.center,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                Center(
-                  child: OsmeaComponents.button(
-                    text: 'Try Again',
-                    onPressed: () => viewModel.reset(),
-                    variant: ButtonVariant.outlined,
-                    size: ButtonSize.medium,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return ErrorHandlingView(
+      goRoute: goRoute,
+      onRetrySuccess: () => viewModel.reset(),
+      onGoBack: () => Navigator.of(context).pop(),
     );
   }
 
   /// Results view using OSMEA components
   Widget _buildResultsView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
+    // Use custom resultBuilder if provided
+    if (resultBuilder != null) {
+      return resultBuilder!(context, state.results);
+    }
+
+    // Default ListView implementation
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: state.results.length,
@@ -764,6 +769,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
   /// Empty state view using OSMEA components
   Widget _buildEmptyView(
       BuildContext context, SearchState state, SearchCubit viewModel) {
+    // Use custom emptyStateBuilder if provided
+    if (emptyStateBuilder != null) {
+      return emptyStateBuilder!(context);
+    }
+
+    // Default empty state
     return Center(
       child: SingleChildScrollView(
         child: Padding(
