@@ -38,6 +38,42 @@
       "args": ["--flavor", "prod"]
     },
     {
+      "name": "🧪 Storefront Supabase - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_supabase/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_supabase",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🧪 Storefront Supabase - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_supabase/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_supabase",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🧪 Storefront Supabase - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_supabase/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_supabase",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🧪 Storefront Supabase - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/storefront_supabase/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/storefront_supabase",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    },
+    {
       "name": "🎛️ Admin Dashboard - Dev (Debug)",
       "type": "dart",
       "request": "launch",
@@ -144,4 +180,3 @@
     }
   ]
 }
-
