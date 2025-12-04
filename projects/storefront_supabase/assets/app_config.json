@@ -1,0 +1,143 @@
+{
+    "app_settings": {
+      "app_name": "Storefront Supabase",
+      "app_version": "1.0.0",
+      "build_number": "1",
+      "environment": "production",
+      "debug_mode": false,
+      "maintenance_mode": false
+    },
+    "api_configuration": {
+      "base_url": "https://api.masterfabric.co/storefront_supabase",
+      "timeout_seconds": 45,
+      "retry_count": 3,
+      "enable_logging": true
+    },
+    "firebase_configuration": {
+      "analytics_enabled": true,
+      "crashlytics_enabled": true,
+      "performance_monitoring_enabled": true,
+      "remote_config_enabled": true,
+      "remote_config_fetch_timeout": 60,
+      "remote_config_cache_expiration": 3600
+    },
+    "ui_configuration": {
+      "theme_mode": "light",
+      "primary_color": "#000000",
+      "accent_color": "#FFFFFF",
+      "font_scale": 1.0,
+      "enable_haptic_feedback": true,
+      "enable_sound_effects": true
+    },
+    "security_configuration": {
+      "enable_ssl_pinning": true,
+      "certificate_validation": true,
+      "biometric_authentication": true,
+      "session_timeout_minutes": 45
+    },
+    "storage_configuration": {
+      "enable_encryption": true,
+      "cache_size_mb": 150,
+      "auto_cleanup_enabled": true,
+      "backup_enabled": true
+    },
+    "notification_configuration": {
+      "push_notifications_enabled": true,
+      "local_notifications_enabled": true,
+      "notification_sound": "default",
+      "vibration_enabled": true
+    },
+    "feature_flags": {
+      "onboarding_enabled": true,
+      "dark_mode_available": true,
+      "offline_mode_enabled": true,
+      "beta_features_enabled": false,
+      "analytics_opt_out_available": true
+
+    },
+    "splash_configuration": {
+      "enabled": true,
+      "style": "enterprise",
+      "duration_milliseconds": 3000,
+      "min_duration_milliseconds": 1500,
+      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true",
+      "background_color": "#FFFFFF",
+      "logo_color": "#000000",
+      "show_loading_indicator": true,
+      "loading_indicator_color": "#000000",
+      "show_version_info": true,
+      "version_text_color": "#666666",
+      "fade_animation_enabled": true,
+      "animation_duration_milliseconds": 500,
+      "enable_logo_animation": true,
+      "logo_animation_type": "fade_scale",
+      "show_app_name": true,
+      "app_name_text_color": "#000000",
+      "app_name_font_size": 24,
+      "navigation_target": "/onboarding",
+      "fallback_navigation_target": "/home",
+      "check_connectivity": true,
+      "preload_critical_data": true,
+      "show_error_on_failure": false,
+      "retry_on_error": true,
+      "max_retry_attempts": 2,
+      "enable_dev_mode_tap": true,
+      "dev_mode_tap_count": 7
+    },
+    "localization_configuration": {
+      "default_language": "tr",
+      "supported_languages": ["tr", "en", "de", "fr"],
+      "rtl_support": false,
+      "auto_detect_language": true
+    },
+    "performance_configuration": {
+      "image_cache_size_mb": 75,
+      "network_cache_size_mb": 50,
+      "lazy_loading_enabled": true,
+      "preload_critical_assets": true
+    },
+    "onboarding_configuration": {
+      "style": "space",
+      "auto_advance_seconds": null,
+      "show_skip_button": true,
+      "show_page_indicator": true,
+      "animation_duration": 400,
+      "primary_color": "#000000",
+      "secondary_color": "#FFFFFF",
+      "pages": [
+        {
+          "title": "Storefront Supabase",
+          "description": "Stay updated with the latest Storefront Supabase security news and alerts.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Next"
+        },
+        {
+          "title": "Real-time Storefront Supabase Monitoring",
+          "description": "Get instant notifications about new storefront supabase and security threats as they are discovered.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#F5F5F5",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Continue"
+        },
+        {
+          "title": "Advanced Search & Filtering",
+          "description": "Search and filter storefront supabase by severity, vendor, product, or date to find exactly what you need.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#E5E5E5",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Continue"
+        }
+      ]
+    }
+  }
