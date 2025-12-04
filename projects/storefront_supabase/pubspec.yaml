@@ -61,6 +61,7 @@ dependencies:
 dependency_overrides:
   slang: 4.8.1
   slang_flutter: 4.8.0
+  slang_build_runner: 4.8.0
 
 dev_dependencies:
   flutter_test:
