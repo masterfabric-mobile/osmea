@@ -69,63 +69,31 @@ class _MinimalistHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: OsmeaComponents.text(
-          'Storefront Woo',
-          color: OsmeaColors.black,
-          textStyle: OsmeaTextStyle.titleLarge(
-            context,
-          ).copyWith(fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: OsmeaComponents.container(
-            padding: const EdgeInsets.all(32),
-            child: OsmeaComponents.center(
-              child: OsmeaComponents.column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Welcome Title
-                  OsmeaComponents.text(
-                    'Welcome to Storefront Woo',
-                    color: OsmeaColors.black,
-                    textAlign: TextAlign.center,
-                    textStyle: OsmeaTextStyle.headlineSmall(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.w600),
-                  ),
-
-                  OsmeaComponents.sizedBox(height: 16),
-
-                  // Welcome Subtitle
-                  OsmeaComponents.text(
-                    'Your WooCommerce powered store',
-                    color: OsmeaColors.slate,
-                    textAlign: TextAlign.center,
-                    textStyle: OsmeaTextStyle.bodyMedium(context),
-                  ),
-
-                  OsmeaComponents.sizedBox(height: 48),
-
-                  // Main Content
-                  OsmeaComponents.text(
-                    'This is the default home page. You can customize it according to your needs.',
-                    color: OsmeaColors.pewter,
-                    textAlign: TextAlign.center,
-                    textStyle: OsmeaTextStyle.bodyMedium(context),
-                  ),
-
-                  OsmeaComponents.sizedBox(height: 32),
-                ],
-              ),
+    return OsmeaComponents.scaffold(
+      body: OsmeaComponents.center(
+        child: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Welcome Title
+            OsmeaComponents.text(
+              'Welcome to Storefront Supabase',
+              color: OsmeaColors.black,
+              textAlign: TextAlign.center,
+              textStyle: OsmeaTextStyle.headlineSmall(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
             ),
-          ),
+
+            OsmeaComponents.sizedBox(height: 16),
+
+            // Welcome Subtitle
+            OsmeaComponents.text(
+              'Your Supabase powered store',
+              color: OsmeaColors.slate,
+              textAlign: TextAlign.center,
+              textStyle: OsmeaTextStyle.bodyMedium(context),
+            ),
+          ],
         ),
       ),
     );
