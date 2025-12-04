@@ -16,14 +16,7 @@ class SupabaseHomeView
     super.key,
     super.arguments = const {'home': true},
     required super.goRoute,
-  }) : super(
-          appBarPadding: const AppBarPaddingVisibility.disabled(),
-          navbarSpacer: const SpacerVisibility.disabled(),
-          footerSpacer: const SpacerVisibility.disabled(),
-          verticalPadding: const PaddingVisibility.disabled(),
-          horizontalPadding: const PaddingVisibility.disabled(),
-          coreAppBar: null,
-        );
+  }) : super();
 
   @override
   void initialContent(
@@ -79,5 +72,3 @@ class SupabaseHomeView
     );
   }
 }
-
-

@@ -1,9 +1,3 @@
-/// Simple home states for Supabase storefront.
-///
-/// Kept intentionally minimal – the goal is just to demonstrate the
-/// `BaseViewModelHydratedCubit` + `MasterViewHydratedCubit` flow using
-/// core's base infrastructure.
-
 abstract class SupabaseHomeState {}
 
 class SupabaseHomeInitialState extends SupabaseHomeState {}
@@ -14,7 +8,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
 
   SupabaseHomeLoadedState({
     required this.title,
-    required this.subtitle,
+    required this.subtitle,    
   });
 }
 

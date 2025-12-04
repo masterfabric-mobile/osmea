@@ -18,7 +18,7 @@ Future<GetIt> configureDependencies({String? environment}) async {
     debugPrint('✅ Core dependencies initialized');
 
     // Initialize app-specific dependencies
-    final result = await getIt.init(environment: environment);
+    final result = getIt.init(environment: environment);
     debugPrint('✅ App dependencies initialized');
 
     // Ensure SupabaseHomeViewModel is registered (safety net in case
