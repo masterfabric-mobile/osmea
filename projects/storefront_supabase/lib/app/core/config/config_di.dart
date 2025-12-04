@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:storefront_supabase/app/core/config/config_di.config.dart';
+import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -19,6 +20,15 @@ Future<GetIt> configureDependencies({String? environment}) async {
     // Initialize app-specific dependencies
     final result = await getIt.init(environment: environment);
     debugPrint('✅ App dependencies initialized');
+
+    // Ensure SupabaseHomeViewModel is registered (safety net in case
+    // code generation is not up to date).
+    if (!getIt.isRegistered<SupabaseHomeViewModel>()) {
+      getIt.registerFactory<SupabaseHomeViewModel>(
+        () => SupabaseHomeViewModel(),
+      );
+      debugPrint('✅ SupabaseHomeViewModel registered manually in GetIt');
+    }
 
     return result;
   } catch (e, stackTrace) {
