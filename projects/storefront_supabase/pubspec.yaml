@@ -1,0 +1,100 @@
+name: storefront_supabase
+description: "Ecommerce Storefront App - Modern Flutter-based storefront application for Supabase with BLoC state management, localization support, and responsive design"
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ────────────────────────────────
+  # CORE PACKAGE
+  # ────────────────────────────────
+
+  core:
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core 
+
+  # ────────────────────────────────
+  # ICONS
+  # ────────────────────────────────
+  cupertino_icons: ^1.0.8
+
+  # ────────────────────────────────  
+  # DEPENDENCY INJECTION
+  # ────────────────────────────────
+  flutter_bloc: ^9.1.1     # BLoC pattern for managing application state
+  get_it: ^7.7.0           # Simple service locator (manual DI)
+  injectable: ^2.5.0       # Annotation-based code generation for get_it
+
+  # ────────────────────────────────
+  # ROUTING / NAVIGATION
+  # ────────────────────────────────
+  go_router: ^15.1.3       # Declarative navigation with deep linking support
+
+  # ────────────────────────────────
+  # ENVIRONMENT CONFIGURATION
+  # ────────────────────────────────
+  flavor: ^2.0.0           # Manage multiple environments (dev, staging, prod)
+
+  # ────────────────────────────────
+  # LOCALIZATION (i18n)
+  # ────────────────────────────────
+  slang: ^4.7.3            # JSON-based translation tool with advanced features
+  slang_flutter: ^4.7.0    # Flutter bindings for the slang localization package
+
+  # ────────────────────────────────
+  # CODE GENERATION / ASSET MANAGEMENT
+  # ────────────────────────────────
+  flutter_gen: ^5.10.0     # Generates strongly typed asset references (images, fonts, etc.)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DEPENDENCY OVERRIDES
+# ═══════════════════════════════════════════════════════════════════════════════
+dependency_overrides:
+  slang: 4.8.1
+  slang_flutter: 4.8.0
+  slang_build_runner: 4.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+  # ────────────────────────────────
+  # CODE GENERATION
+  # ────────────────────────────────
+  injectable_generator: ^2.6.2     # Generates code for injectable (DI)
+  build_runner: ^2.5.4            # Core tool for running code generation
+  slang_build_runner: ^4.7.0      # Code generator for slang localization
+  flutter_gen_runner: any         # Generator for flutter_gen (assets, colors, fonts, etc.)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FLUTTER GEN CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+flutter_gen:
+  output: lib/gen/
+  line_length: 80
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FLUTTER PROJECT CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+flutter:
+# ────────────────────────────────
+  # ASSET MANAGEMENT
+  # ────────────────────────────────
+  assets:
+    - assets/                    # Configuration files (app_config.json)
+  # ────────────────────────────────
+  # MATERIAL DESIGN
+  # ────────────────────────────────
+
+  uses-material-design: true
