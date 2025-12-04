@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:core/src/views/routes.dart';
 
+import 'package:storefront_supabase/app/views/view_home/home_view.dart';
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   // Global route configuration
@@ -57,45 +59,8 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/home',
       builder: (BuildContext context, GoRouterState state) {
-        return const _MinimalistHomePage();
+        return SupabaseHomeView(goRoute: (String path) => context.go(path));
       },
     ),
   ],
 );
-
-/// 🏠 Default Home Page
-class _MinimalistHomePage extends StatelessWidget {
-  const _MinimalistHomePage();
-
-  @override
-  Widget build(BuildContext context) {
-    return OsmeaComponents.scaffold(
-      body: OsmeaComponents.center(
-        child: OsmeaComponents.column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Welcome Title
-            OsmeaComponents.text(
-              'Welcome to Storefront Supabase',
-              color: OsmeaColors.black,
-              textAlign: TextAlign.center,
-              textStyle: OsmeaTextStyle.headlineSmall(
-                context,
-              ).copyWith(fontWeight: FontWeight.w600),
-            ),
-
-            OsmeaComponents.sizedBox(height: 16),
-
-            // Welcome Subtitle
-            OsmeaComponents.text(
-              'Your Supabase powered store',
-              color: OsmeaColors.slate,
-              textAlign: TextAlign.center,
-              textStyle: OsmeaTextStyle.bodyMedium(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
