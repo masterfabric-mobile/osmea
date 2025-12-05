@@ -4,49 +4,52 @@ import 'package:core/core.dart';
 
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
+import 'package:storefront_supabase/app/views/view_cart/cart_view.dart';
+import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
-import 'package:storefront_supabase/app/views/view_login/login_view.dart';
-import 'package:storefront_supabase/app/views/view_signup/signup_view.dart';
+import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   final Widget child;
 
   const MainScreen({super.key, required this.child});
 
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  final List<NavbarItem> _navItems = [
+    NavbarItem(text: 'Home', icon: const Icon(Icons.home), onTap: () {}),
+    NavbarItem(text: 'Categories', icon: const Icon(Icons.category), onTap: () {}),
+    NavbarItem(text: 'My Cart', icon: const Icon(Icons.shopping_cart), onTap: () {}),
+    NavbarItem(text: 'Favorites', icon: const Icon(Icons.favorite), onTap: () {}),
+    NavbarItem(text: 'Profile', icon: const Icon(Icons.person), onTap: () {}),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+      body: widget.child,
+      bottomNavigationBar: OsmeaComponents.navbar(
+        items: _navItems,
+        variant: NavbarVariant.primary,
+        size: NavbarSize.medium,
         currentIndex: _calculateSelectedIndex(context),
-        onTap: (int idx) => _onItemTapped(idx, context),
+        onItemTap: (int idx) => _onItemTapped(idx, context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
 
-  static int _calculateSelectedIndex(BuildContext context) {
+  int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/favorites')) {
-      return 1;
-    }
-    if (location.startsWith('/settings')) {
-      return 2;
-    }
+    if (location.startsWith('/categories')) return 1;
+    if (location.startsWith('/cart')) return 2;
+    if (location.startsWith('/favorites')) return 3;
+    if (location.startsWith('/profile')) return 4;
     return 0;
   }
 
@@ -56,83 +59,34 @@ class MainScreen extends StatelessWidget {
         context.go('/home');
         break;
       case 1:
-        context.go('/favorites');
+        context.go('/categories');
         break;
       case 2:
-        context.go('/settings');
+        context.go('/cart');
+        break;
+      case 3:
+        context.go('/favorites');
+        break;
+      case 4:
+        context.go('/profile');
         break;
     }
   }
 }
 
-
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/home', // Change initial route to home, which is part of ShellRoute
-  // Global route configuration
+  initialLocation: '/home',
   routes: <RouteBase>[
-    // Splash Screen Route (still accessible directly)
     GoRoute(
       path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return SplashView(
-          goRoute: (String path) {
-            if (path.contains(Routes.home.name)) {
-              context.go('/home');
-            } else if (path.contains(Routes.onboarding.name)) {
-              context.go('/onboarding');
-            } else {
-              context.go('/home'); // Default fallback
-            }
-          },
-        );
-      },
+      builder: (BuildContext context, GoRouterState state) =>
+          SplashView(goRoute: (String path) => context.go(path)),
     ),
-
-    // Onboarding Route
     GoRoute(
       path: '/onboarding',
-      builder: (BuildContext context, GoRouterState state) {
-        return OnboardingView(
-          goRoute: (String path) {
-            if (path.contains(Routes.home.name)) {
-              context.go('/home');
-            } else {
-              context.go('/home'); // Default fallback
-            }
-          },
-          onCompleted: () {
-            debugPrint('🎉 Onboarding completed!');
-            context.go('/home');
-          },
-          onSkipped: () {
-            debugPrint('⏭️ Onboarding skipped!');
-            context.go('/home');
-          },
-          onError: (error) {
-            debugPrint('❌ Onboarding error: $error');
-            context.go('/home');
-          },
-        );
-      },
+      builder: (BuildContext context, GoRouterState state) =>
+          OnboardingView(goRoute: (String path) => context.go(path)),
     ),
-
-    // Login Page
-    GoRoute(
-      path: '/login',
-      builder: (BuildContext context, GoRouterState state) {
-        return LoginView(goRoute: (String path) => context.go(path));
-      },
-    ),
-
-    // Signup Page
-    GoRoute(
-      path: '/signup',
-      builder: (BuildContext context, GoRouterState state) {
-        return SignupView(goRoute: (String path) => context.go(path));
-      },
-    ),
-    
-    // Product Detail Page
     GoRoute(
       path: '/product-detail/:id',
       builder: (BuildContext context, GoRouterState state) {
@@ -143,28 +97,40 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
-
-    // ShellRoute for main navigation (Home, Favorites, Settings)
+    // Settings is now a top-level route
+    GoRoute(
+      path: '/settings',
+      builder: (BuildContext context, GoRouterState state) {
+        return SettingsView(goRoute: (String path) => context.go(path));
+      },
+    ),
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
         GoRoute(
           path: '/home',
-          builder: (BuildContext context, GoRouterState state) {
-            return SupabaseHomeView(goRoute: (String path) => context.go(path));
-          },
+          builder: (BuildContext context, GoRouterState state) =>
+              SupabaseHomeView(goRoute: (String path) => context.go(path)),
+        ),
+        GoRoute(
+          path: '/categories',
+          builder: (BuildContext context, GoRouterState state) =>
+              CategoriesView(goRoute: (String path) => context.go(path)),
+        ),
+        GoRoute(
+          path: '/cart',
+          builder: (BuildContext context, GoRouterState state) =>
+              CartView(goRoute: (String path) => context.go(path)),
         ),
         GoRoute(
           path: '/favorites',
-          builder: (BuildContext context, GoRouterState state) {
-            return FavoritesView(goRoute: (String path) => context.go(path));
-          },
+          builder: (BuildContext context, GoRouterState state) =>
+              FavoritesView(goRoute: (String path) => context.go(path)),
         ),
         GoRoute(
-          path: '/settings',
-          builder: (BuildContext context, GoRouterState state) {
-            return SettingsView(goRoute: (String path) => context.go(path));
-          },
+          path: '/profile',
+          builder: (BuildContext context, GoRouterState state) =>
+              ProfileView(goRoute: (String path) => context.go(path)),
         ),
       ],
     ),
