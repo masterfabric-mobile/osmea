@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:core/core.dart';
 
 import 'models/view_model.dart';
@@ -10,7 +11,21 @@ class SettingsView
     super.key,
     super.arguments = const {'init': true},
     required super.goRoute,
-  });
+  }) : super(
+          horizontalPadding: const PaddingVisibility.disabled(),
+          appBarPadding: const AppBarPaddingVisibility.disabled(),
+          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+            title: OsmeaComponents.text(
+              'Settings',
+              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            size: AppBarSize.large,
+            elevation: 0,
+            titleSpacing: 0.0,
+          ),
+        );
 
   @override
   void initialContent(
@@ -34,10 +49,17 @@ class SettingsView
     }
 
     if (state is SettingsLoadedState) {
-      return OsmeaComponents.scaffold(
-        body: OsmeaComponents.center(
-          child: OsmeaComponents.text('Settings Page Content'),
-        ),
+      return ListView(
+        children: [
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('Dark Mode'),
+            leading: const Icon(Icons.dark_mode),
+            trailing: Switch(
+              value: state.darkModeEnabled,
+              onChanged: (value) => viewModel.toggleDarkMode(value),
+            ),
+          ),
+        ],
       );
     }
 

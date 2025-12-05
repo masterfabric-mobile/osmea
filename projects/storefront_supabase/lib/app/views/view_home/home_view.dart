@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:core/core.dart';
 
 import 'models/home_view_model.dart';
@@ -16,7 +17,33 @@ class SupabaseHomeView
     super.key,
     super.arguments = const {'home': true},
     required super.goRoute,
-  }) : super();
+  }) : super(
+          horizontalPadding: const PaddingVisibility.disabled(),
+          appBarPadding: const AppBarPaddingVisibility.disabled(),
+          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+            title: OsmeaComponents.text(
+              'Storefront Supabase',
+              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            size: AppBarSize.large,
+            elevation: 0,
+            titleSpacing: 0.0,
+            actions: [
+              AppBarAction(
+                type: AppBarActionType.search,
+                icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onPrimary),
+                onPressed: () {},
+              ),
+              AppBarAction(
+                type: AppBarActionType.more,
+                icon: Icon(Icons.shopping_cart_outlined, color: Theme.of(context).colorScheme.onPrimary),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        );
 
   @override
   void initialContent(
@@ -40,28 +67,26 @@ class SupabaseHomeView
     }
 
     if (state is SupabaseHomeLoadedState) {
-      return OsmeaComponents.scaffold(
-        body: OsmeaComponents.center(
-          child: OsmeaComponents.column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OsmeaComponents.text(
-                state.title,
-                color: OsmeaColors.black,
-                textAlign: TextAlign.center,
-                textStyle: OsmeaTextStyle.headlineSmall(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w600),
-              ),
-              OsmeaComponents.sizedBox(height: 16),
-              OsmeaComponents.text(
-                state.subtitle,
-                color: OsmeaColors.slate,
-                textAlign: TextAlign.center,
-                textStyle: OsmeaTextStyle.bodyMedium(context),
-              ),
-            ],
-          ),
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OsmeaComponents.text(
+              state.title,
+              color: OsmeaColors.black,
+              textAlign: TextAlign.center,
+              textStyle: OsmeaTextStyle.headlineSmall(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
+            ),
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.text(
+              state.subtitle,
+              color: OsmeaColors.slate,
+              textAlign: TextAlign.center,
+              textStyle: OsmeaTextStyle.bodyMedium(context),
+            ),
+          ],
         ),
       );
     }
