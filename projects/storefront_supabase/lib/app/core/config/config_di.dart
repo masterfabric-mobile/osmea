@@ -4,7 +4,10 @@ import 'package:injectable/injectable.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:storefront_supabase/app/core/config/config_di.config.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_categories/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -28,6 +31,27 @@ Future<GetIt> configureDependencies({String? environment}) async {
         () => SupabaseHomeViewModel(),
       );
       debugPrint('✅ SupabaseHomeViewModel registered manually in GetIt');
+    }
+
+    if (!getIt.isRegistered<CategoriesViewModel>()) {
+      getIt.registerFactory<CategoriesViewModel>(
+        () => CategoriesViewModel(),
+      );
+      debugPrint('✅ CategoriesViewModel registered manually in GetIt');
+    }
+
+    if (!getIt.isRegistered<ProfileViewModel>()) {
+      getIt.registerFactory<ProfileViewModel>(
+        () => ProfileViewModel(),
+      );
+      debugPrint('✅ ProfileViewModel registered manually in GetIt');
+    }
+
+    if (!getIt.isRegistered<CartViewModel>()) {
+      getIt.registerFactory<CartViewModel>(
+        () => CartViewModel(),
+      );
+      debugPrint('✅ CartViewModel registered manually in GetIt');
     }
 
     return result;
