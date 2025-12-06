@@ -1,6 +1,7 @@
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/routes/app_routes.dart';
 
@@ -52,6 +53,20 @@ launchApp({String environment = 'dev'}) async {
   final configStats = assetConfigHelper.getConfigStats();
   final configSource = configStats['config_source'] ?? 'unknown';
   debugPrint('📂 Config: ${configSource == 'project_specific' ? '🎯 Project' : configSource == 'core_package_fallback' ? '📦 Core Package' : '⚠️ Default'}');
+
+  // Initialize Supabase
+  final supabaseUrl = assetConfigHelper.getString('supabase_configuration.url');
+  final supabaseAnonKey = assetConfigHelper.getString('supabase_configuration.anon_key');
+
+  if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty && supabaseUrl != 'YOUR_SUPABASE_URL') {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+    debugPrint('✅ Supabase initialized');
+  } else {
+    debugPrint('⚠️ Supabase URL or anon key not found or is placeholder. Skipping initialization.');
+  }
 
   // Configure dependency injection for the application
   await configureDependencies(environment: environment);

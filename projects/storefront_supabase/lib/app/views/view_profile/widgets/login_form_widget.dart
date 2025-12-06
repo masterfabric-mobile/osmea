@@ -39,24 +39,11 @@ class LoginFormWidget extends StatelessWidget {
           focusColor: OsmeaColors.black,
           type: TextFieldType.password,
           obscureText: true,
-          // autovalidateMode is not supported, removing this line
-          validator: (value) {
-            if (value == null || value.length < 10) {
-              return 'Must be at least 10 characters.';
-            }
-            if (!value.contains(RegExp(r'[A-Z]'))) {
-              return 'Must contain an uppercase letter.';
-            }
-            if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-              return 'Must contain a special character.';
-            }
-            return null;
-          },
         ),
         OsmeaComponents.sizedBox(height: 24),
         OsmeaComponents.button(
           text: 'Sign In',
-          onPressed: viewModel.state.isFormValid ? viewModel.login : null,
+          onPressed: viewModel.login,
           variant: ButtonVariant.primary,
           fullWidth: true,
           backgroundColor: OsmeaColors.black,

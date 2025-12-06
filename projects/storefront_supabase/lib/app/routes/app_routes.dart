@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide SearchView;
 
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
@@ -8,6 +8,7 @@ import 'package:storefront_supabase/app/views/view_cart/cart_view.dart';
 import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
+import 'package:storefront_supabase/app/views/view_search/search_view.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 
 class MainScreen extends StatefulWidget {
@@ -87,16 +88,6 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) =>
           OnboardingView(goRoute: (String path) => context.go(path)),
     ),
-    GoRoute(
-      path: '/product-detail/:id',
-      builder: (BuildContext context, GoRouterState state) {
-        final productId = state.pathParameters['id'];
-        return ProductDetailView(
-          goRoute: (String path) => context.go(path),
-          arguments: {'productId': productId},
-        );
-      },
-    ),
     // Settings is now a top-level route
     GoRoute(
       path: '/settings',
@@ -107,6 +98,16 @@ final GoRouter appRouter = GoRouter(
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
+        GoRoute(
+          path: '/product-detail/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            final productId = state.pathParameters['id'];
+            return ProductDetailView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'productId': productId},
+            );
+          },
+        ),
         GoRoute(
           path: '/home',
           builder: (BuildContext context, GoRouterState state) =>
@@ -131,6 +132,11 @@ final GoRouter appRouter = GoRouter(
           path: '/profile',
           builder: (BuildContext context, GoRouterState state) =>
               ProfileView(goRoute: (String path) => context.go(path)),
+        ),
+        GoRoute(
+          path: '/search',
+          builder: (BuildContext context, GoRouterState state) =>
+              SearchView(goRoute: (String path) => context.go(path)),
         ),
       ],
     ),

@@ -39,19 +39,6 @@ class SignupFormWidget extends StatelessWidget {
           focusColor: OsmeaColors.black,
           type: TextFieldType.password,
           obscureText: true,
-          // autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: (value) {
-            if (value == null || value.length < 10) {
-              return 'Must be at least 10 characters.';
-            }
-            if (!value.contains(RegExp(r'[A-Z]'))) {
-              return 'Must contain an uppercase letter.';
-            }
-            if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-              return 'Must contain a special character.';
-            }
-            return null;
-          },
         ),
         OsmeaComponents.sizedBox(height: 16),
         OsmeaComponents.textField(
@@ -65,17 +52,11 @@ class SignupFormWidget extends StatelessWidget {
           focusColor: OsmeaColors.black,
           type: TextFieldType.password,
           obscureText: true,
-          validator: (value) {
-            if (value != viewModel.passwordController.text) {
-              return 'Passwords do not match.';
-            }
-            return null;
-          },
         ),
         OsmeaComponents.sizedBox(height: 24),
         OsmeaComponents.button(
           text: 'Sign Up',
-          onPressed: viewModel.state.isFormValid ? viewModel.signup : null,
+          onPressed: viewModel.signup,
           variant: ButtonVariant.primary,
           fullWidth: true,
           backgroundColor: OsmeaColors.black,

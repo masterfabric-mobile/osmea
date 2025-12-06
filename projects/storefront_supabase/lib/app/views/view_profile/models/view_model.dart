@@ -1,38 +1,35 @@
-import 'package:core/core.dart';
+import 'dart:async';
+import 'package:core/core.dart' hide AuthState;
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'states.dart';
 
 @injectable
 class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
+  final SupabaseClient _supabaseClient;
+  late final StreamSubscription<AuthState> _authSubscription;
+
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController confirmPasswordController;
 
-  ProfileViewModel() : super(const ProfileState()) {
-    emailController = TextEditingController()..addListener(_validateForm);
-    passwordController = TextEditingController()..addListener(_validateForm);
-    confirmPasswordController = TextEditingController()..addListener(_validateForm);
+  ProfileViewModel(this._supabaseClient) : super(const ProfileState()) {
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    confirmPasswordController = TextEditingController();
+
+    _authSubscription =
+        _supabaseClient.auth.onAuthStateChange.listen((data) {
+      final Session? session = data.session;
+      stateChanger(state.copyWith(isLoggedIn: session != null));
+    });
   }
 
-  @override
   Future<void> initial() async {
-    // In a real app, you would check the actual authentication status here.
-    _validateForm();
-  }
-
-  void _validateForm() {
-    final pass = passwordController.text;
-    final isPasswordValid = pass.length >= 10 &&
-        pass.contains(RegExp(r'[A-Z]')) &&
-        pass.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
-
-    final arePasswordsMatching =
-        !state.showLoginView ? pass == confirmPasswordController.text : true;
-
-    stateChanger(state.copyWith(
-      isFormValid: isPasswordValid && arePasswordsMatching && emailController.text.isNotEmpty,
-    ));
+    // Set initial state based on current user
+    stateChanger(
+        state.copyWith(isLoggedIn: _supabaseClient.auth.currentUser != null));
   }
 
   void switchToLogin() {
@@ -46,36 +43,70 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   }
 
   Future<void> login() async {
-    if (!state.isFormValid) return;
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      stateChanger(
+          state.copyWith(errorMessage: 'Please enter email and password.'));
+      return;
+    }
     stateChanger(state.copyWith(isLoading: true, errorMessage: null));
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (emailController.text == 'test@osmea.com' &&
-        passwordController.text == 'Password123!') {
-      stateChanger(state.copyWith(isLoading: false, isLoggedIn: true));
-    } else {
-      stateChanger(state.copyWith(
-          isLoading: false, errorMessage: 'Invalid credentials. Please try again.'));
+    try {
+      final response = await _supabaseClient.auth.signInWithPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      if (response.user == null) {
+        stateChanger(state.copyWith(
+            isLoading: false, errorMessage: 'Login failed. Please check your credentials.'));
+      } else {
+        _clearFieldsAndErrors();
+        stateChanger(state.copyWith(isLoading: false, isLoggedIn: true));
+      }
+    } on AuthException catch (e) {
+      stateChanger(state.copyWith(isLoading: false, errorMessage: e.message));
+    } catch (e) {
+      stateChanger(
+          state.copyWith(isLoading: false, errorMessage: 'An unexpected error occurred.'));
     }
   }
 
   Future<void> signup() async {
-    if (!state.isFormValid) return;
-    stateChanger(state.copyWith(isLoading: true, errorMessage: null));
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Final check before "API call"
-    if (passwordController.text != confirmPasswordController.text) {
-      stateChanger(state.copyWith(isLoading: false, errorMessage: 'Passwords do not match.'));
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      stateChanger(state.copyWith(
+          errorMessage: 'Please fill all fields.'));
       return;
     }
-    // Simulate successful signup
-    stateChanger(state.copyWith(isLoading: false, isLoggedIn: true));
+    if (passwordController.text != confirmPasswordController.text) {
+      stateChanger(state.copyWith(errorMessage: 'Passwords do not match.'));
+      return;
+    }
+    stateChanger(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      final response = await _supabaseClient.auth.signUp(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      // Supabase sends a confirmation email by default.
+      // We will treat it as logged in for simplicity, but a real app should handle email verification.
+      if (response.user != null) {
+         _clearFieldsAndErrors();
+         stateChanger(state.copyWith(isLoading: false, isLoggedIn: true, showLoginView: true, errorMessage: 'Success! Please check your email to confirm your registration.'));
+      } else {
+         stateChanger(state.copyWith(isLoading: false, errorMessage: 'Signup failed. Please try again.'));
+      }
+    } on AuthException catch (e) {
+      stateChanger(state.copyWith(isLoading: false, errorMessage: e.message));
+    } catch (e) {
+      stateChanger(
+          state.copyWith(isLoading: false, errorMessage: 'An unexpected error occurred.'));
+    }
   }
 
   Future<void> logout() async {
     stateChanger(state.copyWith(isLoading: true));
-    await Future.delayed(const Duration(seconds: 1));
+    await _supabaseClient.auth.signOut();
     _clearFieldsAndErrors();
     stateChanger(const ProfileState(isLoggedIn: false, showLoginView: true));
   }
@@ -84,10 +115,11 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     emailController.clear();
     passwordController.clear();
     confirmPasswordController.clear();
-    stateChanger(state.copyWith(errorMessage: null, isFormValid: false));
+    stateChanger(state.copyWith(errorMessage: null));
   }
 
   void dispose() {
+    _authSubscription.cancel();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();

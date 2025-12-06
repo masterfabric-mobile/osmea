@@ -48,14 +48,29 @@ class CategoriesView
       );
     }
 
+    if (state is CategoriesLoadingState || state is CategoriesInitialState) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     if (state is CategoriesLoadedState) {
+      if (state.categories.isEmpty) {
+        return Center(
+          child: OsmeaComponents.text('No categories found.'),
+        );
+      }
       return ListView.builder(
         itemCount: state.categories.length,
         itemBuilder: (context, index) {
+          final category = state.categories[index];
           return OsmeaComponents.listItem(
-            title: OsmeaComponents.text(state.categories[index]),
+            title: OsmeaComponents.text(category.name),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement navigation to products by category
+              // goRoute('/products/category/${category.slug}');
+            },
           );
         },
       );

@@ -1,13 +1,11 @@
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:storefront_supabase/app/core/config/config_di.config.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_categories/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+
 
 GetIt getIt = GetIt.instance;
 
@@ -20,39 +18,16 @@ Future<GetIt> configureDependencies({String? environment}) async {
     getIt = await Core().init(getIt);
     debugPrint('✅ Core dependencies initialized');
 
+    // Register Supabase client
+    if (!getIt.isRegistered<SupabaseClient>()) {
+      getIt.registerSingleton<SupabaseClient>(Supabase.instance.client);
+      debugPrint('✅ SupabaseClient registered manually in GetIt');
+    }
+
+
     // Initialize app-specific dependencies
     final result = getIt.init(environment: environment);
     debugPrint('✅ App dependencies initialized');
-
-    // Ensure SupabaseHomeViewModel is registered (safety net in case
-    // code generation is not up to date).
-    if (!getIt.isRegistered<SupabaseHomeViewModel>()) {
-      getIt.registerFactory<SupabaseHomeViewModel>(
-        () => SupabaseHomeViewModel(),
-      );
-      debugPrint('✅ SupabaseHomeViewModel registered manually in GetIt');
-    }
-
-    if (!getIt.isRegistered<CategoriesViewModel>()) {
-      getIt.registerFactory<CategoriesViewModel>(
-        () => CategoriesViewModel(),
-      );
-      debugPrint('✅ CategoriesViewModel registered manually in GetIt');
-    }
-
-    if (!getIt.isRegistered<ProfileViewModel>()) {
-      getIt.registerFactory<ProfileViewModel>(
-        () => ProfileViewModel(),
-      );
-      debugPrint('✅ ProfileViewModel registered manually in GetIt');
-    }
-
-    if (!getIt.isRegistered<CartViewModel>()) {
-      getIt.registerFactory<CartViewModel>(
-        () => CartViewModel(),
-      );
-      debugPrint('✅ CartViewModel registered manually in GetIt');
-    }
 
     return result;
   } catch (e, stackTrace) {

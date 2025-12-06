@@ -76,7 +76,13 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           children: [
             const LogoHeaderWidget(),
             if (state.errorMessage != null) ...[
-              OsmeaComponents.text(state.errorMessage!, color: OsmeaColors.red),
+              OsmeaComponents.text(
+                state.errorMessage!,
+                color: state.errorMessage!.startsWith('Success')
+                    ? OsmeaColors.green
+                    : OsmeaColors.red,
+                textAlign: TextAlign.center,
+              ),
               OsmeaComponents.sizedBox(height: 16),
             ],
             AnimatedSwitcher(
