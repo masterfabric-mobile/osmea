@@ -13,6 +13,10 @@
       "retry_count": 3,
       "enable_logging": true
     },
+    "supabase_configuration": {
+      "url": "https://rxjtfevrnxfsupdrvwtq.supabase.co",
+      "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4anRmZXZybnhmc3VwZHJ2d3RxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjY0OTEsImV4cCI6MjA4MDM0MjQ5MX0.zPhU-urlLVIwP9Q4UhYe67_H98yJi2tCOsGAfId8KgA"
+    },
     "firebase_configuration": {
       "analytics_enabled": true,
       "crashlytics_enabled": true,
