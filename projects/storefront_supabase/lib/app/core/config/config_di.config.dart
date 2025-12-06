@@ -36,10 +36,11 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    gh.factory<_i826.CartViewModel>(() => _i826.CartViewModel());
     gh.factory<_i76.SettingsViewModel>(() => _i76.SettingsViewModel());
     gh.factory<_i844.SearchViewModel>(() => _i844.SearchViewModel());
-    gh.factory<_i721.FavoritesViewModel>(() => _i721.FavoritesViewModel());
+    gh.factory<_i826.CartViewModel>(
+      () => _i826.CartViewModel(gh<_i454.SupabaseClient>()),
+    );
     gh.factory<_i56.ProfileViewModel>(
       () => _i56.ProfileViewModel(gh<_i454.SupabaseClient>()),
     );
@@ -51,6 +52,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i482.SupabaseHomeViewModel>(
       () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i721.FavoritesViewModel>(
+      () => _i721.FavoritesViewModel(gh<_i454.SupabaseClient>()),
     );
     return this;
   }

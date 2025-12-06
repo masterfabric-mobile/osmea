@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 
@@ -14,16 +16,44 @@ class ProductDetailView
     required super.goRoute,
   }) : super(
           coreAppBar: (context, viewModel) {
-            if (viewModel.state is ProductDetailLoadedState) {
-              final state = viewModel.state as ProductDetailLoadedState;
-              return OsmeaComponents.appBar(
-                title: Text(state.product.name),
-                variant: AppBarVariant.primary,
-              );
-            }
+            final productId = arguments['productId'] as String?;
             return OsmeaComponents.appBar(
-              title: const Text('Product Detail'),
+              title: (viewModel.state is ProductDetailLoadedState)
+                  ? Text((viewModel.state as ProductDetailLoadedState).product.name)
+                  : const Text('Product Detail'),
               variant: AppBarVariant.primary,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+                icon: const Icon(Icons.arrow_back),
+              ),
+              actions: [
+                AppBarAction(
+                  type: AppBarActionType.favorite,
+                  icon: BlocBuilder<ProductDetailViewModel, ProductDetailState>(
+                    bloc: viewModel,
+                    builder: (context, state) {
+                      bool isInWishlist = false;
+                      if (state is ProductDetailLoadedState) {
+                        isInWishlist = state.isInWishlist;
+                      }
+                      return Icon(
+                        isInWishlist ? Icons.favorite : Icons.favorite_border,
+                      );
+                    },
+                  ),
+                  onPressed: () {
+                    if (productId != null) {
+                      viewModel.toggleFavorite(productId);
+                    }
+                  },
+                ),
+              ],
             );
           },
         );
@@ -106,17 +136,30 @@ class ProductDetailView
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 24),
+                  _buildQuantitySelector(context, viewModel, state),
+                  const SizedBox(height: 16),
                   OsmeaComponents.button(
                     text: 'Add to Cart',
-                    onPressed: () {
-                      viewModel.addToCart(product.id);
+                    onPressed: () async {
+                      final success = await viewModel.addToCart(
+                          product.id, state.detailPageQuantity);
                       if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Product added to cart!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Product added to cart!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Failed to add product. Please log in and try again.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     variant: ButtonVariant.primary,
                     fullWidth: true,
@@ -140,6 +183,30 @@ class ProductDetailView
       );
     }
     return const Center(child: Text('Something went wrong.'));
+  }
+
+  Widget _buildQuantitySelector(BuildContext context,
+      ProductDetailViewModel viewModel, ProductDetailLoadedState state) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        OsmeaComponents.iconButton(
+          onPressed: viewModel.decreaseQuantity,
+          icon: const Icon(Icons.remove),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            '${state.detailPageQuantity}',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
+        OsmeaComponents.iconButton(
+          onPressed: viewModel.increaseQuantity,
+          icon: const Icon(Icons.add),
+        ),
+      ],
+    );
   }
 
   Widget _buildReviewsList(List<ProductReview> reviews) {

@@ -1,12 +1,16 @@
+import 'package:storefront_supabase/app/models/product.dart';
+
 abstract class FavoritesState {}
 
 class FavoritesInitialState extends FavoritesState {}
 
+class FavoritesLoadingState extends FavoritesState {}
+
 class FavoritesLoadedState extends FavoritesState {
-  final List<String> favoriteItems;
+  final List<Product> favoriteProducts;
 
   FavoritesLoadedState({
-    required this.favoriteItems,
+    required this.favoriteProducts,
   });
 }
 

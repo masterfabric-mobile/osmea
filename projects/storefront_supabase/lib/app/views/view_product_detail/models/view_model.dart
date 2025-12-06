@@ -29,46 +29,143 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
     stateChanger(ProductDetailLoadingState());
     try {
-      // Fetch product and reviews
-      final productResponse = await _supabaseClient
-          .from('products')
-          .select('*, product_images(*)')
-          .eq('id', productId)
-          .single();
-      
-      final reviewsResponse = await _supabaseClient
-          .from('product_reviews')
-          .select('*, users(full_name)')
-          .eq('product_id', productId);
+      final userId = _supabaseClient.auth.currentUser?.id;
+
+      // Fetch product, reviews, and favorite status in parallel
+      final responses = await Future.wait<dynamic>([
+        _supabaseClient
+            .from('products')
+            .select('*, product_images(*)')
+            .eq('id', productId)
+            .single(),
+        _supabaseClient
+            .from('product_reviews')
+            .select('*, users(full_name)')
+            .eq('product_id', productId),
+        if (userId != null)
+          _supabaseClient
+              .from('favorites')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('product_id', productId)
+              .limit(1)
+        else
+          Future.value([]),
+      ]);
+
+      final productResponse = responses[0] as PostgrestMap;
+      final reviewsResponse = responses[1] as List<dynamic>;
+      final favoriteResponse = responses[2] as List<dynamic>;
 
       final product = Product.fromJson(productResponse);
       final reviews = reviewsResponse
-          .map((data) =>
-              ProductReview.fromJson(data))
+          .map((data) => ProductReview.fromJson(data))
           .toList();
 
-      stateChanger(
-          ProductDetailLoadedState(product: product, reviews: reviews));
+      final isInWishlist = favoriteResponse.isNotEmpty;
+
+      stateChanger(ProductDetailLoadedState(
+          product: product, reviews: reviews, isInWishlist: isInWishlist));
     } catch (e) {
       stateChanger(
           ProductDetailErrorState('Failed to load product details: $e'));
     }
   }
 
-  Future<void> addToCart(String productId) async {
+  Future<void> toggleFavorite(String productId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) {
+      // Maybe show a message to log in
+      debugPrint("User not logged in, can't add to favorites.");
       return;
     }
 
+    if (state is! ProductDetailLoadedState) return;
+
+    final currentLoadedState = state as ProductDetailLoadedState;
+    final bool isCurrentlyInWishlist = currentLoadedState.isInWishlist;
+
     try {
-      await _supabaseClient.from('cart').insert({
-        'user_id': userId,
-        'product_id': productId,
-        'quantity': 1,
-      });
+      if (isCurrentlyInWishlist) {
+        // Remove from favorites
+        await _supabaseClient
+            .from('favorites')
+            .delete()
+            .match({'user_id': userId, 'product_id': productId});
+        debugPrint('Product $productId removed from favorites.');
+      } else {
+        // Add to favorites
+        await _supabaseClient
+            .from('favorites')
+            .insert({'user_id': userId, 'product_id': productId});
+        debugPrint('Product $productId added to favorites.');
+      }
+
+      // Update the UI
+      stateChanger(
+        currentLoadedState.copyWith(isInWishlist: !isCurrentlyInWishlist),
+      );
     } catch (e) {
-      // Handle error
+      debugPrint("Error updating favorite status: $e");
+      // Optionally, show an error message to the user
+    }
+  }
+
+  void increaseQuantity() {
+    if (state is ProductDetailLoadedState) {
+      final currentLoadedState = state as ProductDetailLoadedState;
+      stateChanger(currentLoadedState.copyWith(
+          detailPageQuantity: currentLoadedState.detailPageQuantity + 1));
+    }
+  }
+
+  void decreaseQuantity() {
+    if (state is ProductDetailLoadedState) {
+      final currentLoadedState = state as ProductDetailLoadedState;
+      if (currentLoadedState.detailPageQuantity > 1) {
+        stateChanger(currentLoadedState.copyWith(
+            detailPageQuantity: currentLoadedState.detailPageQuantity - 1));
+      }
+    }
+  }
+
+  Future<bool> addToCart(String productId, int quantity) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) {
+      debugPrint("User not logged in, can't add to cart.");
+      return false;
+    }
+
+    try {
+      // Check if the item is already in the cart
+      final existingCartItem = await _supabaseClient
+          .from('cart')
+          .select('id, quantity')
+          .eq('user_id', userId)
+          .eq('product_id', productId)
+          .maybeSingle();
+
+      if (existingCartItem != null) {
+        // If it exists, update the quantity
+        final newQuantity = (existingCartItem['quantity'] as int) + quantity;
+        await _supabaseClient
+            .from('cart')
+            .update({'quantity': newQuantity})
+            .eq('id', existingCartItem['id'] as String);
+        debugPrint('Product $productId quantity updated to $newQuantity.');
+      } else {
+        // If it doesn't exist, insert a new row
+        await _supabaseClient.from('cart').insert({
+          'user_id': userId,
+          'product_id': productId,
+          'quantity': quantity,
+        });
+        debugPrint('Product $productId added to cart with quantity $quantity.');
+      }
+      return true;
+    } catch (e) {
+      debugPrint("Error adding to cart: $e");
+      return false;
     }
   }
 
