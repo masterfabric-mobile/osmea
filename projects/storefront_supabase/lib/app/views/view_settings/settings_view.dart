@@ -24,6 +24,10 @@ class SettingsView
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
+            leading: OsmeaComponents.iconButton(
+              onPressed: () => goRoute('/profile'),
+              icon: const Icon(Icons.arrow_back),
+            ),
           ),
         );
 

@@ -51,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
     if (location.startsWith('/categories')) return 1;
     if (location.startsWith('/cart')) return 2;
     if (location.startsWith('/favorites')) return 3;
-    if (location.startsWith('/profile')) return 4;
+    if (location.startsWith('/profile') || location.startsWith('/settings')) return 4;
     return 0;
   }
 
@@ -89,16 +89,15 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) =>
           OnboardingView(goRoute: (String path) => context.go(path)),
     ),
-    // Settings is now a top-level route
-    GoRoute(
-      path: '/settings',
-      builder: (BuildContext context, GoRouterState state) {
-        return SettingsView(goRoute: (String path) => context.go(path));
-      },
-    ),
     ShellRoute(
       builder: (context, state, child) => MainScreen(child: child),
       routes: [
+        GoRoute(
+          path: '/settings',
+          builder: (BuildContext context, GoRouterState state) {
+            return SettingsView(goRoute: (String path) => context.go(path));
+          },
+        ),
         GoRoute(
           path: '/product-detail/:id',
           builder: (BuildContext context, GoRouterState state) {

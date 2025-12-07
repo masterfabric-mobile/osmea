@@ -28,7 +28,7 @@ class ProductDetailView
                   if (context.canPop()) {
                     context.pop();
                   } else {
-                    context.go('/');
+                    context.go('/home');
                   }
                 },
                 icon: const Icon(Icons.arrow_back),
