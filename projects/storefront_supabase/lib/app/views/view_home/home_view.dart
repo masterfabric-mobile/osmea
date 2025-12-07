@@ -92,7 +92,7 @@ class SupabaseHomeView
           return Card(
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-              onTap: () => goRoute('/product-detail/${product.id}'),
+                        onTap: () => goRoute('/product-detail/${product.id}'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

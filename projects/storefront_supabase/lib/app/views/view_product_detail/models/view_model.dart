@@ -21,7 +21,12 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     reviewCommentController = TextEditingController();
   }
 
-  Future<void> initial({String? productId}) async {
+  Future<void> initial({String? productId, Product? product}) async {
+    if (product != null) {
+      stateChanger(ProductDetailLoadedState(product: product, reviews: []));
+      return;
+    }
+
     if (productId == null) {
       stateChanger(ProductDetailErrorState('Product ID is missing.'));
       return;
@@ -57,7 +62,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       final reviewsResponse = responses[1] as List<dynamic>;
       final favoriteResponse = responses[2] as List<dynamic>;
 
-      final product = Product.fromJson(productResponse);
+      final loadedProduct = Product.fromJson(productResponse);
       final reviews = reviewsResponse
           .map((data) => ProductReview.fromJson(data))
           .toList();
@@ -65,7 +70,9 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       final isInWishlist = favoriteResponse.isNotEmpty;
 
       stateChanger(ProductDetailLoadedState(
-          product: product, reviews: reviews, isInWishlist: isInWishlist));
+          product: loadedProduct,
+          reviews: reviews,
+          isInWishlist: isInWishlist));
     } catch (e) {
       stateChanger(
           ProductDetailErrorState('Failed to load product details: $e'));

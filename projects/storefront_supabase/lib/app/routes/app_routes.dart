@@ -1,3 +1,4 @@
+import 'package:storefront_supabase/app/models/product.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart' hide SearchView;
@@ -102,9 +103,13 @@ final GoRouter appRouter = GoRouter(
           path: '/product-detail/:id',
           builder: (BuildContext context, GoRouterState state) {
             final productId = state.pathParameters['id'];
+            final product = state.extra as Product?;
             return ProductDetailView(
               goRoute: (String path) => context.go(path),
-              arguments: {'productId': productId},
+              arguments: {
+                'productId': productId,
+                'product': product,
+              },
             );
           },
         ),

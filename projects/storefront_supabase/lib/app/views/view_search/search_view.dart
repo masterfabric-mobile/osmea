@@ -73,9 +73,11 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
       if (state.searchResults.isEmpty &&
           viewModel.searchController.text.isNotEmpty) {
         return OsmeaComponents.center(
-          child: OsmeaComponents.text('No results found for "${viewModel.searchController.text}"'),
+          child: OsmeaComponents.text(
+              'No results found for "${viewModel.searchController.text}"'),
         );
-      } else if (state.searchResults.isEmpty && viewModel.searchController.text.isEmpty) {
+      } else if (state.searchResults.isEmpty &&
+          viewModel.searchController.text.isEmpty) {
         return OsmeaComponents.center(
           child: OsmeaComponents.text('Start typing to search...'),
         );
@@ -83,17 +85,31 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
       return ListView.builder(
         itemCount: state.searchResults.length,
         itemBuilder: (context, index) {
-          final result = state.searchResults[index];
-          return OsmeaComponents.listItem(
-            title: OsmeaComponents.text(result),
-            onTap: () {
-              // Navigate to product detail or handle selection
-              goRoute('/product-detail/$result');
-            },
+          final product = state.searchResults[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              leading: Image.network(
+                product.imageUrl,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error),
+              ),
+              title: Text(product.name),
+              subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+              onTap: () {
+                goRoute('/product-detail/${product.id}');
+              },
+            ),
           );
         },
       );
     }
-    return const Center(child: CircularProgressIndicator()); // Should not happen
+    return const Center(
+        child:
+            CircularProgressIndicator()); // Should not happen in normal flow
   }
 }
+

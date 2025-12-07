@@ -1,3 +1,4 @@
+import 'package:storefront_supabase/app/models/product.dart';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
@@ -64,7 +65,8 @@ class ProductDetailView
     BuildContext context,
   ) {
     final productId = arguments['productId'] as String?;
-    viewModel.initial(productId: productId);
+    final product = arguments['product'] as Product?;
+    viewModel.initial(productId: productId, product: product);
   }
 
   @override
