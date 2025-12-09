@@ -2,52 +2,36 @@ import 'package:flutter/material.dart';
 
 import 'package:core/core.dart';
 
-import 'models/home_view_model.dart';
+import 'models/view_model.dart';
 import 'models/states.dart';
 
-/// Supabase Home View
-///
-/// This view is built using `MasterViewCubit` from core and a
-/// `SupabaseHomeViewModel` that extends `BaseViewModelCubit`.
-/// It replaces the old `_MinimalistHomePage` while keeping the same
-/// visual design for now.
-class SupabaseHomeView
-    extends MasterViewCubit<SupabaseHomeViewModel, SupabaseHomeState> {
-  SupabaseHomeView({
+class FavoritesView
+    extends MasterViewCubit<FavoritesViewModel, FavoritesState> {
+  FavoritesView({
     super.key,
-    super.arguments = const {'home': true},
+    super.arguments = const {'init': true},
     required super.goRoute,
   }) : super(
           horizontalPadding: const PaddingVisibility.disabled(),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Storefront Supabase',
-              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+              'My Favorites', // Changed to English
+              color: Theme.of(context)
+                  .colorScheme
+                  .onPrimary, // Text color matches onPrimary
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
-            actions: [
-              AppBarAction(
-                type: AppBarActionType.search,
-                icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onPrimary),
-                onPressed: () => goRoute('/search'),
-              ),
-              AppBarAction(
-                type: AppBarActionType.more,
-                icon: Icon(Icons.shopping_cart_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                onPressed: () => goRoute('/cart'),
-              ),
-            ],
           ),
         );
 
   @override
   void initialContent(
-    SupabaseHomeViewModel viewModel,
+    FavoritesViewModel viewModel,
     BuildContext context,
   ) {
     viewModel.initial();
@@ -56,26 +40,37 @@ class SupabaseHomeView
   @override
   Widget viewContent(
     BuildContext context,
-    SupabaseHomeViewModel viewModel,
-    SupabaseHomeState state,
+    FavoritesViewModel viewModel,
+    FavoritesState state,
   ) {
-    if (state is SupabaseHomeErrorState) {
-      return buildError(
-        state.message,
-        onRetry: () => viewModel.initial(),
+    if (state is FavoritesLoadingState || state is FavoritesInitialState) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is FavoritesErrorState) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(state.message, textAlign: TextAlign.center),
+              const SizedBox(height: 20),
+              OsmeaComponents.button(
+                text: 'Log In / Sign Up', // Changed to English
+                onPressed: () => goRoute('/profile'),
+                variant: ButtonVariant.primary,
+              ),
+            ],
+          ),
+        ),
       );
     }
 
-    if (state is SupabaseHomeLoadingState || state is SupabaseHomeInitialState) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (state is SupabaseHomeLoadedState) {
-      if (state.products.isEmpty) {
-        return OsmeaComponents.center(
-          child: OsmeaComponents.text('No products found.'),
+    if (state is FavoritesLoadedState) {
+      if (state.favoriteProducts.isEmpty) {
+        return Center(
+          child: OsmeaComponents.text('No favorite products yet.'), // Changed to English
         );
       }
       return GridView.builder(
@@ -86,24 +81,26 @@ class SupabaseHomeView
           mainAxisSpacing: 16.0,
           childAspectRatio: 0.75,
         ),
-        itemCount: state.products.length,
+        itemCount: state.favoriteProducts.length,
         itemBuilder: (context, index) {
-          final product = state.products[index];
+          final product = state.favoriteProducts[index];
           return Card(
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-                        onTap: () => goRoute('/product-detail/${product.id}'),
+              onTap: () => goRoute('/product-detail/${product.id}'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: (product.imageUrl.contains('placehold.co'))
-                        ? const Center(child: Icon(Icons.image, color: Colors.grey))
+                        ? const Center(
+                            child: Icon(Icons.image, color: Colors.grey))
                         : Image.network(
                             product.imageUrl,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return const Center(child: Icon(Icons.error, color: Colors.red));
+                              return const Center(
+                                  child: Icon(Icons.error, color: Colors.red));
                             },
                           ),
                   ),
@@ -116,16 +113,18 @@ class SupabaseHomeView
                           product.name,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '\$${product.price.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
                         ),
                       ],
                     ),
@@ -138,9 +137,8 @@ class SupabaseHomeView
       );
     }
 
-    // Fallback for any other state
     return const Center(
-      child: Text('Something went wrong.'),
+      child: CircularProgressIndicator(),
     );
   }
 }

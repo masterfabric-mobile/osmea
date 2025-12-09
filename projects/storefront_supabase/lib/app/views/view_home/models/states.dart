@@ -1,20 +1,16 @@
-/// Simple home states for Supabase storefront.
-///
-/// Kept intentionally minimal – the goal is just to demonstrate the
-/// `BaseViewModelHydratedCubit` + `MasterViewHydratedCubit` flow using
-/// core's base infrastructure.
+import 'package:storefront_supabase/app/models/product.dart';
 
 abstract class SupabaseHomeState {}
 
 class SupabaseHomeInitialState extends SupabaseHomeState {}
 
+class SupabaseHomeLoadingState extends SupabaseHomeState {}
+
 class SupabaseHomeLoadedState extends SupabaseHomeState {
-  final String title;
-  final String subtitle;
+  final List<Product> products;
 
   SupabaseHomeLoadedState({
-    required this.title,
-    required this.subtitle,
+    required this.products,
   });
 }
 

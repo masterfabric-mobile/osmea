@@ -1,0 +1,73 @@
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+
+class SignupFormWidget extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  final VoidCallback onSwitchToLogin;
+
+  const SignupFormWidget({
+    super.key,
+    required this.viewModel,
+    required this.onSwitchToLogin,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OsmeaComponents.column(
+      children: [
+        OsmeaComponents.textField(
+          controller: viewModel.emailController,
+          label: 'Email',
+          prefixIcon: const Icon(
+            Icons.email_outlined,
+            color: OsmeaColors.black,
+          ),
+          variant: TextFieldVariant.outlined,
+          focusColor: OsmeaColors.black,
+          type: TextFieldType.email,
+        ),
+        OsmeaComponents.sizedBox(height: 16),
+        OsmeaComponents.textField(
+          controller: viewModel.passwordController,
+          label: 'Password',
+          prefixIcon: const Icon(
+            Icons.lock_outline,
+            color: OsmeaColors.black,
+          ),
+          variant: TextFieldVariant.outlined,
+          focusColor: OsmeaColors.black,
+          type: TextFieldType.password,
+          obscureText: true,
+        ),
+        OsmeaComponents.sizedBox(height: 16),
+        OsmeaComponents.textField(
+          controller: viewModel.confirmPasswordController,
+          label: 'Confirm Password',
+          prefixIcon: const Icon(
+            Icons.lock_outline,
+            color: OsmeaColors.black,
+          ),
+          variant: TextFieldVariant.outlined,
+          focusColor: OsmeaColors.black,
+          type: TextFieldType.password,
+          obscureText: true,
+        ),
+        OsmeaComponents.sizedBox(height: 24),
+        OsmeaComponents.button(
+          text: 'Sign Up',
+          onPressed: viewModel.signup,
+          variant: ButtonVariant.primary,
+          fullWidth: true,
+          backgroundColor: OsmeaColors.black,
+          textColor: OsmeaColors.white,
+        ),
+        OsmeaComponents.sizedBox(height: 16),
+        OsmeaComponents.textButton(
+          text: "Already have an account? Sign In",
+          onPressed: onSwitchToLogin,
+        ),
+      ],
+    );
+  }
+}

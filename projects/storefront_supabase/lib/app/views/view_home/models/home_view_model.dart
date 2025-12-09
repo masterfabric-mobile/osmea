@@ -1,31 +1,32 @@
 import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:storefront_supabase/app/models/product.dart';
 import 'states.dart';
 
-/// Minimal Home ViewModel for Supabase storefront.
-///
-/// Uses `BaseViewModelCubit` from core so it fits perfectly into
-/// `MasterViewCubit`-based views without hydration.
 @injectable
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
-  SupabaseHomeViewModel() : super(SupabaseHomeInitialState());
+  final SupabaseClient _supabaseClient;
 
-  /// Simple initial bootstrap – in a real app this is where you'd
-  /// fetch featured products, categories, etc.
+  SupabaseHomeViewModel(this._supabaseClient)
+      : super(SupabaseHomeInitialState());
+
   Future<void> initial() async {
+    stateChanger(SupabaseHomeLoadingState());
+
     try {
-      // In the future this can be driven from remote config / Supabase.
-      stateChanger(
-        SupabaseHomeLoadedState(
-          title: 'Welcome to Storefront Supabase',
-          subtitle: 'Your Supabase powered store',
-        ),
-      );
+      final response = await _supabaseClient
+          .from('products')
+          .select('*, product_images(image_url, is_primary, sort_order)')
+          .eq('is_active', true)
+          .order('created_at', ascending: false);
+
+      final products =
+          response.map((data) => Product.fromJson(data)).toList();
+
+      stateChanger(SupabaseHomeLoadedState(products: products));
     } catch (e) {
-      stateChanger(SupabaseHomeErrorState('Failed to load home: $e'));
+      stateChanger(SupabaseHomeErrorState('Failed to load products: $e'));
     }
   }
-
-  // No hydration needed for plain BaseCubit usage.
 }

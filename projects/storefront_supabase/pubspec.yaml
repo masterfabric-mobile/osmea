@@ -27,6 +27,12 @@ dependencies:
   # ────────────────────────────────
   cupertino_icons: ^1.0.8
 
+  # ────────────────────────────────
+  # SUPABASE
+  # ────────────────────────────────
+  supabase_flutter: ^2.5.3
+
+
   # ────────────────────────────────  
   # DEPENDENCY INJECTION
   # ────────────────────────────────
@@ -54,6 +60,7 @@ dependencies:
   # CODE GENERATION / ASSET MANAGEMENT
   # ────────────────────────────────
   flutter_gen: ^5.10.0     # Generates strongly typed asset references (images, fonts, etc.)
+  intl: ^0.20.2
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCY OVERRIDES

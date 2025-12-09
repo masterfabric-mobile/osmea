@@ -14,10 +14,10 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://your_store_url.com",
-    "brand_name": "your_brand_name",
+    "store_url": "http://localhost:8000",
+    "brand_name": "WooPress Dev",
     "auth_key": "YOUR_SPECIAL_AUTH_CODE",
-    "version": "v?",
+    "version": "v1",
     "verify_ssl": true,
     "query_string_auth": false,
     "products_per_page": 20,
