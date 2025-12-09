@@ -20,12 +20,12 @@ dependencies:
   go_router: ^15.1.1 # Routing
   injectable: ^2.5.1 # Dependency injection
   logger: ^2.5.0 # Logging utility
-  slang: ^4.8.1
+  slang: ^4.11.1
   url_launcher: ^6.3.1 # URL launcher for support links
   flutter_localizations: # add this
     sdk: flutter
   intl: ^0.20.0
-  slang_flutter: ^4.8.0 # Localization
+  slang_flutter: ^4.11.0 # Localization
   sqflite: ^2.4.2 # Database
   shared_preferences: ^2.5.3 # Shared preferences
   firebase_analytics: ^11.4.5 # Analytics

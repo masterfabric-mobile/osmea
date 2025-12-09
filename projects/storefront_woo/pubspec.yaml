@@ -39,8 +39,8 @@ dependencies:
   # ────────────────────────────────
   # LOCALIZATION (i18n)
   # ────────────────────────────────
-  slang: ^4.7.3            # JSON-based translation tool with advanced features
-  slang_flutter: ^4.7.0    # Flutter bindings for the slang localization package
+  slang: ^4.11.1            # JSON-based translation tool with advanced features
+  slang_flutter: ^4.11.0    # Flutter bindings for the slang localization package
 
   # ────────────────────────────────
   # CODE GENERATION / ASSET MANAGEMENT

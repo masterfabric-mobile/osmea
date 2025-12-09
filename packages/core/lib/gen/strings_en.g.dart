@@ -3,12 +3,13 @@
 ///
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
+// dart format off
 
 part of 'strings.g.dart';
 
 // Path: <root>
 typedef TranslationsEn = Translations; // ignore: unused_element
-class Translations implements BaseTranslations<AppLocale, Translations> {
+class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Returns the current translations of the given [context].
 	///
 	/// Usage:
@@ -87,26 +88,21 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 /// so the map is split into smaller functions (512 entries each).
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
-		return _flatMapFunction$0(path);
-	}
-
-	dynamic _flatMapFunction$0(String path) {
-		switch (path) {
-			case 'localLanguageCode': return 'en_US';
-			case 'appTitle': return 'OSMEA App';
-			case 'emptyText': return '';
-			case 'cancel': return 'Cancel';
-			case 'loading': return 'Loading...';
-			case 'error': return 'An error occurred.';
-			case 'maintenance': return 'Maintenance mode.';
-			case 'empty': return 'No data available.';
-			case 'unauthorized': return 'Unauthorized access.';
-			case 'timeout': return 'Request timed out.';
-			case 'undo': return 'Undo';
-			case 'webview': return 'WebView';
-			case 'defaultMessage': return 'An unexpected error occurred. Please try again later.';
-			default: return null;
-		}
+		return switch (path) {
+			'localLanguageCode' => 'en_US',
+			'appTitle' => 'OSMEA App',
+			'emptyText' => '',
+			'cancel' => 'Cancel',
+			'loading' => 'Loading...',
+			'error' => 'An error occurred.',
+			'maintenance' => 'Maintenance mode.',
+			'empty' => 'No data available.',
+			'unauthorized' => 'Unauthorized access.',
+			'timeout' => 'Request timed out.',
+			'undo' => 'Undo',
+			'webview' => 'WebView',
+			'defaultMessage' => 'An unexpected error occurred. Please try again later.',
+			_ => null,
+		};
 	}
 }
-
