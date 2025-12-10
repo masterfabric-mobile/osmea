@@ -288,7 +288,7 @@ class OsmeaTabBar extends CoreTabBarContainer {
 
   /// 🎯 Build individual tab widgets
   List<Widget> _buildTabWidgets(BuildContext context, TabBarState state) {
-    return tabs.asMap().entries.map((entry) {
+    final tabWidgets = tabs.asMap().entries.map((entry) {
       final index = entry.key;
       final tab = entry.value;
       final isActive =
@@ -301,6 +301,17 @@ class OsmeaTabBar extends CoreTabBarContainer {
         state,
       );
     }).toList();
+
+    // For fixed style, wrap tabs in Expanded to ensure equal width distribution
+    if (style == TabBarStyle.fixed && position.isHorizontal) {
+      return tabWidgets
+          .map((tab) => Expanded(
+                child: tab,
+              ))
+          .toList();
+    }
+
+    return tabWidgets;
   }
 
   /// 🎯 Build individual tab widget
@@ -314,15 +325,33 @@ class OsmeaTabBar extends CoreTabBarContainer {
     final effectiveTextColor = _getEffectiveTextColor(context, isActive);
     final effectiveIconColor = _getEffectiveIconColor(context, isActive);
 
+    // Adjust padding based on variant - minimal horizontal padding, keep vertical
+    // For secondary variant, use minimal horizontal padding to reduce row width
+    final tabPadding = variant == TabBarVariant.secondary
+        ? const EdgeInsets.symmetric(horizontal: 0, vertical: 20)
+        : const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+    // Adjust border radius based on variant - must match container for seamless look
+    final tabBorderRadius = variant == TabBarVariant.secondary
+        ? BorderRadius.circular(10)
+        : BorderRadius.circular(13);
+
+    // For secondary variant with fixed style, remove constraints to allow equal expansion
+    // Also ensure width fills available space
+    final tabConstraints =
+        (variant == TabBarVariant.secondary && style == TabBarStyle.fixed)
+            ? null
+            : _getTabConstraints(context);
+
     Widget tabContent = OsmeaContainer(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 8,
-      ),
-      constraints: _getTabConstraints(context),
+      padding: tabPadding,
+      constraints: tabConstraints,
+      width: (variant == TabBarVariant.secondary && style == TabBarStyle.fixed)
+          ? double.infinity
+          : null,
       decoration: BoxDecoration(
         color: _getTabBackgroundColor(context, isActive),
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: tabBorderRadius,
       ),
       child: _buildTabContent(
         context,
@@ -462,22 +491,19 @@ class OsmeaTabBar extends CoreTabBarContainer {
 
     // Add text if should show labels
     if (showLabels) {
-      Widget textWidget = ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 100), // Prevent overflow
-        child: OsmeaText(
-          tab.text,
-          style: TextStyle(
-            fontSize: 12, // Smaller for mobile
-            fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
-            color: textColor,
-            height: 1.1,
-            letterSpacing: 0.05,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          softWrap: false,
+      Widget textWidget = OsmeaText(
+        tab.text,
+        style: TextStyle(
+          fontSize: variant == TabBarVariant.secondary ? 14 : 13,
+          fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+          color: textColor,
+          height: 1.3,
+          letterSpacing: variant == TabBarVariant.secondary ? 0.0 : 0.1,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        softWrap: false,
       );
 
       children.add(textWidget);
@@ -504,44 +530,38 @@ class OsmeaTabBar extends CoreTabBarContainer {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: children
-            .map(
-              (child) => Padding(
-                padding:
-                    EdgeInsets.symmetric(vertical: children.length > 1 ? 1 : 0),
-                child: child,
-              ),
-            )
-            .toList(),
+        children: children,
       );
     } else {
+      // For horizontal layout, wrap text in Expanded if both icon and text exist
+      if (children.length > 1 && showLabels && showIcons && tab.icon != null) {
+        return Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            children[0], // Icon
+            SizedBox(width: variant == TabBarVariant.secondary ? 4 : 8),
+            Expanded(child: children[1]), // Text with expansion
+          ],
+        );
+      }
+
+      // For text only, center it properly and allow expansion
       return Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: children
-            .map(
-              (child) => Flexible(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: children.length > 1 ? 2 : 0),
-                  child: child,
-                ),
-              ),
-            )
-            .toList(),
+        children: children.map((child) => Expanded(child: child)).toList(),
       );
     }
   }
 
   /// 🎨 Get tab background color based on indicator style
   Color _getTabBackgroundColor(BuildContext context, bool isActive) {
-    // For line, dot, and none indicators, keep tabs transparent
-    if (indicatorStyle == TabBarIndicatorStyle.line ||
-        indicatorStyle == TabBarIndicatorStyle.dot ||
-        indicatorStyle == TabBarIndicatorStyle.none ||
-        indicatorStyle == TabBarIndicatorStyle.border) {
-      return OsmeaColors.transparent;
+    // For secondary variant, always show active tab with white background for segmented control look
+    if (variant == TabBarVariant.secondary && isActive) {
+      return activeFillColor ?? OsmeaColors.white;
     }
 
     // For fill indicator, use custom fill color or default indicator color
@@ -549,6 +569,14 @@ class OsmeaTabBar extends CoreTabBarContainer {
       if (isActive) {
         return activeFillColor ?? getEffectiveIndicatorColor(context);
       }
+      return OsmeaColors.transparent;
+    }
+
+    // For line, dot, border, and none indicators, keep tabs transparent (except secondary variant active tabs)
+    if (indicatorStyle == TabBarIndicatorStyle.line ||
+        indicatorStyle == TabBarIndicatorStyle.dot ||
+        indicatorStyle == TabBarIndicatorStyle.none ||
+        indicatorStyle == TabBarIndicatorStyle.border) {
       return OsmeaColors.transparent;
     }
 
@@ -614,11 +642,13 @@ class OsmeaTabBar extends CoreTabBarContainer {
   }
 
   /// 📐 Get tab constraints
-  BoxConstraints _getTabConstraints(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  BoxConstraints? _getTabConstraints(BuildContext context) {
+    // For secondary variant with fixed style, don't use constraints (let Expanded handle it)
+    if (variant == TabBarVariant.secondary && style == TabBarStyle.fixed) {
+      return null;
+    }
 
-    // Mobile-friendly calculations
-    final tabCount = tabs.length;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     switch (position) {
       case TabBarPosition.top:
@@ -632,14 +662,9 @@ class OsmeaTabBar extends CoreTabBarContainer {
             maxHeight: 60,
           );
         } else {
-          // Fixed tabs need to fit in screen
-          final availableWidth = screenWidth - 32; // Account for padding
-          final maxTabWidth =
-              (availableWidth / tabCount) - 8; // Account for spacing
-
-          return BoxConstraints(
-            minWidth: 60,
-            maxWidth: math.max(maxTabWidth, 60),
+          // Fixed tabs should expand equally - constraints will be handled by Expanded widget
+          return const BoxConstraints(
+            minWidth: 80,
             minHeight: 44,
             maxHeight: 56,
           );

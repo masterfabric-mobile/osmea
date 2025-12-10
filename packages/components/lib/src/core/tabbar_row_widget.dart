@@ -5,7 +5,6 @@ import 'package:osmea_components/src/components/row/row.dart';
 import 'package:osmea_components/src/components/wrap/wrap.dart';
 import 'package:osmea_components/src/core/row_widget.dart';
 
-
 /// 📑 **OSMEA Core TabBar Row**
 ///
 /// Copyright (c) 2025, OSMEA Team
@@ -121,8 +120,8 @@ abstract class CoreTabBarRow extends CoreRow {
     // Use style-based alignment if no custom alignment specified
     switch (style) {
       case TabBarStyle.fixed:
-        return position.isHorizontal 
-            ? MainAxisAlignment.spaceEvenly 
+        return position.isHorizontal
+            ? MainAxisAlignment.spaceEvenly
             : MainAxisAlignment.start;
       case TabBarStyle.scrollable:
         return MainAxisAlignment.start;
@@ -161,15 +160,20 @@ abstract class CoreTabBarRow extends CoreRow {
   /// ↔️ Get effective spacing between tabs
   double getEffectiveSpacing(BuildContext context) {
     if (spacing != null) return spacing!;
-    
-    // TDesign style minimal spacing
+
+    // For secondary variant, no spacing between tabs (segmented control style)
+    if (variant == TabBarVariant.secondary) {
+      return 0.0;
+    }
+
+    // TDesign style minimal spacing for other variants
     return 4.0;
   }
 
   /// ↕️ Get effective run spacing for wrapped tabs
   double getEffectiveRunSpacing(BuildContext context) {
     if (runSpacing != null) return runSpacing!;
-    
+
     final sizeConfig = size.config(context);
     return sizeConfig.tabSpacing * 0.5;
   }
@@ -177,14 +181,14 @@ abstract class CoreTabBarRow extends CoreRow {
   /// ⏱️ Get effective animation duration
   Duration getEffectiveAnimationDuration(BuildContext context) {
     if (animationDuration != null) return animationDuration!;
-    
+
     return const Duration(milliseconds: 200);
   }
 
   /// 🎮 Get effective scroll physics
   ScrollPhysics getEffectiveScrollPhysics(BuildContext context) {
     if (physics != null) return physics!;
-    
+
     switch (style) {
       case TabBarStyle.scrollable:
         return const BouncingScrollPhysics();
@@ -196,7 +200,7 @@ abstract class CoreTabBarRow extends CoreRow {
   /// 🔄 Get text direction based on position
   TextDirection? getEffectiveTextDirection(BuildContext context) {
     if (textDirection != null) return textDirection;
-    
+
     return Directionality.of(context);
   }
 
@@ -224,13 +228,13 @@ abstract class CoreTabBarRow extends CoreRow {
   /// 🎯 Build tabs with proper spacing
   List<Widget> buildTabsWithSpacing(BuildContext context, List<Widget> tabs) {
     if (tabs.isEmpty) return tabs;
-    
+
     final effectiveSpacing = getEffectiveSpacing(context);
     final spacedTabs = <Widget>[];
-    
+
     for (int i = 0; i < tabs.length; i++) {
       spacedTabs.add(tabs[i]);
-      
+
       // Add spacing between tabs (except after last tab)
       if (i < tabs.length - 1) {
         if (axis == Axis.horizontal) {
@@ -240,7 +244,7 @@ abstract class CoreTabBarRow extends CoreRow {
         }
       }
     }
-    
+
     return spacedTabs;
   }
 
@@ -249,7 +253,7 @@ abstract class CoreTabBarRow extends CoreRow {
     if (!shouldScroll) {
       return child;
     }
-    
+
     return SingleChildScrollView(
       controller: scrollController,
       physics: getEffectiveScrollPhysics(context),
@@ -262,7 +266,7 @@ abstract class CoreTabBarRow extends CoreRow {
   /// ⚡ Build animated wrapper if needed
   Widget buildAnimatedWrapper(BuildContext context, Widget child) {
     if (!shouldAnimate) return child;
-    
+
     return AnimatedContainer(
       duration: getEffectiveAnimationDuration(context),
       curve: easeInOut,
@@ -277,12 +281,12 @@ abstract class CoreTabBarRow extends CoreRow {
     final effectiveMainAxisSize = getEffectiveMainAxisSize();
     final effectiveCrossAxisAlignment = getEffectiveCrossAxisAlignment();
     final effectiveTextDirection = getEffectiveTextDirection(context);
-    
+
     // Build tabs with spacing
     final spacedChildren = buildTabsWithSpacing(context, children);
-    
+
     Widget rowWidget;
-    
+
     // Build based on position (horizontal or vertical)
     if (position.isHorizontal) {
       // For horizontal tabs, use better overflow protection
@@ -297,9 +301,15 @@ abstract class CoreTabBarRow extends CoreRow {
           children: children,
         );
       } else {
+        // For secondary variant with fixed style, use start alignment since tabs are already Expanded
+        final finalMainAxisAlignment =
+            (variant == TabBarVariant.secondary && style == TabBarStyle.fixed)
+                ? MainAxisAlignment.start
+                : effectiveMainAxisAlignment;
+
         rowWidget = OsmeaRow(
-          mainAxisAlignment: effectiveMainAxisAlignment,
-          mainAxisSize: effectiveMainAxisSize,
+          mainAxisAlignment: finalMainAxisAlignment,
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: effectiveCrossAxisAlignment,
           textDirection: effectiveTextDirection,
           verticalDirection: verticalDirection,
@@ -331,13 +341,13 @@ abstract class CoreTabBarRow extends CoreRow {
         );
       }
     }
-    
+
     // Apply scrollable wrapper if needed
     rowWidget = buildScrollableWrapper(context, rowWidget);
-    
+
     // Apply animated wrapper if needed
     rowWidget = buildAnimatedWrapper(context, rowWidget);
-    
+
     return rowWidget;
   }
-} 
+}
