@@ -18,7 +18,7 @@ _$GetUsersMeResponseImpl _$$GetUsersMeResponseImplFromJson(
       avatarUrls: json['avatar_urls'] == null
           ? null
           : AvatarUrls.fromJson(json['avatar_urls'] as Map<String, dynamic>),
-      meta: json['meta'] as List<dynamic>?,
+      meta: json['meta'],
       isSuperAdmin: json['is_super_admin'] as bool?,
       woocommerceMeta: json['woocommerce_meta'] == null
           ? null

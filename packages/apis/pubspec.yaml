@@ -18,8 +18,8 @@ dependencies:
     sdk: flutter
 
   # Dependency injection
-  injectable: ^2.5.1
-  get_it: 7.7.0
+  injectable: ^2.7.1
+  get_it: ^8.3.0
 
   # Networking
   retrofit: 4.1.0
@@ -38,10 +38,7 @@ dependencies:
   logger: ^2.5.0
 
   core:
-    git:
-      url: https://github.com/masterfabric-mobile/osmea.git
-      ref: dev
-      path: packages/core
+    path: ../core
 
   # Code generation and annotations
   json_annotation: ^4.9.0

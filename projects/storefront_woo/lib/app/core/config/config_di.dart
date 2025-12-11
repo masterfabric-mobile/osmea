@@ -5,7 +5,6 @@ import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/core/config/config_di.config.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:flutter/foundation.dart';
-import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -14,11 +13,13 @@ Future<GetIt> configureDependencies({String? environment}) async {
   try {
     debugPrint('🔧 Configuring dependencies for environment: $environment');
 
-    // Initialize core dependencies
+    // Initialize core dependencies FIRST (Logger is registered here)
+    // APIs package needs Logger which is registered in core
     getIt = await Core().init(getIt);
     debugPrint('✅ Core dependencies initialized');
 
-    // Initialize APIs package dependencies
+    // Initialize APIs package dependencies AFTER core
+    // WooNetwork.init() calls configureDependencies which needs Logger
     await _initializeApisPackage(environment);
     debugPrint('✅ APIs package dependencies initialized');
 
@@ -39,86 +40,6 @@ Future<GetIt> configureDependencies({String? environment}) async {
     } catch (e) {
       debugPrint('⚠️ Could not register WishlistViewModel as singleton: $e');
       // Continue - factory registration will be used
-    }
-
-    // Override AccountCubit to inject getUsersMe callback for fresh API calls
-    // This ensures profile data is always fresh (user can update their info)
-    try {
-      debugPrint('🔍 storefront_woo DI: Checking AccountCubit registration...');
-      debugPrint('🔍 storefront_woo DI: AccountCubit isRegistered: ${getIt.isRegistered<AccountCubit>()}');
-      if (getIt.isRegistered<AccountCubit>()) {
-        debugPrint('🔍 storefront_woo DI: Unregistering existing AccountCubit...');
-        getIt.unregister<AccountCubit>();
-        debugPrint('✅ storefront_woo DI: AccountCubit unregistered');
-      }
-      debugPrint('🔍 storefront_woo DI: Registering AccountCubit with getUsersMe callback...');
-      getIt.registerFactory<AccountCubit>(() {
-        debugPrint('🔍 storefront_woo DI: AccountCubit factory called');
-        // Try to get AuthCubit from GetIt if registered
-        AuthCubit? authCubit;
-        try {
-          if (getIt.isRegistered<AuthCubit>()) {
-            authCubit = getIt<AuthCubit>();
-            debugPrint('✅ storefront_woo DI: AuthCubit found');
-          } else {
-            debugPrint('⚠️ storefront_woo DI: AuthCubit not registered');
-          }
-        } catch (e) {
-          debugPrint('⚠️ AccountCubit DI: AuthCubit not available: $e');
-        }
-
-        // Create getUsersMe callback that calls API directly
-        // IMPORTANT: Return name as-is from API, do NOT process it
-        Future<Map<String, dynamic>?> getUsersMeCallback() async {
-          try {
-            debugPrint('🔍 AccountCubit DI: getUsersMe callback called');
-            final jwtToken = await WooJwtTokenStorage.loadToken();
-            if (jwtToken != null && jwtToken.accessToken.isNotEmpty) {
-              debugPrint('🔍 AccountCubit DI: JWT token found, calling API...');
-              final authService = getIt<WooAuthService>();
-              final authHeader = 'Bearer ${jwtToken.accessToken}';
-              final userMeResponse = await authService.getUsersMe(authHeader);
-              
-              debugPrint('✅ AccountCubit DI: getUsersMe API call successful');
-              debugPrint('👤 AccountCubit DI: User name from API (raw): "${userMeResponse.name}"');
-              debugPrint('👤 AccountCubit DI: User name type: ${userMeResponse.name.runtimeType}');
-              
-              // Return name as-is from API response - NO processing
-              final result = {
-                'id': userMeResponse.id,
-                'name': userMeResponse.name, // Use name directly, no processing
-                'url': userMeResponse.url,
-                'description': userMeResponse.description,
-                'link': userMeResponse.link,
-                'slug': userMeResponse.slug,
-                'avatar_urls': userMeResponse.avatarUrls?.toJson(),
-                'is_super_admin': userMeResponse.isSuperAdmin,
-                'woocommerce_meta': userMeResponse.woocommerceMeta?.toJson(),
-              };
-              
-              debugPrint('👤 AccountCubit DI: Returning result with name: "${result['name']}"');
-              return result;
-            } else {
-              debugPrint('⚠️ AccountCubit DI: No JWT token found');
-            }
-          } catch (e, stackTrace) {
-            debugPrint('⚠️ AccountCubit DI: Error calling getUsersMe API: $e');
-            debugPrint('⚠️ AccountCubit DI: Stack trace: $stackTrace');
-          }
-          return null;
-        }
-
-        debugPrint('🔍 storefront_woo DI: Creating AccountCubit with callback...');
-        final accountCubit = AccountCubit(
-          getUsersMeCallback: getUsersMeCallback,
-        );
-        debugPrint('✅ storefront_woo DI: AccountCubit created with callback');
-        return accountCubit;
-      });
-      debugPrint('✅ AccountCubit registered with getUsersMe callback in storefront_woo DI');
-    } catch (e) {
-      debugPrint('⚠️ Could not register AccountCubit with callback: $e');
-      // Continue - core registration will be used
     }
 
     return result;
