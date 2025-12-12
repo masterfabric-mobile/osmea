@@ -30,9 +30,7 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         return Scaffold(
           body: child,
-          bottomNavigationBar: _getNavbarForRoute(
-            state.uri.path,
-          ),
+          bottomNavigationBar: _getNavbarForRoute(state.uri.path),
         );
       },
       routes: [
@@ -618,6 +616,10 @@ final GoRouter appRouter = GoRouter(
         final accountCubit = GetIt.I<AccountCubit>();
         final authCubit = GetIt.I<AuthCubit>();
 
+        // Load user API data and set it to AccountCubit
+        // This ensures profile data is always fresh (user can update their info)
+        _loadUserApiData(accountCubit);
+
         return CustomTransitionPage(
           child: BlocListener<AuthCubit, AuthState>(
             bloc: authCubit,
@@ -628,6 +630,8 @@ final GoRouter appRouter = GoRouter(
                   '👤 Route: AuthCubit authenticated, refreshing profile...',
                 );
                 WidgetsBinding.instance.addPostFrameCallback((_) {
+                  // Reload user API data and refresh profile
+                  _loadUserApiData(accountCubit);
                   accountCubit.refreshProfile();
                 });
               }
@@ -654,45 +658,63 @@ final GoRouter appRouter = GoRouter(
                 }
               },
               onSignOut: () async {
-                // Platform-specific cleanup: cookies, wishlist, cart tokens
-                debugPrint('🚪 Route: Starting platform-specific cleanup...');
+                // AccountCubit handles its own state clearing
+                // Platform-specific cleanup is provided via callback
+                await accountCubit.signOut(
+                  onSignOut: () async {
+                    // Platform-specific cleanup: cookies, wishlist, cart tokens, AuthCubit
+                    debugPrint(
+                      '🚪 Route: Starting platform-specific cleanup...',
+                    );
 
-                // Step 1: Clear WooCommerce JWT token
-                try {
-                  await WooJwtTokenStorage.clearToken();
-                  debugPrint('✅ Route: WooJWT token cleared');
-                } catch (e) {
-                  debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
-                }
+                    // Step 1: Sign out from AuthCubit
+                    try {
+                      await authCubit.signOut();
+                      debugPrint('✅ Route: AuthCubit signed out');
+                    } catch (e) {
+                      debugPrint(
+                        '⚠️ Route: Failed to sign out from AuthCubit: $e',
+                      );
+                    }
 
-                // Step 2: Clear cart token
-                try {
-                  await WooCartTokenStorage.clearCartToken();
-                  debugPrint('✅ Route: WooCartToken cleared');
-                } catch (e) {
-                  debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
-                }
+                    // Step 2: Clear WooCommerce JWT token
+                    try {
+                      await WooJwtTokenStorage.clearToken();
+                      debugPrint('✅ Route: WooJWT token cleared');
+                    } catch (e) {
+                      debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
+                    }
 
-                // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
-                try {
-                  await ApiDioClient.clearAllCookies();
-                  debugPrint(
-                    '✅ Route: All cookies cleared (including WP cookies)',
-                  );
-                } catch (e) {
-                  debugPrint('⚠️ Route: Failed to clear cookies: $e');
-                }
+                    // Step 3: Clear cart token
+                    try {
+                      await WooCartTokenStorage.clearCartToken();
+                      debugPrint('✅ Route: WooCartToken cleared');
+                    } catch (e) {
+                      debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
+                    }
 
-                // Step 4: Clear wishlist (user-specific data)
-                try {
-                  final wishlistViewModel = GetIt.I<WishlistViewModel>();
-                  wishlistViewModel.clearAll();
-                  debugPrint('✅ Route: Wishlist cleared');
-                } catch (e) {
-                  debugPrint('⚠️ Route: Failed to clear wishlist: $e');
-                }
+                    // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+                    try {
+                      await ApiDioClient.clearAllCookies();
+                      debugPrint(
+                        '✅ Route: All cookies cleared (including WP cookies)',
+                      );
+                    } catch (e) {
+                      debugPrint('⚠️ Route: Failed to clear cookies: $e');
+                    }
 
-                debugPrint('✅ Route: Platform-specific cleanup completed');
+                    // Step 5: Clear wishlist (user-specific data)
+                    try {
+                      final wishlistViewModel = GetIt.I<WishlistViewModel>();
+                      wishlistViewModel.clearAll();
+                      debugPrint('✅ Route: Wishlist cleared');
+                    } catch (e) {
+                      debugPrint('⚠️ Route: Failed to clear wishlist: $e');
+                    }
+
+                    debugPrint('✅ Route: Platform-specific cleanup completed');
+                  },
+                );
 
                 // Step 5: Navigate to home after sign out
                 await Future.delayed(const Duration(milliseconds: 300));
@@ -704,9 +726,7 @@ final GoRouter appRouter = GoRouter(
                   debugPrint('⚠️ Route: Context not mounted, cannot navigate');
                 }
               },
-              bottomNavigationBar: _getNavbarForRoute(
-                state.uri.path,
-              ),
+              bottomNavigationBar: _getNavbarForRoute(state.uri.path),
             ),
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -934,19 +954,19 @@ Widget? _getNavbarForRoute(String location) {
           bloc: GetIt.I<WishlistViewModel>(),
           buildWhen: (previous, current) {
             // Rebuild when wishlist count changes
-            final prevCount = previous is WishlistLoadedState 
-                ? previous.items.length 
+            final prevCount = previous is WishlistLoadedState
+                ? previous.items.length
                 : 0;
-            final currCount = current is WishlistLoadedState 
-                ? current.items.length 
+            final currCount = current is WishlistLoadedState
+                ? current.items.length
                 : 0;
             return prevCount != currCount;
           },
           builder: (context, wishlistState) {
-            final wishlistCount = wishlistState is WishlistLoadedState 
-                ? wishlistState.items.length 
+            final wishlistCount = wishlistState is WishlistLoadedState
+                ? wishlistState.items.length
                 : 0;
-            
+
             // Get AuthCubit from GetIt to listen to auth state changes
             try {
               final authCubit = GetIt.I<AuthCubit>();
@@ -1094,6 +1114,51 @@ List<NavbarItem> _buildNavbarItems(
       tooltip: isAuthenticated ? 'Profile' : 'Sign In',
     ),
   ];
+}
+
+/// Load user API data and set it to AccountCubit
+/// This fetches fresh user data from the API (username, email, etc.)
+Future<void> _loadUserApiData(AccountCubit accountCubit) async {
+  try {
+    debugPrint('🔍 AccountCubit Route: Loading user API data...');
+    final jwtToken = await WooJwtTokenStorage.loadToken();
+    if (jwtToken != null && jwtToken.accessToken.isNotEmpty) {
+      debugPrint('🔍 AccountCubit Route: JWT token found, calling API...');
+      final authService = GetIt.I<WooAuthService>();
+      final authHeader = 'Bearer ${jwtToken.accessToken}';
+      final userMeResponse = await authService.getUsersMe(authHeader);
+
+      debugPrint('✅ AccountCubit Route: getUsersMe API call successful');
+      debugPrint(
+        '👤 AccountCubit Route: User name from API (raw): "${userMeResponse.name}"',
+      );
+
+      // Prepare user data map with username, email, etc.
+      final userData = {
+        'id': userMeResponse.id,
+        'name': userMeResponse.name, // Use name directly, no processing
+        'url': userMeResponse.url,
+        'description': userMeResponse.description,
+        'link': userMeResponse.link,
+        'slug': userMeResponse.slug,
+        'avatar_urls': userMeResponse.avatarUrls?.toJson(),
+        'is_super_admin': userMeResponse.isSuperAdmin,
+        'woocommerce_meta': userMeResponse.woocommerceMeta?.toJson(),
+      };
+
+      debugPrint(
+        '👤 AccountCubit Route: Setting user data with name: "${userData['name']}"',
+      );
+      accountCubit.setUserApiData(userData);
+    } else {
+      debugPrint('⚠️ AccountCubit Route: No JWT token found');
+      accountCubit.setUserApiData(null);
+    }
+  } catch (e, stackTrace) {
+    debugPrint('⚠️ AccountCubit Route: Error calling getUsersMe API: $e');
+    debugPrint('⚠️ AccountCubit Route: Stack trace: $stackTrace');
+    accountCubit.setUserApiData(null);
+  }
 }
 
 /// Navigate to page based on index

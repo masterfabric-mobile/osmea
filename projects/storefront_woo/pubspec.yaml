@@ -23,8 +23,8 @@ dependencies:
   # STATE MANAGEMENT & DEPENDENCY INJECTION
   # ────────────────────────────────
   flutter_bloc: ^9.1.1     # BLoC pattern for managing application state
-  get_it: ^7.7.0           # Simple service locator (manual DI)
-  injectable: ^2.5.1       # Annotation-based code generation for get_it
+  get_it: ^8.3.0           # Simple service locator (manual DI)
+  injectable: ^2.7.1       # Annotation-based code generation for get_it
 
   # ────────────────────────────────
   # ROUTING / NAVIGATION
@@ -59,7 +59,7 @@ dev_dependencies:
   # ────────────────────────────────
   # CODE GENERATION
   # ────────────────────────────────
-  injectable_generator: ^2.6.2     # Generates code for injectable (DI)
+  injectable_generator: ^2.7.0     # Generates code for injectable (DI) - compatible with freezed 2.x
   build_runner: ^2.5.4            # Core tool for running code generation
   slang_build_runner: ^4.7.0      # Code generator for slang localization
   flutter_gen_runner: any         # Generator for flutter_gen (assets, colors, fonts, etc.)

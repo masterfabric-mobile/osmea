@@ -18,7 +18,7 @@ dependencies:
   hydrated_bloc: ^10.1.1 # Persisted state management for Cubit/BLoC (bloc 9.x)
   equatable: ^2.0.7 # Value equality
   go_router: ^15.1.1 # Routing
-  injectable: ^2.5.1 # Dependency injection
+  injectable: ^2.7.1 # Dependency injection
   logger: ^2.5.0 # Logging utility
   slang: ^4.11.1
   url_launcher: ^6.3.1 # URL launcher for support links
@@ -33,7 +33,7 @@ dependencies:
   firebase_remote_config: ^5.3.4 # Remote Config
   device_info_plus: ^11.4.0 # Device info
   package_info_plus: ^8.3.0 # Package info
-  dio: ^5.4.3 # HTTP client for file downloads
+  dio: ^5.7.0 # HTTP client for file downloads
   path_provider: ^2.1.5 # Path provider for file storage
   permission_handler: ^11.2.0 # Runtime permissions handler
   share_plus: ^10.1.4 # Sharing text/files across platforms
@@ -52,7 +52,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.4.7 # Code generation
-  injectable_generator: ^2.6.2 # Injectable code generator
+  injectable_generator: ^2.11.1 # Injectable code generator
   slang_build_runner: ^4.8.0
  
 dependency_overrides:

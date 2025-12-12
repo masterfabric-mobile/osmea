@@ -35,7 +35,8 @@ mixin _$GetUsersMeResponse {
   @JsonKey(name: "avatar_urls")
   AvatarUrls? get avatarUrls => throw _privateConstructorUsedError;
   @JsonKey(name: "meta")
-  List<dynamic>? get meta => throw _privateConstructorUsedError;
+  dynamic get meta =>
+      throw _privateConstructorUsedError; // Can be List or Map depending on API version
   @JsonKey(name: "is_super_admin")
   bool? get isSuperAdmin => throw _privateConstructorUsedError;
   @JsonKey(name: "woocommerce_meta")
@@ -63,7 +64,7 @@ abstract class $GetUsersMeResponseCopyWith<$Res> {
       @JsonKey(name: "link") String? link,
       @JsonKey(name: "slug") String? slug,
       @JsonKey(name: "avatar_urls") AvatarUrls? avatarUrls,
-      @JsonKey(name: "meta") List<dynamic>? meta,
+      @JsonKey(name: "meta") dynamic meta,
       @JsonKey(name: "is_super_admin") bool? isSuperAdmin,
       @JsonKey(name: "woocommerce_meta") WoocommerceMeta? woocommerceMeta,
       @JsonKey(name: "_links") Links? links});
@@ -130,7 +131,7 @@ class _$GetUsersMeResponseCopyWithImpl<$Res, $Val extends GetUsersMeResponse>
       meta: freezed == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>?,
+              as dynamic,
       isSuperAdmin: freezed == isSuperAdmin
           ? _value.isSuperAdmin
           : isSuperAdmin // ignore: cast_nullable_to_non_nullable
@@ -199,7 +200,7 @@ abstract class _$$GetUsersMeResponseImplCopyWith<$Res>
       @JsonKey(name: "link") String? link,
       @JsonKey(name: "slug") String? slug,
       @JsonKey(name: "avatar_urls") AvatarUrls? avatarUrls,
-      @JsonKey(name: "meta") List<dynamic>? meta,
+      @JsonKey(name: "meta") dynamic meta,
       @JsonKey(name: "is_super_admin") bool? isSuperAdmin,
       @JsonKey(name: "woocommerce_meta") WoocommerceMeta? woocommerceMeta,
       @JsonKey(name: "_links") Links? links});
@@ -265,9 +266,9 @@ class __$$GetUsersMeResponseImplCopyWithImpl<$Res>
           : avatarUrls // ignore: cast_nullable_to_non_nullable
               as AvatarUrls?,
       meta: freezed == meta
-          ? _value._meta
+          ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>?,
+              as dynamic,
       isSuperAdmin: freezed == isSuperAdmin
           ? _value.isSuperAdmin
           : isSuperAdmin // ignore: cast_nullable_to_non_nullable
@@ -295,11 +296,10 @@ class _$GetUsersMeResponseImpl implements _GetUsersMeResponse {
       @JsonKey(name: "link") this.link,
       @JsonKey(name: "slug") this.slug,
       @JsonKey(name: "avatar_urls") this.avatarUrls,
-      @JsonKey(name: "meta") final List<dynamic>? meta,
+      @JsonKey(name: "meta") this.meta,
       @JsonKey(name: "is_super_admin") this.isSuperAdmin,
       @JsonKey(name: "woocommerce_meta") this.woocommerceMeta,
-      @JsonKey(name: "_links") this.links})
-      : _meta = meta;
+      @JsonKey(name: "_links") this.links});
 
   factory _$GetUsersMeResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$GetUsersMeResponseImplFromJson(json);
@@ -325,17 +325,10 @@ class _$GetUsersMeResponseImpl implements _GetUsersMeResponse {
   @override
   @JsonKey(name: "avatar_urls")
   final AvatarUrls? avatarUrls;
-  final List<dynamic>? _meta;
   @override
   @JsonKey(name: "meta")
-  List<dynamic>? get meta {
-    final value = _meta;
-    if (value == null) return null;
-    if (_meta is EqualUnmodifiableListView) return _meta;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
+  final dynamic meta;
+// Can be List or Map depending on API version
   @override
   @JsonKey(name: "is_super_admin")
   final bool? isSuperAdmin;
@@ -365,7 +358,7 @@ class _$GetUsersMeResponseImpl implements _GetUsersMeResponse {
             (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.avatarUrls, avatarUrls) ||
                 other.avatarUrls == avatarUrls) &&
-            const DeepCollectionEquality().equals(other._meta, _meta) &&
+            const DeepCollectionEquality().equals(other.meta, meta) &&
             (identical(other.isSuperAdmin, isSuperAdmin) ||
                 other.isSuperAdmin == isSuperAdmin) &&
             (identical(other.woocommerceMeta, woocommerceMeta) ||
@@ -384,7 +377,7 @@ class _$GetUsersMeResponseImpl implements _GetUsersMeResponse {
       link,
       slug,
       avatarUrls,
-      const DeepCollectionEquality().hash(_meta),
+      const DeepCollectionEquality().hash(meta),
       isSuperAdmin,
       woocommerceMeta,
       links);
@@ -413,7 +406,7 @@ abstract class _GetUsersMeResponse implements GetUsersMeResponse {
       @JsonKey(name: "link") final String? link,
       @JsonKey(name: "slug") final String? slug,
       @JsonKey(name: "avatar_urls") final AvatarUrls? avatarUrls,
-      @JsonKey(name: "meta") final List<dynamic>? meta,
+      @JsonKey(name: "meta") final dynamic meta,
       @JsonKey(name: "is_super_admin") final bool? isSuperAdmin,
       @JsonKey(name: "woocommerce_meta") final WoocommerceMeta? woocommerceMeta,
       @JsonKey(name: "_links") final Links? links}) = _$GetUsersMeResponseImpl;
@@ -444,8 +437,8 @@ abstract class _GetUsersMeResponse implements GetUsersMeResponse {
   AvatarUrls? get avatarUrls;
   @override
   @JsonKey(name: "meta")
-  List<dynamic>? get meta;
-  @override
+  dynamic get meta;
+  @override // Can be List or Map depending on API version
   @JsonKey(name: "is_super_admin")
   bool? get isSuperAdmin;
   @override
