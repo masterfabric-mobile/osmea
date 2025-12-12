@@ -8,6 +8,7 @@ import 'package:storefront_woo/app/views/view_product_detail/product_detail_view
 import 'package:storefront_woo/app/views/view_product_list/product_list_view.dart';
 import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
+import 'package:storefront_woo/app/views/view_checkout/checkout_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -771,6 +772,47 @@ final GoRouter appRouter = GoRouter(
             );
           },
           transitionDuration: const Duration(milliseconds: 500),
+        );
+      },
+    ),
+
+    // Checkout Route
+    GoRoute(
+      path: '/checkout',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final arguments = {
+          'checkout': true,
+          if (extra != null) ...extra,
+        };
+        return CustomTransitionPage(
+          child: CheckoutView(
+            arguments: arguments,
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('cart')) {
+                context.go('/cart');
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOutCubic,
+                ),
+              ),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 400),
         );
       },
     ),
