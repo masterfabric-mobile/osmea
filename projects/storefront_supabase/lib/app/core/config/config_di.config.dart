@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/views/admin/dashboard/models/view_model.dart'
+    as _i1122;
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart'
     as _i826;
 import 'package:storefront_supabase/app/views/view_categories/models/view_model.dart'
@@ -58,6 +60,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i721.FavoritesViewModel>(
       () => _i721.FavoritesViewModel(gh<_i454.SupabaseClient>()),
     );
+    gh.factory<_i1122.AdminDashboardViewModel>(
+        () => _i1122.AdminDashboardViewModel(gh<_i454.SupabaseClient>()));
     return this;
   }
 }

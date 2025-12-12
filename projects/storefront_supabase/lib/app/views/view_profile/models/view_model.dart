@@ -21,15 +21,16 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
 
     _authSubscription =
         _supabaseClient.auth.onAuthStateChange.listen((data) {
-      final Session? session = data.session;
-      stateChanger(state.copyWith(isLoggedIn: session != null));
+      final session = data.session;
+      final userRole = session?.user.role;
+      stateChanger(state.copyWith(isLoggedIn: session != null, userRole: userRole));
     });
   }
 
   Future<void> initial() async {
-    // Set initial state based on current user
+    final currentUser = _supabaseClient.auth.currentUser;
     stateChanger(
-        state.copyWith(isLoggedIn: _supabaseClient.auth.currentUser != null));
+        state.copyWith(isLoggedIn: currentUser != null, userRole: currentUser?.role));
   }
 
   void switchToLogin() {
@@ -59,7 +60,8 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
             isLoading: false, errorMessage: 'Login failed. Please check your credentials.'));
       } else {
         _clearFieldsAndErrors();
-        stateChanger(state.copyWith(isLoading: false, isLoggedIn: true));
+        final userRole = response.user?.role;
+        stateChanger(state.copyWith(isLoading: false, isLoggedIn: true, userRole: userRole));
       }
     } on AuthException catch (e) {
       stateChanger(state.copyWith(isLoading: false, errorMessage: e.message));
@@ -108,7 +110,7 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     stateChanger(state.copyWith(isLoading: true));
     await _supabaseClient.auth.signOut();
     _clearFieldsAndErrors();
-    stateChanger(const ProfileState(isLoggedIn: false, showLoginView: true));
+    stateChanger(const ProfileState(isLoggedIn: false, showLoginView: true, userRole: null));
   }
 
   void _clearFieldsAndErrors() {

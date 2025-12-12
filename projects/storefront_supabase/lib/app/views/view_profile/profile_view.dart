@@ -63,6 +63,13 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => goRoute('/settings'),
           ),
+          if (state.userRole == 'admin')
+            OsmeaComponents.listItem(
+              title: OsmeaComponents.text('Admin Dashboard'),
+              leading: const Icon(Icons.admin_panel_settings),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => goRoute('/admin/dashboard'),
+            ),
         ],
       );
     }
