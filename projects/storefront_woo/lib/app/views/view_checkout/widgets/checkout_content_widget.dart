@@ -26,7 +26,7 @@ class CheckoutContentWidget extends StatefulWidget {
 
 class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   final _formKey = GlobalKey<FormState>();
-  
+
   final _billingFirstNameController = TextEditingController();
   final _billingLastNameController = TextEditingController();
   final _billingEmailController = TextEditingController();
@@ -57,7 +57,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
     _loadUserData();
     _loadSavedFormData();
     _setupFormListeners();
-    
+
     // Listen to viewModel state changes for loading state
     widget.viewModel.stream.listen((state) {
       if (mounted) {
@@ -65,7 +65,8 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           setState(() {
             _isLoading = true;
           });
-        } else if (state is CheckoutOrderCompletedState || state is CheckoutErrorState) {
+        } else if (state is CheckoutOrderCompletedState ||
+            state is CheckoutErrorState) {
           setState(() {
             _isLoading = false;
           });
@@ -95,55 +96,89 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       await storage.init();
 
       // Load billing address
-      final billingFirstName = await storage.getItem('checkout_billing_first_name');
-      final billingLastName = await storage.getItem('checkout_billing_last_name');
+      final billingFirstName = await storage.getItem(
+        'checkout_billing_first_name',
+      );
+      final billingLastName = await storage.getItem(
+        'checkout_billing_last_name',
+      );
       final billingEmail = await storage.getItem('checkout_billing_email');
       final billingPhone = await storage.getItem('checkout_billing_phone');
-      final billingAddress1 = await storage.getItem('checkout_billing_address_1');
-      final billingAddress2 = await storage.getItem('checkout_billing_address_2');
+      final billingAddress1 = await storage.getItem(
+        'checkout_billing_address_1',
+      );
+      final billingAddress2 = await storage.getItem(
+        'checkout_billing_address_2',
+      );
       final billingCity = await storage.getItem('checkout_billing_city');
       final billingState = await storage.getItem('checkout_billing_state');
-      final billingPostcode = await storage.getItem('checkout_billing_postcode');
+      final billingPostcode = await storage.getItem(
+        'checkout_billing_postcode',
+      );
       final billingCountry = await storage.getItem('checkout_billing_country');
 
       // Load shipping address
-      final shippingFirstName = await storage.getItem('checkout_shipping_first_name');
-      final shippingLastName = await storage.getItem('checkout_shipping_last_name');
+      final shippingFirstName = await storage.getItem(
+        'checkout_shipping_first_name',
+      );
+      final shippingLastName = await storage.getItem(
+        'checkout_shipping_last_name',
+      );
       final shippingPhone = await storage.getItem('checkout_shipping_phone');
-      final shippingAddress1 = await storage.getItem('checkout_shipping_address_1');
-      final shippingAddress2 = await storage.getItem('checkout_shipping_address_2');
+      final shippingAddress1 = await storage.getItem(
+        'checkout_shipping_address_1',
+      );
+      final shippingAddress2 = await storage.getItem(
+        'checkout_shipping_address_2',
+      );
       final shippingCity = await storage.getItem('checkout_shipping_city');
       final shippingState = await storage.getItem('checkout_shipping_state');
-      final shippingPostcode = await storage.getItem('checkout_shipping_postcode');
-      final shippingCountry = await storage.getItem('checkout_shipping_country');
+      final shippingPostcode = await storage.getItem(
+        'checkout_shipping_postcode',
+      );
+      final shippingCountry = await storage.getItem(
+        'checkout_shipping_country',
+      );
 
       // Load same as billing preference
       final sameAsBilling = await storage.getItem('checkout_same_as_billing');
 
       // Restore billing address
-      if (billingFirstName != null) _billingFirstNameController.text = billingFirstName;
-      if (billingLastName != null) _billingLastNameController.text = billingLastName;
+      if (billingFirstName != null)
+        _billingFirstNameController.text = billingFirstName;
+      if (billingLastName != null)
+        _billingLastNameController.text = billingLastName;
       if (billingEmail != null && _billingEmailController.text.isEmpty) {
         _billingEmailController.text = billingEmail;
       }
       if (billingPhone != null) _billingPhoneController.text = billingPhone;
-      if (billingAddress1 != null) _billingAddress1Controller.text = billingAddress1;
-      if (billingAddress2 != null) _billingAddress2Controller.text = billingAddress2;
+      if (billingAddress1 != null)
+        _billingAddress1Controller.text = billingAddress1;
+      if (billingAddress2 != null)
+        _billingAddress2Controller.text = billingAddress2;
       if (billingCity != null) _billingCityController.text = billingCity;
       if (billingState != null) _billingStateController.text = billingState;
-      if (billingPostcode != null) _billingPostcodeController.text = billingPostcode;
-      if (billingCountry != null) _billingCountryController.text = billingCountry;
+      if (billingPostcode != null)
+        _billingPostcodeController.text = billingPostcode;
+      if (billingCountry != null)
+        _billingCountryController.text = billingCountry;
 
       // Restore shipping address
-      if (shippingFirstName != null) _shippingFirstNameController.text = shippingFirstName;
-      if (shippingLastName != null) _shippingLastNameController.text = shippingLastName;
+      if (shippingFirstName != null)
+        _shippingFirstNameController.text = shippingFirstName;
+      if (shippingLastName != null)
+        _shippingLastNameController.text = shippingLastName;
       if (shippingPhone != null) _shippingPhoneController.text = shippingPhone;
-      if (shippingAddress1 != null) _shippingAddress1Controller.text = shippingAddress1;
-      if (shippingAddress2 != null) _shippingAddress2Controller.text = shippingAddress2;
+      if (shippingAddress1 != null)
+        _shippingAddress1Controller.text = shippingAddress1;
+      if (shippingAddress2 != null)
+        _shippingAddress2Controller.text = shippingAddress2;
       if (shippingCity != null) _shippingCityController.text = shippingCity;
       if (shippingState != null) _shippingStateController.text = shippingState;
-      if (shippingPostcode != null) _shippingPostcodeController.text = shippingPostcode;
-      if (shippingCountry != null) _shippingCountryController.text = shippingCountry;
+      if (shippingPostcode != null)
+        _shippingPostcodeController.text = shippingPostcode;
+      if (shippingCountry != null)
+        _shippingCountryController.text = shippingCountry;
 
       // Restore same as billing preference
       if (sameAsBilling != null) {
@@ -168,30 +203,90 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       await storage.init();
 
       // Save billing address
-      await storage.setItem('checkout_billing_first_name', _billingFirstNameController.text);
-      await storage.setItem('checkout_billing_last_name', _billingLastNameController.text);
-      await storage.setItem('checkout_billing_email', _billingEmailController.text);
-      await storage.setItem('checkout_billing_phone', _billingPhoneController.text);
-      await storage.setItem('checkout_billing_address_1', _billingAddress1Controller.text);
-      await storage.setItem('checkout_billing_address_2', _billingAddress2Controller.text);
-      await storage.setItem('checkout_billing_city', _billingCityController.text);
-      await storage.setItem('checkout_billing_state', _billingStateController.text);
-      await storage.setItem('checkout_billing_postcode', _billingPostcodeController.text);
-      await storage.setItem('checkout_billing_country', _billingCountryController.text);
+      await storage.setItem(
+        'checkout_billing_first_name',
+        _billingFirstNameController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_last_name',
+        _billingLastNameController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_email',
+        _billingEmailController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_phone',
+        _billingPhoneController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_address_1',
+        _billingAddress1Controller.text,
+      );
+      await storage.setItem(
+        'checkout_billing_address_2',
+        _billingAddress2Controller.text,
+      );
+      await storage.setItem(
+        'checkout_billing_city',
+        _billingCityController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_state',
+        _billingStateController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_postcode',
+        _billingPostcodeController.text,
+      );
+      await storage.setItem(
+        'checkout_billing_country',
+        _billingCountryController.text,
+      );
 
       // Save shipping address
-      await storage.setItem('checkout_shipping_first_name', _shippingFirstNameController.text);
-      await storage.setItem('checkout_shipping_last_name', _shippingLastNameController.text);
-      await storage.setItem('checkout_shipping_phone', _shippingPhoneController.text);
-      await storage.setItem('checkout_shipping_address_1', _shippingAddress1Controller.text);
-      await storage.setItem('checkout_shipping_address_2', _shippingAddress2Controller.text);
-      await storage.setItem('checkout_shipping_city', _shippingCityController.text);
-      await storage.setItem('checkout_shipping_state', _shippingStateController.text);
-      await storage.setItem('checkout_shipping_postcode', _shippingPostcodeController.text);
-      await storage.setItem('checkout_shipping_country', _shippingCountryController.text);
+      await storage.setItem(
+        'checkout_shipping_first_name',
+        _shippingFirstNameController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_last_name',
+        _shippingLastNameController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_phone',
+        _shippingPhoneController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_address_1',
+        _shippingAddress1Controller.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_address_2',
+        _shippingAddress2Controller.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_city',
+        _shippingCityController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_state',
+        _shippingStateController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_postcode',
+        _shippingPostcodeController.text,
+      );
+      await storage.setItem(
+        'checkout_shipping_country',
+        _shippingCountryController.text,
+      );
 
       // Save same as billing preference
-      await storage.setItem('checkout_same_as_billing', _sameAsBilling.toString());
+      await storage.setItem(
+        'checkout_same_as_billing',
+        _sameAsBilling.toString(),
+      );
 
       debugPrint('💾 Checkout form data saved to storage');
     } catch (e) {
@@ -282,29 +377,33 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             // Billing Address Section
             _buildSectionHeader(context, 'Billing Address', Icons.receipt),
             _buildBillingForm(context),
-            
+
             OsmeaComponents.sizedBox(height: 24),
-            
+
             // Shipping Address Section
-            _buildSectionHeader(context, 'Shipping Address', Icons.local_shipping),
+            _buildSectionHeader(
+              context,
+              'Shipping Address',
+              Icons.local_shipping,
+            ),
             _buildSameAsBillingCheckbox(context),
             _buildShippingForm(context),
-            
+
             OsmeaComponents.sizedBox(height: 24),
-            
+
             // Order Summary
             _buildOrderSummary(context),
-            
+
             OsmeaComponents.sizedBox(height: 24),
-            
+
             // Payment Method Selection
             _buildPaymentMethodSection(context),
-            
+
             OsmeaComponents.sizedBox(height: 32),
-            
+
             // Continue to Payment Button
             _buildContinueButton(context),
-            
+
             OsmeaComponents.sizedBox(height: 16),
           ],
         ),
@@ -312,18 +411,33 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
     return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(horizontal: context.spacing16),
+      margin: EdgeInsets.only(
+        left: context.spacing16,
+        right: context.spacing16,
+        bottom: context.spacing12,
+      ),
       child: OsmeaComponents.row(
         children: [
-          Icon(icon, color: OsmeaColors.nordicBlue, size: context.iconSizeNormal),
-          OsmeaComponents.sizedBox(width: 8),
+          OsmeaComponents.container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: OsmeaColors.nordicBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: OsmeaColors.nordicBlue, size: 20),
+          ),
+          OsmeaComponents.sizedBox(width: 12),
           OsmeaComponents.text(
             title,
-            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            textStyle: OsmeaTextStyle.titleMedium(
+              context,
+            ).copyWith(fontWeight: FontWeight.w600),
             color: OsmeaColors.thunder,
           ),
         ],
@@ -334,12 +448,6 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   Widget _buildBillingForm(BuildContext context) {
     return OsmeaComponents.container(
       margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      padding: context.paddingNormal,
-      decoration: BoxDecoration(
-        color: OsmeaColors.paperWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OsmeaColors.silver, width: 1),
-      ),
       child: OsmeaComponents.column(
         children: [
           OsmeaComponents.row(
@@ -347,18 +455,22 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingFirstNameController,
-                  label: 'First Name',
-                  icon: Icons.person,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  label: '',
+                  hint: 'First name',
+                  icon: Icons.person_outline,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingLastNameController,
-                  label: 'Last Name',
+                  label: '',
+                  hint: 'Last name',
                   icon: Icons.person_outline,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
             ],
@@ -366,8 +478,9 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingEmailController,
-            label: 'Email',
-            icon: Icons.email,
+            label: '',
+            hint: 'Email',
+            icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value?.isEmpty ?? true) return 'Required';
@@ -378,22 +491,25 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingPhoneController,
-            label: 'Phone',
-            icon: Icons.phone,
+            label: '',
+            hint: 'Phone',
+            icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingAddress1Controller,
-            label: 'Address Line 1',
-            icon: Icons.home,
+            label: '',
+            hint: 'Address Line 1',
+            icon: Icons.home_outlined,
             validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingAddress2Controller,
-            label: 'Address Line 2 (Optional)',
+            label: '',
+            hint: 'Address Line 2 (Optional)',
             icon: Icons.home_outlined,
           ),
           OsmeaComponents.sizedBox(height: 12),
@@ -402,18 +518,22 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingCityController,
-                  label: 'City',
-                  icon: Icons.location_city,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  label: '',
+                  hint: 'City',
+                  icon: Icons.location_city_outlined,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingStateController,
-                  label: 'State',
-                  icon: Icons.map,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  label: '',
+                  hint: 'State',
+                  icon: Icons.map_outlined,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
             ],
@@ -424,18 +544,22 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingPostcodeController,
-                  label: 'Postcode',
-                  icon: Icons.markunread_mailbox,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  label: '',
+                  hint: 'Postcode',
+                  icon: Icons.markunread_mailbox_outlined,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
               Expanded(
                 child: _buildTextFormField(
                   controller: _billingCountryController,
-                  label: 'Country',
+                  label: '',
+                  hint: 'Country',
                   icon: Icons.public,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Required' : null,
                 ),
               ),
             ],
@@ -447,25 +571,47 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
 
   Widget _buildSameAsBillingCheckbox(BuildContext context) {
     return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      child: CheckboxListTile(
-        value: _sameAsBilling,
-        onChanged: (value) {
+      margin: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: OsmeaColors.nordicBlue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _sameAsBilling
+              ? OsmeaColors.nordicBlue
+              : OsmeaColors.silver.withOpacity(0.3),
+          width: 1.5,
+        ),
+      ),
+      child: InkWell(
+        onTap: () {
           setState(() {
-            _sameAsBilling = value ?? false;
+            _sameAsBilling = !_sameAsBilling;
             if (_sameAsBilling) {
               _copyBillingToShipping();
             }
-            _saveFormData(); // Save preference change
+            _saveFormData();
           });
         },
-        title: OsmeaComponents.text(
-          'Same as billing address',
-          textStyle: OsmeaTextStyle.bodyMedium(context),
-          color: OsmeaColors.thunder,
+        child: OsmeaComponents.row(
+          children: [
+            Icon(
+              _sameAsBilling ? Icons.check_box : Icons.check_box_outline_blank,
+              color: _sameAsBilling
+                  ? OsmeaColors.nordicBlue
+                  : OsmeaColors.pewter,
+              size: 24,
+            ),
+            OsmeaComponents.sizedBox(width: 12),
+            OsmeaComponents.text(
+              'Same as billing address',
+              textStyle: OsmeaTextStyle.bodyMedium(
+                context,
+              ).copyWith(fontWeight: FontWeight.w500),
+              color: OsmeaColors.thunder,
+            ),
+          ],
         ),
-        activeColor: OsmeaColors.nordicBlue,
-        contentPadding: EdgeInsets.zero,
       ),
     );
   }
@@ -483,131 +629,135 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   }
 
   Widget _buildShippingForm(BuildContext context) {
+    if (_sameAsBilling) {
+      return OsmeaComponents.sizedBox(height: 0);
+    }
+
     return OsmeaComponents.container(
       margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      padding: context.paddingNormal,
-      decoration: BoxDecoration(
-        color: OsmeaColors.paperWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OsmeaColors.silver, width: 1),
-      ),
-      child: Opacity(
-        opacity: _sameAsBilling ? 0.5 : 1.0,
-        child: OsmeaComponents.column(
-          children: [
-            OsmeaComponents.row(
-              children: [
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingFirstNameController,
-                    label: 'First Name',
-                    icon: Icons.person,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+      child: OsmeaComponents.column(
+        children: [
+          OsmeaComponents.row(
+            children: [
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingFirstNameController,
+                  label: '',
+                  hint: 'First name',
+                  icon: Icons.person_outline,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-                OsmeaComponents.sizedBox(width: 12),
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingLastNameController,
-                    label: 'Last Name',
-                    icon: Icons.person_outline,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+              ),
+              OsmeaComponents.sizedBox(width: 12),
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingLastNameController,
+                  label: '',
+                  hint: 'Last name',
+                  icon: Icons.person_outline,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-              ],
-            ),
-            OsmeaComponents.sizedBox(height: 12),
-            _buildTextFormField(
-              controller: _shippingPhoneController,
-              label: 'Phone',
-              icon: Icons.phone,
-              keyboardType: TextInputType.phone,
-              enabled: !_sameAsBilling,
-              validator: _sameAsBilling
-                  ? null
-                  : (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            OsmeaComponents.sizedBox(height: 12),
-            _buildTextFormField(
-              controller: _shippingAddress1Controller,
-              label: 'Address Line 1',
-              icon: Icons.home,
-              enabled: !_sameAsBilling,
-              validator: _sameAsBilling
-                  ? null
-                  : (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            OsmeaComponents.sizedBox(height: 12),
-            _buildTextFormField(
-              controller: _shippingAddress2Controller,
-              label: 'Address Line 2 (Optional)',
-              icon: Icons.home_outlined,
-              enabled: !_sameAsBilling,
-            ),
-            OsmeaComponents.sizedBox(height: 12),
-            OsmeaComponents.row(
-              children: [
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingCityController,
-                    label: 'City',
-                    icon: Icons.location_city,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+              ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: 12),
+          _buildTextFormField(
+            controller: _shippingPhoneController,
+            label: '',
+            hint: 'Phone',
+            icon: Icons.phone_outlined,
+            keyboardType: TextInputType.phone,
+            enabled: !_sameAsBilling,
+            validator: _sameAsBilling
+                ? null
+                : (value) => value?.isEmpty ?? true ? 'Required' : null,
+          ),
+          OsmeaComponents.sizedBox(height: 12),
+          _buildTextFormField(
+            controller: _shippingAddress1Controller,
+            label: '',
+            hint: 'Address Line 1',
+            icon: Icons.home_outlined,
+            enabled: !_sameAsBilling,
+            validator: _sameAsBilling
+                ? null
+                : (value) => value?.isEmpty ?? true ? 'Required' : null,
+          ),
+          OsmeaComponents.sizedBox(height: 12),
+          _buildTextFormField(
+            controller: _shippingAddress2Controller,
+            label: '',
+            hint: 'Address Line 2 (Optional)',
+            icon: Icons.home_outlined,
+            enabled: !_sameAsBilling,
+          ),
+          OsmeaComponents.sizedBox(height: 12),
+          OsmeaComponents.row(
+            children: [
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingCityController,
+                  label: '',
+                  hint: 'City',
+                  icon: Icons.location_city_outlined,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-                OsmeaComponents.sizedBox(width: 12),
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingStateController,
-                    label: 'State',
-                    icon: Icons.map,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+              ),
+              OsmeaComponents.sizedBox(width: 12),
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingStateController,
+                  label: '',
+                  hint: 'State',
+                  icon: Icons.map_outlined,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-              ],
-            ),
-            OsmeaComponents.sizedBox(height: 12),
-            OsmeaComponents.row(
-              children: [
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingPostcodeController,
-                    label: 'Postcode',
-                    icon: Icons.markunread_mailbox,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+              ),
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: 12),
+          OsmeaComponents.row(
+            children: [
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingPostcodeController,
+                  label: '',
+                  hint: 'Postcode',
+                  icon: Icons.markunread_mailbox_outlined,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-                OsmeaComponents.sizedBox(width: 12),
-                Expanded(
-                  child: _buildTextFormField(
-                    controller: _shippingCountryController,
-                    label: 'Country',
-                    icon: Icons.public,
-                    enabled: !_sameAsBilling,
-                    validator: _sameAsBilling
-                        ? null
-                        : (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
+              ),
+              OsmeaComponents.sizedBox(width: 12),
+              Expanded(
+                child: _buildTextFormField(
+                  controller: _shippingCountryController,
+                  label: '',
+                  hint: 'Country',
+                  icon: Icons.public,
+                  enabled: !_sameAsBilling,
+                  validator: _sameAsBilling
+                      ? null
+                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -615,33 +765,54 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String label,
+    required String hint,
     required IconData icon,
     TextInputType? keyboardType,
     bool enabled = true,
     String? Function(String?)? validator,
   }) {
+    final currentContext = context; // Capture context at build time
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       enabled: enabled,
       validator: validator,
+      style: OsmeaTextStyle.bodyMedium(currentContext),
       decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: OsmeaColors.nordicBlue),
+        labelText: hint,
+        labelStyle: OsmeaTextStyle.bodySmall(currentContext).copyWith(
+          color: OsmeaColors.pewter,
+        ),
+        floatingLabelStyle: OsmeaTextStyle.bodySmall(currentContext).copyWith(
+          color: OsmeaColors.nordicBlue,
+        ),
+        prefixIcon: Icon(icon, color: OsmeaColors.nordicBlue, size: 20),
+        filled: true,
+        fillColor: OsmeaColors.paperWhite,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: OsmeaColors.silver.withOpacity(0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.silver),
+          borderSide: BorderSide(color: OsmeaColors.silver.withOpacity(0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.nordicBlue, width: 2),
+          borderSide: BorderSide(color: OsmeaColors.nordicBlue, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.red),
+          borderSide: BorderSide(color: OsmeaColors.amberFlame, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: OsmeaColors.amberFlame, width: 1.5),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: OsmeaColors.silver.withOpacity(0.2)),
         ),
       ),
     );
@@ -655,38 +826,54 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
 
     return OsmeaComponents.container(
       margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      padding: context.paddingNormal,
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: OsmeaColors.paperWhite,
+        gradient: LinearGradient(
+          colors: [
+            OsmeaColors.nordicBlue.withOpacity(0.05),
+            OsmeaColors.nordicBlue.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OsmeaColors.silver, width: 1),
+        border: Border.all(
+          color: OsmeaColors.nordicBlue.withOpacity(0.2),
+          width: 1,
+        ),
       ),
-      child: OsmeaComponents.column(
+      child: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          OsmeaComponents.text(
-            'Order Summary',
-            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            color: OsmeaColors.thunder,
-          ),
-          OsmeaComponents.sizedBox(height: 12),
-          OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          OsmeaComponents.column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OsmeaComponents.text(
-                'Total',
-                textStyle: OsmeaTextStyle.bodyLarge(context),
+                'Order Total',
+                textStyle: OsmeaTextStyle.bodyMedium(context),
                 color: OsmeaColors.pewter,
               ),
+              OsmeaComponents.sizedBox(height: 4),
               OsmeaComponents.text(
                 formattedTotal,
-                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: OsmeaColors.nordicBlue,
-                ),
+                textStyle: OsmeaTextStyle.headlineSmall(
+                  context,
+                ).copyWith(fontWeight: FontWeight.bold),
+                color: OsmeaColors.nordicBlue,
               ),
             ],
+          ),
+          OsmeaComponents.container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: OsmeaColors.nordicBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.shopping_bag_outlined,
+              color: OsmeaColors.nordicBlue,
+              size: 28,
+            ),
           ),
         ],
       ),
@@ -696,42 +883,58 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   Widget _buildPaymentMethodSection(BuildContext context) {
     return OsmeaComponents.container(
       margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      padding: context.paddingNormal,
-      decoration: BoxDecoration(
-        color: OsmeaColors.paperWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OsmeaColors.silver, width: 1),
-      ),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          OsmeaComponents.text(
-            'Payment Method',
-            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            color: OsmeaColors.thunder,
-          ),
-          OsmeaComponents.sizedBox(height: 12),
           OsmeaComponents.container(
-            padding: context.paddingNormal,
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: OsmeaColors.nordicBlue.withOpacity(0.1),
+              color: OsmeaColors.paperWhite,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: OsmeaColors.nordicBlue, width: 2),
+              border: Border.all(
+                color: OsmeaColors.nordicBlue.withOpacity(0.3),
+                width: 1.5,
+              ),
             ),
             child: OsmeaComponents.row(
               children: [
-                Icon(Icons.account_balance, color: OsmeaColors.nordicBlue),
-                OsmeaComponents.sizedBox(width: 12),
-                Expanded(
-                  child: OsmeaComponents.text(
-                    'Bank Transfer (Havale/EFT)',
-                    textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    color: OsmeaColors.thunder,
+                OsmeaComponents.container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: Icon(
+                    Icons.account_balance,
+                    color: OsmeaColors.nordicBlue,
+                    size: 24,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 14),
+                Expanded(
+                  child: OsmeaComponents.column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      OsmeaComponents.text(
+                        'Bank Transfer',
+                        textStyle: OsmeaTextStyle.bodyLarge(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w600),
+                        color: OsmeaColors.thunder,
+                      ),
+                      OsmeaComponents.sizedBox(height: 2),
+                      OsmeaComponents.text(
+                        'Havale/EFT',
+                        textStyle: OsmeaTextStyle.bodySmall(context),
+                        color: OsmeaColors.pewter,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.check_circle,
+                  color: OsmeaColors.forestHeart,
+                  size: 24,
                 ),
               ],
             ),
@@ -748,17 +951,22 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
         onPressed: _isLoading ? null : () => _handleContinue(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: OsmeaColors.nordicBlue,
-          padding: context.paddingNormal,
+          disabledBackgroundColor: OsmeaColors.pewter.withOpacity(0.3),
+          padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 4,
+          elevation: 0,
+          shadowColor: Colors.transparent,
         ),
         child: _isLoading
-            ? OsmeaComponents.loading(
-                type: LoadingType.circularFade,
-                size: 24,
-                color: OsmeaColors.white,
+            ? OsmeaComponents.sizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.white),
+                ),
               )
             : OsmeaComponents.row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -768,10 +976,15 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                     textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                       color: OsmeaColors.white,
                       fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
                     ),
                   ),
                   OsmeaComponents.sizedBox(width: 8),
-                  Icon(Icons.arrow_forward, color: OsmeaColors.white, size: 20),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: OsmeaColors.white,
+                    size: 20,
+                  ),
                 ],
               ),
       ),
@@ -822,4 +1035,3 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
     );
   }
 }
-

@@ -12,7 +12,8 @@ import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart
 import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_content_widget.dart';
 
 /// CheckoutView displays checkout form with billing and shipping addresses
-class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutState> {
+class CheckoutView
+    extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutState> {
   CheckoutView({
     super.key,
     super.arguments,
@@ -29,7 +30,9 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
            title: OsmeaComponents.text(
              'Checkout',
              color: OsmeaColors.thunder,
-             textStyle: OsmeaTextStyle.titleLarge(context),
+             textStyle: OsmeaTextStyle.titleLarge(
+               context,
+             ).copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.3),
            ),
            backgroundColor: OsmeaColors.paperWhite,
            elevation: 0,
@@ -37,11 +40,11 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
            variant: AppBarVariant.standard,
            size: AppBarSize.standard,
            leading: OsmeaComponents.iconButton(
-             onPressed: () => context.pop(),
+             onPressed: () => goRoute('/cart'),
              icon: Icon(
-               Icons.arrow_back,
+               Icons.arrow_back_ios_new_rounded,
                color: OsmeaColors.thunder,
-               size: context.iconSizeNormal,
+               size: 20,
              ),
            ),
          ),
@@ -62,7 +65,9 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
     CheckoutViewModel viewModel,
     CheckoutState state,
   ) {
-    debugPrint('🛒 CheckoutView: viewContent called with state: ${state.runtimeType}');
+    debugPrint(
+      '🛒 CheckoutView: viewContent called with state: ${state.runtimeType}',
+    );
     return _buildBody(context, viewModel, state);
   }
 
@@ -81,7 +86,8 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
       );
     }
 
-    if (state is CheckoutLoadingState || state is CheckoutProcessingOrderState) {
+    if (state is CheckoutLoadingState ||
+        state is CheckoutProcessingOrderState) {
       return LoadingScreen(
         goRoute: goRoute,
         loadingType: LoadingModelType.dataLoading,
@@ -106,7 +112,10 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
     );
   }
 
-  Widget _buildOrderSuccess(BuildContext context, CheckoutOrderCompletedState state) {
+  Widget _buildOrderSuccess(
+    BuildContext context,
+    CheckoutOrderCompletedState state,
+  ) {
     final formattedTotal = PriceInfoCurrencyHelper.formatPrice(
       state.totalAmount,
       currencyCode: state.currencyCode,
@@ -116,7 +125,7 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OsmeaComponents.sizedBox(height: 40),
+          OsmeaComponents.sizedBox(height: 48),
           // Success Icon
           OsmeaComponents.container(
             alignment: Alignment.center,
@@ -124,32 +133,37 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: OsmeaColors.forestHeart.withOpacity(0.1),
+                gradient: LinearGradient(
+                  colors: [
+                    OsmeaColors.forestHeart.withOpacity(0.1),
+                    OsmeaColors.meadow.withOpacity(0.05),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.check_circle,
+                Icons.check_circle_rounded,
                 color: OsmeaColors.forestHeart,
-                size: 60,
+                size: 64,
               ),
             ),
           ),
-          OsmeaComponents.sizedBox(height: 24),
+          OsmeaComponents.sizedBox(height: 28),
           // Success Message
           OsmeaComponents.container(
-            margin: EdgeInsets.symmetric(horizontal: context.spacing16),
+            margin: EdgeInsets.symmetric(horizontal: context.spacing24),
             child: OsmeaComponents.text(
               'Order Placed Successfully!',
-              textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              textStyle: OsmeaTextStyle.headlineSmall(
+                context,
+              ).copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
               textAlign: TextAlign.center,
               color: OsmeaColors.thunder,
             ),
           ),
           OsmeaComponents.sizedBox(height: 12),
           OsmeaComponents.container(
-            margin: EdgeInsets.symmetric(horizontal: context.spacing16),
+            margin: EdgeInsets.symmetric(horizontal: context.spacing24),
             child: OsmeaComponents.text(
               'Your order has been received and is being processed.',
               textStyle: OsmeaTextStyle.bodyMedium(context),
@@ -157,108 +171,154 @@ class CheckoutView extends MasterViewHydratedCubit<CheckoutViewModel, CheckoutSt
               color: OsmeaColors.pewter,
             ),
           ),
-          OsmeaComponents.sizedBox(height: 32),
-          // Order Details
+          OsmeaComponents.sizedBox(height: 40),
+          // Order Details Card
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-            padding: context.paddingNormal,
+            padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: OsmeaColors.paperWhite,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: OsmeaColors.silver, width: 1),
+              border: Border.all(
+                color: OsmeaColors.silver.withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OsmeaComponents.text(
-                  'Order Details',
-                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    fontWeight: FontWeight.bold,
+                // Total Amount - Highlighted
+                Center(
+                  child: OsmeaComponents.container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          OsmeaColors.nordicBlue.withOpacity(0.08),
+                          OsmeaColors.nordicBlue.withOpacity(0.03),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: OsmeaComponents.column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        OsmeaComponents.text(
+                          'Total Amount',
+                          textStyle: OsmeaTextStyle.bodySmall(context),
+                          color: OsmeaColors.pewter,
+                        ),
+                        OsmeaComponents.sizedBox(height: 8),
+                        OsmeaComponents.text(
+                          formattedTotal,
+                          textStyle: OsmeaTextStyle.headlineMedium(context)
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                          color: OsmeaColors.nordicBlue,
+                        ),
+                      ],
+                    ),
                   ),
-                  color: OsmeaColors.thunder,
                 ),
-                OsmeaComponents.sizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 20),
                 _buildOrderDetailRow(context, 'Order ID', '#${state.orderId}'),
                 _buildOrderDetailRow(context, 'Order Key', state.orderKey),
-                _buildOrderDetailRow(context, 'Status', state.status.toUpperCase()),
-                OsmeaComponents.sizedBox(height: 12),
-                OsmeaComponents.container(
-                  height: 1,
-                  color: OsmeaColors.silver,
-                ),
-                OsmeaComponents.sizedBox(height: 12),
-                OsmeaComponents.row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OsmeaComponents.text(
-                      'Total Amount',
-                      textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      color: OsmeaColors.thunder,
-                    ),
-                    OsmeaComponents.text(
-                      formattedTotal,
-                      textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: OsmeaColors.nordicBlue,
-                      ),
-                    ),
-                  ],
+                _buildOrderDetailRow(
+                  context,
+                  'Status',
+                  state.status.toUpperCase(),
+                  isStatus: true,
                 ),
               ],
             ),
           ),
           OsmeaComponents.sizedBox(height: 32),
-          // Action Buttons
+          // Action Button
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing16),
             child: ElevatedButton(
               onPressed: () => goRoute('/home'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: OsmeaColors.nordicBlue,
-                padding: context.paddingNormal,
+                padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 4,
+                elevation: 0,
               ),
-              child: OsmeaComponents.text(
-                'Back to Home',
-                textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                  color: OsmeaColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: OsmeaComponents.row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.home_rounded, color: OsmeaColors.white, size: 20),
+                  OsmeaComponents.sizedBox(width: 8),
+                  OsmeaComponents.text(
+                    'Back to Home',
+                    textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                      color: OsmeaColors.white,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          OsmeaComponents.sizedBox(height: 16),
+          OsmeaComponents.sizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildOrderDetailRow(BuildContext context, String label, String value) {
+  Widget _buildOrderDetailRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool isStatus = false,
+  }) {
     return OsmeaComponents.container(
-      margin: EdgeInsets.only(bottom: 12),
-      child: OsmeaComponents.row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      margin: EdgeInsets.only(bottom: 14),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
             label,
-            textStyle: OsmeaTextStyle.bodyMedium(context),
+            textStyle: OsmeaTextStyle.bodySmall(context),
             color: OsmeaColors.pewter,
           ),
-          OsmeaComponents.text(
-            value,
-            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            color: OsmeaColors.thunder,
-          ),
+          OsmeaComponents.sizedBox(height: 6),
+          isStatus
+              ? OsmeaComponents.container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.forestHeart.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: OsmeaColors.forestHeart.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: OsmeaComponents.text(
+                    value,
+                    textStyle: OsmeaTextStyle.bodySmall(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w600),
+                    color: OsmeaColors.forestHeart,
+                  ),
+                )
+              : OsmeaComponents.text(
+                  value,
+                  textStyle: OsmeaTextStyle.bodyMedium(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w600),
+                  color: OsmeaColors.thunder,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
         ],
       ),
     );
   }
 }
-
