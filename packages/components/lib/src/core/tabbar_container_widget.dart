@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:osmea_components/osmea_components.dart';
 import 'package:osmea_components/src/core/container_widget.dart';
 
-
 /// 📑 **OSMEA Core TabBar Container**
 ///
 /// Copyright (c) 2025, OSMEA Team
@@ -119,14 +118,15 @@ abstract class CoreTabBarContainer extends CoreContainer {
   /// 🎯 Get effective background color based on variant
   Color? getEffectiveBackgroundColor(BuildContext context) {
     if (backgroundColor != null) return backgroundColor;
-    
+
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     switch (variant) {
       case TabBarVariant.primary:
         return colorScheme.primary;
       case TabBarVariant.secondary:
-        return colorScheme.surface;
+        // Use a light gray background for segmented control look
+        return OsmeaColors.ash;
       case TabBarVariant.outlined:
         return OsmeaColors.transparent;
       case TabBarVariant.glass:
@@ -139,9 +139,9 @@ abstract class CoreTabBarContainer extends CoreContainer {
   /// 🔲 Get effective border color based on variant
   Color? getEffectiveBorderColor(BuildContext context) {
     if (borderColor != null) return borderColor;
-    
+
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     switch (variant) {
       case TabBarVariant.outlined:
         return colorScheme.outline;
@@ -152,13 +152,12 @@ abstract class CoreTabBarContainer extends CoreContainer {
     }
   }
 
-
   /// 📊 Get effective indicator color based on variant
   Color getEffectiveIndicatorColor(BuildContext context) {
     if (indicatorColor != null) return indicatorColor!;
-    
+
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     switch (variant) {
       case TabBarVariant.primary:
         return colorScheme.onPrimary;
@@ -174,7 +173,7 @@ abstract class CoreTabBarContainer extends CoreContainer {
   /// ⭕ Get effective border radius based on size and position
   BorderRadius getEffectiveBorderRadius(BuildContext context) {
     if (borderRadius != null) return borderRadius!;
-    
+
     // Different radius based on position
     switch (position) {
       case TabBarPosition.top:
@@ -193,7 +192,7 @@ abstract class CoreTabBarContainer extends CoreContainer {
   /// ✨ Get effective elevation based on variant
   double getEffectiveElevation(BuildContext context) {
     if (elevation != null) return elevation!;
-    
+
     switch (variant) {
       case TabBarVariant.primary:
         return 2.0;
@@ -208,10 +207,12 @@ abstract class CoreTabBarContainer extends CoreContainer {
   }
 
   /// 🪟 Check if variant needs backdrop blur
-  bool get needsBackdropBlur => variant == TabBarVariant.glass && enableGlassEffect;
+  bool get needsBackdropBlur =>
+      variant == TabBarVariant.glass && enableGlassEffect;
 
   /// 🔲 Check if variant needs border
-  bool get needsBorder => variant == TabBarVariant.outlined || variant == TabBarVariant.glass;
+  bool get needsBorder =>
+      variant == TabBarVariant.outlined || variant == TabBarVariant.glass;
 
   /// 📊 Check if indicator should be shown
   bool get shouldShowIndicator => indicatorStyle != TabBarIndicatorStyle.none;
@@ -219,9 +220,9 @@ abstract class CoreTabBarContainer extends CoreContainer {
   /// 📐 Get container constraints based on position and size
   BoxConstraints getEffectiveConstraints(BuildContext context) {
     if (constraints != null) return constraints!;
-    
+
     final screenSize = MediaQuery.of(context).size;
-    
+
     switch (position) {
       case TabBarPosition.top:
       case TabBarPosition.bottom:
@@ -229,9 +230,9 @@ abstract class CoreTabBarContainer extends CoreContainer {
           minHeight: 64,
           maxHeight: 80,
           minWidth: 0,
-          maxWidth: math.min(screenSize.width - 16, 400), // Limit width for mobile
+          maxWidth:
+              math.min(screenSize.width - 16, 400), // Limit width for mobile
         );
-
     }
   }
 
@@ -240,13 +241,32 @@ abstract class CoreTabBarContainer extends CoreContainer {
     final effectiveBackgroundColor = getEffectiveBackgroundColor(context);
     final effectiveBorderColor = getEffectiveBorderColor(context);
 
+    // Adjust border radius for secondary variant (segmented control style)
+    // Container radius should be slightly larger than tab radius for visual harmony
+    final containerRadius = variant == TabBarVariant.secondary
+        ? BorderRadius.circular(12)
+        : BorderRadius.circular(13);
+
     return BoxDecoration(
       color: effectiveBackgroundColor ?? OsmeaColors.snow,
-      borderRadius: BorderRadius.circular(13),
-      border: needsBorder && effectiveBorderColor != null 
+      borderRadius: containerRadius,
+      border: needsBorder && effectiveBorderColor != null
           ? Border.all(color: effectiveBorderColor, width: 1.0)
           : null,
     );
+  }
+
+  /// 📐 Get effective padding based on variant
+  EdgeInsetsGeometry? getEffectivePadding(BuildContext context) {
+    if (padding != null) return padding;
+
+    // For secondary variant, use minimal equal padding for clean look
+    if (variant == TabBarVariant.secondary) {
+      return const EdgeInsets.all(2.0);
+    }
+
+    // Default padding for other variants
+    return const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0);
   }
 
   @override
@@ -254,7 +274,7 @@ abstract class CoreTabBarContainer extends CoreContainer {
     Widget container = OsmeaComponents.container(
       key: key,
       alignment: alignment,
-      padding: padding,
+      padding: getEffectivePadding(context),
       decoration: decoration ?? buildTabBarDecoration(context),
       foregroundDecoration: foregroundDecoration,
       width: width,
@@ -280,4 +300,4 @@ abstract class CoreTabBarContainer extends CoreContainer {
 
     return container;
   }
-} 
+}

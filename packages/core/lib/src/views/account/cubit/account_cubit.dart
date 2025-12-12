@@ -19,30 +19,22 @@ import 'package:core/src/helper/auth_storage_helper.dart';
 import 'package:core/src/views/account/cubit/account_state.dart';
 import 'package:injectable/injectable.dart';
 
-/// Typedef for getUsersMe callback function
-/// This allows injectable to properly resolve the function type
-typedef GetUsersMeCallback = Future<Map<String, dynamic>?> Function();
-
 /// 🧠 **OSMEA Account Cubit**
 ///
 /// Manages account view state and data loading
 /// Supports loading from app_config.json or mock data fallback
-/// 
+///
 /// Note: This cubit is platform-agnostic and only uses AuthStorageHelper
 /// for user data. It does not depend on AuthCubit to maintain core package independence.
+/// Platform-specific implementations should provide user data (username, email, etc.) directly.
 @injectable
 class AccountCubit extends BaseViewModelCubit<AccountState> {
-  AccountCubit({
-    GetUsersMeCallback? getUsersMeCallback,
-  }) : super(const AccountState()) {
-    _getUsersMeCallback = getUsersMeCallback;
+  AccountCubit() : super(const AccountState()) {
     debugPrint('🔍 AccountCubit: Constructor called');
-    debugPrint(
-        '🔍 AccountCubit: getUsersMeCallback is null: ${getUsersMeCallback == null}');
   }
 
   final AssetConfigHelper _configHelper = AssetConfigHelper();
-  GetUsersMeCallback? _getUsersMeCallback;
+  Map<String, dynamic>? _userApiData;
 
   // Public trigger functions
   void initialize() => _initialize();
@@ -50,6 +42,14 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
   /// Refresh profile data from auth storage
   /// Call this when user logs in or profile is updated
   void refreshProfile() => _initialize();
+
+  /// Set user API data (username, email, etc.)
+  /// Platform-specific implementations should call this with API response data
+  void setUserApiData(Map<String, dynamic>? userData) {
+    _userApiData = userData;
+    debugPrint('👤 AccountCubit: User API data set');
+    debugPrint('👤 AccountCubit: User data keys: ${userData?.keys.toList()}');
+  }
 
   // Private methods
   Future<void> _initialize() async {
@@ -83,8 +83,8 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
         accountData = _getMockAccountData();
       }
 
-      // Load profile data: Priority 1) Auth Storage, 2) Config, 3) Default
-      final profileData = await _loadProfileData(accountData);
+      // Load profile data: Priority 1) User API Data, 2) Auth Storage, 3) Config, 4) Default
+      final profileData = await _loadProfileData(accountData, _userApiData);
 
       // Parse sections
       final sectionsList = accountData['sections'];
@@ -118,56 +118,36 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
     }
   }
 
-  /// Load profile data: Always try Auth Storage first, then use default values
-  /// Config is not used for profile data - it's always from auth storage or default
-  /// Also checks AuthCubit metadata for getUsersMe data
-  Future<AccountProfileData> _loadProfileData(
-      Map<String, dynamic> accountData) async {
+  /// Load profile data: Priority 1) User API Data, 2) Auth Storage, 3) Default
+  /// Config is not used for profile data - it's always from user API data, auth storage or default
+  /// Platform-specific implementations should provide user API data via setUserApiData()
+  Future<AccountProfileData> _loadProfileData(Map<String, dynamic> accountData,
+      Map<String, dynamic>? userApiData) async {
     try {
       // Always try to load from Auth Storage first
       final authStorage = AuthStorageHelper();
       final userData = await authStorage.getUserData();
 
-      // Call getUsersMe API to get fresh user data (user can update their info)
-      // Use callback if provided, otherwise fallback to metadata
-      Map<String, dynamic>? getUsersMeData;
-      if (_getUsersMeCallback != null) {
-        try {
-          debugPrint(
-              '👤 AccountCubit: Calling getUsersMe API for fresh user data...');
-          getUsersMeData = await _getUsersMeCallback!();
-          if (getUsersMeData != null) {
-            final apiName = getUsersMeData['name'];
-            debugPrint('✅ AccountCubit: getUsersMe API call successful');
-            debugPrint(
-                '👤 AccountCubit: getUsersMeData keys: ${getUsersMeData.keys.toList()}');
-            debugPrint(
-                '👤 AccountCubit: User name from API: "$apiName" (type: ${apiName.runtimeType})');
+      // Use user API data if provided (from platform-specific implementation)
+      Map<String, dynamic>? getUsersMeData = userApiData;
+      if (getUsersMeData != null) {
+        final apiName = getUsersMeData['name'];
+        debugPrint('✅ AccountCubit: User API data available');
+        debugPrint(
+            '👤 AccountCubit: User API data keys: ${getUsersMeData.keys.toList()}');
+        debugPrint(
+            '👤 AccountCubit: User name from API: "$apiName" (type: ${apiName.runtimeType})');
 
-            // Check if name is valid (not null and not empty)
-            if (apiName != null && apiName is String && apiName.isNotEmpty) {
-              debugPrint(
-                  '✅ AccountCubit: Valid name found in API response: "$apiName"');
-            } else {
-              debugPrint(
-                  '⚠️ AccountCubit: Name is null or empty in API response');
-              // Don't set to null, keep the data but name will be null
-            }
-          } else {
-            debugPrint('⚠️ AccountCubit: getUsersMe API returned null');
-            getUsersMeData = null;
-          }
-        } catch (e, stackTrace) {
-          debugPrint('⚠️ AccountCubit: Error calling getUsersMe API: $e');
-          debugPrint('⚠️ AccountCubit: Stack trace: $stackTrace');
-          getUsersMeData = null;
+        // Check if name is valid (not null and not empty)
+        if (apiName != null && apiName is String && apiName.isNotEmpty) {
+          debugPrint(
+              '✅ AccountCubit: Valid name found in API response: "$apiName"');
+        } else {
+          debugPrint('⚠️ AccountCubit: Name is null or empty in API response');
         }
       } else {
-        debugPrint('⚠️ AccountCubit: getUsersMe callback is null');
+        debugPrint('⚠️ AccountCubit: User API data not provided');
       }
-
-      // Note: Metadata fallback removed - AccountCubit should not depend on AuthCubit
-      // Platform-specific implementations can provide getUsersMeCallback if needed
 
       if (userData != null && userData.isNotEmpty) {
         debugPrint('👤 AccountCubit: Loading profile from auth storage');
@@ -430,5 +410,31 @@ class AccountCubit extends BaseViewModelCubit<AccountState> {
     debugPrint('🗑️ AccountCubit: Clearing account data...');
     stateChanger(const AccountState());
     debugPrint('✅ AccountCubit: Account data cleared');
+  }
+
+  /// Sign out from account
+  /// Clears all account-related data and state
+  /// Platform-specific cleanup (e.g., AuthCubit signOut) can be provided via callback
+  Future<void> signOut({Future<void> Function()? onSignOut}) async {
+    debugPrint('🚪 AccountCubit: Signing out...');
+
+    // Clear user API data
+    _userApiData = null;
+    debugPrint('✅ AccountCubit: User API data cleared');
+
+    // Clear account state
+    clearAccountData();
+
+    // Call platform-specific signOut callback if provided
+    if (onSignOut != null) {
+      try {
+        await onSignOut();
+        debugPrint('✅ AccountCubit: Platform-specific signOut completed');
+      } catch (e) {
+        debugPrint('⚠️ AccountCubit: Error in platform-specific signOut: $e');
+      }
+    }
+
+    debugPrint('✅ AccountCubit: Sign out completed');
   }
 }

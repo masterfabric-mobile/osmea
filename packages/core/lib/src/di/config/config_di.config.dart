@@ -45,6 +45,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     final commonLoggerModule = _$CommonLoggerModule();
     gh.factory<_i674.CommonLogger>(() => commonLoggerModule.commonLogger);
+    gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit());
     gh.factory<_i651.AuthCubit>(() => _i651.AuthCubit());
     gh.factory<_i905.EmptyViewCubit>(() => _i905.EmptyViewCubit());
     gh.factory<_i183.ErrorHandlingCubit>(() => _i183.ErrorHandlingCubit());
@@ -58,8 +59,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i974.Logger>(() => commonLoggerModule.logger);
     gh.singleton<_i481.ICommonLogger>(
         () => _i674.CommonLogger(logger: gh<_i974.Logger>()));
-    gh.factory<_i111.AccountCubit>(() =>
-        _i111.AccountCubit(getUsersMeCallback: gh<_i111.GetUsersMeCallback>()));
     return this;
   }
 }
