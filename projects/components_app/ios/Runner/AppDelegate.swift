@@ -3,17 +3,25 @@ import Flutter
 import GoogleMaps
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     // Read the API key from the Info.plist, which is populated by the xcconfig file.
-    guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String, !apiKey.isEmpty else {
-        fatalError("API_KEY not found or is empty in Info.plist. Make sure you have configured the build script and Info.plist correctly and that the key is in your .env file.")
+    // Make it optional so the app can run without it (Google Maps features won't work)
+    if let apiKey = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String, 
+       !apiKey.isEmpty, 
+       apiKey != "YOUR_API_KEY_HERE",
+       apiKey != "$(API_KEY)" {
+      GMSServices.provideAPIKey(apiKey)
+    } else {
+      print("Warning: API_KEY not found or is empty. Google Maps features will not work.")
     }
-    GMSServices.provideAPIKey(apiKey)
-    GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 }
