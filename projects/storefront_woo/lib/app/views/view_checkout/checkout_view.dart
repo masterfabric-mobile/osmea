@@ -225,7 +225,7 @@ class CheckoutView
                 ),
                 OsmeaComponents.sizedBox(height: 20),
                 _buildOrderDetailRow(context, 'Order ID', '#${state.orderId}'),
-                _buildOrderDetailRow(context, 'Order Key', state.orderKey),
+                // _buildOrderDetailRow(context, 'Order Key', state.orderKey),
                 _buildOrderDetailRow(
                   context,
                   'Status',
