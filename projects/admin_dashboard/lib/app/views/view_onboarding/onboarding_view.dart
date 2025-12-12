@@ -7,7 +7,7 @@
 
 import 'package:admin_dashboard/core/constants/text_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide OnboardingView, OnboardingState;
 import 'package:admin_dashboard/app/views/view_onboarding/models/onboarding_view_model.dart';
 import 'package:admin_dashboard/app/views/view_onboarding/models/module/events.dart';
 import 'package:admin_dashboard/app/views/view_onboarding/models/module/states.dart';

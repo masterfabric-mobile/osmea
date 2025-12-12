@@ -3,12 +3,13 @@
 ///
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
+// dart format off
 
 part of 'resources.g.dart';
 
 // Path: <root>
 typedef TranslationsEn = Translations; // ignore: unused_element
-class Translations implements BaseTranslations<AppLocale, Translations> {
+class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Returns the current translations of the given [context].
 	///
 	/// Usage:
@@ -51,7 +52,11 @@ class TranslationsApplicationConfigEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Dashboard'
 	String get app_name => TranslationOverrides.string(_root.$meta, 'application_config.app_name', {}) ?? 'Dashboard';
+
+	/// en: '1.0.0'
 	String get app_version => TranslationOverrides.string(_root.$meta, 'application_config.app_version', {}) ?? '1.0.0';
 }
 
@@ -62,29 +67,77 @@ class TranslationsCommonEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Skip'
 	String get skip => TranslationOverrides.string(_root.$meta, 'common.skip', {}) ?? 'Skip';
+
+	/// en: 'Back'
 	String get back => TranslationOverrides.string(_root.$meta, 'common.back', {}) ?? 'Back';
+
+	/// en: 'Next'
 	String get next => TranslationOverrides.string(_root.$meta, 'common.next', {}) ?? 'Next';
+
+	/// en: 'Done'
 	String get done => TranslationOverrides.string(_root.$meta, 'common.done', {}) ?? 'Done';
+
+	/// en: 'Continue'
 	String get kContinue => TranslationOverrides.string(_root.$meta, 'common.kContinue', {}) ?? 'Continue';
+
+	/// en: 'Cancel'
 	String get cancel => TranslationOverrides.string(_root.$meta, 'common.cancel', {}) ?? 'Cancel';
+
+	/// en: 'Save'
 	String get save => TranslationOverrides.string(_root.$meta, 'common.save', {}) ?? 'Save';
+
+	/// en: 'Edit'
 	String get edit => TranslationOverrides.string(_root.$meta, 'common.edit', {}) ?? 'Edit';
+
+	/// en: 'Delete'
 	String get delete => TranslationOverrides.string(_root.$meta, 'common.delete', {}) ?? 'Delete';
+
+	/// en: 'Loading...'
 	String get loading => TranslationOverrides.string(_root.$meta, 'common.loading', {}) ?? 'Loading...';
+
+	/// en: 'Please wait...'
 	String get please_wait => TranslationOverrides.string(_root.$meta, 'common.please_wait', {}) ?? 'Please wait...';
+
+	/// en: 'Success!'
 	String get success => TranslationOverrides.string(_root.$meta, 'common.success', {}) ?? 'Success!';
+
+	/// en: 'Error'
 	String get error => TranslationOverrides.string(_root.$meta, 'common.error', {}) ?? 'Error';
+
+	/// en: 'Warning'
 	String get warning => TranslationOverrides.string(_root.$meta, 'common.warning', {}) ?? 'Warning';
+
+	/// en: 'Information'
 	String get info => TranslationOverrides.string(_root.$meta, 'common.info', {}) ?? 'Information';
+
+	/// en: 'Something went wrong!'
 	String get error_title => TranslationOverrides.string(_root.$meta, 'common.error_title', {}) ?? 'Something went wrong!';
+
+	/// en: 'An unexpected error occurred. Please try again.'
 	String get error_message => TranslationOverrides.string(_root.$meta, 'common.error_message', {}) ?? 'An unexpected error occurred. Please try again.';
+
+	/// en: 'Retry'
 	String get retry => TranslationOverrides.string(_root.$meta, 'common.retry', {}) ?? 'Retry';
+
+	/// en: 'Refresh'
 	String get refresh => TranslationOverrides.string(_root.$meta, 'common.refresh', {}) ?? 'Refresh';
+
+	/// en: 'Completed!'
 	String get completed => TranslationOverrides.string(_root.$meta, 'common.completed', {}) ?? 'Completed!';
+
+	/// en: 'Redirecting...'
 	String get redirecting => TranslationOverrides.string(_root.$meta, 'common.redirecting', {}) ?? 'Redirecting...';
+
+	/// en: 'Image missing'
 	String get image_missing => TranslationOverrides.string(_root.$meta, 'common.image_missing', {}) ?? 'Image missing';
+
+	/// en: 'No data available'
 	String get no_data => TranslationOverrides.string(_root.$meta, 'common.no_data', {}) ?? 'No data available';
+
+	/// en: 'Coming soon'
 	String get coming_soon => TranslationOverrides.string(_root.$meta, 'common.coming_soon', {}) ?? 'Coming soon';
 }
 
@@ -107,7 +160,11 @@ class TranslationsViewsSplashEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Made by'
 	String get made_by => TranslationOverrides.string(_root.$meta, 'views.splash.made_by', {}) ?? 'Made by';
+
+	/// en: 'MasterFabric'
 	String get mf => TranslationOverrides.string(_root.$meta, 'views.splash.mf', {}) ?? 'MasterFabric';
 }
 
@@ -121,6 +178,8 @@ class TranslationsViewsOnboardingEn {
 	late final TranslationsViewsOnboardingPage1En page1 = TranslationsViewsOnboardingPage1En._(_root);
 	late final TranslationsViewsOnboardingPage2En page2 = TranslationsViewsOnboardingPage2En._(_root);
 	late final TranslationsViewsOnboardingPage3En page3 = TranslationsViewsOnboardingPage3En._(_root);
+
+	/// en: 'Skip'
 	String get skip => TranslationOverrides.string(_root.$meta, 'views.onboarding.skip', {}) ?? 'Skip';
 }
 
@@ -131,14 +190,29 @@ class TranslationsViewsWelcomeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Welcome to OSMEA Dashboard'
 	String get title => TranslationOverrides.string(_root.$meta, 'views.welcome.title', {}) ?? 'Welcome to OSMEA Dashboard';
+
+	/// en: 'Ready to start managing your store?'
 	String get subtitle => TranslationOverrides.string(_root.$meta, 'views.welcome.subtitle', {}) ?? 'Ready to start managing your store?';
+
+	/// en: 'Your complete e-commerce management solution is ready. Start organizing your products, tracking orders, and growing your business with powerful analytics and insights.'
 	String get description => TranslationOverrides.string(_root.$meta, 'views.welcome.description', {}) ?? 'Your complete e-commerce management solution is ready. Start organizing your products, tracking orders, and growing your business with powerful analytics and insights.';
+
+	/// en: 'Manage Your Store'
 	String get manage_your_store => TranslationOverrides.string(_root.$meta, 'views.welcome.manage_your_store', {}) ?? 'Manage Your Store';
+
+	/// en: 'Get Started'
 	String get get_started => TranslationOverrides.string(_root.$meta, 'views.welcome.get_started', {}) ?? 'Get Started';
-	String get button_text => TranslationOverrides.string(_root.$meta, 'views.welcome.button_text', {}) ?? 'Done';
+
+	/// en: 'Setting up your dashboard...'
 	String get loading_message => TranslationOverrides.string(_root.$meta, 'views.welcome.loading_message', {}) ?? 'Setting up your dashboard...';
+
+	/// en: 'Welcome setup completed successfully!'
 	String get success_message => TranslationOverrides.string(_root.$meta, 'views.welcome.success_message', {}) ?? 'Welcome setup completed successfully!';
+
+	/// en: 'Failed to initialize welcome screen'
 	String get error_message => TranslationOverrides.string(_root.$meta, 'views.welcome.error_message', {}) ?? 'Failed to initialize welcome screen';
 }
 
@@ -149,8 +223,14 @@ class TranslationsViewsOnboardingPage1En {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Welcome to OSMEA!'
 	String get title => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.title', {}) ?? 'Welcome to OSMEA!';
+
+	/// en: 'OSMEA Dashboard helps you manage your store efficiently from products to orders and analytics so you can stay in control and focus on growth.'
 	String get description => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.description', {}) ?? 'OSMEA Dashboard helps you manage your store efficiently from products to orders and analytics so you can stay in control and focus on growth.';
+
+	/// en: 'Next'
 	String get button_text => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.button_text', {}) ?? 'Next';
 }
 
@@ -161,8 +241,14 @@ class TranslationsViewsOnboardingPage2En {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Manage With Ease'
 	String get title => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.title', {}) ?? 'Manage With Ease';
+
+	/// en: 'OSMEA Dashboard streamlines store management from listings to orders giving you full control and the freedom to grow your mobile commerce business.'
 	String get description => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.description', {}) ?? 'OSMEA Dashboard streamlines store management from listings to orders giving you full control and the freedom to grow your mobile commerce business.';
+
+	/// en: 'Next'
 	String get button_text => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.button_text', {}) ?? 'Next';
 }
 
@@ -173,65 +259,72 @@ class TranslationsViewsOnboardingPage3En {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Built for Scale and Simplicity'
 	String get title => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.title', {}) ?? 'Built for Scale and Simplicity';
+
+	/// en: 'OSMEA Dashboard scales with your business, delivering smart, secure tools to manage any number of storefronts efficiently and on brand.'
 	String get description => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.description', {}) ?? 'OSMEA Dashboard scales with your business, delivering smart, secure tools to manage any number of storefronts efficiently and on brand.';
+
+	/// en: 'Done'
 	String get button_text => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.button_text', {}) ?? 'Done';
 }
 
-/// Flat map(s) containing all translations.
+/// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
+///
+/// The Dart AOT compiler has issues with very large switch statements,
+/// so the map is split into smaller functions (512 entries each).
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
-		switch (path) {
-			case 'application_config.app_name': return TranslationOverrides.string(_root.$meta, 'application_config.app_name', {}) ?? 'Dashboard';
-			case 'application_config.app_version': return TranslationOverrides.string(_root.$meta, 'application_config.app_version', {}) ?? '1.0.0';
-			case 'common.skip': return TranslationOverrides.string(_root.$meta, 'common.skip', {}) ?? 'Skip';
-			case 'common.back': return TranslationOverrides.string(_root.$meta, 'common.back', {}) ?? 'Back';
-			case 'common.next': return TranslationOverrides.string(_root.$meta, 'common.next', {}) ?? 'Next';
-			case 'common.done': return TranslationOverrides.string(_root.$meta, 'common.done', {}) ?? 'Done';
-			case 'common.kContinue': return TranslationOverrides.string(_root.$meta, 'common.kContinue', {}) ?? 'Continue';
-			case 'common.cancel': return TranslationOverrides.string(_root.$meta, 'common.cancel', {}) ?? 'Cancel';
-			case 'common.save': return TranslationOverrides.string(_root.$meta, 'common.save', {}) ?? 'Save';
-			case 'common.edit': return TranslationOverrides.string(_root.$meta, 'common.edit', {}) ?? 'Edit';
-			case 'common.delete': return TranslationOverrides.string(_root.$meta, 'common.delete', {}) ?? 'Delete';
-			case 'common.loading': return TranslationOverrides.string(_root.$meta, 'common.loading', {}) ?? 'Loading...';
-			case 'common.please_wait': return TranslationOverrides.string(_root.$meta, 'common.please_wait', {}) ?? 'Please wait...';
-			case 'common.success': return TranslationOverrides.string(_root.$meta, 'common.success', {}) ?? 'Success!';
-			case 'common.error': return TranslationOverrides.string(_root.$meta, 'common.error', {}) ?? 'Error';
-			case 'common.warning': return TranslationOverrides.string(_root.$meta, 'common.warning', {}) ?? 'Warning';
-			case 'common.info': return TranslationOverrides.string(_root.$meta, 'common.info', {}) ?? 'Information';
-			case 'common.error_title': return TranslationOverrides.string(_root.$meta, 'common.error_title', {}) ?? 'Something went wrong!';
-			case 'common.error_message': return TranslationOverrides.string(_root.$meta, 'common.error_message', {}) ?? 'An unexpected error occurred. Please try again.';
-			case 'common.retry': return TranslationOverrides.string(_root.$meta, 'common.retry', {}) ?? 'Retry';
-			case 'common.refresh': return TranslationOverrides.string(_root.$meta, 'common.refresh', {}) ?? 'Refresh';
-			case 'common.completed': return TranslationOverrides.string(_root.$meta, 'common.completed', {}) ?? 'Completed!';
-			case 'common.redirecting': return TranslationOverrides.string(_root.$meta, 'common.redirecting', {}) ?? 'Redirecting...';
-			case 'common.image_missing': return TranslationOverrides.string(_root.$meta, 'common.image_missing', {}) ?? 'Image missing';
-			case 'common.no_data': return TranslationOverrides.string(_root.$meta, 'common.no_data', {}) ?? 'No data available';
-			case 'common.coming_soon': return TranslationOverrides.string(_root.$meta, 'common.coming_soon', {}) ?? 'Coming soon';
-			case 'views.splash.made_by': return TranslationOverrides.string(_root.$meta, 'views.splash.made_by', {}) ?? 'Made by';
-			case 'views.splash.mf': return TranslationOverrides.string(_root.$meta, 'views.splash.mf', {}) ?? 'MasterFabric';
-			case 'views.onboarding.page1.title': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.title', {}) ?? 'Welcome to OSMEA!';
-			case 'views.onboarding.page1.description': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.description', {}) ?? 'OSMEA Dashboard helps you manage your store efficiently from products to orders and analytics so you can stay in control and focus on growth.';
-			case 'views.onboarding.page1.button_text': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.button_text', {}) ?? 'Next';
-			case 'views.onboarding.page2.title': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.title', {}) ?? 'Manage With Ease';
-			case 'views.onboarding.page2.description': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.description', {}) ?? 'OSMEA Dashboard streamlines store management from listings to orders giving you full control and the freedom to grow your mobile commerce business.';
-			case 'views.onboarding.page2.button_text': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.button_text', {}) ?? 'Next';
-			case 'views.onboarding.page3.title': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.title', {}) ?? 'Built for Scale and Simplicity';
-			case 'views.onboarding.page3.description': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.description', {}) ?? 'OSMEA Dashboard scales with your business, delivering smart, secure tools to manage any number of storefronts efficiently and on brand.';
-			case 'views.onboarding.page3.button_text': return TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.button_text', {}) ?? 'Done';
-			case 'views.onboarding.skip': return TranslationOverrides.string(_root.$meta, 'views.onboarding.skip', {}) ?? 'Skip';
-			case 'views.welcome.title': return TranslationOverrides.string(_root.$meta, 'views.welcome.title', {}) ?? 'Welcome to OSMEA Dashboard';
-			case 'views.welcome.subtitle': return TranslationOverrides.string(_root.$meta, 'views.welcome.subtitle', {}) ?? 'Ready to start managing your store?';
-			case 'views.welcome.description': return TranslationOverrides.string(_root.$meta, 'views.welcome.description', {}) ?? 'Your complete e-commerce management solution is ready. Start organizing your products, tracking orders, and growing your business with powerful analytics and insights.';
-			case 'views.welcome.manage_your_store': return TranslationOverrides.string(_root.$meta, 'views.welcome.manage_your_store', {}) ?? 'Manage Your Store';
-			case 'views.welcome.get_started': return TranslationOverrides.string(_root.$meta, 'views.welcome.get_started', {}) ?? 'Get Started';
-			case 'views.welcome.button_text': return TranslationOverrides.string(_root.$meta, 'views.welcome.button_text', {}) ?? 'Done';
-			case 'views.welcome.loading_message': return TranslationOverrides.string(_root.$meta, 'views.welcome.loading_message', {}) ?? 'Setting up your dashboard...';
-			case 'views.welcome.success_message': return TranslationOverrides.string(_root.$meta, 'views.welcome.success_message', {}) ?? 'Welcome setup completed successfully!';
-			case 'views.welcome.error_message': return TranslationOverrides.string(_root.$meta, 'views.welcome.error_message', {}) ?? 'Failed to initialize welcome screen';
-			default: return null;
-		}
+		return switch (path) {
+			'application_config.app_name' => TranslationOverrides.string(_root.$meta, 'application_config.app_name', {}) ?? 'Dashboard',
+			'application_config.app_version' => TranslationOverrides.string(_root.$meta, 'application_config.app_version', {}) ?? '1.0.0',
+			'common.skip' => TranslationOverrides.string(_root.$meta, 'common.skip', {}) ?? 'Skip',
+			'common.back' => TranslationOverrides.string(_root.$meta, 'common.back', {}) ?? 'Back',
+			'common.next' => TranslationOverrides.string(_root.$meta, 'common.next', {}) ?? 'Next',
+			'common.done' => TranslationOverrides.string(_root.$meta, 'common.done', {}) ?? 'Done',
+			'common.kContinue' => TranslationOverrides.string(_root.$meta, 'common.kContinue', {}) ?? 'Continue',
+			'common.cancel' => TranslationOverrides.string(_root.$meta, 'common.cancel', {}) ?? 'Cancel',
+			'common.save' => TranslationOverrides.string(_root.$meta, 'common.save', {}) ?? 'Save',
+			'common.edit' => TranslationOverrides.string(_root.$meta, 'common.edit', {}) ?? 'Edit',
+			'common.delete' => TranslationOverrides.string(_root.$meta, 'common.delete', {}) ?? 'Delete',
+			'common.loading' => TranslationOverrides.string(_root.$meta, 'common.loading', {}) ?? 'Loading...',
+			'common.please_wait' => TranslationOverrides.string(_root.$meta, 'common.please_wait', {}) ?? 'Please wait...',
+			'common.success' => TranslationOverrides.string(_root.$meta, 'common.success', {}) ?? 'Success!',
+			'common.error' => TranslationOverrides.string(_root.$meta, 'common.error', {}) ?? 'Error',
+			'common.warning' => TranslationOverrides.string(_root.$meta, 'common.warning', {}) ?? 'Warning',
+			'common.info' => TranslationOverrides.string(_root.$meta, 'common.info', {}) ?? 'Information',
+			'common.error_title' => TranslationOverrides.string(_root.$meta, 'common.error_title', {}) ?? 'Something went wrong!',
+			'common.error_message' => TranslationOverrides.string(_root.$meta, 'common.error_message', {}) ?? 'An unexpected error occurred. Please try again.',
+			'common.retry' => TranslationOverrides.string(_root.$meta, 'common.retry', {}) ?? 'Retry',
+			'common.refresh' => TranslationOverrides.string(_root.$meta, 'common.refresh', {}) ?? 'Refresh',
+			'common.completed' => TranslationOverrides.string(_root.$meta, 'common.completed', {}) ?? 'Completed!',
+			'common.redirecting' => TranslationOverrides.string(_root.$meta, 'common.redirecting', {}) ?? 'Redirecting...',
+			'common.image_missing' => TranslationOverrides.string(_root.$meta, 'common.image_missing', {}) ?? 'Image missing',
+			'common.no_data' => TranslationOverrides.string(_root.$meta, 'common.no_data', {}) ?? 'No data available',
+			'common.coming_soon' => TranslationOverrides.string(_root.$meta, 'common.coming_soon', {}) ?? 'Coming soon',
+			'views.splash.made_by' => TranslationOverrides.string(_root.$meta, 'views.splash.made_by', {}) ?? 'Made by',
+			'views.splash.mf' => TranslationOverrides.string(_root.$meta, 'views.splash.mf', {}) ?? 'MasterFabric',
+			'views.onboarding.page1.title' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.title', {}) ?? 'Welcome to OSMEA!',
+			'views.onboarding.page1.description' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.description', {}) ?? 'OSMEA Dashboard helps you manage your store efficiently from products to orders and analytics so you can stay in control and focus on growth.',
+			'views.onboarding.page1.button_text' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page1.button_text', {}) ?? 'Next',
+			'views.onboarding.page2.title' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.title', {}) ?? 'Manage With Ease',
+			'views.onboarding.page2.description' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.description', {}) ?? 'OSMEA Dashboard streamlines store management from listings to orders giving you full control and the freedom to grow your mobile commerce business.',
+			'views.onboarding.page2.button_text' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page2.button_text', {}) ?? 'Next',
+			'views.onboarding.page3.title' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.title', {}) ?? 'Built for Scale and Simplicity',
+			'views.onboarding.page3.description' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.description', {}) ?? 'OSMEA Dashboard scales with your business, delivering smart, secure tools to manage any number of storefronts efficiently and on brand.',
+			'views.onboarding.page3.button_text' => TranslationOverrides.string(_root.$meta, 'views.onboarding.page3.button_text', {}) ?? 'Done',
+			'views.onboarding.skip' => TranslationOverrides.string(_root.$meta, 'views.onboarding.skip', {}) ?? 'Skip',
+			'views.welcome.title' => TranslationOverrides.string(_root.$meta, 'views.welcome.title', {}) ?? 'Welcome to OSMEA Dashboard',
+			'views.welcome.subtitle' => TranslationOverrides.string(_root.$meta, 'views.welcome.subtitle', {}) ?? 'Ready to start managing your store?',
+			'views.welcome.description' => TranslationOverrides.string(_root.$meta, 'views.welcome.description', {}) ?? 'Your complete e-commerce management solution is ready. Start organizing your products, tracking orders, and growing your business with powerful analytics and insights.',
+			'views.welcome.manage_your_store' => TranslationOverrides.string(_root.$meta, 'views.welcome.manage_your_store', {}) ?? 'Manage Your Store',
+			'views.welcome.get_started' => TranslationOverrides.string(_root.$meta, 'views.welcome.get_started', {}) ?? 'Get Started',
+			'views.welcome.loading_message' => TranslationOverrides.string(_root.$meta, 'views.welcome.loading_message', {}) ?? 'Setting up your dashboard...',
+			'views.welcome.success_message' => TranslationOverrides.string(_root.$meta, 'views.welcome.success_message', {}) ?? 'Welcome setup completed successfully!',
+			'views.welcome.error_message' => TranslationOverrides.string(_root.$meta, 'views.welcome.error_message', {}) ?? 'Failed to initialize welcome screen',
+			_ => null,
+		};
 	}
 }
-

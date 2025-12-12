@@ -9,7 +9,7 @@ import 'dart:async';
 import 'package:admin_dashboard/core/constants/text_constants.dart';
 import 'package:admin_dashboard/app/views/view_onboarding/models/module/events.dart';
 import 'package:admin_dashboard/app/views/view_onboarding/models/module/states.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide OnboardingState;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';

@@ -11,7 +11,7 @@ import 'package:admin_dashboard/core/resources/resources.g.dart';
 import 'package:admin_dashboard/app/views/view_splash/models/module/events.dart';
 import 'package:admin_dashboard/app/views/view_splash/models/module/states.dart';
 import 'package:admin_dashboard/app/views/view_splash/models/splash_view_model.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide SplashView, SplashState;
 import 'package:flutter/material.dart';
 import 'package:admin_dashboard/gen/assets.gen.dart';
 

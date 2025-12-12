@@ -16,7 +16,9 @@ void main() async {
     properties: {'apiUrl': 'https://api.example.com.dev'},
   );
 
-  debugPrint('Flavor set at startup: ${Flavor.I.name}');
+  debugPrint(
+    'Flavor set at startup: ${environment.toString().split('.').last.toUpperCase()}',
+  );
   await configureDependencies(environment: 'dev');
 
   await MasterApp.runBefore(allowCollectDataTelemetry: false);

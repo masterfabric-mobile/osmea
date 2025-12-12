@@ -2,7 +2,8 @@
 import 'package:admin_dashboard/app/views/view_splash/splash_view.dart';
 import 'package:admin_dashboard/app/views/view_onboarding/onboarding_view.dart';
 import 'package:admin_dashboard/app/views/view_welcome/welcome_view.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide SplashView, OnboardingView, SplashState, OnboardingState;
 import 'package:flavor/flavor.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
