@@ -20,7 +20,8 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
   }
 
   Future<List<Order>> _fetchOrders() async {
-    final response = await Supabase.instance.client.from('orders').select();
+    final response =
+        await Supabase.instance.client.from('orders').select('*, users(*)');
     return (response as List)
         .map((e) => Order.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -52,7 +53,8 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
               final order = orders[index];
               return ListTile(
                 title: Text('Order #${order.orderNumber}'),
-                subtitle: Text('Total: \$${order.total.toStringAsFixed(2)}'),
+                subtitle: Text(
+                    'User: ${order.user?.fullName ?? 'N/A'} - Total: \$${order.total.toStringAsFixed(2)}'),
                 trailing: Text(order.status),
               );
             },

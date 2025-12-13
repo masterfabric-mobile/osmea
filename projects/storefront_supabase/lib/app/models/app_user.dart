@@ -4,6 +4,7 @@ class AppUser {
   final String? fullName;
   final DateTime createdAt;
   final String? avatarUrl;
+  final String? role;
 
   AppUser({
     required this.id,
@@ -11,6 +12,7 @@ class AppUser {
     this.fullName,
     required this.createdAt,
     this.avatarUrl,
+    this.role,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class AppUser {
       fullName: json['full_name'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       avatarUrl: json['avatar_url'] as String?,
+      role: json['role'] as String?,
     );
   }
 }

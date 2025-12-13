@@ -20,8 +20,10 @@ class _AdminProductsViewState extends State<AdminProductsView> {
   }
 
   Future<List<Product>> _fetchProducts() async {
-    final response = await Supabase.instance.client.from('products').select();
-    final products = (response as List).map((e) => Product.fromJson(e)).toList();
+    final response =
+        await Supabase.instance.client.from('products').select('*, product_images(*)');
+    final products =
+        (response as List).map((e) => Product.fromJson(e)).toList();
     return products;
   }
 
@@ -41,12 +43,23 @@ class _AdminProductsViewState extends State<AdminProductsView> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
+          if (snapshot.data == null || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No products found.'));
+          }
           final products = snapshot.data!;
           return ListView.builder(
             itemCount: products.length,
             itemBuilder: (context, index) {
               final product = products[index];
               return ListTile(
+                leading: Image.network(
+                  product.imageUrl,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.error, size: 40),
+                ),
                 title: Text(product.name),
                 subtitle: Text('\$${product.price}'),
               );

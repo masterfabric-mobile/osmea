@@ -61,7 +61,8 @@ class _AdminUsersViewState extends State<AdminUsersView> {
                             '?'),
                       ),
                 title: Text(user.fullName ?? user.email ?? 'Unnamed User'),
-                subtitle: Text(user.email ?? 'No email'),
+                subtitle: Text(
+                    '${user.email ?? 'No email'} - Role: ${user.role ?? 'N/A'}'),
               );
             },
           );
