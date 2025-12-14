@@ -11,6 +11,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/views/admin/dashboard/models/view_model.dart'
+    as _i821;
+import 'package:storefront_supabase/app/views/admin/products/add_product/view_model.dart'
+    as _i156;
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart'
     as _i826;
 import 'package:storefront_supabase/app/views/view_categories/models/view_model.dart'
@@ -39,6 +43,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i76.SettingsViewModel>(() => _i76.SettingsViewModel());
     gh.factory<_i826.CartViewModel>(
       () => _i826.CartViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i156.AddProductViewModel>(
+      () => _i156.AddProductViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i821.AdminDashboardViewModel>(
+      () => _i821.AdminDashboardViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i56.ProfileViewModel>(
       () => _i56.ProfileViewModel(gh<_i454.SupabaseClient>()),

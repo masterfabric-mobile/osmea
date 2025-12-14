@@ -4,6 +4,7 @@ class ProfileState {
   final bool showLoginView;
   final String? errorMessage;
   final bool isFormValid;
+  final String? userRole;
 
   const ProfileState({
     this.isLoggedIn = false,
@@ -11,6 +12,7 @@ class ProfileState {
     this.showLoginView = true,
     this.errorMessage,
     this.isFormValid = false,
+    this.userRole,
   });
 
   ProfileState copyWith({
@@ -19,13 +21,15 @@ class ProfileState {
     bool? showLoginView,
     String? errorMessage,
     bool? isFormValid,
+    String? userRole,
   }) {
     return ProfileState(
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
       isLoading: isLoading ?? this.isLoading,
       showLoginView: showLoginView ?? this.showLoginView,
-      errorMessage: errorMessage, // Allow setting null error message
+      errorMessage: errorMessage,
       isFormValid: isFormValid ?? this.isFormValid,
+      userRole: userRole ?? this.userRole,
     );
   }
 }

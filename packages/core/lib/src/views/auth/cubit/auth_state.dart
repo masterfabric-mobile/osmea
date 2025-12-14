@@ -237,6 +237,7 @@ class AuthAuthenticatedState extends AuthState {
   final String? jwtToken;
   final Map<String, dynamic>? userData;
   final bool isAuthenticated;
+  final String? role;
 
   /// Additional metadata for platform-specific implementations (e.g., WooCommerce tokens)
   final Map<String, dynamic>? metadata;
@@ -245,6 +246,7 @@ class AuthAuthenticatedState extends AuthState {
     this.jwtToken,
     this.userData,
     required this.isAuthenticated,
+    this.role,
     this.metadata,
   });
 
@@ -254,11 +256,13 @@ class AuthAuthenticatedState extends AuthState {
     // isAuthenticated should be derived from jwtToken, not from JSON
     // This ensures state is never authenticated without a valid token
     final isAuthenticated = jwtToken != null && jwtToken.isNotEmpty;
+    final userData = json['userData'] as Map<String, dynamic>?;
 
     return AuthAuthenticatedState(
       jwtToken: jwtToken,
-      userData: json['userData'] as Map<String, dynamic>?,
+      userData: userData,
       isAuthenticated: isAuthenticated, // Always derived from jwtToken
+      role: userData?['role'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
@@ -278,18 +282,20 @@ class AuthAuthenticatedState extends AuthState {
     String? jwtToken,
     Map<String, dynamic>? userData,
     bool? isAuthenticated,
+    String? role,
     Map<String, dynamic>? metadata,
   }) {
     return AuthAuthenticatedState(
       jwtToken: jwtToken ?? this.jwtToken,
       userData: userData ?? this.userData,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      role: role ?? this.role,
       metadata: metadata ?? this.metadata,
     );
   }
 
   @override
-  List<Object?> get props => [jwtToken, userData, isAuthenticated, metadata];
+  List<Object?> get props => [jwtToken, userData, isAuthenticated, role, metadata];
 }
 
 /// Unauthenticated state - user logged out

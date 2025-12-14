@@ -20,16 +20,40 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     confirmPasswordController = TextEditingController();
 
     _authSubscription =
-        _supabaseClient.auth.onAuthStateChange.listen((data) {
-      final Session? session = data.session;
-      stateChanger(state.copyWith(isLoggedIn: session != null));
+        _supabaseClient.auth.onAuthStateChange.listen((data) async {
+      final session = data.session;
+      if (session != null) {
+        await _fetchAndSetUserRole(session.user.id);
+      } else {
+        stateChanger(
+            const ProfileState(isLoggedIn: false, userRole: null));
+      }
     });
   }
 
   Future<void> initial() async {
-    // Set initial state based on current user
-    stateChanger(
-        state.copyWith(isLoggedIn: _supabaseClient.auth.currentUser != null));
+    final currentUser = _supabaseClient.auth.currentUser;
+    if (currentUser != null) {
+      await _fetchAndSetUserRole(currentUser.id);
+    } else {
+      stateChanger(const ProfileState(isLoggedIn: false, userRole: null));
+    }
+  }
+
+  Future<void> _fetchAndSetUserRole(String userId) async {
+    try {
+      final response = await _supabaseClient
+          .from('users')
+          .select('role')
+          .eq('id', userId)
+          .single();
+
+      final userRole = response['role'] as String?;
+      stateChanger(state.copyWith(isLoggedIn: true, userRole: userRole));
+    } catch (e) {
+      // If fetching profile fails, still log them in but with a default role
+      stateChanger(state.copyWith(isLoggedIn: true, userRole: 'customer'));
+    }
   }
 
   void switchToLogin() {
@@ -56,16 +80,19 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
       );
       if (response.user == null) {
         stateChanger(state.copyWith(
-            isLoading: false, errorMessage: 'Login failed. Please check your credentials.'));
+            isLoading: false,
+            errorMessage: 'Login failed. Please check your credentials.'));
       } else {
         _clearFieldsAndErrors();
-        stateChanger(state.copyWith(isLoading: false, isLoggedIn: true));
+        // The onAuthStateChange listener will handle fetching the role.
+        // We just need to set loading to false.
+        stateChanger(state.copyWith(isLoading: false));
       }
     } on AuthException catch (e) {
       stateChanger(state.copyWith(isLoading: false, errorMessage: e.message));
     } catch (e) {
-      stateChanger(
-          state.copyWith(isLoading: false, errorMessage: 'An unexpected error occurred.'));
+      stateChanger(state.copyWith(
+          isLoading: false, errorMessage: 'An unexpected error occurred.'));
     }
   }
 
@@ -73,8 +100,7 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     if (emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
-      stateChanger(state.copyWith(
-          errorMessage: 'Please fill all fields.'));
+      stateChanger(state.copyWith(errorMessage: 'Please fill all fields.'));
       return;
     }
     if (passwordController.text != confirmPasswordController.text) {
@@ -89,18 +115,23 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
         password: passwordController.text.trim(),
       );
       // Supabase sends a confirmation email by default.
-      // We will treat it as logged in for simplicity, but a real app should handle email verification.
       if (response.user != null) {
-         _clearFieldsAndErrors();
-         stateChanger(state.copyWith(isLoading: false, isLoggedIn: true, showLoginView: true, errorMessage: 'Success! Please check your email to confirm your registration.'));
+        _clearFieldsAndErrors();
+        stateChanger(state.copyWith(
+            isLoading: false,
+            isLoggedIn: false, // User is not logged in until email confirmed
+            showLoginView: true,
+            errorMessage:
+                'Success! Please check your email to confirm your registration.'));
       } else {
-         stateChanger(state.copyWith(isLoading: false, errorMessage: 'Signup failed. Please try again.'));
+        stateChanger(state.copyWith(
+            isLoading: false, errorMessage: 'Signup failed. Please try again.'));
       }
     } on AuthException catch (e) {
       stateChanger(state.copyWith(isLoading: false, errorMessage: e.message));
     } catch (e) {
-      stateChanger(
-          state.copyWith(isLoading: false, errorMessage: 'An unexpected error occurred.'));
+      stateChanger(state.copyWith(
+          isLoading: false, errorMessage: 'An unexpected error occurred.'));
     }
   }
 
@@ -108,20 +139,32 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     stateChanger(state.copyWith(isLoading: true));
     await _supabaseClient.auth.signOut();
     _clearFieldsAndErrors();
-    stateChanger(const ProfileState(isLoggedIn: false, showLoginView: true));
+    // The onAuthStateChange listener will catch this and update the state
+    // to logged out.
   }
 
   void _clearFieldsAndErrors() {
     emailController.clear();
     passwordController.clear();
     confirmPasswordController.clear();
-    stateChanger(state.copyWith(errorMessage: null));
+    if (state.errorMessage != null) {
+        stateChanger(ProfileState(
+          isLoggedIn: state.isLoggedIn,
+          isLoading: state.isLoading,
+          showLoginView: state.showLoginView,
+          isFormValid: state.isFormValid,
+          userRole: state.userRole,
+          errorMessage: null,
+        ));
+    }
   }
 
-  void dispose() {
+  @override
+  Future<void> close() {
     _authSubscription.cancel();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    return super.close();
   }
 }
