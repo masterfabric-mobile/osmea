@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminUsersView extends StatefulWidget {
   const AdminUsersView({super.key});
@@ -32,6 +33,12 @@ class _AdminUsersViewState extends State<AdminUsersView> {
       appBar: OsmeaComponents.appBar(
         title: OsmeaComponents.text('Users'),
         variant: AppBarVariant.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        leading: OsmeaComponents.iconButton(
+          onPressed: () => context.go('/profile'),
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: FutureBuilder<List<AppUser>>(
         future: _users,

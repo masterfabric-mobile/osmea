@@ -15,20 +15,28 @@ class AddProductView
     required super.goRoute,
     super.arguments = const {'init': true},
   }) : super(
-          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text('Add New Product'),
-            variant: AppBarVariant.primary,
-          ),
+          coreAppBar: (context, viewModel) {
+            final productId = arguments['productId'] as String?;
+            return OsmeaComponents.appBar(
+              title: OsmeaComponents.text(
+                  productId == null ? 'Add New Product' : 'Edit Product'),
+              variant: AppBarVariant.primary,
+            );
+          },
         );
 
   @override
   void initialContent(AddProductViewModel viewModel, BuildContext context) {
-    viewModel.initial();
+    final productId = arguments['productId'] as String?;
+    viewModel.initial(productId: productId);
   }
 
   @override
   Widget viewContent(
       BuildContext context, AddProductViewModel viewModel, AddProductState state) {
+    final productId = arguments['productId'] as String?;
+    final isEditMode = productId != null;
+
     if (state is AddProductLoading || state is AddProductInitial) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -42,20 +50,20 @@ class AddProductView
             const SizedBox(height: 16),
             OsmeaComponents.button(
               text: 'Retry',
-              onPressed: viewModel.initial,
+              onPressed: () => initialContent(viewModel, context),
             ),
           ],
         ),
       );
     }
-     if (state is AddProductSubmitting) {
-      return const Center(
+    if (state is AddProductSubmitting) {
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
+            const CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Adding Product...'),
+            Text(isEditMode ? 'Saving Changes...' : 'Adding Product...'),
           ],
         ),
       );
@@ -68,21 +76,23 @@ class AddProductView
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 50),
             const SizedBox(height: 16),
-            const Text('Product Added Successfully!'),
+            Text(isEditMode
+                ? 'Product Updated Successfully!'
+                : 'Product Added Successfully!'),
             const SizedBox(height: 16),
+            if (!isEditMode)
+              OsmeaComponents.button(
+                text: 'Add Another Product',
+                onPressed: () => initialContent(viewModel, context),
+              ),
             OsmeaComponents.button(
-              text: 'Add Another Product',
-              onPressed: viewModel.initial,
-            ),
-             OsmeaComponents.button(
               text: 'Go to products',
-              onPressed: ()=> goRoute('/admin/products'),
+              onPressed: () => goRoute('/admin/products'),
             )
           ],
         ),
       );
     }
-
 
     if (state is AddProductLoaded) {
       return BlocListener<AddProductViewModel, AddProductState>(
@@ -103,7 +113,7 @@ class AddProductView
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildImagePicker(context, viewModel, state.image),
+                _buildImagePicker(context, viewModel, state.image, state.existingImageUrl),
                 const SizedBox(height: 24),
                 _buildTextField(viewModel.nameController, 'Product Name'),
                 const SizedBox(height: 16),
@@ -149,8 +159,8 @@ class AddProductView
                 ),
                 const SizedBox(height: 32),
                 OsmeaComponents.button(
-                  text: 'Add Product',
-                  onPressed: viewModel.submitProduct,
+                  text: isEditMode ? 'Save Changes' : 'Add Product',
+                  onPressed: () => viewModel.submitProduct(productId: productId),
                   fullWidth: true,
                 ),
               ],
@@ -163,8 +173,17 @@ class AddProductView
     return const Center(child: Text('An unexpected state occurred.'));
   }
 
-  Widget _buildImagePicker(
-      BuildContext context, AddProductViewModel viewModel, File? image) {
+  Widget _buildImagePicker(BuildContext context, AddProductViewModel viewModel,
+      File? localImage, String? existingImageUrl) {
+    Widget imageWidget;
+    if (localImage != null) {
+      imageWidget = Image.file(localImage, fit: BoxFit.cover);
+    } else if (existingImageUrl != null && existingImageUrl.isNotEmpty) {
+      imageWidget = Image.network(existingImageUrl, fit: BoxFit.cover);
+    } else {
+      imageWidget = const Icon(Icons.image, size: 50, color: Colors.grey);
+    }
+
     return Center(
       child: Column(
         children: [
@@ -175,11 +194,10 @@ class AddProductView
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: image != null
-                ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(image, fit: BoxFit.cover))
-                : const Icon(Icons.image, size: 50, color: Colors.grey),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: imageWidget,
+            ),
           ),
           const SizedBox(height: 8),
           OsmeaComponents.textButton(
@@ -222,7 +240,7 @@ class AddProductView
     void Function(T?) onChanged,
   ) {
     return DropdownButtonFormField<T>(
-      value: selectedItem,
+      initialValue: selectedItem,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
