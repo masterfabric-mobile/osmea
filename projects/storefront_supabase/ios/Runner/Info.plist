@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library to upload product images.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera to take pictures of product images.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not require access to the microphone, but it is included for image picker.</string>
 </dict>
 </plist>

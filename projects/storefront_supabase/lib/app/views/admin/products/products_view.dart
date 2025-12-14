@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,7 +12,7 @@ class AdminProductsView extends StatefulWidget {
 }
 
 class _AdminProductsViewState extends State<AdminProductsView> {
-  late final Future<List<Product>> _products;
+  late Future<List<Product>> _products;
 
   @override
   void initState() {
@@ -20,11 +21,18 @@ class _AdminProductsViewState extends State<AdminProductsView> {
   }
 
   Future<List<Product>> _fetchProducts() async {
-    final response =
-        await Supabase.instance.client.from('products').select('*, product_images(*)');
+    final response = await Supabase.instance.client
+        .from('products')
+        .select('*, product_images(*)');
     final products =
         (response as List).map((e) => Product.fromJson(e)).toList();
     return products;
+  }
+
+  void _refreshProducts() {
+    setState(() {
+      _products = _fetchProducts();
+    });
   }
 
   @override
@@ -47,25 +55,32 @@ class _AdminProductsViewState extends State<AdminProductsView> {
             return const Center(child: Text('No products found.'));
           }
           final products = snapshot.data!;
-          return ListView.builder(
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return ListTile(
-                leading: Image.network(
-                  product.imageUrl,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error, size: 40),
-                ),
-                title: Text(product.name),
-                subtitle: Text('\$${product.price}'),
-              );
-            },
+          return RefreshIndicator(
+            onRefresh: () async => _refreshProducts(),
+            child: ListView.builder(
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ListTile(
+                  leading: Image.network(
+                    product.imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.error, size: 40),
+                  ),
+                  title: Text(product.name),
+                  subtitle: Text('\$${product.price}'),
+                );
+              },
+            ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/admin/products/add'),
+        child: const Icon(Icons.add),
       ),
     );
   }

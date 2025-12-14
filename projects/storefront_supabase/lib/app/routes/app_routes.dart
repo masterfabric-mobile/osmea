@@ -6,6 +6,7 @@ import 'package:storefront_supabase/app/views/admin/dashboard/dashboard_view.dar
 import 'package:storefront_supabase/app/views/admin/orders/orders_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/products_view.dart';
 import 'package:storefront_supabase/app/views/admin/settings/settings_view.dart';
+import 'package:storefront_supabase/app/views/admin/products/add_product/add_product_view.dart';
 import 'package:storefront_supabase/app/views/admin/users/users_view.dart';
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
@@ -240,6 +241,12 @@ final GoRouter appRouter = GoRouter(
           path: '/admin/products',
           builder: (BuildContext context, GoRouterState state) {
             return const AdminProductsView();
+          },
+        ),
+         GoRoute(
+          path: '/admin/products/add',
+          builder: (BuildContext context, GoRouterState state) {
+            return AddProductView(goRoute: (String path) => context.go(path));
           },
         ),
         GoRoute(

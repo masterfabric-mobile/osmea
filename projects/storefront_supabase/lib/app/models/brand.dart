@@ -1,25 +1,25 @@
-class Category {
-  final String id;
+class Brand {
+  final int id;
   final String name;
   final String slug;
+  final String? logoUrl;
   final String? description;
-  final String? imageUrl;
 
-  Category({
+  Brand({
     required this.id,
     required this.name,
     required this.slug,
+    this.logoUrl,
     this.description,
-    this.imageUrl,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json['id'] as String,
+  factory Brand.fromJson(Map<String, dynamic> json) {
+    return Brand(
+      id: json['id'] as int,
       name: json['name'] as String,
       slug: json['slug'] as String,
+      logoUrl: json['logo_url'] as String?,
       description: json['description'] as String?,
-      imageUrl: json['image_url'] as String?,
     );
   }
 
@@ -27,7 +27,7 @@ class Category {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Category && other.id == id;
+    return other is Brand && other.id == id;
   }
 
   @override

@@ -37,7 +37,7 @@ dependencies:
   # DEPENDENCY INJECTION
   # ────────────────────────────────
   flutter_bloc: ^9.1.1     # BLoC pattern for managing application state
-  get_it: ^7.7.0           # Simple service locator (manual DI)
+  get_it: ^8.3.0           # Simple service locator (manual DI)
   injectable: ^2.5.0       # Annotation-based code generation for get_it
 
   # ────────────────────────────────
@@ -61,6 +61,7 @@ dependencies:
   # ────────────────────────────────
   flutter_gen: ^5.10.0     # Generates strongly typed asset references (images, fonts, etc.)
   intl: ^0.20.2
+  image_picker: ^1.2.1
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCY OVERRIDES
