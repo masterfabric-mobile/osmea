@@ -13,29 +13,29 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     super.arguments = const {'init': true},
     required super.goRoute,
   }) : super(
-         horizontalPadding: const PaddingVisibility.disabled(),
-         appBarPadding: const AppBarPaddingVisibility.disabled(),
-         coreAppBar: (context, viewModel) {
-           // Only show an AppBar if the user is logged in
-           if (viewModel.state.isLoggedIn) {
-             return OsmeaComponents.appBar(
-               title: OsmeaComponents.text('Profile'),
-               variant: AppBarVariant.primary,
-               size: AppBarSize.large,
-               elevation: 0,
-               titleSpacing: 0.0,
-               actions: [
-                 AppBarAction(
-                   type: AppBarActionType.profile,
-                   icon: const Icon(Icons.logout),
-                   onPressed: () => viewModel.logout(),
-                 ),
-               ],
-             );
-           }
-           return AppBar(toolbarHeight: 0); // Empty AppBar when logged out
-         },
-       );
+          horizontalPadding: const PaddingVisibility.disabled(),
+          appBarPadding: const AppBarPaddingVisibility.disabled(),
+          coreAppBar: (context, viewModel) {
+            final state = viewModel.state;
+            if (state is ProfileAuthenticated) {
+              return OsmeaComponents.appBar(
+                title: OsmeaComponents.text('Profile'),
+                variant: AppBarVariant.primary,
+                size: AppBarSize.large,
+                elevation: 0,
+                titleSpacing: 0.0,
+                actions: [
+                  AppBarAction(
+                    type: AppBarActionType.profile,
+                    icon: const Icon(Icons.logout),
+                    onPressed: () => viewModel.logout(),
+                  ),
+                ],
+              );
+            }
+            return AppBar(toolbarHeight: 0);
+          },
+        );
 
   @override
   void initialContent(ProfileViewModel viewModel, BuildContext context) {
@@ -48,13 +48,11 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     ProfileViewModel viewModel,
     ProfileState state,
   ) {
-    if (state.isLoading) {
+    if (state is ProfileInitial || state is ProfileLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (state.isLoggedIn) {
-      // The Scaffold and AppBar are now handled by MasterViewCubit.
-      // We just return the body content.
+    if (state is ProfileAuthenticated) {
       return ListView(
         children: [
           OsmeaComponents.listItem(
@@ -74,41 +72,45 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       );
     }
 
-    // Login/Signup view (no Scaffold or AppBar here)
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LogoHeaderWidget(),
-            if (state.errorMessage != null) ...[
-              OsmeaComponents.text(
-                state.errorMessage!,
-                color: state.errorMessage!.startsWith('Success')
-                    ? OsmeaColors.green
-                    : OsmeaColors.red,
-                textAlign: TextAlign.center,
+    if (state is ProfileUnauthenticated) {
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const LogoHeaderWidget(),
+              if (state.errorMessage != null) ...[
+                OsmeaComponents.text(
+                  state.errorMessage!,
+                  color: state.errorMessage!.startsWith('Success')
+                      ? OsmeaColors.green
+                      : OsmeaColors.red,
+                  textAlign: TextAlign.center,
+                ),
+                OsmeaComponents.sizedBox(height: 16),
+              ],
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: state.showLoginView
+                    ? LoginFormWidget(
+                        key: const ValueKey('login'),
+                        viewModel: viewModel,
+                        onSwitchToSignup: viewModel.switchToSignup,
+                      )
+                    : SignupFormWidget(
+                        key: const ValueKey('signup'),
+                        viewModel: viewModel,
+                        onSwitchToLogin: viewModel.switchToLogin,
+                      ),
               ),
-              OsmeaComponents.sizedBox(height: 16),
             ],
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: state.showLoginView
-                  ? LoginFormWidget(
-                      key: const ValueKey('login'),
-                      viewModel: viewModel,
-                      onSwitchToSignup: viewModel.switchToSignup,
-                    )
-                  : SignupFormWidget(
-                      key: const ValueKey('signup'),
-                      viewModel: viewModel,
-                      onSwitchToLogin: viewModel.switchToLogin,
-                    ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    // Fallback for any other state
+    return const Center(child: Text('An unexpected error occurred.'));
   }
 }
