@@ -93,7 +93,7 @@ class AdminProductsView
     var tempSelectedCatIds =
         Set<String>.from(currentState.selectedCategoryIds);
     var tempSelectedBrandIds =
-        Set<String>.from(currentState.selectedBrandIds);
+        Set<int>.from(currentState.selectedBrandIds);
 
     showModalBottomSheet(
       context: context,
@@ -169,7 +169,7 @@ class AdminProductsView
                               });
                             },
                           ),
-                          _buildCheckboxFilterSection<Category>(
+                          _buildCheckboxFilterSection<Category, String>(
                             context,
                             'Categories',
                             currentState.allCategories,
@@ -184,13 +184,13 @@ class AdminProductsView
                               });
                             },
                           ),
-                          _buildCheckboxFilterSection<Brand>(
+                          _buildCheckboxFilterSection<Brand, int>(
                             context,
                             'Brands',
                             currentState.allBrands,
                             tempSelectedBrandIds,
                             (brand) => brand.name,
-                            (brand) => brand.id.toString(),
+                            (brand) => brand.id,
                             (isSelected, id) {
                               setModalState(() {
                                 isSelected
@@ -279,14 +279,14 @@ class AdminProductsView
     );
   }
 
-  Widget _buildCheckboxFilterSection<T>(
+  Widget _buildCheckboxFilterSection<T, ID>(
     BuildContext context,
     String title,
     List<T> allItems,
-    Set<String> selectedIds,
+    Set<ID> selectedIds,
     String Function(T) itemTitle,
-    String Function(T) itemId,
-    void Function(bool, String) onChanged,
+    ID Function(T) itemId,
+    void Function(bool, ID) onChanged,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

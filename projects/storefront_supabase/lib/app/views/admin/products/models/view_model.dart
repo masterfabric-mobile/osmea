@@ -10,7 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'states.dart';
 
 @injectable
-class AdminProductsViewModel extends BaseViewModelCubit<AdminProductsState> {
+class AdminProductsViewModel
+    extends BaseViewModelCubit<AdminProductsState> {
   final SupabaseClient _supabaseClient;
   Timer? _debounce;
   final TextEditingController searchController;
@@ -19,17 +20,21 @@ class AdminProductsViewModel extends BaseViewModelCubit<AdminProductsState> {
       : searchController = TextEditingController(),
         super(AdminProductsLoaded(products: []));
 
+  /* -------------------- SEARCH -------------------- */
+
   void setSearchQuery(String query) {
     if (state is! AdminProductsLoaded) return;
     final currentState = state as AdminProductsLoaded;
 
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (currentState.searchQuery != query) {
         fetchProducts(searchQuery: query);
       }
     });
   }
+
+  /* -------------------- SORTS -------------------- */
 
   void setPriceSort(PriceSort sort) {
     if (state is! AdminProductsLoaded) return;
@@ -46,15 +51,19 @@ class AdminProductsViewModel extends BaseViewModelCubit<AdminProductsState> {
     fetchProducts(popularitySort: sort);
   }
 
+  /* -------------------- FILTERS -------------------- */
+
   void setCategoryFilters(Set<String> categoryIds) {
     if (state is! AdminProductsLoaded) return;
     fetchProducts(selectedCategoryIds: categoryIds);
   }
 
-  void setBrandFilters(Set<String> brandIds) {
+  void setBrandFilters(Set<int> brandIds) {
     if (state is! AdminProductsLoaded) return;
     fetchProducts(selectedBrandIds: brandIds);
   }
+
+  /* -------------------- FETCH -------------------- */
 
   Future<void> fetchProducts({
     String? searchQuery,
@@ -62,76 +71,118 @@ class AdminProductsViewModel extends BaseViewModelCubit<AdminProductsState> {
     DateSort? dateSort,
     PopularitySort? popularitySort,
     Set<String>? selectedCategoryIds,
-    Set<String>? selectedBrandIds,
+    Set<int>? selectedBrandIds,
   }) async {
-    AdminProductsLoaded currentState;
-    if (state is AdminProductsLoaded) {
-      currentState = state as AdminProductsLoaded;
-    } else {
-      // Initial load, create a default state
-      currentState = AdminProductsLoaded(products: []);
-    }
+    AdminProductsLoaded currentState =
+        state is AdminProductsLoaded
+            ? state as AdminProductsLoaded
+            : AdminProductsLoaded(products: []);
 
     stateChanger(AdminProductsLoading());
 
     try {
-      // On initial load, fetch categories and brands
-      if (currentState.allCategories.isEmpty || currentState.allBrands.isEmpty) {
-        final responses = await Future.wait([
+      /* -------- Initial lookup data -------- */
+
+      if (currentState.allCategories.isEmpty ||
+          currentState.allBrands.isEmpty) {
+        final results = await Future.wait([
           _supabaseClient.from('categories').select(),
           _supabaseClient.from('brand').select(),
         ]);
+
         currentState = currentState.copyWith(
-          allCategories: (responses[0] as List).map((e) => Category.fromJson(e)).toList(),
-          allBrands: (responses[1] as List).map((e) => Brand.fromJson(e)).toList(),
+          allCategories: (results[0] as List)
+              .map((e) => Category.fromJson(e))
+              .toList(),
+          allBrands: (results[1] as List)
+              .map((e) => Brand.fromJson(e))
+              .toList(),
         );
       }
 
       final finalQuery = searchQuery ?? currentState.searchQuery;
       final finalPriceSort = priceSort ?? currentState.priceSort;
       final finalDateSort = dateSort ?? currentState.dateSort;
-      final finalPopularitySort = popularitySort ?? currentState.popularitySort;
-      final finalCategoryIds = selectedCategoryIds ?? currentState.selectedCategoryIds;
-      final finalBrandIds = selectedBrandIds ?? currentState.selectedBrandIds;
-      
-      dynamic query = _supabaseClient.from('products_with_wishlist_count').select('*, product_images(*)');
+      final finalPopularitySort =
+          popularitySort ?? currentState.popularitySort;
+      final finalCategoryIds =
+          selectedCategoryIds ?? currentState.selectedCategoryIds;
+      final finalBrandIds =
+          selectedBrandIds ?? currentState.selectedBrandIds;
+
+      /* -------- Base query -------- */
+
+      var baseQuery = _supabaseClient
+          .from('products_with_wishlist_count')
+          .select('*, product_images(*)')
+          .eq('is_active', true); // Only active products in admin panel
+
+      PostgrestFilterBuilder currentFilteredQuery = baseQuery;
+
+      /* -------- Filters -------- */
 
       if (finalQuery.isNotEmpty) {
-        query = query.ilike('name', '%$finalQuery%');
+        currentFilteredQuery = currentFilteredQuery.ilike('name', '%$finalQuery%');
       }
+
       if (finalCategoryIds.isNotEmpty) {
-        query = query.in_('category_id', finalCategoryIds.toList());
+        currentFilteredQuery = currentFilteredQuery.filter('category_id', 'in', finalCategoryIds.toList());
       }
+
       if (finalBrandIds.isNotEmpty) {
-        query = query.in_('brand_id', finalBrandIds.toList());
+        currentFilteredQuery = currentFilteredQuery.filter('brand_id', 'in', finalBrandIds.toList());
       }
+
+      /* -------- Sorting -------- */
+
+      // Apply the selected sort order
+      PostgrestTransformBuilder finalOrderedQuery;
 
       if (finalPriceSort != PriceSort.none) {
-        query = query.order('price', ascending: finalPriceSort == PriceSort.lowToHigh);
+        finalOrderedQuery = currentFilteredQuery.order(
+          'price',
+          ascending: finalPriceSort == PriceSort.lowToHigh,
+        );
       } else if (finalPopularitySort != PopularitySort.none) {
-        query = query.order('wishlist_count', ascending: false);
+        finalOrderedQuery = currentFilteredQuery.order(
+          'wishlist_count',
+          ascending: false,
+        );
+      } else {
+        finalOrderedQuery = currentFilteredQuery.order(
+          'created_at',
+          ascending: finalDateSort == DateSort.oldestFirst,
+        );
       }
-      
-      query = query.order('created_at', ascending: finalDateSort == DateSort.oldestFirst);
 
-      final response = await query;
-      final products = (response as List).map((e) => Product.fromJson(e)).toList();
+      /* -------- Execute -------- */
 
-      stateChanger(AdminProductsLoaded(
-        products: products,
-        searchQuery: finalQuery,
-        priceSort: finalPriceSort,
-        dateSort: finalDateSort,
-        popularitySort: finalPopularitySort,
-        allCategories: currentState.allCategories,
-        allBrands: currentState.allBrands,
-        selectedCategoryIds: finalCategoryIds,
-        selectedBrandIds: finalBrandIds,
-      ));
+      final response = await finalOrderedQuery; // Await the final ordered query
+      final products = (response as List)
+          .map((e) => Product.fromJson(e))
+          .toList();
+
+      stateChanger(
+        AdminProductsLoaded(
+          products: products,
+          searchQuery: finalQuery,
+          priceSort: finalPriceSort,
+          dateSort: finalDateSort,
+          popularitySort: finalPopularitySort,
+          allCategories: currentState.allCategories,
+          allBrands: currentState.allBrands,
+          selectedCategoryIds: finalCategoryIds,
+          selectedBrandIds: finalBrandIds,
+        ),
+      );
     } catch (e) {
-      stateChanger(AdminProductsError('Error: ${e.toString()}'));
+      stateChanger(
+        AdminProductsError('Failed to load products: $e'),
+      );
     }
   }
+
+  /* -------------------- DISPOSE -------------------- */
 
   @override
   Future<void> close() {

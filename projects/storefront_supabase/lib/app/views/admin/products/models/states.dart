@@ -22,7 +22,7 @@ class AdminProductsLoaded extends AdminProductsState {
 
   // For tracking selected filters
   final Set<String> selectedCategoryIds;
-  final Set<String> selectedBrandIds;
+  final Set<int> selectedBrandIds;
 
   AdminProductsLoaded({
     required this.products,
@@ -33,7 +33,7 @@ class AdminProductsLoaded extends AdminProductsState {
     this.allCategories = const [],
     this.allBrands = const [],
     this.selectedCategoryIds = const {},
-    this.selectedBrandIds = const {},
+    this.selectedBrandIds = const <int>{},
   });
 
   AdminProductsLoaded copyWith({
@@ -45,7 +45,7 @@ class AdminProductsLoaded extends AdminProductsState {
     List<Category>? allCategories,
     List<Brand>? allBrands,
     Set<String>? selectedCategoryIds,
-    Set<String>? selectedBrandIds,
+    Set<int>? selectedBrandIds,
   }) {
     return AdminProductsLoaded(
       products: products ?? this.products,
