@@ -12,26 +12,38 @@ class AddProductLoading extends AddProductState {}
 class AddProductLoaded extends AddProductState {
   final List<Category> categories;
   final List<Brand> brands;
+  final Category? selectedCategory;
+  final Brand? selectedBrand;
   final File? image;
+  final String? existingImageUrl;
   final String? errorMessage;
 
   AddProductLoaded({
     required this.categories,
     required this.brands,
+    this.selectedCategory,
+    this.selectedBrand,
     this.image,
+    this.existingImageUrl,
     this.errorMessage,
   });
 
   AddProductLoaded copyWith({
     List<Category>? categories,
     List<Brand>? brands,
+    Category? selectedCategory,
+    Brand? selectedBrand,
     File? image,
+    String? existingImageUrl,
     String? errorMessage,
   }) {
     return AddProductLoaded(
       categories: categories ?? this.categories,
       brands: brands ?? this.brands,
+      selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedBrand: selectedBrand ?? this.selectedBrand,
       image: image ?? this.image,
+      existingImageUrl: existingImageUrl ?? this.existingImageUrl,
       errorMessage: errorMessage,
     );
   }

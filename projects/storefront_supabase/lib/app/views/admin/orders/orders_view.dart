@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_supabase/app/models/order.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminOrdersView extends StatefulWidget {
   const AdminOrdersView({super.key});
@@ -33,6 +34,12 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
       appBar: OsmeaComponents.appBar(
         title: OsmeaComponents.text('Orders'),
         variant: AppBarVariant.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        leading: OsmeaComponents.iconButton(
+          onPressed: () => context.go('/profile'),
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: FutureBuilder<List<Order>>(
         future: _orders,

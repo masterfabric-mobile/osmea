@@ -1,7 +1,7 @@
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart' hide SearchView;
+import 'package:core/core.dart' hide SearchView, SplashView, OnboardingView;
 import 'package:storefront_supabase/app/views/admin/dashboard/dashboard_view.dart';
 import 'package:storefront_supabase/app/views/admin/orders/orders_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/products_view.dart';
@@ -12,10 +12,12 @@ import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_supabase/app/views/view_cart/cart_view.dart';
 import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
+import 'package:storefront_supabase/app/views/view_categories/products_by_category/products_by_category_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
 import 'package:storefront_supabase/app/views/view_search/search_view.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
+import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 
 
 
@@ -157,11 +159,6 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
   routes: <RouteBase>[
     GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) =>
-          SplashView(goRoute: (String path) => context.go(path)),
-    ),
-    GoRoute(
       path: '/onboarding',
       builder: (BuildContext context, GoRouterState state) =>
           OnboardingView(goRoute: (String path) => context.go(path)),
@@ -198,6 +195,21 @@ final GoRouter appRouter = GoRouter(
           path: '/categories',
           builder: (BuildContext context, GoRouterState state) =>
               CategoriesView(goRoute: (String path) => context.go(path)),
+          routes: [
+            GoRoute(
+                path: 'products/:categoryId',
+                builder: (BuildContext context, GoRouterState state) {
+                  final categoryId = state.pathParameters['categoryId'];
+                  final categoryName = state.uri.queryParameters['name'];
+                  return ProductsByCategoryView(
+                    goRoute: (String path) => context.go(path),
+                    arguments: {
+                      'categoryId': categoryId,
+                      'categoryName': categoryName
+                    },
+                  );
+                }),
+          ],
         ),
         GoRoute(
           path: '/cart',
@@ -240,7 +252,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/products',
           builder: (BuildContext context, GoRouterState state) {
-            return const AdminProductsView();
+            return AdminProductsView(goRoute: (String path) => context.go(path));
           },
         ),
          GoRoute(
@@ -250,15 +262,25 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: '/admin/products/edit/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            final productId = state.pathParameters['id'];
+            return AddProductView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'productId': productId},
+            );
+          },
+        ),
+        GoRoute(
           path: '/admin/orders',
           builder: (BuildContext context, GoRouterState state) {
-            return const AdminOrdersView();
+            return AdminOrdersView();
           },
         ),
         GoRoute(
           path: '/admin/settings',
           builder: (BuildContext context, GoRouterState state) {
-            return const AdminSettingsView();
+            return AdminSettingsView(goRoute: (String path) => context.go(path));
           },
         ),
       ],
