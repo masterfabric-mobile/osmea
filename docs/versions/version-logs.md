@@ -2,8 +2,14 @@
 
 > This changelog is generated from the latest closed pull requests. For a full, always-up-to-date changelog, visit [Closed PRs on GitHub](https://github.com/masterfabric-mobile/osmea/pulls?q=is%3Apr+is%3Aclosed).  
 
-## 📦 APIs – v0.54.11
+## 📦 APIs – v0.56.11
 
+- **[#260 – Core → Account View Update Signout And Using Style](https://github.com/masterfabric-mobile/osmea/pull/260)**  
+  Refactors AccountCubit architecture to eliminate callback dependencies and improve separation of concerns. Removes `GetUsersMeCallback` dependency, introduces direct data injection via `setUserApiData()` method, and centralizes signout logic with platform-specific callback support.  Moves API data handling to route level for better architectural separation, updates `GetUsersMeResponse` model to handle flexible `meta` field types, and resolves DI configuration warnings.  Fixes signout state persistence issues and type cast errors while improving code quality and testability. 
+
+- **[#257 – Feature → Wishlist Rewrite](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Completely rewrites WishlistCubit with singleton global state management, enhanced pagination, and optimized sync mechanisms. Integrates empty view support and removes legacy wishlist implementation for a modern, performant wishlist feature.
+    
 - **[#255 – Package → API → User Info Section API](https://github.com/masterfabric-mobile/osmea/pull/255)**  
   Adds full integration with the WordPress REST API `/wp-json/wp/v2/users/me` endpoint. Enables retrieval of authenticated user information using JWT, and introduces a dedicated WordPress User Information section in HomeView for in-app authentication and meta data display.
 
@@ -483,7 +489,37 @@
   Established a modular, scalable UI structure (`lib/src/`), reusable components, enums, design tokens, and core infrastructure for future UI elements.
                                            
 
-## ⚙️ Core – v3.29.7
+## ⚙️ Core – v3.34.12
+
+- **[#257 – Core → Authentication System Migration](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Implements a new hydrated AuthCubit architecture replacing legacy SignInView/SignUpView and their cubits.  Introduces AuthView, AuthFormState, and AuthState with full DI integration and auth_configuration support for modern, persistent authentication state management.
+
+- **[#257 – Core → Empty View Engine](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Adds a comprehensive empty state management system with EmptyViewCubit, EmptyViewState, and EmptyPageModel. Supports 13+ empty view types with configuration-driven rendering via empty_view_configuration, enabling consistent empty state UX across all features.
+
+- **[#257 – Core → Dependency Injection Expansion](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Extends the DI layer with registrations for AuthCubit, WishlistViewModel, ErrorHandlingCubit, ProfileViewModel, and EmptyViewCubit. Cleans up legacy DI entries and modernizes the service locator structure for improved maintainability. 
+
+- **[#257 – Core → Configuration System Expansion](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Expands app_config.json with new configuration sections for auth, empty_view, wishlist, navbar, and search. Updates config models to support feature-specific settings, enabling centralized and flexible configuration management.
+
+- **[#257 – Core → Error Handling and API Communication Improvements](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Enhances ErrorHandlingCubit with standardized error formatting and robust loading/error state mechanisms. Improves API communication patterns with consistent error feedback across all network operations.
+
+- **[#257 – Feature → Search System Refresh](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Modernizes SearchViewModel with debounced search, Grid to Wrap layout migration, and improved empty result handling.  Enhances search UX with better state management and responsive design patterns.
+
+- **[#257 – Feature → Account Module Synchronization](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Integrates AccountView with AuthCubit, adds profile refresh mechanism and username field support. Cleans up layout structure for improved account management and user profile handling.
+
+- **[#257 – UI/UX → Consistency Updates (Spacing, Padding, Color)](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Standardizes spacing, padding, and color tokens across all modules. Unifies text styles and cleans up widget structure for consistent visual design and improved UI maintainability.
+
+- **[#257 – UI/UX → Loading and Error State Standardization](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Introduces ProductDetailError, WishlistErrorHandler, and CartErrorHandler components.  Establishes global loading patterns and unified error UI components for consistent state handling across the application.
+
+- **[#257 – Maintenance → Legacy Code Cleanup](https://github.com/masterfabric-mobile/osmea/pull/257)**  
+  Removes deprecated auth widgets, HomeLoadingWidget, HomeErrorWidget, and legacy wishlist cubit. Cleans up unused views and routes, reducing technical debt and improving codebase clarity.
 
 - **[#253 – Core → Account View](https://github.com/masterfabric-mobile/osmea/pull/253)**  
   Implements a configurable Account View with dynamic profile data loading, configuration-driven menu sections, and extensible sub-route widgets. Provides theme style support and robust state management for a flexible, user-centric account experience.
