@@ -89,34 +89,39 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
     required String activeCategoryId,
     required List<Category> subCategories,
     required bool showSizeFilter,
-    String? ageGroup,
+    List<String> selectedSizes = const [],
   }) async {
     try {
-      // Logic: Fetch products for activeCategory AND all its descendants (deep search)
-      // This ensures if I am in "Electronics", I see "Laptops" products too.
-      
-      // 1. Get all descendant IDs (Recursive) - Postgres function would be better, but Dart recursion is fine for small trees
       final List<String> allCategoryIds = await _getAllDescendantIds(activeCategoryId);
-      allCategoryIds.add(activeCategoryId); // Include self
+      allCategoryIds.add(activeCategoryId); 
 
-      // 2. Build Query
       var query = _supabaseClient
           .from('products')
           .select('*, product_images(image_url, is_primary, sort_order)')
           .eq('is_active', true)
           .inFilter('category_id', allCategoryIds); 
 
-      if (showSizeFilter && ageGroup != null) {
-        query = query.eq('target_age_group', ageGroup);
-      }
+      // Note: Supabase doesn't have an easy "array contains any of array" filter for comma-separated strings directly via Postgrest yet without complex RPC or splitting.
+      // So we fetch products first and filter in memory if size filter is active.
+      // Or, we can use ILIKE/OR logic but that's hard dynamically.
+      // For this prototype, we filter in memory after fetch.
 
       final response = await query.order('created_at', ascending: false);
-      final products = (response as List).map((data) => Product.fromJson(data as Map<String, dynamic>)).toList();
+      var products = (response as List).map((data) => Product.fromJson(data as Map<String, dynamic>)).toList();
+
+      if (showSizeFilter && selectedSizes.isNotEmpty) {
+        products = products.where((p) {
+          if (p.targetAgeGroup == null) return false;
+          final productSizes = p.targetAgeGroup!.split(',').map((e) => e.trim()).toList();
+          // Intersection check
+          return productSizes.any((s) => selectedSizes.contains(s));
+        }).toList();
+      }
 
       stateChanger(ProductsByCategoryLoaded(
         products: products,
         subCategories: subCategories,
-        selectedAgeGroup: ageGroup,
+        selectedSizes: selectedSizes,
         showSizeFilter: showSizeFilter,
       ));
     } catch (e) {
@@ -124,37 +129,50 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
     }
   }
 
+  // Helper for hierarchy
   Future<List<String>> _getAllDescendantIds(String parentId) async {
     final List<String> ids = [];
     final response = await _supabaseClient.from('categories').select('id').eq('parent_id', parentId);
-    
     for (var item in response as List) {
       final id = item['id'] as String;
       ids.add(id);
-      ids.addAll(await _getAllDescendantIds(id)); // Recursion
+      ids.addAll(await _getAllDescendantIds(id));
     }
     return ids;
   }
 
-  // When a subcategory chip is clicked, we "drill down" into it.
-  // This effectively changes the page context to that subcategory.
-  void navigateToSubcategory(String subcategoryId) {
-    // Re-run the main fetch logic with the new ID. 
-    // This allows deep drilling: Electronics -> Computers -> Laptops
-    fetchProductsByCategory(subcategoryId);
+  void navigateToSubcategory(String? subcategoryId) {
+    if (state is ProductsByCategoryLoaded && _currentCategoryId != null) {
+      final currentState = state as ProductsByCategoryLoaded;
+      final newId = currentState.selectedSubcategoryId == subcategoryId ? null : subcategoryId;
+
+      // When category changes, we might want to clear size filters or keep them. 
+      // Keeping them usually feels better.
+      _fetchProductsInternal(
+        activeCategoryId: newId ?? _currentCategoryId!,
+        subCategories: currentState.subCategories,
+        showSizeFilter: currentState.showSizeFilter, // Ideally re-check hierarchy if subcat changes
+        selectedSizes: currentState.selectedSizes,
+      );
+    }
   }
 
-  void filterByAgeGroup(String? ageGroup) {
+  void toggleSizeFilter(String size) {
     if (state is ProductsByCategoryLoaded && _currentCategoryId != null) {
       final currentState = state as ProductsByCategoryLoaded;
       
-      final newAge = currentState.selectedAgeGroup == ageGroup ? null : ageGroup;
+      final currentList = List<String>.from(currentState.selectedSizes);
+      if (currentList.contains(size)) {
+        currentList.remove(size);
+      } else {
+        currentList.add(size);
+      }
 
       _fetchProductsInternal(
-        activeCategoryId: _currentCategoryId!,
+        activeCategoryId: currentState.selectedSubcategoryId ?? _currentCategoryId!,
         subCategories: currentState.subCategories,
         showSizeFilter: currentState.showSizeFilter,
-        ageGroup: newAge,
+        selectedSizes: currentList,
       );
     }
   }

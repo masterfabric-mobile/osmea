@@ -333,8 +333,13 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeLoadedState currentState,
   ) {
-    var tempSelectedCatIds = Set<String>.from(currentState.selectedCategoryIds);
-    var tempSelectedBrandIds = Set<int>.from(currentState.selectedBrandIds);
+    // Hierarchical Filters
+    Category? tempRoot = currentState.selectedRootCategory;
+    Category? tempSub = currentState.selectedSubCategory;
+    Category? tempLeaf = currentState.selectedLeafCategory;
+    
+    // Brand Filter
+    Set<int> tempBrandIds = Set.from(currentState.selectedBrandIds);
 
     showModalBottomSheet(
       context: context,
@@ -342,6 +347,12 @@ class SupabaseHomeView
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
+            
+            // Helpers
+            final rootCats = viewModel.getRootCategories(currentState.allCategories);
+            final subCats = viewModel.getSubCategories(currentState.allCategories, tempRoot?.id);
+            final leafCats = viewModel.getSubCategories(currentState.allCategories, tempSub?.id);
+
             return DraggableScrollableSheet(
               expand: false,
               initialChildSize: 0.6,
@@ -370,33 +381,58 @@ class SupabaseHomeView
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         children: [
-                          _buildCheckboxFilterSection<Category, String>(
-                            context,
-                            'Categories',
-                            currentState.allCategories,
-                            tempSelectedCatIds,
-                            (cat) => cat.name,
-                            (cat) => cat.id,
-                            (isSelected, id) {
-                              setModalState(() {
-                                isSelected
-                                    ? tempSelectedCatIds.add(id)
-                                    : tempSelectedCatIds.remove(id);
-                              });
-                            },
+                           // --- Category Hierarchy ---
+                          _buildSafeDropdown<Category>(
+                            'Main Category',
+                            rootCats,
+                            (c) => c.name,
+                            tempRoot,
+                            (val) => setModalState(() {
+                              tempRoot = val;
+                              tempSub = null;
+                              tempLeaf = null;
+                            }),
                           ),
+                          if (tempRoot != null && subCats.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            _buildSafeDropdown<Category>(
+                              'Sub Category',
+                              subCats,
+                              (c) => c.name,
+                              tempSub,
+                              (val) => setModalState(() {
+                                tempSub = val;
+                                tempLeaf = null;
+                              }),
+                            ),
+                          ],
+                          if (tempSub != null && leafCats.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            _buildSafeDropdown<Category>(
+                              'Specific Category',
+                              leafCats,
+                              (c) => c.name,
+                              tempLeaf,
+                              (val) => setModalState(() {
+                                tempLeaf = val;
+                              }),
+                            ),
+                          ],
+                          
+                          const Divider(height: 32),
+                          
                           _buildCheckboxFilterSection<Brand, int>(
                             context,
                             'Brands',
                             currentState.allBrands,
-                            tempSelectedBrandIds,
+                            tempBrandIds,
                             (brand) => brand.name,
                             (brand) => brand.id,
                             (isSelected, id) {
                               setModalState(() {
                                 isSelected
-                                    ? tempSelectedBrandIds.add(id)
-                                    : tempSelectedBrandIds.remove(id);
+                                    ? tempBrandIds.add(id)
+                                    : tempBrandIds.remove(id);
                               });
                             },
                           ),
@@ -411,8 +447,10 @@ class SupabaseHomeView
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
-                                  tempSelectedCatIds.clear();
-                                  tempSelectedBrandIds.clear();
+                                  tempRoot = null;
+                                  tempSub = null;
+                                  tempLeaf = null;
+                                  tempBrandIds.clear();
                                 });
                               },
                               child: const Text('Clear'),
@@ -423,8 +461,10 @@ class SupabaseHomeView
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
-                                  selectedCategoryIds: tempSelectedCatIds,
-                                  selectedBrandIds: tempSelectedBrandIds,
+                                  selectedRoot: tempRoot,
+                                  selectedSub: tempSub,
+                                  selectedLeaf: tempLeaf,
+                                  selectedBrandIds: tempBrandIds,
                                 );
                                 Navigator.pop(context);
                               },
@@ -441,6 +481,38 @@ class SupabaseHomeView
           },
         );
       },
+    );
+  }
+  
+  Widget _buildSafeDropdown<T>(
+    String label,
+    List<T> items,
+    String Function(T) itemToString,
+    T? selectedItem,
+    void Function(T?) onChanged,
+  ) {
+    T? effectiveValue;
+    if (selectedItem != null) {
+      try {
+        effectiveValue = items.firstWhere((item) => item == selectedItem);
+      } catch (e) {
+        effectiveValue = null;
+      }
+    }
+    return DropdownButtonFormField<T>(
+      // ignore: deprecated_member_use
+      value: effectiveValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<T>(
+          value: item,
+          child: Text(itemToString(item)),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 
@@ -460,7 +532,9 @@ class SupabaseHomeView
             title: Text((sort as Enum).name),
             leading: Radio<T>(
               value: sort,
+              // ignore: deprecated_member_use
               groupValue: currentSort,
+              // ignore: deprecated_member_use
               onChanged: null,
             ),
             onTap: () => onChanged(sort),

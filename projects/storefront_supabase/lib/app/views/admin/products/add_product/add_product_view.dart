@@ -265,6 +265,7 @@ class AddProductView
     }
 
     return DropdownButtonFormField<T>(
+      // ignore: deprecated_member_use
       value: effectiveValue,
       decoration: InputDecoration(
         labelText: label,
@@ -346,35 +347,6 @@ class AddProductView
     );
   }
 
-  Widget _buildDropdown<T>(
-    String label,
-    List<T> items,
-    String Function(T) itemToString,
-    T? selectedItem,
-    void Function(T?) onChanged,
-  ) {
-    return DropdownButtonFormField<T>(
-      initialValue: selectedItem,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: items.map((item) {
-        return DropdownMenuItem<T>(
-          value: item,
-          child: Text(itemToString(item)),
-        );
-      }).toList(),
-      onChanged: onChanged,
-       validator: (value) {
-        if (value == null) {
-          return 'Please select a $label';
-        }
-        return null;
-      },
-    );
-  }
-
   void _showAddBrandDialog(BuildContext context, AddProductViewModel viewModel) {
     final brandNameController = TextEditingController();
     showDialog(
@@ -403,19 +375,6 @@ class AddProductView
           ],
         );
       },
-    );
-  }
-
-  Widget _buildDisabledDropdown(String label, String hint) {
-    return TextFormField(
-      enabled: false,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: Colors.grey[200],
-      ),
     );
   }
 }

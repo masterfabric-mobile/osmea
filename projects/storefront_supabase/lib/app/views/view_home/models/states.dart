@@ -21,7 +21,9 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final List<Brand> allBrands;
 
   // For tracking selected filters
-  final Set<String> selectedCategoryIds;
+  final Category? selectedRootCategory;
+  final Category? selectedSubCategory;
+  final Category? selectedLeafCategory;
   final Set<int> selectedBrandIds;
 
   SupabaseHomeLoadedState({
@@ -32,7 +34,9 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     this.popularitySort = PopularitySort.none,
     this.allCategories = const [],
     this.allBrands = const [],
-    this.selectedCategoryIds = const {},
+    this.selectedRootCategory,
+    this.selectedSubCategory,
+    this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
   });
 
@@ -44,7 +48,9 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     PopularitySort? popularitySort,
     List<Category>? allCategories,
     List<Brand>? allBrands,
-    Set<String>? selectedCategoryIds,
+    Category? selectedRootCategory,
+    Category? selectedSubCategory,
+    Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
   }) {
     return SupabaseHomeLoadedState(
@@ -55,7 +61,9 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
       popularitySort: popularitySort ?? this.popularitySort,
       allCategories: allCategories ?? this.allCategories,
       allBrands: allBrands ?? this.allBrands,
-      selectedCategoryIds: selectedCategoryIds ?? this.selectedCategoryIds,
+      selectedRootCategory: selectedRootCategory ?? this.selectedRootCategory,
+      selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
+      selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
     );
   }

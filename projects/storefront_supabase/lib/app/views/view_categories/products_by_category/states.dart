@@ -11,22 +11,22 @@ class ProductsByCategoryLoaded extends ProductsByCategoryState {
   final List<Product> products;
   final List<Category> subCategories;
   final String? selectedSubcategoryId;
-  final String? selectedAgeGroup;
-  final bool showSizeFilter; // New field
+  final List<String> selectedSizes; // Changed to List
+  final bool showSizeFilter;
 
   ProductsByCategoryLoaded({
     required this.products,
     this.subCategories = const [],
     this.selectedSubcategoryId,
-    this.selectedAgeGroup,
-    this.showSizeFilter = false, // Default false
+    this.selectedSizes = const [], // Default empty
+    this.showSizeFilter = false,
   });
 
   ProductsByCategoryLoaded copyWith({
     List<Product>? products,
     List<Category>? subCategories,
     String? selectedSubcategoryId,
-    String? selectedAgeGroup,
+    List<String>? selectedSizes,
     bool? showSizeFilter,
   }) {
     return ProductsByCategoryLoaded(
@@ -34,7 +34,7 @@ class ProductsByCategoryLoaded extends ProductsByCategoryState {
       subCategories: subCategories ?? this.subCategories,
       selectedSubcategoryId:
           selectedSubcategoryId ?? this.selectedSubcategoryId,
-      selectedAgeGroup: selectedAgeGroup ?? this.selectedAgeGroup,
+      selectedSizes: selectedSizes ?? this.selectedSizes,
       showSizeFilter: showSizeFilter ?? this.showSizeFilter,
     );
   }

@@ -105,11 +105,11 @@ class ProductsByCategoryView
                       separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         final age = viewModel.ageGroups[index];
-                        final isSelected = state.selectedAgeGroup == age;
-                        return ChoiceChip(
+                        final isSelected = state.selectedSizes.contains(age);
+                        return FilterChip(
                           label: Text(age),
                           selected: isSelected,
-                          onSelected: (_) => viewModel.filterByAgeGroup(age),
+                          onSelected: (_) => viewModel.toggleSizeFilter(age),
                         );
                       },
                     ),

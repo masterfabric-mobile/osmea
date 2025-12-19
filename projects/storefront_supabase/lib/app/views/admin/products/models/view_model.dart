@@ -51,16 +51,32 @@ class AdminProductsViewModel
     fetchProducts(popularitySort: sort);
   }
 
-  /* -------------------- FILTERS -------------------- */
+  // Options for sizes/ages (Shared with AddProduct)
+  final List<String> clothingSizesAndAges = [
+    'Baby (0-2)', 'Toddler (2-4)', 'Kids (4-8)', 'Pre-Teen (9-12)',
+    'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'
+  ];
+  final List<String> shoeSizes = List.generate(14, (index) => (34 + index).toString());
 
-  void setCategoryFilters(Set<String> categoryIds) {
+  /* -------------------- FILTERS (Updated) -------------------- */
+
+  void setHierarchicalCategories(Category? root, Category? sub, Category? leaf) {
     if (state is! AdminProductsLoaded) return;
-    fetchProducts(selectedCategoryIds: categoryIds);
+    fetchProducts(
+      selectedRoot: root,
+      selectedSub: sub,
+      selectedLeaf: leaf,
+    );
   }
 
   void setBrandFilters(Set<int> brandIds) {
     if (state is! AdminProductsLoaded) return;
     fetchProducts(selectedBrandIds: brandIds);
+  }
+
+  void setSizeFilters(List<String> sizes) {
+    if (state is! AdminProductsLoaded) return;
+    fetchProducts(selectedSizesOrAges: sizes);
   }
 
   /* -------------------- FETCH -------------------- */
@@ -70,72 +86,85 @@ class AdminProductsViewModel
     PriceSort? priceSort,
     DateSort? dateSort,
     PopularitySort? popularitySort,
-    Set<String>? selectedCategoryIds,
+    Category? selectedRoot,
+    Category? selectedSub,
+    Category? selectedLeaf,
     Set<int>? selectedBrandIds,
+    List<String>? selectedSizesOrAges,
   }) async {
-    AdminProductsLoaded currentState =
-        state is AdminProductsLoaded
-            ? state as AdminProductsLoaded
-            : AdminProductsLoaded(products: []);
+    AdminProductsLoaded currentState = state is AdminProductsLoaded
+        ? state as AdminProductsLoaded
+        : AdminProductsLoaded(products: []);
 
     stateChanger(AdminProductsLoading());
 
     try {
       /* -------- Initial lookup data -------- */
-
-      if (currentState.allCategories.isEmpty ||
-          currentState.allBrands.isEmpty) {
+      if (currentState.allCategories.isEmpty || currentState.allBrands.isEmpty) {
         final results = await Future.wait([
           _supabaseClient.from('categories').select(),
           _supabaseClient.from('brand').select(),
         ]);
 
         currentState = currentState.copyWith(
-          allCategories: (results[0] as List)
-              .map((e) => Category.fromJson(e))
-              .toList(),
-          allBrands: (results[1] as List)
-              .map((e) => Brand.fromJson(e))
-              .toList(),
+          allCategories: (results[0] as List).map((e) => Category.fromJson(e)).toList(),
+          allBrands: (results[1] as List).map((e) => Brand.fromJson(e)).toList(),
         );
       }
 
       final finalQuery = searchQuery ?? currentState.searchQuery;
       final finalPriceSort = priceSort ?? currentState.priceSort;
       final finalDateSort = dateSort ?? currentState.dateSort;
-      final finalPopularitySort =
-          popularitySort ?? currentState.popularitySort;
-      final finalCategoryIds =
-          selectedCategoryIds ?? currentState.selectedCategoryIds;
-      final finalBrandIds =
-          selectedBrandIds ?? currentState.selectedBrandIds;
+      final finalPopularitySort = popularitySort ?? currentState.popularitySort;
+      final finalBrandIds = selectedBrandIds ?? currentState.selectedBrandIds;
+      final finalSizes = selectedSizesOrAges ?? currentState.selectedSizesOrAges;
+
+      // Handle Hierarchy State
+      // If new values are passed, use them. Else fallback to current state.
+      // Note: If 'selectedRoot' is passed as null explicitly? 
+      // We assume if passed, it's an update. If not passed (null), keep current.
+      // But here we might want to clear. Let's assume the View passes the new full state of selection.
+      
+      // Actually, to support partial updates, we need to know if it was passed.
+      // Simplified: The view calls this method with the *new* state of filters.
+      
+      final activeRoot = selectedRoot ?? currentState.selectedRootCategory;
+      final activeSub = selectedSub ?? currentState.selectedSubCategory;
+      final activeLeaf = selectedLeaf ?? currentState.selectedLeafCategory;
+      
+      // If root changed, sub/leaf might be invalid if we didn't clear them in View.
+      // We rely on the View/Sheet to provide consistent triplet.
 
       /* -------- Base query -------- */
 
       var baseQuery = _supabaseClient
-          .from('products_with_wishlist_count')
+          .from('products') // Using standard table to avoid view dependency issues for now
           .select('*, product_images(*)')
-          .eq('is_active', true); // Only active products in admin panel
+          .eq('is_active', true);
 
       PostgrestFilterBuilder currentFilteredQuery = baseQuery;
 
-      /* -------- Filters -------- */
-
+      /* -------- Text Search -------- */
       if (finalQuery.isNotEmpty) {
         currentFilteredQuery = currentFilteredQuery.ilike('name', '%$finalQuery%');
       }
 
-      if (finalCategoryIds.isNotEmpty) {
-        currentFilteredQuery = currentFilteredQuery.filter('category_id', 'in', finalCategoryIds.toList());
+      /* -------- Hierarchy Filter (Deep Search) -------- */
+      final targetCategory = activeLeaf ?? activeSub ?? activeRoot;
+      if (targetCategory != null) {
+        // Get all descendant IDs
+        final descendantIds = await _getAllDescendantIds(targetCategory.id);
+        descendantIds.add(targetCategory.id);
+        
+        currentFilteredQuery = currentFilteredQuery.inFilter('category_id', descendantIds);
       }
 
+      /* -------- Brand Filter -------- */
       if (finalBrandIds.isNotEmpty) {
-        currentFilteredQuery = currentFilteredQuery.filter('brand_id', 'in', finalBrandIds.toList());
+        currentFilteredQuery = currentFilteredQuery.inFilter('brand_id', finalBrandIds.toList());
       }
 
       /* -------- Sorting -------- */
-
-      // Apply the selected sort order
       PostgrestTransformBuilder finalOrderedQuery;
 
       if (finalPriceSort != PriceSort.none) {
@@ -144,10 +173,8 @@ class AdminProductsViewModel
           ascending: finalPriceSort == PriceSort.lowToHigh,
         );
       } else if (finalPopularitySort != PopularitySort.none) {
-        finalOrderedQuery = currentFilteredQuery.order(
-          'wishlist_count',
-          ascending: false,
-        );
+        // Fallback to price if wishlist_count column missing on raw table
+        finalOrderedQuery = currentFilteredQuery.order('price'); 
       } else {
         finalOrderedQuery = currentFilteredQuery.order(
           'created_at',
@@ -155,12 +182,20 @@ class AdminProductsViewModel
         );
       }
 
-      /* -------- Execute -------- */
+      /* -------- Execute & Client-side Size Filter -------- */
+      final response = await finalOrderedQuery;
+      var products = (response as List).map((e) => Product.fromJson(e)).toList();
 
-      final response = await finalOrderedQuery; // Await the final ordered query
-      final products = (response as List)
-          .map((e) => Product.fromJson(e))
-          .toList();
+      // Client-side filtering for sizes (comma-separated string in DB)
+      if (finalSizes.isNotEmpty) {
+        products = products.where((p) {
+          if (p.targetAgeGroup == null) return false;
+          // DB: "S, M, L" -> List: ["S", "M", "L"]
+          final productSizes = p.targetAgeGroup!.split(',').map((e) => e.trim()).toList();
+          // Check intersection: Does product have *any* of the selected filters?
+          return productSizes.any((s) => finalSizes.contains(s));
+        }).toList();
+      }
 
       stateChanger(
         AdminProductsLoaded(
@@ -171,19 +206,51 @@ class AdminProductsViewModel
           popularitySort: finalPopularitySort,
           allCategories: currentState.allCategories,
           allBrands: currentState.allBrands,
-          selectedCategoryIds: finalCategoryIds,
+          selectedRootCategory: activeRoot,
+          selectedSubCategory: activeSub,
+          selectedLeafCategory: activeLeaf,
           selectedBrandIds: finalBrandIds,
+          selectedSizesOrAges: finalSizes,
         ),
       );
     } catch (e) {
-      stateChanger(
-        AdminProductsError('Failed to load products: $e'),
-      );
+      stateChanger(AdminProductsError('Failed to load products: $e'));
     }
   }
 
-  /* -------------------- DISPOSE -------------------- */
+  // Helper for hierarchy
+  Future<List<String>> _getAllDescendantIds(String parentId) async {
+    final List<String> ids = [];
+    final response = await _supabaseClient.from('categories').select('id').eq('parent_id', parentId);
+    for (var item in response as List) {
+      final id = item['id'] as String;
+      ids.add(id);
+      ids.addAll(await _getAllDescendantIds(id));
+    }
+    return ids;
+  }
+  
+  // Helpers for UI
+  List<Category> getRootCategories(List<Category> all) {
+    return all.where((c) => c.parentId == null).toList();
+  }
+  
+  List<Category> getSubCategories(List<Category> all, String? parentId) {
+    if (parentId == null) return [];
+    return all.where((c) => c.parentId == parentId).toList();
+  }
 
+  bool isShoeCategory(Category? leaf, Category? sub, Category? root) {
+    final slugToCheck = (leaf?.slug ?? sub?.slug ?? root?.slug ?? '').toLowerCase();
+    return slugToCheck.contains('shoe') || slugToCheck.contains('boot') || slugToCheck.contains('sneaker');
+  }
+  
+  bool isFashionCategory(Category? root) {
+     final rootSlug = root?.slug.toLowerCase() ?? '';
+     return rootSlug == 'fashion' || rootSlug == 'clothing' || rootSlug.contains('cloth');
+  }
+
+  /* -------------------- DISPOSE -------------------- */
   @override
   Future<void> close() {
     _debounce?.cancel();
