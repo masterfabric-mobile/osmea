@@ -61,7 +61,7 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
               return ListTile(
                 title: Text('Order #${order.orderNumber}'),
                 subtitle: Text(
-                    'User: ${order.user?.fullName ?? 'N/A'} - Total: \$${order.total.toStringAsFixed(2)}'),
+                    'User: ${order.user?.username != null ? '@${order.user!.username}' : (order.user?.fullName ?? 'N/A')} - Total: \$${order.total.toStringAsFixed(2)}'),
                 trailing: Text(order.status),
               );
             },

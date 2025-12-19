@@ -18,6 +18,7 @@ import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
 import 'package:storefront_supabase/app/views/view_search/search_view.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
+import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 
 
 
@@ -226,6 +227,32 @@ final GoRouter appRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return ProfileView(goRoute: (String path) => context.go(path));
           },
+          routes: [
+            GoRoute(
+              path: 'info',
+              builder: (BuildContext context, GoRouterState state) {
+                return PersonalInfoView(goRoute: (String path) => context.go(path));
+              },
+            ),
+             GoRoute(
+              path: 'addresses',
+              builder: (BuildContext context, GoRouterState state) {
+                return Scaffold(
+                  appBar: AppBar(title: const Text('My Addresses')),
+                  body: const Center(child: Text('Addresses Coming Soon')),
+                );
+              },
+            ),
+             GoRoute(
+              path: 'orders',
+              builder: (BuildContext context, GoRouterState state) {
+                 // Reusing AdminOrdersView as a placeholder, but in real app this should be UserOrdersView
+                return const Scaffold(
+                  body: Center(child: Text("My Orders (User View) - Coming Soon")),
+                );
+              },
+            ),
+          ]
         ),
         GoRoute(
           path: '/search',

@@ -2,6 +2,7 @@ class AppUser {
   final String id;
   final String? email;
   final String? fullName;
+  final String? username;
   final DateTime createdAt;
   final String? avatarUrl;
   final String? role;
@@ -10,6 +11,7 @@ class AppUser {
     required this.id,
     this.email,
     this.fullName,
+    this.username,
     required this.createdAt,
     this.avatarUrl,
     this.role,
@@ -20,6 +22,7 @@ class AppUser {
       id: json['id'] as String,
       email: json['email'] as String?,
       fullName: json['full_name'] as String?,
+      username: json['username'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       avatarUrl: json['avatar_url'] as String?,
       role: json['role'] as String?,

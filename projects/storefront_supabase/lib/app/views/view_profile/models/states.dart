@@ -1,3 +1,5 @@
+import 'package:storefront_supabase/app/models/app_user.dart';
+
 abstract class ProfileState {
   const ProfileState();
 }
@@ -7,8 +9,8 @@ class ProfileInitial extends ProfileState {}
 class ProfileLoading extends ProfileState {}
 
 class ProfileAuthenticated extends ProfileState {
-  final String? userRole;
-  const ProfileAuthenticated({required this.userRole});
+  final AppUser user;
+  const ProfileAuthenticated({required this.user});
 }
 
 class ProfileUnauthenticated extends ProfileState {

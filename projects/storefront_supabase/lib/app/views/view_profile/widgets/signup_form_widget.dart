@@ -17,6 +17,17 @@ class SignupFormWidget extends StatelessWidget {
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.textField(
+          controller: viewModel.usernameController,
+          label: 'Username',
+          prefixIcon: const Icon(
+            Icons.person_outline,
+            color: OsmeaColors.black,
+          ),
+          variant: TextFieldVariant.outlined,
+          focusColor: OsmeaColors.black,
+        ),
+        OsmeaComponents.sizedBox(height: 16),
+        OsmeaComponents.textField(
           controller: viewModel.emailController,
           label: 'Email',
           prefixIcon: const Icon(
