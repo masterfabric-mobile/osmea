@@ -69,6 +69,12 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => goRoute('/profile/addresses'),
           ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('Change Password'),
+            leading: const Icon(Icons.lock_reset_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/change-password'),
+          ),
           
           _buildSectionHeader(context, 'Shopping'),
           OsmeaComponents.listItem(
