@@ -340,6 +340,9 @@ class SupabaseHomeView
     
     // Brand Filter
     Set<int> tempBrandIds = Set.from(currentState.selectedBrandIds);
+    
+    // Size Filter
+    List<String> tempSizes = List.from(currentState.selectedSizesOrAges);
 
     showModalBottomSheet(
       context: context,
@@ -352,11 +355,14 @@ class SupabaseHomeView
             final rootCats = viewModel.getRootCategories(currentState.allCategories);
             final subCats = viewModel.getSubCategories(currentState.allCategories, tempRoot?.id);
             final leafCats = viewModel.getSubCategories(currentState.allCategories, tempSub?.id);
+            
+            final isShoe = viewModel.isShoeCategory(tempLeaf, tempSub, tempRoot);
+            final isFashion = viewModel.isFashionCategory(tempRoot);
 
             return DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.6,
-              maxChildSize: 0.9,
+              initialChildSize: 0.85,
+              maxChildSize: 0.95,
               builder: (context, scrollController) {
                 return Column(
                   children: [
@@ -391,6 +397,7 @@ class SupabaseHomeView
                               tempRoot = val;
                               tempSub = null;
                               tempLeaf = null;
+                              tempSizes.clear();
                             }),
                           ),
                           if (tempRoot != null && subCats.isNotEmpty) ...[
@@ -403,6 +410,7 @@ class SupabaseHomeView
                               (val) => setModalState(() {
                                 tempSub = val;
                                 tempLeaf = null;
+                                tempSizes.clear();
                               }),
                             ),
                           ],
@@ -415,11 +423,37 @@ class SupabaseHomeView
                               tempLeaf,
                               (val) => setModalState(() {
                                 tempLeaf = val;
+                                tempSizes.clear();
                               }),
                             ),
                           ],
                           
                           const Divider(height: 32),
+
+                          // --- Size / Age Filter ---
+                          if (isShoe || isFashion) ...[
+                            Text(
+                              isShoe ? 'Shoe Sizes' : 'Size / Age Groups',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              children: (isShoe ? viewModel.shoeSizes : viewModel.clothingSizesAndAges).map((opt) {
+                                final isSelected = tempSizes.contains(opt);
+                                return FilterChip(
+                                  label: Text(opt),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    setModalState(() {
+                                      selected ? tempSizes.add(opt) : tempSizes.remove(opt);
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                            const Divider(height: 32),
+                          ],
                           
                           _buildCheckboxFilterSection<Brand, int>(
                             context,
@@ -451,6 +485,7 @@ class SupabaseHomeView
                                   tempSub = null;
                                   tempLeaf = null;
                                   tempBrandIds.clear();
+                                  tempSizes.clear();
                                 });
                               },
                               child: const Text('Clear'),
@@ -465,6 +500,8 @@ class SupabaseHomeView
                                   selectedSub: tempSub,
                                   selectedLeaf: tempLeaf,
                                   selectedBrandIds: tempBrandIds,
+                                  selectedSizesOrAges: tempSizes,
+                                  applyFilter: true,
                                 );
                                 Navigator.pop(context);
                               },

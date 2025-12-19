@@ -12,6 +12,13 @@ import 'states.dart';
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final SupabaseClient _supabaseClient;
 
+  // Options for sizes/ages
+  final List<String> clothingSizesAndAges = [
+    'Baby (0-2)', 'Toddler (2-4)', 'Kids (4-8)', 'Pre-Teen (9-12)',
+    'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'
+  ];
+  final List<String> shoeSizes = List.generate(14, (index) => (34 + index).toString());
+
   SupabaseHomeViewModel(this._supabaseClient)
       : super(SupabaseHomeInitialState());
 
@@ -40,15 +47,31 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       selectedRoot: root,
       selectedSub: sub,
       selectedLeaf: leaf,
+      applyFilter: true,
     );
   }
 
   void setBrandFilters(Set<int> brandIds) {
     if (state is! SupabaseHomeLoadedState) return;
-    fetchProducts(selectedBrandIds: brandIds);
+    fetchProducts(selectedBrandIds: brandIds, applyFilter: true);
+  }
+
+  void setSizeFilters(List<String> sizes) {
+    if (state is! SupabaseHomeLoadedState) return;
+    fetchProducts(selectedSizesOrAges: sizes, applyFilter: true);
   }
 
   /* -------------------- HELPERS -------------------- */
+
+  bool isShoeCategory(Category? leaf, Category? sub, Category? root) {
+    final slugToCheck = (leaf?.slug ?? sub?.slug ?? root?.slug ?? '').toLowerCase();
+    return slugToCheck.contains('shoe') || slugToCheck.contains('boot') || slugToCheck.contains('sneaker');
+  }
+  
+  bool isFashionCategory(Category? root) {
+     final rootSlug = root?.slug.toLowerCase() ?? '';
+     return rootSlug == 'fashion' || rootSlug == 'clothing' || rootSlug.contains('cloth');
+  }
 
   List<Category> getRootCategories(List<Category> all) {
     return all.where((c) => c.parentId == null).toList();
@@ -85,6 +108,8 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     Category? selectedSub,
     Category? selectedLeaf,
     Set<int>? selectedBrandIds,
+    List<String>? selectedSizesOrAges,
+    bool applyFilter = false,
   }) async {
     SupabaseHomeLoadedState currentState =
         state is SupabaseHomeLoadedState
@@ -95,7 +120,6 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
     try {
       /* -------- Initial lookup data -------- */
-
       if (currentState.allCategories.isEmpty ||
           currentState.allBrands.isEmpty) {
         final results = await Future.wait([
@@ -118,29 +142,34 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       final finalDateSort = dateSort ?? currentState.dateSort;
       final finalPopularitySort =
           popularitySort ?? currentState.popularitySort;
-      final finalBrandIds =
-          selectedBrandIds ?? currentState.selectedBrandIds;
       
-      // Handle Hierarchy
-      // If passing null explicitly for logic, we need to know. 
-      // But assuming View passes the new set.
-      final activeRoot = selectedRoot ?? currentState.selectedRootCategory;
-      final activeSub = selectedSub ?? currentState.selectedSubCategory;
-      final activeLeaf = selectedLeaf ?? currentState.selectedLeafCategory;
+      // Handle Filters
+      // If applyFilter is true, use the passed values (even if null/empty) to override.
+      // Otherwise, fallback to current state.
+      
+      final activeRoot = applyFilter ? selectedRoot : (selectedRoot ?? currentState.selectedRootCategory);
+      final activeSub = applyFilter ? selectedSub : (selectedSub ?? currentState.selectedSubCategory);
+      final activeLeaf = applyFilter ? selectedLeaf : (selectedLeaf ?? currentState.selectedLeafCategory);
+      
+      final finalBrandIds = applyFilter 
+          ? (selectedBrandIds ?? const {}) 
+          : (selectedBrandIds ?? currentState.selectedBrandIds);
+          
+      final finalSizes = applyFilter 
+          ? (selectedSizesOrAges ?? const []) 
+          : (selectedSizesOrAges ?? currentState.selectedSizesOrAges);
 
       /* -------- Base query -------- */
       
-      // Use products_with_wishlist_count if available for popularity sort,
-      // otherwise fallback to products.
+      // Use products table by default to ensure we have all latest columns (like target_age_group).
       var baseQuery = _supabaseClient
-          .from('products_with_wishlist_count')
+          .from('products')
           .select('*, product_images(image_url, is_primary, sort_order)')
           .eq('is_active', true);
 
       PostgrestFilterBuilder currentFilteredQuery = baseQuery;
 
-      /* -------- Filters -------- */
-
+      /* -------- Text Search -------- */
       if (finalQuery.isNotEmpty) {
         currentFilteredQuery = currentFilteredQuery.ilike('name', '%$finalQuery%');
       }
@@ -155,12 +184,12 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         currentFilteredQuery = currentFilteredQuery.inFilter('category_id', descendantIds);
       }
 
+      /* -------- Brand Filter -------- */
       if (finalBrandIds.isNotEmpty) {
         currentFilteredQuery = currentFilteredQuery.inFilter('brand_id', finalBrandIds.toList());
       }
 
       /* -------- Sorting -------- */
-
       PostgrestTransformBuilder finalOrderedQuery;
 
       if (finalPriceSort != PriceSort.none) {
@@ -169,10 +198,8 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           ascending: finalPriceSort == PriceSort.lowToHigh,
         );
       } else if (finalPopularitySort != PopularitySort.none) {
-        finalOrderedQuery = currentFilteredQuery.order(
-          'wishlist_count',
-          ascending: false,
-        );
+        // Fallback to price if wishlist_count column missing on raw table
+        finalOrderedQuery = currentFilteredQuery.order('price'); 
       } else {
         finalOrderedQuery = currentFilteredQuery.order(
           'created_at',
@@ -180,12 +207,22 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         );
       }
 
-      /* -------- Execute -------- */
-
+      /* -------- Execute & Client-side Size Filter -------- */
       final response = await finalOrderedQuery;
-      final products = (response as List)
+      var products = (response as List)
           .map((e) => Product.fromJson(e))
           .toList();
+
+      // Client-side filtering for sizes (comma-separated string in DB)
+      if (finalSizes.isNotEmpty) {
+        products = products.where((p) {
+          if (p.targetAgeGroup == null) return false;
+          // DB: "S, M, L" -> List: ["S", "M", "L"]
+          final productSizes = p.targetAgeGroup!.split(',').map((e) => e.trim()).toList();
+          // Check intersection: Does product have *any* of the selected filters?
+          return productSizes.any((s) => finalSizes.contains(s));
+        }).toList();
+      }
 
       stateChanger(
         SupabaseHomeLoadedState(
@@ -200,32 +237,11 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           selectedSubCategory: activeSub,
           selectedLeafCategory: activeLeaf,
           selectedBrandIds: finalBrandIds,
+          selectedSizesOrAges: finalSizes,
         ),
       );
     } catch (e) {
-      // Fallback if view doesn't exist or error occurs, try basic products table
-      if (e.toString().contains('relation "public.products_with_wishlist_count" does not exist')) {
-         try {
-             // Re-apply filters on basic table
-             var fallbackQuery = _supabaseClient
-              .from('products')
-              .select('*, product_images(image_url, is_primary, sort_order)')
-              .eq('is_active', true);
-             
-             // ... apply same filters again for fallback ... 
-             // To save time/code duplication, for now just basic fetch or minimal fallback
-             // Better: refactor query building. But keeping it simple for CLI agent.
-             
-             final response = await fallbackQuery.order('created_at', ascending: false);
-             final products = (response as List).map((data) => Product.fromJson(data)).toList();
-             
-             stateChanger(SupabaseHomeLoadedState(products: products));
-         } catch (fallbackError) {
-             stateChanger(SupabaseHomeErrorState('Failed to load products: $fallbackError'));
-         }
-      } else {
-         stateChanger(SupabaseHomeErrorState('Failed to load products: $e'));
-      }
+      stateChanger(SupabaseHomeErrorState('Failed to load products: $e'));
     }
   }
 }

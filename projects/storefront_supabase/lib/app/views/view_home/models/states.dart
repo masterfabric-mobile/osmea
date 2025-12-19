@@ -25,6 +25,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final Category? selectedSubCategory;
   final Category? selectedLeafCategory;
   final Set<int> selectedBrandIds;
+  final List<String> selectedSizesOrAges;
 
   SupabaseHomeLoadedState({
     required this.products,
@@ -38,6 +39,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     this.selectedSubCategory,
     this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
+    this.selectedSizesOrAges = const [],
   });
 
   SupabaseHomeLoadedState copyWith({
@@ -52,6 +54,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     Category? selectedSubCategory,
     Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
+    List<String>? selectedSizesOrAges,
   }) {
     return SupabaseHomeLoadedState(
       products: products ?? this.products,
@@ -65,6 +68,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
       selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
       selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
+      selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
     );
   }
 }
