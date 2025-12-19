@@ -25,7 +25,7 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
   Category? _selectedSub;
   Category? _selectedLeaf;
   Brand? _selectedBrand;
-  String? _selectedSizeOrAge;
+  List<String> _selectedSizesOrAges = []; // Changed to List
 
   // Options
   final List<String> clothingSizesAndAges = [
@@ -88,36 +88,45 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     priceController.text = (data['price'] ?? 0).toString();
     skuController.text = data['sku'] ?? '';
     stockController.text = (data['stock_quantity'] ?? 0).toString();
-    _selectedSizeOrAge = data['target_age_group'] as String?;
+    
+    // Convert string back to list (e.g. "S,M,L" -> ["S", "M", "L"])
+    final ageGroupStr = data['target_age_group'] as String?;
+    if (ageGroupStr != null && ageGroupStr.isNotEmpty) {
+      _selectedSizesOrAges = ageGroupStr.split(',').map((e) => e.trim()).toList();
+    } else {
+      _selectedSizesOrAges = [];
+    }
 
     if (data['brand'] != null) {
-      final brandId = data['brand']['id']; // assuming id comes as int
-      // fix for type mismatch if needed, usually int
-      _selectedBrand = allBrands.firstWhere((b) => b.id == brandId, orElse: () => Brand.fromJson(data['brand']));
+      final brandId = data['brand']['id']; 
+      // Safe find
+      _selectedBrand = allBrands.firstWhere(
+        (b) => b.id == brandId, 
+        orElse: () => Brand.fromJson(data['brand'])
+      );
     }
 
     if (data['categories'] != null) {
       final catId = data['categories']['id'] as String;
-      final category = allCats.firstWhere((c) => c.id == catId, orElse: () => Category.fromJson(data['categories']));
+      // Safe find for category
+      final category = allCats.firstWhere(
+        (c) => c.id == catId, 
+        orElse: () => Category.fromJson(data['categories'])
+      );
       
-      // Attempt to reconstruct hierarchy (Leaf -> Sub -> Root)
-      // This is a simple reconstruction, assumes max 3 levels.
       if (category.parentId != null) {
         final parent = allCats.firstWhere((c) => c.id == category.parentId, orElse: () => category);
         if (parent.parentId != null) {
-           // It's a leaf (Level 3)
            final root = allCats.firstWhere((c) => c.id == parent.parentId, orElse: () => parent);
            _selectedRoot = root;
            _selectedSub = parent;
            _selectedLeaf = category;
         } else {
-           // It's a sub (Level 2)
            _selectedRoot = parent;
            _selectedSub = category;
            _selectedLeaf = null;
         }
       } else {
-        // It's a root (Level 1)
         _selectedRoot = category;
         _selectedSub = null;
         _selectedLeaf = null;
@@ -135,7 +144,7 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     _selectedSub = null;
     _selectedLeaf = null;
     _selectedBrand = null;
-    _selectedSizeOrAge = null;
+    _selectedSizesOrAges = [];
   }
 
   void _emitLoadedState(List<Category> allCategories, List<Brand> brands, [String? existingImageUrl]) {
@@ -147,7 +156,7 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
       selectedSubCategory: _selectedSub,
       selectedLeafCategory: _selectedLeaf,
       selectedBrand: _selectedBrand,
-      selectedSizeOrAge: _selectedSizeOrAge,
+      selectedSizesOrAges: _selectedSizesOrAges,
     ));
   }
 
@@ -158,7 +167,7 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     _selectedRoot = category;
     _selectedSub = null;
     _selectedLeaf = null;
-    _selectedSizeOrAge = null; // Reset size when category tree changes
+    _selectedSizesOrAges = []; 
     _refreshState();
   }
 
@@ -166,14 +175,14 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     if (state is! AddProductLoaded) return;
     _selectedSub = category;
     _selectedLeaf = null;
-    _selectedSizeOrAge = null;
+    _selectedSizesOrAges = [];
     _refreshState();
   }
 
   void onLeafCategoryChanged(Category? category) {
     if (state is! AddProductLoaded) return;
     _selectedLeaf = category;
-    _selectedSizeOrAge = null;
+    _selectedSizesOrAges = [];
     _refreshState();
   }
   
@@ -183,9 +192,15 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     _refreshState();
   }
 
-  void onSizeOrAgeChanged(String? val) {
+  // Multi-select toggle
+  void toggleSizeOrAge(String val) {
     if (state is! AddProductLoaded) return;
-    _selectedSizeOrAge = val;
+    
+    if (_selectedSizesOrAges.contains(val)) {
+      _selectedSizesOrAges.remove(val);
+    } else {
+      _selectedSizesOrAges.add(val);
+    }
     _refreshState();
   }
 
@@ -196,7 +211,7 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
       selectedSubCategory: _selectedSub,
       selectedLeafCategory: _selectedLeaf,
       selectedBrand: _selectedBrand,
-      selectedSizeOrAge: _selectedSizeOrAge,
+      selectedSizesOrAges: _selectedSizesOrAges,
     ));
   }
   
@@ -211,7 +226,6 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
   }
 
   bool get isShoeCategory {
-    // Check if any selected category implies 'shoes'
     final slugToCheck = (_selectedLeaf?.slug ?? _selectedSub?.slug ?? _selectedRoot?.slug ?? '').toLowerCase();
     return slugToCheck.contains('shoe') || slugToCheck.contains('boot') || slugToCheck.contains('sneaker');
   }
@@ -227,7 +241,6 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
     if (state is! AddProductLoaded) return;
     final currentState = state as AddProductLoaded;
     
-    // Determine the deepest selected category
     final finalCategory = _selectedLeaf ?? _selectedSub ?? _selectedRoot;
 
     if (finalCategory == null || _selectedBrand == null) {
@@ -270,7 +283,8 @@ class AddProductViewModel extends BaseViewModelCubit<AddProductState> {
         'stock_quantity': int.parse(stockController.text),
         'category_id': finalCategory.id,
         'brand_id': _selectedBrand!.id,
-        'target_age_group': _selectedSizeOrAge, // Save size/age here
+        // Convert list to comma-separated string for DB
+        'target_age_group': _selectedSizesOrAges.join(','), 
       };
 
       if (!isEditMode) {

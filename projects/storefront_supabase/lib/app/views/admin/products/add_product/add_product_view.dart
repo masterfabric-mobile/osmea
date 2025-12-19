@@ -141,7 +141,7 @@ class AddProductView
                 Row(
                   children: [
                     Expanded(
-                      child: _buildDropdown<Brand>(
+                      child: _buildSafeDropdown<Brand>(
                         'Brand',
                         state.brands,
                         (b) => b.name,
@@ -179,7 +179,7 @@ class AddProductView
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDropdown<Category>(
+        _buildSafeDropdown<Category>(
           'Main Category',
           rootCats,
           (c) => c.name,
@@ -188,7 +188,7 @@ class AddProductView
         ),
         if (state.selectedRootCategory != null && subCats.isNotEmpty) ...[
           const SizedBox(height: 16),
-          _buildDropdown<Category>(
+          _buildSafeDropdown<Category>(
             'Sub Category',
             subCats,
             (c) => c.name,
@@ -198,7 +198,7 @@ class AddProductView
         ],
         if (state.selectedSubCategory != null && leafCats.isNotEmpty) ...[
           const SizedBox(height: 16),
-          _buildDropdown<Category>(
+          _buildSafeDropdown<Category>(
             'Specific Category',
             leafCats,
             (c) => c.name,
@@ -211,24 +211,80 @@ class AddProductView
   }
 
   Widget _buildDynamicSizeSelector(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
+    List<String> options = [];
+    String label = '';
+
     if (viewModel.isShoeCategory) {
-      return _buildDropdown<String>(
-        'Shoe Size',
-        viewModel.shoeSizes,
-        (val) => val,
-        state.selectedSizeOrAge,
-        viewModel.onSizeOrAgeChanged,
-      );
+      options = viewModel.shoeSizes;
+      label = 'Select Shoe Sizes';
     } else if (viewModel.isFashionCategory) {
-      return _buildDropdown<String>(
-        'Size / Age Group',
-        viewModel.clothingSizesAndAges,
-        (val) => val,
-        state.selectedSizeOrAge,
-        viewModel.onSizeOrAgeChanged,
-      );
+      options = viewModel.clothingSizesAndAges;
+      label = 'Select Sizes / Age Groups';
+    } else {
+      return const SizedBox.shrink();
     }
-    return const SizedBox.shrink(); // Hide for Electronics, etc.
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 4.0,
+          children: options.map((option) {
+            final isSelected = state.selectedSizesOrAges.contains(option);
+            return FilterChip(
+              label: Text(option),
+              selected: isSelected,
+              onSelected: (_) => viewModel.toggleSizeOrAge(option),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// A safer dropdown builder that ensures the selected item exists in the list.
+  /// If [selectedItem] is not null but not in [items], it resets the selection to null (or handles it gracefully).
+  Widget _buildSafeDropdown<T>(
+    String label,
+    List<T> items,
+    String Function(T) itemToString,
+    T? selectedItem,
+    void Function(T?) onChanged,
+  ) {
+    // Check if the selected item is actually in the list based on object identity or equality
+    T? effectiveValue;
+    if (selectedItem != null) {
+      try {
+        effectiveValue = items.firstWhere((item) => item == selectedItem);
+      } catch (e) {
+        effectiveValue = null; // Item not found, reset selection
+      }
+    }
+
+    return DropdownButtonFormField<T>(
+      value: effectiveValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<T>(
+          value: item,
+          child: Text(itemToString(item)),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      validator: (value) {
+        // Only validate if items are available (meaning selection is expected)
+        if (items.isNotEmpty && value == null) {
+          return 'Please select a $label';
+        }
+        return null;
+      },
+    );
   }
 
   Widget _buildImagePicker(BuildContext context, AddProductViewModel viewModel,

@@ -19,7 +19,7 @@ class AddProductLoaded extends AddProductState {
   final Category? selectedLeafCategory; // The deepest selected level
   
   final Brand? selectedBrand;
-  final String? selectedSizeOrAge; // Holds 'XS', '42', 'Kids (4-8)', etc.
+  final List<String> selectedSizesOrAges; // Changed to List for multi-select
   
   final File? image;
   final String? existingImageUrl;
@@ -32,7 +32,7 @@ class AddProductLoaded extends AddProductState {
     this.selectedSubCategory,
     this.selectedLeafCategory,
     this.selectedBrand,
-    this.selectedSizeOrAge,
+    this.selectedSizesOrAges = const [], // Default empty list
     this.image,
     this.existingImageUrl,
     this.errorMessage,
@@ -45,7 +45,7 @@ class AddProductLoaded extends AddProductState {
     Category? selectedSubCategory,
     Category? selectedLeafCategory,
     Brand? selectedBrand,
-    String? selectedSizeOrAge,
+    List<String>? selectedSizesOrAges,
     File? image,
     String? existingImageUrl,
     String? errorMessage,
@@ -57,7 +57,7 @@ class AddProductLoaded extends AddProductState {
       selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
       selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrand: selectedBrand ?? this.selectedBrand,
-      selectedSizeOrAge: selectedSizeOrAge ?? this.selectedSizeOrAge,
+      selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
       image: image ?? this.image,
       existingImageUrl: existingImageUrl ?? this.existingImageUrl,
       errorMessage: errorMessage,
