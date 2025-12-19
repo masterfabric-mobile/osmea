@@ -10,38 +10,54 @@ class AddProductInitial extends AddProductState {}
 class AddProductLoading extends AddProductState {}
 
 class AddProductLoaded extends AddProductState {
-  final List<Category> categories;
+  final List<Category> allCategories; // Holds raw list
   final List<Brand> brands;
-  final Category? selectedCategory;
+  
+  // Hierarchical Selections
+  final Category? selectedRootCategory;
+  final Category? selectedSubCategory;
+  final Category? selectedLeafCategory; // The deepest selected level
+  
   final Brand? selectedBrand;
+  final String? selectedSizeOrAge; // Holds 'XS', '42', 'Kids (4-8)', etc.
+  
   final File? image;
   final String? existingImageUrl;
   final String? errorMessage;
 
   AddProductLoaded({
-    required this.categories,
+    required this.allCategories,
     required this.brands,
-    this.selectedCategory,
+    this.selectedRootCategory,
+    this.selectedSubCategory,
+    this.selectedLeafCategory,
     this.selectedBrand,
+    this.selectedSizeOrAge,
     this.image,
     this.existingImageUrl,
     this.errorMessage,
   });
 
   AddProductLoaded copyWith({
-    List<Category>? categories,
+    List<Category>? allCategories,
     List<Brand>? brands,
-    Category? selectedCategory,
+    Category? selectedRootCategory,
+    Category? selectedSubCategory,
+    Category? selectedLeafCategory,
     Brand? selectedBrand,
+    String? selectedSizeOrAge,
     File? image,
     String? existingImageUrl,
     String? errorMessage,
   }) {
     return AddProductLoaded(
-      categories: categories ?? this.categories,
+      allCategories: allCategories ?? this.allCategories,
       brands: brands ?? this.brands,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedRootCategory: selectedRootCategory ?? this.selectedRootCategory,
+      selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
+      selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrand: selectedBrand ?? this.selectedBrand,
+      selectedSizeOrAge: selectedSizeOrAge ?? this.selectedSizeOrAge,
       image: image ?? this.image,
       existingImageUrl: existingImageUrl ?? this.existingImageUrl,
       errorMessage: errorMessage,

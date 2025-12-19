@@ -55,15 +55,15 @@ class CategoriesView
     }
 
     if (state is CategoriesLoadedState) {
-      if (state.categories.isEmpty) {
+      if (state.rootCategories.isEmpty) {
         return Center(
           child: OsmeaComponents.text('No categories found.'),
         );
       }
       return ListView.builder(
-        itemCount: state.categories.length,
+        itemCount: state.rootCategories.length,
         itemBuilder: (context, index) {
-          final category = state.categories[index];
+          final category = state.rootCategories[index];
           return OsmeaComponents.listItem(
             title: OsmeaComponents.text(category.name),
             trailing: const Icon(Icons.chevron_right),

@@ -128,17 +128,15 @@ class AddProductView
                 _buildTextField(viewModel.stockController, 'Stock Quantity',
                     keyboardType: TextInputType.number),
                 const SizedBox(height: 24),
-                if (state.categories.isEmpty)
-                  _buildDisabledDropdown('Category',
-                      'No categories found. Please add a category first.')
-                else
-                  _buildDropdown<Category>(
-                    'Category',
-                    state.categories,
-                    (c) => c.name,
-                    viewModel.selectedCategory,
-                    viewModel.onCategoryChanged,
-                  ),
+                
+                // --- CATEGORY HIERARCHY ---
+                _buildCategoryHierarchy(context, viewModel, state),
+                
+                const SizedBox(height: 16),
+                
+                // --- DYNAMIC SIZE/AGE SELECTOR ---
+                _buildDynamicSizeSelector(context, viewModel, state),
+
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -147,7 +145,7 @@ class AddProductView
                         'Brand',
                         state.brands,
                         (b) => b.name,
-                        viewModel.selectedBrand,
+                        state.selectedBrand,
                         viewModel.onBrandChanged,
                       ),
                     ),
@@ -171,6 +169,66 @@ class AddProductView
     }
 
     return const Center(child: Text('An unexpected state occurred.'));
+  }
+
+  Widget _buildCategoryHierarchy(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
+    final rootCats = viewModel.getRootCategories(state.allCategories);
+    final subCats = viewModel.getSubCategories(state.allCategories, state.selectedRootCategory?.id);
+    final leafCats = viewModel.getSubCategories(state.allCategories, state.selectedSubCategory?.id);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDropdown<Category>(
+          'Main Category',
+          rootCats,
+          (c) => c.name,
+          state.selectedRootCategory,
+          viewModel.onRootCategoryChanged,
+        ),
+        if (state.selectedRootCategory != null && subCats.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildDropdown<Category>(
+            'Sub Category',
+            subCats,
+            (c) => c.name,
+            state.selectedSubCategory,
+            viewModel.onSubCategoryChanged,
+          ),
+        ],
+        if (state.selectedSubCategory != null && leafCats.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildDropdown<Category>(
+            'Specific Category',
+            leafCats,
+            (c) => c.name,
+            state.selectedLeafCategory,
+            viewModel.onLeafCategoryChanged,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDynamicSizeSelector(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
+    if (viewModel.isShoeCategory) {
+      return _buildDropdown<String>(
+        'Shoe Size',
+        viewModel.shoeSizes,
+        (val) => val,
+        state.selectedSizeOrAge,
+        viewModel.onSizeOrAgeChanged,
+      );
+    } else if (viewModel.isFashionCategory) {
+      return _buildDropdown<String>(
+        'Size / Age Group',
+        viewModel.clothingSizesAndAges,
+        (val) => val,
+        state.selectedSizeOrAge,
+        viewModel.onSizeOrAgeChanged,
+      );
+    }
+    return const SizedBox.shrink(); // Hide for Electronics, etc.
   }
 
   Widget _buildImagePicker(BuildContext context, AddProductViewModel viewModel,

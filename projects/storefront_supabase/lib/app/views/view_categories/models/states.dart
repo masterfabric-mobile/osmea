@@ -8,9 +8,11 @@ class CategoriesLoadingState extends CategoriesState {}
 
 class CategoriesLoadedState extends CategoriesState {
   final List<Category> categories;
+  final List<Category> rootCategories;
 
   CategoriesLoadedState({
     required this.categories,
+    required this.rootCategories,
   });
 }
 
