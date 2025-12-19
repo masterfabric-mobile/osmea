@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/product_filters.dart';
+import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'states.dart';
 

@@ -3,7 +3,7 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/product_filters.dart';
+import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/states.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/view_model.dart';
 
@@ -73,11 +73,145 @@ class AdminProductsView
             ),
           ),
           IconButton(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort',
+            onPressed: () => _showSortSheet(context, viewModel, state),
+          ),
+          IconButton(
             icon: const Icon(Icons.filter_list),
+            tooltip: 'Filter',
             onPressed: () => _showFilterSheet(context, viewModel, state),
           ),
         ],
       ),
+    );
+  }
+
+  void _showSortSheet(
+    BuildContext context,
+    AdminProductsViewModel viewModel,
+    AdminProductsLoaded currentState,
+  ) {
+    var tempPriceSort = currentState.priceSort;
+    var tempDateSort = currentState.dateSort;
+    var tempPopularitySort = currentState.popularitySort;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.4,
+              maxChildSize: 0.6,
+              builder: (context, scrollController) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Sort',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        children: [
+                          _buildSortSection(
+                            context,
+                            'Sort by Date',
+                            tempDateSort,
+                            DateSort.values,
+                            (sort) {
+                              setModalState(() {
+                                tempDateSort = sort as DateSort;
+                                tempPriceSort = PriceSort.none;
+                                tempPopularitySort = PopularitySort.none;
+                              });
+                            },
+                          ),
+                          _buildSortSection(
+                            context,
+                            'Sort by Popularity',
+                            tempPopularitySort,
+                            PopularitySort.values,
+                            (sort) {
+                              setModalState(() {
+                                tempPopularitySort = sort as PopularitySort;
+                                tempPriceSort = PriceSort.none;
+                                tempDateSort = DateSort.none;
+                              });
+                            },
+                          ),
+                          _buildSortSection(
+                            context,
+                            'Sort by Price',
+                            tempPriceSort,
+                            PriceSort.values,
+                            (sort) {
+                              setModalState(() {
+                                tempPriceSort = sort as PriceSort;
+                                tempDateSort = DateSort.none;
+                                tempPopularitySort = PopularitySort.none;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setModalState(() {
+                                  tempPriceSort = PriceSort.none;
+                                  tempDateSort = DateSort.newestFirst;
+                                  tempPopularitySort = PopularitySort.none;
+                                });
+                              },
+                              child: const Text('Clear'),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                viewModel.fetchProducts(
+                                  priceSort: tempPriceSort,
+                                  dateSort: tempDateSort,
+                                  popularitySort: tempPopularitySort,
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Apply'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
@@ -86,14 +220,8 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsLoaded currentState,
   ) {
-    // ✅ TEMP STATE’LER BURADA (KRİTİK NOKTA)
-    var tempPriceSort = currentState.priceSort;
-    var tempDateSort = currentState.dateSort;
-    var tempPopularitySort = currentState.popularitySort;
-    var tempSelectedCatIds =
-        Set<String>.from(currentState.selectedCategoryIds);
-    var tempSelectedBrandIds =
-        Set<int>.from(currentState.selectedBrandIds);
+    var tempSelectedCatIds = Set<String>.from(currentState.selectedCategoryIds);
+    var tempSelectedBrandIds = Set<int>.from(currentState.selectedBrandIds);
 
     showModalBottomSheet(
       context: context,
@@ -129,46 +257,6 @@ class AdminProductsView
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         children: [
-                          _buildSortSection(
-                            context,
-                            'Sort by Date',
-                            tempDateSort,
-                            DateSort.values,
-                            (sort) {
-                              setModalState(() {
-                                tempDateSort = sort as DateSort;
-                                tempPriceSort = PriceSort.none;
-                                tempPopularitySort = PopularitySort.none;
-                              });
-                            },
-                          ),
-                          _buildSortSection(
-                            context,
-                            'Sort by Popularity',
-                            tempPopularitySort,
-                            PopularitySort.values,
-                            (sort) {
-                              setModalState(() {
-                                tempPopularitySort =
-                                    sort as PopularitySort;
-                                tempPriceSort = PriceSort.none;
-                                tempDateSort = DateSort.none;
-                              });
-                            },
-                          ),
-                          _buildSortSection(
-                            context,
-                            'Sort by Price',
-                            tempPriceSort,
-                            PriceSort.values,
-                            (sort) {
-                              setModalState(() {
-                                tempPriceSort = sort as PriceSort;
-                                tempDateSort = DateSort.none;
-                                tempPopularitySort = PopularitySort.none;
-                              });
-                            },
-                          ),
                           _buildCheckboxFilterSection<Category, String>(
                             context,
                             'Categories',
@@ -210,10 +298,6 @@ class AdminProductsView
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
-                                  tempPriceSort = PriceSort.none;
-                                  tempDateSort = DateSort.newestFirst;
-                                  tempPopularitySort =
-                                      PopularitySort.none;
                                   tempSelectedCatIds.clear();
                                   tempSelectedBrandIds.clear();
                                 });
@@ -226,13 +310,8 @@ class AdminProductsView
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
-                                  priceSort: tempPriceSort,
-                                  dateSort: tempDateSort,
-                                  popularitySort: tempPopularitySort,
-                                  selectedCategoryIds:
-                                      tempSelectedCatIds,
-                                  selectedBrandIds:
-                                      tempSelectedBrandIds,
+                                  selectedCategoryIds: tempSelectedCatIds,
+                                  selectedBrandIds: tempSelectedBrandIds,
                                 );
                                 Navigator.pop(context);
                               },
