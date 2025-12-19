@@ -164,14 +164,32 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       // Use products table by default to ensure we have all latest columns (like target_age_group).
       var baseQuery = _supabaseClient
           .from('products')
-          .select('*, product_images(image_url, is_primary, sort_order)')
+          .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
           .eq('is_active', true);
 
       PostgrestFilterBuilder currentFilteredQuery = baseQuery;
 
       /* -------- Text Search -------- */
       if (finalQuery.isNotEmpty) {
-        currentFilteredQuery = currentFilteredQuery.ilike('name', '%$finalQuery%');
+        final sanitizedQuery = finalQuery.replaceAll(',', ' ');
+        
+        // 1. Find brands that match the query
+        final brandResponse = await _supabaseClient
+            .from('brand')
+            .select('id')
+            .ilike('name', '%$sanitizedQuery%');
+        
+        final brandIds = (brandResponse as List)
+            .map((e) => e['id'] as int)
+            .toList();
+
+        // 2. Build the OR filter string
+        String orFilter = 'name.ilike.*$sanitizedQuery*';
+        if (brandIds.isNotEmpty) {
+          orFilter += ',brand_id.in.(${brandIds.join(',')})';
+        }
+        
+        currentFilteredQuery = currentFilteredQuery.or(orFilter);
       }
 
       /* -------- Hierarchy Filter (Deep Search) -------- */

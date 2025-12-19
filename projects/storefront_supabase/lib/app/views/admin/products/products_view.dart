@@ -478,36 +478,43 @@ class AdminProductsView
     }
 
     if (state is AdminProductsLoaded) {
-      if (state.products.isEmpty) {
+      if (state.products.isEmpty && !state.isLoading) {
         return const Center(child: Text('No products found.'));
       }
 
-      return RefreshIndicator(
-        onRefresh: viewModel.fetchProducts,
-        child: ListView.builder(
-          itemCount: state.products.length,
-          itemBuilder: (context, index) {
-            final product = state.products[index];
-            return ListTile(
-              leading: Image.network(
-                product.imageUrl,
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.error, size: 40),
+      return Column(
+        children: [
+          if (state.isLoading) const LinearProgressIndicator(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: viewModel.fetchProducts,
+              child: ListView.builder(
+                itemCount: state.products.length,
+                itemBuilder: (context, index) {
+                  final product = state.products[index];
+                  return ListTile(
+                    leading: Image.network(
+                      product.imageUrl,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.error, size: 40),
+                    ),
+                    title: Text(product.name),
+                    subtitle:
+                        Text('\$${product.price.toStringAsFixed(2)}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () =>
+                          context.go('/admin/products/edit/${product.id}'),
+                    ),
+                  );
+                },
               ),
-              title: Text(product.name),
-              subtitle:
-                  Text('\$${product.price.toStringAsFixed(2)}'),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () =>
-                    context.go('/admin/products/edit/${product.id}'),
-              ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       );
     }
 

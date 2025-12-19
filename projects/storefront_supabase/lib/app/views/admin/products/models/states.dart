@@ -27,6 +27,7 @@ class AdminProductsLoaded extends AdminProductsState {
   
   final Set<int> selectedBrandIds;
   final List<String> selectedSizesOrAges; // Multi-select sizes
+  final bool isLoading;
 
   AdminProductsLoaded({
     required this.products,
@@ -41,6 +42,7 @@ class AdminProductsLoaded extends AdminProductsState {
     this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
     this.selectedSizesOrAges = const [],
+    this.isLoading = false,
   });
 
   AdminProductsLoaded copyWith({
@@ -56,6 +58,7 @@ class AdminProductsLoaded extends AdminProductsState {
     Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
     List<String>? selectedSizesOrAges,
+    bool? isLoading,
   }) {
     return AdminProductsLoaded(
       products: products ?? this.products,
@@ -70,6 +73,7 @@ class AdminProductsLoaded extends AdminProductsState {
       selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
       selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }

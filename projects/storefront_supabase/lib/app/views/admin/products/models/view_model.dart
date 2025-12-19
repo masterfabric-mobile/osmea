@@ -92,11 +92,14 @@ class AdminProductsViewModel
     Set<int>? selectedBrandIds,
     List<String>? selectedSizesOrAges,
   }) async {
-    AdminProductsLoaded currentState = state is AdminProductsLoaded
-        ? state as AdminProductsLoaded
-        : AdminProductsLoaded(products: []);
-
-    stateChanger(AdminProductsLoading());
+    AdminProductsLoaded currentState;
+    if (state is AdminProductsLoaded) {
+      currentState = state as AdminProductsLoaded;
+      stateChanger(currentState.copyWith(isLoading: true));
+    } else {
+      stateChanger(AdminProductsLoading());
+      currentState = AdminProductsLoaded(products: []);
+    }
 
     try {
       /* -------- Initial lookup data -------- */
@@ -139,14 +142,32 @@ class AdminProductsViewModel
 
       var baseQuery = _supabaseClient
           .from('products') // Using standard table to avoid view dependency issues for now
-          .select('*, product_images(*)')
+          .select('*, product_images(*), brand(name)')
           .eq('is_active', true);
 
       PostgrestFilterBuilder currentFilteredQuery = baseQuery;
 
       /* -------- Text Search -------- */
       if (finalQuery.isNotEmpty) {
-        currentFilteredQuery = currentFilteredQuery.ilike('name', '%$finalQuery%');
+        final sanitizedQuery = finalQuery.replaceAll(',', ' ');
+        
+        // 1. Find brands that match the query
+        final brandResponse = await _supabaseClient
+            .from('brand')
+            .select('id')
+            .ilike('name', '%$sanitizedQuery%');
+        
+        final brandIds = (brandResponse as List)
+            .map((e) => e['id'] as int)
+            .toList();
+
+        // 2. Build the OR filter string
+        String orFilter = 'name.ilike.*$sanitizedQuery*';
+        if (brandIds.isNotEmpty) {
+          orFilter += ',brand_id.in.(${brandIds.join(',')})';
+        }
+        
+        currentFilteredQuery = currentFilteredQuery.or(orFilter);
       }
 
       /* -------- Hierarchy Filter (Deep Search) -------- */
@@ -211,6 +232,7 @@ class AdminProductsViewModel
           selectedLeafCategory: activeLeaf,
           selectedBrandIds: finalBrandIds,
           selectedSizesOrAges: finalSizes,
+          isLoading: false,
         ),
       );
     } catch (e) {
