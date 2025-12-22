@@ -4,6 +4,7 @@ class Category {
   final String slug;
   final String? description;
   final String? imageUrl;
+  final String? parentId;
 
   Category({
     required this.id,
@@ -11,6 +12,7 @@ class Category {
     required this.slug,
     this.description,
     this.imageUrl,
+    this.parentId,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Category {
       slug: json['slug'] as String,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
+      parentId: json['parent_id'] as String?,
     );
   }
 

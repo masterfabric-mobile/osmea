@@ -18,6 +18,7 @@ Future<GetIt> configureDependencies({String? environment}) async {
     getIt = await Core().init(getIt);
     debugPrint('✅ Core dependencies initialized');
 
+
     // Register Supabase client
     if (!getIt.isRegistered<SupabaseClient>()) {
       getIt.registerSingleton<SupabaseClient>(Supabase.instance.client);

@@ -171,7 +171,9 @@ class AdminDashboardView
                   ? Text(user.fullName?.substring(0, 1) ?? '?')
                   : null,
             ),
-            title: Text(user.fullName ?? 'Unnamed User'),
+            title: Text(user.username != null
+                ? '${user.fullName ?? 'Unnamed'} (@${user.username})'
+                : user.fullName ?? 'Unnamed User'),
             subtitle: Text('Joined ${DateFormat.yMMMd().format(user.createdAt)}'),
           );
         }).toList(),

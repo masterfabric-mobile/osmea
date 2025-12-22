@@ -31,6 +31,8 @@ import 'package:storefront_supabase/app/views/view_home/models/home_view_model.d
     as _i482;
 import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart'
     as _i421;
+import 'package:storefront_supabase/app/views/view_profile/change_password/models/view_model.dart'
+    as _i319;
 import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart'
     as _i56;
 import 'package:storefront_supabase/app/views/view_search/models/view_model.dart'
@@ -65,11 +67,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i56.ProfileViewModel>(
       () => _i56.ProfileViewModel(gh<_i454.SupabaseClient>()),
     );
+    gh.factory<_i319.ChangePasswordViewModel>(
+      () => _i319.ChangePasswordViewModel(gh<_i454.SupabaseClient>()),
+    );
     gh.factory<_i421.ProductDetailViewModel>(
       () => _i421.ProductDetailViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i1038.CategoriesViewModel>(
       () => _i1038.CategoriesViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i793.ProductsByCategoryViewModel>(
+      () => _i793.ProductsByCategoryViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i482.SupabaseHomeViewModel>(
       () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
@@ -79,9 +87,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i721.FavoritesViewModel>(
       () => _i721.FavoritesViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i793.ProductsByCategoryViewModel>(
-      () => _i793.ProductsByCategoryViewModel(gh<_i454.SupabaseClient>()),
     );
     return this;
   }

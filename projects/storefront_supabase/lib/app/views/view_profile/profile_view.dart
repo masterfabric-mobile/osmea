@@ -54,20 +54,69 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
     if (state is ProfileAuthenticated) {
       return ListView(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
+          _buildSectionHeader(context, 'Account'),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('My Information'),
+            leading: const Icon(Icons.person_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/info'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('My Addresses'),
+            leading: const Icon(Icons.location_on_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/addresses'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('Change Password'),
+            leading: const Icon(Icons.lock_reset_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/change-password'),
+          ),
+          
+          _buildSectionHeader(context, 'Shopping'),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('My Orders'),
+            leading: const Icon(Icons.shopping_bag_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/orders'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('My Reviews'),
+            leading: const Icon(Icons.star_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              // Navigate to reviews
+            },
+          ),
+
+          _buildSectionHeader(context, 'General'),
           OsmeaComponents.listItem(
             title: OsmeaComponents.text('Settings'),
-            leading: const Icon(Icons.settings),
+            leading: const Icon(Icons.settings_outlined),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => goRoute('/settings'),
           ),
-          if (state.userRole == 'admin')
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text('Help & Support'),
+            leading: const Icon(Icons.help_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+               // Navigate to help
+            },
+          ),
+
+          if (state.user.role == 'admin') ...[
+            _buildSectionHeader(context, 'Admin'),
             OsmeaComponents.listItem(
               title: OsmeaComponents.text('Admin Dashboard'),
-              leading: const Icon(Icons.admin_panel_settings),
+              leading: const Icon(Icons.admin_panel_settings_outlined),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => goRoute('/admin/dashboard'),
             ),
+          ],
         ],
       );
     }
@@ -112,5 +161,19 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
     // Fallback for any other state
     return const Center(child: Text('An unexpected error occurred.'));
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+      ),
+    );
   }
 }

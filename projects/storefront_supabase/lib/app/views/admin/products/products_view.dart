@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
-import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/product_filters.dart';
+import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/states.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/view_model.dart';
 
@@ -73,7 +72,13 @@ class AdminProductsView
             ),
           ),
           IconButton(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort',
+            onPressed: () => _showSortSheet(context, viewModel, state),
+          ),
+          IconButton(
             icon: const Icon(Icons.filter_list),
+            tooltip: 'Filter',
             onPressed: () => _showFilterSheet(context, viewModel, state),
           ),
         ],
@@ -81,19 +86,14 @@ class AdminProductsView
     );
   }
 
-  void _showFilterSheet(
+  void _showSortSheet(
     BuildContext context,
     AdminProductsViewModel viewModel,
     AdminProductsLoaded currentState,
   ) {
-    // ✅ TEMP STATE’LER BURADA (KRİTİK NOKTA)
     var tempPriceSort = currentState.priceSort;
     var tempDateSort = currentState.dateSort;
     var tempPopularitySort = currentState.popularitySort;
-    var tempSelectedCatIds =
-        Set<String>.from(currentState.selectedCategoryIds);
-    var tempSelectedBrandIds =
-        Set<int>.from(currentState.selectedBrandIds);
 
     showModalBottomSheet(
       context: context,
@@ -103,8 +103,8 @@ class AdminProductsView
           builder: (BuildContext context, StateSetter setModalState) {
             return DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.6,
-              maxChildSize: 0.9,
+              initialChildSize: 0.4,
+              maxChildSize: 0.6,
               builder: (context, scrollController) {
                 return Column(
                   children: [
@@ -114,7 +114,7 @@ class AdminProductsView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Filters',
+                            'Sort',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -149,8 +149,7 @@ class AdminProductsView
                             PopularitySort.values,
                             (sort) {
                               setModalState(() {
-                                tempPopularitySort =
-                                    sort as PopularitySort;
+                                tempPopularitySort = sort as PopularitySort;
                                 tempPriceSort = PriceSort.none;
                                 tempDateSort = DateSort.none;
                               });
@@ -169,36 +168,6 @@ class AdminProductsView
                               });
                             },
                           ),
-                          _buildCheckboxFilterSection<Category, String>(
-                            context,
-                            'Categories',
-                            currentState.allCategories,
-                            tempSelectedCatIds,
-                            (cat) => cat.name,
-                            (cat) => cat.id,
-                            (isSelected, id) {
-                              setModalState(() {
-                                isSelected
-                                    ? tempSelectedCatIds.add(id)
-                                    : tempSelectedCatIds.remove(id);
-                              });
-                            },
-                          ),
-                          _buildCheckboxFilterSection<Brand, int>(
-                            context,
-                            'Brands',
-                            currentState.allBrands,
-                            tempSelectedBrandIds,
-                            (brand) => brand.name,
-                            (brand) => brand.id,
-                            (isSelected, id) {
-                              setModalState(() {
-                                isSelected
-                                    ? tempSelectedBrandIds.add(id)
-                                    : tempSelectedBrandIds.remove(id);
-                              });
-                            },
-                          ),
                         ],
                       ),
                     ),
@@ -212,10 +181,7 @@ class AdminProductsView
                                 setModalState(() {
                                   tempPriceSort = PriceSort.none;
                                   tempDateSort = DateSort.newestFirst;
-                                  tempPopularitySort =
-                                      PopularitySort.none;
-                                  tempSelectedCatIds.clear();
-                                  tempSelectedBrandIds.clear();
+                                  tempPopularitySort = PopularitySort.none;
                                 });
                               },
                               child: const Text('Clear'),
@@ -229,10 +195,6 @@ class AdminProductsView
                                   priceSort: tempPriceSort,
                                   dateSort: tempDateSort,
                                   popularitySort: tempPopularitySort,
-                                  selectedCategoryIds:
-                                      tempSelectedCatIds,
-                                  selectedBrandIds:
-                                      tempSelectedBrandIds,
                                 );
                                 Navigator.pop(context);
                               },
@@ -252,6 +214,225 @@ class AdminProductsView
     );
   }
 
+  void _showFilterSheet(
+    BuildContext context,
+    AdminProductsViewModel viewModel,
+    AdminProductsLoaded currentState,
+  ) {
+    // Temp State for Filter Sheet
+    Category? tempRoot = currentState.selectedRootCategory;
+    Category? tempSub = currentState.selectedSubCategory;
+    Category? tempLeaf = currentState.selectedLeafCategory;
+    Set<int> tempBrandIds = Set.from(currentState.selectedBrandIds);
+    List<String> tempSizes = List.from(currentState.selectedSizesOrAges);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            
+            // Helpers
+            final rootCats = viewModel.getRootCategories(currentState.allCategories);
+            final subCats = viewModel.getSubCategories(currentState.allCategories, tempRoot?.id);
+            final leafCats = viewModel.getSubCategories(currentState.allCategories, tempSub?.id);
+            
+            final isShoe = viewModel.isShoeCategory(tempLeaf, tempSub, tempRoot);
+            final isFashion = viewModel.isFashionCategory(tempRoot);
+
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.85,
+              maxChildSize: 0.95,
+              builder: (context, scrollController) {
+                return Column(
+                  children: [
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Filters', style: Theme.of(context).textTheme.titleLarge),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        children: [
+                          // --- Category Hierarchy ---
+                          _buildSafeDropdown<Category>(
+                            'Main Category',
+                            rootCats,
+                            (c) => c.name,
+                            tempRoot,
+                            (val) => setModalState(() {
+                              tempRoot = val;
+                              tempSub = null;
+                              tempLeaf = null;
+                              tempSizes.clear(); // Reset sizes on root change
+                            }),
+                          ),
+                          if (tempRoot != null && subCats.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            _buildSafeDropdown<Category>(
+                              'Sub Category',
+                              subCats,
+                              (c) => c.name,
+                              tempSub,
+                              (val) => setModalState(() {
+                                tempSub = val;
+                                tempLeaf = null;
+                                tempSizes.clear();
+                              }),
+                            ),
+                          ],
+                          if (tempSub != null && leafCats.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            _buildSafeDropdown<Category>(
+                              'Specific Category',
+                              leafCats,
+                              (c) => c.name,
+                              tempLeaf,
+                              (val) => setModalState(() {
+                                tempLeaf = val;
+                                tempSizes.clear();
+                              }),
+                            ),
+                          ],
+
+                          const Divider(height: 32),
+
+                          // --- Size / Age Filter ---
+                          if (isShoe || isFashion) ...[
+                            Text(
+                              isShoe ? 'Shoe Sizes' : 'Size / Age Groups',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              children: (isShoe ? viewModel.shoeSizes : viewModel.clothingSizesAndAges).map((opt) {
+                                final isSelected = tempSizes.contains(opt);
+                                return FilterChip(
+                                  label: Text(opt),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    setModalState(() {
+                                      selected ? tempSizes.add(opt) : tempSizes.remove(opt);
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                            const Divider(height: 32),
+                          ],
+
+                          // --- Brand Filter ---
+                          Text('Brands', style: Theme.of(context).textTheme.titleMedium),
+                          ...currentState.allBrands.map((brand) {
+                            final isSelected = tempBrandIds.contains(brand.id);
+                            return CheckboxListTile(
+                              title: Text(brand.name),
+                              value: isSelected,
+                              onChanged: (val) {
+                                setModalState(() {
+                                  val == true ? tempBrandIds.add(brand.id) : tempBrandIds.remove(brand.id);
+                                });
+                              },
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                    
+                    // Buttons
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setModalState(() {
+                                  tempRoot = null;
+                                  tempSub = null;
+                                  tempLeaf = null;
+                                  tempBrandIds.clear();
+                                  tempSizes.clear();
+                                });
+                              },
+                              child: const Text('Clear'),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                viewModel.fetchProducts(
+                                  selectedRoot: tempRoot,
+                                  selectedSub: tempSub,
+                                  selectedLeaf: tempLeaf,
+                                  selectedBrandIds: tempBrandIds,
+                                  selectedSizesOrAges: tempSizes,
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Apply'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSafeDropdown<T>(
+    String label,
+    List<T> items,
+    String Function(T) itemToString,
+    T? selectedItem,
+    void Function(T?) onChanged,
+  ) {
+    T? effectiveValue;
+    if (selectedItem != null) {
+      try {
+        effectiveValue = items.firstWhere((item) => item == selectedItem);
+      } catch (e) {
+        effectiveValue = null;
+      }
+    }
+    return DropdownButtonFormField<T>(
+      // ignore: deprecated_member_use
+      value: effectiveValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<T>(
+          value: item,
+          child: Text(itemToString(item)),
+        );
+      }).toList(),
+      onChanged: onChanged,
+    );
+  }
+
   Widget _buildSortSection<T>(
     BuildContext context,
     String title,
@@ -268,7 +449,9 @@ class AdminProductsView
             title: Text((sort as Enum).name),
             leading: Radio<T>(
               value: sort,
+              // ignore: deprecated_member_use
               groupValue: currentSort,
+              // ignore: deprecated_member_use
               onChanged: null,
             ),
             onTap: () => onChanged(sort),
@@ -279,35 +462,7 @@ class AdminProductsView
     );
   }
 
-  Widget _buildCheckboxFilterSection<T, ID>(
-    BuildContext context,
-    String title,
-    List<T> allItems,
-    Set<ID> selectedIds,
-    String Function(T) itemTitle,
-    ID Function(T) itemId,
-    void Function(bool, ID) onChanged,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ...allItems.map((item) {
-          final id = itemId(item);
-          final isSelected = selectedIds.contains(id);
-          return ListTile(
-            title: Text(itemTitle(item)),
-            leading: Checkbox(
-              value: isSelected,
-              onChanged: null,
-            ),
-            onTap: () => onChanged(!isSelected, id),
-          );
-        }),
-        const Divider(),
-      ],
-    );
-  }
+
 
   Widget _buildBody(
     BuildContext context,
@@ -323,36 +478,43 @@ class AdminProductsView
     }
 
     if (state is AdminProductsLoaded) {
-      if (state.products.isEmpty) {
+      if (state.products.isEmpty && !state.isLoading) {
         return const Center(child: Text('No products found.'));
       }
 
-      return RefreshIndicator(
-        onRefresh: viewModel.fetchProducts,
-        child: ListView.builder(
-          itemCount: state.products.length,
-          itemBuilder: (context, index) {
-            final product = state.products[index];
-            return ListTile(
-              leading: Image.network(
-                product.imageUrl,
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.error, size: 40),
+      return Column(
+        children: [
+          if (state.isLoading) const LinearProgressIndicator(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: viewModel.fetchProducts,
+              child: ListView.builder(
+                itemCount: state.products.length,
+                itemBuilder: (context, index) {
+                  final product = state.products[index];
+                  return ListTile(
+                    leading: Image.network(
+                      product.imageUrl,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.error, size: 40),
+                    ),
+                    title: Text(product.name),
+                    subtitle:
+                        Text('\$${product.price.toStringAsFixed(2)}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () =>
+                          context.go('/admin/products/edit/${product.id}'),
+                    ),
+                  );
+                },
               ),
-              title: Text(product.name),
-              subtitle:
-                  Text('\$${product.price.toStringAsFixed(2)}'),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () =>
-                    context.go('/admin/products/edit/${product.id}'),
-              ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       );
     }
 

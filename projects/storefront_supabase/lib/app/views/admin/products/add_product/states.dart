@@ -10,38 +10,54 @@ class AddProductInitial extends AddProductState {}
 class AddProductLoading extends AddProductState {}
 
 class AddProductLoaded extends AddProductState {
-  final List<Category> categories;
+  final List<Category> allCategories; // Holds raw list
   final List<Brand> brands;
-  final Category? selectedCategory;
+  
+  // Hierarchical Selections
+  final Category? selectedRootCategory;
+  final Category? selectedSubCategory;
+  final Category? selectedLeafCategory; // The deepest selected level
+  
   final Brand? selectedBrand;
+  final List<String> selectedSizesOrAges; // Changed to List for multi-select
+  
   final File? image;
   final String? existingImageUrl;
   final String? errorMessage;
 
   AddProductLoaded({
-    required this.categories,
+    required this.allCategories,
     required this.brands,
-    this.selectedCategory,
+    this.selectedRootCategory,
+    this.selectedSubCategory,
+    this.selectedLeafCategory,
     this.selectedBrand,
+    this.selectedSizesOrAges = const [], // Default empty list
     this.image,
     this.existingImageUrl,
     this.errorMessage,
   });
 
   AddProductLoaded copyWith({
-    List<Category>? categories,
+    List<Category>? allCategories,
     List<Brand>? brands,
-    Category? selectedCategory,
+    Category? selectedRootCategory,
+    Category? selectedSubCategory,
+    Category? selectedLeafCategory,
     Brand? selectedBrand,
+    List<String>? selectedSizesOrAges,
     File? image,
     String? existingImageUrl,
     String? errorMessage,
   }) {
     return AddProductLoaded(
-      categories: categories ?? this.categories,
+      allCategories: allCategories ?? this.allCategories,
       brands: brands ?? this.brands,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedRootCategory: selectedRootCategory ?? this.selectedRootCategory,
+      selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
+      selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrand: selectedBrand ?? this.selectedBrand,
+      selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
       image: image ?? this.image,
       existingImageUrl: existingImageUrl ?? this.existingImageUrl,
       errorMessage: errorMessage,

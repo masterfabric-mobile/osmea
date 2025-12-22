@@ -2,10 +2,11 @@ import 'dart:async';
 import 'package:core/core.dart' hide AuthState;
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart'; // Add this import
+import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'states.dart';
 
-@injectable
 @injectable
 class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   final SupabaseClient _supabaseClient;
@@ -14,17 +15,55 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController confirmPasswordController;
+  late final TextEditingController usernameController;
+  
+  // New fields
+  late final TextEditingController birthdateController; // Used for display
+  DateTime? selectedBirthdate;
+  String? selectedGender;
+  
+  // Address Fields
+  late final TextEditingController phoneController;
+  late final TextEditingController addressController;
+  late final TextEditingController postalCodeController;
+  
+  String? selectedCountry;
+  String? selectedCity;
+  
+  // Simple Data for Country/City Selection
+  final Map<String, List<String>> countryCityMap = {
+    'Turkey': ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya'],
+    'USA': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+    'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt'],
+    'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice'],
+    'United Kingdom': ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool'],
+  };
+  
+  List<String> get availableCities => selectedCountry != null 
+      ? (countryCityMap[selectedCountry] ?? []) 
+      : [];
+  
+
 
   ProfileViewModel(this._supabaseClient) : super(ProfileInitial()) {
     emailController = TextEditingController();
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
+    usernameController = TextEditingController();
+    birthdateController = TextEditingController();
+    
+    // Address
+    phoneController = TextEditingController();
+    addressController = TextEditingController();
+    postalCodeController = TextEditingController();
+    
+
 
     _authSubscription =
         _supabaseClient.auth.onAuthStateChange.listen((data) async {
       final session = data.session;
       if (session != null) {
-        await _fetchAndSetUserRole(session.user.id);
+        await _fetchUserProfile(session.user.id);
       } else {
         stateChanger(const ProfileUnauthenticated());
       }
@@ -35,26 +74,183 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     stateChanger(ProfileLoading());
     final currentUser = _supabaseClient.auth.currentUser;
     if (currentUser != null) {
-      await _fetchAndSetUserRole(currentUser.id);
+      await _fetchUserProfile(currentUser.id);
     } else {
       stateChanger(const ProfileUnauthenticated());
     }
   }
 
-  Future<void> _fetchAndSetUserRole(String userId) async {
+  Future<void> _fetchUserProfile(String userId) async {
     try {
       final response = await _supabaseClient
           .from('users')
-          .select('role')
+          .select()
           .eq('id', userId)
           .single();
 
-      final userRole = response['role'] as String?;
-      stateChanger(ProfileAuthenticated(userRole: userRole));
+      final user = AppUser.fromJson(response);
+      
+      // Populate controllers immediately when data is fetched
+      usernameController.text = user.username ?? '';
+      emailController.text = user.email ?? '';
+      
+      selectedBirthdate = user.birthdate;
+      if (selectedBirthdate != null) {
+        birthdateController.text = DateFormat('yyyy-MM-dd').format(selectedBirthdate!);
+      } else {
+        birthdateController.clear();
+      }
+      
+      selectedGender = user.gender;
+      
+      // Address
+      phoneController.text = user.phone ?? '';
+      addressController.text = user.address ?? '';
+      postalCodeController.text = user.postalCode ?? '';
+      selectedCountry = user.country;
+      selectedCity = user.city;
+
+      stateChanger(ProfileAuthenticated(user: user));
     } catch (e) {
-      stateChanger(const ProfileAuthenticated(userRole: 'customer'));
+      stateChanger(const ProfileUnauthenticated(errorMessage: "Failed to load profile"));
     }
   }
+
+  void populateUserInfo() {
+    if (state is ProfileAuthenticated) {
+      final user = (state as ProfileAuthenticated).user;
+      usernameController.text = user.username ?? '';
+      emailController.text = user.email ?? '';
+      
+      selectedBirthdate = user.birthdate;
+      if (selectedBirthdate != null) {
+        birthdateController.text = DateFormat('yyyy-MM-dd').format(selectedBirthdate!);
+      } else {
+        birthdateController.clear();
+      }
+      
+      selectedGender = user.gender;
+      
+      // Address
+      phoneController.text = user.phone ?? '';
+      addressController.text = user.address ?? '';
+      postalCodeController.text = user.postalCode ?? '';
+      selectedCountry = user.country;
+      selectedCity = user.city;
+    }
+  }
+  
+  void setGender(String? gender) {
+    selectedGender = gender;
+    _refreshState();
+  }
+  
+  void setCountry(String? country) {
+    selectedCountry = country;
+    selectedCity = null; // Reset city when country changes
+    _refreshState();
+  }
+  
+  void setCity(String? city) {
+    selectedCity = city;
+    _refreshState();
+  }
+  
+  void _refreshState() {
+     if (state is ProfileAuthenticated) {
+       stateChanger(ProfileAuthenticated(user: (state as ProfileAuthenticated).user));
+    }
+  }
+
+  Future<void> pickBirthdate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedBirthdate ?? DateTime(2000), // Default to year 2000 if null
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != selectedBirthdate) {
+      selectedBirthdate = picked;
+      birthdateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      _refreshState();
+    }
+  }
+
+  Future<void> updateAddress() async {
+     if (state is! ProfileAuthenticated) return;
+     final currentUser = (state as ProfileAuthenticated).user;
+     stateChanger(ProfileLoading());
+     
+     try {
+       final updates = {
+         'phone': phoneController.text.trim(),
+         'address': addressController.text.trim(),
+         'city': selectedCity,
+         'country': selectedCountry,
+         'postal_code': postalCodeController.text.trim(),
+         'updated_at': DateTime.now().toIso8601String(),
+       };
+       
+       final response = await _supabaseClient
+           .from('users')
+           .update(updates)
+           .eq('id', currentUser.id)
+           .select()
+           .single();
+           
+       final updatedUser = AppUser.fromJson(response);
+       stateChanger(ProfileAuthenticated(user: updatedUser));
+     } catch (e) {
+       stateChanger(ProfileAuthenticated(user: currentUser)); 
+       // Ideally handle error
+     }
+  }
+
+  Future<void> updateProfile() async {
+    if (state is! ProfileAuthenticated) return;
+    
+    final currentUser = (state as ProfileAuthenticated).user;
+    final newUsername = usernameController.text.trim();
+    
+    // Calculate age from birthdate (Optional, if you still want to store age column)
+    int? age;
+    if (selectedBirthdate != null) {
+      final now = DateTime.now();
+      age = now.year - selectedBirthdate!.year;
+      if (now.month < selectedBirthdate!.month || 
+         (now.month == selectedBirthdate!.month && now.day < selectedBirthdate!.day)) {
+        age--;
+      }
+    }
+
+    stateChanger(ProfileLoading());
+
+    try {
+      // 1. Update public.users table
+      final updates = {
+        'username': newUsername,
+        'birthdate': selectedBirthdate?.toIso8601String(), // Store as ISO string (or just 'yyyy-MM-dd')
+        'age': age, // We update age based on birthdate
+        'gender': selectedGender,
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+      
+      final response = await _supabaseClient
+          .from('users')
+          .update(updates)
+          .eq('id', currentUser.id)
+          .select()
+          .single();
+
+      final updatedUser = AppUser.fromJson(response);
+      stateChanger(ProfileAuthenticated(user: updatedUser));
+
+    } catch (e) {
+       stateChanger(ProfileAuthenticated(user: currentUser)); 
+    }
+  }
+  
+
 
   void switchToLogin() {
     _clearFieldsAndErrors();
@@ -96,7 +292,8 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   Future<void> signup() async {
     if (emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
+        confirmPasswordController.text.isEmpty ||
+        usernameController.text.isEmpty) {
       stateChanger(
           const ProfileUnauthenticated(errorMessage: 'Please fill all fields.'));
       return;
@@ -112,6 +309,7 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
       final response = await _supabaseClient.auth.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        data: {'username': usernameController.text.trim()},
       );
       if (response.user != null) {
         _clearFieldsAndErrors();
@@ -141,6 +339,8 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     emailController.clear();
     passwordController.clear();
     confirmPasswordController.clear();
+    usernameController.clear();
+    birthdateController.clear();
   }
 
   @override
@@ -149,6 +349,11 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    usernameController.dispose();
+    birthdateController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    postalCodeController.dispose();
     return super.close();
   }
 }
