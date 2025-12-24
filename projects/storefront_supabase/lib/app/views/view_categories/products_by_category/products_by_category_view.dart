@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_categories/products_by_category/states.dart';
 import 'package:storefront_supabase/app/views/view_categories/products_by_category/view_model.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class ProductsByCategoryView
     extends MasterViewCubit<ProductsByCategoryViewModel, ProductsByCategoryState> {
@@ -14,7 +15,8 @@ class ProductsByCategoryView
           horizontalPadding: const PaddingVisibility.disabled(),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) {
-            final categoryName = arguments['categoryName'] as String? ?? 'Products';
+            final l10n = AppLocalizations.of(context)!;
+            final categoryName = arguments['categoryName'] as String? ?? l10n.products;
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(categoryName),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -47,6 +49,7 @@ class ProductsByCategoryView
   @override
   Widget viewContent(BuildContext context,
       ProductsByCategoryViewModel viewModel, ProductsByCategoryState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is ProductsByCategoryError) {
       return buildError(state.message, onRetry: () {
         final categoryId = arguments['categoryId'] as String?;
@@ -120,7 +123,7 @@ class ProductsByCategoryView
           
           Expanded(
             child: state.products.isEmpty
-                ? const Center(child: Text('No products found for this selection.'))
+                ? Center(child: Text(l10n.noProductsForSelection))
                 : GridView.builder(
                     padding: const EdgeInsets.all(16.0),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

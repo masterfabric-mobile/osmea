@@ -5,6 +5,7 @@ import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/states.dart';
 import 'package:storefront_supabase/app/views/admin/products/models/view_model.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class AdminProductsView
     extends MasterViewCubit<AdminProductsViewModel, AdminProductsState> {
@@ -14,7 +15,7 @@ class AdminProductsView
     super.arguments = const {'init': true},
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text('Products'),
+            title: OsmeaComponents.text(AppLocalizations.of(context)!.products),
             variant: AppBarVariant.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -55,6 +56,7 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is! AdminProductsLoaded) return const SizedBox.shrink();
 
     return Padding(
@@ -64,21 +66,21 @@ class AdminProductsView
           Expanded(
             child: TextField(
               controller: viewModel.searchController,
-              decoration: const InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                hintText: l10n.searchProductsHint,
+                prefixIcon: const Icon(Icons.search),
               ),
               onChanged: viewModel.setSearchQuery,
             ),
           ),
           IconButton(
             icon: const Icon(Icons.sort),
-            tooltip: 'Sort',
+            tooltip: l10n.sort,
             onPressed: () => _showSortSheet(context, viewModel, state),
           ),
           IconButton(
             icon: const Icon(Icons.filter_list),
-            tooltip: 'Filter',
+            tooltip: l10n.filter,
             onPressed: () => _showFilterSheet(context, viewModel, state),
           ),
         ],
@@ -91,6 +93,7 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsLoaded currentState,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     var tempPriceSort = currentState.priceSort;
     var tempDateSort = currentState.dateSort;
     var tempPopularitySort = currentState.popularitySort;
@@ -114,7 +117,7 @@ class AdminProductsView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Sort',
+                            l10n.sort,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -131,7 +134,7 @@ class AdminProductsView
                         children: [
                           _buildSortSection(
                             context,
-                            'Sort by Date',
+                            l10n.sortByDate,
                             tempDateSort,
                             DateSort.values,
                             (sort) {
@@ -144,7 +147,7 @@ class AdminProductsView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Popularity',
+                            l10n.sortByPopularity,
                             tempPopularitySort,
                             PopularitySort.values,
                             (sort) {
@@ -157,7 +160,7 @@ class AdminProductsView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Price',
+                            l10n.sortByPrice,
                             tempPriceSort,
                             PriceSort.values,
                             (sort) {
@@ -184,7 +187,7 @@ class AdminProductsView
                                   tempPopularitySort = PopularitySort.none;
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(l10n.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -198,7 +201,7 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(l10n.apply),
                             ),
                           ),
                         ],
@@ -219,6 +222,7 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsLoaded currentState,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     // Temp State for Filter Sheet
     Category? tempRoot = currentState.selectedRootCategory;
     Category? tempSub = currentState.selectedSubCategory;
@@ -254,7 +258,7 @@ class AdminProductsView
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Filters', style: Theme.of(context).textTheme.titleLarge),
+                          Text(l10n.filters, style: Theme.of(context).textTheme.titleLarge),
                           IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
@@ -267,9 +271,9 @@ class AdminProductsView
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         children: [
-                          // --- Category Hierarchy ---
+                           // --- Category Hierarchy ---
                           _buildSafeDropdown<Category>(
-                            'Main Category',
+                            l10n.mainCategory,
                             rootCats,
                             (c) => c.name,
                             tempRoot,
@@ -283,7 +287,7 @@ class AdminProductsView
                           if (tempRoot != null && subCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Sub Category',
+                              l10n.subCategory,
                               subCats,
                               (c) => c.name,
                               tempSub,
@@ -297,7 +301,7 @@ class AdminProductsView
                           if (tempSub != null && leafCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Specific Category',
+                              l10n.specificCategory,
                               leafCats,
                               (c) => c.name,
                               tempLeaf,
@@ -313,7 +317,7 @@ class AdminProductsView
                           // --- Size / Age Filter ---
                           if (isShoe || isFashion) ...[
                             Text(
-                              isShoe ? 'Shoe Sizes' : 'Size / Age Groups',
+                              isShoe ? l10n.shoeSizes : l10n.sizeAgeGroups,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 8),
@@ -336,7 +340,7 @@ class AdminProductsView
                           ],
 
                           // --- Brand Filter ---
-                          Text('Brands', style: Theme.of(context).textTheme.titleMedium),
+                          Text(l10n.brands, style: Theme.of(context).textTheme.titleMedium),
                           ...currentState.allBrands.map((brand) {
                             final isSelected = tempBrandIds.contains(brand.id);
                             return CheckboxListTile(
@@ -369,7 +373,7 @@ class AdminProductsView
                                   tempSizes.clear();
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(l10n.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -385,7 +389,7 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(l10n.apply),
                             ),
                           ),
                         ],
@@ -469,6 +473,7 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is AdminProductsLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -479,7 +484,7 @@ class AdminProductsView
 
     if (state is AdminProductsLoaded) {
       if (state.products.isEmpty && !state.isLoading) {
-        return const Center(child: Text('No products found.'));
+        return Center(child: Text(l10n.noProducts));
       }
 
       return Column(

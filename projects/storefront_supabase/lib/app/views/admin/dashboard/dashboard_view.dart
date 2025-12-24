@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/models/order.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 import 'models/states.dart';
 import 'models/view_model.dart';
@@ -15,7 +16,7 @@ class AdminDashboardView
       required super.goRoute})
       : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text('Admin Dashboard'),
+            title: OsmeaComponents.text(AppLocalizations.of(context)!.adminDashboard),
             variant: AppBarVariant.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -33,6 +34,7 @@ class AdminDashboardView
 
   @override
   Widget viewContent(BuildContext context, AdminDashboardViewModel viewModel, AdminDashboardState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is AdminDashboardLoadingState || state is AdminDashboardInitialState) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -52,11 +54,11 @@ class AdminDashboardView
             children: [
               _buildStatsGrid(context, state),
               const SizedBox(height: 24),
-              _buildSectionHeader(context, 'Recent Orders'),
+              _buildSectionHeader(context, l10n.recentOrders),
               const SizedBox(height: 8),
               _buildRecentOrders(context, state.recentOrders),
               const SizedBox(height: 24),
-              _buildSectionHeader(context, 'New Users'),
+              _buildSectionHeader(context, l10n.newUsers),
               const SizedBox(height: 8),
               _buildRecentUsers(context, state.recentUsers),
             ],
@@ -65,11 +67,12 @@ class AdminDashboardView
       );
     }
 
-    return const Center(child: Text('An unexpected error occurred.'));
+    return Center(child: Text(l10n.unexpectedError));
   }
 
   Widget _buildStatsGrid(BuildContext context, AdminDashboardLoadedState state) {
-    final formatCurrency = NumberFormat.simpleCurrency(locale: 'en_US');
+    final l10n = AppLocalizations.of(context)!;
+    final formatCurrency = NumberFormat.simpleCurrency(locale: 'en_US'); // locale should be dynamic
     return LayoutBuilder(
       builder: (context, constraints) {
         return GridView.count(
@@ -80,10 +83,10 @@ class AdminDashboardView
           mainAxisSpacing: 16,
           childAspectRatio: 1.5,
           children: [
-            _buildStatCard(context, 'Total Revenue', formatCurrency.format(state.totalRevenue), Icons.monetization_on, Colors.green),
-            _buildStatCard(context, 'Total Orders', state.orderCount.toString(), Icons.shopping_cart, Colors.orange),
-            _buildStatCard(context, 'Total Users', state.userCount.toString(), Icons.people, Colors.blue),
-            _buildStatCard(context, 'Total Products', state.productCount.toString(), Icons.inventory_2, Colors.purple),
+            _buildStatCard(context, l10n.totalRevenue, formatCurrency.format(state.totalRevenue), Icons.monetization_on, Colors.green),
+            _buildStatCard(context, l10n.totalOrders, state.orderCount.toString(), Icons.shopping_cart, Colors.orange),
+            _buildStatCard(context, l10n.totalUsers, state.userCount.toString(), Icons.people, Colors.blue),
+            _buildStatCard(context, l10n.totalProducts, state.productCount.toString(), Icons.inventory_2, Colors.purple),
           ],
         );
       },
@@ -130,16 +133,17 @@ class AdminDashboardView
   }
 
   Widget _buildRecentOrders(BuildContext context, List<Order> orders) {
+    final l10n = AppLocalizations.of(context)!;
     if (orders.isEmpty) {
-      return const Center(child: Text('No recent orders.'));
+      return Center(child: Text(l10n.noRecentOrders));
     }
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: orders.map((order) {
           return ListTile(
-            title: Text('Order #${order.orderNumber}'),
-            subtitle: Text(order.user?.fullName ?? 'Guest'),
+            title: Text('${l10n.orderNumber}${order.orderNumber}'),
+            subtitle: Text(order.user?.fullName ?? l10n.guest),
             trailing: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -155,8 +159,9 @@ class AdminDashboardView
   }
 
   Widget _buildRecentUsers(BuildContext context, List<AppUser> users) {
+    final l10n = AppLocalizations.of(context)!;
     if (users.isEmpty) {
-      return const Center(child: Text('No new users.'));
+      return Center(child: Text(l10n.noNewUsers));
     }
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -172,9 +177,9 @@ class AdminDashboardView
                   : null,
             ),
             title: Text(user.username != null
-                ? '${user.fullName ?? 'Unnamed'} (@${user.username})'
-                : user.fullName ?? 'Unnamed User'),
-            subtitle: Text('Joined ${DateFormat.yMMMd().format(user.createdAt)}'),
+                ? '${user.fullName ?? l10n.unnamed} (@${user.username})'
+                : user.fullName ?? l10n.unnamedUser),
+            subtitle: Text('${l10n.joined} ${DateFormat.yMMMd().format(user.createdAt)}'),
           );
         }).toList(),
       ),

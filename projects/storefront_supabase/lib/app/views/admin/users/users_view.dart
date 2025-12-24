@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class AdminUsersView extends StatefulWidget {
   const AdminUsersView({super.key});
@@ -29,9 +30,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Users'),
+        title: OsmeaComponents.text(l10n.users),
         variant: AppBarVariant.primary,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -47,10 +49,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('${l10n.errorPrefix}${snapshot.error}'));
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No users found.'));
+            return Center(child: Text(l10n.noUsersFound));
           }
           final users = snapshot.data!;
           return ListView.builder(
@@ -68,10 +70,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
                             '?'),
                       ),
                 title: Text(user.username != null
-                    ? '${user.fullName ?? 'Unnamed'} (@${user.username})'
-                    : user.fullName ?? user.email ?? 'Unnamed User'),
+                    ? '${user.fullName ?? l10n.unnamed} (@${user.username})'
+                    : user.fullName ?? user.email ?? l10n.unnamedUser),
                 subtitle: Text(
-                    '${user.email ?? 'No email'} - Role: ${user.role ?? 'N/A'}'),
+                    '${user.email ?? l10n.noEmail} - ${l10n.rolePrefix}${user.role ?? 'N/A'}'),
               );
             },
           );

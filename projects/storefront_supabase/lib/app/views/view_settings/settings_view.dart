@@ -18,7 +18,7 @@ class SettingsView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Settings',
+              AppLocalizations.of(context)!.settings,
               color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -62,14 +62,6 @@ class SettingsView
             leading: const Icon(Icons.language),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageSheet(context),
-          ),
-          OsmeaComponents.listItem(
-            title: OsmeaComponents.text('Dark Mode'),
-            leading: const Icon(Icons.dark_mode),
-            trailing: Switch(
-              value: state.darkModeEnabled,
-              onChanged: (value) => viewModel.toggleDarkMode(value),
-            ),
           ),
         ],
       );
