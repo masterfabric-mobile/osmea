@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class LogoHeaderWidget extends StatelessWidget {
   const LogoHeaderWidget({super.key});
@@ -29,7 +30,7 @@ class LogoHeaderWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: 24),
         OsmeaComponents.text(
-          'Welcome to Storefront',
+          AppLocalizations.of(context)!.welcomeTitle,
           textStyle: OsmeaTextStyle.headlineMedium(context).copyWith(
             fontWeight: FontWeight.w700,
             color: OsmeaColors.black,
@@ -38,7 +39,7 @@ class LogoHeaderWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: 8),
         OsmeaComponents.text(
-          'Sign in or create an account to continue',
+          AppLocalizations.of(context)!.welcomeSubtitle,
           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
             color: OsmeaColors.slate,
           ),

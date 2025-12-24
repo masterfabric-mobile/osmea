@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/core/config/config_di.dart';
 
 import 'package:storefront_supabase/app/routes/app_routes.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
+import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
 
 
 
@@ -225,33 +227,127 @@ launchApp({String environment = 'dev'}) async {
 
 
 
-  // Run the main application with the specified router and configuration
+    // Run the main application with the specified router and configuration
 
-  runApp(
 
-    BlocProvider(
 
-      create: (context) => AccountCubit()..initialize(),
+  
 
-      child: MasterApp(
 
-        router: appRouter, // The router handles navigation within the app
 
-        devModeGrid: debugMode, // Use configuration-based debug mode
+    runApp(
 
-        devModeSpacer: debugMode, // Use configuration-based debug mode
 
-        useConfigurationHelpers: true, // Enable configuration helpers in MasterApp
 
-        themeMode: appThemeMode, // Apply theme mode from configuration
+      MultiBlocProvider(
 
-        fontScale: fontScale, // Apply font scale from configuration
+
+
+        providers: [
+
+
+
+          BlocProvider(create: (context) => AccountCubit()..initialize()),
+
+
+
+          BlocProvider(create: (context) => LanguageCubit()),
+
+
+
+        ],
+
+
+
+        child: BlocBuilder<LanguageCubit, Locale?>(
+
+
+
+          builder: (context, locale) {
+
+
+
+            return MasterApp(
+
+
+
+              router: appRouter, // The router handles navigation within the app
+
+
+
+  
+
+
+
+              devModeGrid: debugMode, // Use configuration-based debug mode
+
+
+
+  
+
+
+
+              devModeSpacer: debugMode, // Use configuration-based debug mode
+
+
+
+  
+
+
+
+              useConfigurationHelpers: true, // Enable configuration helpers in MasterApp
+
+
+
+  
+
+
+
+              themeMode: appThemeMode, // Apply theme mode from configuration
+
+
+
+  
+
+
+
+              fontScale: fontScale, // Apply font scale from configuration
+
+
+
+  
+
+
+
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+
+
+
+              supportedLocales: AppLocalizations.supportedLocales,
+
+
+
+              locale: locale,
+
+
+
+            );
+
+
+
+          },
+
+
+
+        ),
+
+
 
       ),
 
-    ),
 
-  );
+
+    );
 
 
 

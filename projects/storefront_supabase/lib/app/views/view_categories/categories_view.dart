@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:core/core.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -16,7 +17,7 @@ class CategoriesView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Categories',
+              AppLocalizations.of(context)!.categories,
               color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -41,6 +42,7 @@ class CategoriesView
     CategoriesViewModel viewModel,
     CategoriesState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is CategoriesErrorState) {
       return buildError(
         state.message,
@@ -57,7 +59,7 @@ class CategoriesView
     if (state is CategoriesLoadedState) {
       if (state.rootCategories.isEmpty) {
         return Center(
-          child: OsmeaComponents.text('No categories found.'),
+          child: OsmeaComponents.text(l10n.noCategories),
         );
       }
       return ListView.builder(

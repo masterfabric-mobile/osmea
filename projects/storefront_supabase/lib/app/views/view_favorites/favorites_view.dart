@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:core/core.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -16,7 +17,7 @@ class FavoritesView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'My Favorites', // Changed to English
+              AppLocalizations.of(context)!.favorites, // Changed to English
               color: Theme.of(context)
                   .colorScheme
                   .onPrimary, // Text color matches onPrimary
@@ -57,7 +58,7 @@ class FavoritesView
               Text(state.message, textAlign: TextAlign.center),
               const SizedBox(height: 20),
               OsmeaComponents.button(
-                text: 'Log In / Sign Up', // Changed to English
+                text: AppLocalizations.of(context)!.loginSignup, // Changed to English
                 onPressed: () => goRoute('/profile'),
                 variant: ButtonVariant.primary,
               ),
@@ -70,7 +71,7 @@ class FavoritesView
     if (state is FavoritesLoadedState) {
       if (state.favoriteProducts.isEmpty) {
         return Center(
-          child: OsmeaComponents.text('No favorite products yet.'), // Changed to English
+          child: OsmeaComponents.text(AppLocalizations.of(context)!.noFavorites), // Changed to English
         );
       }
       return GridView.builder(

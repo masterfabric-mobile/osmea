@@ -17,15 +17,13 @@ dependencies:
   # ────────────────────────────────
 
   core:
-    git:
-      url: https://github.com/masterfabric-mobile/osmea.git
-      ref: dev
-      path: packages/core 
+    path: ../../packages/core
 
   # ────────────────────────────────
   # ICONS
   # ────────────────────────────────
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.3
 
   # ────────────────────────────────
   # SUPABASE
@@ -53,24 +51,14 @@ dependencies:
   # ────────────────────────────────
   # LOCALIZATION (i18n)
   # ────────────────────────────────
-  slang: ^4.7.3            # JSON-based translation tool with advanced features
-  slang_flutter: ^4.7.0    # Flutter bindings for the slang localization package
-
-  # ────────────────────────────────
-  # CODE GENERATION / ASSET MANAGEMENT
-  # ────────────────────────────────
   flutter_gen: ^5.10.0     # Generates strongly typed asset references (images, fonts, etc.)
   intl: ^0.20.2
   image_picker: ^1.2.1
+  flutter_localizations:
+    sdk: flutter
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# DEPENDENCY OVERRIDES
 # ═══════════════════════════════════════════════════════════════════════════════
-dependency_overrides:
-  slang: 4.8.1
-  slang_flutter: 4.8.0
-  slang_build_runner: 4.8.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,7 +69,6 @@ dev_dependencies:
   # ────────────────────────────────
   injectable_generator: ^2.6.2     # Generates code for injectable (DI)
   build_runner: ^2.5.4            # Core tool for running code generation
-  slang_build_runner: ^4.7.0      # Code generator for slang localization
   flutter_gen_runner: any         # Generator for flutter_gen (assets, colors, fonts, etc.)
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -96,6 +83,7 @@ flutter_gen:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 flutter:
+  generate: true
 # ────────────────────────────────
   # ASSET MANAGEMENT
   # ────────────────────────────────

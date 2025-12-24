@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 import 'models/home_view_model.dart';
 import 'models/states.dart';
@@ -25,7 +26,7 @@ class SupabaseHomeView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Storefront Supabase',
+              AppLocalizations.of(context)!.appTitle,
               color: Theme.of(context)
                   .colorScheme
                   .onPrimary, // Text color matches onPrimary
@@ -66,6 +67,7 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is SupabaseHomeErrorState) {
       return buildError(
         state.message,
@@ -87,7 +89,7 @@ class SupabaseHomeView
           Expanded(
             child: state.products.isEmpty
                 ? OsmeaComponents.center(
-                    child: OsmeaComponents.text('No products found.'),
+                    child: OsmeaComponents.text(l10n.noProducts),
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.all(16.0),
@@ -168,8 +170,8 @@ class SupabaseHomeView
     }
 
     // Fallback for any other state
-    return const Center(
-      child: Text('Something went wrong.'),
+    return Center(
+      child: Text(l10n.somethingWentWrong),
     );
   }
 
@@ -186,13 +188,13 @@ class SupabaseHomeView
         children: [
           TextButton.icon(
             icon: const Icon(Icons.sort),
-            label: const Text('Sort'),
+            label: Text(AppLocalizations.of(context)!.sort),
             onPressed: () => _showSortSheet(context, viewModel, state),
           ),
           const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.filter_list),
-            label: const Text('Filter'),
+            label: Text(AppLocalizations.of(context)!.filter),
             onPressed: () => _showFilterSheet(context, viewModel, state),
           ),
         ],
@@ -205,6 +207,7 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeLoadedState currentState,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     var tempPriceSort = currentState.priceSort;
     var tempDateSort = currentState.dateSort;
     var tempPopularitySort = currentState.popularitySort;
@@ -228,7 +231,7 @@ class SupabaseHomeView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Sort',
+                            l10n.sort,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -245,7 +248,7 @@ class SupabaseHomeView
                         children: [
                           _buildSortSection(
                             context,
-                            'Sort by Date',
+                            l10n.sortByDate,
                             tempDateSort,
                             DateSort.values,
                             (sort) {
@@ -258,7 +261,7 @@ class SupabaseHomeView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Popularity',
+                            l10n.sortByPopularity,
                             tempPopularitySort,
                             PopularitySort.values,
                             (sort) {
@@ -271,7 +274,7 @@ class SupabaseHomeView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Price',
+                            l10n.sortByPrice,
                             tempPriceSort,
                             PriceSort.values,
                             (sort) {
@@ -298,7 +301,7 @@ class SupabaseHomeView
                                   tempPopularitySort = PopularitySort.none;
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(l10n.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -312,7 +315,7 @@ class SupabaseHomeView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(l10n.apply),
                             ),
                           ),
                         ],
@@ -333,6 +336,7 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeLoadedState currentState,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     // Hierarchical Filters
     Category? tempRoot = currentState.selectedRootCategory;
     Category? tempSub = currentState.selectedSubCategory;
@@ -372,7 +376,7 @@ class SupabaseHomeView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Filters',
+                            l10n.filters,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -389,7 +393,7 @@ class SupabaseHomeView
                         children: [
                            // --- Category Hierarchy ---
                           _buildSafeDropdown<Category>(
-                            'Main Category',
+                            l10n.mainCategory,
                             rootCats,
                             (c) => c.name,
                             tempRoot,
@@ -403,7 +407,7 @@ class SupabaseHomeView
                           if (tempRoot != null && subCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Sub Category',
+                              l10n.subCategory,
                               subCats,
                               (c) => c.name,
                               tempSub,
@@ -417,7 +421,7 @@ class SupabaseHomeView
                           if (tempSub != null && leafCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Specific Category',
+                              l10n.specificCategory,
                               leafCats,
                               (c) => c.name,
                               tempLeaf,
@@ -433,7 +437,7 @@ class SupabaseHomeView
                           // --- Size / Age Filter ---
                           if (isShoe || isFashion) ...[
                             Text(
-                              isShoe ? 'Shoe Sizes' : 'Size / Age Groups',
+                              isShoe ? l10n.shoeSizes : l10n.sizeAgeGroups,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 8),
@@ -457,7 +461,7 @@ class SupabaseHomeView
                           
                           _buildCheckboxFilterSection<Brand, int>(
                             context,
-                            'Brands',
+                            l10n.brands,
                             currentState.allBrands,
                             tempBrandIds,
                             (brand) => brand.name,
@@ -488,7 +492,7 @@ class SupabaseHomeView
                                   tempSizes.clear();
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(l10n.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -505,7 +509,7 @@ class SupabaseHomeView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(l10n.apply),
                             ),
                           ),
                         ],

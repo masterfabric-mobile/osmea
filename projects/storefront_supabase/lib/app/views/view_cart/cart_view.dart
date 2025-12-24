@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:core/core.dart';
 import 'package:storefront_supabase/app/models/cart_item.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 import 'models/view_model.dart';
 import 'models/states.dart';
 
@@ -15,7 +16,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'My Cart',
+              AppLocalizations.of(context)!.cart,
               color: Theme.of(context)
                   .colorScheme
                   .onPrimary, // Text color matches onPrimary
@@ -36,6 +37,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
   @override
   Widget viewContent(
       BuildContext context, CartViewModel viewModel, CartState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is CartLoadingState || state is CartInitialState) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -48,7 +50,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
             Text(state.message, textAlign: TextAlign.center),
             const SizedBox(height: 20),
             OsmeaComponents.button(
-              text: 'Log In / Sign Up',
+              text: l10n.loginSignup,
               onPressed: () => goRoute('/profile'),
               variant: ButtonVariant.primary,
             ),
@@ -60,7 +62,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
     if (state is CartLoadedState) {
       if (state.cartItems.isEmpty) {
         return Center(
-          child: OsmeaComponents.text('Your cart is empty.'),
+          child: OsmeaComponents.text(l10n.emptyCart),
         );
       }
 
@@ -80,7 +82,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
       );
     }
 
-    return const Center(child: Text('Something went wrong.'));
+    return Center(child: Text(l10n.somethingWentWrong));
   }
 
   Widget _buildCartItemCard(
@@ -152,7 +154,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
                 const SizedBox(height: 4),
                 TextButton(
                   onPressed: () => viewModel.removeItem(item.id),
-                  child: const Text('Remove', style: TextStyle(color: Colors.red)),
+                  child: Text(AppLocalizations.of(context)!.remove, style: const TextStyle(color: Colors.red)),
                 ),
               ],
             ),
@@ -181,14 +183,14 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total:', style: Theme.of(context).textTheme.headlineSmall),
+              Text('${AppLocalizations.of(context)!.total}:', style: Theme.of(context).textTheme.headlineSmall),
               Text('\$${totalPrice.toStringAsFixed(2)}',
                   style: Theme.of(context).textTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
           OsmeaComponents.button(
-            text: 'Proceed to Checkout',
+            text: AppLocalizations.of(context)!.proceedToCheckout,
             onPressed: () {
               // TODO: Implement checkout flow
             },

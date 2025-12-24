@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
 import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   AddressesView({
@@ -13,7 +14,7 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text('My Addresses'),
+            title: OsmeaComponents.text(AppLocalizations.of(context)!.myAddresses),
             variant: AppBarVariant.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -32,6 +33,7 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   @override
   Widget viewContent(
       BuildContext context, ProfileViewModel viewModel, ProfileState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is ProfileLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -44,7 +46,7 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             // Country Dropdown
             _buildDropdown(
               context: context,
-              label: 'Country',
+              label: l10n.country,
               value: viewModel.selectedCountry,
               items: viewModel.countryCityMap.keys.toList(),
               onChanged: viewModel.setCountry,
@@ -55,34 +57,34 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             // City Dropdown (Dependent)
             _buildDropdown(
               context: context,
-              label: 'City',
+              label: l10n.city,
               value: viewModel.selectedCity,
               items: viewModel.availableCities,
               onChanged: viewModel.setCity,
               icon: Icons.location_city,
-              hint: viewModel.selectedCountry == null ? 'Select Country First' : 'Select City',
+              hint: viewModel.selectedCountry == null ? l10n.selectCountryFirst : l10n.selectCity,
             ),
              const SizedBox(height: 16),
              
-            _buildTextField(context, viewModel.addressController, 'Address', Icons.home),
+            _buildTextField(context, viewModel.addressController, l10n.address, Icons.home),
             const SizedBox(height: 16),
             
-            _buildTextField(context, viewModel.postalCodeController, 'Postal Code', Icons.markunread_mailbox),
+            _buildTextField(context, viewModel.postalCodeController, l10n.postalCode, Icons.markunread_mailbox),
             const SizedBox(height: 16),
             
-            _buildTextField(context, viewModel.phoneController, 'Phone Number', Icons.phone, keyboardType: TextInputType.phone),
+            _buildTextField(context, viewModel.phoneController, l10n.phoneNumber, Icons.phone, keyboardType: TextInputType.phone),
             const SizedBox(height: 32),
             
             OsmeaComponents.button(
-              text: 'Save Address',
+              text: l10n.saveAddress,
               variant: ButtonVariant.primary,
               fullWidth: true,
               onPressed: () async {
                 await viewModel.updateAddress();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Address updated successfully!'), 
+                    SnackBar(
+                      content: Text(l10n.addressUpdated), 
                       backgroundColor: Colors.green
                     ),
                   );
@@ -93,7 +95,7 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
         ),
       );
     }
-    return const Center(child: Text('Please log in to manage addresses.'));
+    return Center(child: Text(l10n.loginToManageAddresses));
   }
   
   Widget _buildDropdown({
@@ -119,7 +121,7 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             children: [
               Icon(icon, color: Colors.black),
               const SizedBox(width: 12),
-              Text(hint ?? "Select $label"),
+              Text(hint ?? "${AppLocalizations.of(context)!.selectPrefix}$label"),
             ],
           ),
           icon: const Icon(Icons.arrow_drop_down),

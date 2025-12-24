@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 class OnboardingView extends StatelessWidget {
   final void Function(String) goRoute;
@@ -8,16 +9,16 @@ class OnboardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Onboarding')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.onboarding)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Onboarding Screen'),
+            Text(AppLocalizations.of(context)!.onboardingScreen),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => goRoute('/home'),
-              child: const Text('Go to Home'),
+              child: Text(AppLocalizations.of(context)!.goToHome),
             ),
           ],
         ),

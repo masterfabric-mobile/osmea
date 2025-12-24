@@ -21,6 +21,7 @@ import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 
 
@@ -34,23 +35,24 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final List<NavbarItem> _navItems = [
-    NavbarItem(text: 'Home', icon: const Icon(Icons.home), onTap: () {}),
-    NavbarItem(
-        text: 'Categories', icon: const Icon(Icons.category), onTap: () {}),
-    NavbarItem(
-        text: 'My Cart', icon: const Icon(Icons.shopping_cart), onTap: () {}),
-    NavbarItem(
-        text: 'Favorites', icon: const Icon(Icons.favorite), onTap: () {}),
-    NavbarItem(text: 'Profile', icon: const Icon(Icons.person), onTap: () {}),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final List<NavbarItem> navItems = [
+      NavbarItem(text: l10n.home, icon: const Icon(Icons.home), onTap: () {}),
+      NavbarItem(
+          text: l10n.categories, icon: const Icon(Icons.category), onTap: () {}),
+      NavbarItem(
+          text: l10n.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
+      NavbarItem(
+          text: l10n.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
+      NavbarItem(text: l10n.profile, icon: const Icon(Icons.person), onTap: () {}),
+    ];
+
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
-        items: _navItems,
+        items: navItems,
         variant: NavbarVariant.primary,
         size: NavbarSize.medium,
         currentIndex: _calculateSelectedIndex(context),
@@ -102,23 +104,24 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  final List<NavbarItem> _navItems = [
-    NavbarItem(
-        text: 'Dashboard', icon: const Icon(Icons.dashboard), onTap: () {}),
-    NavbarItem(text: 'Users', icon: const Icon(Icons.people), onTap: () {}),
-    NavbarItem(
-        text: 'Products', icon: const Icon(Icons.shopping_bag), onTap: () {}),
-    NavbarItem(
-        text: 'Orders', icon: const Icon(Icons.receipt), onTap: () {}),
-    NavbarItem(text: 'Settings', icon: const Icon(Icons.settings), onTap: () {}),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final List<NavbarItem> navItems = [
+      NavbarItem(
+          text: l10n.adminDashboard, icon: const Icon(Icons.dashboard), onTap: () {}),
+      NavbarItem(text: l10n.users, icon: const Icon(Icons.people), onTap: () {}),
+      NavbarItem(
+          text: l10n.products, icon: const Icon(Icons.shopping_bag), onTap: () {}),
+      NavbarItem(
+          text: l10n.orders, icon: const Icon(Icons.receipt), onTap: () {}),
+      NavbarItem(text: l10n.settings, icon: const Icon(Icons.settings), onTap: () {}),
+    ];
+
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
-        items: _navItems,
+        items: navItems,
         variant: NavbarVariant.primary,
         size: NavbarSize.medium,
         currentIndex: _calculateSelectedIndex(context),

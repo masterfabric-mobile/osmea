@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
+import 'package:storefront_supabase/l10n/app_localizations.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -21,7 +22,7 @@ class ProductDetailView
             return OsmeaComponents.appBar(
               title: (viewModel.state is ProductDetailLoadedState)
                   ? Text((viewModel.state as ProductDetailLoadedState).product.name)
-                  : const Text('Product Detail'),
+                  : Text(AppLocalizations.of(context)!.productDetail),
               variant: AppBarVariant.primary,
               leading: OsmeaComponents.iconButton(
                 onPressed: () {
@@ -75,6 +76,7 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is ProductDetailErrorState) {
       return buildError(
         state.message,
@@ -141,23 +143,22 @@ class ProductDetailView
                   _buildQuantitySelector(context, viewModel, state),
                   const SizedBox(height: 16),
                   OsmeaComponents.button(
-                    text: 'Add to Cart',
+                    text: l10n.addToCart,
                     onPressed: () async {
                       final success = await viewModel.addToCart(
                           product.id, state.detailPageQuantity);
                       if (!context.mounted) return;
                       if (success) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Product added to cart!'),
+                          SnackBar(
+                            content: Text(l10n.productAddedToCart),
                             backgroundColor: Colors.green,
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Failed to add product. Please log in and try again.'),
+                          SnackBar(
+                            content: Text(l10n.failedToAddCart),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -170,13 +171,13 @@ class ProductDetailView
                   const Divider(),
                   const SizedBox(height: 16),
                   Text(
-                    'Reviews (${reviews.length})',
+                    l10n.reviewsCount(reviews.length),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
-                  _buildReviewsList(reviews),
+                  _buildReviewsList(context, reviews),
                   const SizedBox(height: 24),
-                  _buildAddReviewForm(viewModel, product.id),
+                  _buildAddReviewForm(context, viewModel, product.id),
                 ],
               ),
             ),
@@ -184,7 +185,7 @@ class ProductDetailView
         ),
       );
     }
-    return const Center(child: Text('Something went wrong.'));
+    return Center(child: Text(l10n.somethingWentWrong));
   }
 
   Widget _buildQuantitySelector(BuildContext context,
@@ -211,9 +212,10 @@ class ProductDetailView
     );
   }
 
-  Widget _buildReviewsList(List<ProductReview> reviews) {
+  Widget _buildReviewsList(BuildContext context, List<ProductReview> reviews) {
+    final l10n = AppLocalizations.of(context)!;
     if (reviews.isEmpty) {
-      return const Center(child: Text('No reviews yet.'));
+      return Center(child: Text(l10n.noReviewsYet));
     }
     return ListView.builder(
       shrinkWrap: true,
@@ -266,20 +268,21 @@ class ProductDetailView
     );
   }
 
-  Widget _buildAddReviewForm(ProductDetailViewModel viewModel, String productId) {
+  Widget _buildAddReviewForm(BuildContext context, ProductDetailViewModel viewModel, String productId) {
+    final l10n = AppLocalizations.of(context)!;
     return StatefulBuilder(
       builder: (context, setState) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Write a Review',
+              l10n.writeReview,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                const Text('Rating: '),
+                Text('${l10n.rating}: '),
                 ...List.generate(5, (index) => IconButton(
                   icon: Icon(
                     index < viewModel.currentRating ? Icons.star : Icons.star_border,
@@ -296,37 +299,37 @@ class ProductDetailView
             const SizedBox(height: 16),
             TextField(
               controller: viewModel.reviewTitleController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Review Title',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: l10n.reviewTitle,
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: viewModel.reviewCommentController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Review',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: l10n.yourReview,
               ),
               maxLines: 4,
             ),
             const SizedBox(height: 16),
             OsmeaComponents.button(
-              text: 'Submit Review',
+              text: l10n.submitReview,
               onPressed: () async {
                 final success = await viewModel.submitReview(productId);
                 if (!context.mounted) return;
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Review submitted!'),
+                    SnackBar(
+                      content: Text(l10n.reviewSubmitted),
                       backgroundColor: Colors.green,
                     ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to submit review. Make sure you are logged in and the review is not empty.'),
+                    SnackBar(
+                      content: Text(l10n.failedSubmitReview),
                       backgroundColor: Colors.red,
                     ),
                   );
