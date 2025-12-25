@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';

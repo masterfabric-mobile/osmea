@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart' hide SearchState;
-import 'package:storefront_supabase/l10n/app_localizations.dart';
+import 'package:core/core.dart' hide SearchState, BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'models/view_model.dart';
 import 'models/states.dart';
 
@@ -14,7 +14,7 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              AppLocalizations.of(context)!.searchProducts, // Changed to English
+              context.resources.searchProducts, // Changed to English
               color: Theme.of(context).colorScheme.onPrimary,
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -39,14 +39,14 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
     SearchViewModel viewModel,
     SearchState state,
   ) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: OsmeaComponents.textField(
             controller: viewModel.searchController,
-            label: l10n.search,
+            label: resources.search,
             prefixIcon: const Icon(Icons.search),
             onChanged: (query) {
               viewModel.search(query);
@@ -64,7 +64,7 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
 
   Widget _buildBody(
       BuildContext context, SearchViewModel viewModel, SearchState state) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     if (state is SearchLoadingState) {
       return const Center(child: CircularProgressIndicator());
     } else if (state is SearchErrorState) {
@@ -77,12 +77,12 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
           viewModel.searchController.text.isNotEmpty) {
         return OsmeaComponents.center(
           child: OsmeaComponents.text(
-              '${l10n.noResultsFor} "${viewModel.searchController.text}"'), // Changed to English
+              '${resources.noResultsFor} "${viewModel.searchController.text}"'), // Changed to English
         );
       } else if (state.searchResults.isEmpty &&
           viewModel.searchController.text.isEmpty) {
         return OsmeaComponents.center(
-          child: OsmeaComponents.text(l10n.startTyping), // Changed to English
+          child: OsmeaComponents.text(resources.startTyping), // Changed to English
         );
       }
       return ListView.builder(

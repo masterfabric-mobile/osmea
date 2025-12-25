@@ -1,4 +1,6 @@
 {
+  "@@locale": "de",
+  "localLanguageCode": "de_DE",
   "home": "Startseite",
   "categories": "Kategorien",
   "cart": "Warenkorb",
@@ -157,8 +159,7 @@
         "type": "int"
       }
     }
-  },
-  "noReviewsYet": "Noch keine Bewertungen.",
+  },  "noReviewsYet": "Noch keine Bewertungen.",
   "emailCannotBeChanged": "* E-Mail kann hier nicht direkt geändert werden.",
   "genderMale": "Männlich",
   "genderFemale": "Weiblich",
@@ -176,3 +177,4 @@
   "password": "Passwort",
   "confirmPassword": "Passwort bestätigen"
 }
+

@@ -1,4 +1,6 @@
 {
+  "@@locale": "tr",
+  "localLanguageCode": "tr_TR",
   "home": "Anasayfa",
   "categories": "Kategoriler",
   "cart": "Sepetim",
@@ -157,8 +159,7 @@
         "type": "int"
       }
     }
-  },
-  "noReviewsYet": "Henüz yorum yok.",
+  },  "noReviewsYet": "Henüz yorum yok.",
   "emailCannotBeChanged": "* E-posta adresi buradan doğrudan değiştirilemez.",
   "genderMale": "Erkek",
   "genderFemale": "Kadın",
@@ -176,3 +177,4 @@
   "password": "Şifre",
   "confirmPassword": "Şifreyi Onayla"
 }
+

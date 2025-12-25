@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
 import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
-import 'package:storefront_supabase/l10n/app_localizations.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   PersonalInfoView({
@@ -11,19 +16,19 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     super.arguments = const {'init': true},
     required super.goRoute,
   }) : super(
-          horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
-          appBarPadding: const AppBarPaddingVisibility.disabled(),
-          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(AppLocalizations.of(context)!.myInformation),
-            variant: AppBarVariant.primary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            leading: OsmeaComponents.iconButton(
-              onPressed: () => context.pop(),
-              icon: const Icon(Icons.arrow_back),
-            ),
-          ),
-        );
+         horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
+         appBarPadding: const AppBarPaddingVisibility.disabled(),
+         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+           title: OsmeaComponents.text(context.resources.myInformation),
+           variant: AppBarVariant.primary,
+           backgroundColor: Theme.of(context).colorScheme.primary,
+           foregroundColor: Theme.of(context).colorScheme.onPrimary,
+           leading: OsmeaComponents.iconButton(
+             onPressed: () => context.pop(),
+             icon: const Icon(Icons.arrow_back),
+           ),
+         ),
+       );
 
   @override
   void initialContent(ProfileViewModel viewModel, BuildContext context) {
@@ -33,40 +38,54 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
   @override
   Widget viewContent(
-      BuildContext context, ProfileViewModel viewModel, ProfileState state) {
-    final l10n = AppLocalizations.of(context)!;
+    BuildContext context,
+    ProfileViewModel viewModel,
+    ProfileState state,
+  ) {
+    final resources = context.resources;
     if (state is ProfileLoading) {
-       return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
-    
+
     if (state is ProfileAuthenticated) {
       return SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: Column(
           children: [
-            _buildEditableField(context, viewModel.usernameController, l10n.username, Icons.person),
+            _buildEditableField(
+              context,
+              viewModel.usernameController,
+              resources.username,
+              Icons.person,
+            ),
             const SizedBox(height: 16),
-            _buildEditableField(context, viewModel.emailController, l10n.email, Icons.email, readOnly: true),
+            _buildEditableField(
+              context,
+              viewModel.emailController,
+              resources.email,
+              Icons.email,
+              readOnly: true,
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 4.0, top: 4.0, bottom: 16),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  l10n.emailCannotBeChanged,
+                  resources.emailCannotBeChanged,
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ),
             ),
-            
+
             // Date of Birth (Age)
             GestureDetector(
               onTap: () => viewModel.pickBirthdate(context),
               child: AbsorbPointer(
                 child: _buildEditableField(
-                  context, 
-                  viewModel.birthdateController, 
-                  l10n.dateOfBirth, 
-                  Icons.calendar_today, 
+                  context,
+                  viewModel.birthdateController,
+                  resources.dateOfBirth,
+                  Icons.calendar_today,
                 ),
               ),
             ),
@@ -77,7 +96,9 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(4), // Matches TextFieldVariant.outlined usually
+                borderRadius: BorderRadius.circular(
+                  4,
+                ), // Matches TextFieldVariant.outlined usually
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
@@ -87,21 +108,22 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                     children: [
                       const Icon(Icons.people_outline, color: Colors.black),
                       const SizedBox(width: 12),
-                      Text(l10n.selectGender),
+                      Text(resources.selectGender),
                     ],
                   ),
                   icon: const Icon(Icons.arrow_drop_down),
-                  items: [
-                    l10n.genderMale,
-                    l10n.genderFemale,
-                    l10n.genderOther,
-                    l10n.genderPreferNotToSay
-                  ].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items:
+                      [
+                        resources.genderMale,
+                        resources.genderFemale,
+                        resources.genderOther,
+                        resources.genderPreferNotToSay,
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
                   onChanged: (newValue) {
                     // Trigger a state update or UI refresh (handled by bloc listener/builder usually, but here handled by setGender)
                     viewModel.setGender(newValue);
@@ -112,39 +134,39 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
             const SizedBox(height: 32),
             OsmeaComponents.button(
-              text: l10n.savePersonalInfo,
+              text: resources.savePersonalInfo,
               variant: ButtonVariant.primary,
               fullWidth: true,
               onPressed: () async {
                 await viewModel.updateProfile();
                 if (context.mounted) {
-                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.profileUpdated), backgroundColor: Colors.green),
-                   );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(resources.profileUpdated),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 }
               },
             ),
-
 
             const SizedBox(height: 32), // Bottom padding
           ],
         ),
       );
     }
-    return Center(child: Text(l10n.loginToViewInfo));
+    return Center(child: Text(resources.loginToViewInfo));
   }
 
   Widget _buildEditableField(
-    BuildContext context, 
-    TextEditingController controller, 
-    String label, 
-    IconData icon,
-    {
-      bool readOnly = false, 
-      bool obscureText = false,
-      TextInputType? keyboardType,
-    }
-  ) {
+    BuildContext context,
+    TextEditingController controller,
+    String label,
+    IconData icon, {
+    bool readOnly = false,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+  }) {
     return OsmeaComponents.textField(
       controller: controller,
       label: label,
@@ -153,7 +175,9 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       focusColor: Colors.black,
       readOnly: readOnly,
       obscureText: obscureText,
-      type: keyboardType == TextInputType.number ? TextFieldType.number : TextFieldType.text, // Simple mapping
+      type: keyboardType == TextInputType.number
+          ? TextFieldType.number
+          : TextFieldType.text, // Simple mapping
     );
   }
 }

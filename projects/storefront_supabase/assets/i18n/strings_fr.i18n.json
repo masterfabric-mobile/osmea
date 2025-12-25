@@ -1,4 +1,6 @@
 {
+  "@@locale": "fr",
+  "localLanguageCode": "fr_FR",
   "home": "Accueil",
   "categories": "Catégories",
   "cart": "Panier",
@@ -157,8 +159,7 @@
         "type": "int"
       }
     }
-  },
-  "noReviewsYet": "Pas encore d'avis.",
+  },  "noReviewsYet": "Pas encore d'avis.",
   "emailCannotBeChanged": "* L'e-mail ne peut pas être modifié ici directement.",
   "genderMale": "Homme",
   "genderFemale": "Femme",
@@ -176,3 +177,4 @@
   "password": "Mot de passe",
   "confirmPassword": "Confirmer le mot de passe"
 }
+

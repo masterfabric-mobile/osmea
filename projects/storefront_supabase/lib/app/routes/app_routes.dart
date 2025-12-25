@@ -1,7 +1,15 @@
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart' hide SearchView, SplashView, OnboardingView;
+import 'package:core/core.dart'
+    hide
+        SearchView,
+        SplashView,
+        OnboardingView,
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:storefront_supabase/app/views/admin/dashboard/dashboard_view.dart';
 import 'package:storefront_supabase/app/views/admin/orders/orders_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/products_view.dart';
@@ -21,9 +29,7 @@ import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
-import 'package:storefront_supabase/l10n/app_localizations.dart';
-
-
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -37,16 +43,33 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     final List<NavbarItem> navItems = [
-      NavbarItem(text: l10n.home, icon: const Icon(Icons.home), onTap: () {}),
       NavbarItem(
-          text: l10n.categories, icon: const Icon(Icons.category), onTap: () {}),
+        text: resources.home,
+        icon: const Icon(Icons.home),
+        onTap: () {},
+      ),
       NavbarItem(
-          text: l10n.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
+        text: resources.categories,
+        icon: const Icon(Icons.category),
+        onTap: () {},
+      ),
       NavbarItem(
-          text: l10n.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
-      NavbarItem(text: l10n.profile, icon: const Icon(Icons.person), onTap: () {}),
+        text: resources.cart,
+        icon: const Icon(Icons.shopping_cart),
+        onTap: () {},
+      ),
+      NavbarItem(
+        text: resources.favorites,
+        icon: const Icon(Icons.favorite),
+        onTap: () {},
+      ),
+      NavbarItem(
+        text: resources.profile,
+        icon: const Icon(Icons.person),
+        onTap: () {},
+      ),
     ];
 
     return Scaffold(
@@ -106,16 +129,33 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     final List<NavbarItem> navItems = [
       NavbarItem(
-          text: l10n.adminDashboard, icon: const Icon(Icons.dashboard), onTap: () {}),
-      NavbarItem(text: l10n.users, icon: const Icon(Icons.people), onTap: () {}),
+        text: resources.adminDashboard,
+        icon: const Icon(Icons.dashboard),
+        onTap: () {},
+      ),
       NavbarItem(
-          text: l10n.products, icon: const Icon(Icons.shopping_bag), onTap: () {}),
+        text: resources.users,
+        icon: const Icon(Icons.people),
+        onTap: () {},
+      ),
       NavbarItem(
-          text: l10n.orders, icon: const Icon(Icons.receipt), onTap: () {}),
-      NavbarItem(text: l10n.settings, icon: const Icon(Icons.settings), onTap: () {}),
+        text: resources.products,
+        icon: const Icon(Icons.shopping_bag),
+        onTap: () {},
+      ),
+      NavbarItem(
+        text: resources.orders,
+        icon: const Icon(Icons.receipt),
+        onTap: () {},
+      ),
+      NavbarItem(
+        text: resources.settings,
+        icon: const Icon(Icons.settings),
+        onTap: () {},
+      ),
     ];
 
     return Scaffold(
@@ -185,10 +225,7 @@ final GoRouter appRouter = GoRouter(
             final product = state.extra as Product?;
             return ProductDetailView(
               goRoute: (String path) => context.go(path),
-              arguments: {
-                'productId': productId,
-                'product': product,
-              },
+              arguments: {'productId': productId, 'product': product},
             );
           },
         ),
@@ -203,18 +240,19 @@ final GoRouter appRouter = GoRouter(
               CategoriesView(goRoute: (String path) => context.go(path)),
           routes: [
             GoRoute(
-                path: 'products/:categoryId',
-                builder: (BuildContext context, GoRouterState state) {
-                  final categoryId = state.pathParameters['categoryId'];
-                  final categoryName = state.uri.queryParameters['name'];
-                  return ProductsByCategoryView(
-                    goRoute: (String path) => context.go(path),
-                    arguments: {
-                      'categoryId': categoryId,
-                      'categoryName': categoryName
-                    },
-                  );
-                }),
+              path: 'products/:categoryId',
+              builder: (BuildContext context, GoRouterState state) {
+                final categoryId = state.pathParameters['categoryId'];
+                final categoryName = state.uri.queryParameters['name'];
+                return ProductsByCategoryView(
+                  goRoute: (String path) => context.go(path),
+                  arguments: {
+                    'categoryId': categoryId,
+                    'categoryName': categoryName,
+                  },
+                );
+              },
+            ),
           ],
         ),
         GoRoute(
@@ -236,31 +274,39 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'info',
               builder: (BuildContext context, GoRouterState state) {
-                return PersonalInfoView(goRoute: (String path) => context.go(path));
-              },
-            ),
-             GoRoute(
-              path: 'addresses',
-              builder: (BuildContext context, GoRouterState state) {
-                return AddressesView(goRoute: (String path) => context.go(path));
-              },
-            ),
-             GoRoute(
-              path: 'change-password',
-              builder: (BuildContext context, GoRouterState state) {
-                return ChangePasswordView(goRoute: (String path) => context.go(path));
-              },
-            ),
-             GoRoute(
-              path: 'orders',
-              builder: (BuildContext context, GoRouterState state) {
-                 // Reusing AdminOrdersView as a placeholder, but in real app this should be UserOrdersView
-                return const Scaffold(
-                  body: Center(child: Text("My Orders (User View) - Coming Soon")),
+                return PersonalInfoView(
+                  goRoute: (String path) => context.go(path),
                 );
               },
             ),
-          ]
+            GoRoute(
+              path: 'addresses',
+              builder: (BuildContext context, GoRouterState state) {
+                return AddressesView(
+                  goRoute: (String path) => context.go(path),
+                );
+              },
+            ),
+            GoRoute(
+              path: 'change-password',
+              builder: (BuildContext context, GoRouterState state) {
+                return ChangePasswordView(
+                  goRoute: (String path) => context.go(path),
+                );
+              },
+            ),
+            GoRoute(
+              path: 'orders',
+              builder: (BuildContext context, GoRouterState state) {
+                // Reusing AdminOrdersView as a placeholder, but in real app this should be UserOrdersView
+                return const Scaffold(
+                  body: Center(
+                    child: Text("My Orders (User View) - Coming Soon"),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/search',
@@ -275,7 +321,9 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/dashboard',
           builder: (BuildContext context, GoRouterState state) {
-            return AdminDashboardView(goRoute: (String path) => context.go(path));
+            return AdminDashboardView(
+              goRoute: (String path) => context.go(path),
+            );
           },
         ),
         GoRoute(
@@ -287,10 +335,12 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/products',
           builder: (BuildContext context, GoRouterState state) {
-            return AdminProductsView(goRoute: (String path) => context.go(path));
+            return AdminProductsView(
+              goRoute: (String path) => context.go(path),
+            );
           },
         ),
-         GoRoute(
+        GoRoute(
           path: '/admin/products/add',
           builder: (BuildContext context, GoRouterState state) {
             return AddProductView(goRoute: (String path) => context.go(path));
@@ -315,7 +365,9 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/settings',
           builder: (BuildContext context, GoRouterState state) {
-            return AdminSettingsView(goRoute: (String path) => context.go(path));
+            return AdminSettingsView(
+              goRoute: (String path) => context.go(path),
+            );
           },
         ),
       ],

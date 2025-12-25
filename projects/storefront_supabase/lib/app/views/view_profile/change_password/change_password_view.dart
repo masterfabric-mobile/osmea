@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/models/states.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/models/view_model.dart';
-import 'package:storefront_supabase/l10n/app_localizations.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 
 class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, ChangePasswordState> {
@@ -15,7 +15,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(AppLocalizations.of(context)!.changePassword),
+            title: OsmeaComponents.text(context.resources.changePassword),
             variant: AppBarVariant.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -34,7 +34,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
   @override
   Widget viewContent(
       BuildContext context, ChangePasswordViewModel viewModel, ChangePasswordState state) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     if (state is ChangePasswordLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -51,7 +51,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           _buildEditableField(
             context,
             viewModel.newPasswordController,
-            l10n.newPassword,
+            resources.newPassword,
             Icons.lock_outline,
             obscureText: true,
           ),
@@ -59,13 +59,13 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           _buildEditableField(
             context,
             viewModel.confirmNewPasswordController,
-            l10n.confirmNewPassword,
+            resources.confirmNewPassword,
             Icons.lock_outline,
             obscureText: true,
           ),
           const SizedBox(height: 24),
           OsmeaComponents.button(
-            text: l10n.updatePassword,
+            text: resources.updatePassword,
             variant: ButtonVariant.primary,
             fullWidth: true,
             onPressed: () async {
@@ -74,7 +74,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(l10n.passwordChanged),
+                    content: Text(resources.passwordChanged),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -82,7 +82,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(l10n.failedChangePassword),
+                    content: Text(resources.failedChangePassword),
                     backgroundColor: Colors.red,
                   ),
                 );

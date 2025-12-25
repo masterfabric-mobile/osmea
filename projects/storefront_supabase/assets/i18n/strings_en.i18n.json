@@ -1,4 +1,6 @@
 {
+  "@@locale": "en",
+  "localLanguageCode": "en_US",
   "home": "Home",
   "categories": "Categories",
   "cart": "Cart",
@@ -176,3 +178,4 @@
   "password": "Password",
   "confirmPassword": "Confirm Password"
 }
+

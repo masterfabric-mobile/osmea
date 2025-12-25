@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/views/admin/products/add_product/states.dart';
 import 'package:storefront_supabase/app/views/admin/products/add_product/view_model.dart';
-import 'package:storefront_supabase/l10n/app_localizations.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AddProductView
     extends MasterViewCubit<AddProductViewModel, AddProductState> {
@@ -17,11 +17,11 @@ class AddProductView
     super.arguments = const {'init': true},
   }) : super(
           coreAppBar: (context, viewModel) {
-            final l10n = AppLocalizations.of(context)!;
+            final resources = context.resources;
             final productId = arguments['productId'] as String?;
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
-                  productId == null ? l10n.addNewProduct : l10n.editProduct),
+                  productId == null ? resources.addNewProduct : resources.editProduct),
               variant: AppBarVariant.primary,
             );
           },
@@ -36,7 +36,7 @@ class AddProductView
   @override
   Widget viewContent(
       BuildContext context, AddProductViewModel viewModel, AddProductState state) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     final productId = arguments['productId'] as String?;
     final isEditMode = productId != null;
 
@@ -52,7 +52,7 @@ class AddProductView
             Text(state.message),
             const SizedBox(height: 16),
             OsmeaComponents.button(
-              text: l10n.retry,
+              text: resources.retry,
               onPressed: () => initialContent(viewModel, context),
             ),
           ],
@@ -66,7 +66,7 @@ class AddProductView
           children: [
             const CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text(isEditMode ? l10n.savingChanges : l10n.addingProduct),
+            Text(isEditMode ? resources.savingChanges : resources.addingProduct),
           ],
         ),
       );
@@ -80,16 +80,16 @@ class AddProductView
             const Icon(Icons.check_circle, color: Colors.green, size: 50),
             const SizedBox(height: 16),
             Text(isEditMode
-                ? l10n.productUpdatedSuccess
-                : l10n.productAddedSuccess),
+                ? resources.productUpdatedSuccess
+                : resources.productAddedSuccess),
             const SizedBox(height: 16),
             if (!isEditMode)
               OsmeaComponents.button(
-                text: l10n.addAnotherProduct,
+                text: resources.addAnotherProduct,
                 onPressed: () => initialContent(viewModel, context),
               ),
             OsmeaComponents.button(
-              text: l10n.goToProducts,
+              text: resources.goToProducts,
               onPressed: () => goRoute('/admin/products'),
             )
           ],
@@ -118,17 +118,17 @@ class AddProductView
               children: [
                 _buildImagePicker(context, viewModel, state.image, state.existingImageUrl),
                 const SizedBox(height: 24),
-                _buildTextField(context, viewModel.nameController, l10n.productName),
+                _buildTextField(context, viewModel.nameController, resources.productName),
                 const SizedBox(height: 16),
-                _buildTextField(context, viewModel.descriptionController, l10n.description,
+                _buildTextField(context, viewModel.descriptionController, resources.description,
                     maxLines: 5),
                 const SizedBox(height: 16),
-                _buildTextField(context, viewModel.priceController, l10n.price,
+                _buildTextField(context, viewModel.priceController, resources.price,
                     keyboardType: TextInputType.number),
                 const SizedBox(height: 16),
-                _buildTextField(context, viewModel.skuController, l10n.sku),
+                _buildTextField(context, viewModel.skuController, resources.sku),
                 const SizedBox(height: 16),
-                _buildTextField(context, viewModel.stockController, l10n.stockQuantity,
+                _buildTextField(context, viewModel.stockController, resources.stockQuantity,
                     keyboardType: TextInputType.number),
                 const SizedBox(height: 24),
                 
@@ -146,7 +146,7 @@ class AddProductView
                     Expanded(
                       child: _buildSafeDropdown<Brand>(
                         context,
-                        l10n.brand,
+                        resources.brand,
                         state.brands,
                         (b) => b.name,
                         state.selectedBrand,
@@ -161,7 +161,7 @@ class AddProductView
                 ),
                 const SizedBox(height: 32),
                 OsmeaComponents.button(
-                  text: isEditMode ? l10n.saveChanges : l10n.addProduct,
+                  text: isEditMode ? resources.saveChanges : resources.addProduct,
                   onPressed: () => viewModel.submitProduct(productId: productId),
                   fullWidth: true,
                 ),
@@ -172,11 +172,11 @@ class AddProductView
       );
     }
 
-    return Center(child: Text(l10n.unexpectedError));
+    return Center(child: Text(resources.unexpectedError));
   }
 
   Widget _buildCategoryHierarchy(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     final rootCats = viewModel.getRootCategories(state.allCategories);
     final subCats = viewModel.getSubCategories(state.allCategories, state.selectedRootCategory?.id);
     final leafCats = viewModel.getSubCategories(state.allCategories, state.selectedSubCategory?.id);
@@ -186,7 +186,7 @@ class AddProductView
       children: [
         _buildSafeDropdown<Category>(
           context,
-          l10n.mainCategory,
+          resources.mainCategory,
           rootCats,
           (c) => c.name,
           state.selectedRootCategory,
@@ -196,7 +196,7 @@ class AddProductView
           const SizedBox(height: 16),
           _buildSafeDropdown<Category>(
             context,
-            l10n.subCategory,
+            resources.subCategory,
             subCats,
             (c) => c.name,
             state.selectedSubCategory,
@@ -207,7 +207,7 @@ class AddProductView
           const SizedBox(height: 16),
           _buildSafeDropdown<Category>(
             context,
-            l10n.specificCategory,
+            resources.specificCategory,
             leafCats,
             (c) => c.name,
             state.selectedLeafCategory,
@@ -219,16 +219,16 @@ class AddProductView
   }
 
   Widget _buildDynamicSizeSelector(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     List<String> options = [];
     String label = '';
 
     if (viewModel.isShoeCategory) {
       options = viewModel.shoeSizes;
-      label = l10n.selectShoeSizes;
+      label = resources.selectShoeSizes;
     } else if (viewModel.isFashionCategory) {
       options = viewModel.clothingSizesAndAges;
-      label = l10n.selectSizeAgeGroups;
+      label = resources.selectSizeAgeGroups;
     } else {
       return const SizedBox.shrink();
     }
@@ -291,7 +291,7 @@ class AddProductView
       validator: (value) {
         // Only validate if items are available (meaning selection is expected)
         if (items.isNotEmpty && value == null) {
-          return '${AppLocalizations.of(context)!.pleaseSelectA}$label';
+          return '${context.resources.pleaseSelectA}$label';
         }
         return null;
       },
@@ -300,7 +300,7 @@ class AddProductView
 
   Widget _buildImagePicker(BuildContext context, AddProductViewModel viewModel,
       File? localImage, String? existingImageUrl) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     Widget imageWidget;
     if (localImage != null) {
       imageWidget = Image.file(localImage, fit: BoxFit.cover);
@@ -327,7 +327,7 @@ class AddProductView
           ),
           const SizedBox(height: 8),
           OsmeaComponents.textButton(
-            text: l10n.pickImage,
+            text: resources.pickImage,
             onPressed: viewModel.pickImage,
           ),
         ],
@@ -352,7 +352,7 @@ class AddProductView
       keyboardType: keyboardType,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return '${AppLocalizations.of(context)!.pleaseEnterA}$label';
+          return '${context.resources.pleaseEnterA}$label';
         }
         return null;
       },
@@ -360,21 +360,21 @@ class AddProductView
   }
 
   void _showAddBrandDialog(BuildContext context, AddProductViewModel viewModel) {
-    final l10n = AppLocalizations.of(context)!;
+    final resources = context.resources;
     final brandNameController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(l10n.addNewBrandTitle),
+          title: Text(resources.addNewBrandTitle),
           content: TextField(
             controller: brandNameController,
-            decoration: InputDecoration(hintText: l10n.enterBrandName),
+            decoration: InputDecoration(hintText: resources.enterBrandName),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.cancel),
+              child: Text(resources.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -383,7 +383,7 @@ class AddProductView
                   Navigator.of(context).pop();
                 }
               },
-              child: Text(l10n.save),
+              child: Text(resources.save),
             ),
           ],
         );

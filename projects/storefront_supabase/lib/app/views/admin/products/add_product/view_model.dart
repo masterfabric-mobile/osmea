@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
