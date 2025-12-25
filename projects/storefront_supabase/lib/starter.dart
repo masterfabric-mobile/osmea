@@ -1,7 +1,12 @@
-
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,8 +15,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/core/config/config_di.dart';
 
 import 'package:storefront_supabase/app/routes/app_routes.dart';
-
-
+import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 /// 🚀 Launch the Storefront WooCommerce application
 
@@ -54,56 +59,46 @@ import 'package:storefront_supabase/app/routes/app_routes.dart';
 /// ```
 
 launchApp({String environment = 'dev'}) async {
-
   /// Initializes necessary components before the app starts.
 
   WidgetsFlutterBinding.ensureInitialized();
 
-
-
   // 🔧 Determine configuration settings based on environment
 
-  bool enableRemoteConfig = environment != 'dev'; // Enable remote config for staging/production
+  bool enableRemoteConfig =
+      environment != 'dev'; // Enable remote config for staging/production
 
-  bool allowTelemetry = environment == 'production'; // Only collect telemetry in production
-
-
+  bool allowTelemetry =
+      environment == 'production'; // Only collect telemetry in production
 
   debugPrint('🚀 Starting Storefront WooCommerce App');
 
   debugPrint('🔧 Environment: $environment');
 
-  debugPrint('📡 Remote Config: ${enableRemoteConfig ? 'Enabled' : 'Disabled'}');
+  debugPrint(
+    '📡 Remote Config: ${enableRemoteConfig ? 'Enabled' : 'Disabled'}',
+  );
 
   debugPrint('📊 Telemetry: ${allowTelemetry ? 'Enabled' : 'Disabled'}');
-
-
 
   // Perform any necessary setup before the app starts with configuration management
 
   await MasterApp.runBefore(
-
     allowCollectDataTelemetry: allowTelemetry,
 
     enableRemoteConfig: enableRemoteConfig,
 
     assetConfigPath:
-
         'assets/app_config.json', // Use project-specific config, fallback to @core package
-
   );
-
-
 
   // 🗂️ Initialize configuration helpers for app-level usage
 
   final AssetConfigHelper assetConfigHelper = AssetConfigHelper();
 
-  bool configLoaded =
-
-      await assetConfigHelper.loadConfig('assets/app_config.json');
-
-
+  bool configLoaded = await assetConfigHelper.loadConfig(
+    'assets/app_config.json',
+  );
 
   // Simple config source info
 
@@ -112,108 +107,74 @@ launchApp({String environment = 'dev'}) async {
   final configSource = configStats['config_source'] ?? 'unknown';
 
   debugPrint(
-
-      '📂 Config: ${configSource == 'project_specific' ? '🎯 Project' : configSource == 'core_package_fallback' ? '📦 Core Package' : '⚠️ Default'}');
-
-
+    '📂 Config: ${configSource == 'project_specific'
+        ? '🎯 Project'
+        : configSource == 'core_package_fallback'
+        ? '📦 Core Package'
+        : '⚠️ Default'}',
+  );
 
   // Initialize Supabase
 
-  final supabaseUrl =
+  final supabaseUrl = assetConfigHelper.getString('supabase_configuration.url');
 
-      assetConfigHelper.getString('supabase_configuration.url');
-
-  final supabaseAnonKey =
-
-      assetConfigHelper.getString('supabase_configuration.anon_key');
-
-
+  final supabaseAnonKey = assetConfigHelper.getString(
+    'supabase_configuration.anon_key',
+  );
 
   if (supabaseUrl.isNotEmpty &&
-
       supabaseAnonKey.isNotEmpty &&
-
       supabaseUrl != 'YOUR_SUPABASE_URL') {
-
-    await Supabase.initialize(
-
-      url: supabaseUrl,
-
-      anonKey: supabaseAnonKey,
-
-    );
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
     debugPrint('✅ Supabase initialized');
-
   } else {
-
     debugPrint(
-
-        '⚠️ Supabase URL or anon key not found or is placeholder. Skipping initialization.');
-
+      '⚠️ Supabase URL or anon key not found or is placeholder. Skipping initialization.',
+    );
   }
-
-
 
   // Configure dependency injection for the application
 
   await configureDependencies(environment: environment);
 
-
-
   // 🎨 Get UI configuration from config helpers
 
   bool debugMode = configLoaded
-
-      ? assetConfigHelper.getBool('app_settings.debug_mode', environment == 'dev')
-
+      ? assetConfigHelper.getBool(
+          'app_settings.debug_mode',
+          environment == 'dev',
+        )
       : (environment == 'dev');
 
-
-
   double fontScale = configLoaded
-
       ? assetConfigHelper.getDouble('ui_configuration.font_scale', 1.0)
-
       : 1.0;
 
-
-
   String themeMode = configLoaded
-
       ? assetConfigHelper.getString('ui_configuration.theme_mode', 'light')
-
       : 'light';
-
-
 
   // Convert theme mode string to ThemeMode enum
 
   ThemeMode appThemeMode;
 
   switch (themeMode.toLowerCase()) {
-
     case 'dark':
-
       appThemeMode = ThemeMode.dark;
 
       break;
 
     case 'system':
-
       appThemeMode = ThemeMode.system;
 
       break;
 
     default:
-
       appThemeMode = ThemeMode.light;
 
       break;
-
   }
-
-
 
   debugPrint('🎨 Applied UI Configuration:');
 
@@ -223,38 +184,52 @@ launchApp({String environment = 'dev'}) async {
 
   debugPrint('  - Debug Mode: $debugMode');
 
-
-
   // Run the main application with the specified router and configuration
 
   runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AccountCubit()..initialize()),
 
-    BlocProvider(
+        BlocProvider(create: (context) => LanguageCubit()),
+      ],
 
-      create: (context) => AccountCubit()..initialize(),
+      child: BlocBuilder<LanguageCubit, Locale?>(
+        builder: (context, locale) {
+          // Convert Locale to AppLocale and set it in slang
+          if (locale != null) {
+            final appLocale = AppLocaleUtils.parseLocaleParts(
+              languageCode: locale.languageCode,
+              countryCode: locale.countryCode,
+            );
+            LocaleSettings.setLocaleSync(appLocale);
+          } else {
+            // Use device locale if no saved locale
+            LocaleSettings.useDeviceLocaleSync();
+          }
 
-      child: MasterApp(
-
-        router: appRouter, // The router handles navigation within the app
-
-        devModeGrid: debugMode, // Use configuration-based debug mode
-
-        devModeSpacer: debugMode, // Use configuration-based debug mode
-
-        useConfigurationHelpers: true, // Enable configuration helpers in MasterApp
-
-        themeMode: appThemeMode, // Apply theme mode from configuration
-
-        fontScale: fontScale, // Apply font scale from configuration
-
+          return TranslationProvider(
+            child: MasterApp(
+              router: appRouter, // The router handles navigation within the app
+              devModeGrid: debugMode, // Use configuration-based debug mode
+              devModeSpacer: debugMode, // Use configuration-based debug mode
+              useConfigurationHelpers:
+                  true, // Enable configuration helpers in MasterApp
+              themeMode: appThemeMode, // Apply theme mode from configuration
+              fontScale: fontScale, // Apply font scale from configuration
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              supportedLocales: AppLocaleUtils.supportedLocales,
+              locale: LocaleSettings.currentLocale.flutterLocale,
+            ),
+          );
+        },
       ),
-
     ),
-
   );
 
-
-
   debugPrint('✅ Storefront WooCommerce App launched successfully');
-
 }

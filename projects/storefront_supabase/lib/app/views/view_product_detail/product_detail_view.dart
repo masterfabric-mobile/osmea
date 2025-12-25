@@ -1,10 +1,16 @@
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -16,54 +22,53 @@ class ProductDetailView
     super.arguments = const {'init': true},
     required super.goRoute,
   }) : super(
-          coreAppBar: (context, viewModel) {
-            final productId = arguments['productId'] as String?;
-            return OsmeaComponents.appBar(
-              title: (viewModel.state is ProductDetailLoadedState)
-                  ? Text((viewModel.state as ProductDetailLoadedState).product.name)
-                  : const Text('Product Detail'),
-              variant: AppBarVariant.primary,
-              leading: OsmeaComponents.iconButton(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/home');
-                  }
-                },
-                icon: const Icon(Icons.arrow_back),
-              ),
-              actions: [
-                AppBarAction(
-                  type: AppBarActionType.favorite,
-                  icon: BlocBuilder<ProductDetailViewModel, ProductDetailState>(
-                    bloc: viewModel,
-                    builder: (context, state) {
-                      bool isInWishlist = false;
-                      if (state is ProductDetailLoadedState) {
-                        isInWishlist = state.isInWishlist;
-                      }
-                      return Icon(
-                        isInWishlist ? Icons.favorite : Icons.favorite_border,
-                      );
-                    },
-                  ),
-                  onPressed: () {
-                    if (productId != null) {
-                      viewModel.toggleFavorite(productId);
-                    }
-                  },
-                ),
-              ],
-            );
-          },
-        );
+         coreAppBar: (context, viewModel) {
+           final productId = arguments['productId'] as String?;
+           return OsmeaComponents.appBar(
+             title: (viewModel.state is ProductDetailLoadedState)
+                 ? Text(
+                     (viewModel.state as ProductDetailLoadedState).product.name,
+                   )
+                 : Text(context.resources.productDetail),
+             variant: AppBarVariant.primary,
+             leading: OsmeaComponents.iconButton(
+               onPressed: () {
+                 if (context.canPop()) {
+                   context.pop();
+                 } else {
+                   context.go('/home');
+                 }
+               },
+               icon: const Icon(Icons.arrow_back),
+             ),
+             actions: [
+               AppBarAction(
+                 type: AppBarActionType.favorite,
+                 icon: BlocBuilder<ProductDetailViewModel, ProductDetailState>(
+                   bloc: viewModel,
+                   builder: (context, state) {
+                     bool isInWishlist = false;
+                     if (state is ProductDetailLoadedState) {
+                       isInWishlist = state.isInWishlist;
+                     }
+                     return Icon(
+                       isInWishlist ? Icons.favorite : Icons.favorite_border,
+                     );
+                   },
+                 ),
+                 onPressed: () {
+                   if (productId != null) {
+                     viewModel.toggleFavorite(productId);
+                   }
+                 },
+               ),
+             ],
+           );
+         },
+       );
 
   @override
-  void initialContent(
-    ProductDetailViewModel viewModel,
-    BuildContext context,
-  ) {
+  void initialContent(ProductDetailViewModel viewModel, BuildContext context) {
     final productId = arguments['productId'] as String?;
     final product = arguments['product'] as Product?;
     viewModel.initial(productId: productId, product: product);
@@ -75,6 +80,7 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailState state,
   ) {
+    final resources = context.resources;
     if (state is ProductDetailErrorState) {
       return buildError(
         state.message,
@@ -100,7 +106,9 @@ class ProductDetailView
                     height: 300,
                     width: double.infinity,
                     color: Colors.grey[200],
-                    child: const Center(child: Icon(Icons.image, color: Colors.grey, size: 50)),
+                    child: const Center(
+                      child: Icon(Icons.image, color: Colors.grey, size: 50),
+                    ),
                   )
                 : Image.network(
                     product.imageUrl,
@@ -112,7 +120,9 @@ class ProductDetailView
                         height: 300,
                         width: double.infinity,
                         color: Colors.grey[200],
-                        child: const Center(child: Icon(Icons.error, color: Colors.red, size: 50)),
+                        child: const Center(
+                          child: Icon(Icons.error, color: Colors.red, size: 50),
+                        ),
                       );
                     },
                   ),
@@ -129,8 +139,8 @@ class ProductDetailView
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -141,23 +151,24 @@ class ProductDetailView
                   _buildQuantitySelector(context, viewModel, state),
                   const SizedBox(height: 16),
                   OsmeaComponents.button(
-                    text: 'Add to Cart',
+                    text: resources.addToCart,
                     onPressed: () async {
                       final success = await viewModel.addToCart(
-                          product.id, state.detailPageQuantity);
+                        product.id,
+                        state.detailPageQuantity,
+                      );
                       if (!context.mounted) return;
                       if (success) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Product added to cart!'),
+                          SnackBar(
+                            content: Text(resources.productAddedToCart),
                             backgroundColor: Colors.green,
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Failed to add product. Please log in and try again.'),
+                          SnackBar(
+                            content: Text(resources.failedToAddCart),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -170,13 +181,16 @@ class ProductDetailView
                   const Divider(),
                   const SizedBox(height: 16),
                   Text(
-                    'Reviews (${reviews.length})',
+                    resources.reviewsCount.replaceAll(
+                      '{count}',
+                      reviews.length.toString(),
+                    ),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
-                  _buildReviewsList(reviews),
+                  _buildReviewsList(context, reviews),
                   const SizedBox(height: 24),
-                  _buildAddReviewForm(viewModel, product.id),
+                  _buildAddReviewForm(context, viewModel, product.id),
                 ],
               ),
             ),
@@ -184,11 +198,14 @@ class ProductDetailView
         ),
       );
     }
-    return const Center(child: Text('Something went wrong.'));
+    return Center(child: Text(resources.somethingWentWrong));
   }
 
-  Widget _buildQuantitySelector(BuildContext context,
-      ProductDetailViewModel viewModel, ProductDetailLoadedState state) {
+  Widget _buildQuantitySelector(
+    BuildContext context,
+    ProductDetailViewModel viewModel,
+    ProductDetailLoadedState state,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -211,9 +228,10 @@ class ProductDetailView
     );
   }
 
-  Widget _buildReviewsList(List<ProductReview> reviews) {
+  Widget _buildReviewsList(BuildContext context, List<ProductReview> reviews) {
+    final resources = context.resources;
     if (reviews.isEmpty) {
-      return const Center(child: Text('No reviews yet.'));
+      return Center(child: Text(resources.noReviewsYet));
     }
     return ListView.builder(
       shrinkWrap: true,
@@ -233,7 +251,9 @@ class ProductDetailView
                   children: [
                     Text(
                       review.authorName,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       DateFormat.yMMMd().format(review.createdAt),
@@ -244,20 +264,26 @@ class ProductDetailView
                 const SizedBox(height: 4),
                 // Simple star rating display
                 Row(
-                  children: List.generate(5, (i) => Icon(
-                    i < review.rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 20,
-                  )),
+                  children: List.generate(
+                    5,
+                    (i) => Icon(
+                      i < review.rating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
+                  ),
                 ),
                 if (review.title != null && review.title!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(review.title!, style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    review.title!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ],
                 if (review.comment != null && review.comment!.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(review.comment!),
-                ]
+                ],
               ],
             ),
           ),
@@ -266,67 +292,77 @@ class ProductDetailView
     );
   }
 
-  Widget _buildAddReviewForm(ProductDetailViewModel viewModel, String productId) {
+  Widget _buildAddReviewForm(
+    BuildContext context,
+    ProductDetailViewModel viewModel,
+    String productId,
+  ) {
+    final resources = context.resources;
     return StatefulBuilder(
       builder: (context, setState) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Write a Review',
+              resources.writeReview,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                const Text('Rating: '),
-                ...List.generate(5, (index) => IconButton(
-                  icon: Icon(
-                    index < viewModel.currentRating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
+                Text('${resources.rating}: '),
+                ...List.generate(
+                  5,
+                  (index) => IconButton(
+                    icon: Icon(
+                      index < viewModel.currentRating
+                          ? Icons.star
+                          : Icons.star_border,
+                      color: Colors.amber,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        viewModel.setRating(index + 1.0);
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      viewModel.setRating(index + 1.0);
-                    });
-                  },
-                )),
+                ),
               ],
             ),
             const SizedBox(height: 16),
             TextField(
               controller: viewModel.reviewTitleController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Review Title',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: resources.reviewTitle,
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: viewModel.reviewCommentController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Review',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: resources.yourReview,
               ),
               maxLines: 4,
             ),
             const SizedBox(height: 16),
             OsmeaComponents.button(
-              text: 'Submit Review',
+              text: resources.submitReview,
               onPressed: () async {
                 final success = await viewModel.submitReview(productId);
                 if (!context.mounted) return;
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Review submitted!'),
+                    SnackBar(
+                      content: Text(resources.reviewSubmitted),
                       backgroundColor: Colors.green,
                     ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to submit review. Make sure you are logged in and the review is not empty.'),
+                    SnackBar(
+                      content: Text(resources.failedSubmitReview),
                       backgroundColor: Colors.red,
                     ),
                   );

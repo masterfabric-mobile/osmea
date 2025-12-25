@@ -1,4 +1,4 @@
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';

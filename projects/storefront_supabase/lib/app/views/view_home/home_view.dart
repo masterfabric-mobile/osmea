@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/home_view_model.dart';
 import 'models/states.dart';
@@ -21,42 +27,43 @@ class SupabaseHomeView
     super.arguments = const {'home': true},
     required super.goRoute,
   }) : super(
-          horizontalPadding: const PaddingVisibility.disabled(),
-          appBarPadding: const AppBarPaddingVisibility.disabled(),
-          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(
-              'Storefront Supabase',
-              color: Theme.of(context)
-                  .colorScheme
-                  .onPrimary, // Text color matches onPrimary
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            size: AppBarSize.large,
-            elevation: 0,
-            titleSpacing: 0.0,
-            actions: [
-              AppBarAction(
-                type: AppBarActionType.search,
-                icon: Icon(Icons.search,
-                    color: Theme.of(context).colorScheme.onPrimary),
-                onPressed: () => goRoute('/search'),
-              ),
-              AppBarAction(
-                type: AppBarActionType.more,
-                icon: Icon(Icons.shopping_cart_outlined,
-                    color: Theme.of(context).colorScheme.onPrimary),
-                onPressed: () => goRoute('/cart'),
-              ),
-            ],
-          ),
-        );
+         horizontalPadding: const PaddingVisibility.disabled(),
+         appBarPadding: const AppBarPaddingVisibility.disabled(),
+         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+           title: OsmeaComponents.text(
+             context.resources.appTitle,
+             color: Theme.of(
+               context,
+             ).colorScheme.onPrimary, // Text color matches onPrimary
+           ),
+           backgroundColor: Theme.of(context).colorScheme.primary,
+           foregroundColor: Theme.of(context).colorScheme.onPrimary,
+           size: AppBarSize.large,
+           elevation: 0,
+           titleSpacing: 0.0,
+           actions: [
+             AppBarAction(
+               type: AppBarActionType.search,
+               icon: Icon(
+                 Icons.search,
+                 color: Theme.of(context).colorScheme.onPrimary,
+               ),
+               onPressed: () => goRoute('/search'),
+             ),
+             AppBarAction(
+               type: AppBarActionType.more,
+               icon: Icon(
+                 Icons.shopping_cart_outlined,
+                 color: Theme.of(context).colorScheme.onPrimary,
+               ),
+               onPressed: () => goRoute('/cart'),
+             ),
+           ],
+         ),
+       );
 
   @override
-  void initialContent(
-    SupabaseHomeViewModel viewModel,
-    BuildContext context,
-  ) {
+  void initialContent(SupabaseHomeViewModel viewModel, BuildContext context) {
     viewModel.initial();
   }
 
@@ -66,18 +73,14 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeState state,
   ) {
+    final resources = context.resources;
     if (state is SupabaseHomeErrorState) {
-      return buildError(
-        state.message,
-        onRetry: () => viewModel.initial(),
-      );
+      return buildError(state.message, onRetry: () => viewModel.initial());
     }
 
     if (state is SupabaseHomeLoadingState ||
         state is SupabaseHomeInitialState) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state is SupabaseHomeLoadedState) {
@@ -87,17 +90,17 @@ class SupabaseHomeView
           Expanded(
             child: state.products.isEmpty
                 ? OsmeaComponents.center(
-                    child: OsmeaComponents.text('No products found.'),
+                    child: OsmeaComponents.text(resources.noProducts),
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.all(16.0),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
-                      childAspectRatio: 0.75,
-                    ),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16.0,
+                          mainAxisSpacing: 16.0,
+                          childAspectRatio: 0.75,
+                        ),
                     itemCount: state.products.length,
                     itemBuilder: (context, index) {
                       final product = state.products[index];
@@ -109,20 +112,26 @@ class SupabaseHomeView
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: (product.imageUrl
-                                        .contains('placehold.co'))
+                                child:
+                                    (product.imageUrl.contains('placehold.co'))
                                     ? const Center(
-                                        child: Icon(Icons.image,
-                                            color: Colors.grey))
+                                        child: Icon(
+                                          Icons.image,
+                                          color: Colors.grey,
+                                        ),
+                                      )
                                     : Image.network(
                                         product.imageUrl,
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) {
-                                          return const Center(
-                                              child: Icon(Icons.error,
-                                                  color: Colors.red));
-                                        },
+                                              return const Center(
+                                                child: Icon(
+                                                  Icons.error,
+                                                  color: Colors.red,
+                                                ),
+                                              );
+                                            },
                                       ),
                               ),
                               Padding(
@@ -148,9 +157,9 @@ class SupabaseHomeView
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                           ),
                                     ),
                                   ],
@@ -168,9 +177,7 @@ class SupabaseHomeView
     }
 
     // Fallback for any other state
-    return const Center(
-      child: Text('Something went wrong.'),
-    );
+    return Center(child: Text(resources.somethingWentWrong));
   }
 
   Widget _buildFilterBar(
@@ -186,13 +193,13 @@ class SupabaseHomeView
         children: [
           TextButton.icon(
             icon: const Icon(Icons.sort),
-            label: const Text('Sort'),
+            label: Text(context.resources.sort),
             onPressed: () => _showSortSheet(context, viewModel, state),
           ),
           const SizedBox(width: 8),
           TextButton.icon(
             icon: const Icon(Icons.filter_list),
-            label: const Text('Filter'),
+            label: Text(context.resources.filter),
             onPressed: () => _showFilterSheet(context, viewModel, state),
           ),
         ],
@@ -205,6 +212,7 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeLoadedState currentState,
   ) {
+    final resources = context.resources;
     var tempPriceSort = currentState.priceSort;
     var tempDateSort = currentState.dateSort;
     var tempPopularitySort = currentState.popularitySort;
@@ -228,7 +236,7 @@ class SupabaseHomeView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Sort',
+                            resources.sort,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -245,7 +253,7 @@ class SupabaseHomeView
                         children: [
                           _buildSortSection(
                             context,
-                            'Sort by Date',
+                            resources.sortByDate,
                             tempDateSort,
                             DateSort.values,
                             (sort) {
@@ -258,7 +266,7 @@ class SupabaseHomeView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Popularity',
+                            resources.sortByPopularity,
                             tempPopularitySort,
                             PopularitySort.values,
                             (sort) {
@@ -271,7 +279,7 @@ class SupabaseHomeView
                           ),
                           _buildSortSection(
                             context,
-                            'Sort by Price',
+                            resources.sortByPrice,
                             tempPriceSort,
                             PriceSort.values,
                             (sort) {
@@ -298,7 +306,7 @@ class SupabaseHomeView
                                   tempPopularitySort = PopularitySort.none;
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(resources.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -312,7 +320,7 @@ class SupabaseHomeView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(resources.apply),
                             ),
                           ),
                         ],
@@ -333,14 +341,15 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeLoadedState currentState,
   ) {
+    final resources = context.resources;
     // Hierarchical Filters
     Category? tempRoot = currentState.selectedRootCategory;
     Category? tempSub = currentState.selectedSubCategory;
     Category? tempLeaf = currentState.selectedLeafCategory;
-    
+
     // Brand Filter
     Set<int> tempBrandIds = Set.from(currentState.selectedBrandIds);
-    
+
     // Size Filter
     List<String> tempSizes = List.from(currentState.selectedSizesOrAges);
 
@@ -350,13 +359,24 @@ class SupabaseHomeView
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            
             // Helpers
-            final rootCats = viewModel.getRootCategories(currentState.allCategories);
-            final subCats = viewModel.getSubCategories(currentState.allCategories, tempRoot?.id);
-            final leafCats = viewModel.getSubCategories(currentState.allCategories, tempSub?.id);
-            
-            final isShoe = viewModel.isShoeCategory(tempLeaf, tempSub, tempRoot);
+            final rootCats = viewModel.getRootCategories(
+              currentState.allCategories,
+            );
+            final subCats = viewModel.getSubCategories(
+              currentState.allCategories,
+              tempRoot?.id,
+            );
+            final leafCats = viewModel.getSubCategories(
+              currentState.allCategories,
+              tempSub?.id,
+            );
+
+            final isShoe = viewModel.isShoeCategory(
+              tempLeaf,
+              tempSub,
+              tempRoot,
+            );
             final isFashion = viewModel.isFashionCategory(tempRoot);
 
             return DraggableScrollableSheet(
@@ -372,7 +392,7 @@ class SupabaseHomeView
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Filters',
+                            resources.filters,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           IconButton(
@@ -387,9 +407,9 @@ class SupabaseHomeView
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         children: [
-                           // --- Category Hierarchy ---
+                          // --- Category Hierarchy ---
                           _buildSafeDropdown<Category>(
-                            'Main Category',
+                            resources.mainCategory,
                             rootCats,
                             (c) => c.name,
                             tempRoot,
@@ -403,7 +423,7 @@ class SupabaseHomeView
                           if (tempRoot != null && subCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Sub Category',
+                              resources.subCategory,
                               subCats,
                               (c) => c.name,
                               tempSub,
@@ -417,7 +437,7 @@ class SupabaseHomeView
                           if (tempSub != null && leafCats.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSafeDropdown<Category>(
-                              'Specific Category',
+                              resources.specificCategory,
                               leafCats,
                               (c) => c.name,
                               tempLeaf,
@@ -427,37 +447,48 @@ class SupabaseHomeView
                               }),
                             ),
                           ],
-                          
+
                           const Divider(height: 32),
 
                           // --- Size / Age Filter ---
                           if (isShoe || isFashion) ...[
                             Text(
-                              isShoe ? 'Shoe Sizes' : 'Size / Age Groups',
+                              isShoe
+                                  ? resources.shoeSizes
+                                  : resources.sizeAgeGroups,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 8),
                             Wrap(
                               spacing: 8,
-                              children: (isShoe ? viewModel.shoeSizes : viewModel.clothingSizesAndAges).map((opt) {
-                                final isSelected = tempSizes.contains(opt);
-                                return FilterChip(
-                                  label: Text(opt),
-                                  selected: isSelected,
-                                  onSelected: (selected) {
-                                    setModalState(() {
-                                      selected ? tempSizes.add(opt) : tempSizes.remove(opt);
-                                    });
-                                  },
-                                );
-                              }).toList(),
+                              children:
+                                  (isShoe
+                                          ? viewModel.shoeSizes
+                                          : viewModel.clothingSizesAndAges)
+                                      .map((opt) {
+                                        final isSelected = tempSizes.contains(
+                                          opt,
+                                        );
+                                        return FilterChip(
+                                          label: Text(opt),
+                                          selected: isSelected,
+                                          onSelected: (selected) {
+                                            setModalState(() {
+                                              selected
+                                                  ? tempSizes.add(opt)
+                                                  : tempSizes.remove(opt);
+                                            });
+                                          },
+                                        );
+                                      })
+                                      .toList(),
                             ),
                             const Divider(height: 32),
                           ],
-                          
+
                           _buildCheckboxFilterSection<Brand, int>(
                             context,
-                            'Brands',
+                            resources.brands,
                             currentState.allBrands,
                             tempBrandIds,
                             (brand) => brand.name,
@@ -488,7 +519,7 @@ class SupabaseHomeView
                                   tempSizes.clear();
                                 });
                               },
-                              child: const Text('Clear'),
+                              child: Text(resources.clear),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -505,7 +536,7 @@ class SupabaseHomeView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(resources.apply),
                             ),
                           ),
                         ],
@@ -520,7 +551,7 @@ class SupabaseHomeView
       },
     );
   }
-  
+
   Widget _buildSafeDropdown<T>(
     String label,
     List<T> items,
@@ -600,10 +631,7 @@ class SupabaseHomeView
           final isSelected = selectedIds.contains(id);
           return ListTile(
             title: Text(itemTitle(item)),
-            leading: Checkbox(
-              value: isSelected,
-              onChanged: null,
-            ),
+            leading: Checkbox(value: isSelected, onChanged: null),
             onTap: () => onChanged(!isSelected, id),
           );
         }),

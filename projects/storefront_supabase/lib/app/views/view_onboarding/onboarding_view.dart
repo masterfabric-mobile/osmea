@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class OnboardingView extends StatelessWidget {
   final void Function(String) goRoute;
@@ -8,16 +9,16 @@ class OnboardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Onboarding')),
+      appBar: AppBar(title: Text(context.resources.onboarding)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Onboarding Screen'),
+            Text(context.resources.onboardingScreen),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => goRoute('/home'),
-              child: const Text('Go to Home'),
+              child: Text(context.resources.goToHome),
             ),
           ],
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -16,7 +18,7 @@ class SettingsView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Settings',
+              context.resources.settings,
               color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -56,12 +58,10 @@ class SettingsView
       return ListView(
         children: [
           OsmeaComponents.listItem(
-            title: OsmeaComponents.text('Dark Mode'),
-            leading: const Icon(Icons.dark_mode),
-            trailing: Switch(
-              value: state.darkModeEnabled,
-              onChanged: (value) => viewModel.toggleDarkMode(value),
-            ),
+            title: OsmeaComponents.text(context.resources.language),
+            leading: const Icon(Icons.language),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showLanguageSheet(context),
           ),
         ],
       );
@@ -69,6 +69,75 @@ class SettingsView
 
     return const Center(
       child: CircularProgressIndicator(),
+    );
+  }
+
+  void _showLanguageSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Text('🇺🇸'),
+              title: const Text('English'),
+              onTap: () {
+                final locale = const Locale('en');
+                context.read<LanguageCubit>().changeLanguage(locale);
+                final appLocale = AppLocaleUtils.parseLocaleParts(
+                  languageCode: locale.languageCode,
+                  countryCode: locale.countryCode,
+                );
+                LocaleSettings.setLocaleSync(appLocale);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Text('🇹🇷'),
+              title: const Text('Türkçe'),
+              onTap: () {
+                final locale = const Locale('tr');
+                context.read<LanguageCubit>().changeLanguage(locale);
+                final appLocale = AppLocaleUtils.parseLocaleParts(
+                  languageCode: locale.languageCode,
+                  countryCode: locale.countryCode,
+                );
+                LocaleSettings.setLocaleSync(appLocale);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Text('🇩🇪'),
+              title: const Text('Deutsch'),
+              onTap: () {
+                final locale = const Locale('de');
+                context.read<LanguageCubit>().changeLanguage(locale);
+                final appLocale = AppLocaleUtils.parseLocaleParts(
+                  languageCode: locale.languageCode,
+                  countryCode: locale.countryCode,
+                );
+                LocaleSettings.setLocaleSync(appLocale);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Text('🇫🇷'),
+              title: const Text('Français'),
+              onTap: () {
+                final locale = const Locale('fr');
+                context.read<LanguageCubit>().changeLanguage(locale);
+                final appLocale = AppLocaleUtils.parseLocaleParts(
+                  languageCode: locale.languageCode,
+                  countryCode: locale.countryCode,
+                );
+                LocaleSettings.setLocaleSync(appLocale);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
