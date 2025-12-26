@@ -1,0 +1,417 @@
+{
+    "app_settings": {
+      "app_name": "Storefront WooCommerce",
+      "app_version": "1.0.0",
+      "build_number": "1",
+      "environment": "production",
+      "debug_mode": false,
+      "maintenance_mode": false
+    },
+    "api_configuration": {
+      "base_url": "https://api.masterfabric.co/woo",
+      "timeout_seconds": 45,
+      "retry_count": 3,
+      "enable_logging": true
+    },
+  "woocommerce_configuration": {
+    "store_url": "http://localhost:8000",
+    "brand_name": "WooPress Dev",
+    "auth_key": "YOUR_SPECIAL_AUTH_CODE",
+    "version": "v1",
+    "verify_ssl": true,
+    "query_string_auth": false,
+    "products_per_page": 20,
+    "enable_reviews": true,
+    "enable_coupons": true,
+    "enable_guest_checkout": true
+  },
+  "account_configuration": {
+    "style": "space",
+    "space_style_colors": {
+      "primary_color": "#000000",
+      "secondary_color": "#06060666",
+      "text_color": "#000000",
+      "icon_color": "#000000",
+      "separator_color": "#E5E5E5",
+      "background_color": "#FFFFFF"
+    },
+    "sections": [
+      {
+        "sectionTitle": "Orders & Requests",
+        "items": [
+          {
+            "id": "all_orders",
+            "title": "All My Orders",
+            "iconName": "shopping_bag_outlined",
+            "iconColor": "#4A90E2",
+            "route": "/orders"
+          },
+          {
+            "id": "return_requests",
+            "title": "My Return Requests",
+            "iconName": "schedule",
+            "iconColor": "#4CAF50",
+            "route": "/returns"
+          },
+          {
+            "id": "cancel_requests",
+            "title": "My Cancellation Requests",
+            "iconName": "update",
+            "iconColor": "#FFC107",
+            "route": "/cancellations"
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Account & Preferences",
+        "items": [
+          {
+            "id": "account_settings",
+            "title": "Account Settings",
+            "iconName": "person_outline",
+            "iconColor": "#4A90E2",
+            "route": "/account-info"
+          },
+          {
+            "id": "notification_preferences",
+            "title": "Notification Preferences",
+            "iconName": "notifications_outlined",
+            "iconColor": "#E57373",
+            "route": "/notifications"
+          }
+        ]
+      },
+      {
+        "sectionTitle": "Alarm & Watchlists",
+        "items": [
+          {
+            "id": "stock_alarm",
+            "title": "My Stock Alarm List",
+            "iconName": "inventory_outlined",
+            "iconColor": "#9C27B0",
+            "route": "/stock-alarms"
+          },
+          {
+            "id": "price_alarm",
+            "title": "My Price Alarm List",
+            "iconName": "local_offer_outlined",
+            "iconColor": "#673AB7",
+            "route": "/price-alarms"
+          }
+        ]
+      }
+    ]
+  },
+    "firebase_configuration": {
+      "analytics_enabled": true,
+      "crashlytics_enabled": true,
+      "performance_monitoring_enabled": true,
+      "remote_config_enabled": true,
+      "remote_config_fetch_timeout": 60,
+      "remote_config_cache_expiration": 3600
+    },
+    "ui_configuration": {
+      "theme_mode": "light",
+      "primary_color": "#000000",
+      "accent_color": "#FFFFFF",
+      "search_app_bar_color": "#A3D3F2FF",
+      "font_scale": 1.0,
+      "enable_haptic_feedback": true,
+      "enable_sound_effects": true
+    },
+
+      "search_view_configuration": {
+    "search_app_bar_color": "#FFFFFFFF",
+
+    "search_bar_border_color": "#E0E0E0FF",
+    "action_icon_color": "#6B7280FF",
+    "text_color": "#000000FF",
+    "hint_text_color": "#6B7280FF",
+    "focus_color": "#2563EBFF",
+    "error_color": "#EF4444FF",
+    "search_bar_show_clear_button": true,
+    "search_bar_show_search_icon": true,
+    "elevation": 4.0,
+    "search_bar_size": "medium",
+    "search_bar_variant": "borderless",
+    "search_bar_border_radius": 20.0,
+    "title": "Search",
+    "search_hint": "Search products, brands, categories...",
+    "show_barcode_scanner": true,
+    "show_voice_search": true,
+    "show_back_button": true,
+    "action_button_spacing": 2.0,
+    "action_button_min_width": 32.0,
+    "action_button_min_height": 32.0,
+    "action_button_padding_all": 4.0
+  },
+    "security_configuration": {
+      "enable_ssl_pinning": true,
+      "certificate_validation": true,
+      "biometric_authentication": true,
+      "session_timeout_minutes": 45
+    },
+    "storage_configuration": {
+      "enable_encryption": true,
+      "cache_size_mb": 150,
+      "auto_cleanup_enabled": true,
+      "backup_enabled": true
+    },
+    "notification_configuration": {
+      "push_notifications_enabled": true,
+      "local_notifications_enabled": true,
+      "notification_sound": "default",
+      "vibration_enabled": true
+    },
+    "feature_flags": {
+      "onboarding_enabled": true,
+      "dark_mode_available": true,
+      "offline_mode_enabled": true,
+      "beta_features_enabled": false,
+      "analytics_opt_out_available": true,
+      "woocommerce_integration_enabled": true,
+      "payment_gateway_enabled": true,
+      "wishlist_enabled": true,
+      "cart_persistence_enabled": true
+    },
+    "splash_configuration": {
+      "enabled": true,
+      "style": "enterprise",
+      "duration_milliseconds": 3000,
+      "min_duration_milliseconds": 1500,
+      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true",
+      "background_color": "#FFFFFF",
+      "logo_color": "#000000",
+      "show_loading_indicator": true,
+      "loading_indicator_color": "#000000",
+      "show_version_info": true,
+      "version_text_color": "#666666",
+      "fade_animation_enabled": true,
+      "animation_duration_milliseconds": 500,
+      "enable_logo_animation": true,
+      "logo_animation_type": "fade_scale",
+      "show_app_name": true,
+      "app_name_text_color": "#000000",
+      "app_name_font_size": 24,
+      "navigation_target": "/onboarding",
+      "fallback_navigation_target": "/home",
+      "check_connectivity": true,
+      "preload_critical_data": true,
+      "show_error_on_failure": false,
+      "retry_on_error": true,
+      "max_retry_attempts": 2,
+      "enable_dev_mode_tap": true,
+      "dev_mode_tap_count": 7
+    },
+    "localization_configuration": {
+      "default_language": "tr",
+      "supported_languages": ["tr", "en", "de", "fr"],
+      "rtl_support": false,
+      "auto_detect_language": true
+    },
+    "performance_configuration": {
+      "image_cache_size_mb": 75,
+      "network_cache_size_mb": 50,
+      "lazy_loading_enabled": true,
+      "preload_critical_assets": true
+    },
+    "onboarding_configuration": {
+      "style": "space",
+      "auto_advance_seconds": null,
+      "show_skip_button": true,
+      "show_page_indicator": true,
+      "animation_duration": 400,
+      "primary_color": "#000000",
+      "secondary_color": "#FFFFFF",
+      "pages": [
+        {
+          "title": "Your WooCommerce Store",
+          "description": "Easily manage your products and increase your sales with powerful WooCommerce integration.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Next"
+        },
+        {
+          "title": "Easy Product Management",
+          "description": "Add, edit your products and track inventory status in real-time.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#F5F5F5",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Continue"
+        },
+        {
+          "title": "Inventory Control",
+          "description": "Keep track of your stock levels and get notified when products are running low.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#E5E5E5",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Continue"
+        },
+        {
+          "title": "Order Management",
+          "description": "Process orders efficiently and keep your customers satisfied with fast delivery.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#D5D5D5",
+          "text_color": "#000000",
+          "button_text": null,
+          "skip_text": "Skip",
+          "next_text": "Continue"
+        },
+        {
+          "title": "Advanced Analytics",
+          "description": "Grow your business with sales reports, customer analytics and performance metrics.",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#C5C5C5",
+          "text_color": "#000000",
+          "button_text": "Open My Store",
+          "skip_text": null,
+          "next_text": null
+        }
+      ]
+    },
+    "loading_configuration": {
+      "style": "enterprise",
+      "type": "authentication",
+      "duration_milliseconds": 3000,
+      "step_duration_milliseconds": 750,
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "progress_color": "#000000",
+      "animation_type": "linear",
+      "show_logo": true,
+      "logo_animation_enabled": true,
+      "auto_dismiss_enabled": true,
+      "tap_to_dismiss_enabled": true,
+      "show_progress_indicator": true,
+      "show_percentage": true,
+      "animation_enabled": true,
+      "haptic_feedback_enabled": true,
+      "steps": [
+       
+      ],
+      "custom_messages": {
+        "network_error": "Network connection required",
+        "timeout_error": "Operation timed out",
+        "generic_error": "Something went wrong",
+        "retry_message": "Tap to retry",
+        "cancel_message": "Tap to cancel"
+      },
+      "accessibility": {
+        "enabled": true,
+        "announce_steps": true,
+        "voice_over_enabled": true,
+        "semantic_labels": {
+          "loading": "Loading in progress",
+          "progress": "Progress indicator",
+          "step": "Loading step",
+          "cancel": "Cancel loading",
+          "retry": "Retry loading"
+        }
+      }
+    },
+    "error_handling_configuration": {
+      "style": "space",
+      "errorTitle": "Something went wrong..",
+      "animation_duration": 500,
+      "primary_color": "#FAFAFAFF",
+      "secondary_color": "#7B0000FF",
+      "background_color": "#FAFAFAFF",
+      "text_color": "#000000FF"
+      
+    },
+    "auth_configuration": {
+      "ui_style": {
+        "tab_container_radius": 12,
+        "tab_item_radius": 10,
+        "button_radius": 12,
+        "content_area_top_radius": 32,
+        "background_color": "#4A6FE8",
+        "horizontal_padding": 24
+      },
+      "sign_in": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "remember_me_label": "Remember me",
+        "forgot_password_label": "Forgot Password?",
+        "sign_in_button": "Continue",
+        "sign_in_button_loading": "Signing in...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "sign_up": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "password_confirm_label": "Confirm Password",
+        "password_confirm_hint": "Confirm your password",
+        "privacy_policy_label": "I have read and accept the Privacy Policy",
+        "terms_label": "I have read and accept the Terms of Service",
+        "sign_up_button": "Create Account",
+        "sign_up_button_loading": "Creating account...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "forgot_password": {
+        "title": "Reset Password",
+        "subtitle": "Enter your email to reset"
+      }
+    },
+    "empty_view_configuration": {
+      "style": "enterprise",
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "animation_duration": 400,
+      "primary_color": "#000000",
+      "secondary_color": "#FFFFFF",
+      "enable_haptic_feedback": true,
+      "default_empty_message": "No items found",
+      "show_action_button": true,
+      "empty_pages": [
+        {
+          "title": "Your cart is empty",
+          "description": "Add items to your cart to see them here.",
+          "empty_type": "cart",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Start Shopping"
+        },
+        {
+          "title": "No favorites yet",
+          "description": "Start adding items to your favorites to see them here.",
+          "empty_type": "wishlist",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Explore Products"
+        }
+      ]
+    }
+
+  }
+
