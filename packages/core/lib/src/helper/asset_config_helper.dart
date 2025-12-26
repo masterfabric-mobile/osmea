@@ -69,6 +69,9 @@ class AssetConfigHelper {
   /// Flag to track if automatic initialization was attempted
   bool _autoInitAttempted = false;
 
+  /// Flag to track if WordPress config is set (should not be overridden)
+  bool _isWordPressConfigSet = false;
+
   /// 📂 Load configuration from an asset file with optional fallback
   ///
   /// This method loads a JSON configuration file with configurable fallback:
@@ -82,6 +85,10 @@ class AssetConfigHelper {
   /// - Only attempts to load from the specified assetPath
   /// - No fallback to @core package config
   /// - Used when MasterApp already handles fallback logic
+  ///
+  /// **WordPress Config Protection:**
+  /// - If WordPress config is already set (via setConfig), this method will not override it
+  /// - Returns true immediately if WordPress config is set, without loading from file
   ///
   /// Parameters:
   /// - [assetPath]: The path to the JSON asset file. If null and enableFallback=true, defaults to @core package config
@@ -105,6 +112,12 @@ class AssetConfigHelper {
   /// ```
   Future<bool> loadConfig(
       [String? assetPath, bool enableFallback = true]) async {
+    // Protect WordPress config from being overridden
+    if (_isWordPressConfigSet && _currentConfig != null) {
+      debugPrint('🔒 WordPress config is set, skipping loadConfig to prevent override');
+      debugPrint('📂 Current config source: $_currentConfigPath');
+      return true;
+    }
     // Define @core package config path
     const String corePackageConfigPath = 'packages/core/assets/app_config.json';
 
@@ -712,10 +725,13 @@ class AssetConfigHelper {
   ///
   /// This method clears all cached configuration data, forcing the next
   /// loadConfig call to read from the asset file again.
+  ///
+  /// Note: This will also clear WordPress config protection flag.
   void clearCache() {
     _configCache.clear();
     _currentConfig = null;
     _currentConfigPath = null;
+    _isWordPressConfigSet = false;
     debugPrint('🗑️ Configuration cache cleared');
   }
 
@@ -737,6 +753,42 @@ class AssetConfigHelper {
 
     // Reload the configuration
     return await loadConfig(_currentConfigPath!);
+  }
+
+  /// 🔧 Set configuration data directly (for merged configs from external sources)
+  ///
+  /// This method allows setting configuration data that has been merged
+  /// from external sources (e.g., WordPress REST API) into AssetConfigHelper.
+  ///
+  /// Parameters:
+  /// - [config]: The configuration map to set
+  /// - [sourcePath]: Optional path identifier for the config source (for tracking)
+  ///
+  /// Returns:
+  /// - bool: true if config was set successfully, false otherwise
+  bool setConfig(Map<String, dynamic> config, [String? sourcePath]) {
+    try {
+      _currentConfig = config;
+      _currentConfigPath = sourcePath ?? 'merged_config';
+      
+      // Mark as WordPress config if source path indicates it
+      _isWordPressConfigSet = sourcePath == 'wordpress_merged_config';
+      
+      // Cache the merged config
+      final cacheKey = sourcePath ?? 'merged_config';
+      _configCache[cacheKey] = config;
+      
+      debugPrint('✅ Configuration set from external source: ${sourcePath ?? 'merged'}');
+      if (_isWordPressConfigSet) {
+        debugPrint('🔒 WordPress config is now protected from override');
+      }
+      debugPrint('📊 Configuration keys: ${config.keys.toList()}');
+      
+      return true;
+    } catch (e) {
+      debugPrint('❌ Error setting configuration: $e');
+      return false;
+    }
   }
 
   /// 🔧 Private method to get a value using dot notation with auto-initialization
