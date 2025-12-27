@@ -1,5 +1,7 @@
 import 'package:storefront_woo/app/routes/app_routes.dart';
 import 'package:storefront_woo/app/core/config/config_di.dart';
+import 'package:storefront_woo/services/wordpress_config_service.dart';
+import 'package:storefront_woo/services/wordpress_config_integration.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
@@ -52,15 +54,58 @@ launchApp({String environment = 'dev'}) async {
 
   // 🗂️ Initialize configuration helpers for app-level usage
   final AssetConfigHelper assetConfigHelper = AssetConfigHelper();
-  bool configLoaded = await assetConfigHelper.loadConfig(
-    'assets/app_config.json',
-  );
-
+  
+  // 📡 Try to load WordPress config and merge with local config
+  WordPressConfigIntegration? wordPressConfigIntegration;
+  bool configLoaded = false;
+  
+  try {
+    debugPrint('📡 Attempting to load configuration from WordPress...');
+    
+    final wordPressService = WordPressConfigService(
+      baseUrl: 'http://example.com', // WordPress site URL
+    );
+    
+    wordPressConfigIntegration = WordPressConfigIntegration(
+      configService: wordPressService,
+      assetConfigHelper: assetConfigHelper,
+    );
+    
+    // Load and merge WordPress config with local config
+    final mergedConfig = await wordPressConfigIntegration!.loadAndMergeConfig(
+      localConfigPath: 'assets/app_config.json',
+      useWordPressAsPrimary: true, // WordPress config overrides local
+    );
+    
+    if (mergedConfig != null) {
+      configLoaded = true;
+      debugPrint('✅ Configuration loaded: WordPress + Local (merged)');
+      
+      // Set merged config to AssetConfigHelper so all parts of the app use it
+      assetConfigHelper.setConfig(mergedConfig, 'wordpress_merged_config');
+      debugPrint('✅ Merged config set to AssetConfigHelper');
+    } else {
+      // Fallback to local config only
+      debugPrint('⚠️ WordPress config failed, falling back to local config');
+      configLoaded = await assetConfigHelper.loadConfig(
+        'assets/app_config.json',
+      );
+    }
+  } catch (e) {
+    debugPrint('⚠️ WordPress config integration error: $e');
+    debugPrint('📦 Falling back to local config only');
+    configLoaded = await assetConfigHelper.loadConfig(
+      'assets/app_config.json',
+    );
+  }
+  
   // Simple config source info
   final configStats = assetConfigHelper.getConfigStats();
   final configSource = configStats['config_source'] ?? 'unknown';
   debugPrint(
-    '📂 Config: ${configSource == 'project_specific'
+    '📂 Config Source: ${wordPressConfigIntegration != null && wordPressConfigIntegration!.mergedConfig != null
+        ? '🌐 WordPress + Local (merged)'
+        : configSource == 'project_specific'
         ? '🎯 Project'
         : configSource == 'core_package_fallback'
         ? '📦 Core Package'
@@ -149,20 +194,44 @@ launchApp({String environment = 'dev'}) async {
   }
 
   // 🎨 Get UI configuration from config helpers
-  bool debugMode = configLoaded
-      ? assetConfigHelper.getBool(
-          'app_settings.debug_mode',
-          environment == 'dev',
-        )
-      : (environment == 'dev');
-
-  double fontScale = configLoaded
-      ? assetConfigHelper.getDouble('ui_configuration.font_scale', 1.0)
-      : 1.0;
-
-  String themeMode = configLoaded
-      ? assetConfigHelper.getString('ui_configuration.theme_mode', 'light')
-      : 'light';
+  // Use WordPress config integration if available, otherwise fallback to AssetConfigHelper
+  bool debugMode;
+  double fontScale;
+  String themeMode;
+  
+  if (wordPressConfigIntegration != null && wordPressConfigIntegration!.mergedConfig != null) {
+    // Use WordPress merged config
+    debugMode = configLoaded
+        ? wordPressConfigIntegration!.getBool(
+            'app_settings.debug_mode',
+            environment == 'dev',
+          )
+        : (environment == 'dev');
+    
+    fontScale = configLoaded
+        ? wordPressConfigIntegration!.getDouble('ui_configuration.font_scale', 1.0)
+        : 1.0;
+    
+    themeMode = configLoaded
+        ? wordPressConfigIntegration!.getString('ui_configuration.theme_mode', 'light')
+        : 'light';
+  } else {
+    // Use local AssetConfigHelper
+    debugMode = configLoaded
+        ? assetConfigHelper.getBool(
+            'app_settings.debug_mode',
+            environment == 'dev',
+          )
+        : (environment == 'dev');
+    
+    fontScale = configLoaded
+        ? assetConfigHelper.getDouble('ui_configuration.font_scale', 1.0)
+        : 1.0;
+    
+    themeMode = configLoaded
+        ? assetConfigHelper.getString('ui_configuration.theme_mode', 'light')
+        : 'light';
+  }
 
   // Convert theme mode string to ThemeMode enum
   ThemeMode appThemeMode;

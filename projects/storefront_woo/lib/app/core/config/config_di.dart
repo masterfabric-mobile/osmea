@@ -67,14 +67,45 @@ Future<void> _initializeFromEnvironment(String? environment) async {
   try {
     debugPrint('🔧 Initializing WooCommerce from app configuration...');
 
-    // Get configuration from app_config.json
+    // Get configuration from AssetConfigHelper
+    // WordPress merged config is already set in starter.dart via setConfig()
+    // We should use that config if available, otherwise fallback to local
     final AssetConfigHelper configHelper = AssetConfigHelper();
-    await configHelper.loadConfig('assets/app_config.json');
+    
+    // Check if WordPress config is already set (from starter.dart)
+    final currentConfigPath = configHelper.getCurrentConfigPath();
+    final isWordPressConfig = currentConfigPath == 'wordpress_merged_config';
+    
+    if (isWordPressConfig) {
+      debugPrint('🌐 Using WordPress merged configuration');
+    } else if (configHelper.getAllConfig() == null) {
+      // Only load local config if WordPress config is not set and no config is loaded
+      debugPrint('📦 Loading local configuration (WordPress config not available)');
+      await configHelper.loadConfig('assets/app_config.json');
+    } else {
+      debugPrint('📂 Using existing configuration');
+    }
 
-    final storeUrl = configHelper.getString(
+    var storeUrl = configHelper.getString(
       'woocommerce_configuration.store_url',
       '',
-    );
+    ).trim();
+    
+    // Normalize URL: Fix common formatting issues
+    if (storeUrl.isNotEmpty) {
+      // Fix missing slash after http: or https: (e.g., http:/example.com -> http://example.com)
+      if (storeUrl.startsWith('http:/') && !storeUrl.startsWith('http://')) {
+        storeUrl = storeUrl.replaceFirst('http:/', 'http://');
+      } else if (storeUrl.startsWith('https:/') && !storeUrl.startsWith('https://')) {
+        storeUrl = storeUrl.replaceFirst('https:/', 'https://');
+      }
+      
+      // Remove trailing slash if present
+      if (storeUrl.endsWith('/')) {
+        storeUrl = storeUrl.substring(0, storeUrl.length - 1);
+      }
+    }
+    
     final brandName = configHelper.getString(
       'woocommerce_configuration.brand_name',
       'simple-jwt-login',
@@ -85,9 +116,21 @@ Future<void> _initializeFromEnvironment(String? environment) async {
     );
 
     if (storeUrl.isNotEmpty && brandName.isNotEmpty) {
+      // Validate URL format
+      try {
+        final uri = Uri.tryParse(storeUrl);
+        if (uri == null || (uri.scheme != 'http' && uri.scheme != 'https')) {
+          throw Exception('Invalid URL format: $storeUrl');
+        }
+      } catch (e) {
+        debugPrint('❌ Invalid store URL format: $storeUrl');
+        debugPrint('   Error: $e');
+        throw Exception('Invalid WooCommerce store URL format: $storeUrl');
+      }
+      
       // Initialize WooCommerce network
       debugPrint('🔧 Initializing WooCommerce with JWT Auth:');
-      debugPrint('  - Store URL: $storeUrl');
+      debugPrint('  - Store URL: $storeUrl (normalized)');
       debugPrint('  - Brand Name (JWT Plugin): $brandName');
       debugPrint('  - API Version: $apiVersion');
       debugPrint('  - Auth Method: JWT (No consumer key/secret needed)');
