@@ -422,23 +422,9 @@ class _CampaignPopupButtonWidgetState
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OsmeaComponents.text(
-                  '%',
-                  textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                    color: textColorParsed,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                  ),
-                ),
+             
                 OsmeaComponents.sizedBox(width: 2),
-                OsmeaComponents.text(
-                  '%',
-                  textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                    color: textColorParsed,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                  ),
-                ),
+                
               ],
             ),
             OsmeaComponents.sizedBox(height: 2),

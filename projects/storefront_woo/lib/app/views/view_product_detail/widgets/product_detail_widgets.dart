@@ -12,9 +12,25 @@ import 'package:storefront_woo/app/views/view_product_detail/models/product_deta
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/action_section.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_images_widget.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/product_info_section_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_name_price_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_attributes_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_description_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+
+/// Component model with orderID
+class _ProductDetailComponent {
+  final int orderId;
+  final Widget widget;
+  final String name;
+
+  _ProductDetailComponent({
+    required this.orderId,
+    required this.widget,
+    required this.name,
+  });
+}
 
 /// Main content widget for product detail view
 class ProductDetailContentWidget extends StatelessWidget {
@@ -37,26 +53,16 @@ class ProductDetailContentWidget extends StatelessWidget {
     final wishlistVm = GetIt.I<WishlistViewModel>();
     final isInWishlist = wishlistVm.isSaved(productId);
 
+    final configHelper = AssetConfigHelper();
+    final orderedComponents = _buildOrderedComponents(context, configHelper, isInWishlist, productId);
+
         return Stack(
           children: [
             OsmeaComponents.singleChildScrollView(
               padding: EdgeInsets.only(bottom: context.dynamicHeight(0.10)),
               child: OsmeaComponents.column(
                 crossAxisAlignment: context.crossStart,
-                children: [
-                  // Product images with overlay actions
-                  ProductImagesWidget(
-                    imageUrls: state.imageUrls,
-                    viewModel: viewModel,
-                    goRoute: goRoute,
-                    withOverlays: true,
-                    isInWishlist: isInWishlist,
-                    productId: productId,
-                  ),
-
-                  // Product info section
-                  ProductInfoSectionWidget(viewModel: viewModel, state: state),
-                ],
+                children: orderedComponents,
               ),
             ),
 
@@ -186,7 +192,7 @@ class ProductDetailContentWidget extends StatelessWidget {
                     },
                     selectedQuantity: state.selectedQuantity,
                     onUpdateQuantity: (q) => viewModel.updateQuantityFire(q),
-                    onShare: () {},
+                    onShare: () => _shareProduct(context, state),
                     showWishlistAndShare: false,
                   ),
                 ),
@@ -194,5 +200,147 @@ class ProductDetailContentWidget extends StatelessWidget {
             ),
           ],
         );
+  }
+
+  /// Loads component orderID from config
+  int _getOrderId(AssetConfigHelper configHelper, String componentName) {
+    try {
+      final config = configHelper.getObject('product_detail_view.$componentName');
+      return config?['order_id'] as int? ?? 999;
+    } catch (e) {
+      debugPrint('⚠️ Failed to load order_id for $componentName: $e');
+      return 999;
+    }
+  }
+
+  /// Checks if component is enabled
+  bool _isEnabled(AssetConfigHelper configHelper, String componentName) {
+    try {
+      final config = configHelper.getObject('product_detail_view.$componentName');
+      return config?['enabled'] as bool? ?? true;
+    } catch (e) {
+      debugPrint('⚠️ Failed to load enabled for $componentName: $e');
+      return true;
+    }
+  }
+
+  /// Builds all components sorted by orderID
+  List<Widget> _buildOrderedComponents(
+    BuildContext context,
+    AssetConfigHelper configHelper,
+    bool isInWishlist,
+    int productId,
+  ) {
+    final List<_ProductDetailComponent> components = [];
+
+    // Images - always first (order_id 0)
+    if (_isEnabled(configHelper, 'images')) {
+      components.add(
+        _ProductDetailComponent(
+          orderId: 0,
+          widget: ProductImagesWidget(
+            imageUrls: state.imageUrls,
+            viewModel: viewModel,
+            goRoute: goRoute,
+            withOverlays: true,
+            isInWishlist: isInWishlist,
+            productId: productId,
+            productName: state.product.name,
+          ),
+          name: 'images',
+        ),
+      );
+    }
+
+    // Name and Price
+    if (_isEnabled(configHelper, 'name_and_price')) {
+      components.add(
+        _ProductDetailComponent(
+          orderId: _getOrderId(configHelper, 'name_and_price'),
+          widget: ProductNamePriceWidget(state: state),
+          name: 'name_and_price',
+        ),
+      );
+    }
+
+    // Attributes
+    if (_isEnabled(configHelper, 'attributes') &&
+        state.product.attributes != null &&
+        state.product.attributes!.isNotEmpty) {
+      components.add(
+        _ProductDetailComponent(
+          orderId: _getOrderId(configHelper, 'attributes'),
+          widget: ProductAttributesWidget(
+            viewModel: viewModel,
+            state: state,
+          ),
+          name: 'attributes',
+        ),
+      );
+    }
+
+    // Description
+    if (_isEnabled(configHelper, 'description') &&
+        state.product.description?.isNotEmpty == true) {
+      components.add(
+        _ProductDetailComponent(
+          orderId: _getOrderId(configHelper, 'description'),
+          widget: ProductDescriptionWidget(
+            viewModel: viewModel,
+            state: state,
+          ),
+          name: 'description',
+        ),
+      );
+    }
+
+    // Reviews
+    if (_isEnabled(configHelper, 'reviews')) {
+      components.add(
+        _ProductDetailComponent(
+          orderId: _getOrderId(configHelper, 'reviews'),
+          widget: ProductReviewsWidget(state: state),
+          name: 'reviews',
+        ),
+      );
+    }
+
+    // Sort by orderID (images always first with order_id 0)
+    components.sort((a, b) => a.orderId.compareTo(b.orderId));
+
+    // Convert to widgets list
+    return components.map((c) => c.widget).toList();
+  }
+
+  /// Shares product information
+  Future<void> _shareProduct(BuildContext context, ProductDetailLoadedState state) async {
+    try {
+      final product = state.product;
+      final productId = product.id ?? 0;
+      final productName = product.name ?? 'Product';
+      
+      // Construct shareable text with product name and URL
+      final shareText = '$productName\n\n/product-detail/$productId';
+      
+      // Share using ApplicationShareHelper
+      final success = await ApplicationShareHelper.shareText(
+        shareText,
+        subject: productName,
+      );
+      
+      if (success) {
+        debugPrint('✅ Product shared successfully: $productName');
+      } else {
+        debugPrint('⚠️ Failed to share product');
+        if (context.mounted) {
+          context.snackbarError('Failed to share product');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error sharing product: $e');
+      if (context.mounted) {
+        context.snackbarError('Error sharing product');
+      }
+    }
   }
 }

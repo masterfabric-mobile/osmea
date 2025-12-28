@@ -11,6 +11,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_mo
     as product_models;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
+import 'package:osmea_components/src/enums/collapse_enums.dart';
 
 /// Widget for displaying product attributes with chip selection
 class ProductAttributesWidget extends StatelessWidget {
@@ -72,118 +73,214 @@ class ProductAttributesWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    // Separate collapsible attributes (color, size, material, fit, usage area) from others
+    final collapsibleAttributeNames = [
+      'color', 'renk',
+      'size', 'beden',
+      'material', 'materyal',
+      'kalıp', 'kalip', 'fit',
+      'kullanım alanı', 'kullanim alani', 'usage area', 'usage'
+    ];
+    final collapsibleAttributes = <Map<String, dynamic>>[];
+    final regularAttributes = <Map<String, dynamic>>[];
+
+    for (final attr in normalized) {
+      final attrName = ((attr['name'] as String?) ?? '').toLowerCase();
+      if (collapsibleAttributeNames.any((name) => attrName.contains(name))) {
+        collapsibleAttributes.add(attr);
+      } else {
+        regularAttributes.add(attr);
+      }
+    }
+
     return OsmeaComponents.column(
       crossAxisAlignment: context.crossStart,
       children: [
-        for (final attr in normalized) ...[
-          OsmeaComponents.text(
-            ((attr['name'] as String?) ?? '').capitalizeFirst(),
-            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.thunder,
-              fontWeight: FontWeight.w600,
+        // Collapsible attributes (Color, Size, Material) - full width edge to edge
+        if (collapsibleAttributes.isNotEmpty)
+          OsmeaComponents.collapse(
+            size: CollapseSize.medium,
+            variant: CollapseVariant.ghost,
+            mode: CollapseBehaviorMode.multiple,
+            children: collapsibleAttributes.map((attr) {
+              final attrName = (attr['name'] as String?) ?? '';
+              final selectedValue = state.selectedAttributes[attrName];
+              final displayName = attrName.capitalizeFirst();
+
+              return OsmeaCollapsePanel(
+                header: selectedValue != null
+                    ? RichText(
+                        text: TextSpan(
+                          style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                            color: OsmeaColors.thunder,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          children: [
+                            TextSpan(text: '$displayName: '),
+                            TextSpan(
+                              text: selectedValue.capitalizeFirst(),
+                              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                                color: OsmeaColors.thunder,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : OsmeaComponents.text(
+                        displayName,
+                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: OsmeaColors.thunder,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                value: attrName.toLowerCase(),
+                body: OsmeaComponents.padding(
+                  padding: EdgeInsets.only(
+                    top: context.spacing6,
+                    bottom: context.spacing4,
+                    left: context.spacing16,
+                    right: context.spacing16,
+                  ),
+                  child: Wrap(
+                    spacing: context.spacing8,
+                    runSpacing: context.spacing8,
+                    children: [
+                      for (final opt in (attr['options'] as List<String>)) ...[
+                        _buildChip(
+                          context,
+                          attrName,
+                          opt,
+                          state,
+                          viewModel,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        if (collapsibleAttributes.isNotEmpty && regularAttributes.isNotEmpty)
+          OsmeaComponents.padding(
+            padding: EdgeInsets.symmetric(horizontal: context.spacing16),
+            child: OsmeaComponents.sizedBox(height: context.spacing8),
+          ),
+
+        // Regular attributes (non-collapsible) - with padding
+        if (regularAttributes.isNotEmpty)
+          OsmeaComponents.padding(
+            padding: EdgeInsets.symmetric(horizontal: context.spacing16),
+            child: OsmeaComponents.column(
+              crossAxisAlignment: context.crossStart,
+              children: [
+                for (final attr in regularAttributes) ...[
+                  OsmeaComponents.text(
+                    ((attr['name'] as String?) ?? '').capitalizeFirst(),
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.thunder,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing6),
+                  Wrap(
+                    spacing: context.spacing8,
+                    runSpacing: context.spacing8,
+                    children: [
+                      for (final opt in (attr['options'] as List<String>)) ...[
+                        _buildChip(
+                          context,
+                          (attr['name'] as String?) ?? '',
+                          opt,
+                          state,
+                          viewModel,
+                        ),
+                      ],
+                    ],
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
+                ],
+              ],
             ),
           ),
-          OsmeaComponents.sizedBox(height: context.spacing6),
-          Wrap(
-            spacing: context.spacing8,
-            runSpacing: context.spacing8,
-            children: [
-              for (final opt in (attr['options'] as List<String>)) ...[
-                Builder(
-                  builder: (context) {
-                    final attrName = (attr['name'] as String?) ?? '';
-                    final isSelected =
-                        state.selectedAttributes[attrName] == opt;
-                    final isHighlighted =
-                        state.highlightedAttributes.contains(attrName) &&
-                        !isSelected;
-
-                    final isAvailable = _isOptionAvailable(
-                      attrName,
-                      opt,
-                      state.product,
-                      state.selectedAttributes,
-                    );
-
-                    final borderColor = isHighlighted
-                        ? OsmeaColors.amberFlame
-                        : (isSelected
-                            ? OsmeaColors.nordicBlue
-                            : (isAvailable
-                                ? OsmeaColors.grayMaterial[300]!
-                                    .withValues(alpha: context.alpha60)
-                                : OsmeaColors.grayMaterial[200]!));
-
-                    final backgroundColor = isHighlighted
-                        ? OsmeaColors.amberFlame.withValues(alpha: 0.08)
-                        : (isSelected
-                            ? OsmeaColors.nordicBlue.withValues(alpha: 0.15)
-                            : Colors.transparent);
-
-                    return OsmeaComponents.chips(
-                      text: opt.capitalizeFirst(),
-                      selected: isSelected,
-                      state: isAvailable || isSelected
-                          ? (isSelected
-                              ? ChipsState.selected
-                              : ChipsState.normal)
-                          : ChipsState.disabled,
-                      variant: isHighlighted
-                          ? ChipsVariant.danger
-                          : (isSelected
-                              ? ChipsVariant.primary
-                              : ChipsVariant.neutral),
-                      style: isSelected
-                          ? ChipsStyle.soft
-                          : ChipsStyle.outlined,
-                      size: ChipsSize.medium,
-                      shape: ChipsShape.rounded,
-                      backgroundColor: backgroundColor,
-                      borderColor: borderColor,
-                      borderWidth: isHighlighted
-                          ? context.width1 + 0.5
-                          : context.width1,
-                      textColor: isHighlighted
-                          ? OsmeaColors.amberFlame
-                          : (isSelected
-                              ? OsmeaColors.nordicBlue
-                              : (isAvailable
-                                  ? OsmeaColors.thunder
-                                  : OsmeaColors.pewter.withValues(
-                                      alpha: context.alpha50,
-                                    ))),
-                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                        fontWeight: isSelected || isHighlighted
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.spacing12,
-                        vertical: context.spacing6,
-                      ),
-                      onTap: (isAvailable || isSelected)
-                          ? () async {
-                              if (isSelected) {
-                                await viewModel.clearSelectedAttribute(
-                                  attrName,
-                                );
-                              } else {
-                                await viewModel.setSelectedAttribute(
-                                  attrName,
-                                  opt,
-                                );
-                              }
-                            }
-                          : null,
-                    );
-                  },
-                ),
-              ],
-            ],
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-        ],
       ],
+    );
+  }
+
+  /// Builds a chip widget for attribute options
+  Widget _buildChip(
+    BuildContext context,
+    String attrName,
+    String opt,
+    ProductDetailLoadedState state,
+    ProductDetailViewModel viewModel,
+  ) {
+    final isSelected = state.selectedAttributes[attrName] == opt;
+    final isHighlighted =
+        state.highlightedAttributes.contains(attrName) && !isSelected;
+
+    final isAvailable = _isOptionAvailable(
+      attrName,
+      opt,
+      state.product,
+      state.selectedAttributes,
+    );
+
+    final borderColor = isHighlighted
+        ? OsmeaColors.amberFlame
+        : (isSelected
+            ? OsmeaColors.nordicBlue
+            : (isAvailable
+                ? OsmeaColors.grayMaterial[300]!
+                    .withValues(alpha: context.alpha60)
+                : OsmeaColors.grayMaterial[200]!));
+
+    final backgroundColor = isHighlighted
+        ? OsmeaColors.amberFlame.withValues(alpha: 0.08)
+        : (isSelected
+            ? OsmeaColors.nordicBlue.withValues(alpha: 0.15)
+            : Colors.transparent);
+
+    return OsmeaComponents.chips(
+      text: opt.capitalizeFirst(),
+      selected: isSelected,
+      state: isAvailable || isSelected
+          ? (isSelected ? ChipsState.selected : ChipsState.normal)
+          : ChipsState.disabled,
+      variant: isHighlighted
+          ? ChipsVariant.danger
+          : (isSelected ? ChipsVariant.primary : ChipsVariant.neutral),
+      style: isSelected ? ChipsStyle.soft : ChipsStyle.outlined,
+      size: ChipsSize.medium,
+      shape: ChipsShape.rounded,
+      backgroundColor: backgroundColor,
+      borderColor: borderColor,
+      borderWidth: isHighlighted ? context.width1 + 0.5 : context.width1,
+      textColor: isHighlighted
+          ? OsmeaColors.amberFlame
+          : (isSelected
+              ? OsmeaColors.nordicBlue
+              : (isAvailable
+                  ? OsmeaColors.thunder
+                  : OsmeaColors.pewter.withValues(alpha: context.alpha50))),
+      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        fontWeight: isSelected || isHighlighted
+            ? FontWeight.w600
+            : FontWeight.w500,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing12,
+        vertical: context.spacing6,
+      ),
+      onTap: (isAvailable || isSelected)
+          ? () async {
+              if (isSelected) {
+                await viewModel.clearSelectedAttribute(attrName);
+              } else {
+                await viewModel.setSelectedAttribute(attrName, opt);
+              }
+            }
+          : null,
     );
   }
 

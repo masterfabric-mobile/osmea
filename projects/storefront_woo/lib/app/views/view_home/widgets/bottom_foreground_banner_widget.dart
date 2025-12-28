@@ -121,6 +121,7 @@ class _BottomForegroundBannerWidgetState
     }
   }
 
+
   /// Handle dismiss button tap with smooth animation
   void _handleDismiss() {
     // Start reverse animation (keep _isVisible true during animation)

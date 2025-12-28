@@ -16,6 +16,7 @@ class ProductImagesWidget extends StatelessWidget {
   final bool withOverlays;
   final bool isInWishlist;
   final int productId;
+  final String? productName;
 
   const ProductImagesWidget({
     super.key,
@@ -25,6 +26,7 @@ class ProductImagesWidget extends StatelessWidget {
     this.withOverlays = false,
     this.isInWishlist = false,
     this.productId = 0,
+    this.productName,
   });
 
   @override
@@ -113,7 +115,7 @@ class ProductImagesWidget extends StatelessWidget {
           pager,
           Positioned(
             right: context.spacing10,
-            top: context.spacing10,
+            top: context.spacing16,
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.iconButton(
@@ -137,7 +139,7 @@ class ProductImagesWidget extends StatelessWidget {
                   variant: ButtonVariant.ghost,
                   backgroundColor: OsmeaColors.white.withValues(alpha: 0.9),
                   borderRadius: context.width24,
-                  onPressed: () {},
+                  onPressed: () => _shareProduct(context),
                 ),
               ],
             ),
@@ -145,6 +147,33 @@ class ProductImagesWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Shares product information
+  Future<void> _shareProduct(BuildContext context) async {
+    try {
+      final name = productName ?? 'Product';
+      final shareText = '$name\n\n/product-detail/$productId';
+      
+      final success = await ApplicationShareHelper.shareText(
+        shareText,
+        subject: name,
+      );
+      
+      if (success) {
+        debugPrint('✅ Product shared successfully: $name');
+      } else {
+        debugPrint('⚠️ Failed to share product');
+        if (context.mounted) {
+          context.snackbarError('Failed to share product');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error sharing product: $e');
+      if (context.mounted) {
+        context.snackbarError('Error sharing product');
+      }
+    }
   }
 }
 

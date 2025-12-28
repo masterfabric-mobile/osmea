@@ -566,6 +566,28 @@
         "product_id": null
       }
     },
+    "product_detail_view": {
+      "images": {
+        "enabled": true,
+        "order_id": 0
+      },
+      "name_and_price": {
+        "enabled": true,
+        "order_id": 1
+      },
+      "attributes": {
+        "enabled": true,
+        "order_id": 3
+      },
+      "description": {
+        "enabled": true,
+        "order_id": 4
+      },
+      "reviews": {
+        "enabled": true,
+        "order_id": 2
+      }
+    },
     "navbar_configuration": {
       "enabled": true,
       "items": [
