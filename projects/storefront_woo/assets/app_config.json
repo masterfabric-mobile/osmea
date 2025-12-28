@@ -413,6 +413,12 @@
       ]
     },
     "home_view": {
+      "component_spacing": {
+        "top": 0,
+        "bottom": 16,
+        "horizontal": 20,
+        "title_to_content": 16
+      },
       "search": {
         "enabled": true,
         "order_id": 0,
@@ -432,6 +438,10 @@
       "banner": {
         "enabled": true,
         "order_id": 2,
+        "padding": {
+          "top": 0,
+          "bottom": 16
+        },
         "items": [
           {
             "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
@@ -489,6 +499,11 @@
         "card_height": 160,
         "card_width": 280,
         "border_radius": 12,
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        },
         "items": [
           {
             "imageUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400",
@@ -520,14 +535,24 @@
         "enabled": true,
         "order_id": 5,
         "title": "Deals of the Day",
-        "limit": 10
+        "limit": 10,
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
       },
       "recommended": {
         "enabled": true,
         "order_id": 6,
         "title": "Recommended for you",
         "limit": 4,
-        "product_ids": []
+        "product_ids": [],
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
       },
       "campaign_popup_button": {
         "enabled": true,

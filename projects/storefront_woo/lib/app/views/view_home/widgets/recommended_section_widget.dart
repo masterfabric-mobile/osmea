@@ -62,6 +62,29 @@ class RecommendedSectionWidget extends StatelessWidget {
     return allProducts.take(limit).toList();
   }
 
+  /// Gets horizontal padding from config
+  double _getHorizontalPadding() {
+    try {
+      final config = _loadRecommendedConfig();
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+        if (horizontal != null && horizontal > 0) {
+          return horizontal;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load horizontal padding: $e');
+    }
+    // Default from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+  }
+
+  /// Gets title to content spacing from config
+  double _getTitleSpacing() {
+    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final config = _loadRecommendedConfig();
@@ -73,17 +96,14 @@ class RecommendedSectionWidget extends StatelessWidget {
     final recommendedProducts = _getRecommendedProducts();
     if (recommendedProducts.isEmpty) return const SizedBox.shrink();
 
+    final horizontalPadding = _getHorizontalPadding();
+
     return OsmeaComponents.column(
       crossAxisAlignment: context.crossStart,
       children: [
         // Section header with "See all" button
         OsmeaComponents.padding(
-          padding: EdgeInsets.fromLTRB(
-            context.spacing20,
-            0,
-            context.spacing20,
-            0,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.row(
             mainAxisAlignment: context.spaceBetween,
             crossAxisAlignment: context.crossCenter,
@@ -132,10 +152,10 @@ class RecommendedSectionWidget extends StatelessWidget {
             ],
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.height16),
-        // Product grid - 2 columns
+        OsmeaComponents.sizedBox(height: _getTitleSpacing()),
+        // Product grid - 2 columns (no padding, spacing handled by parent)
         OsmeaComponents.padding(
-          padding: context.horizontalPaddingNormal,
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Wrap(
             spacing: context.spacing16,
             runSpacing: context.height16,
@@ -145,7 +165,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                 child: SizedBox(
                   width:
                       (context.allWidth -
-                          (context.spacing20 * 2) -
+                          (horizontalPadding * 2) -
                           context.spacing16) /
                       2,
                   child: _buildRecommendedCard(context, product),

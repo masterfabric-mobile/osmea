@@ -117,6 +117,28 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     }
   }
 
+  /// Gets bottom spacing for a component from config
+  /// Returns spacing value in pixels (not EdgeInsets)
+  double _getComponentBottomSpacing(
+    AssetConfigHelper configHelper,
+    String componentName,
+  ) {
+    try {
+      final config = configHelper.getObject('home_view.$componentName');
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final bottom = (paddingConfig['bottom'] as num?)?.toDouble();
+        if (bottom != null && bottom > 0) {
+          return bottom;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load spacing for $componentName: $e');
+    }
+    // Default spacing from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.bottom', 16.0);
+  }
+
   /// Builds all components sorted by orderID
   List<Widget> _buildOrderedComponents(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
@@ -216,8 +238,25 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     // Sort by orderID
     components.sort((a, b) => a.orderId.compareTo(b.orderId));
 
-    // Convert to widgets list
-    return components.map((c) => c.widget).toList();
+    // Convert to widgets list with spacing between components
+    // Use SizedBox for spacing instead of padding
+    final List<Widget> widgets = [];
+    for (int i = 0; i < components.length; i++) {
+      final component = components[i];
+      
+      // Add the component widget
+      widgets.add(component.widget);
+      
+      // Add spacing after component (except for the last one)
+      if (i < components.length - 1) {
+        final bottomSpacing = _getComponentBottomSpacing(configHelper, component.name);
+        if (bottomSpacing > 0) {
+          widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));
+        }
+      }
+    }
+    
+    return widgets;
   }
 
   Future<void> _handleRefresh() async {
@@ -244,8 +283,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
               child: OsmeaComponents.singleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.only(
-                  top: context.spacing16,
-                  bottom: context.spacing24 * 2,
+                  bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
                 ),
                 child: OsmeaComponents.column(
                   children: _buildOrderedComponents(context),

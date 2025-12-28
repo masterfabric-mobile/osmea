@@ -39,6 +39,29 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
 
   // No internal filtering; ViewModel provides sale products. Config is used only for title/cta.
 
+  /// Gets horizontal padding from config
+  double _getHorizontalPadding() {
+    try {
+      final config = _loadDealsConfig();
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+        if (horizontal != null && horizontal > 0) {
+          return horizontal;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load horizontal padding: $e');
+    }
+    // Default from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+  }
+
+  /// Gets title to content spacing from config
+  double _getTitleSpacing() {
+    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cfg =
@@ -79,16 +102,13 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
         )
         .toList();
 
+    final horizontalPadding = _getHorizontalPadding();
+
     return OsmeaComponents.column(
       crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.padding(
-          padding: EdgeInsets.fromLTRB(
-            context.spacing20,
-            0,
-            context.spacing20,
-            0,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.row(
             mainAxisAlignment: context.spaceBetween,
             children: [
@@ -115,7 +135,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
             ],
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.height16),
+        OsmeaComponents.sizedBox(height: _getTitleSpacing()),
         // Render completely empty space when no slides — avoids any internal carousel padding/gutters
         if (bannerItems.isEmpty)
           SizedBox(height: bannerHeight)

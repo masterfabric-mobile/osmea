@@ -71,6 +71,24 @@ class PromotionalBarWidget extends StatelessWidget {
     }
   }
 
+  /// Gets horizontal padding from config
+  double _getHorizontalPadding() {
+    try {
+      final config = _loadPromotionalConfig();
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+        if (horizontal != null && horizontal > 0) {
+          return horizontal;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load horizontal padding: $e');
+    }
+    // Default from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+  }
+
   /// Loads promotional bar items from config
   List<PromotionalBarItem> _loadPromotionalItems() {
     try {
@@ -246,13 +264,10 @@ class PromotionalBarWidget extends StatelessWidget {
     // Take only first 2 items
     final displayItems = items.take(2).toList();
 
+    final horizontalPadding = _getHorizontalPadding();
+
     return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        context.spacing16,
-        context.spacing20,
-        context.spacing16,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: OsmeaComponents.row(
         children: displayItems
             .asMap()

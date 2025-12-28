@@ -76,6 +76,29 @@ class CampaignCardWidget extends StatelessWidget {
     }
   }
 
+  /// Gets horizontal padding from config
+  double _getHorizontalPadding() {
+    try {
+      final config = _loadCampaignConfig();
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+        if (horizontal != null && horizontal > 0) {
+          return horizontal;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load horizontal padding: $e');
+    }
+    // Default from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+  }
+
+  /// Gets title to content spacing from config
+  double _getTitleSpacing() {
+    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+  }
+
   /// Handles campaign card tap navigation
   void _handleCardTap(BuildContext context, CampaignCardItem card) {
     // Navigate based on configuration
@@ -204,18 +227,14 @@ class CampaignCardWidget extends StatelessWidget {
     if (campaignCards.isEmpty) return const SizedBox.shrink();
 
     final sectionTitle = config?['title'] as String? ?? 'Campaigns';
+    final horizontalPadding = _getHorizontalPadding();
 
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section header
         OsmeaComponents.padding(
-          padding: EdgeInsets.fromLTRB(
-            context.spacing20,
-            context.spacing16,
-            context.spacing20,
-            context.spacing12,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.text(
             sectionTitle,
             textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
@@ -225,17 +244,17 @@ class CampaignCardWidget extends StatelessWidget {
             ),
           ),
         ),
+        OsmeaComponents.sizedBox(height: _getTitleSpacing()),
         // Horizontal scrollable campaign cards
         OsmeaComponents.singleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.row(
             children: campaignCards
                 .map((card) => _buildCampaignCard(context, card))
                 .toList(),
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing16),
       ],
     );
   }
