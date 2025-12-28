@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 /// ProductListView displays a filtered list of products
 class ProductListView
@@ -65,7 +66,7 @@ class ProductListView
     }
 
     if (state is ProductListLoadingState) {
-      return buildLoading(color: OsmeaColors.nordicBlue);
+      return buildUnifiedLoading(goRoute: goRoute);
     }
 
     if (state is ProductListLoadedState) {
@@ -73,7 +74,7 @@ class ProductListView
     }
 
     // Initial state - show loading
-    return buildLoading(color: OsmeaColors.nordicBlue);
+    return buildUnifiedLoading(goRoute: goRoute);
   }
 }
 

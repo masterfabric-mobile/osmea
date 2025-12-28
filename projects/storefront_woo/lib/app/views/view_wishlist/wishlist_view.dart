@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_list_widget.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 // Single source of truth: WishlistViewModel
 
 class WishlistView
@@ -156,21 +157,11 @@ class WishlistView
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initial();
       });
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        stepDuration: context.durationSlow,
-        showCancelButton: false,
-      );
+      return UnifiedLoadingWidget(goRoute: goRoute);
     }
 
     if (state is WishlistLoadingState) {
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        stepDuration: context.durationSlow,
-        showCancelButton: false,
-      );
+      return UnifiedLoadingWidget(goRoute: goRoute);
     }
 
     if (state is WishlistErrorState) {

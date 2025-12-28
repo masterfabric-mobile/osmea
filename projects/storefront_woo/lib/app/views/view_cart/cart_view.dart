@@ -5,12 +5,15 @@
  * Uses MasterViewHydratedCubit pattern with HydratedBloc state management.
  */
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_content_widget.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 /// CartView displays the shopping cart with items and checkout functionality
 class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
@@ -45,6 +48,18 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
                size: context.iconSizeNormal,
              ),
            ),
+           actions: [
+             AppBarAction(
+               type: AppBarActionType.refresh,
+               icon: Icon(
+                 Icons.refresh,
+                 color: OsmeaColors.thunder,
+                 size: context.iconSizeNormal,
+               ),
+               onPressed: () => viewModel.loadCart(),
+               tooltip: 'Refresh cart',
+             ),
+           ],
          ),
        ) {
     debugPrint('🛒 CartView: Constructor called');
@@ -94,25 +109,94 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
       );
     }
 
-    // Loading state
-    if (state is CartLoadingState) {
-      return LoadingScreen(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        loadingSteps: ['Loading cart...'],
-      );
-    }
+    // Use BlocBuilder to listen to state changes and preserve loaded state during loading
+    return BlocBuilder<CartViewModel, CartState>(
+      bloc: viewModel,
+      builder: (context, currentState) {
+        // Get the loaded state - prefer currentState if it's loaded, otherwise use lastLoadedState or state parameter
+        CartLoadedState? loadedState;
+        if (currentState is CartLoadedState) {
+          loadedState = currentState;
+        } else if (state is CartLoadedState) {
+          // Use the state parameter if currentState is loading but we have loaded state from parameter
+          loadedState = state;
+        } else if (viewModel.lastLoadedState != null) {
+          // Use last loaded state from viewModel when currentState is loading
+          loadedState = viewModel.lastLoadedState;
+        }
 
-    // Loaded state
-    if (state is CartLoadedState) {
-      return CartContentWidget(viewModel: viewModel, state: state);
-    }
+        // If we have a loaded state, show content with overlay
+        if (loadedState != null) {
+          final isLoading = currentState is CartLoadingState;
+          return _buildCartContentWithRefresh(
+            context,
+            viewModel,
+            loadedState,
+            isLoading: isLoading,
+          );
+        }
 
-    // Initial state
-    return LoadingScreen(
-      goRoute: goRoute,
-      loadingType: LoadingModelType.dataLoading,
-      loadingSteps: ['Loading cart...'],
+        // Loading state or initial state - show full screen loading
+        return UnifiedLoadingWidget(
+          goRoute: goRoute,
+          loadingSteps: ['Loading cart...'],
+        );
+      },
+    );
+  }
+
+  Widget _buildCartContentWithRefresh(
+    BuildContext context,
+    CartViewModel viewModel,
+    CartLoadedState state, {
+    bool isLoading = false,
+  }) {
+    return BlocBuilder<CartViewModel, CartState>(
+      bloc: viewModel,
+      builder: (context, currentState) {
+        final isCurrentlyLoading = isLoading || currentState is CartLoadingState;
+        
+        return Stack(
+          children: [
+            // Cart content
+            RefreshIndicator(
+              onRefresh: () => viewModel.refreshCart(),
+              color: OsmeaColors.nordicBlue,
+              backgroundColor: OsmeaColors.white,
+              strokeWidth: 2.0,
+              displacement: 40,
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                child: CartContentWidget(viewModel: viewModel, state: state),
+              ),
+            ),
+            // Loading overlay when refreshing
+            if (isCurrentlyLoading)
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  child: Container(
+                    color: OsmeaColors.white.withValues(alpha: 0.7),
+                    child: OsmeaComponents.center(
+                      child: OsmeaComponents.container(
+                        padding: EdgeInsets.all(context.spacing24),
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: OsmeaComponents.loading(
+                          type: LoadingType.circularFade,
+                          size: context.iconSizeLarge,
+                          color: OsmeaColors.nordicBlue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

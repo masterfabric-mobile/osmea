@@ -15,6 +15,7 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_error_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_skeleton_widget.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 /// HomeView displays the main e-commerce product catalog
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
@@ -69,8 +70,8 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
         // Navigate to auth
         context.push('/auth');
       });
-      // Show simple loading indicator while navigating
-      return const Center(child: CircularProgressIndicator());
+      // Show unified loading indicator while navigating
+      return buildUnifiedLoading(goRoute: goRoute);
     }
 
     // Build content based on state - using helpful error widget

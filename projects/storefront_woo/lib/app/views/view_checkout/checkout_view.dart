@@ -6,10 +6,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_content_widget.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 /// CheckoutView displays checkout form with billing and shipping addresses
 class CheckoutView
@@ -88,9 +88,8 @@ class CheckoutView
 
     if (state is CheckoutLoadingState ||
         state is CheckoutProcessingOrderState) {
-      return LoadingScreen(
+      return UnifiedLoadingWidget(
         goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
         loadingSteps: state is CheckoutProcessingOrderState
             ? ['Processing order...', 'Creating order...']
             : ['Loading checkout...'],
@@ -105,9 +104,8 @@ class CheckoutView
       return CheckoutContentWidget(viewModel: viewModel, state: state);
     }
 
-    return LoadingScreen(
+    return UnifiedLoadingWidget(
       goRoute: goRoute,
-      loadingType: LoadingModelType.dataLoading,
       loadingSteps: ['Loading checkout...'],
     );
   }

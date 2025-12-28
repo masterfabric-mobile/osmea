@@ -33,6 +33,7 @@ class CartContentWidget extends StatelessWidget {
     }
 
     return OsmeaComponents.singleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       child: OsmeaComponents.column(
         children: [
           OsmeaComponents.sizedBox(height: context.spacing12),

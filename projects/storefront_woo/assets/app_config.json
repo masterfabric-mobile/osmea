@@ -14,9 +14,9 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://example.com",
+    "store_url": "https://example.com",
     "brand_name": "example",  
-    "auth_key": "THISISMySpeCiaLAUthCodeExampleWoo",
+    "auth_key": "THISISMySpeCiaLAUthCodeExampleExample",
     "version": "v1",
     "verify_ssl": true,
     "query_string_auth": false,
@@ -283,7 +283,7 @@
     },
     "loading_configuration": {
       "style": "enterprise",
-      "type": "authentication",
+      "type": "dataLoading",
       "duration_milliseconds": 3000,
       "step_duration_milliseconds": 750,
       "background_color": "#FFFFFF",
@@ -293,13 +293,15 @@
       "show_logo": true,
       "logo_animation_enabled": true,
       "auto_dismiss_enabled": true,
-      "tap_to_dismiss_enabled": true,
-      "show_progress_indicator": true,
-      "show_percentage": true,
+      "tap_to_dismiss_enabled": false,
+      "show_progress_indicator": false,
+      "show_percentage": false,
       "animation_enabled": true,
       "haptic_feedback_enabled": true,
       "steps": [
-       
+        "Loading...",
+        "Almost ready...",
+        "Complete"
       ],
       "custom_messages": {
         "network_error": "Network connection required",

@@ -9,6 +9,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 /// Campaign view that displays full-screen campaign images
 class CampaignView extends StatefulWidget {
@@ -144,9 +145,7 @@ class _CampaignViewState extends State<CampaignView>
 
   /// Build loading state while config is loading
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return UnifiedLoadingWidget(goRoute: widget.goRoute);
   }
 
   /// Build full-screen campaign image
@@ -158,9 +157,7 @@ class _CampaignViewState extends State<CampaignView>
           widget.goRoute('/home');
         }
       });
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return UnifiedLoadingWidget(goRoute: widget.goRoute);
     }
 
     // Ensure currentIndex is valid

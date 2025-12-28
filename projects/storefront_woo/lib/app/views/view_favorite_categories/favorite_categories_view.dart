@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/models/favorite_categories_view_model.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/models/states.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/models/favorite_category.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 
 class FavoriteCategoriesView
     extends
@@ -64,21 +65,11 @@ class FavoriteCategoriesView
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initial();
       });
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        stepDuration: context.durationSlow,
-        showCancelButton: false,
-      );
+      return UnifiedLoadingWidget(goRoute: goRoute);
     }
 
     if (state is FavoriteCategoriesLoadingState) {
-      return LoadingView(
-        goRoute: goRoute,
-        loadingType: LoadingModelType.dataLoading,
-        stepDuration: context.durationSlow,
-        showCancelButton: false,
-      );
+      return UnifiedLoadingWidget(goRoute: goRoute);
     }
 
     if (state is FavoriteCategoriesErrorState) {
@@ -120,12 +111,7 @@ class FavoriteCategoriesView
       );
     }
 
-    return LoadingView(
-      goRoute: goRoute,
-      loadingType: LoadingModelType.dataLoading,
-      stepDuration: context.durationSlow,
-      showCancelButton: false,
-    );
+    return UnifiedLoadingWidget(goRoute: goRoute);
   }
 
   Widget _buildCategoryCard(

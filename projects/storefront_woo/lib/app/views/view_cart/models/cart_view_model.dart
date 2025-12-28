@@ -26,6 +26,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   final CartCouponsService _cartCouponsService = GetIt.I<CartCouponsService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
+  // Track last loaded state to show overlay during updates
+  CartLoadedState? _lastLoadedState;
+  CartLoadedState? get lastLoadedState => _lastLoadedState;
+
   // Arguments holder for route/widget inputs
   final Map<String, dynamic> _arguments = {};
   void setArguments(Map<String, dynamic> args) {
@@ -38,6 +42,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   // Public trigger functions - HydratedCubit pattern
   void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
+  Future<void> refreshCart({String? cartToken}) async => await _loadCart(cartToken: cartToken);
   Future<void> addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
   void removeItemFromCart(int productId, {BuildContext? context}) {
@@ -316,21 +321,23 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: API cart processed - items: ${cartItems.length}, total: $totalPrice, currency: $currencyCode ($currencySymbol), coupons: ${coupons.length}',
       );
 
-      emit(
-        CartLoadedState(
-          cartItems: cartItems,
-          totalPrice: totalPrice,
-          totalItems: response.itemsCount ?? 0,
-          coupons: coupons,
-          shippingAddress: response.shippingAddress,
-          billingAddress: response.billingAddress,
-          currencyCode: currencyCode,
-          currencySymbol: currencySymbol,
-          currencyDecimalSeparator: currencyDecimalSeparator,
-          currencyThousandSeparator: currencyThousandSeparator,
-          currencyMinorUnit: currencyMinorUnit,
-        ),
+      final loadedState = CartLoadedState(
+        cartItems: cartItems,
+        totalPrice: totalPrice,
+        totalItems: response.itemsCount ?? 0,
+        coupons: coupons,
+        shippingAddress: response.shippingAddress,
+        billingAddress: response.billingAddress,
+        currencyCode: currencyCode,
+        currencySymbol: currencySymbol,
+        currencyDecimalSeparator: currencyDecimalSeparator,
+        currencyThousandSeparator: currencyThousandSeparator,
+        currencyMinorUnit: currencyMinorUnit,
       );
+      
+      // Track last loaded state for overlay during updates
+      _lastLoadedState = loadedState;
+      emit(loadedState);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error processing cart response: $e');
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
@@ -424,6 +431,25 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling removeItem API: productId=$productId',
       );
 
+      // Get the current state BEFORE emitting loading state
+      final currentState = state;
+      CartLoadedState? loadedState;
+      if (currentState is CartLoadedState) {
+        loadedState = currentState;
+      } else if (_lastLoadedState != null) {
+        // Use last loaded state if current state is not loaded
+        loadedState = _lastLoadedState;
+      }
+
+      if (loadedState == null) {
+        debugPrint('❌ No cart loaded to remove item from');
+        emit(CartErrorState(message: 'No cart loaded'));
+        return;
+      }
+
+      // Emit loading state to show overlay (after we've saved the loaded state)
+      emit(CartLoadingState());
+
       // Get tokens before API call
       final cartToken = await _getCartToken();
       final jwtToken = await _getJwtToken();
@@ -442,17 +468,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return;
       }
 
-      // Find the cart item key for this product
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ No cart loaded to remove item from');
-        emit(CartErrorState(message: 'No cart loaded'));
-        return;
-      }
-
       // Find the item key for this product
       String? itemKey;
-      for (final item in currentState.cartItems) {
+      for (final item in loadedState.cartItems) {
         if (item.productId == productId) {
           itemKey = item.key;
           break;
@@ -519,6 +537,25 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling updateItem API: productId=$productId, quantity=$quantity',
       );
 
+      // Get the current state BEFORE emitting loading state
+      final currentState = state;
+      CartLoadedState? loadedState;
+      if (currentState is CartLoadedState) {
+        loadedState = currentState;
+      } else if (_lastLoadedState != null) {
+        // Use last loaded state if current state is not loaded
+        loadedState = _lastLoadedState;
+      }
+
+      if (loadedState == null) {
+        debugPrint('❌ No cart loaded to update item in');
+        emit(CartErrorState(message: 'No cart loaded'));
+        return;
+      }
+
+      // Emit loading state to show overlay (after we've saved the loaded state)
+      emit(CartLoadingState());
+
       // Get tokens before API call
       final cartToken = await _getCartToken();
       final jwtToken = await _getJwtToken();
@@ -531,17 +568,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: updateItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
       );
 
-      // Find the cart item key for this product
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ No cart loaded to update item in');
-        emit(CartErrorState(message: 'No cart loaded'));
-        return;
-      }
-
       // Find the item key for this product
       String? itemKey;
-      for (final item in currentState.cartItems) {
+      for (final item in loadedState.cartItems) {
         if (item.productId == productId) {
           itemKey = item.key;
           break;
@@ -598,16 +627,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       debugPrint('🛒 CartViewModel: Clearing cart');
       // WooCommerce doesn't have a direct clear cart API
       // Show empty cart state
-      emit(
-        CartLoadedState(
-          cartItems: [],
-          totalPrice: 0.0,
-          totalItems: 0,
-          coupons: [],
-          shippingAddress: null,
-          billingAddress: null,
-        ),
+      final loadedState = CartLoadedState(
+        cartItems: [],
+        totalPrice: 0.0,
+        totalItems: 0,
+        coupons: [],
+        shippingAddress: null,
+        billingAddress: null,
       );
+      
+      // Track last loaded state for overlay during updates
+      _lastLoadedState = loadedState;
+      emit(loadedState);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error clearing cart: $e');
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
