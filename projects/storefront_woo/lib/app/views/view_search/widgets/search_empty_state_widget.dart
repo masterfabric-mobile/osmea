@@ -274,13 +274,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           ),
           OsmeaComponents.sizedBox(height: context.spacing8),
           SizedBox(
-            height: 140,
-            child: ListView.separated(
+            height: 100,
+            child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: context.horizontalPaddingZero,
               itemCount: _brands.length,
-              separatorBuilder: (context, index) =>
-                  SizedBox(width: context.spacing8),
               itemBuilder: (context, index) {
                 final brand = _brands[index];
                 return _BrandCard(
@@ -295,32 +293,34 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         // Categories section
         OsmeaComponents.text(
           'Categories',
-          textStyle: OsmeaTextStyle.titleMedium(context),
+          textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing8),
-        ..._categories.map((category) {
-          return OsmeaComponents.listItem(
-            variant: ListItemVariant.outlined,
-            size: ListItemSize.large,
-            padding: EdgeInsets.symmetric(
-              horizontal: context.spacing12,
-              vertical: context.spacing10,
-            ),
-            margin: context.onlyBottomPaddingLow,
-            title: OsmeaComponents.text(
-              category.name ?? 'Category',
-              textStyle: OsmeaTextStyle.titleSmall(
-                context,
-              ).copyWith(fontWeight: FontWeight.w600),
-            ),
-            trailing: Icon(Icons.chevron_right, color: OsmeaColors.pewter),
-            onTap: () {
-              if (category.id != null) {
-                _searchByCategory(category.id as int, category.name ?? '');
-              }
-            },
-          );
-        }),
+        OsmeaComponents.sizedBox(height: context.spacing12),
+        // Categories grid with images
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: context.spacing12,
+            mainAxisSpacing: context.spacing12,
+            childAspectRatio: 0.85,
+          ),
+          itemCount: _categories.length,
+          itemBuilder: (context, index) {
+            final category = _categories[index];
+            return _CategoryCard(
+              category: category,
+              onTap: () {
+                if (category.id != null) {
+                  _searchByCategory(category.id as int, category.name ?? '');
+                }
+              },
+            );
+          },
+        ),
       ],
     );
   }
@@ -334,70 +334,223 @@ class _BrandCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.basicCard(
-      width: 120,
-      height: 140,
-      variant: ComponentAppearance.outlined,
-      size: ComponentSize.small,
-      borderRadius: BorderRadius.circular(12),
-      padding: context.paddingLow,
-      margin: context.paddingZero,
-      onTap: onTap,
-      customContent: Column(
-        mainAxisAlignment: context.centerMain,
+    final imageUrl = brand.image?.thumbnail ?? brand.image?.src;
+    final brandName = brand.name ?? 'Brand';
+    final circleSize = 64.0;
+
+    return Container(
+      margin: EdgeInsets.only(right: context.spacing12),
+      child: OsmeaComponents.column(
         crossAxisAlignment: context.crossCenter,
         children: [
-          // Brand image or placeholder
-          if (brand.image?.thumbnail != null || brand.image?.src != null)
-            OsmeaComponents.image(
-              imageUrl: brand.image?.thumbnail ?? brand.image?.src,
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
-              borderRadius: BorderRadius.circular(8),
-              variant: ImageVariant.normal,
-              cacheWidth: 120, // Limit image size for performance
-              showLoadingIndicator: true,
-              errorWidget: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.pewter,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.branding_watermark,
-                  color: OsmeaColors.pewter,
-                  size: 30,
-                ),
-              ),
-            )
-          else
-            Container(
-              width: 60,
-              height: 60,
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: circleSize,
+              height: circleSize,
               decoration: BoxDecoration(
-                color: OsmeaColors.pewter,
-                borderRadius: BorderRadius.circular(8),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: OsmeaColors.nordicBlue,
+                  width: 2,
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    OsmeaColors.nordicBlue,
+                    OsmeaColors.nordicBlue.withOpacity(0.7),
+                  ],
+                ),
               ),
-              child: Icon(
-                Icons.branding_watermark,
-                color: OsmeaColors.pewter,
-                size: 30,
+              child: ClipOval(
+                child: imageUrl != null && imageUrl.isNotEmpty
+                    ? OsmeaComponents.image(
+                        imageUrl: imageUrl,
+                        width: circleSize,
+                        height: circleSize,
+                        fit: BoxFit.cover,
+                        variant: ImageVariant.normal,
+                        cacheWidth: 128,
+                        showLoadingIndicator: true,
+                        errorWidget: _buildDefaultIcon(context, circleSize),
+                      )
+                    : _buildDefaultIcon(context, circleSize),
               ),
             ),
-          SizedBox(height: context.spacing8),
-          // Brand name
-          OsmeaComponents.text(
-            brand.name ?? 'Brand',
-            textStyle: OsmeaTextStyle.bodySmall(
-              context,
-            ).copyWith(fontWeight: FontWeight.w600, color: OsmeaColors.thunder),
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing8),
+          SizedBox(
+            width: circleSize + context.spacing12,
+            child: OsmeaComponents.text(
+              brandName,
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                fontSize:
+                    context.fontSizeExtraSmall * context.textScaleFactor,
+                fontWeight: FontWeight.w500,
+                color: OsmeaColors.thunder,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDefaultIcon(BuildContext context, double size) {
+    return Container(
+      width: size,
+      height: size,
+      color: OsmeaColors.pewter,
+      child: Icon(
+        Icons.branding_watermark,
+        size: size * 0.5,
+        color: OsmeaColors.thunder,
+      ),
+    );
+  }
+}
+
+/// Category card widget with image
+class _CategoryCard extends StatelessWidget {
+  final dynamic category;
+  final VoidCallback onTap;
+
+  const _CategoryCard({
+    required this.category,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = category.image?.src ?? category.image?.thumbnail;
+    final categoryName = category.name ?? 'Category';
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Background image
+                imageUrl != null && imageUrl.isNotEmpty
+                    ? OsmeaComponents.image(
+                        imageUrl: imageUrl,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        variant: ImageVariant.normal,
+                        errorWidget: _buildImagePlaceholder(context),
+                        placeholder: Container(
+                          color: Colors.grey.shade100,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                OsmeaColors.nordicBlue,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : _buildImagePlaceholder(context),
+                // Gradient overlay from bottom - darker
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.85),
+                          Colors.black.withOpacity(0.65),
+                          Colors.black.withOpacity(0.3),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.3, 0.7, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+                // Category name on gradient
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(context.spacing12),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: OsmeaComponents.text(
+                        categoryName,
+                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePlaceholder(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey.shade100,
+            Colors.grey.shade200,
+          ],
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.category_outlined,
+          color: Colors.grey.shade400,
+          size: 48,
+        ),
       ),
     );
   }
