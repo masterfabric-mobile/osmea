@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:osmea_components/src/enums/carousel_enums.dart';
 
 /// Banner item model from config
 class BannerItem {
@@ -92,7 +93,7 @@ class BannerCarouselWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => _handleBannerTap(context, banner),
       child: ClipRRect(
-        borderRadius: context.borderRadiusNormal,
+        borderRadius: BorderRadius.zero,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -184,11 +185,10 @@ class BannerCarouselWidget extends StatelessWidget {
     }
 
     // Always use items (not imageUrls) to support tap handlers
-    // Build items with tap handlers for navigation
+    // Build items with tap handlers for navigation - edge to edge (no horizontal margin)
     final items = banners
         .map(
           (banner) => OsmeaComponents.container(
-            margin: EdgeInsets.symmetric(horizontal: context.spacing4),
             width: double.infinity,
             height: context.height192,
             child: _buildBannerItem(context, banner),
@@ -202,12 +202,7 @@ class BannerCarouselWidget extends StatelessWidget {
         .toList();
 
     return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing16,
-        0,
-        context.spacing16,
-        context.spacing16,
-      ),
+      padding: EdgeInsets.only(bottom: context.spacing16),
       child: OsmeaComponents.carousel(
         variant: CarouselVariant.standard,
         size: CarouselSize.large,
@@ -218,9 +213,34 @@ class BannerCarouselWidget extends StatelessWidget {
         showArrows: true,
         autoPlay: CarouselAutoPlay.continuous,
         autoPlayInterval: 4.seconds,
-        indicatorType: CarouselIndicatorType.dot,
-        indicatorPosition: CarouselIndicatorPosition.bottomCenter,
-        borderRadiusValue: context.borderRadiusNormal,
+        indicatorType: CarouselIndicatorType.custom,
+        indicatorPosition: CarouselIndicatorPosition.bottomRight,
+        customIndicator: (context, itemCount, activeIndex) {
+          return OsmeaComponents.padding(
+            padding: EdgeInsets.only(
+              right: context.spacing16,
+              bottom: context.spacing12,
+            ),
+            child: OsmeaComponents.container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.spacing8,
+                vertical: context.spacing4,
+              ),
+              decoration: BoxDecoration(
+                color: OsmeaColors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: OsmeaComponents.text(
+                '${activeIndex + 1}/$itemCount',
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                  color: OsmeaColors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          );
+        },
+        borderRadiusValue: BorderRadius.zero,
         loop: true,
       ),
     );
