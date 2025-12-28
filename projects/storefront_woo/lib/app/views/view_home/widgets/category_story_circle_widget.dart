@@ -28,8 +28,7 @@ class CategoryStoryCircleWidget extends StatefulWidget {
       _CategoryStoryCircleWidgetState();
 }
 
-class _CategoryStoryCircleWidgetState
-    extends State<CategoryStoryCircleWidget> {
+class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
   final FavoriteCategoriesHelper _favoriteHelper = FavoriteCategoriesHelper();
   Map<int, bool> _favoriteStatus = {};
 
@@ -42,9 +41,7 @@ class _CategoryStoryCircleWidgetState
   Future<void> _loadFavoriteStatus() async {
     final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
     setState(() {
-      _favoriteStatus = {
-        for (var id in favoriteIds) id: true,
-      };
+      _favoriteStatus = {for (var id in favoriteIds) id: true};
     });
   }
 
@@ -106,32 +103,25 @@ class _CategoryStoryCircleWidgetState
 
     final displayCategories = widget.categories.take(maxItems).toList();
 
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        0,
-        context.spacing20,
-        context.spacing16,
-      ),
-      child: SizedBox(
-        height: showNames
-            ? (circleSize.toDouble() + context.spacing8 + context.height20)
-            : circleSize.toDouble(),
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: displayCategories.length,
-          itemBuilder: (context, index) {
-            final category = displayCategories[index];
-            return _buildCategoryCircle(
-              context,
-              category,
-              circleSize.toDouble(),
-              imageSize.toDouble(),
-              spacing.toDouble(),
-              showNames,
-            );
-          },
-        ),
+    return SizedBox(
+      height: showNames
+          ? (circleSize.toDouble() + context.spacing8 + context.height20)
+          : circleSize.toDouble(),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(left: context.spacing8),
+        itemCount: displayCategories.length,
+        itemBuilder: (context, index) {
+          final category = displayCategories[index];
+          return _buildCategoryCircle(
+            context,
+            category,
+            circleSize.toDouble(),
+            imageSize.toDouble(),
+            spacing.toDouble(),
+            showNames,
+          );
+        },
       ),
     );
   }
@@ -167,10 +157,7 @@ class _CategoryStoryCircleWidgetState
                   height: circleSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: OsmeaColors.nordicBlue,
-                      width: 2,
-                    ),
+                    border: Border.all(color: OsmeaColors.nordicBlue, width: 2),
                     gradient: LinearGradient(
                       begin: context.topLeft,
                       end: context.bottomRight,
@@ -218,10 +205,7 @@ class _CategoryStoryCircleWidgetState
                     decoration: BoxDecoration(
                       color: OsmeaColors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: OsmeaColors.silver,
-                        width: 1,
-                      ),
+                      border: Border.all(color: OsmeaColors.silver, width: 1),
                     ),
                     child: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -272,4 +256,3 @@ class _CategoryStoryCircleWidgetState
     );
   }
 }
-

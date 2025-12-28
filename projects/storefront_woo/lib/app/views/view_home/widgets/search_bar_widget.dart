@@ -14,10 +14,7 @@ import 'package:core/core.dart';
 class SearchBarWidget extends StatefulWidget {
   final AssetConfigHelper configHelper;
 
-  const SearchBarWidget({
-    super.key,
-    required this.configHelper,
-  });
+  const SearchBarWidget({super.key, required this.configHelper});
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -58,7 +55,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
     if (!showSearch) return const SizedBox.shrink();
 
-    final placeholder = config?['placeholder'] as String? ??
+    final placeholder =
+        config?['placeholder'] as String? ??
         'Search products, brands, categories...';
     final variant = config?['variant'] as String? ?? 'outlined';
 
@@ -72,7 +70,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       child: OsmeaComponents.searchbar(
         controller: _controller,
         hint: placeholder,
-        size: TextFieldSize.small, // Daha kompakt yükseklik için küçük boyut
+        size: TextFieldSize.medium,
         searchbarStyle: SearchbarStyle.minimal,
         searchbarVariant: variant == 'outlined'
             ? SearchbarVariant.outlined
@@ -101,4 +99,3 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     );
   }
 }
-
