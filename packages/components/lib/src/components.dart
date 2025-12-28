@@ -3041,6 +3041,7 @@ class OsmeaComponents {
     DotIndicatorAnimation? dotAnimation,
     Color? dotCustomActiveColor,
     Color? dotCustomInactiveColor,
+    double? itemSpacing,
   }) {
     return OsmeaCarousel(
       key: key,
@@ -3087,6 +3088,7 @@ class OsmeaComponents {
       dotAnimation: dotAnimation,
       dotCustomActiveColor: dotCustomActiveColor,
       dotCustomInactiveColor: dotCustomInactiveColor,
+      itemSpacing: itemSpacing ?? 12.0,
     );
   }
 

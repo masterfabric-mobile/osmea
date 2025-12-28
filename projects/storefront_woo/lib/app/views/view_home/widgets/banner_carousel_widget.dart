@@ -93,7 +93,7 @@ class BannerCarouselWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => _handleBannerTap(context, banner),
       child: ClipRRect(
-        borderRadius: BorderRadius.zero,
+        borderRadius: context.borderRadiusMinStandard,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -190,7 +190,7 @@ class BannerCarouselWidget extends StatelessWidget {
         .map(
           (banner) => OsmeaComponents.container(
             width: double.infinity,
-            height: context.height192,
+            height: context.height160,
             child: _buildBannerItem(context, banner),
           ),
         )
@@ -202,19 +202,27 @@ class BannerCarouselWidget extends StatelessWidget {
         .toList();
 
     return OsmeaComponents.padding(
-      padding: EdgeInsets.only(bottom: context.spacing16),
+      padding: EdgeInsets.only(
+        bottom: context.spacing16,
+        left: context.spacing16,
+        right: context.spacing16,
+      ),
       child: OsmeaComponents.carousel(
         variant: CarouselVariant.standard,
         size: CarouselSize.large,
-        height: context.height192,
+        height: context.height160,
         items: items,
         onItemTaps: onItemTaps,
         showIndicators: true,
-        showArrows: true,
+        showArrows: false,
         autoPlay: CarouselAutoPlay.continuous,
         autoPlayInterval: 4.seconds,
+        transitionType: CarouselTransitionType.fade,
+        animationDuration: const Duration(milliseconds: 600),
         indicatorType: CarouselIndicatorType.custom,
         indicatorPosition: CarouselIndicatorPosition.bottomRight,
+        customPadding: EdgeInsets.zero,
+        itemSpacing: 0,
         customIndicator: (context, itemCount, activeIndex) {
           return OsmeaComponents.padding(
             padding: EdgeInsets.only(
@@ -240,7 +248,7 @@ class BannerCarouselWidget extends StatelessWidget {
             ),
           );
         },
-        borderRadiusValue: BorderRadius.zero,
+        borderRadiusValue: context.borderRadiusMinStandard,
         loop: true,
       ),
     );
