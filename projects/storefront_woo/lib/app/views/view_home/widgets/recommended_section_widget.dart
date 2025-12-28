@@ -86,15 +86,30 @@ class RecommendedSectionWidget extends StatelessWidget {
             mainAxisAlignment: context.spaceBetween,
             crossAxisAlignment: context.crossCenter,
             children: [
-              OsmeaComponents.text(
-                sectionTitle,
-                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                  fontSize: context.fontSizeNormal * context.textScaleFactor,
-                  fontWeight: FontWeight.w600, // Semi Bold
-                  height: context.lineHeightTight, // line height 20px
-                  letterSpacing: -0.2,
-                  color: OsmeaColors.thunder,
-                ),
+              OsmeaComponents.row(
+                children: [
+                  OsmeaComponents.text(
+                    sectionTitle,
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                      fontSize: context.fontSizeNormal * context.textScaleFactor,
+                      fontWeight: FontWeight.w600, // Semi Bold
+                      height: context.lineHeightTight, // line height 20px
+                      letterSpacing: -0.2,
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing4),
+                  OsmeaComponents.text(
+                    '(${recommendedProducts.length})',
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                      fontSize: (context.fontSizeNormal * context.textScaleFactor) * 0.7,
+                      fontWeight: FontWeight.w600, // Semi Bold
+                      height: context.lineHeightTight, // line height 20px
+                      letterSpacing: -0.2,
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
+                ],
               ),
               // See all button
               GestureDetector(
