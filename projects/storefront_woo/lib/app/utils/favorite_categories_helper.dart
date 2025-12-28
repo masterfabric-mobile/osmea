@@ -20,7 +20,13 @@ class FavoriteCategoriesHelper {
 
   /// Initialize storage
   Future<void> init() async {
-    await _storage.init();
+    try {
+      await _storage.init();
+      debugPrint('💖 FavoriteCategoriesHelper: Storage initialized successfully');
+    } catch (e) {
+      debugPrint('⚠️ FavoriteCategoriesHelper: Error initializing storage: $e');
+      rethrow;
+    }
   }
 
   /// Get all favorite category IDs
@@ -28,15 +34,21 @@ class FavoriteCategoriesHelper {
     try {
       await init();
       final data = await _storage.getItem(_storageKey);
+      debugPrint('💖 FavoriteCategoriesHelper: Retrieved data for key "$_storageKey": $data');
+      
       if (data == null || data.toString().isEmpty) {
+        debugPrint('💖 FavoriteCategoriesHelper: No favorite categories found (empty or null)');
         return [];
       }
 
       final jsonString = data.toString();
       final List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList.map((e) => int.parse(e.toString())).toList();
+      final favoriteIds = jsonList.map((e) => int.parse(e.toString())).toList();
+      debugPrint('💖 FavoriteCategoriesHelper: Parsed ${favoriteIds.length} favorite category IDs: $favoriteIds');
+      return favoriteIds;
     } catch (e) {
       debugPrint('⚠️ Error getting favorite category IDs: $e');
+      debugPrint('⚠️ Stack trace: ${StackTrace.current}');
       return [];
     }
   }

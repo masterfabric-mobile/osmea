@@ -39,41 +39,69 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
   }
 
   Future<void> _loadFavoriteStatus() async {
-    final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
-    setState(() {
-      _favoriteStatus = {for (var id in favoriteIds) id: true};
-    });
+    try {
+      final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
+      debugPrint('💖 CategoryStoryCircle: Loaded ${favoriteIds.length} favorite category IDs: $favoriteIds');
+      if (mounted) {
+        setState(() {
+          _favoriteStatus = {for (var id in favoriteIds) id: true};
+        });
+      }
+    } catch (e) {
+      debugPrint('⚠️ CategoryStoryCircle: Error loading favorite status: $e');
+      if (mounted) {
+        setState(() {
+          _favoriteStatus = {};
+        });
+      }
+    }
   }
 
   Future<void> _toggleFavorite(int categoryId, String categoryName) async {
     final wasFavorite = _favoriteStatus[categoryId] ?? false;
-    final success = await _favoriteHelper.toggleFavorite(categoryId);
-
-    if (success) {
+    
+    // Optimistically update UI first
+    if (mounted) {
       setState(() {
         _favoriteStatus[categoryId] = !wasFavorite;
       });
+    }
 
-      if (!context.mounted) return;
+    final success = await _favoriteHelper.toggleFavorite(categoryId);
 
-      context.showSnackbar(
-        title: !wasFavorite ? 'Added to favorites' : 'Removed from favorites',
-        message: !wasFavorite
-            ? 'Category was added to your favorites'
-            : 'Category was removed from your favorites',
-        type: !wasFavorite ? SnackbarType.info : SnackbarType.error,
-        style: SnackbarStyle.minimal,
-        position: SnackbarPosition.bottom,
-        animation: SnackbarAnimation.slide,
-        actionLabel: 'Undo',
-        onAction: () async {
-          await _favoriteHelper.toggleFavorite(categoryId);
+    if (!success) {
+      // Revert on failure
+      if (mounted) {
+        setState(() {
+          _favoriteStatus[categoryId] = wasFavorite;
+        });
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    final isNowFavorite = !wasFavorite;
+    context.showSnackbar(
+      title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
+      message: isNowFavorite
+          ? '$categoryName was added to your favorites'
+          : '$categoryName was removed from your favorites',
+      type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
+      style: SnackbarStyle.minimal,
+      position: SnackbarPosition.bottom,
+      animation: SnackbarAnimation.slide,
+      duration: const Duration(seconds: 2),
+      actionLabel: 'Undo',
+      onAction: () async {
+        await _favoriteHelper.toggleFavorite(categoryId);
+        if (mounted) {
           setState(() {
             _favoriteStatus[categoryId] = wasFavorite;
           });
-        },
-      );
-    }
+        }
+      },
+    );
   }
 
   /// Loads circle categories configuration

@@ -48,9 +48,13 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   bool isSaved(int productId) {
     final s = state;
-    return s is WishlistLoadedState
-        ? s.items.any((e) => e.id == productId)
-        : false;
+    // Handle WishlistSuccessState by using previousState
+    if (s is WishlistLoadedState) {
+      return s.items.any((e) => e.id == productId);
+    } else if (s is WishlistSuccessState) {
+      return s.previousState.items.any((e) => e.id == productId);
+    }
+    return false;
   }
 
   int get count => state is WishlistLoadedState
@@ -584,16 +588,24 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('💡 Wishlist: unauthenticated add -> local only');
         // Add to local state for unauthenticated users
         final s = state;
-        final items = s is WishlistLoadedState ? [...s.items, item] : [item];
+        // Handle WishlistSuccessState by using previousState
+        final currentItems = s is WishlistLoadedState
+            ? s.items
+            : s is WishlistSuccessState
+            ? s.previousState.items
+            : <WishlistItem>[];
+
+        // Check if item already exists
+        if (currentItems.any((e) => e.id == item.id)) {
+          debugPrint(
+            '💡 Wishlist: Item already in local state (unauthenticated)',
+          );
+          return;
+        }
+
+        final items = [...currentItems, item];
         final newState = WishlistLoadedState(items: items);
         emit(newState);
-        // Emit success state to show snackbar
-        emit(
-          WishlistSuccessState(
-            message: 'Added to favorites',
-            previousState: newState,
-          ),
-        );
         debugPrint('✅ Wishlist: Item added to local state (unauthenticated)');
         return;
       }
@@ -819,27 +831,39 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('💡 Wishlist: unauthenticated remove -> local only');
         // Remove from local state for unauthenticated users
         final s = state;
-        final items = s is WishlistLoadedState
-            ? s.items.where((e) => e.id != productId).toList()
-            : const <WishlistItem>[];
+        // Handle WishlistSuccessState by using previousState
+        final currentItems = s is WishlistLoadedState
+            ? s.items
+            : s is WishlistSuccessState
+            ? s.previousState.items
+            : <WishlistItem>[];
+        final items = currentItems.where((e) => e.id != productId).toList();
         emit(WishlistLoadedState(items: items));
+        debugPrint(
+          '✅ Wishlist: Item removed from local state (unauthenticated)',
+        );
         return;
       }
 
       // Find the item to get itemId if available
       final s = state;
+      // Handle WishlistSuccessState by using previousState
+      final currentItems = s is WishlistLoadedState
+          ? s.items
+          : s is WishlistSuccessState
+          ? s.previousState.items
+          : <WishlistItem>[];
+
       WishlistItem? itemToRemove;
-      if (s is WishlistLoadedState) {
-        itemToRemove = s.items.firstWhere(
+      if (currentItems.isNotEmpty) {
+        itemToRemove = currentItems.firstWhere(
           (e) => e.id == productId,
           orElse: () => WishlistItem(id: productId),
         );
       }
 
       // Update local state optimistically (UI updates immediately)
-      final items = s is WishlistLoadedState
-          ? s.items.where((e) => e.id != productId).toList()
-          : const <WishlistItem>[];
+      final items = currentItems.where((e) => e.id != productId).toList();
       emit(WishlistLoadedState(items: items));
 
       final apiVersion = _config.getString(
