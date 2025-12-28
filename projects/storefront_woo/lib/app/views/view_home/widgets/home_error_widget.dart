@@ -1,56 +1,38 @@
 /*
- * Product Detail Error Widget
- * ---------------------------
- * User-friendly error widget for product detail view.
- * Provides helpful actions when product is not found or fails to load.
+ * HomeErrorWidget
+ * ---------------
+ * User-friendly error widget for home view.
+ * Provides helpful actions when products fail to load.
  */
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 
-/// Error widget for product detail view with helpful actions
-class ProductDetailErrorWidget extends StatelessWidget {
+/// Error widget for home view with helpful actions
+class HomeErrorWidget extends StatelessWidget {
   final String message;
-  final VoidCallback onRetry;
+  final VoidCallback? onRetry;
 
-  const ProductDetailErrorWidget({
+  const HomeErrorWidget({
     super.key,
     required this.message,
-    required this.onRetry,
+    this.onRetry,
   });
-
-  /// Checks if error indicates product not found
-  bool _isProductNotFound(String errorMessage) {
-    final lowerMessage = errorMessage.toLowerCase();
-    return lowerMessage.contains('not found') ||
-        lowerMessage.contains('404') ||
-        lowerMessage.contains('product not found') ||
-        lowerMessage.contains('does not exist');
-  }
 
   @override
   Widget build(BuildContext context) {
     final configHelper = AssetConfigHelper();
-    final isNotFound = _isProductNotFound(message);
     
     // Try to get error configuration
-    String errorTitle = isNotFound 
-        ? 'Product Not Found'
-        : 'Unable to Load Product';
+    String errorTitle = 'Unable to Load Products';
     try {
       errorTitle = configHelper.getString(
         'error_handling_configuration.errorTitle',
-        errorTitle,
+        'Unable to Load Products',
       );
     } catch (e) {
       debugPrint('⚠️ Failed to load error title from config: $e');
-    }
-
-    // User-friendly error message
-    String userMessage = message;
-    if (isNotFound) {
-      userMessage = 'The product you\'re looking for doesn\'t exist or has been removed.';
     }
 
     return OsmeaComponents.singleChildScrollView(
@@ -70,7 +52,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                isNotFound ? Icons.search_off : Icons.error_outline,
+                Icons.shopping_bag_outlined,
                 size: 64,
                 color: OsmeaColors.pewter,
               ),
@@ -89,7 +71,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(height: context.spacing12),
             // Error message
             OsmeaComponents.text(
-              userMessage,
+              message,
               textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 fontSize: context.fontSizeSmall * context.textScaleFactor,
                 color: OsmeaColors.pewter,
@@ -104,8 +86,8 @@ class ProductDetailErrorWidget extends StatelessWidget {
             OsmeaComponents.column(
               crossAxisAlignment: context.crossCenter,
               children: [
-                // Retry button (primary action) - only show if not "not found"
-                if (!isNotFound)
+                // Retry button (primary action)
+                if (onRetry != null)
                   OsmeaComponents.button(
                     text: 'Try Again',
                     onPressed: onRetry,
@@ -113,7 +95,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
                     size: ButtonSize.large,
                     fullWidth: true,
                   ),
-                if (!isNotFound) OsmeaComponents.sizedBox(height: context.spacing12),
+                if (onRetry != null) OsmeaComponents.sizedBox(height: context.spacing12),
                 // Browse products button
                 OsmeaComponents.button(
                   text: 'Browse All Products',
@@ -125,11 +107,11 @@ class ProductDetailErrorWidget extends StatelessWidget {
                   fullWidth: true,
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing12),
-                // Go back button
+                // Search button
                 OsmeaComponents.button(
-                  text: 'Go Back',
+                  text: 'Search Products',
                   onPressed: () {
-                    context.pop();
+                    context.push('/search');
                   },
                   variant: ButtonVariant.ghost,
                   size: ButtonSize.large,
@@ -143,6 +125,4 @@ class ProductDetailErrorWidget extends StatelessWidget {
     );
   }
 }
-
-
 

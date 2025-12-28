@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/home_error_widget.dart';
 
 /// HomeView displays the main e-commerce product catalog
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
@@ -44,7 +45,11 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     HomeViewModel viewModel,
     HomeState state,
   ) {
-    return _buildBody(context, viewModel, state);
+    return _HomeViewWithRouteAware(
+      state: state,
+      viewModel: viewModel,
+      buildBody: _buildBody,
+    );
   }
 
   Widget _buildBody(
@@ -66,9 +71,12 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Build content based on state - using simple loading indicator
+    // Build content based on state - using helpful error widget
     if (state is HomeErrorState) {
-      return buildError(state.message, onRetry: () => viewModel.loadProducts());
+      return HomeErrorWidget(
+        message: state.message,
+        onRetry: () => viewModel.loadProducts(),
+      );
     }
 
     if (state is HomeLoadingState) {
@@ -78,13 +86,89 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
 
     if (state is HomeLoadedState) {
       // Use RepaintBoundary and lazy loading to prevent blocking
+      // Use key based on route to force rebuild when navigating back
       return RepaintBoundary(
-        child: HomeContentWidget(state: state, viewModel: viewModel),
+        child: HomeContentWidget(
+          key: ValueKey(GoRouterState.of(context).uri.toString()),
+          state: state,
+          viewModel: viewModel,
+        ),
       );
     }
 
     // Initial state - show simple loading indicator
     return const Center(child: CircularProgressIndicator());
+  }
+}
+
+/// Wrapper widget that listens to route changes and refreshes config
+class _HomeViewWithRouteAware extends StatefulWidget {
+  final HomeState state;
+  final HomeViewModel viewModel;
+  final Widget Function(BuildContext, HomeViewModel, HomeState) buildBody;
+
+  const _HomeViewWithRouteAware({
+    required this.state,
+    required this.viewModel,
+    required this.buildBody,
+  });
+
+  @override
+  State<_HomeViewWithRouteAware> createState() =>
+      _HomeViewWithRouteAwareState();
+}
+
+class _HomeViewWithRouteAwareState extends State<_HomeViewWithRouteAware>
+    with WidgetsBindingObserver {
+  String? _lastRoute;
+  bool _hasInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // App resumed - refresh config
+      _refreshConfig();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentRoute = GoRouterState.of(context).uri.toString();
+    
+    // Only refresh if route changed (navigated back) or first time
+    if (!_hasInitialized || _lastRoute != currentRoute) {
+      _lastRoute = currentRoute;
+      if (_hasInitialized) {
+        // Route changed - refresh config
+        _refreshConfig();
+      } else {
+        _hasInitialized = true;
+      }
+    }
+  }
+
+  void _refreshConfig() {
+    debugPrint('🔄 HomeView: Refreshing configuration from app_config.json');
+    // Trigger rebuild by calling initial again to reload config
+    widget.viewModel.initial();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.buildBody(context, widget.viewModel, widget.state);
   }
 }
 

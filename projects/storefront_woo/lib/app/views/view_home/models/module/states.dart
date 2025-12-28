@@ -6,6 +6,7 @@
  */
 
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 
 /// Base class for all home states
 abstract class HomeState {}
@@ -25,6 +26,7 @@ class HomeLoadedState extends HomeState {
   final int? selectedCategoryId;
   final ListAllProductsResponseModel?
   selectedProduct; // Selected product information
+  final List<ListProductCategoriesResponseModel> categories; // Categories for story circles
 
   HomeLoadedState({
     required this.products,
@@ -33,6 +35,7 @@ class HomeLoadedState extends HomeState {
     this.searchQuery,
     this.selectedCategoryId,
     this.selectedProduct,
+    this.categories = const [],
   });
 
   HomeLoadedState copyWith({
@@ -42,6 +45,7 @@ class HomeLoadedState extends HomeState {
     String? searchQuery,
     int? selectedCategoryId,
     ListAllProductsResponseModel? selectedProduct,
+    List<ListProductCategoriesResponseModel>? categories,
   }) {
     return HomeLoadedState(
       products: products ?? this.products,
@@ -50,6 +54,7 @@ class HomeLoadedState extends HomeState {
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
       selectedProduct: selectedProduct ?? this.selectedProduct,
+      categories: categories ?? this.categories,
     );
   }
 }
