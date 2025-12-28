@@ -26,6 +26,7 @@ class ProductListView
     super.footerSpacer = const SpacerVisibility.disabled(),
     super.verticalPadding = const PaddingVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.useSafeArea = false,
     required super.goRoute,
   }) : super(
          coreAppBar: (context, viewModel) =>

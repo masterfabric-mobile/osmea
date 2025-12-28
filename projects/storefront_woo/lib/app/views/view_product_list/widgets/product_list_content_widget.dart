@@ -40,6 +40,9 @@ class ProductListContentWidget extends StatelessWidget {
     debugPrint(
       '📦 ProductListContentWidget: Has active filters: ${viewModel.filters.hasActiveFilters}',
     );
+    debugPrint(
+      '📦 ProductListContentWidget: Has chip-worthy filters: ${_hasChipWorthyFilters()}',
+    );
 
     if (state.products.isEmpty) {
       debugPrint(
@@ -54,17 +57,15 @@ class ProductListContentWidget extends StatelessWidget {
 
     return OsmeaComponents.column(
       children: [
+        // Add top padding for AppBar when useSafeArea is false
+        SizedBox(height: context.highValue * 1.5),
         // Icon buttons for Sort by / Filters
         _buildActionButtons(context),
 
         // Active filter chips
-        if (viewModel.filters.hasActiveFilters)
+        if (_hasChipWorthyFilters())
           OsmeaComponents.padding(
-            padding: EdgeInsets.only(
-              left: context.spacing20,
-              right: context.spacing20,
-              bottom: context.spacing8,
-            ),
+            padding: context.paddingNormal,
             child: _buildActiveFilterChips(context),
           ),
         // Product grid
@@ -227,10 +228,31 @@ class ProductListContentWidget extends StatelessWidget {
     );
   }
 
+  /// Check if there are filters that will show chips (excluding orderBy which doesn't show a chip)
+  bool _hasChipWorthyFilters() {
+    final filters = viewModel.filters;
+    return (filters.selectedCategories != null &&
+            filters.selectedCategories!.isNotEmpty) ||
+        (filters.selectedTags != null && filters.selectedTags!.isNotEmpty) ||
+        (filters.selectedAttributes != null &&
+            filters.selectedAttributes!.isNotEmpty) ||
+        filters.onSale == true ||
+        filters.featured == true ||
+        filters.stockStatus != null ||
+        filters.minPrice != null ||
+        filters.maxPrice != null;
+  }
+
   /// Builds active filter chips
   Widget _buildActiveFilterChips(BuildContext context) {
     final filters = viewModel.filters;
     final chips = <Widget>[];
+
+    debugPrint('🔍 _buildActiveFilterChips: Building chips');
+    debugPrint('  - selectedCategories: ${filters.selectedCategories}');
+    debugPrint('  - onSale: ${filters.onSale}');
+    debugPrint('  - featured: ${filters.featured}');
+    debugPrint('  - stockStatus: ${filters.stockStatus}');
 
     // Price range filter chips - REMOVED as requested
 
@@ -238,7 +260,6 @@ class ProductListContentWidget extends StatelessWidget {
     if (filters.selectedCategories != null &&
         filters.selectedCategories!.isNotEmpty) {
       // Get category names from state
-      final state = viewModel.state;
       for (final categoryId in filters.selectedCategories!) {
         final category = state.categories.firstWhere(
           (cat) => cat.id == categoryId,
@@ -327,8 +348,18 @@ class ProductListContentWidget extends StatelessWidget {
       );
     }
 
-    if (chips.isEmpty) return const SizedBox.shrink();
+    debugPrint('🔍 _buildActiveFilterChips: Built ${chips.length} chips');
 
+    if (chips.isEmpty) {
+      debugPrint(
+        '⚠️ _buildActiveFilterChips: No chips to display, returning SizedBox.shrink()',
+      );
+      return const SizedBox.shrink();
+    }
+
+    debugPrint(
+      '✅ _buildActiveFilterChips: Returning chip list with ${chips.length} chips',
+    );
     return OsmeaComponents.singleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: OsmeaComponents.row(children: chips),
