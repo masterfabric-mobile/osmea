@@ -47,11 +47,23 @@ class CouponInputWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(width: context.spacing8),
             BlocBuilder<TextFieldCubit, TextFieldCubitState>(
               builder: (context, state) {
-                return OsmeaComponents.textButton(
-                  text: 'Apply',
+                return TextButton(
                   onPressed: () => _applyCoupon(context, state.currentValue),
-                  size: ButtonSize.small,
-                  variant: ButtonVariant.primary,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing12,
+                      vertical: context.spacing8,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: OsmeaComponents.text(
+                    'Apply',
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.nordicBlue,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 );
               },
             ),
