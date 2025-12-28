@@ -63,9 +63,10 @@ class ProductCardWidget extends StatelessWidget {
       onTap: onTap,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Image container
-          OsmeaComponents.container(
+          Container(
             height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
               color: OsmeaColors.grayMaterial[50],
@@ -83,7 +84,7 @@ class ProductCardWidget extends StatelessWidget {
                           height: context.height160 + context.spacing10,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return OsmeaComponents.container(
+                            return Container(
                               width: double.infinity,
                               height: context.height160 + context.spacing10,
                               color: OsmeaColors.grayMaterial[50],
@@ -97,7 +98,7 @@ class ProductCardWidget extends StatelessWidget {
                           },
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return OsmeaComponents.container(
+                            return Container(
                               width: double.infinity,
                               height: context.height160 + context.spacing10,
                               color: OsmeaColors.grayMaterial[50],
@@ -111,7 +112,7 @@ class ProductCardWidget extends StatelessWidget {
                             );
                           },
                         )
-                      : OsmeaComponents.container(
+                      : Container(
                           width: double.infinity,
                           height: context.height160 + context.spacing10,
                           color: OsmeaColors.grayMaterial[50],
@@ -180,7 +181,7 @@ class ProductCardWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing8),
           // Product info
           OsmeaComponents.padding(
-            padding: EdgeInsets.only(left: context.spacing8),
+            padding: context.onlyLeftPaddingLow,
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -242,7 +243,7 @@ class ProductCardWidget extends StatelessWidget {
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                     fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    height: context.lineHeightSnug,
+                    height: 1.14,
                     color: OsmeaColors.thunder,
                   ),
                   maxLines: 2,
@@ -257,7 +258,7 @@ class ProductCardWidget extends StatelessWidget {
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                       fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
-                      height: context.lineHeightNormal,
+                      height: 1.2,
                       color: OsmeaColors.pewter,
                     ),
                     maxLines: 1,
