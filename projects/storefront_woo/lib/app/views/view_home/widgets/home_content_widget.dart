@@ -7,6 +7,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
@@ -206,6 +207,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     return components.map((c) => c.widget).toList();
   }
 
+  Future<void> _handleRefresh() async {
+    await widget.viewModel.initial();
+  }
+
   @override
   Widget build(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
@@ -214,15 +219,24 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-            child: OsmeaComponents.singleChildScrollView(
-              padding: EdgeInsets.only(
-                top: context.spacing16,
-                bottom: context.spacing24 * 2,
-              ),
-              child: OsmeaComponents.column(
-                children: _buildOrderedComponents(context),
+          // iOS-styled pull-to-refresh
+          RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: OsmeaColors.nordicBlue,
+            backgroundColor: OsmeaColors.white,
+            strokeWidth: 2.0,
+            displacement: 40,
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: OsmeaComponents.singleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  top: context.spacing16,
+                  bottom: context.spacing24 * 2,
+                ),
+                child: OsmeaComponents.column(
+                  children: _buildOrderedComponents(context),
+                ),
               ),
             ),
           ),

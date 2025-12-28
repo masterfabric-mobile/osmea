@@ -191,6 +191,16 @@ class _CategoryStoryCircleWidgetState
                             cacheWidth: imageSize.toInt(),
                             showLoadingIndicator: true,
                             errorWidget: _buildDefaultIcon(context, circleSize),
+                            placeholder: Container(
+                              width: circleSize,
+                              height: circleSize,
+                              color: OsmeaColors.white,
+                              child: Icon(
+                                Icons.category_outlined,
+                                size: circleSize * 0.5,
+                                color: OsmeaColors.thunder,
+                              ),
+                            ),
                           )
                         : _buildDefaultIcon(context, circleSize),
                   ),
@@ -253,7 +263,7 @@ class _CategoryStoryCircleWidgetState
     return Container(
       width: size,
       height: size,
-      color: OsmeaColors.pewter,
+      color: OsmeaColors.white,
       child: Icon(
         Icons.category_outlined,
         size: size * 0.5,
