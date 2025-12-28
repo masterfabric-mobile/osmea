@@ -1,0 +1,280 @@
+/*
+ * Collapsible Order Summary Widget
+ * ---------------------------------
+ * Bottom-stacked collapsible order summary widget.
+ */
+
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:core/core.dart';
+import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
+import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/order_summary_widget.dart';
+import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
+
+/// Collapsible order summary widget for bottom of cart
+class CollapsibleOrderSummaryWidget extends StatefulWidget {
+  final CartViewModel viewModel;
+  final CartLoadedState state;
+  final ValueChanged<bool>? onExpandedChanged;
+
+  const CollapsibleOrderSummaryWidget({
+    super.key,
+    required this.viewModel,
+    required this.state,
+    this.onExpandedChanged,
+  });
+
+  @override
+  State<CollapsibleOrderSummaryWidget> createState() =>
+      _CollapsibleOrderSummaryWidgetState();
+}
+
+class _CollapsibleOrderSummaryWidgetState
+    extends State<CollapsibleOrderSummaryWidget>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+  late AnimationController _animationController;
+  late Animation<double> _expandAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+      // Notify parent of expanded state change
+      widget.onExpandedChanged?.call(_isExpanded);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        color: OsmeaColors.paperWhite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Collapsible order summary (above bottom bar)
+            ClipRect(
+              child: SizeTransition(
+                sizeFactor: _expandAnimation,
+                child: Column(
+                  children: [
+                    OsmeaComponents.container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: OrderSummaryWidget(state: widget.state),
+                    ),
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                  ],
+                ),
+              ),
+            ),
+            // Bottom summary bar with total and expand button
+            OsmeaComponents.container(
+              decoration: BoxDecoration(
+                color: OsmeaColors.white,
+                border: _isExpanded
+                    ? Border(
+                        top: BorderSide(
+                          color: OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      )
+                    : null,
+              ),
+              child: OsmeaComponents.padding(
+                padding: EdgeInsets.all(context.spacing16),
+                child: OsmeaComponents.column(
+                  children: [
+                    // Total row with expand button
+                    OsmeaComponents.row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        OsmeaComponents.column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            OsmeaComponents.text(
+                              'Total',
+                              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                                color: OsmeaColors.pewter,
+                              ),
+                            ),
+                            OsmeaComponents.sizedBox(height: context.spacing4),
+                            OsmeaComponents.text(
+                              PriceInfoCurrencyHelper.formatPrice(
+                                widget.state.totalPrice,
+                                currencyCode: widget.state.currencyCode,
+                                currencyDecimalSeparator:
+                                    widget.state.currencyDecimalSeparator,
+                                currencyThousandSeparator:
+                                    widget.state.currencyThousandSeparator,
+                                decimalPlaces:
+                                    widget.state.currencyMinorUnit ?? 2,
+                              ),
+                              textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: OsmeaColors.thunder,
+                              ),
+                            ),
+                          ],
+                        ),
+                        OsmeaComponents.iconButton(
+                          onPressed: _toggleExpanded,
+                          icon: AnimatedRotation(
+                            turns: _isExpanded ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Icon(
+                              Icons.keyboard_arrow_up,
+                              color: OsmeaColors.thunder,
+                              size: context.iconSizeLarge,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    OsmeaComponents.sizedBox(height: context.spacing16),
+                    // Checkout button
+                    _buildCheckoutButton(context),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckoutButton(BuildContext context) {
+    return OsmeaComponents.container(
+      decoration: BoxDecoration(
+        color: OsmeaColors.nordicBlue,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _handleCheckout(context);
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OsmeaComponents.text(
+                  'Checkout',
+                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                    color: OsmeaColors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  color: OsmeaColors.white,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleCheckout(BuildContext context) async {
+    try {
+      // Check if user is authenticated using AuthCubit (more reliable)
+      bool isAuthenticated = false;
+      try {
+        final authCubit = GetIt.I<AuthCubit>();
+        final authState = authCubit.state;
+        isAuthenticated = authState is AuthAuthenticatedState &&
+            authState.isAuthenticated &&
+            authState.jwtToken != null &&
+            authState.jwtToken!.isNotEmpty;
+      } catch (e) {
+        debugPrint('⚠️ Could not get AuthCubit, trying AuthStorageHelper: $e');
+        // Fallback to AuthStorageHelper
+        final authStorage = AuthStorageHelper();
+        isAuthenticated = await authStorage.isAuthenticated();
+      }
+
+      if (!isAuthenticated) {
+        // User not authenticated, show message and redirect to auth
+        if (context.mounted) {
+          context.snackbarWarning(
+            'Please sign in to complete your purchase',
+            duration: const Duration(seconds: 3),
+          );
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (context.mounted) {
+            context.go('/auth');
+          }
+        }
+        return;
+      }
+
+      // User is authenticated, proceed with checkout
+      // Navigate to checkout page where user will fill address forms
+      if (context.mounted) {
+        final currentState = widget.viewModel.state;
+        if (currentState is CartLoadedState) {
+          // Navigate to checkout page (not directly to payment)
+          // User will fill address forms in checkout page
+          context.go(
+            '/checkout',
+            extra: {
+              'totalAmount': currentState.totalPrice,
+              'currencySymbol': currentState.currencySymbol,
+              'currencyCode': currentState.currencyCode,
+            },
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        context.snackbarError(
+          'Error starting checkout: ${e.toString()}',
+          duration: const Duration(seconds: 3),
+        );
+      }
+    }
+  }
+}
+

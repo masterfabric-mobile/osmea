@@ -4,19 +4,19 @@
  * Main content widget for cart view displaying cart items, coupons, and summary.
  */
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:go_router/go_router.dart';
-import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_empty_widget.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_item_swipe_widget.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/coupon_section_widget.dart';
-import 'package:storefront_woo/app/views/view_cart/widgets/order_summary_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/product_count_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/collapsible_order_summary_widget.dart';
 
 /// Main content widget for cart view
-class CartContentWidget extends StatelessWidget {
+class CartContentWidget extends StatefulWidget {
   final CartViewModel viewModel;
   final CartLoadedState state;
 
@@ -27,155 +27,114 @@ class CartContentWidget extends StatelessWidget {
   });
 
   @override
+  State<CartContentWidget> createState() => _CartContentWidgetState();
+}
+
+class _CartContentWidgetState extends State<CartContentWidget> {
+  final GlobalKey _bottomWidgetKey = GlobalKey();
+  double _bottomWidgetHeight = 200; // Default fallback height
+  bool _isSummaryExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measureBottomWidget();
+    });
+  }
+
+  void _measureBottomWidget() {
+    final RenderBox? renderBox =
+        _bottomWidgetKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && mounted) {
+      setState(() {
+        _bottomWidgetHeight = renderBox.size.height + MediaQuery.of(context).padding.bottom;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (state.cartItems.isEmpty) {
+    if (widget.state.cartItems.isEmpty) {
       return const CartEmptyWidget();
     }
 
-    return OsmeaComponents.singleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: OsmeaComponents.column(
-        children: [
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          ..._buildCartItems(context),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          CouponSectionWidget(
-            viewModel: viewModel,
-            state: state,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          OrderSummaryWidget(state: state),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          
-          // Complete Purchase Button
-          _buildCheckoutButton(context),
-          
-          OsmeaComponents.sizedBox(height: context.spacing16),
-        ],
-      ),
-    );
-  }
+    // Calculate responsive bottom padding
+    final screenHeight = MediaQuery.of(context).size.height;
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    // Use a percentage of screen height or measured height, whichever is larger
+    final responsiveBottomPadding = (_bottomWidgetHeight + safeAreaBottom + context.spacing16)
+        .clamp(200.0, screenHeight * 0.3);
 
-  Widget _buildCheckoutButton(BuildContext context) {
-    return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
+    return Stack(
+      children: [
+        // Scrollable content
+        OsmeaComponents.singleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: OsmeaComponents.column(
+            children: [
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              ..._buildCartItems(context),
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              // Product count widget before coupon section
+              ProductCountWidget(state: widget.state),
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              CouponSectionWidget(
+                viewModel: widget.viewModel,
+                state: widget.state,
+              ),
+              // Responsive bottom padding to account for fixed bottom summary
+              OsmeaComponents.sizedBox(height: responsiveBottomPadding),
+            ],
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            _handleCheckout(context);
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: OsmeaComponents.row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OsmeaComponents.text(
-                  'Complete Purchase',
-                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    color: OsmeaColors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
+        ),
+        // Blur overlay when summary is expanded
+        if (_isSummaryExpanded)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                child: Container(
+                  color: OsmeaColors.white.withValues(alpha: 0.3),
                 ),
-                OsmeaComponents.sizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: OsmeaColors.white,
-                  size: 20,
-                ),
-              ],
+              ),
+            ),
+          ),
+        // Fixed bottom collapsible summary
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: _BottomWidgetMeasurer(
+            key: _bottomWidgetKey,
+            onHeightChanged: _measureBottomWidget,
+            child: CollapsibleOrderSummaryWidget(
+              viewModel: widget.viewModel,
+              state: widget.state,
+              onExpandedChanged: (isExpanded) {
+                setState(() {
+                  _isSummaryExpanded = isExpanded;
+                });
+              },
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
-  void _handleCheckout(BuildContext context) async {
-    try {
-      // Check if user is authenticated using AuthCubit (more reliable)
-      bool isAuthenticated = false;
-      try {
-        final authCubit = GetIt.I<AuthCubit>();
-        final authState = authCubit.state;
-        isAuthenticated = authState is AuthAuthenticatedState &&
-            authState.isAuthenticated &&
-            authState.jwtToken != null &&
-            authState.jwtToken!.isNotEmpty;
-      } catch (e) {
-        debugPrint('⚠️ Could not get AuthCubit, trying AuthStorageHelper: $e');
-        // Fallback to AuthStorageHelper
-        final authStorage = AuthStorageHelper();
-        isAuthenticated = await authStorage.isAuthenticated();
-      }
-
-      if (!isAuthenticated) {
-        // User not authenticated, show message and redirect to auth
-        if (context.mounted) {
-          context.snackbarWarning(
-            'Please sign in to complete your purchase',
-            duration: const Duration(seconds: 3),
-          );
-          await Future.delayed(const Duration(milliseconds: 500));
-          if (context.mounted) {
-            context.go('/auth');
-          }
-        }
-        return;
-      }
-
-      // User is authenticated, proceed with checkout
-      // Navigate to checkout page where user will fill address forms
-      if (context.mounted) {
-        final currentState = viewModel.state;
-        if (currentState is CartLoadedState) {
-          // Navigate to checkout page (not directly to payment)
-          // User will fill address forms in checkout page
-          context.go(
-            '/checkout',
-            extra: {
-              'totalAmount': currentState.totalPrice,
-              'currencySymbol': currentState.currencySymbol,
-              'currencyCode': currentState.currencyCode,
-            },
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        context.snackbarError(
-          'Error starting checkout: ${e.toString()}',
-          duration: const Duration(seconds: 3),
-        );
-      }
-    }
-  }
-
   List<Widget> _buildCartItems(BuildContext context) {
-    return state.cartItems.asMap().entries.map((entry) {
+    return widget.state.cartItems.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
       return OsmeaComponents.column(
         children: [
           CartItemSwipeWidget(
             item: item,
-            viewModel: viewModel,
-            state: state,
+            viewModel: widget.viewModel,
+            state: widget.state,
           ),
-          if (index < state.cartItems.length - 1)
+          if (index < widget.state.cartItems.length - 1)
             OsmeaComponents.container(
               margin: EdgeInsets.symmetric(horizontal: context.spacing16),
               height: context.height1,
@@ -184,6 +143,44 @@ class CartContentWidget extends StatelessWidget {
         ],
       );
     }).toList();
+  }
+}
+
+/// Widget that measures its child's height and reports it
+class _BottomWidgetMeasurer extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onHeightChanged;
+
+  const _BottomWidgetMeasurer({
+    super.key,
+    required this.child,
+    required this.onHeightChanged,
+  });
+
+  @override
+  State<_BottomWidgetMeasurer> createState() => _BottomWidgetMeasurerState();
+}
+
+class _BottomWidgetMeasurerState extends State<_BottomWidgetMeasurer> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onHeightChanged();
+    });
+  }
+
+  @override
+  void didUpdateWidget(_BottomWidgetMeasurer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onHeightChanged();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
 
