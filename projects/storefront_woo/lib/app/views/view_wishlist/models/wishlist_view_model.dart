@@ -69,34 +69,44 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       _remove(productId, groupId: groupId);
   Future<void> addItemToCartFromWishlist(int productId) =>
       _addItemToCartFromWishlist(productId);
-  
+
   /// Adds item to cart and then removes it from wishlist
   Future<void> addItemToCartAndRemoveFromWishlist(int productId) async {
     try {
-      debugPrint('🛒 WishlistViewModel: Starting add to cart and remove from wishlist for product $productId');
-      
+      debugPrint(
+        '🛒 WishlistViewModel: Starting add to cart and remove from wishlist for product $productId',
+      );
+
       // Store the current wishlist items before any operation
       // Handle case where state might be WishlistActionPromptState (popup is open)
       final currentState = state;
       WishlistLoadedState? loadedState;
-      
+
       if (currentState is WishlistActionPromptState) {
         // If popup is open, use previousState
-        debugPrint('💡 WishlistViewModel: State is WishlistActionPromptState, using previousState');
+        debugPrint(
+          '💡 WishlistViewModel: State is WishlistActionPromptState, using previousState',
+        );
         loadedState = currentState.previousState;
       } else if (currentState is WishlistLoadedState) {
         loadedState = currentState;
       } else {
-        debugPrint('⚠️ WishlistViewModel: Current state is not WishlistLoadedState, cannot remove item');
+        debugPrint(
+          '⚠️ WishlistViewModel: Current state is not WishlistLoadedState, cannot remove item',
+        );
         // Try to add to cart anyway
         await _addItemToCartFromWishlist(productId);
         return;
       }
-      
+
       final currentItems = List<WishlistItem>.from(loadedState.items);
-      debugPrint('💾 WishlistViewModel: Stored ${currentItems.length} items before operations');
-      debugPrint('💾 WishlistViewModel: Current items IDs: ${currentItems.map((e) => e.id).toList()}');
-      
+      debugPrint(
+        '💾 WishlistViewModel: Stored ${currentItems.length} items before operations',
+      );
+      debugPrint(
+        '💾 WishlistViewModel: Current items IDs: ${currentItems.map((e) => e.id).toList()}',
+      );
+
       // First add to cart - throw exception if it fails
       try {
         await _addItemToCartFromWishlist(productId);
@@ -105,79 +115,100 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('❌ WishlistViewModel: Cart addition failed: $e');
         // Re-throw exception so UI can show error
         final errorMessage = ApiErrorUtils.getErrorMessage(e);
-        emit(WishlistErrorState(message: 'Failed to add to cart: $errorMessage'));
+        emit(
+          WishlistErrorState(message: 'Failed to add to cart: $errorMessage'),
+        );
         rethrow;
       }
-      
+
       // Re-check state after cart addition (in case it changed)
       final stateAfterCart = state;
       final itemsAfterCart = stateAfterCart is WishlistLoadedState
           ? List<WishlistItem>.from(stateAfterCart.items)
           : currentItems;
-      
+
       debugPrint('🗑️ WishlistViewModel: Starting removal from wishlist');
-      debugPrint('🗑️ WishlistViewModel: Items after cart addition: ${itemsAfterCart.length}');
+      debugPrint(
+        '🗑️ WishlistViewModel: Items after cart addition: ${itemsAfterCart.length}',
+      );
       debugPrint('🗑️ WishlistViewModel: Removing product ID: $productId');
-      
+
       // Remove the item manually from local state without server sync
       final updatedItems = itemsAfterCart.where((item) {
         final shouldKeep = item.id != productId;
         if (!shouldKeep) {
-          debugPrint('🗑️ WishlistViewModel: Filtering out item with id=${item.id} (matches productId=$productId)');
+          debugPrint(
+            '🗑️ WishlistViewModel: Filtering out item with id=${item.id} (matches productId=$productId)',
+          );
         }
         return shouldKeep;
       }).toList();
-      
-      debugPrint('📝 WishlistViewModel: Updated items count: ${updatedItems.length} (removed product $productId)');
-      debugPrint('📝 WishlistViewModel: Remaining items IDs: ${updatedItems.map((e) => e.id).toList()}');
-      
+
+      debugPrint(
+        '📝 WishlistViewModel: Updated items count: ${updatedItems.length} (removed product $productId)',
+      );
+      debugPrint(
+        '📝 WishlistViewModel: Remaining items IDs: ${updatedItems.map((e) => e.id).toList()}',
+      );
+
       // Emit the updated state immediately
       emit(WishlistLoadedState(items: updatedItems));
-      
+
       // Optionally try to remove from server in background (don't await)
       _removeFromServerInBackground(productId);
-      
-      debugPrint('✅ WishlistViewModel: Add to cart and remove from wishlist completed');
+
+      debugPrint(
+        '✅ WishlistViewModel: Add to cart and remove from wishlist completed',
+      );
     } catch (e) {
       debugPrint('❌ Failed to add to cart and remove from wishlist: $e');
       // Error state already emitted in catch block above, don't emit again
       if (state is! WishlistErrorState) {
         final errorMessage = ApiErrorUtils.getErrorMessage(e);
-        emit(WishlistErrorState(message: 'Failed to complete operation: $errorMessage'));
+        emit(
+          WishlistErrorState(
+            message: 'Failed to complete operation: $errorMessage',
+          ),
+        );
       }
     }
   }
-  
+
   /// Remove item from server in background without affecting UI state
   Future<void> _removeFromServerInBackground(int productId) async {
     try {
       final jwt = await _getJwtToken();
       if (jwt == null || jwt.isEmpty) {
-        debugPrint('💡 Background remove: Not authenticated, skipping server removal');
+        debugPrint(
+          '💡 Background remove: Not authenticated, skipping server removal',
+        );
         return;
       }
-      
-      final apiVersion = _config.getString('woocommerce_configuration.version', 'v1');
-      
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
       // Find the item to get itemId if available
       final s = state;
       WishlistItem? itemToRemove;
       WishlistLoadedState? loadedState;
-      
+
       if (s is WishlistActionPromptState) {
         // If popup is open, use previousState
         loadedState = s.previousState;
       } else if (s is WishlistLoadedState) {
         loadedState = s;
       }
-      
+
       if (loadedState != null) {
         itemToRemove = loadedState.items.firstWhere(
           (e) => e.id == productId,
           orElse: () => WishlistItem(id: productId),
         );
       }
-      
+
       // Try DELETE by itemId first (preferred method)
       bool deleteSuccess = false;
       if (itemToRemove?.itemId != null) {
@@ -211,25 +242,34 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             productId: productId,
             groupId: 0, // Default group for most implementations
           );
-          
+
           final response = await _wishlistService.deleteItemByProduct(
             apiVersion: apiVersion,
             request: request,
           );
-          
-          debugPrint('🔄 Background remove: Server removal response - success: ${response.success}');
+
+          debugPrint(
+            '🔄 Background remove: Server removal response - success: ${response.success}',
+          );
         } catch (e) {
-          debugPrint('⚠️ Background remove: Server removal failed: $e (UI state not affected)');
+          debugPrint(
+            '⚠️ Background remove: Server removal failed: $e (UI state not affected)',
+          );
         }
       }
     } catch (e) {
-      debugPrint('⚠️ Background remove: Server removal failed: $e (UI state not affected)');
+      debugPrint(
+        '⚠️ Background remove: Server removal failed: $e (UI state not affected)',
+      );
     }
   }
+
   void promptAddToCartOptions(WishlistItem item) =>
       _promptAddToCartOptions(item);
   void restorePrevious(WishlistLoadedState prev) {
-    debugPrint('🔄 WishlistViewModel: Restoring previous state with ${prev.items.length} items');
+    debugPrint(
+      '🔄 WishlistViewModel: Restoring previous state with ${prev.items.length} items',
+    );
     emit(prev);
   }
 
@@ -375,38 +415,38 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           final itemId = itemResponse.id;
           final productId = itemResponse.productId;
 
-        if (productId == null || productId == 0) {
+          if (productId == null || productId == 0) {
+            debugPrint(
+              '⚠️ Wishlist: Skipping item with invalid productId: ${itemResponse.id}',
+            );
+            continue;
+          }
+
+          // Get fields from response (supports both API format and legacy format)
+          // API format: name, price, image
+          // Legacy format: product_name, product_price, product_image
+          // Helper function to safely convert dynamic to String?
+          String? safeStringFromResponse(dynamic value) {
+            if (value == null) return null;
+            if (value is String) return value;
+            if (value is bool) return value.toString();
+            if (value is num) return value.toString();
+            return value.toString();
+          }
+
+          final name =
+              safeStringFromResponse(itemResponse.name) ??
+              safeStringFromResponse(itemResponse.productName);
+          final price =
+              safeStringFromResponse(itemResponse.price) ??
+              safeStringFromResponse(itemResponse.productPrice);
+          final image =
+              safeStringFromResponse(itemResponse.image) ??
+              safeStringFromResponse(itemResponse.productImage);
+
           debugPrint(
-            '⚠️ Wishlist: Skipping item with invalid productId: ${itemResponse.id}',
+            '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name, price: $price',
           );
-          continue;
-        }
-
-        // Get fields from response (supports both API format and legacy format)
-        // API format: name, price, image
-        // Legacy format: product_name, product_price, product_image
-        // Helper function to safely convert dynamic to String?
-        String? safeStringFromResponse(dynamic value) {
-          if (value == null) return null;
-          if (value is String) return value;
-          if (value is bool) return value.toString();
-          if (value is num) return value.toString();
-          return value.toString();
-        }
-
-        final name =
-            safeStringFromResponse(itemResponse.name) ??
-            safeStringFromResponse(itemResponse.productName);
-        final price =
-            safeStringFromResponse(itemResponse.price) ??
-            safeStringFromResponse(itemResponse.productPrice);
-        final image =
-            safeStringFromResponse(itemResponse.image) ??
-            safeStringFromResponse(itemResponse.productImage);
-
-        debugPrint(
-          '💖 Wishlist: Parsing item - id: $itemId, productId: $productId, name: $name, price: $price',
-        );
 
           // Try to fetch full product details for currency code and proper pricing
           try {
@@ -429,10 +469,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
                 : image;
 
             final productName = product.name ?? name ?? 'Product';
-            final productPrice = prices?.regularPrice ?? 
-                                 prices?.price ?? 
-                                 price ?? 
-                                 '0.00';
+            final productPrice =
+                prices?.regularPrice ?? prices?.price ?? price ?? '0.00';
 
             debugPrint(
               '💖 Wishlist: Creating WishlistItem - name: $productName, price: $productPrice',
@@ -458,16 +496,16 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
               '⚠️ Wishlist: Failed to fetch product $productId, using API response data: $e',
             );
             debugPrint('⚠️ Stack trace: $stackTrace');
-            
+
             // Fallback: use wishlist API response data directly
             // Ensure we have at least some data
             final fallbackName = name ?? 'Product';
             final fallbackPrice = price ?? '0.00';
-            
+
             debugPrint(
               '💖 Wishlist: Using fallback data - name: $fallbackName, price: $fallbackPrice',
             );
-            
+
             mapped.add(
               WishlistItem(
                 id: productId,
@@ -498,11 +536,15 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       final currentState = state;
       if (currentState is WishlistLoadedState) {
         // Keep existing state if available - don't clear it!
-        debugPrint('💡 Wishlist: Sync failed, keeping existing state with ${currentState.items.length} items');
+        debugPrint(
+          '💡 Wishlist: Sync failed, keeping existing state with ${currentState.items.length} items',
+        );
         emit(WishlistLoadedState(items: currentState.items));
       } else if (currentState is WishlistActionPromptState) {
         // If popup is open, restore previous state
-        debugPrint('💡 Wishlist: Sync failed, restoring previous state from popup');
+        debugPrint(
+          '💡 Wishlist: Sync failed, restoring previous state from popup',
+        );
         emit(WishlistLoadedState(items: currentState.previousState.items));
       } else {
         // If no existing state, try to restore from persisted state
@@ -510,9 +552,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('💡 Wishlist: Sync failed, checking persisted state...');
         // Don't emit empty state - let HydratedCubit restore from storage
         // If that fails too, only then use empty state
-        final persistedState = state; // This should be restored by HydratedCubit
+        final persistedState =
+            state; // This should be restored by HydratedCubit
         if (persistedState is WishlistLoadedState) {
-          debugPrint('💡 Wishlist: Using persisted state with ${persistedState.items.length} items');
+          debugPrint(
+            '💡 Wishlist: Using persisted state with ${persistedState.items.length} items',
+          );
           emit(persistedState);
         } else {
           debugPrint('💡 Wishlist: No persisted state, using empty state');
@@ -543,10 +588,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         final newState = WishlistLoadedState(items: items);
         emit(newState);
         // Emit success state to show snackbar
-        emit(WishlistSuccessState(
-          message: 'Added to favorites',
-          previousState: newState,
-        ));
+        emit(
+          WishlistSuccessState(
+            message: 'Added to favorites',
+            previousState: newState,
+          ),
+        );
         debugPrint('✅ Wishlist: Item added to local state (unauthenticated)');
         return;
       }
@@ -565,7 +612,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       try {
         await _syncFromServer(groupId: groupId);
       } catch (syncError) {
-        debugPrint('⚠️ Wishlist: Sync before add failed, but continuing with add: $syncError');
+        debugPrint(
+          '⚠️ Wishlist: Sync before add failed, but continuing with add: $syncError',
+        );
         // Restore preserved state if sync failed
         if (preservedState != null) {
           emit(preservedState);
@@ -599,7 +648,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       );
 
       // Call API to add item - THIS IS THE CRITICAL CALL
-      debugPrint('💖 Wishlist: Sending API request to add item (productId: ${item.id}, groupId: ${groupId ?? 0})');
+      debugPrint(
+        '💖 Wishlist: Sending API request to add item (productId: ${item.id}, groupId: ${groupId ?? 0})',
+      );
       final response = await _wishlistService.addItemToWishlist(
         apiVersion: apiVersion,
         request: AddWishlistItemRequest(
@@ -630,7 +681,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         try {
           await _syncFromServer(groupId: groupId);
         } catch (syncError) {
-          debugPrint('⚠️ Wishlist: Sync after failed add also failed: $syncError');
+          debugPrint(
+            '⚠️ Wishlist: Sync after failed add also failed: $syncError',
+          );
           // Keep current state if sync fails
           if (preservedState != null) {
             // Add item to preserved state optimistically
@@ -656,13 +709,17 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           // After successful sync, emit success state to show snackbar
           final currentState = state;
           if (currentState is WishlistLoadedState) {
-            emit(WishlistSuccessState(
-              message: 'Added to favorites',
-              previousState: currentState,
-            ));
+            emit(
+              WishlistSuccessState(
+                message: 'Added to favorites',
+                previousState: currentState,
+              ),
+            );
           }
         } catch (syncError) {
-          debugPrint('⚠️ Wishlist: Sync after successful add failed: $syncError');
+          debugPrint(
+            '⚠️ Wishlist: Sync after successful add failed: $syncError',
+          );
           // If sync fails, add item optimistically to current state
           final cur = state;
           WishlistLoadedState? optimisticState;
@@ -683,10 +740,12 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           }
           // Emit success state even if sync failed
           if (optimisticState != null) {
-            emit(WishlistSuccessState(
-              message: 'Added to favorites',
-              previousState: optimisticState,
-            ));
+            emit(
+              WishlistSuccessState(
+                message: 'Added to favorites',
+                previousState: optimisticState,
+              ),
+            );
           }
         }
       }
@@ -843,7 +902,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             return;
           } else {
             // If delete failed, don't sync - keep optimistic update
-            debugPrint('⚠️ Wishlist: Delete by itemId failed, but keeping optimistic removal');
+            debugPrint(
+              '⚠️ Wishlist: Delete by itemId failed, but keeping optimistic removal',
+            );
             return;
           }
         } catch (e) {
@@ -858,14 +919,18 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             return;
           }
           // For other errors, keep optimistic update - don't sync to avoid clearing list
-          debugPrint('⚠️ Wishlist: Delete failed with error, but keeping optimistic removal');
+          debugPrint(
+            '⚠️ Wishlist: Delete failed with error, but keeping optimistic removal',
+          );
           return;
         }
       }
     } catch (e) {
       debugPrint('❌ Wishlist remove error: $e');
       // On error, keep optimistic update instead of syncing to avoid clearing list
-      debugPrint('💡 Wishlist: Remove error occurred, but keeping optimistic removal');
+      debugPrint(
+        '💡 Wishlist: Remove error occurred, but keeping optimistic removal',
+      );
       // Don't sync from server as it might clear the entire list
     }
   }
@@ -886,7 +951,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
     // First, check if product is variable and get first variation if needed
     int? variationId;
-    
+
     try {
       final product = await _productService.retrieveProduct(
         apiVersion: _config.getString(
@@ -897,8 +962,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       );
 
       // Check if product is variable and has variations
-      if (product.type == 'variable' && 
-          product.variations != null && 
+      if (product.type == 'variable' &&
+          product.variations != null &&
           product.variations!.isNotEmpty) {
         // Get first variation ID (for wishlist, we use first available variation)
         final firstVariation = product.variations!.first;
@@ -906,12 +971,16 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           final id = firstVariation['id'];
           if (id != null) {
             variationId = int.tryParse(id.toString());
-            debugPrint('🛒 Found first variation ID: $variationId for variable product');
+            debugPrint(
+              '🛒 Found first variation ID: $variationId for variable product',
+            );
           }
         }
       }
     } catch (e) {
-      debugPrint('⚠️ Could not fetch product details, proceeding with product ID: $e');
+      debugPrint(
+        '⚠️ Could not fetch product details, proceeding with product ID: $e',
+      );
     }
 
     // Ensure we have a cart token; if missing, initialize cart first
@@ -935,15 +1004,10 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     // If variation ID found, use it as the id; otherwise use product ID
     final itemId = variationId ?? productId;
 
-    debugPrint(
-      '🛒 Adding to cart: id=$itemId, variationId=$variationId',
-    );
+    debugPrint('🛒 Adding to cart: id=$itemId, variationId=$variationId');
 
     var response = await _cartService.addItem(
-      apiVersion: _config.getString(
-        'woocommerce_configuration.version',
-        'v1',
-      ),
+      apiVersion: _config.getString('woocommerce_configuration.version', 'v1'),
       cartToken: cartToken ?? '',
       jwtToken: await _getJwtToken(), // Optional JWT token
       id: itemId,
@@ -1010,7 +1074,9 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
     // Restore preserved wishlist state to ensure it's not cleared
     if (preservedState != null) {
-      debugPrint('💾 WishlistViewModel: Restoring preserved wishlist state after cart addition');
+      debugPrint(
+        '💾 WishlistViewModel: Restoring preserved wishlist state after cart addition',
+      );
       emit(preservedState);
     }
 
