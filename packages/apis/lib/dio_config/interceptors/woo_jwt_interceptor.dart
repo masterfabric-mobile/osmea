@@ -93,6 +93,29 @@ class WooJwtInterceptor extends Interceptor {
         return;
       }
 
+      // If Authorization header is already set (e.g., by Retrofit @Header annotation),
+      // respect it and don't overwrite - this allows explicit token passing
+      // But only if it's a valid Bearer token
+      if (options.headers.containsKey('Authorization') &&
+          options.headers['Authorization'] != null) {
+        final existingAuth = options.headers['Authorization'];
+        if (existingAuth is String && existingAuth.isNotEmpty) {
+          // Check if it's a valid Bearer token (not empty or just "Bearer")
+          if (existingAuth.startsWith('Bearer ') && existingAuth.length > 7) {
+            debugPrint(
+                '🔐 Authorization header already set with valid token, respecting it (path: ${options.path})');
+            return;
+          }
+          // If it's invalid (e.g., "Bearer " with no token), we'll replace it below
+          debugPrint(
+              '⚠️ Authorization header exists but appears invalid (${existingAuth.length} chars), replacing it');
+        } else {
+          // Header is null or empty, we'll set it below
+          debugPrint(
+              '⚠️ Authorization header is null or empty, will be set by interceptor');
+        }
+      }
+
       // Check if this is a wishlist endpoint - JWT is optional for wishlist
       final isWishlistEndpoint = _isWishlistEndpoint(options.path);
 
@@ -316,6 +339,29 @@ class WooJwtEnhancedInterceptor extends Interceptor {
       // Skip JWT for authentication endpoints
       if (_isAuthEndpoint(options.path)) {
         return;
+      }
+
+      // If Authorization header is already set (e.g., by Retrofit @Header annotation),
+      // respect it and don't overwrite - this allows explicit token passing
+      // But only if it's a valid Bearer token
+      if (options.headers.containsKey('Authorization') &&
+          options.headers['Authorization'] != null) {
+        final existingAuth = options.headers['Authorization'];
+        if (existingAuth is String && existingAuth.isNotEmpty) {
+          // Check if it's a valid Bearer token (not empty or just "Bearer")
+          if (existingAuth.startsWith('Bearer ') && existingAuth.length > 7) {
+            debugPrint(
+                '🔐 Authorization header already set with valid token, respecting it (path: ${options.path})');
+            return;
+          }
+          // If it's invalid (e.g., "Bearer " with no token), we'll replace it below
+          debugPrint(
+              '⚠️ Authorization header exists but appears invalid (${existingAuth.length} chars), replacing it');
+        } else {
+          // Header is null or empty, we'll set it below
+          debugPrint(
+              '⚠️ Authorization header is null or empty, will be set by interceptor');
+        }
       }
 
       // Check if this is a wishlist endpoint - JWT is optional for wishlist

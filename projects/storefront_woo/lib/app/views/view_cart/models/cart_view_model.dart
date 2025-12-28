@@ -372,12 +372,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       // Use empty string if cart token is null - API will handle it
       // Don't call getCart() here as it causes nonce issues with JWT
+      // Only pass jwtToken if it's not null - interceptor will handle it if null
       var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken ?? '',
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
+        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated, null otherwise (interceptor will add it)
         id: productId,
         quantity: quantity,
       );
