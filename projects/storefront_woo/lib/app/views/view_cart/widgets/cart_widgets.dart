@@ -572,13 +572,20 @@ class CartContentWidget extends StatelessWidget {
       }
 
       // User is authenticated, proceed with checkout
+      // Navigate to bank transfer payment view
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Checkout feature coming soon!'),
-            backgroundColor: Colors.blue,
-          ),
-        );
+        final currentState = viewModel.state;
+        if (currentState is CartLoadedState) {
+          // Navigate to checkout page where user will fill address forms
+          context.go(
+            '/checkout',
+            extra: {
+              'totalAmount': currentState.totalPrice,
+              'currencySymbol': currentState.currencySymbol,
+              'currencyCode': currentState.currencyCode,
+            },
+          );
+        }
       }
     } catch (e) {
       if (context.mounted) {

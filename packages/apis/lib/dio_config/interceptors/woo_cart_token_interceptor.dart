@@ -306,6 +306,7 @@ class WooCartTokenInterceptor extends Interceptor {
       '/wp-json/wc/v2/cart',
       '/wp-json/wc/store/v1', // WooCommerce Store API v1
       '/wp-json/wc/store/v2', // WooCommerce Store API v2
+      '/checkout', // Checkout endpoints also need cart token
     ];
 
     return cartPaths.any((cartPath) => path.contains(cartPath));

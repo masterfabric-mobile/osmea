@@ -67,10 +67,8 @@ class CategoriesView
           return OsmeaComponents.listItem(
             title: OsmeaComponents.text(category.name),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Implement navigation to products by category
-              // goRoute('/products/category/${category.slug}');
-            },
+            onTap: () => goRoute(
+                '/categories/products/${category.id}?name=${Uri.encodeComponent(category.name)}'),
           );
         },
       );
