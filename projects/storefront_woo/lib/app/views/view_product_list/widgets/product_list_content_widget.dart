@@ -21,7 +21,7 @@ import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 
 /// Main content widget for product list view
-class ProductListContentWidget extends StatelessWidget {
+class ProductListContentWidget extends StatefulWidget {
   final ProductListLoadedState state;
   final ProductListViewModel viewModel;
 
@@ -32,7 +32,49 @@ class ProductListContentWidget extends StatelessWidget {
   });
 
   @override
+  State<ProductListContentWidget> createState() =>
+      _ProductListContentWidgetState();
+}
+
+class _ProductListContentWidgetState extends State<ProductListContentWidget> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final shouldShow = _scrollController.offset > 300;
+    if (shouldShow != _showScrollToTop) {
+      setState(() {
+        _showScrollToTop = shouldShow;
+      });
+    }
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final state = widget.state;
+    final viewModel = widget.viewModel;
+
     debugPrint(
       '📦 ProductListContentWidget: Building with ${state.products.length} products',
     );
@@ -55,36 +97,77 @@ class ProductListContentWidget extends StatelessWidget {
       '✅ ProductListContentWidget: Showing product grid with ${state.products.length} products',
     );
 
-    return OsmeaComponents.column(
+    return Stack(
       children: [
-        // Add top padding for AppBar when useSafeArea is false
-        SizedBox(height: context.highValue * 1.5),
-        // Icon buttons for Sort by / Filters
-        _buildActionButtons(context),
+        OsmeaComponents.column(
+          children: [
+            // Add top padding for AppBar when useSafeArea is false
+            SizedBox(height: context.highValue * 1.5),
+            // Icon buttons for Sort by / Filters
+            _buildActionButtons(context),
 
-        // Active filter chips
-        if (_hasChipWorthyFilters())
-          OsmeaComponents.padding(
-            padding: context.paddingNormal,
-            child: _buildActiveFilterChips(context),
-          ),
-        // Product grid
-        Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if (scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent &&
-                  state.hasMore) {
-                viewModel.loadMore();
-              }
-              return false;
-            },
-            child: RefreshIndicator(
-              onRefresh: () async => viewModel.loadProducts(refresh: true),
-              child: _buildProductGrid(context),
+            // Active filter chips
+            if (_hasChipWorthyFilters())
+              OsmeaComponents.padding(
+                padding: context.paddingNormal,
+                child: _buildActiveFilterChips(context),
+              ),
+            // Product grid
+            Expanded(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (scrollInfo.metrics.pixels ==
+                          scrollInfo.metrics.maxScrollExtent &&
+                      widget.state.hasMore) {
+                    widget.viewModel.loadMore();
+                  }
+                  return false;
+                },
+                child: RefreshIndicator(
+                  onRefresh: () async =>
+                      widget.viewModel.loadProducts(refresh: true),
+                  child: _buildProductGrid(context),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Scroll to top button
+        if (_showScrollToTop)
+          Positioned(
+            bottom: context.spacing24,
+            right: context.spacing24,
+            child: Material(
+              color: OsmeaColors.nordicBlue,
+              shape: const CircleBorder(),
+              elevation: 8,
+              shadowColor: OsmeaColors.nordicBlue.withOpacity(0.4),
+              child: InkWell(
+                onTap: _scrollToTop,
+                borderRadius: BorderRadius.circular(context.spacing32),
+                child: Container(
+                  width: context.width48,
+                  height: context.height48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: OsmeaColors.nordicBlue.withOpacity(0.3),
+                        blurRadius: context.blurRadius12,
+                        offset: context.offsetVerticalCustom(context.spacing4),
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.keyboard_arrow_up,
+                    color: OsmeaColors.white,
+                    size: context.iconSizeNormal,
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -119,7 +202,7 @@ class ProductListContentWidget extends StatelessWidget {
                   color: OsmeaColors.thunder,
                   size: context.iconSizeNormal,
                 ),
-                if (viewModel.filters.hasActiveFilters)
+                if (widget.viewModel.filters.hasActiveFilters)
                   Positioned(
                     right: -4,
                     top: -4,
@@ -144,22 +227,25 @@ class ProductListContentWidget extends StatelessWidget {
 
   /// Shows sort bottom sheet
   void _showSortBottomSheet(BuildContext context) {
-    viewModel.resetDialogInit();
+    widget.viewModel.resetDialogInit();
 
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.medium,
       title: 'Sort by',
       backgroundColor: OsmeaColors.white,
-      child: ProductListFiltersWidget(viewModel: viewModel, showOnlySort: true),
+      child: ProductListFiltersWidget(
+        viewModel: widget.viewModel,
+        showOnlySort: true,
+      ),
     ).then((_) {
-      viewModel.resetDialogInit();
+      widget.viewModel.resetDialogInit();
     });
   }
 
   /// Shows filters bottom sheet
   void _showFiltersBottomSheet(BuildContext context) {
-    viewModel.resetDialogInit();
+    widget.viewModel.resetDialogInit();
 
     OsmeaBottomSheetHelpers.showModal(
       context: context,
@@ -167,11 +253,11 @@ class ProductListContentWidget extends StatelessWidget {
       title: 'Filters',
       backgroundColor: OsmeaColors.white,
       child: ProductListFiltersWidget(
-        viewModel: viewModel,
+        viewModel: widget.viewModel,
         showOnlySort: false,
       ),
     ).then((_) {
-      viewModel.resetDialogInit();
+      widget.viewModel.resetDialogInit();
     });
   }
 
@@ -184,15 +270,15 @@ class ProductListContentWidget extends StatelessWidget {
           crossAxisAlignment: context.crossCenter,
           children: [
             OsmeaComponents.container(
-              width: 80,
-              height: 80,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 color: OsmeaColors.nordicBlue,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.inventory_2_outlined,
-                size: 40,
+                size: context.iconSizeExtraHigh,
                 color: OsmeaColors.nordicBlue,
               ),
             ),
@@ -213,11 +299,11 @@ class ProductListContentWidget extends StatelessWidget {
               ).copyWith(color: OsmeaColors.pewter),
               textAlign: TextAlign.center,
             ),
-            if (viewModel.filters.hasActiveFilters) ...[
+            if (widget.viewModel.filters.hasActiveFilters) ...[
               OsmeaComponents.sizedBox(height: context.spacing16),
               OsmeaComponents.button(
                 text: 'Clear all filters',
-                onPressed: () => viewModel.clearFilters(),
+                onPressed: () => widget.viewModel.clearFilters(),
                 variant: ButtonVariant.outlined,
                 size: ButtonSize.medium,
               ),
@@ -230,7 +316,7 @@ class ProductListContentWidget extends StatelessWidget {
 
   /// Check if there are filters that will show chips (excluding orderBy which doesn't show a chip)
   bool _hasChipWorthyFilters() {
-    final filters = viewModel.filters;
+    final filters = widget.viewModel.filters;
     return (filters.selectedCategories != null &&
             filters.selectedCategories!.isNotEmpty) ||
         (filters.selectedTags != null && filters.selectedTags!.isNotEmpty) ||
@@ -245,7 +331,7 @@ class ProductListContentWidget extends StatelessWidget {
 
   /// Builds active filter chips
   Widget _buildActiveFilterChips(BuildContext context) {
-    final filters = viewModel.filters;
+    final filters = widget.viewModel.filters;
     final chips = <Widget>[];
 
     debugPrint('🔍 _buildActiveFilterChips: Building chips');
@@ -261,7 +347,7 @@ class ProductListContentWidget extends StatelessWidget {
         filters.selectedCategories!.isNotEmpty) {
       // Get category names from state
       for (final categoryId in filters.selectedCategories!) {
-        final category = state.categories.firstWhere(
+        final category = widget.state.categories.firstWhere(
           (cat) => cat.id == categoryId,
           orElse: () =>
               const ListProductCategoriesResponseModel(id: null, name: null),
@@ -282,7 +368,7 @@ class ProductListContentWidget extends StatelessWidget {
                   filters.selectedCategories!,
                 );
                 newSelectedCategories.remove(categoryId);
-                viewModel.updateFilter(
+                widget.viewModel.updateFilter(
                   selectedCategories: newSelectedCategories.isEmpty
                       ? null
                       : newSelectedCategories,
@@ -305,7 +391,7 @@ class ProductListContentWidget extends StatelessWidget {
             selected: true,
             closable: true,
             onClose: () {
-              viewModel.updateFilter(onSale: null);
+              widget.viewModel.updateFilter(onSale: null);
             },
           ),
         ),
@@ -323,7 +409,7 @@ class ProductListContentWidget extends StatelessWidget {
             selected: true,
             closable: true,
             onClose: () {
-              viewModel.updateFilter(featured: null);
+              widget.viewModel.updateFilter(featured: null);
             },
           ),
         ),
@@ -341,7 +427,7 @@ class ProductListContentWidget extends StatelessWidget {
             selected: true,
             closable: true,
             onClose: () {
-              viewModel.updateFilter(stockStatus: null);
+              widget.viewModel.updateFilter(stockStatus: null);
             },
           ),
         ),
@@ -382,18 +468,28 @@ class ProductListContentWidget extends StatelessWidget {
 
   /// Builds product grid - same layout as home recommended section
   Widget _buildProductGrid(BuildContext context) {
+    final state = widget.state;
     final bool isTablet = context.allWidth >= 768;
-    final double crossAxisSpacing = 15;
-    final double mainAxisSpacing = 16;
+    final double crossAxisSpacing = context.spacing8;
+    final double mainAxisSpacing = context.spacing8;
+
+    // Calculate card width similar to recommended section
+    final double horizontalPadding = context.spacing12 * 2;
+    final double cardWidth =
+        (context.allWidth - horizontalPadding - crossAxisSpacing) /
+        (isTablet ? 3 : 2);
+    final double estimatedCardHeight = 280;
+    final double childAspectRatio = cardWidth / estimatedCardHeight;
 
     return GridView.builder(
+      controller: _scrollController,
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing20,
-        vertical: context.spacing12,
+        horizontal: context.spacing12,
+        vertical: context.spacing8,
       ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isTablet ? 3 : 2,
-        childAspectRatio: isTablet ? 0.68 : 0.58,
+        childAspectRatio: childAspectRatio,
         crossAxisSpacing: crossAxisSpacing,
         mainAxisSpacing: mainAxisSpacing,
       ),
@@ -403,12 +499,12 @@ class ProductListContentWidget extends StatelessWidget {
           if (state.hasMore) {
             // Load more trigger
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              viewModel.loadMore();
+              widget.viewModel.loadMore();
             });
             return OsmeaComponents.center(
               child: OsmeaComponents.loading(
                 type: LoadingType.circularFade,
-                size: 32,
+                size: context.iconSizeExtraHigh,
                 color: OsmeaColors.nordicBlue,
               ),
             );
@@ -423,13 +519,15 @@ class ProductListContentWidget extends StatelessWidget {
         final wishlistVm = GetIt.I<WishlistViewModel>();
         final isSaved = wishlistVm.isSaved(productId);
 
-        return ProductCardWidget(
-          product: product,
-          isSaved: isSaved,
-          onWishlistTap: () {
-            GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-          },
-          onTap: () => context.push('/product-detail/$productId'),
+        return ClipRect(
+          child: ProductCardWidget(
+            product: product,
+            isSaved: isSaved,
+            onWishlistTap: () {
+              GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+            },
+            onTap: () => context.push('/product-detail/$productId'),
+          ),
         );
       },
     );
