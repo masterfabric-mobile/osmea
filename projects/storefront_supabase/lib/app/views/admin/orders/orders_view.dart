@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/app/models/order.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminOrdersView extends StatefulWidget {
   const AdminOrdersView({super.key});
@@ -30,9 +31,10 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
 
   @override
   Widget build(BuildContext context) {
+    final resources = context.resources;
     return Scaffold(
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Orders'),
+        title: OsmeaComponents.text(resources.orders),
         variant: AppBarVariant.primary,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -48,10 +50,10 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('${resources.errorPrefix}${snapshot.error}'));
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No orders found.'));
+            return Center(child: Text(resources.noOrdersFound));
           }
           final orders = snapshot.data!;
           return ListView.builder(
@@ -59,9 +61,9 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
             itemBuilder: (context, index) {
               final order = orders[index];
               return ListTile(
-                title: Text('Order #${order.orderNumber}'),
+                title: Text('${resources.orderNumber}${order.orderNumber}'),
                 subtitle: Text(
-                    'User: ${order.user?.fullName ?? 'N/A'} - Total: \$${order.total.toStringAsFixed(2)}'),
+                    '${resources.userPrefix}${order.user?.username != null ? '@${order.user!.username}' : (order.user?.fullName ?? 'N/A')} - ${resources.totalPrefix}\$${order.total.toStringAsFixed(2)}'),
                 trailing: Text(order.status),
               );
             },

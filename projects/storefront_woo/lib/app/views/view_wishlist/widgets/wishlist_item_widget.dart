@@ -157,8 +157,7 @@ class WishlistItemWidget extends StatelessWidget {
                 size: context.iconSizeSmall,
               ),
               size: ButtonSize.extraSmall,
-              borderRadius: context.spacing4,
-              variant: ButtonVariant.outlined,
+              variant: ButtonVariant.ghost,
               onPressed: () {
                 viewModel.remove(item.id);
                 context.showSnackbar(

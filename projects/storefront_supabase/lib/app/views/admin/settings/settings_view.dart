@@ -1,8 +1,9 @@
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/views/admin/settings/models/states.dart';
 import 'package:storefront_supabase/app/views/admin/settings/models/view_model.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminSettingsView
     extends MasterViewCubit<AdminSettingsViewModel, AdminSettingsState> {
@@ -12,7 +13,7 @@ class AdminSettingsView
     super.arguments = const {'init': true},
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text('Admin Settings'),
+            title: OsmeaComponents.text(context.resources.adminSettings),
             variant: AppBarVariant.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -31,6 +32,7 @@ class AdminSettingsView
   @override
   Widget viewContent(
       BuildContext context, AdminSettingsViewModel viewModel, AdminSettingsState state) {
+    final resources = context.resources;
     if (state is AdminSettingsLoading || state is AdminSettingsInitial) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -46,18 +48,18 @@ class AdminSettingsView
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Admin Information', style: Theme.of(context).textTheme.titleLarge),
+            Text(resources.adminInformation, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            _buildInfoRow('Email:', adminUser.email ?? 'N/A'),
-            _buildInfoRow('Full Name:', adminUser.fullName ?? 'N/A'),
-            _buildInfoRow('Role:', adminUser.role ?? 'N/A'),
-            _buildInfoRow('Member Since:', adminUser.createdAt.toLocal().toString().split(' ')[0]),
+            _buildInfoRow(resources.emailLabel, adminUser.email ?? 'N/A'),
+            _buildInfoRow(resources.fullNameLabel, adminUser.fullName ?? 'N/A'),
+            _buildInfoRow(resources.roleLabel, adminUser.role ?? 'N/A'),
+            _buildInfoRow(resources.memberSinceLabel, adminUser.createdAt.toLocal().toString().split(' ')[0]),
             // Add more admin-specific settings or information here
           ],
         ),
       );
     }
-    return const Center(child: Text('An unexpected error occurred.'));
+    return Center(child: Text(resources.unexpectedError));
   }
 
   Widget _buildInfoRow(String label, String value) {

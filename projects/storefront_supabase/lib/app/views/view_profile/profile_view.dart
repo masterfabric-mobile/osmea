@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'models/view_model.dart';
 import 'models/states.dart';
 import 'widgets/logo_header_widget.dart';
@@ -19,7 +20,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             final state = viewModel.state;
             if (state is ProfileAuthenticated) {
               return OsmeaComponents.appBar(
-                title: OsmeaComponents.text('Profile'),
+                title: OsmeaComponents.text(context.resources.profile),
                 variant: AppBarVariant.primary,
                 size: AppBarSize.large,
                 elevation: 0,
@@ -48,26 +49,76 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     ProfileViewModel viewModel,
     ProfileState state,
   ) {
+    final resources = context.resources;
     if (state is ProfileInitial || state is ProfileLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (state is ProfileAuthenticated) {
       return ListView(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
+          _buildSectionHeader(context, resources.account),
           OsmeaComponents.listItem(
-            title: OsmeaComponents.text('Settings'),
-            leading: const Icon(Icons.settings),
+            title: OsmeaComponents.text(resources.myInformation),
+            leading: const Icon(Icons.person_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/info'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.myAddresses),
+            leading: const Icon(Icons.location_on_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/addresses'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.changePassword),
+            leading: const Icon(Icons.lock_reset_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/change-password'),
+          ),
+          
+          _buildSectionHeader(context, resources.shopping),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.myOrders),
+            leading: const Icon(Icons.shopping_bag_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => goRoute('/profile/orders'),
+          ),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.myReviews),
+            leading: const Icon(Icons.star_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              // Navigate to reviews
+            },
+          ),
+
+          _buildSectionHeader(context, resources.general),
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.settings),
+            leading: const Icon(Icons.settings_outlined),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => goRoute('/settings'),
           ),
-          if (state.userRole == 'admin')
+          OsmeaComponents.listItem(
+            title: OsmeaComponents.text(resources.helpSupport),
+            leading: const Icon(Icons.help_outline),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+               // Navigate to help
+            },
+          ),
+
+          if (state.user.role == 'admin') ...[
+            _buildSectionHeader(context, resources.admin),
             OsmeaComponents.listItem(
-              title: OsmeaComponents.text('Admin Dashboard'),
-              leading: const Icon(Icons.admin_panel_settings),
+              title: OsmeaComponents.text(resources.adminDashboard),
+              leading: const Icon(Icons.admin_panel_settings_outlined),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => goRoute('/admin/dashboard'),
             ),
+          ],
         ],
       );
     }
@@ -111,6 +162,20 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     }
 
     // Fallback for any other state
-    return const Center(child: Text('An unexpected error occurred.'));
+    return Center(child: Text(resources.unexpectedError));
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+      ),
+    );
   }
 }

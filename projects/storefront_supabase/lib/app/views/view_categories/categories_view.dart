@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -16,7 +17,7 @@ class CategoriesView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Categories',
+              context.resources.categories,
               color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -41,6 +42,7 @@ class CategoriesView
     CategoriesViewModel viewModel,
     CategoriesState state,
   ) {
+    final resources = context.resources;
     if (state is CategoriesErrorState) {
       return buildError(
         state.message,
@@ -55,15 +57,15 @@ class CategoriesView
     }
 
     if (state is CategoriesLoadedState) {
-      if (state.categories.isEmpty) {
+      if (state.rootCategories.isEmpty) {
         return Center(
-          child: OsmeaComponents.text('No categories found.'),
+          child: OsmeaComponents.text(resources.noCategories),
         );
       }
       return ListView.builder(
-        itemCount: state.categories.length,
+        itemCount: state.rootCategories.length,
         itemBuilder: (context, index) {
-          final category = state.categories[index];
+          final category = state.rootCategories[index];
           return OsmeaComponents.listItem(
             title: OsmeaComponents.text(category.name),
             trailing: const Icon(Icons.chevron_right),

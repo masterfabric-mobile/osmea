@@ -1,0 +1,124 @@
+/* OSMEA App Config Manager - Admin Styles */
+
+.osmea-config-wrap {
+    max-width: 1200px;
+}
+
+.osmea-config-header {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.osmea-config-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.osmea-config-actions .button {
+    margin: 0;
+}
+
+.osmea-json-editor {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    resize: vertical;
+    min-height: 500px;
+}
+
+.osmea-json-editor:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.osmea-json-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    display: none;
+}
+
+.osmea-json-status.valid {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    display: block;
+}
+
+.osmea-json-status.invalid {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    display: block;
+}
+
+.osmea-config-info {
+    background: #f0f6fc;
+    border-left: 4px solid #2271b1;
+    padding: 15px 20px;
+    margin: 20px 0;
+}
+
+.osmea-config-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.osmea-config-info code {
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    display: inline-block;
+    margin: 5px 0;
+}
+
+.osmea-config-info .description {
+    margin-top: 10px;
+    color: #646970;
+}
+
+/* Loading state */
+.osmea-json-editor.saving {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Success message */
+.notice.notice-success.osmea-notice {
+    border-left-color: #00a32a;
+}
+
+/* Error message */
+.notice.notice-error.osmea-notice {
+    border-left-color: #d63638;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .osmea-config-actions {
+        flex-direction: column;
+    }
+    
+    .osmea-config-actions .button {
+        width: 100%;
+    }
+    
+    .osmea-json-editor {
+        font-size: 12px;
+        min-height: 400px;
+    }
+}
+

@@ -6,6 +6,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 
 /// Banner item model from config
@@ -14,9 +15,21 @@ class BannerItem {
   final String? title;
   final String? subtitle;
   final String? text;
+  final String? route;
+  final int? categoryId;
+  final int? productId;
   final VoidCallback? onTap;
 
-  BannerItem({this.imageUrl, this.title, this.subtitle, this.text, this.onTap});
+  BannerItem({
+    this.imageUrl,
+    this.title,
+    this.subtitle,
+    this.text,
+    this.route,
+    this.categoryId,
+    this.productId,
+    this.onTap,
+  });
 
   factory BannerItem.fromConfig(Map<String, dynamic> config) {
     return BannerItem(
@@ -24,6 +37,9 @@ class BannerItem {
       title: config['title'] as String?,
       subtitle: config['subtitle'] as String?,
       text: config['text'] as String?,
+      route: config['route'] as String?,
+      categoryId: config['category_id'] as int?,
+      productId: config['product_id'] as int?,
     );
   }
 }
@@ -52,58 +68,108 @@ class BannerCarouselWidget extends StatelessWidget {
     }
   }
 
+  /// Handles banner tap navigation
+  void _handleBannerTap(BuildContext context, BannerItem banner) {
+    if (banner.onTap != null) {
+      banner.onTap!();
+      return;
+    }
+
+    // Navigate based on configuration
+    if (banner.route != null && banner.route!.isNotEmpty) {
+      // Direct route navigation
+      context.push(banner.route!);
+    } else if (banner.categoryId != null) {
+      // Navigate to category products page
+      context.push('/products?category_id=${banner.categoryId}');
+    } else if (banner.productId != null) {
+      // Navigate to product detail page
+      context.push('/product-detail/${banner.productId}');
+    }
+  }
+
   Widget _buildBannerItem(BuildContext context, BannerItem banner) {
     return GestureDetector(
-      onTap: banner.onTap,
-      child: OsmeaComponents.imageCard(
-        // Image configuration
-        imageUrl: banner.imageUrl,
-        imageHeight: context.height192,
-        imageFit: BoxFit.cover,
-        imageAlignment: context.center,
-        imagePosition: banner.imageUrl != null && banner.imageUrl!.isNotEmpty
-            ? ComponentPosition.center
-            : ComponentPosition.top,
-
-        // Card appearance
-        variant: ComponentAppearance.filled,
-        size: ComponentSize.medium,
-        backgroundColor: OsmeaColors.nordicBlue,
+      onTap: () => _handleBannerTap(context, banner),
+      child: ClipRRect(
         borderRadius: context.borderRadiusNormal,
-        width: double.infinity,
-        height: context.height192,
-
-        // Content
-        title: banner.title,
-        content: banner.text,
-
-        // Text styling for overlay on background images
-        titleStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-          fontWeight: FontWeight.w700,
-          color: OsmeaColors.white,
-          shadows: [
-            Shadow(color: OsmeaColors.thunder, blurRadius: context.blurRadius2),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background image - fills entire container
+            if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty)
+              OsmeaComponents.image(
+                imageUrl: banner.imageUrl,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                variant: ImageVariant.normal,
+                borderRadius: BorderRadius.zero,
+              )
+            else
+              Container(
+                color: OsmeaColors.nordicBlue,
+              ),
+            // Gradient overlay for text readability
+            if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: context.topCenter,
+                      end: context.bottomCenter,
+                      colors: [Colors.transparent, OsmeaColors.thunder],
+                    ),
+                  ),
+                ),
+              ),
+            // Text content overlay
+            if (banner.title != null || banner.text != null)
+              Positioned.fill(
+                child: OsmeaComponents.padding(
+                  padding: context.paddingNormal,
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (banner.title != null)
+                        OsmeaComponents.text(
+                          banner.title!,
+                          textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: OsmeaColors.white,
+                            shadows: [
+                              Shadow(
+                                color: OsmeaColors.thunder,
+                                blurRadius: context.blurRadius2,
+                              ),
+                            ],
+                          ),
+                          maxLines: context.maxLineTwo,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      if (banner.title != null && banner.text != null)
+                        OsmeaComponents.sizedBox(height: context.spacing8),
+                      if (banner.text != null)
+                        OsmeaComponents.text(
+                          banner.text!,
+                          textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                            color: OsmeaColors.white,
+                            shadows: [
+                              Shadow(
+                                color: OsmeaColors.thunder,
+                                blurRadius: context.blurRadius2,
+                              ),
+                            ],
+                          ),
+                          maxLines: context.maxLineThree,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
           ],
-        ),
-        contentStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-          color: OsmeaColors.white,
-          shadows: [
-            Shadow(color: OsmeaColors.thunder, blurRadius: context.blurRadius2),
-          ],
-        ),
-
-        // Text overflow control
-        titleMaxLines: context.maxLineTwo,
-        contentMaxLines: context.maxLineThree,
-        textOverflow: TextOverflow.ellipsis,
-        spacing: context.spacing12,
-
-        // Show overlay for better text readability on background images
-        showOverlay: banner.imageUrl != null && banner.imageUrl!.isNotEmpty,
-        overlayGradient: LinearGradient(
-          begin: context.topCenter,
-          end: context.bottomCenter,
-          colors: [Colors.transparent, OsmeaColors.thunder],
         ),
       ),
     );
@@ -117,47 +183,22 @@ class BannerCarouselWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final imageUrls = banners
-        .where((b) => b.imageUrl != null && b.imageUrl!.isNotEmpty)
-        .map((b) => b.imageUrl!)
-        .toList();
-
-    // If all banners have images, use imageUrls
-    if (imageUrls.length == banners.length) {
-      return OsmeaComponents.padding(
-        padding: EdgeInsets.fromLTRB(
-          context.spacing16,
-          0,
-          context.spacing16,
-          context.spacing16,
-        ),
-        child: OsmeaComponents.carousel(
-          imageUrls: imageUrls,
-          variant: CarouselVariant.standard,
-          size: CarouselSize.large,
-          height: context.height192,
-          autoPlay: CarouselAutoPlay.continuous,
-          autoPlayInterval: 4.seconds,
-          showIndicators: true,
-          showArrows: true,
-          loop: true,
-          indicatorPosition: CarouselIndicatorPosition.bottomCenter,
-          indicatorType: CarouselIndicatorType.dot,
-          borderRadiusValue: context.borderRadiusNormal,
-        ),
-      );
-    }
-
-    // Mixed content: build items and delegate to OsmeaComponents.carousel
+    // Always use items (not imageUrls) to support tap handlers
+    // Build items with tap handlers for navigation
     final items = banners
         .map(
-          (b) => OsmeaComponents.container(
+          (banner) => OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing4),
             width: double.infinity,
             height: context.height192,
-            child: _buildBannerItem(context, b),
+            child: _buildBannerItem(context, banner),
           ),
         )
+        .toList();
+
+    // Create tap handlers for each banner
+    final onItemTaps = banners
+        .map((banner) => () => _handleBannerTap(context, banner))
         .toList();
 
     return OsmeaComponents.padding(
@@ -172,6 +213,7 @@ class BannerCarouselWidget extends StatelessWidget {
         size: CarouselSize.large,
         height: context.height192,
         items: items,
+        onItemTaps: onItemTaps,
         showIndicators: true,
         showArrows: true,
         autoPlay: CarouselAutoPlay.continuous,
@@ -179,6 +221,7 @@ class BannerCarouselWidget extends StatelessWidget {
         indicatorType: CarouselIndicatorType.dot,
         indicatorPosition: CarouselIndicatorPosition.bottomCenter,
         borderRadiusValue: context.borderRadiusNormal,
+        loop: true,
       ),
     );
   }

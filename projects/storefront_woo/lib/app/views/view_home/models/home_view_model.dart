@@ -14,6 +14,8 @@ import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
@@ -25,11 +27,14 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   // Dependencies
   final ProductService _productService = GetIt.I<ProductService>();
   final CartService _cartService = GetIt.I<CartService>();
+  final StoreProductCategoriesService _categoriesService =
+      GetIt.I<StoreProductCategoriesService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   // State variables
   List<ListAllProductsResponseModel> _products = [];
   List<ListAllProductsResponseModel> _allProducts = [];
+  List<ListProductCategoriesResponseModel> _categories = [];
   bool _hasMore = true;
   int _currentPage = 1;
   String? _searchQuery;
@@ -53,8 +58,11 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
   Future<void> initial() async {
     // Initialize wishlist first to ensure state is ready
     await _initializeWishlist();
-    // Then load products - await to ensure wishlist is loaded first
-    await loadProducts();
+    // Load products and categories in parallel
+    await Future.wait([
+      loadProducts(),
+      loadCategories(),
+    ]);
   }
 
   /// Initializes wishlist if not already loaded
@@ -214,6 +222,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: _currentPage,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e, stackTrace) {
@@ -223,6 +232,41 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
       // Get user-friendly error message
       final userMessage = ApiErrorUtils.getErrorMessage(e);
       emit(HomeErrorState(message: userMessage));
+    }
+  }
+
+  /// Load categories from WooCommerce Store API
+  Future<void> loadCategories() async {
+    try {
+      debugPrint('📂 HomeViewModel: Loading categories...');
+
+      final apiVersion = _configHelper.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
+      final categories = await _categoriesService.listProductCategories(
+        apiVersion: apiVersion,
+        perPage: 100,
+        hideEmpty: true,
+        parent: 0,
+      );
+
+      _categories = categories;
+      debugPrint(
+        '✅ HomeViewModel: Loaded ${categories.length} categories',
+      );
+
+      final currentState = state;
+      if (currentState is HomeLoadedState) {
+        emit(
+          currentState.copyWith(categories: _categories),
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error loading categories: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      _categories = [];
     }
   }
 
@@ -254,6 +298,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: _currentPage,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e) {
@@ -302,6 +347,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: 1,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e) {
@@ -322,6 +368,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: 1,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e) {
@@ -336,8 +383,9 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
     _currentPage = 1;
     _products = [];
     _allProducts = [];
+    _categories = [];
     _hasMore = true;
-    loadProducts();
+    initial();
   }
 
   void filterByCategory(int? categoryId) {
@@ -364,6 +412,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: 1,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e) {
@@ -413,6 +462,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           currentPage: _currentPage,
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
+          categories: _categories,
         ),
       );
     } catch (e) {
@@ -467,6 +517,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
             currentPage: _currentPage,
             searchQuery: _searchQuery,
             selectedCategoryId: _selectedCategoryId,
+            categories: _categories,
           ),
         );
       }
@@ -502,6 +553,7 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
           searchQuery: _searchQuery,
           selectedCategoryId: _selectedCategoryId,
           selectedProduct: product, // Store selected product in state
+          categories: _categories,
         ),
       );
     } catch (e) {

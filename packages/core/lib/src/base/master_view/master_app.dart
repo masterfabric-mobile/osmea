@@ -363,6 +363,9 @@ class MasterApp extends StatelessWidget {
     this.devModeGrid = true,
     this.devModeSpacer = true,
     this.useConfigurationHelpers = true, // Enable configuration helpers
+    this.localizationsDelegates,
+    this.supportedLocales = const <Locale>[Locale('en', 'US')],
+    this.locale,
   })  : assert(fontScale > 0, 'Font scale must be greater than 0! 🔍');
 
   final GoRouter router; // Router for navigation
@@ -376,6 +379,9 @@ class MasterApp extends StatelessWidget {
   final bool devModeGrid;
   final bool devModeSpacer;
   final bool useConfigurationHelpers; // Enable configuration helpers
+  final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+  final Iterable<Locale> supportedLocales;
+  final Locale? locale;
 
   @override
   Widget build(BuildContext context) {
@@ -436,6 +442,9 @@ class MasterApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: resources.appTitle,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
+        locale: locale,
         scaffoldMessengerKey:
             messengerKey, // Key for showing snackbars and dialogs
         routerConfig: router, // Configuration for the router

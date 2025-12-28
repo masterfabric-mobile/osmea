@@ -1,4 +1,4 @@
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,7 +18,13 @@ class CategoriesViewModel extends BaseViewModelCubit<CategoriesState> {
       final categories = (response as List)
           .map((data) => Category.fromJson(data as Map<String, dynamic>))
           .toList();
-      stateChanger(CategoriesLoadedState(categories: categories));
+      
+      final rootCategories = categories.where((c) => c.parentId == null).toList();
+      
+      stateChanger(CategoriesLoadedState(
+        categories: categories,
+        rootCategories: rootCategories,
+      ));
     } catch (e) {
       stateChanger(CategoriesErrorState('Failed to load categories: $e'));
     }

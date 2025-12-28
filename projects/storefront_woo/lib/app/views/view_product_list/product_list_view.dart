@@ -95,8 +95,15 @@ PreferredSizeWidget _buildProductListAppBar(
     backgroundColor: OsmeaColors.white,
     foregroundColor: OsmeaColors.thunder,
     leading: OsmeaComponents.iconButton(
-      onPressed: () => context.pop(),
       icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+      onPressed: () {
+        // Check if we can pop, otherwise navigate to home
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/home');
+        }
+      },
       backgroundColor: OsmeaColors.transparent,
       tooltip: 'Back',
     ),

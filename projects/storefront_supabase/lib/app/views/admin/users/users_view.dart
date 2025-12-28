@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminUsersView extends StatefulWidget {
   const AdminUsersView({super.key});
@@ -29,9 +30,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
 
   @override
   Widget build(BuildContext context) {
+    final resources = context.resources;
     return Scaffold(
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Users'),
+        title: OsmeaComponents.text(resources.users),
         variant: AppBarVariant.primary,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -47,10 +49,10 @@ class _AdminUsersViewState extends State<AdminUsersView> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('${resources.errorPrefix}${snapshot.error}'));
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No users found.'));
+            return Center(child: Text(resources.noUsersFound));
           }
           final users = snapshot.data!;
           return ListView.builder(
@@ -67,9 +69,11 @@ class _AdminUsersViewState extends State<AdminUsersView> {
                             user.email?.substring(0, 1) ??
                             '?'),
                       ),
-                title: Text(user.fullName ?? user.email ?? 'Unnamed User'),
+                title: Text(user.username != null
+                    ? '${user.fullName ?? resources.unnamed} (@${user.username})'
+                    : user.fullName ?? user.email ?? resources.unnamedUser),
                 subtitle: Text(
-                    '${user.email ?? 'No email'} - Role: ${user.role ?? 'N/A'}'),
+                    '${user.email ?? resources.noEmail} - ${resources.rolePrefix}${user.role ?? 'N/A'}'),
               );
             },
           );

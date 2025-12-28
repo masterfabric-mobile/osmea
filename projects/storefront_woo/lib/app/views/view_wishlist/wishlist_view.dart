@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_list_widget.dart';
@@ -21,24 +23,109 @@ class WishlistView
          arguments: arguments ?? const {'saved': true},
          coreAppBar: (context, cubit) => PreferredSize(
            preferredSize: Size.fromHeight(kToolbarHeight),
-           child: OsmeaComponents.appBar(
-             title: OsmeaComponents.text(
-               'Favourites',
-               variant: OsmeaTextVariant.headlineMedium,
-               color: OsmeaColors.black,
-               fontWeight: FontWeight.w600,
-             ),
-             backgroundColor: OsmeaColors.white,
-             foregroundColor: OsmeaColors.black,
-             elevation: 0,
-             surfaceTintColor: OsmeaColors.transparent,
-             shadowColor: OsmeaColors.transparent,
-            leading: OsmeaComponents.iconButton(
-              icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
-              onPressed: () => Navigator.of(context).maybePop(),
-              backgroundColor: OsmeaColors.transparent,
-            ),
-             centerTitle: false,
+           child: BlocBuilder<WishlistViewModel, WishlistState>(
+             bloc: cubit,
+             builder: (context, state) {
+               final count = state is WishlistLoadedState ? state.items.length : 0;
+               final hasItems = count > 0;
+               
+               return OsmeaComponents.appBar(
+                 title: OsmeaComponents.text(
+                   count > 0 ? 'Favourites ($count)' : 'Favourites',
+                   variant: OsmeaTextVariant.headlineMedium,
+                   color: OsmeaColors.black,
+                   fontWeight: FontWeight.w600,
+                 ),
+                 backgroundColor: OsmeaColors.white,
+                 foregroundColor: OsmeaColors.black,
+                 elevation: 0,
+                 surfaceTintColor: OsmeaColors.transparent,
+                 shadowColor: OsmeaColors.transparent,
+                 leading: OsmeaComponents.iconButton(
+                   icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
+                   onPressed: () => Navigator.of(context).maybePop(),
+                   backgroundColor: OsmeaColors.transparent,
+                 ),
+                 actions: [
+                   AppBarAction(
+                     icon: Icon(Icons.category_outlined, color: OsmeaColors.black),
+                     onPressed: () {
+                       context.push('/favorite-categories');
+                     },
+                     tooltip: 'Favorite Categories',
+                   ),
+                   if (hasItems)
+                     AppBarAction(
+                       icon: Icon(Icons.delete_outline, color: OsmeaColors.black),
+                       onPressed: () async {
+                             final confirmed = await OsmeaComponents.showPopup<bool>(
+                               context: context,
+                               variant: PopupVariant.dialog,
+                               title: 'Remove all favorites?',
+                               subtitle:
+                                   'Are you sure you want to remove all items from your favorites? This action cannot be undone.',
+                               padding: context.paddingNormal,
+                               child: OsmeaComponents.column(
+                                 mainAxisSize: MainAxisSize.min,
+                                 children: [
+                                   OsmeaComponents.row(
+                                     children: [
+                                       OsmeaComponents.expanded(
+                                         child: OsmeaComponents.button(
+                                           text: 'Cancel',
+                                           variant: ButtonVariant.outlined,
+                                           onPressed: () =>
+                                               Navigator.of(context).pop(false),
+                                         ),
+                                       ),
+                                       OsmeaComponents.sizedBox(width: context.spacing8),
+                                       OsmeaComponents.expanded(
+                                         child: OsmeaComponents.button(
+                                           text: 'Remove All',
+                                           variant: ButtonVariant.primary,
+                                           onPressed: () =>
+                                               Navigator.of(context).pop(true),
+                                         ),
+                                       ),
+                                     ],
+                                   ),
+                                 ],
+                               ),
+                             );
+                             
+                             if (confirmed == true) {
+                               final previousState = state is WishlistLoadedState
+                                   ? state
+                                   : null;
+                               final previousItems = previousState?.items ?? [];
+                               
+                               cubit.clearAll();
+                               
+                               if (previousItems.isNotEmpty) {
+                                 context.showSnackbar(
+                                   title: 'All favorites removed',
+                                   message: 'All items were removed from your favorites',
+                                   type: SnackbarType.error,
+                                   style: SnackbarStyle.minimal,
+                                   position: SnackbarPosition.bottom,
+                                   animation: SnackbarAnimation.slide,
+                                   actionLabel: 'Undo',
+                                   onAction: () {
+                                     // Restore all items
+                                     for (final item in previousItems) {
+                                       cubit.add(item);
+                                     }
+                                   },
+                                 );
+                               }
+                             }
+                           },
+                           tooltip: 'Remove all',
+                         ),
+                 ],
+                 centerTitle: false,
+               );
+             },
            ),
          ),
        );

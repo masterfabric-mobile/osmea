@@ -1,4 +1,4 @@
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,6 +17,7 @@ Future<GetIt> configureDependencies({String? environment}) async {
     // Initialize core dependencies
     getIt = await Core().init(getIt);
     debugPrint('✅ Core dependencies initialized');
+
 
     // Register Supabase client
     if (!getIt.isRegistered<SupabaseClient>()) {

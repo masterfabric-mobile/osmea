@@ -1,7 +1,7 @@
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/product_filters.dart';
+import 'package:storefront_supabase/app/models/product_filters.dart';
 
 abstract class AdminProductsState {}
 
@@ -14,26 +14,35 @@ class AdminProductsLoaded extends AdminProductsState {
   final String searchQuery;
   final PriceSort priceSort;
   final DateSort dateSort;
-  final PopularitySort popularitySort; // Added popularitySort
+  final PopularitySort popularitySort;
 
-  // For populating filter options
+  // Data Sources
   final List<Category> allCategories;
   final List<Brand> allBrands;
 
-  // For tracking selected filters
-  final Set<String> selectedCategoryIds;
+  // Filter Selections (Hierarchical)
+  final Category? selectedRootCategory;
+  final Category? selectedSubCategory;
+  final Category? selectedLeafCategory;
+  
   final Set<int> selectedBrandIds;
+  final List<String> selectedSizesOrAges; // Multi-select sizes
+  final bool isLoading;
 
   AdminProductsLoaded({
     required this.products,
     this.searchQuery = '',
     this.priceSort = PriceSort.none,
     this.dateSort = DateSort.newestFirst,
-    this.popularitySort = PopularitySort.none, // Default value
+    this.popularitySort = PopularitySort.none,
     this.allCategories = const [],
     this.allBrands = const [],
-    this.selectedCategoryIds = const {},
+    this.selectedRootCategory,
+    this.selectedSubCategory,
+    this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
+    this.selectedSizesOrAges = const [],
+    this.isLoading = false,
   });
 
   AdminProductsLoaded copyWith({
@@ -41,22 +50,30 @@ class AdminProductsLoaded extends AdminProductsState {
     String? searchQuery,
     PriceSort? priceSort,
     DateSort? dateSort,
-    PopularitySort? popularitySort, // Added popularitySort
+    PopularitySort? popularitySort,
     List<Category>? allCategories,
     List<Brand>? allBrands,
-    Set<String>? selectedCategoryIds,
+    Category? selectedRootCategory,
+    Category? selectedSubCategory,
+    Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
+    List<String>? selectedSizesOrAges,
+    bool? isLoading,
   }) {
     return AdminProductsLoaded(
       products: products ?? this.products,
       searchQuery: searchQuery ?? this.searchQuery,
       priceSort: priceSort ?? this.priceSort,
       dateSort: dateSort ?? this.dateSort,
-      popularitySort: popularitySort ?? this.popularitySort, // Copy popularitySort
+      popularitySort: popularitySort ?? this.popularitySort,
       allCategories: allCategories ?? this.allCategories,
       allBrands: allBrands ?? this.allBrands,
-      selectedCategoryIds: selectedCategoryIds ?? this.selectedCategoryIds,
+      selectedRootCategory: selectedRootCategory ?? this.selectedRootCategory,
+      selectedSubCategory: selectedSubCategory ?? this.selectedSubCategory,
+      selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
+      selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }
