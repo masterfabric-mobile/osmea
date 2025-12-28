@@ -14,9 +14,9 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://woocomm.store",
-    "brand_name": "ticimax",
-    "auth_key": "THISISMySpeCiaLAUthCodeTicimaxWoo",
+    "store_url": "http://example.com",
+    "brand_name": "example",
+    "auth_key": "THISISMySpeCiaLAUthCodeExampleWoo",
     "version": "v1",
     "verify_ssl": true,
     "query_string_auth": false,
