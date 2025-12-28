@@ -119,8 +119,16 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/search',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Create focus node for auto-focusing search input
+            final searchFocusNode = FocusNode();
+            
+            // Extract query from URL if present
+            final query = state.uri.queryParameters['query'];
+            
             return CustomTransitionPage(
-              child: SearchView(
+              child: _AutoFocusSearchView(
+                searchFocusNode: searchFocusNode,
+                initialQuery: query,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -132,13 +140,6 @@ final GoRouter appRouter = GoRouter(
                     context.go('/home');
                   }
                 },
-                title: const Text('Search Products'),
-                searchHint: 'Search for products...',
-                showBackButton: true,
-                showTitle: false,
-                onBackPressed: () => context.go('/home'),
-
-                // WooCommerce search provider
                 searchProvider: (query) async {
                   try {
                     final productService = GetIt.I<ProductService>();
@@ -156,18 +157,6 @@ final GoRouter appRouter = GoRouter(
                     debugPrint('❌ Search error: $e');
                     return [];
                   }
-                },
-
-                // Custom result builder for product grid
-                resultBuilder: (context, results) {
-                  return SearchResultsGridWidget(products: results);
-                },
-
-                // Empty state with categories and brands
-                emptyStateBuilder: (context) {
-                  // Get SearchCubit from context to enable category/brand search
-                  final searchCubit = context.read<SearchCubit>();
-                  return SearchEmptyStateWidget(searchCubit: searchCubit);
                 },
               ),
               transitionsBuilder:
@@ -1581,5 +1570,69 @@ void _navigateToPageFallback(BuildContext context, int index, bool isAuthenticat
       break;
     default:
       context.go('/home');
+  }
+}
+
+/// Wrapper widget that auto-focuses the search input when navigated to
+class _AutoFocusSearchView extends StatefulWidget {
+  final FocusNode searchFocusNode;
+  final String? initialQuery;
+  final Function(String) goRoute;
+  final Future<List<dynamic>> Function(String query) searchProvider;
+
+  const _AutoFocusSearchView({
+    required this.searchFocusNode,
+    this.initialQuery,
+    required this.goRoute,
+    required this.searchProvider,
+  });
+
+  @override
+  State<_AutoFocusSearchView> createState() => _AutoFocusSearchViewState();
+}
+
+class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(text: widget.initialQuery);
+    
+    // Request focus after the frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.searchFocusNode.canRequestFocus) {
+        widget.searchFocusNode.requestFocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    widget.searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SearchView(
+      goRoute: widget.goRoute,
+      title: const Text('Search Products'),
+      searchHint: 'Search for products...',
+      searchController: _searchController,
+      searchFocusNode: widget.searchFocusNode,
+      showBackButton: true,
+      showTitle: false,
+      onBackPressed: () => widget.goRoute('/home'),
+      searchProvider: widget.searchProvider,
+      resultBuilder: (context, results) {
+        return SearchResultsGridWidget(products: results);
+      },
+      emptyStateBuilder: (context) {
+        final searchCubit = context.read<SearchCubit>();
+        return SearchEmptyStateWidget(searchCubit: searchCubit);
+      },
+    );
   }
 }
