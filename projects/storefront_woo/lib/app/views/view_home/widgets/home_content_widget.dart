@@ -19,6 +19,7 @@ import 'package:storefront_woo/app/views/view_home/widgets/category_story_circle
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/promotional_bar_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/bottom_foreground_banner_widget.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home component model with orderID
@@ -254,6 +255,21 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
           ),
           // Floating campaign popup button - positioned absolutely
           CampaignPopupButtonWidget(
+            configHelper: configHelper,
+            goRoute: (String path) {
+              if (path.contains('products')) {
+                context.go('/products');
+              } else if (path.contains('product-detail')) {
+                context.go(path);
+              } else if (path.contains('category')) {
+                context.go(path);
+              } else {
+                context.go(path);
+              }
+            },
+          ),
+          // Bottom foreground banner - dismissible banner at bottom
+          BottomForegroundBannerWidget(
             configHelper: configHelper,
             goRoute: (String path) {
               if (path.contains('products')) {
