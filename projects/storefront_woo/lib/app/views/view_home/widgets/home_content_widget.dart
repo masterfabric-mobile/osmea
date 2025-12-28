@@ -18,6 +18,7 @@ import 'package:storefront_woo/app/views/view_home/widgets/search_bar_widget.dar
 import 'package:storefront_woo/app/views/view_home/widgets/category_story_circle_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/promotional_bar_widget.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home component model with orderID
@@ -152,6 +153,17 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
           orderId: _getOrderId(configHelper, 'banner'),
           widget: BannerCarouselWidget(configHelper: configHelper),
           name: 'banner',
+        ),
+      );
+    }
+
+    // Promotional bar (2 items side by side)
+    if (_isEnabled(configHelper, 'promotional_bar')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'promotional_bar'),
+          widget: PromotionalBarWidget(configHelper: configHelper),
+          name: 'promotional_bar',
         ),
       );
     }

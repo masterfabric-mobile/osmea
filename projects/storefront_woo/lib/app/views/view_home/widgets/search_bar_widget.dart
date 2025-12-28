@@ -72,6 +72,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       child: OsmeaComponents.searchbar(
         controller: _controller,
         hint: placeholder,
+        size: TextFieldSize.small, // Daha kompakt yükseklik için küçük boyut
         searchbarStyle: SearchbarStyle.minimal,
         searchbarVariant: variant == 'outlined'
             ? SearchbarVariant.outlined

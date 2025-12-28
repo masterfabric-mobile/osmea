@@ -43,7 +43,13 @@ class WishlistView
                  shadowColor: OsmeaColors.transparent,
                  leading: OsmeaComponents.iconButton(
                    icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
-                   onPressed: () => Navigator.of(context).maybePop(),
+                   onPressed: () {
+                     if (context.canPop()) {
+                       context.pop();
+                     } else {
+                       context.go('/home');
+                     }
+                   },
                    backgroundColor: OsmeaColors.transparent,
                  ),
                  actions: [
