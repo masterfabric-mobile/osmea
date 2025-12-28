@@ -10,6 +10,7 @@ import 'package:storefront_woo/app/views/view_cart/cart_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/wishlist_view.dart';
 import 'package:storefront_woo/app/views/view_checkout/checkout_view.dart';
 import 'package:storefront_woo/app/views/view_campaign/campaign_view.dart';
+import 'package:storefront_woo/app/views/view_favorite_categories/favorite_categories_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
@@ -328,6 +329,31 @@ final GoRouter appRouter = GoRouter(
             );
           },
           transitionDuration: const Duration(milliseconds: 600),
+        );
+      },
+    ),
+
+    // Favorite Categories Route
+    GoRoute(
+      path: '/favorite-categories',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: FavoriteCategoriesView(
+            arguments: const {'favorite_categories': true},
+            goRoute: (String path) {
+              if (path.contains('home')) {
+                context.go('/home');
+              } else if (path.contains('products')) {
+                context.go(path);
+              } else {
+                context.go('/favorite-categories');
+              }
+            },
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
         );
       },
     ),

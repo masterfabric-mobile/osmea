@@ -15,6 +15,8 @@ import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart'
     as _i892;
 import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart'
     as _i439;
+import 'package:storefront_woo/app/views/view_favorite_categories/models/favorite_categories_view_model.dart'
+    as _i963;
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
     as _i867;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
@@ -32,6 +34,9 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i892.CartViewModel>(() => _i892.CartViewModel());
+    gh.factory<_i963.FavoriteCategoriesViewModel>(
+      () => _i963.FavoriteCategoriesViewModel(),
+    );
     gh.factory<_i277.ProductListViewModel>(() => _i277.ProductListViewModel());
     gh.factory<_i241.WishlistViewModel>(() => _i241.WishlistViewModel());
     gh.factory<_i819.ProductDetailViewModel>(

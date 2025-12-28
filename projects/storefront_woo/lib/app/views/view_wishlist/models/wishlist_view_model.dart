@@ -540,7 +540,13 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         // Add to local state for unauthenticated users
         final s = state;
         final items = s is WishlistLoadedState ? [...s.items, item] : [item];
-        emit(WishlistLoadedState(items: items));
+        final newState = WishlistLoadedState(items: items);
+        emit(newState);
+        // Emit success state to show snackbar
+        emit(WishlistSuccessState(
+          message: 'Added to favorites',
+          previousState: newState,
+        ));
         debugPrint('✅ Wishlist: Item added to local state (unauthenticated)');
         return;
       }
@@ -647,22 +653,40 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         // Always sync from server after successful add to ensure state consistency
         try {
           await _syncFromServer(groupId: groupId);
+          // After successful sync, emit success state to show snackbar
+          final currentState = state;
+          if (currentState is WishlistLoadedState) {
+            emit(WishlistSuccessState(
+              message: 'Added to favorites',
+              previousState: currentState,
+            ));
+          }
         } catch (syncError) {
           debugPrint('⚠️ Wishlist: Sync after successful add failed: $syncError');
           // If sync fails, add item optimistically to current state
           final cur = state;
+          WishlistLoadedState? optimisticState;
           if (cur is WishlistLoadedState) {
             if (!cur.items.any((w) => w.id == item.id)) {
               final items = [...cur.items, item];
-              emit(WishlistLoadedState(items: items));
+              optimisticState = WishlistLoadedState(items: items);
+              emit(optimisticState);
             }
           } else if (preservedState != null) {
             if (!preservedState.items.any((w) => w.id == item.id)) {
               final items = [...preservedState.items, item];
-              emit(WishlistLoadedState(items: items));
+              optimisticState = WishlistLoadedState(items: items);
+              emit(optimisticState);
             } else {
               emit(preservedState);
             }
+          }
+          // Emit success state even if sync failed
+          if (optimisticState != null) {
+            emit(WishlistSuccessState(
+              message: 'Added to favorites',
+              previousState: optimisticState,
+            ));
           }
         }
       }
