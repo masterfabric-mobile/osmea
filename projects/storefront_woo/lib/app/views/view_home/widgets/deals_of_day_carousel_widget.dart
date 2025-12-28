@@ -10,6 +10,7 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:osmea_components/src/enums/carousel_enums.dart';
 
 /// Deals of the day carousel widget (stateless)
 /// Uses OsmeaComponents.carousel for state/indicator management
@@ -157,8 +158,33 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               autoPlay: CarouselAutoPlay.continuous,
               autoPlayInterval: 7.seconds,
               animationDuration: context.durationSlow,
-              indicatorType: CarouselIndicatorType.dot,
-              indicatorPosition: CarouselIndicatorPosition.bottomCenter,
+              indicatorType: CarouselIndicatorType.custom,
+              indicatorPosition: CarouselIndicatorPosition.bottomRight,
+              customIndicator: (context, itemCount, activeIndex) {
+                return OsmeaComponents.padding(
+                  padding: EdgeInsets.only(
+                    right: context.spacing16,
+                    bottom: context.spacing12,
+                  ),
+                  child: OsmeaComponents.container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing8,
+                      vertical: context.spacing4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: OsmeaComponents.text(
+                      '${activeIndex + 1}/$itemCount',
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        color: OsmeaColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
       ],
