@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
@@ -297,7 +298,57 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       context: context,
       size: BottomSheetSize.medium,
       title: 'Sort by',
+      subtitle: null,
       backgroundColor: OsmeaColors.white,
+      headerActions: [
+        BlocBuilder<ProductListViewModel, ProductListState>(
+          bloc: widget.viewModel,
+          builder: (context, state) {
+            final tempFilters = widget.viewModel.tempFilters;
+            final selectedSortBy = tempFilters.orderBy ?? 'date';
+            final selectedOrder = tempFilters.order ?? 'desc';
+            final isDefaultSort =
+                selectedSortBy == 'date' && selectedOrder == 'desc';
+
+            if (isDefaultSort) {
+              return OsmeaComponents.button(
+                text: 'Apply',
+                onPressed: () {
+                  widget.viewModel.applyFilters();
+                  Navigator.pop(context);
+                },
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.small,
+              );
+            }
+            return OsmeaComponents.row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OsmeaComponents.button(
+                  text: 'Clear all',
+                  onPressed: () {
+                    widget.viewModel.updateTempFilter(
+                      orderBy: 'date',
+                      order: 'desc',
+                    );
+                  },
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.small,
+                ),
+                OsmeaComponents.button(
+                  text: 'Apply',
+                  onPressed: () {
+                    widget.viewModel.applyFilters();
+                    Navigator.pop(context);
+                  },
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.small,
+                ),
+              ],
+            );
+          },
+        ),
+      ],
       child: ProductListFiltersWidget(
         viewModel: widget.viewModel,
         showOnlySort: true,
@@ -316,6 +367,46 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       size: BottomSheetSize.large,
       title: 'Filters',
       backgroundColor: OsmeaColors.white,
+      headerActions: [
+        BlocBuilder<ProductListViewModel, ProductListState>(
+          bloc: widget.viewModel,
+          builder: (context, state) {
+            if (!widget.viewModel.hasTempFilters()) {
+              return OsmeaComponents.button(
+                text: 'Apply',
+                onPressed: () {
+                  widget.viewModel.applyFilters();
+                  Navigator.pop(context);
+                },
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.small,
+              );
+            }
+            return OsmeaComponents.row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OsmeaComponents.button(
+                  text: 'Clear all',
+                  onPressed: () {
+                    widget.viewModel.clearFilters();
+                  },
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.small,
+                ),
+                OsmeaComponents.button(
+                  text: 'Apply',
+                  onPressed: () {
+                    widget.viewModel.applyFilters();
+                    Navigator.pop(context);
+                  },
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.small,
+                ),
+              ],
+            );
+          },
+        ),
+      ],
       child: ProductListFiltersWidget(
         viewModel: widget.viewModel,
         showOnlySort: false,

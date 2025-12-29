@@ -10,14 +10,13 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_product_list/widgets/filter_header_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/sort_options_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/price_range_filter_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/on_sale_filter_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/stock_status_filter_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/categories_filter_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/tags_filter_widget.dart';
-import 'package:storefront_woo/app/views/view_product_list/widgets/attributes_filter_widget.dart';
+// import 'package:storefront_woo/app/views/view_product_list/widgets/attributes_filter_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/collapsible_section_widget.dart';
 
 class ProductListFiltersWidget extends StatefulWidget {
@@ -67,20 +66,13 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
         final selectedSortBy = tempFilters.orderBy ?? 'date';
         final selectedOrder = tempFilters.order ?? 'desc';
 
-        return OsmeaComponents.column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FilterHeaderWidget(
-              viewModel: widget.viewModel,
-              showOnlySort: widget.showOnlySort,
-            ),
-            Flexible(
-              child: widget.showOnlySort
-                  ? _buildSortingContent(context, selectedSortBy, selectedOrder)
-                  : _buildFilteringContent(context, tempFilters),
-            ),
-          ],
-        );
+        return widget.showOnlySort
+            ? _buildSortingContent(
+                context,
+                selectedSortBy,
+                selectedOrder,
+              )
+            : _buildFilteringContent(context, tempFilters);
       },
     );
   }
@@ -92,16 +84,14 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
     String selectedOrder,
   ) {
     return SingleChildScrollView(
-      padding: context.paddingNormal,
-      child: OsmeaComponents.column(
-        crossAxisAlignment: context.crossStart,
-        children: [
-          SortOptionsWidget(
-            viewModel: widget.viewModel,
-            selectedSortBy: selectedSortBy,
-            selectedOrder: selectedOrder,
-          ),
-        ],
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing20,
+        vertical: context.spacing12,
+      ),
+      child: SortOptionsWidget(
+        viewModel: widget.viewModel,
+        selectedSortBy: selectedSortBy,
+        selectedOrder: selectedOrder,
       ),
     );
   }
@@ -109,7 +99,10 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
   /// Build filtering tab content
   Widget _buildFilteringContent(BuildContext context, dynamic tempFilters) {
     return SingleChildScrollView(
-      padding: context.paddingNormal,
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing20,
+        vertical: context.spacing12,
+      ),
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
@@ -118,7 +111,7 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
           OsmeaComponents.sizedBox(height: context.spacing16),
 
           // Attributes - Collapsible (each attribute as separate panel)
-          AttributesFilterWidget(viewModel: widget.viewModel),
+          // AttributesFilterWidget(viewModel: widget.viewModel),
 
           // Categories - Collapsible
           CollapsibleSectionWidget(
