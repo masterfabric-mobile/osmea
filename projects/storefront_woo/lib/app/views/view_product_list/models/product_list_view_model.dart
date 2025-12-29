@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:core/core.dart' as core;
-import 'package:core/core.dart' show PriceInfoCurrencyHelper;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -11,6 +10,8 @@ import 'package:apis/network/remote/woocommerce/store_api/product_attributes_api
 import 'package:apis/network/remote/woocommerce/store_api/product_attribute_terms/abstract/store_product_attribute_terms_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_tags_api/abstract/store_product_tags_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_tags_api/freezed_model/response/list_product_tags_response_model.dart';
 
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
@@ -174,6 +175,8 @@ class ProductListViewModel
       GetIt.I<StoreProductAttributeTermsService>();
   final StoreProductCategoriesService _categoriesService =
       GetIt.I<StoreProductCategoriesService>();
+  final StoreProductTagsService _tagsService =
+      GetIt.I<StoreProductTagsService>();
   final core.AssetConfigHelper _config = core.AssetConfigHelper();
 
   // Optional route/view arguments holder
@@ -224,6 +227,10 @@ class ProductListViewModel
   List<ListProductCategoriesResponseModel> _categories = [];
   List<ListProductCategoriesResponseModel> get categories =>
       List.unmodifiable(_categories);
+
+  // Tags
+  List<ListProductTagsResponseModel> _tags = [];
+  List<ListProductTagsResponseModel> get tags => List.unmodifiable(_tags);
 
   // Guard to prevent multiple loadProducts calls
   bool _isLoadingProducts = false;
@@ -287,12 +294,18 @@ class ProductListViewModel
         totalPages: state.totalPages,
         attributesWithTerms: state.attributesWithTerms,
         categories: state.categories,
+        tags: state.tags,
       ),
     );
   }
 
   /// Helper method to emit products loaded state
   void _emitProductsLoaded() {
+    // Preserve tags: use _tags if available, otherwise use state tags
+    // This prevents tags from being lost when products are reloaded
+    final currentState = state;
+    final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
     emit(
       ProductListLoadedState(
         products: _allProducts,
@@ -301,6 +314,7 @@ class ProductListViewModel
         totalPages: _totalPages,
         attributesWithTerms: _attributesWithTerms,
         categories: _categories,
+        tags: tagsToUse,
       ),
     );
   }
@@ -316,6 +330,7 @@ class ProductListViewModel
         totalPages: state.totalPages,
         attributesWithTerms: state.attributesWithTerms,
         categories: state.categories,
+        tags: state.tags,
       ),
     );
   }
@@ -341,6 +356,24 @@ class ProductListViewModel
     debugPrint(
       '🚀 ProductListViewModel.loadProducts called (refresh: $refresh, hasInitialLoad: $_hasInitialLoadCompleted, productsCount: ${_allProducts.length})',
     );
+
+    // Preserve tags from current state before loading products
+    // This prevents tags from being lost when products are reloaded
+    final currentState = state;
+    if (_tags.isEmpty && currentState.tags.isNotEmpty) {
+      debugPrint(
+        '🏷️ loadProducts: Preserving tags from state (${currentState.tags.length} tags)',
+      );
+      _tags = List.from(
+        currentState.tags,
+      ); // Create a copy to avoid reference issues
+    } else if (_tags.isNotEmpty) {
+      debugPrint(
+        '🏷️ loadProducts: _tags already has ${_tags.length} tags, keeping them',
+      );
+    } else {
+      debugPrint('🏷️ loadProducts: No tags to preserve');
+    }
 
     _isLoadingProducts = true;
 
@@ -677,8 +710,28 @@ class ProductListViewModel
       if (_categories.isEmpty) {
         loadCategories();
       }
+
+      // Load tags if not already loaded - always try to load
+      debugPrint('🏷️ initFilterDialog: Checking tags...');
+      debugPrint('  - _tags.isEmpty: ${_tags.isEmpty}');
+      debugPrint('  - _tags.length: ${_tags.length}');
+      if (_tags.isEmpty) {
+        debugPrint('🏷️ initFilterDialog: Tags empty, calling loadTags()');
+        loadTags();
+      } else {
+        debugPrint(
+          '🏷️ initFilterDialog: Tags already loaded (${_tags.length} tags)',
+        );
+      }
     } else {
       debugPrint('🚫 initFilterDialog already initialized, skipping...');
+      // Even if already initialized, check if tags need to be loaded
+      if (_tags.isEmpty) {
+        debugPrint(
+          '🏷️ initFilterDialog: Dialog already initialized but tags empty, calling loadTags()',
+        );
+        loadTags();
+      }
     }
   }
 
@@ -711,6 +764,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
             isLoadingFilterOptions: true,
           ),
         );
@@ -723,6 +777,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
           ),
         );
       }
@@ -785,6 +840,7 @@ class ProductListViewModel
             totalPages: updatedState.totalPages,
             attributesWithTerms: _attributesWithTerms,
             categories: updatedState.categories,
+            tags: updatedState.tags,
             isLoadingFilterOptions: false,
           ),
         );
@@ -797,6 +853,7 @@ class ProductListViewModel
             totalPages: updatedState.totalPages,
             attributesWithTerms: _attributesWithTerms,
             categories: updatedState.categories,
+            tags: updatedState.tags,
           ),
         );
       }
@@ -817,6 +874,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
             isLoadingFilterOptions: false,
             filterOptionsError:
                 'Failed to load attributes: ${_getErrorMessage(e)}',
@@ -832,6 +890,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
           ),
         );
       }
@@ -914,6 +973,9 @@ class ProductListViewModel
     // Emit current state to trigger rebuild in filter dialog
     // Preserve products and other state while updating filter options
     final currentState = state;
+    // Preserve tags: use _tags if available, otherwise use state tags
+    final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
     if (currentState is ProductListLoadedState) {
       emit(
         ProductListLoadedState(
@@ -923,6 +985,7 @@ class ProductListViewModel
           totalPages: currentState.totalPages,
           attributesWithTerms: currentState.attributesWithTerms,
           categories: currentState.categories,
+          tags: tagsToUse,
         ),
       );
     } else if (currentState is ProductListFilterOptionsLoadedState) {
@@ -934,11 +997,27 @@ class ProductListViewModel
           totalPages: currentState.totalPages,
           attributesWithTerms: currentState.attributesWithTerms,
           categories: currentState.categories,
+          tags: tagsToUse,
         ),
       );
     } else {
-      // Fallback: emit current state as-is
-      emit(currentState);
+      // For other state types, try to preserve tags if possible
+      if (currentState is ProductListLoadingState) {
+        emit(
+          ProductListLoadingState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: tagsToUse,
+          ),
+        );
+      } else {
+        // Fallback: emit current state as-is (will preserve tags if state has them)
+        emit(currentState);
+      }
     }
   }
 
@@ -1252,6 +1331,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
             isLoadingFilterOptions: true,
           ),
         );
@@ -1264,6 +1344,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
           ),
         );
       }
@@ -1296,6 +1377,7 @@ class ProductListViewModel
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: _categories,
+            tags: currentState.tags,
           ),
         );
       } else if (currentState is ProductListLoadingState) {
@@ -1309,6 +1391,7 @@ class ProductListViewModel
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: _categories,
+            tags: currentState.tags,
           ),
         );
       } else if (currentState is ProductListErrorState) {
@@ -1323,6 +1406,7 @@ class ProductListViewModel
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: _categories,
+            tags: currentState.tags,
           ),
         );
       } else {
@@ -1337,6 +1421,7 @@ class ProductListViewModel
             productsError: currentState.productsError,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: _categories,
+            tags: currentState.tags,
           ),
         );
       }
@@ -1355,6 +1440,7 @@ class ProductListViewModel
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
             categories: currentState.categories,
+            tags: currentState.tags,
             isLoadingFilterOptions: false,
             filterOptionsError:
                 'Failed to load categories: ${_getErrorMessage(e)}',
@@ -1372,6 +1458,7 @@ class ProductListViewModel
               filterOptionsError: _getErrorMessage(e),
               attributesWithTerms: currentState.attributesWithTerms,
               categories: currentState.categories,
+              tags: currentState.tags,
             ),
           );
         } else if (currentState is ProductListLoadingState) {
@@ -1385,6 +1472,7 @@ class ProductListViewModel
               filterOptionsError: _getErrorMessage(e),
               attributesWithTerms: currentState.attributesWithTerms,
               categories: currentState.categories,
+              tags: currentState.tags,
             ),
           );
         } else {
@@ -1399,6 +1487,202 @@ class ProductListViewModel
               isLoadingProducts: currentState.isLoadingProducts,
               productsError: currentState.productsError,
               categories: currentState.categories,
+              tags: currentState.tags,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  /// Load tags for filtering
+  Future<void> loadTags() async {
+    try {
+      debugPrint('🏷️ ProductListViewModel: Loading tags...');
+      debugPrint('  - API Version will be checked');
+      debugPrint('  - Current _tags.length: ${_tags.length}');
+
+      // Keep the current state type to preserve products visibility
+      final currentState = state;
+      debugPrint('  - Current state type: ${currentState.runtimeType}');
+      if (currentState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: currentState.tags,
+            isLoadingFilterOptions: true,
+          ),
+        );
+      } else {
+        emit(
+          ProductListFilterOptionsLoadingState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: currentState.tags,
+          ),
+        );
+      }
+
+      final apiVersion = _config.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
+      debugPrint(
+        '🏷️ ProductListViewModel: Calling API with version: $apiVersion',
+      );
+      debugPrint('  - perPage: 100');
+      debugPrint('  - hideEmpty: true');
+
+      final tags = await _tagsService.listProductTags(
+        apiVersion: apiVersion,
+        perPage: 100, // Get all tags
+        hideEmpty: true, // Only get tags with products
+      );
+
+      debugPrint('🏷️ ProductListViewModel: API returned ${tags.length} tags');
+      if (tags.isNotEmpty) {
+        debugPrint('  - First tag: ${tags.first.name} (ID: ${tags.first.id})');
+      }
+
+      _tags = tags;
+      debugPrint(
+        '✅ ProductListViewModel: Loaded ${tags.length} tags into _tags',
+      );
+
+      // Emit state with updated tags, preserving the current state type
+      if (currentState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: _tags,
+          ),
+        );
+      } else if (currentState is ProductListLoadingState) {
+        emit(
+          ProductListLoadingState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: _tags,
+          ),
+        );
+      } else if (currentState is ProductListErrorState) {
+        emit(
+          ProductListErrorState(
+            message: currentState.message,
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingFilterOptions: false,
+            filterOptionsError: null,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: _tags,
+          ),
+        );
+      } else {
+        // Fallback to FilterOptionsLoadedState if state type is unknown
+        emit(
+          ProductListFilterOptionsLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            isLoadingProducts: currentState.isLoadingProducts,
+            productsError: currentState.productsError,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: _tags,
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ ProductListViewModel: Error loading tags: $e');
+      debugPrint('❌ Error type: ${e.runtimeType}');
+      debugPrint('❌ Stack trace: $stackTrace');
+      debugPrint('❌ _tags will remain empty: ${_tags.length}');
+
+      // Preserve current state type even on error
+      final currentState = state;
+      if (currentState is ProductListLoadedState) {
+        emit(
+          ProductListLoadedState(
+            products: currentState.products,
+            hasMore: currentState.hasMore,
+            currentPage: currentState.currentPage,
+            totalPages: currentState.totalPages,
+            attributesWithTerms: currentState.attributesWithTerms,
+            categories: currentState.categories,
+            tags: currentState.tags,
+            isLoadingFilterOptions: false,
+            filterOptionsError: 'Failed to load tags: ${_getErrorMessage(e)}',
+          ),
+        );
+      } else {
+        if (currentState is ProductListLoadedState) {
+          emit(
+            ProductListLoadedState(
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              attributesWithTerms: currentState.attributesWithTerms,
+              categories: currentState.categories,
+              tags: currentState.tags,
+              isLoadingFilterOptions: false,
+              filterOptionsError: _getErrorMessage(e),
+            ),
+          );
+        } else if (currentState is ProductListLoadingState) {
+          emit(
+            ProductListLoadingState(
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              isLoadingFilterOptions: false,
+              filterOptionsError: _getErrorMessage(e),
+              attributesWithTerms: currentState.attributesWithTerms,
+              categories: currentState.categories,
+              tags: currentState.tags,
+            ),
+          );
+        } else {
+          emit(
+            ProductListFilterOptionsErrorState(
+              message: 'Failed to load tags: ${_getErrorMessage(e)}',
+              products: currentState.products,
+              hasMore: currentState.hasMore,
+              currentPage: currentState.currentPage,
+              totalPages: currentState.totalPages,
+              attributesWithTerms: currentState.attributesWithTerms,
+              isLoadingProducts: currentState.isLoadingProducts,
+              productsError: currentState.productsError,
+              categories: currentState.categories,
+              tags: currentState.tags,
             ),
           );
         }
