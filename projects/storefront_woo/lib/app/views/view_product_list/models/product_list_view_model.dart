@@ -286,25 +286,35 @@ class ProductListViewModel
 
   /// Helper method to emit products loading state
   void _emitProductsLoading() {
+    // Preserve categories and tags: use _categories/_tags if available, otherwise use state
+    final currentState = state;
+    final categoriesToUse = _categories.isNotEmpty
+        ? _categories
+        : currentState.categories;
+    final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
     emit(
       ProductListLoadingState(
-        products: state.products,
-        hasMore: state.hasMore,
-        currentPage: state.currentPage,
-        totalPages: state.totalPages,
-        attributesWithTerms: state.attributesWithTerms,
-        categories: state.categories,
-        tags: state.tags,
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        attributesWithTerms: currentState.attributesWithTerms,
+        categories: categoriesToUse,
+        tags: tagsToUse,
       ),
     );
   }
 
   /// Helper method to emit products loaded state
   void _emitProductsLoaded() {
-    // Preserve tags: use _tags if available, otherwise use state tags
-    // This prevents tags from being lost when products are reloaded
+    // Preserve tags and categories: use _tags/_categories if available, otherwise use state
+    // This prevents tags and categories from being lost when products are reloaded
     final currentState = state;
     final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+    final categoriesToUse = _categories.isNotEmpty
+        ? _categories
+        : currentState.categories;
 
     emit(
       ProductListLoadedState(
@@ -313,7 +323,7 @@ class ProductListViewModel
         currentPage: _currentPage,
         totalPages: _totalPages,
         attributesWithTerms: _attributesWithTerms,
-        categories: _categories,
+        categories: categoriesToUse,
         tags: tagsToUse,
       ),
     );
@@ -321,16 +331,23 @@ class ProductListViewModel
 
   /// Helper method to emit products error state
   void _emitProductsError(String message) {
+    // Preserve categories and tags: use _categories/_tags if available, otherwise use state
+    final currentState = state;
+    final categoriesToUse = _categories.isNotEmpty
+        ? _categories
+        : currentState.categories;
+    final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
     emit(
       ProductListErrorState(
         message: message,
-        products: state.products,
-        hasMore: state.hasMore,
-        currentPage: state.currentPage,
-        totalPages: state.totalPages,
-        attributesWithTerms: state.attributesWithTerms,
-        categories: state.categories,
-        tags: state.tags,
+        products: currentState.products,
+        hasMore: currentState.hasMore,
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        attributesWithTerms: currentState.attributesWithTerms,
+        categories: categoriesToUse,
+        tags: tagsToUse,
       ),
     );
   }
@@ -357,8 +374,8 @@ class ProductListViewModel
       '🚀 ProductListViewModel.loadProducts called (refresh: $refresh, hasInitialLoad: $_hasInitialLoadCompleted, productsCount: ${_allProducts.length})',
     );
 
-    // Preserve tags from current state before loading products
-    // This prevents tags from being lost when products are reloaded
+    // Preserve tags and categories from current state before loading products
+    // This prevents tags and categories from being lost when products are reloaded
     final currentState = state;
     if (_tags.isEmpty && currentState.tags.isNotEmpty) {
       debugPrint(
@@ -373,6 +390,21 @@ class ProductListViewModel
       );
     } else {
       debugPrint('🏷️ loadProducts: No tags to preserve');
+    }
+
+    if (_categories.isEmpty && currentState.categories.isNotEmpty) {
+      debugPrint(
+        '📂 loadProducts: Preserving categories from state (${currentState.categories.length} categories)',
+      );
+      _categories = List.from(
+        currentState.categories,
+      ); // Create a copy to avoid reference issues
+    } else if (_categories.isNotEmpty) {
+      debugPrint(
+        '📂 loadProducts: _categories already has ${_categories.length} categories, keeping them',
+      );
+    } else {
+      debugPrint('📂 loadProducts: No categories to preserve');
     }
 
     _isLoadingProducts = true;
@@ -973,8 +1005,11 @@ class ProductListViewModel
     // Emit current state to trigger rebuild in filter dialog
     // Preserve products and other state while updating filter options
     final currentState = state;
-    // Preserve tags: use _tags if available, otherwise use state tags
+    // Preserve tags and categories: use _tags/_categories if available, otherwise use state
     final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+    final categoriesToUse = _categories.isNotEmpty
+        ? _categories
+        : currentState.categories;
 
     if (currentState is ProductListLoadedState) {
       emit(
@@ -984,7 +1019,7 @@ class ProductListViewModel
           currentPage: currentState.currentPage,
           totalPages: currentState.totalPages,
           attributesWithTerms: currentState.attributesWithTerms,
-          categories: currentState.categories,
+          categories: categoriesToUse,
           tags: tagsToUse,
         ),
       );
@@ -996,12 +1031,12 @@ class ProductListViewModel
           currentPage: currentState.currentPage,
           totalPages: currentState.totalPages,
           attributesWithTerms: currentState.attributesWithTerms,
-          categories: currentState.categories,
+          categories: categoriesToUse,
           tags: tagsToUse,
         ),
       );
     } else {
-      // For other state types, try to preserve tags if possible
+      // For other state types, try to preserve tags and categories if possible
       if (currentState is ProductListLoadingState) {
         emit(
           ProductListLoadingState(
@@ -1010,12 +1045,12 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
+            categories: categoriesToUse,
             tags: tagsToUse,
           ),
         );
       } else {
-        // Fallback: emit current state as-is (will preserve tags if state has them)
+        // Fallback: emit current state as-is (will preserve tags/categories if state has them)
         emit(currentState);
       }
     }
@@ -1322,6 +1357,12 @@ class ProductListViewModel
 
       // Keep the current state type to preserve products visibility
       final currentState = state;
+      // Preserve categories and tags: use _categories/_tags if available, otherwise use state
+      final categoriesToUse = _categories.isNotEmpty
+          ? _categories
+          : currentState.categories;
+      final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1330,8 +1371,8 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: currentState.tags,
+            categories: categoriesToUse,
+            tags: tagsToUse,
             isLoadingFilterOptions: true,
           ),
         );
@@ -1343,8 +1384,8 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: currentState.tags,
+            categories: categoriesToUse,
+            tags: tagsToUse,
           ),
         );
       }
@@ -1366,6 +1407,10 @@ class ProductListViewModel
       );
 
       // Emit state with updated categories, preserving the current state type
+      // Use _categories (just loaded) and preserve tags
+      final finalCategoriesToUse = _categories;
+      final finalTagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1376,8 +1421,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: _categories,
-            tags: currentState.tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else if (currentState is ProductListLoadingState) {
@@ -1390,8 +1435,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: _categories,
-            tags: currentState.tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else if (currentState is ProductListErrorState) {
@@ -1405,8 +1450,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: _categories,
-            tags: currentState.tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else {
@@ -1420,8 +1465,8 @@ class ProductListViewModel
             isLoadingProducts: currentState.isLoadingProducts,
             productsError: currentState.productsError,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: _categories,
-            tags: currentState.tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       }
@@ -1431,6 +1476,12 @@ class ProductListViewModel
 
       // Preserve current state type even on error
       final currentState = state;
+      // Preserve categories and tags: use _categories/_tags if available, otherwise use state
+      final categoriesToUse = _categories.isNotEmpty
+          ? _categories
+          : currentState.categories;
+      final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1439,8 +1490,8 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: currentState.tags,
+            categories: categoriesToUse,
+            tags: tagsToUse,
             isLoadingFilterOptions: false,
             filterOptionsError:
                 'Failed to load categories: ${_getErrorMessage(e)}',
@@ -1457,8 +1508,8 @@ class ProductListViewModel
               isLoadingFilterOptions: false,
               filterOptionsError: _getErrorMessage(e),
               attributesWithTerms: currentState.attributesWithTerms,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
             ),
           );
         } else if (currentState is ProductListLoadingState) {
@@ -1471,8 +1522,8 @@ class ProductListViewModel
               isLoadingFilterOptions: false,
               filterOptionsError: _getErrorMessage(e),
               attributesWithTerms: currentState.attributesWithTerms,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
             ),
           );
         } else {
@@ -1486,8 +1537,8 @@ class ProductListViewModel
               attributesWithTerms: currentState.attributesWithTerms,
               isLoadingProducts: currentState.isLoadingProducts,
               productsError: currentState.productsError,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
             ),
           );
         }
@@ -1505,6 +1556,11 @@ class ProductListViewModel
       // Keep the current state type to preserve products visibility
       final currentState = state;
       debugPrint('  - Current state type: ${currentState.runtimeType}');
+      // Preserve categories: use _categories if available, otherwise use state categories
+      final categoriesToUse = _categories.isNotEmpty
+          ? _categories
+          : currentState.categories;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1513,7 +1569,7 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
+            categories: categoriesToUse,
             tags: currentState.tags,
             isLoadingFilterOptions: true,
           ),
@@ -1526,7 +1582,7 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
+            categories: categoriesToUse,
             tags: currentState.tags,
           ),
         );
@@ -1560,6 +1616,12 @@ class ProductListViewModel
       );
 
       // Emit state with updated tags, preserving the current state type
+      // Use _tags (just loaded) and preserve categories
+      final finalTagsToUse = _tags;
+      final finalCategoriesToUse = _categories.isNotEmpty
+          ? _categories
+          : currentState.categories;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1570,8 +1632,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: _tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else if (currentState is ProductListLoadingState) {
@@ -1584,8 +1646,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: _tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else if (currentState is ProductListErrorState) {
@@ -1599,8 +1661,8 @@ class ProductListViewModel
             isLoadingFilterOptions: false,
             filterOptionsError: null,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: _tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       } else {
@@ -1614,8 +1676,8 @@ class ProductListViewModel
             isLoadingProducts: currentState.isLoadingProducts,
             productsError: currentState.productsError,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: _tags,
+            categories: finalCategoriesToUse,
+            tags: finalTagsToUse,
           ),
         );
       }
@@ -1627,6 +1689,13 @@ class ProductListViewModel
 
       // Preserve current state type even on error
       final currentState = state;
+      // Preserve categories: use _categories if available, otherwise use state categories
+      final categoriesToUse = _categories.isNotEmpty
+          ? _categories
+          : currentState.categories;
+      // Preserve tags: use _tags if available, otherwise use state tags
+      final tagsToUse = _tags.isNotEmpty ? _tags : currentState.tags;
+
       if (currentState is ProductListLoadedState) {
         emit(
           ProductListLoadedState(
@@ -1635,8 +1704,8 @@ class ProductListViewModel
             currentPage: currentState.currentPage,
             totalPages: currentState.totalPages,
             attributesWithTerms: currentState.attributesWithTerms,
-            categories: currentState.categories,
-            tags: currentState.tags,
+            categories: categoriesToUse,
+            tags: tagsToUse,
             isLoadingFilterOptions: false,
             filterOptionsError: 'Failed to load tags: ${_getErrorMessage(e)}',
           ),
@@ -1650,8 +1719,8 @@ class ProductListViewModel
               currentPage: currentState.currentPage,
               totalPages: currentState.totalPages,
               attributesWithTerms: currentState.attributesWithTerms,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
               isLoadingFilterOptions: false,
               filterOptionsError: _getErrorMessage(e),
             ),
@@ -1666,8 +1735,8 @@ class ProductListViewModel
               isLoadingFilterOptions: false,
               filterOptionsError: _getErrorMessage(e),
               attributesWithTerms: currentState.attributesWithTerms,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
             ),
           );
         } else {
@@ -1681,8 +1750,8 @@ class ProductListViewModel
               attributesWithTerms: currentState.attributesWithTerms,
               isLoadingProducts: currentState.isLoadingProducts,
               productsError: currentState.productsError,
-              categories: currentState.categories,
-              tags: currentState.tags,
+              categories: categoriesToUse,
+              tags: tagsToUse,
             ),
           );
         }
