@@ -79,7 +79,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     final discountedTop3 = saleProducts
         .where(
           (p) =>
-              p.prices?.salePrice != null &&
+              p.prices?.salePrice != null && 
               (p.prices?.salePrice?.isNotEmpty ?? false) &&
               p.prices?.salePrice != p.prices?.regularPrice,
         )
@@ -163,23 +163,26 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               customIndicator: (context, itemCount, activeIndex) {
                 return OsmeaComponents.padding(
                   padding: EdgeInsets.only(
-                    right: context.spacing16,
-                    bottom: context.spacing12,
+                    right: context.spacing8,
+                    bottom: context.spacing8,
                   ),
                   child: OsmeaComponents.container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.spacing8,
-                      vertical: context.spacing4,
+                      horizontal: context.spacing6,
+                      vertical: context.spacing2,
                     ),
                     decoration: BoxDecoration(
-                      color: OsmeaColors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(8),
+                      color: OsmeaColors.black.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(context.spacing12),
                     ),
                     child: OsmeaComponents.text(
                       '${activeIndex + 1}/$itemCount',
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                         color: OsmeaColors.white,
+                        fontSize: context.fontSizeExtraSmall * 0.95,
                         fontWeight: FontWeight.w600,
+                        height: 1.15,
+                        letterSpacing: 0.1,
                       ),
                     ),
                   ),
