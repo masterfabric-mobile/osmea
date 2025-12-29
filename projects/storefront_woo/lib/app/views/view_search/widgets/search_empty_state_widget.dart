@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/abstract/store_product_categories_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
@@ -72,31 +73,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   }
 
   Future<void> _searchByCategory(int categoryId, String categoryName) async {
-    if (widget.searchCubit == null) return;
-
     debugPrint('📁 Category selected: $categoryName (ID: $categoryId)');
 
-    try {
-      final productService = GetIt.I<ProductService>();
-
-      await widget.searchCubit!.performSearch(
-        categoryName,
-        searchProvider: (query) async {
-          final products = await productService.listAllProducts(
-            apiVersion: 'v1',
-            category: categoryId,
-            page: 1,
-            perPage: 20,
-          );
-          debugPrint(
-            '🔍 Found ${products.length} products for category: $categoryName',
-          );
-          return products;
-        },
-        immediate: true,
-      );
-    } catch (e) {
-      debugPrint('❌ Error loading category products: $e');
+    // Navigate to product list view with category filter
+    if (mounted) {
+      context.push('/products?category_id=$categoryId');
     }
   }
 
@@ -231,11 +212,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           child: Column(
             mainAxisAlignment: context.centerMain,
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: OsmeaColors.pewter,
-              ),
+              Icon(Icons.error_outline, size: 64, color: OsmeaColors.pewter),
               SizedBox(height: context.spacing16),
               OsmeaComponents.text(
                 _error!,
@@ -293,9 +270,9 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         // Categories section
         OsmeaComponents.text(
           'Categories',
-          textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          textStyle: OsmeaTextStyle.titleMedium(
+            context,
+          ).copyWith(fontWeight: FontWeight.bold),
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
         // Categories grid with images
@@ -350,10 +327,7 @@ class _BrandCard extends StatelessWidget {
               height: circleSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: OsmeaColors.nordicBlue,
-                  width: 2,
-                ),
+                border: Border.all(color: OsmeaColors.nordicBlue, width: 2),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -385,8 +359,7 @@ class _BrandCard extends StatelessWidget {
             child: OsmeaComponents.text(
               brandName,
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontSize:
-                    context.fontSizeExtraSmall * context.textScaleFactor,
+                fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                 fontWeight: FontWeight.w500,
                 color: OsmeaColors.thunder,
               ),
@@ -419,10 +392,7 @@ class _CategoryCard extends StatelessWidget {
   final dynamic category;
   final VoidCallback onTap;
 
-  const _CategoryCard({
-    required this.category,
-    required this.onTap,
-  });
+  const _CategoryCard({required this.category, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -539,10 +509,7 @@ class _CategoryCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.grey.shade100,
-            Colors.grey.shade200,
-          ],
+          colors: [Colors.grey.shade100, Colors.grey.shade200],
         ),
       ),
       child: Center(
