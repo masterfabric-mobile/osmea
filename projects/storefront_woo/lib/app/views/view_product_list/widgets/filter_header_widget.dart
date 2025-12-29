@@ -20,19 +20,29 @@ class FilterHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.padding(
+    return Container(
       padding: context.paddingNormal,
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: OsmeaColors.silver.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+      ),
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
           OsmeaComponents.row(
             mainAxisAlignment: context.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: OsmeaComponents.text(
                   showOnlySort ? 'Sort Products' : 'Filter Products',
                   textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: OsmeaColors.thunder,
                   ),
                 ),
@@ -45,14 +55,13 @@ class FilterHeaderWidget extends StatelessWidget {
                       text: 'Clear all',
                       onPressed: () {
                         viewModel.clearFilters();
-                        Navigator.pop(context);
                       },
-                      variant: ButtonVariant.ghost,
+                      variant: ButtonVariant.outlined,
                       size: ButtonSize.small,
                       icon: Icon(
-                        Icons.clear_all,
+                        Icons.clear_all_rounded,
                         size: context.iconSizeSmall,
-                        color: OsmeaColors.nordicBlue,
+                        color: OsmeaColors.pewter,
                       ),
                       iconPosition: IconPosition.leading,
                     ),
@@ -64,12 +73,12 @@ class FilterHeaderWidget extends StatelessWidget {
                       viewModel.applyFilters();
                       Navigator.pop(context);
                     },
-                    variant: ButtonVariant.ghost,
+                    variant: ButtonVariant.primary,
                     size: ButtonSize.small,
                     icon: Icon(
-                      Icons.check,
+                      Icons.check_rounded,
                       size: context.iconSizeSmall,
-                      color: OsmeaColors.nordicBlue,
+                      color: OsmeaColors.white,
                     ),
                     iconPosition: IconPosition.leading,
                   ),

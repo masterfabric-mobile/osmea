@@ -109,7 +109,10 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             // Active filter chips
             if (_hasChipWorthyFilters())
               OsmeaComponents.padding(
-                padding: context.paddingNormal,
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.spacing20,
+                  vertical: context.spacing12,
+                ),
                 child: _buildActiveFilterChips(context),
               ),
             // Product grid
@@ -174,53 +177,114 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
 
   /// Builds icon buttons for Sort by / Filters
   Widget _buildActionButtons(BuildContext context) {
+    final hasActiveFilters = widget.viewModel.filters.hasActiveFilters;
+
     return OsmeaComponents.padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.spacing20,
         vertical: context.spacing12,
       ),
       child: OsmeaComponents.row(
-        mainAxisAlignment: context.spaceBetween,
         children: [
-          OsmeaComponents.iconButton(
-            onPressed: () => _showSortBottomSheet(context),
-            icon: Icon(
-              Icons.sort,
-              color: OsmeaColors.thunder,
-              size: context.iconSizeNormal,
+          // Sort button
+          Expanded(
+            child: _buildModernActionButton(
+              context: context,
+              icon: Icons.sort_rounded,
+              label: 'Sort',
+              onPressed: () => _showSortBottomSheet(context),
+              hasBadge: false,
             ),
-            backgroundColor: OsmeaColors.transparent,
-            tooltip: 'Sort by',
           ),
-          OsmeaComponents.iconButton(
-            onPressed: () => _showFiltersBottomSheet(context),
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  Icons.filter_list,
-                  color: OsmeaColors.thunder,
-                  size: context.iconSizeNormal,
-                ),
-                if (widget.viewModel.filters.hasActiveFilters)
-                  Positioned(
-                    right: -4,
-                    top: -4,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: OsmeaColors.nordicBlue,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-              ],
+          OsmeaComponents.sizedBox(width: context.spacing12),
+          // Filter button
+          Expanded(
+            child: _buildModernActionButton(
+              context: context,
+              icon: Icons.tune_rounded,
+              label: 'Filters',
+              onPressed: () => _showFiltersBottomSheet(context),
+              hasBadge: hasActiveFilters,
             ),
-            backgroundColor: OsmeaColors.transparent,
-            tooltip: 'Filters',
           ),
         ],
+      ),
+    );
+  }
+
+  /// Builds a modern action button with icon and label
+  Widget _buildModernActionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    required bool hasBadge,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(context.spacing12),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing12,
+            vertical: context.spacing10,
+          ),
+          decoration: BoxDecoration(
+            color: OsmeaColors.white,
+            borderRadius: BorderRadius.circular(context.spacing12),
+            border: Border.all(color: OsmeaColors.silver, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: OsmeaColors.black.withOpacity(0.04),
+                blurRadius: context.blurRadius8,
+                offset: context.offsetVerticalCustom(context.spacing2),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    icon,
+                    color: OsmeaColors.thunder,
+                    size: context.iconSizeNormal,
+                  ),
+                  if (hasBadge)
+                    Positioned(
+                      right: -6,
+                      top: -6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.nordicBlue,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: OsmeaColors.white,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              OsmeaComponents.sizedBox(width: context.spacing6),
+              OsmeaComponents.text(
+                label,
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: OsmeaColors.thunder,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -356,13 +420,15 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         final categoryName = category.name ?? 'Category $categoryId';
         chips.add(
           OsmeaComponents.padding(
-            padding: context.onlyRightPaddingLow,
+            padding: EdgeInsets.only(right: context.spacing8),
             child: OsmeaComponents.chips(
               text: categoryName,
               variant: ChipsVariant.primary,
               style: ChipsStyle.normal,
               selected: true,
               closable: true,
+              backgroundColor: OsmeaColors.nordicBlue,
+              textColor: OsmeaColors.white,
               onClose: () {
                 final newSelectedCategories = List<int>.from(
                   filters.selectedCategories!,
@@ -383,13 +449,15 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     if (filters.onSale == true) {
       chips.add(
         OsmeaComponents.padding(
-          padding: context.onlyRightPaddingLow,
+          padding: EdgeInsets.only(right: context.spacing8),
           child: OsmeaComponents.chips(
             text: 'On Sale',
             variant: ChipsVariant.primary,
             style: ChipsStyle.normal,
             selected: true,
             closable: true,
+            backgroundColor: OsmeaColors.nordicBlue,
+            textColor: OsmeaColors.white,
             onClose: () {
               widget.viewModel.updateFilter(onSale: null);
             },
@@ -401,7 +469,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     if (filters.featured == true) {
       chips.add(
         OsmeaComponents.padding(
-          padding: context.onlyRightPaddingLow,
+          padding: EdgeInsets.only(right: context.spacing8),
           child: OsmeaComponents.chips(
             text: 'Featured',
             variant: ChipsVariant.secondary,
@@ -419,7 +487,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     if (filters.stockStatus != null) {
       chips.add(
         OsmeaComponents.padding(
-          padding: context.onlyRightPaddingLow,
+          padding: EdgeInsets.only(right: context.spacing8),
           child: OsmeaComponents.chips(
             text: _formatStockStatus(filters.stockStatus!),
             variant: ChipsVariant.info,
@@ -446,9 +514,33 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     debugPrint(
       '✅ _buildActiveFilterChips: Returning chip list with ${chips.length} chips',
     );
-    return OsmeaComponents.singleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: OsmeaComponents.row(children: chips),
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: context.spacing8),
+      child: OsmeaComponents.singleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: OsmeaComponents.row(
+          children: [
+            ...chips,
+            // Clear all button
+            OsmeaComponents.padding(
+              padding: context.onlyLeftPaddingLow,
+              child: OsmeaComponents.chips(
+                text: 'Clear all',
+                variant: ChipsVariant.neutral,
+                style: ChipsStyle.outlined,
+                icon: Icon(
+                  Icons.close,
+                  size: context.iconSizeExtraSmall,
+                  color: OsmeaColors.pewter,
+                ),
+                iconPosition: ChipsIconPosition.start,
+                onTap: () => widget.viewModel.clearFilters(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
