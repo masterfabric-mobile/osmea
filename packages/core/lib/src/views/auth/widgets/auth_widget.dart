@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
 import 'package:core/src/views/auth/enums/auth_design_variant.dart';
@@ -835,11 +834,6 @@ class AuthWidget extends StatelessWidget {
                     : _buildStartupSignUpContent(
                         context, formState, cubit, buttonRadius, startupPrimaryColor),
                 OsmeaComponents.sizedBox(height: context.spacing32),
-                // Back to Home button (only on Sign In page)
-                if (currentTab == 0) ...[
-                  _buildStartupBackToHomeButton(context, startupPrimaryColor, buttonRadius),
-                  OsmeaComponents.sizedBox(height: context.spacing16),
-                ],
                   ],
                 ),
               ),
@@ -847,31 +841,6 @@ class AuthWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  /// 🎨 Startup Logo
-  Widget _buildStartupLogo(
-    BuildContext context,
-    String? logoUrl,
-    double logoWidth,
-    double logoHeight,
-    String appName,
-  ) {
-    return OsmeaComponents.center(
-      child: logoUrl != null
-          ? OsmeaComponents.image(
-              imageUrl: logoUrl,
-              width: logoWidth * 0.7,
-              height: logoHeight * 0.7,
-              fit: BoxFit.contain,
-            )
-          : OsmeaComponents.text(
-              appName,
-              variant: OsmeaTextVariant.headlineMedium,
-              color: OsmeaColors.thunder,
-              fontWeight: FontWeight.w700,
-            ),
     );
   }
 
@@ -890,29 +859,6 @@ class AuthWidget extends StatelessWidget {
     );
   }
 
-  /// 🏠 Startup Back to Home Button
-  Widget _buildStartupBackToHomeButton(
-    BuildContext context,
-    Color primaryColor,
-    double buttonRadius,
-  ) {
-    return OsmeaComponents.button(
-      text: 'Back to Home',
-      onPressed: () {
-        GoRouter.of(context).go('/home');
-      },
-      variant: ButtonVariant.outlined,
-      backgroundColor: Colors.transparent,
-      textColor: OsmeaColors.nordicBlue,
-      borderColor: OsmeaColors.nordicBlue,
-      borderRadius: buttonRadius,
-      icon: Icon(
-        Icons.home_rounded,
-        color: OsmeaColors.nordicBlue,
-        size: 20,
-      ),
-    );
-  }
 
   /// 📧 Startup Sign In Content
   Widget _buildStartupSignInContent(

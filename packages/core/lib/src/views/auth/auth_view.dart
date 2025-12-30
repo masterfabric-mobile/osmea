@@ -3,6 +3,7 @@ import 'package:core/src/views/auth/widgets/auth_widget.dart';
 import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 /// 🔐 **OSMEA Auth View**
 ///
@@ -38,7 +39,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     super.useSafeArea = false,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
-    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    // Keep app bar visible for back button
+    super.appBarPadding = const AppBarPaddingVisibility.enabled(),
     super.backgroundColor = Colors.transparent,
     this.onSignInSuccess,
     this.onSignInError,
@@ -49,70 +51,104 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     this.defaultRedirectPath,
   }) : super(
           coreAppBar: (context, cubit) {
-            // Get variant from config to determine back button visibility/color
-            final config = cubit.state is AuthFormState 
-                ? (cubit.state as AuthFormState).config 
+            // Get variant from config to determine back button color
+            final config = cubit.state is AuthFormState
+                ? (cubit.state as AuthFormState).config
                 : null;
-            final variant = _getDesignVariantFromConfigStatic(config);
-            
-            // For startup variant, hide the app bar back button (it's in the widget)
-            if (variant == AuthDesignVariant.startup) {
-              return OsmeaComponents.appBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: const SizedBox.shrink(), // Hide back button
-              );
+
+            // Get variant from config inline (can't use instance method in initializer)
+            AuthDesignVariant variant = AuthDesignVariant.enterprise; // Default
+            if (config != null && config.containsKey('ui_style')) {
+              final uiStyle = config['ui_style'] as Map<String, dynamic>?;
+              if (uiStyle != null) {
+                final variantString = uiStyle['style'] as String? ??
+                    uiStyle['design_variant'] as String?;
+                if (variantString != null) {
+                  switch (variantString.toLowerCase()) {
+                    case 'startup':
+                      variant = AuthDesignVariant.startup;
+                      break;
+                    case 'enterprise':
+                    default:
+                      variant = AuthDesignVariant.enterprise;
+                      break;
+                  }
+                }
+              }
             }
-            
-            // For other variants, show white back button
+
+            // Determine colors based on variant
+            // Startup variant uses white background, enterprise uses colored background
+            final backgroundColor = variant == AuthDesignVariant.startup
+                ? OsmeaColors.paperWhite // White background for startup
+                : Colors
+                    .transparent; // Transparent for enterprise (colored background)
+
+            final foregroundColor = variant == AuthDesignVariant.startup
+                ? OsmeaColors
+                    .thunder // Dark color for startup (white background)
+                : Colors
+                    .white; // White color for enterprise (colored background)
+
+            // Get title from config based on current tab
+            final currentTab = cubit.state is AuthFormState
+                ? (cubit.state as AuthFormState).currentTab
+                : initialTab;
+
+            // Get title from config
+            String titleText = 'Sign In to Your Account'; // Default
+            if (config != null) {
+              if (currentTab == 0) {
+                final signInConfig = config['sign_in'] as Map<String, dynamic>?;
+                titleText = signInConfig?['title']?.toString() ??
+                    'Sign In to Your Account';
+              } else {
+                final signUpConfig = config['sign_up'] as Map<String, dynamic>?;
+                titleText =
+                    signUpConfig?['title']?.toString() ?? 'Create Your Account';
+              }
+            }
+
+            // App bar following cart view pattern
+            // Same parameters for both startup and enterprise variants
             return OsmeaComponents.appBar(
-              backgroundColor: Colors.transparent,
+              title: OsmeaComponents.text(
+                titleText,
+                color: foregroundColor,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: backgroundColor,
               elevation: 0,
+              foregroundColor: foregroundColor,
+              variant: AppBarVariant.standard,
+              size: AppBarSize.standard,
               leading: OsmeaComponents.iconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
+                  // Use app router to go back, following cart view pattern
+                  if (context.canPop()) {
+                    context.pop();
                   } else {
-                    goRoute('/home');
+                    context.go('/home');
                   }
                 },
-                variant: ButtonVariant.ghost,
-                size: ButtonSize.medium,
-                backgroundColor: Colors.transparent,
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: foregroundColor,
+                  size: context.iconSizeNormal,
+                ),
               ),
             );
           },
         );
 
-  /// Static helper to get design variant from config (for use in constructor)
-  static AuthDesignVariant _getDesignVariantFromConfigStatic(
-      Map<String, dynamic>? config) {
+  /// Get design variant from config (using 'style' instead of 'design_variant')
+  AuthDesignVariant _getDesignVariantFromConfig(Map<String, dynamic>? config) {
     if (config != null && config.containsKey('ui_style')) {
       final uiStyle = config['ui_style'] as Map<String, dynamic>?;
       if (uiStyle != null) {
-        final variantString = uiStyle['design_variant'] as String?;
-        if (variantString != null) {
-          switch (variantString.toLowerCase()) {
-            case 'startup':
-              return AuthDesignVariant.startup;
-            case 'enterprise':
-            default:
-              return AuthDesignVariant.enterprise;
-          }
-        }
-      }
-    }
-    return AuthDesignVariant.enterprise; // Default
-  }
-
-  /// Get design variant from config
-  AuthDesignVariant _getDesignVariantFromConfig(
-      Map<String, dynamic>? config) {
-    if (config != null && config.containsKey('ui_style')) {
-      final uiStyle = config['ui_style'] as Map<String, dynamic>?;
-      if (uiStyle != null) {
-        final variantString = uiStyle['design_variant'] as String?;
+        // Check for 'style' first (new format), fallback to 'design_variant' for backward compatibility
+        final variantString =
+            uiStyle['style'] as String? ?? uiStyle['design_variant'] as String?;
         if (variantString != null) {
           switch (variantString.toLowerCase()) {
             case 'startup':
