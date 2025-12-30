@@ -65,11 +65,11 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                     uiStyle['design_variant'] as String?;
                 if (variantString != null) {
                   switch (variantString.toLowerCase()) {
-                    case 'space':
-                      variant = AuthDesignVariant.space;
-                      break;
                     case 'startup':
                       variant = AuthDesignVariant.startup;
+                      break;
+                    case 'space':
+                      variant = AuthDesignVariant.space;
                       break;
                     case 'enterprise':
                     default:
@@ -81,17 +81,17 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             }
 
             // Determine colors based on variant
-            // Startup variant uses white background, space uses black background
-            final backgroundColor = variant == AuthDesignVariant.startup
-                ? OsmeaColors.paperWhite // White background for startup
+            // Startup variant uses black background, space uses white background
+            final backgroundColor = variant == AuthDesignVariant.space
+                ? OsmeaColors.paperWhite // White background for space
                 : Colors
-                    .transparent; // Transparent for enterprise and space (colored/black background)
+                    .transparent; // Transparent for enterprise and startup (colored/black background)
 
-            final foregroundColor = variant == AuthDesignVariant.startup
+            final foregroundColor = variant == AuthDesignVariant.space
                 ? OsmeaColors
-                    .thunder // Dark color for startup (white background)
-                : variant == AuthDesignVariant.space
-                    ? Colors.white // White color for space (black background)
+                    .thunder // Dark color for space (white background)
+                : variant == AuthDesignVariant.startup
+                    ? Colors.white // White color for startup (black background)
                     : Colors.white; // White color for enterprise (colored background)
 
             // Get title from config based on current tab
@@ -155,10 +155,10 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             uiStyle['style'] as String? ?? uiStyle['design_variant'] as String?;
         if (variantString != null) {
           switch (variantString.toLowerCase()) {
-            case 'space':
-              return AuthDesignVariant.space;
             case 'startup':
               return AuthDesignVariant.startup;
+            case 'space':
+              return AuthDesignVariant.space;
             case 'enterprise':
             default:
               return AuthDesignVariant.enterprise;

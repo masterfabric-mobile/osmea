@@ -168,7 +168,7 @@ class AuthWidget extends StatelessWidget {
 
         // Build variant-specific design
         switch (designVariant) {
-          case AuthDesignVariant.space:
+          case AuthDesignVariant.startup:
             return _buildSpaceDesign(
               context,
               formState,
@@ -183,7 +183,7 @@ class AuthWidget extends StatelessWidget {
               buttonRadius,
               horizontalPadding,
             );
-          case AuthDesignVariant.startup:
+          case AuthDesignVariant.space:
             return _buildStartupDesign(
               context,
               formState,
