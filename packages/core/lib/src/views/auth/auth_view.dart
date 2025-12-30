@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:core/src/views/auth/widgets/auth_widget.dart';
+import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,24 +48,84 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     this.initialTab = 0,
     this.defaultRedirectPath,
   }) : super(
-          coreAppBar: (context, cubit) => OsmeaComponents.appBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: OsmeaComponents.iconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-              onPressed: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                } else {
-                  goRoute('/home');
-                }
-              },
-              variant: ButtonVariant.ghost,
-              size: ButtonSize.medium,
+          coreAppBar: (context, cubit) {
+            // Get variant from config to determine back button visibility/color
+            final config = cubit.state is AuthFormState 
+                ? (cubit.state as AuthFormState).config 
+                : null;
+            final variant = _getDesignVariantFromConfigStatic(config);
+            
+            // For startup variant, hide the app bar back button (it's in the widget)
+            if (variant == AuthDesignVariant.startup) {
+              return OsmeaComponents.appBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: const SizedBox.shrink(), // Hide back button
+              );
+            }
+            
+            // For other variants, show white back button
+            return OsmeaComponents.appBar(
               backgroundColor: Colors.transparent,
-            ),
-          ),
+              elevation: 0,
+              leading: OsmeaComponents.iconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    goRoute('/home');
+                  }
+                },
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.medium,
+                backgroundColor: Colors.transparent,
+              ),
+            );
+          },
         );
+
+  /// Static helper to get design variant from config (for use in constructor)
+  static AuthDesignVariant _getDesignVariantFromConfigStatic(
+      Map<String, dynamic>? config) {
+    if (config != null && config.containsKey('ui_style')) {
+      final uiStyle = config['ui_style'] as Map<String, dynamic>?;
+      if (uiStyle != null) {
+        final variantString = uiStyle['design_variant'] as String?;
+        if (variantString != null) {
+          switch (variantString.toLowerCase()) {
+            case 'startup':
+              return AuthDesignVariant.startup;
+            case 'enterprise':
+            default:
+              return AuthDesignVariant.enterprise;
+          }
+        }
+      }
+    }
+    return AuthDesignVariant.enterprise; // Default
+  }
+
+  /// Get design variant from config
+  AuthDesignVariant _getDesignVariantFromConfig(
+      Map<String, dynamic>? config) {
+    if (config != null && config.containsKey('ui_style')) {
+      final uiStyle = config['ui_style'] as Map<String, dynamic>?;
+      if (uiStyle != null) {
+        final variantString = uiStyle['design_variant'] as String?;
+        if (variantString != null) {
+          switch (variantString.toLowerCase()) {
+            case 'startup':
+              return AuthDesignVariant.startup;
+            case 'enterprise':
+            default:
+              return AuthDesignVariant.enterprise;
+          }
+        }
+      }
+    }
+    return AuthDesignVariant.enterprise; // Default
+  }
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -276,6 +337,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         onForgotPasswordTap: onForgotPasswordTap,
         config: config,
         initialTab: initialTab,
+        designVariant: _getDesignVariantFromConfig(config),
       ),
     );
   }

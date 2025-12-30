@@ -157,6 +157,8 @@ export 'package:core/src/helper/auth_storage_helper.dart';
 // 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
 export 'package:core/src/views/auth/auth_view.dart';
 
+// 🔐 Exports the auth design variant enum
+export 'package:core/src/views/auth/enums/auth_design_variant.dart';
 
 // 🔐 Exports the auth cubit and state (base implementation)
 export 'package:core/src/views/auth/cubit/auth_cubit.dart';

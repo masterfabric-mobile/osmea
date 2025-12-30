@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
+import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:osmea_components/osmea_components.dart';
 
-/// 🎨 **OSMEA Auth Enterprise Widget**
+/// 🎨 **OSMEA Auth Widget**
 ///
 /// Copyright (c) 2025, OSMEA Team
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
-/// Enterprise authentication style - Professional card-based design with corporate aesthetics
-/// Features: Card layouts, professional typography, corporate color schemes, enterprise styling
+/// Multi-variant authentication widget supporting:
+/// - Enterprise: Professional card-based design with corporate aesthetics
+/// - Startup: Modern, clean e-commerce design
 ///
 /// {@category Widgets}
-/// {@subCategory AuthEnterprise}
+/// {@subCategory Auth}
 
 class AuthWidget extends StatelessWidget {
   final VoidCallback? onSignInSuccess;
@@ -24,6 +27,7 @@ class AuthWidget extends StatelessWidget {
   final VoidCallback? onForgotPasswordTap;
   final Map<String, dynamic>? config;
   final int initialTab;
+  final AuthDesignVariant designVariant;
 
   const AuthWidget({
     super.key,
@@ -34,6 +38,7 @@ class AuthWidget extends StatelessWidget {
     this.onForgotPasswordTap,
     this.config,
     this.initialTab = 0,
+    this.designVariant = AuthDesignVariant.enterprise,
   });
 
   String _getConfigValue(String section, String key, String fallback) {
@@ -162,47 +167,66 @@ class AuthWidget extends StatelessWidget {
             (uiStyleConfig?['horizontal_padding'] as num?)?.toDouble() ??
                 context.spacing24;
 
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
-          child: OsmeaComponents.container(
-            color: backgroundColor,
-            child: SafeArea(
-              bottom: false,
-              child: OsmeaComponents.column(
-                children: [
-                  // 📱 Simple header with logo
-                  _buildSimpleHeader(
-                    context,
-                    logoUrl,
-                    logoWidth,
-                    logoHeight,
-                    appName,
-                  ),
-
-                  // 📄 Main content area with card layout
-                  Expanded(
-                    child: _buildCardContent(
-                      context,
-                      formState,
-                      cubit,
-                      currentTab,
-                      primaryColor,
-                      tabContainerRadius,
-                      tabItemRadius,
-                      buttonRadius,
-                      contentAreaTopRadius,
-                      horizontalPadding,
-                    ),
-                  ),
-                ],
+        // Build variant-specific design
+        switch (designVariant) {
+          case AuthDesignVariant.startup:
+            return _buildStartupDesign(
+              context,
+              formState,
+              cubit,
+              currentTab,
+              primaryColor,
+              backgroundColor,
+              logoUrl,
+              logoWidth,
+              logoHeight,
+              appName,
+              buttonRadius,
+              horizontalPadding,
+            );
+          case AuthDesignVariant.enterprise:
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.dark,
               ),
-            ),
-          ),
-        );
+              child: OsmeaComponents.container(
+                color: backgroundColor,
+                child: SafeArea(
+                  bottom: false,
+                  child: OsmeaComponents.column(
+                    children: [
+                      // 📱 Simple header with logo
+                      _buildSimpleHeader(
+                        context,
+                        logoUrl,
+                        logoWidth,
+                        logoHeight,
+                        appName,
+                      ),
+
+                      // 📄 Main content area with card layout
+                      Expanded(
+                        child: _buildCardContent(
+                          context,
+                          formState,
+                          cubit,
+                          currentTab,
+                          primaryColor,
+                          tabContainerRadius,
+                          tabItemRadius,
+                          buttonRadius,
+                          contentAreaTopRadius,
+                          horizontalPadding,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+        }
       },
     );
   }
@@ -753,6 +777,532 @@ class AuthWidget extends StatelessWidget {
               : ButtonState.enabled),
       fullWidth: true,
       backgroundColor: primaryColor,
+      textColor: OsmeaColors.white,
+      borderRadius: buttonRadius,
+    );
+  }
+
+  // ============================================================================
+  // STARTUP DESIGN VARIANT
+  // ============================================================================
+
+  /// ⚡ Startup Design - Modern, clean e-commerce design
+  Widget _buildStartupDesign(
+    BuildContext context,
+    AuthFormState formState,
+    AuthCubit cubit,
+    int currentTab,
+    Color primaryColor,
+    Color backgroundColor,
+    String? logoUrl,
+    double logoWidth,
+    double logoHeight,
+    String appName,
+    double buttonRadius,
+    double horizontalPadding,
+  ) {
+    // Use orange color for startup variant
+    final startupPrimaryColor = OsmeaColors.sunsetGlow;
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: OsmeaComponents.container(
+        color: OsmeaColors.white,
+        child: SafeArea(
+          top: false, // Remove top safe area padding
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: horizontalPadding,
+                  right: horizontalPadding,
+                  top: context.spacing64, // Top padding for title
+                ),
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Title
+                    _buildStartupTitle(context, currentTab),
+                OsmeaComponents.sizedBox(height: context.spacing64),
+                // Form Content
+                currentTab == 0
+                    ? _buildStartupSignInContent(
+                        context, formState, cubit, buttonRadius, startupPrimaryColor)
+                    : _buildStartupSignUpContent(
+                        context, formState, cubit, buttonRadius, startupPrimaryColor),
+                OsmeaComponents.sizedBox(height: context.spacing32),
+                // Back to Home button (only on Sign In page)
+                if (currentTab == 0) ...[
+                  _buildStartupBackToHomeButton(context, startupPrimaryColor, buttonRadius),
+                  OsmeaComponents.sizedBox(height: context.spacing16),
+                ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🎨 Startup Logo
+  Widget _buildStartupLogo(
+    BuildContext context,
+    String? logoUrl,
+    double logoWidth,
+    double logoHeight,
+    String appName,
+  ) {
+    return OsmeaComponents.center(
+      child: logoUrl != null
+          ? OsmeaComponents.image(
+              imageUrl: logoUrl,
+              width: logoWidth * 0.7,
+              height: logoHeight * 0.7,
+              fit: BoxFit.contain,
+            )
+          : OsmeaComponents.text(
+              appName,
+              variant: OsmeaTextVariant.headlineMedium,
+              color: OsmeaColors.thunder,
+              fontWeight: FontWeight.w700,
+            ),
+    );
+  }
+
+  /// 📝 Startup Title
+  Widget _buildStartupTitle(BuildContext context, int currentTab) {
+    final title = currentTab == 0
+        ? _getConfigValue('sign_in', 'title', 'Sign In to Your Account')
+        : _getConfigValue('sign_up', 'title', 'Create Your Account');
+    
+    return OsmeaComponents.text(
+      title,
+      variant: OsmeaTextVariant.headlineSmall,
+      color: OsmeaColors.thunder,
+      fontWeight: FontWeight.w600,
+      textAlign: TextAlign.center,
+    );
+  }
+
+  /// 🏠 Startup Back to Home Button
+  Widget _buildStartupBackToHomeButton(
+    BuildContext context,
+    Color primaryColor,
+    double buttonRadius,
+  ) {
+    return OsmeaComponents.button(
+      text: 'Back to Home',
+      onPressed: () {
+        GoRouter.of(context).go('/home');
+      },
+      variant: ButtonVariant.outlined,
+      backgroundColor: Colors.transparent,
+      textColor: OsmeaColors.nordicBlue,
+      borderColor: OsmeaColors.nordicBlue,
+      borderRadius: buttonRadius,
+      icon: Icon(
+        Icons.home_rounded,
+        color: OsmeaColors.nordicBlue,
+        size: 20,
+      ),
+    );
+  }
+
+  /// 📧 Startup Sign In Content
+  Widget _buildStartupSignInContent(
+    BuildContext context,
+    AuthFormState formState,
+    AuthCubit cubit,
+    double buttonRadius,
+    Color primaryColor,
+  ) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildStartupEmailField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupPasswordField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing32),
+        _buildStartupSignInButton(
+            context, formState, cubit, buttonRadius, primaryColor),
+        OsmeaComponents.sizedBox(height: context.spacing16),
+        if (onForgotPasswordTap != null)
+          _buildStartupForgotPasswordButton(
+              context, primaryColor, buttonRadius),
+        // Sign Up link
+        if (cubit.signUpCallback != null) ...[
+          OsmeaComponents.sizedBox(height: context.spacing24),
+          _buildStartupSignUpLink(context, cubit),
+        ],
+      ],
+    );
+  }
+
+  /// 📝 Startup Sign Up Content
+  Widget _buildStartupSignUpContent(
+    BuildContext context,
+    AuthFormState formState,
+    AuthCubit cubit,
+    double buttonRadius,
+    Color primaryColor,
+  ) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildStartupSignUpEmailField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupSignUpPasswordField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupSignUpPasswordConfirmField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupSignUpFirstNameField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupSignUpLastNameField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing32),
+        ..._buildDynamicChecklists(context, formState, cubit, primaryColor),
+        OsmeaComponents.sizedBox(height: context.spacing32),
+        _buildStartupSignUpButton(
+            context, formState, cubit, buttonRadius, primaryColor),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildStartupSignInLink(context, cubit),
+      ],
+    );
+  }
+
+  /// 🔗 Startup Sign In Link (for Sign Up page)
+  Widget _buildStartupSignInLink(BuildContext context, AuthCubit cubit) {
+    return OsmeaComponents.center(
+      child: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          OsmeaComponents.text(
+            'Already have an account? ',
+            variant: OsmeaTextVariant.bodyMedium,
+            color: OsmeaColors.pewter,
+          ),
+          GestureDetector(
+            onTap: () => _switchTab(context, 0, cubit),
+            child: OsmeaComponents.text(
+              'Sign In',
+              variant: OsmeaTextVariant.bodyMedium,
+              color: OsmeaColors.nordicBlue,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================================
+  // STARTUP VARIANT FIELD BUILDERS
+  // ============================================================================
+
+  Widget _buildStartupEmailField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_in', 'email_label', 'Email'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_in_email_field'),
+          hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (value) {
+            cubit.updateSignInEmail(value);
+          },
+          errorText: state.signInEmailError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupPasswordField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_in', 'password_label', 'Password'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_in_password_field'),
+          hint: _getConfigValue(
+              'sign_in', 'password_hint', 'Enter your password'),
+          obscureText: state.signInObscurePassword,
+          onChanged: cubit.updateSignInPassword,
+          errorText: state.signInPasswordError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+          suffixIcon: IconButton(
+            icon: Icon(
+              state.signInObscurePassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              color: OsmeaColors.slate,
+              size: context.iconSizeSmall,
+            ),
+            onPressed: cubit.toggleSignInPasswordVisibility,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignInButton(BuildContext context, AuthFormState state,
+      AuthCubit cubit, double buttonRadius, Color primaryColor) {
+    final isLoading = state.operationStatus == AuthOperationStatus.loading;
+    final isEnabled = state.isSignInValid && !isLoading;
+
+    return OsmeaComponents.button(
+      text: isLoading
+          ? _getConfigValue(
+              'sign_in', 'sign_in_button_loading', 'Signing in...')
+          : _getConfigValue('sign_in', 'sign_in_button', 'Continue'),
+      onPressed: isEnabled ? cubit.signIn : null,
+      variant: ButtonVariant.primary,
+      size: ButtonSize.medium,
+      state: isLoading ? ButtonState.loading : ButtonState.enabled,
+      fullWidth: true,
+      backgroundColor: OsmeaColors.nordicBlue,
+      textColor: Colors.white,
+      borderRadius: buttonRadius,
+    );
+  }
+
+  Widget _buildStartupForgotPasswordButton(
+      BuildContext context, Color primaryColor, double buttonRadius) {
+    return OsmeaComponents.button(
+      text: _getConfigValue(
+          'sign_in', 'forgot_password_label', 'Forgot Password?'),
+      onPressed: onForgotPasswordTap,
+      variant: ButtonVariant.outlined,
+      size: ButtonSize.large,
+      fullWidth: true,
+      backgroundColor: OsmeaColors.white,
+      textColor: primaryColor,
+      borderColor: primaryColor,
+      borderRadius: buttonRadius,
+    );
+  }
+
+  /// 🔗 Startup Sign Up Link
+  Widget _buildStartupSignUpLink(BuildContext context, AuthCubit cubit) {
+    return OsmeaComponents.center(
+      child: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          OsmeaComponents.text(
+            'Don\'t have an account? ',
+            variant: OsmeaTextVariant.bodyMedium,
+            color: OsmeaColors.pewter,
+          ),
+          GestureDetector(
+            onTap: () => _switchTab(context, 1, cubit),
+            child: OsmeaComponents.text(
+              'Sign Up',
+              variant: OsmeaTextVariant.bodyMedium,
+              color: OsmeaColors.nordicBlue,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStartupSignUpEmailField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_up', 'email_label', 'Email'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_up_email_field'),
+          hint: _getConfigValue('sign_up', 'email_hint', 'Enter your email'),
+          keyboardType: TextInputType.emailAddress,
+          onChanged: cubit.updateSignUpEmail,
+          errorText: state.signUpEmailError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignUpPasswordField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_up', 'password_label', 'Password'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_up_password_field'),
+          hint: _getConfigValue(
+              'sign_up', 'password_hint', 'Enter your password'),
+          obscureText: state.signUpObscurePassword,
+          onChanged: cubit.updateSignUpPassword,
+          errorText: state.signUpPasswordError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+          suffixIcon: IconButton(
+            icon: Icon(
+              state.signUpObscurePassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              color: OsmeaColors.slate,
+              size: context.iconSizeSmall,
+            ),
+            onPressed: cubit.toggleSignUpPasswordVisibility,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignUpPasswordConfirmField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_up', 'password_confirm_label', 'Confirm Password'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_up_password_confirm_field'),
+          hint: _getConfigValue(
+              'sign_up', 'password_confirm_hint', 'Confirm your password'),
+          obscureText: state.signUpObscurePasswordConfirm,
+          onChanged: cubit.updateSignUpPasswordConfirm,
+          errorText: state.signUpPasswordConfirmError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+          suffixIcon: IconButton(
+            icon: Icon(
+              state.signUpObscurePasswordConfirm
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              color: OsmeaColors.slate,
+              size: context.iconSizeSmall,
+            ),
+            onPressed: cubit.toggleSignUpPasswordConfirmVisibility,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignUpFirstNameField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_up', 'first_name_label', 'First Name'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_up_first_name_field'),
+          hint: _getConfigValue(
+              'sign_up', 'first_name_hint', 'Enter your first name'),
+          onChanged: cubit.updateSignUpFirstName,
+          errorText: state.signUpFirstNameError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignUpLastNameField(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.text(
+          _getConfigValue('sign_up', 'last_name_label', 'Last Name'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w500,
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        OsmeaComponents.textField(
+          key: const Key('sign_up_last_name_field'),
+          hint: _getConfigValue(
+              'sign_up', 'last_name_hint', 'Enter your last name'),
+          onChanged: cubit.updateSignUpLastName,
+          errorText: state.signUpLastNameError,
+          enabled: state.operationStatus != AuthOperationStatus.loading,
+          backgroundColor: OsmeaColors.ash,
+          variant: TextFieldVariant.filled,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupSignUpButton(BuildContext context, AuthFormState state,
+      AuthCubit cubit, double buttonRadius, Color primaryColor) {
+    final isLoading = state.operationStatus == AuthOperationStatus.loading;
+    final isEnabled =
+        state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    return OsmeaComponents.button(
+      text: isLoading
+          ? _getConfigValue(
+              'sign_up', 'sign_up_button_loading', 'Creating account...')
+          : _getConfigValue('sign_up', 'sign_up_button', 'Create Account'),
+      onPressed: isEnabled ? cubit.signUp : null,
+      variant: ButtonVariant.primary,
+      size: ButtonSize.medium,
+      state: isLoading
+          ? ButtonState.loading
+          : (cubit.signUpCallback == null
+              ? ButtonState.disabled
+              : ButtonState.enabled),
+      fullWidth: true,
+      backgroundColor: OsmeaColors.nordicBlue,
       textColor: OsmeaColors.white,
       borderRadius: buttonRadius,
     );
