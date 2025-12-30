@@ -335,6 +335,7 @@
     },
     "auth_configuration": {
       "ui_style": {
+        "style": "startup",
         "tab_container_radius": 12,
         "tab_item_radius": 10,
         "button_radius": 12,
