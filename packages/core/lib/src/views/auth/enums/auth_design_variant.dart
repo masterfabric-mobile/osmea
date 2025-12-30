@@ -12,6 +12,7 @@
 /// **Variants:**
 /// - `enterprise`: Professional, corporate design with card-based layout
 /// - `startup`: Modern, clean design inspired by e-commerce platforms
+/// - `space`: Bold, minimalist black and white design with high contrast
 ///
 /// **Usage:**
 /// ```dart
@@ -35,5 +36,12 @@ enum AuthDesignVariant {
   /// - Minimal form design
   /// - Use for: Consumer apps, e-commerce, modern platforms
   startup,
+
+  /// 🚀 **Space** - Bold, minimalist black and white design
+  /// - High contrast black background
+  /// - White cards and form elements
+  /// - Minimalist typography
+  /// - Use for: Modern apps, tech products, bold brand identity
+  space,
 }
 

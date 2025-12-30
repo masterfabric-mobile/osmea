@@ -65,6 +65,9 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                     uiStyle['design_variant'] as String?;
                 if (variantString != null) {
                   switch (variantString.toLowerCase()) {
+                    case 'space':
+                      variant = AuthDesignVariant.space;
+                      break;
                     case 'startup':
                       variant = AuthDesignVariant.startup;
                       break;
@@ -78,17 +81,18 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             }
 
             // Determine colors based on variant
-            // Startup variant uses white background, enterprise uses colored background
+            // Startup variant uses white background, space uses black background
             final backgroundColor = variant == AuthDesignVariant.startup
                 ? OsmeaColors.paperWhite // White background for startup
                 : Colors
-                    .transparent; // Transparent for enterprise (colored background)
+                    .transparent; // Transparent for enterprise and space (colored/black background)
 
             final foregroundColor = variant == AuthDesignVariant.startup
                 ? OsmeaColors
                     .thunder // Dark color for startup (white background)
-                : Colors
-                    .white; // White color for enterprise (colored background)
+                : variant == AuthDesignVariant.space
+                    ? Colors.white // White color for space (black background)
+                    : Colors.white; // White color for enterprise (colored background)
 
             // Get title from config based on current tab
             final currentTab = cubit.state is AuthFormState
@@ -151,6 +155,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             uiStyle['style'] as String? ?? uiStyle['design_variant'] as String?;
         if (variantString != null) {
           switch (variantString.toLowerCase()) {
+            case 'space':
+              return AuthDesignVariant.space;
             case 'startup':
               return AuthDesignVariant.startup;
             case 'enterprise':
