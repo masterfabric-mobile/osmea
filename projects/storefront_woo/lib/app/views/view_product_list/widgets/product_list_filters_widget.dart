@@ -84,9 +84,9 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
     String selectedOrder,
   ) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing20,
-        vertical: context.spacing12,
+      padding: EdgeInsets.only(
+        top: context.spacing12,
+        bottom: context.spacing12,
       ),
       child: SortOptionsWidget(
         viewModel: widget.viewModel,
@@ -99,9 +99,9 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
   /// Build filtering tab content
   Widget _buildFilteringContent(BuildContext context, dynamic tempFilters) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing20,
-        vertical: context.spacing12,
+      padding: EdgeInsets.only(
+        top: context.spacing12,
+        bottom: context.spacing12,
       ),
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,

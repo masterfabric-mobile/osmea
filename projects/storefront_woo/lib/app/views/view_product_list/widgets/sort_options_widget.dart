@@ -24,6 +24,7 @@ class SortOptionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SortOptionWidget(
           viewModel: viewModel,

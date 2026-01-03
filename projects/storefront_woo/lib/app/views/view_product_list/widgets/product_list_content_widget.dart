@@ -298,57 +298,25 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       context: context,
       size: BottomSheetSize.medium,
       title: 'Sort by',
-      subtitle: null,
+      subtitle: 'Select how you want to sort the products',
       backgroundColor: OsmeaColors.white,
-      headerActions: [
-        BlocBuilder<ProductListViewModel, ProductListState>(
-          bloc: widget.viewModel,
-          builder: (context, state) {
-            final tempFilters = widget.viewModel.tempFilters;
-            final selectedSortBy = tempFilters.orderBy ?? 'date';
-            final selectedOrder = tempFilters.order ?? 'desc';
-            final isDefaultSort =
-                selectedSortBy == 'date' && selectedOrder == 'desc';
-
-            if (isDefaultSort) {
-              return OsmeaComponents.button(
-                text: 'Apply',
-                onPressed: () {
-                  widget.viewModel.applyFilters();
-                  Navigator.pop(context);
-                },
-                variant: ButtonVariant.ghost,
-                size: ButtonSize.small,
-              );
-            }
-            return OsmeaComponents.row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OsmeaComponents.button(
-                  text: 'Clear all',
-                  onPressed: () {
-                    widget.viewModel.updateTempFilter(
-                      orderBy: 'date',
-                      order: 'desc',
-                    );
-                  },
-                  variant: ButtonVariant.ghost,
-                  size: ButtonSize.small,
-                ),
-                OsmeaComponents.button(
-                  text: 'Apply',
-                  onPressed: () {
-                    widget.viewModel.applyFilters();
-                    Navigator.pop(context);
-                  },
-                  variant: ButtonVariant.ghost,
-                  size: ButtonSize.small,
-                ),
-              ],
-            );
-          },
-        ),
-      ],
+      leftAction: OsmeaComponents.button(
+        text: 'Cancel',
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.small,
+      ),
+      rightAction: OsmeaComponents.button(
+        text: 'Apply',
+        onPressed: () {
+          widget.viewModel.applyFilters();
+          Navigator.pop(context);
+        },
+        variant: ButtonVariant.primary,
+        size: ButtonSize.small,
+      ),
       child: ProductListFiltersWidget(
         viewModel: widget.viewModel,
         showOnlySort: true,
@@ -366,47 +334,30 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       context: context,
       size: BottomSheetSize.large,
       title: 'Filters',
+      subtitle: 'Filter products by categories, price, and more',
       backgroundColor: OsmeaColors.white,
-      headerActions: [
-        BlocBuilder<ProductListViewModel, ProductListState>(
-          bloc: widget.viewModel,
-          builder: (context, state) {
-            if (!widget.viewModel.hasTempFilters()) {
-              return OsmeaComponents.button(
-                text: 'Apply',
-                onPressed: () {
-                  widget.viewModel.applyFilters();
-                  Navigator.pop(context);
-                },
-                variant: ButtonVariant.ghost,
-                size: ButtonSize.small,
-              );
-            }
-            return OsmeaComponents.row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OsmeaComponents.button(
-                  text: 'Clear all',
-                  onPressed: () {
-                    widget.viewModel.clearFilters();
-                  },
-                  variant: ButtonVariant.ghost,
-                  size: ButtonSize.small,
-                ),
-                OsmeaComponents.button(
-                  text: 'Apply',
-                  onPressed: () {
-                    widget.viewModel.applyFilters();
-                    Navigator.pop(context);
-                  },
-                  variant: ButtonVariant.ghost,
-                  size: ButtonSize.small,
-                ),
-              ],
-            );
-          },
-        ),
-      ],
+      leftAction: OsmeaComponents.button(
+        text: 'Cancel',
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.small,
+      ),
+      rightAction: BlocBuilder<ProductListViewModel, ProductListState>(
+        bloc: widget.viewModel,
+        builder: (context, state) {
+          return OsmeaComponents.button(
+            text: 'Apply',
+            onPressed: () {
+              widget.viewModel.applyFilters();
+              Navigator.pop(context);
+            },
+            variant: ButtonVariant.primary,
+            size: ButtonSize.small,
+          );
+        },
+      ),
       child: ProductListFiltersWidget(
         viewModel: widget.viewModel,
         showOnlySort: false,

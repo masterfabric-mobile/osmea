@@ -36,34 +36,40 @@ class SortOptionWidget extends StatelessWidget {
         onTap: () {
           viewModel.updateTempFilter(orderBy: orderBy, order: order);
         },
-        borderRadius: BorderRadius.circular(context.spacing12),
+        borderRadius: BorderRadius.circular(7),
         child: Container(
+          width: double.infinity,
           padding: EdgeInsets.symmetric(
-            horizontal: context.spacing16,
-            vertical: context.spacing12,
+            horizontal: context.spacing20,
+            vertical: context.spacing16,
           ),
           decoration: BoxDecoration(
             color: isSelected
                 ? OsmeaColors.nordicBlue.withOpacity(0.08)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(context.spacing8),
+            border: isSelected
+                ? Border.all(
+                    color: OsmeaColors.nordicBlue,
+                    width: 1,
+                  )
+                : null,
+            borderRadius: BorderRadius.circular(7),
           ),
           child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: OsmeaComponents.text(
-                  label,
-                  textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                    color: isSelected
-                        ? OsmeaColors.nordicBlue
-                        : OsmeaColors.thunder,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  ),
+              OsmeaComponents.text(
+                label,
+                textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                  color: isSelected
+                      ? OsmeaColors.nordicBlue
+                      : OsmeaColors.thunder,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
-              if (isSelected)
+              if (isSelected) ...[
+                SizedBox(width: context.spacing8),
                 Container(
                   padding: EdgeInsets.all(context.spacing4),
                   decoration: BoxDecoration(
@@ -76,6 +82,7 @@ class SortOptionWidget extends StatelessWidget {
                     size: context.iconSizeSmall,
                   ),
                 ),
+              ],
             ],
           ),
         ),
