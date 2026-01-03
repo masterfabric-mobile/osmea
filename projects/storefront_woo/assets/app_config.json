@@ -16,7 +16,7 @@
   "woocommerce_configuration": {
     "store_url": "https://example.com",
     "brand_name": "example",  
-    "auth_key": "THISISMySpeCiaLAUthCodeExampleExample",
+    "auth_key": "THISISMySpeCiaLAUthCodeexampleexample",
     "version": "v1",
     "verify_ssl": true,
     "query_string_auth": false,
@@ -447,24 +447,24 @@
         },
         "items": [
           {
-            "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
-            "title": "Summer Collection",
-            "subtitle": "New Arrivals",
-            "text": "Discover the latest fashion trends",
+            "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800",
+            "title": "Fashion Collection",
+            "subtitle": "Latest Styles",
+            "text": "Discover the newest fashion trends",
             "route": "/products"
           },
           {
-            "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800",
-            "title": "Special Offers",
+            "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
+            "title": "Super Sale",
             "subtitle": "Limited Time",
-            "text": "Up to 50% off on selected items",
+            "text": "Up to 70% off on selected items",
             "category_id": 1
           },
           {
             "imageUrl": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800",
-            "title": "Premium Quality",
-            "subtitle": "Best Products",
-            "text": "Shop the finest selection",
+            "title": "Premium Products",
+            "subtitle": "Best Sellers",
+            "text": "Shop our curated premium collection",
             "product_id": 1
           }
         ]
@@ -477,17 +477,16 @@
         "height": "short",
         "items": [
           {
-            "title": "Common Promo",
-            "subtitle": "Enjoy special offers",
+            "title": "Free Shipping",
+            "subtitle": "On orders over $50",
             "background_color": "#F3E8FF",
             "text_color": "#1F2937",
             "accent_color": "#9333EA",
             "route": "/products"
           },
-         
           {
-            "title": "Special Deal",
-            "subtitle": "Limited time offer",
+            "title": "Special Discount",
+            "subtitle": "Up to 40% off",
             "background_color": "#DBEAFE",
             "text_color": "#1F2937",
             "accent_color": "#9333EA",
@@ -509,34 +508,34 @@
         },
         "items": [
           {
-            "imageUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400",
-            "title": "New Year Gift Guide",
-            "subtitle": "Special Offers",
+            "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400",
+            "title": "Fashion & Apparel",
+            "subtitle": "New Collection",
             "category_id": 1
           },
           {
             "imageUrl": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
-            "title": "Mobile Phones & Accessories",
-            "subtitle": "Discover Discounts",
+            "title": "Electronics",
+            "subtitle": "Best Deals",
             "category_id": 2
           },
           {
             "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
-            "title": "Computers & Equipment",
-            "subtitle": "Special Prices",
+            "title": "Home & Living",
+            "subtitle": "Special Offers",
             "category_id": 3
           },
           {
             "imageUrl": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400",
-            "title": "Vehicle Needs",
-            "subtitle": "Special Prices",
+            "title": "Sports & Outdoors",
+            "subtitle": "Great Prices",
             "category_id": 4
           }
         ]
       },
       "deals_of_day": {
         "enabled": true,
-        "order_id": 5,
+        "order_id": 8,
         "title": "Deals of the Day",
         "limit": 10,
         "padding": {
@@ -547,10 +546,95 @@
       },
       "recommended": {
         "enabled": true,
-        "order_id": 6,
+        "order_id": 10,
         "title": "Recommended for you",
         "limit": 4,
         "product_ids": [],
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
+      },
+      "campaign_alert": {
+        "enabled": true,
+        "order_id": 6,
+        "title": "Special Offer",
+        "message": "Limited time offer - Shop now!",
+        "end_time": "2026-02-14T23:59:59Z",
+        "background_color": "#FF4444",
+        "text_color": "#FFFFFF",
+        "route": "/products",
+        "category_id": null,
+        "product_id": null,
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
+      },
+      "flash_sale": {
+        "enabled": true,
+        "order_id": 9,
+        "title": "Flash Sale",
+        "limit": 10,
+        "end_time": "2026-02-01T23:59:59Z",
+        "product_ids": [],
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
+      },
+      "brands": {
+        "enabled": true,
+        "order_id": 7,
+        "title": "Shop by Brand",
+        "layout": "grid",
+        "brands": [
+          {
+            "id": 1,
+            "name": "Nike",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/04/Nike-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/04/Nike-Logo.png",
+            "route": "/products?brand=1"
+          },
+          {
+            "id": 2,
+            "name": "Adidas",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/04/Adidas-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/04/Adidas-Logo.png",
+            "route": "/products?brand=2"
+          },
+          {
+            "id": 3,
+            "name": "Puma",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/04/Puma-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/04/Puma-Logo.png",
+            "route": "/products?brand=3"
+          },
+          {
+            "id": 4,
+            "name": "Apple",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/04/Apple-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/04/Apple-Logo.png",
+            "route": "/products?brand=4"
+          },
+          {
+            "id": 5,
+            "name": "Samsung",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/06/Samsung-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/06/Samsung-Logo.png",
+            "route": "/products?brand=5"
+          },
+          {
+            "id": 6,
+            "name": "Sony",
+            "logo_url": "https://logos-world.net/wp-content/uploads/2020/04/Sony-Logo.png",
+            "image_url": "https://logos-world.net/wp-content/uploads/2020/04/Sony-Logo.png",
+            "route": "/products?brand=6"
+          }
+        ],
         "padding": {
           "top": 0,
           "bottom": 16,
@@ -575,8 +659,8 @@
       "bottom_foreground_banner": {
         "enabled": true,
         "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
-        "title": "Special Offer",
-        "description": "Get up to 50% off on selected items",
+        "title": "Limited Time Offer",
+        "description": "Get up to 60% off on selected items",
         "height": 60,
         "border_radius": 12,
         "image_opacity": 0.4,

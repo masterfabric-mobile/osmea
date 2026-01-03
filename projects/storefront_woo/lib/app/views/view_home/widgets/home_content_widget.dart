@@ -20,6 +20,9 @@ import 'package:storefront_woo/app/views/view_home/widgets/campaign_card_widget.
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/promotional_bar_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/bottom_foreground_banner_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/flash_sale_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/brands_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/campaign_alert_widget.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home component model with orderID
@@ -231,6 +234,48 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
             viewModel: widget.viewModel,
           ),
           name: 'recommended',
+        ),
+      );
+    }
+
+    // Campaign Alert section
+    if (_isEnabled(configHelper, 'campaign_alert')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'campaign_alert'),
+          widget: CampaignAlertWidget(
+            configHelper: configHelper,
+          ),
+          name: 'campaign_alert',
+        ),
+      );
+    }
+
+    // Flash Sale section
+    if (_isEnabled(configHelper, 'flash_sale')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'flash_sale'),
+          widget: FlashSaleSectionWidget(
+            configHelper: configHelper,
+            allProducts: widget.state.products,
+            viewModel: widget.viewModel,
+          ),
+          name: 'flash_sale',
+        ),
+      );
+    }
+
+    // Brands section
+    if (_isEnabled(configHelper, 'brands')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'brands'),
+          widget: BrandsSectionWidget(
+            configHelper: configHelper,
+            viewModel: widget.viewModel,
+          ),
+          name: 'brands',
         ),
       );
     }

@@ -61,7 +61,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
       final config = configHelper.getObject('home_view.$componentName');
       return config?['order_id'] as int? ?? 999;
     } catch (e) {
-      debugPrint('⚠️ Failed to load order_id for $componentName: $e');
+      debugPrint('Failed to load order_id for $componentName: $e');
       return 999;
     }
   }
@@ -72,7 +72,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
       final config = configHelper.getObject('home_view.$componentName');
       return config?['enabled'] as bool? ?? true;
     } catch (e) {
-      debugPrint('⚠️ Failed to load enabled for $componentName: $e');
+      debugPrint('Failed to load enabled for $componentName: $e');
       return true;
     }
   }
@@ -155,6 +155,39 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
           orderId: _getOrderId(configHelper, 'recommended'),
           widget: _buildProductsGridSkeleton(context),
           name: 'recommended',
+        ),
+      );
+    }
+
+    // Campaign alert skeleton
+    if (_isEnabled(configHelper, 'campaign_alert')) {
+      components.add(
+        _SkeletonComponent(
+          orderId: _getOrderId(configHelper, 'campaign_alert'),
+          widget: _buildCampaignAlertSkeleton(context),
+          name: 'campaign_alert',
+        ),
+      );
+    }
+
+    // Flash sale skeleton
+    if (_isEnabled(configHelper, 'flash_sale')) {
+      components.add(
+        _SkeletonComponent(
+          orderId: _getOrderId(configHelper, 'flash_sale'),
+          widget: _buildFlashSaleSkeleton(context),
+          name: 'flash_sale',
+        ),
+      );
+    }
+
+    // Brands skeleton
+    if (_isEnabled(configHelper, 'brands')) {
+      components.add(
+        _SkeletonComponent(
+          orderId: _getOrderId(configHelper, 'brands'),
+          widget: _buildBrandsSkeleton(context),
+          name: 'brands',
         ),
       );
     }
@@ -269,7 +302,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
             return 100.0; // Default: medium
         }
       } catch (e) {
-        debugPrint('⚠️ Failed to load height from config: $e');
+        debugPrint('Failed to load height from config: $e');
         return 100.0; // Default: medium
       }
     }
@@ -458,6 +491,251 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
           );
         },
       ),
+    );
+  }
+
+  Widget _buildCampaignAlertSkeleton(BuildContext context) {
+    return OsmeaComponents.padding(
+      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+      child: _ShimmerContainer(
+        animation: _controller,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing16,
+            vertical: context.spacing12,
+          ),
+          decoration: BoxDecoration(
+            color: OsmeaColors.grayMaterial[200],
+            borderRadius: BorderRadius.circular(context.spacing12),
+          ),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 18,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.grayMaterial[300],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: context.spacing4),
+                    Container(
+                      height: 14,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.grayMaterial[300],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              OsmeaComponents.sizedBox(width: context.spacing12),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.spacing12,
+                  vertical: context.spacing8,
+                ),
+                decoration: BoxDecoration(
+                  color: OsmeaColors.grayMaterial[300],
+                  borderRadius: BorderRadius.circular(context.spacing8),
+                ),
+                child: Container(
+                  height: 20,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[400],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlashSaleSkeleton(BuildContext context) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OsmeaComponents.row(
+                children: [
+                  Container(
+                    height: 20,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing8),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing8,
+                      vertical: context.spacing4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[200],
+                      borderRadius: BorderRadius.circular(context.spacing8),
+                    ),
+                    child: Container(
+                      height: 16,
+                      width: 70,
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.grayMaterial[300],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                height: 16,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.grayMaterial[200],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing16),
+        // Product carousel skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          child: SizedBox(
+            height: context.height160 + context.spacing10 + context.height80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                return _ShimmerContainer(
+                  animation: _controller,
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      right: index < 2 ? context.spacing8 : 0,
+                    ),
+                    width: (context.allWidth - (context.spacing20 * 2) - context.spacing16) / 2,
+                    child: OsmeaComponents.column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: context.height160 + context.spacing10,
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.grayMaterial[200],
+                            borderRadius: context.borderRadiusNormal,
+                          ),
+                        ),
+                        OsmeaComponents.sizedBox(height: context.spacing8),
+                        OsmeaComponents.padding(
+                          padding: context.onlyLeftPaddingLow,
+                          child: OsmeaComponents.column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 16,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  color: OsmeaColors.grayMaterial[300],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              OsmeaComponents.sizedBox(height: context.spacing4),
+                              Container(
+                                height: 14,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: OsmeaColors.grayMaterial[300],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBrandsSkeleton(BuildContext context) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 20,
+                width: 120,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.grayMaterial[200],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              Container(
+                height: 16,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.grayMaterial[200],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing16),
+        // Brands grid skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          child: Wrap(
+            spacing: context.spacing16,
+            runSpacing: context.height16,
+            children: List.generate(6, (index) {
+              return _ShimmerContainer(
+                animation: _controller,
+                child: SizedBox(
+                  width: (context.allWidth - (context.spacing20 * 2) - (context.spacing16 * 2)) / 3,
+                  child: Container(
+                    height: context.height80,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[200],
+                      borderRadius: BorderRadius.circular(context.spacing12),
+                      border: Border.all(
+                        color: OsmeaColors.silver.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
     );
   }
 }
