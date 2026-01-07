@@ -1,124 +1,524 @@
-/* OSMEA App Config Manager - Admin Styles */
+/* OSMEA App Config Manager - Modern Admin Styles */
+
+/* Force override WordPress defaults */
+body.wp-admin .osmea-config-wrap,
+body.admin-color .osmea-config-wrap,
+#wpbody-content .osmea-config-wrap {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+
+:root {
+    --osmea-primary: #2563eb;
+    --osmea-primary-hover: #1d4ed8;
+    --osmea-primary-light: #dbeafe;
+    --osmea-success: #10b981;
+    --osmea-success-light: #d1fae5;
+    --osmea-error: #ef4444;
+    --osmea-error-light: #fee2e2;
+    --osmea-warning: #f59e0b;
+    --osmea-warning-light: #fef3c7;
+    --osmea-gray-50: #f9fafb;
+    --osmea-gray-100: #f3f4f6;
+    --osmea-gray-200: #e5e7eb;
+    --osmea-gray-300: #d1d5db;
+    --osmea-gray-600: #4b5563;
+    --osmea-gray-700: #374151;
+    --osmea-gray-800: #1f2937;
+    --osmea-gray-900: #111827;
+    --osmea-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --osmea-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --osmea-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --osmea-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --osmea-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --osmea-radius: 8px;
+    --osmea-radius-lg: 12px;
+    --osmea-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 .osmea-config-wrap {
-    max-width: 1200px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.osmea-config-header {
-    background: #fff;
-    border: 1px solid #ccd0d4;
-    border-radius: 4px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+/* Header Section */
+body.wp-admin .osmea-config-header,
+.osmea-config-wrap .osmea-config-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
+    border: 1px solid var(--osmea-gray-200) !important;
+    border-radius: var(--osmea-radius-lg) !important;
+    padding: 28px 32px !important;
+    margin: 24px 0 !important;
+    box-shadow: var(--osmea-shadow-sm) !important;
+    transition: var(--osmea-transition) !important;
 }
 
+body.wp-admin .osmea-config-header:hover,
+.osmea-config-wrap .osmea-config-header:hover {
+    box-shadow: var(--osmea-shadow-md) !important;
+}
+
+body.wp-admin .osmea-config-header .description,
+.osmea-config-header .description {
+    color: var(--osmea-gray-600) !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+}
+
+/* Action Buttons */
 .osmea-config-actions {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    margin-top: 20px !important;
+    display: flex !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
 }
 
-.osmea-config-actions .button {
-    margin: 0;
+.osmea-config-actions .button,
+body.wp-admin .osmea-config-actions .button,
+.osmea-config-wrap .osmea-config-actions .button {
+    margin: 0 !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: var(--osmea-radius) !important;
+    border: 1px solid var(--osmea-gray-300) !important;
+    background: #ffffff !important;
+    color: var(--osmea-gray-700) !important;
+    cursor: pointer !important;
+    transition: var(--osmea-transition) !important;
+    box-shadow: var(--osmea-shadow-sm) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    height: auto !important;
+    line-height: 1.5 !important;
 }
 
-.osmea-json-editor {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 15px;
-    resize: vertical;
-    min-height: 500px;
+.osmea-config-actions .button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
 }
 
-.osmea-json-editor:focus {
-    border-color: #2271b1;
-    box-shadow: 0 0 0 1px #2271b1;
-    outline: none;
+.osmea-config-actions .button:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
-.osmea-json-status {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 13px;
-    display: none;
+.osmea-config-actions .button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--osmea-shadow-md);
+    border-color: var(--osmea-primary);
+    color: var(--osmea-primary);
 }
 
-.osmea-json-status.valid {
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    display: block;
+.osmea-config-actions .button:active {
+    transform: translateY(0);
+    box-shadow: var(--osmea-shadow-sm);
 }
 
-.osmea-json-status.invalid {
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-    display: block;
+.osmea-config-actions .button-primary,
+body.wp-admin .osmea-config-actions .button-primary {
+    background: linear-gradient(135deg, var(--osmea-primary) 0%, var(--osmea-primary-hover) 100%) !important;
+    border-color: var(--osmea-primary) !important;
+    color: #ffffff !important;
+    box-shadow: var(--osmea-shadow) !important;
 }
 
-.osmea-config-info {
-    background: #f0f6fc;
-    border-left: 4px solid #2271b1;
-    padding: 15px 20px;
-    margin: 20px 0;
+.osmea-config-actions .button-primary:hover,
+body.wp-admin .osmea-config-actions .button-primary:hover {
+    background: linear-gradient(135deg, var(--osmea-primary-hover) 0%, #1e40af 100%) !important;
+    box-shadow: var(--osmea-shadow-lg) !important;
+    color: #ffffff !important;
+}
+
+/* JSON Editor */
+.osmea-json-editor,
+body.wp-admin .osmea-json-editor,
+textarea.osmea-json-editor,
+#osmea_app_config_json {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', Courier, monospace !important;
+    font-size: 14px !important;
+    line-height: 1.75 !important;
+    background: var(--osmea-gray-50) !important;
+    border: 2px solid var(--osmea-gray-200) !important;
+    border-radius: var(--osmea-radius-lg) !important;
+    padding: 20px !important;
+    resize: vertical !important;
+    min-height: 600px !important;
+    color: var(--osmea-gray-900) !important;
+    transition: var(--osmea-transition) !important;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.osmea-json-editor:focus,
+body.wp-admin .osmea-json-editor:focus,
+textarea.osmea-json-editor:focus,
+#osmea_app_config_json:focus {
+    border-color: var(--osmea-primary) !important;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06), 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    outline: none !important;
+    background: #ffffff !important;
+}
+
+.osmea-json-editor::selection {
+    background: var(--osmea-primary-light);
+    color: var(--osmea-gray-900);
+}
+
+/* JSON Status Indicator */
+body.wp-admin .osmea-json-status,
+.osmea-json-status,
+#osmea-json-status {
+    margin-top: 16px !important;
+    padding: 14px 18px !important;
+    border-radius: var(--osmea-radius) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    display: none !important;
+    align-items: center !important;
+    gap: 10px !important;
+    animation: slideIn 0.3s ease-out !important;
+    box-shadow: var(--osmea-shadow-sm) !important;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.wp-admin .osmea-json-status.valid,
+.osmea-json-status.valid,
+#osmea-json-status.valid {
+    background: linear-gradient(135deg, var(--osmea-success-light) 0%, #ecfdf5 100%) !important;
+    border: 1px solid var(--osmea-success) !important;
+    color: #065f46 !important;
+    display: flex !important;
+}
+
+body.wp-admin .osmea-json-status.valid::before,
+.osmea-json-status.valid::before,
+#osmea-json-status.valid::before {
+    content: '✓' !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    background: var(--osmea-success) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+}
+
+body.wp-admin .osmea-json-status.invalid,
+.osmea-json-status.invalid,
+#osmea-json-status.invalid {
+    background: linear-gradient(135deg, var(--osmea-error-light) 0%, #fef2f2 100%) !important;
+    border: 1px solid var(--osmea-error) !important;
+    color: #991b1b !important;
+    display: flex !important;
+}
+
+body.wp-admin .osmea-json-status.invalid::before,
+.osmea-json-status.invalid::before,
+#osmea-json-status.invalid::before {
+    content: '✕' !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    background: var(--osmea-error) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+}
+
+/* Config Info Box */
+body.wp-admin .osmea-config-info,
+.osmea-config-wrap .osmea-config-info {
+    background: linear-gradient(135deg, var(--osmea-primary-light) 0%, #eff6ff 100%) !important;
+    border-left: 4px solid var(--osmea-primary) !important;
+    border-radius: var(--osmea-radius) !important;
+    padding: 20px 24px !important;
+    margin: 24px 0 !important;
+    box-shadow: var(--osmea-shadow-sm) !important;
+    transition: var(--osmea-transition) !important;
+}
+
+body.wp-admin .osmea-config-info:hover,
+.osmea-config-wrap .osmea-config-info:hover {
+    box-shadow: var(--osmea-shadow-md) !important;
+    transform: translateX(4px) !important;
 }
 
 .osmea-config-info h3 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    color: var(--osmea-gray-900);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.osmea-config-info h3::before {
+    content: '🔌';
+    font-size: 20px;
 }
 
 .osmea-config-info code {
-    background: #fff;
-    padding: 5px 10px;
-    border-radius: 3px;
+    background: #ffffff;
+    padding: 8px 14px;
+    border-radius: var(--osmea-radius);
     font-size: 13px;
+    font-weight: 500;
     display: inline-block;
-    margin: 5px 0;
+    margin: 8px 0;
+    border: 1px solid var(--osmea-gray-200);
+    color: var(--osmea-primary);
+    box-shadow: var(--osmea-shadow-sm);
+    transition: var(--osmea-transition);
+}
+
+.osmea-config-info code:hover {
+    background: var(--osmea-gray-50);
+    box-shadow: var(--osmea-shadow);
+    transform: translateY(-1px);
 }
 
 .osmea-config-info .description {
-    margin-top: 10px;
-    color: #646970;
+    margin-top: 12px;
+    color: var(--osmea-gray-600);
+    font-size: 14px;
+    line-height: 1.6;
 }
 
-/* Loading state */
+/* Loading State */
 .osmea-json-editor.saving {
-    opacity: 0.6;
+    opacity: 0.7;
     pointer-events: none;
+    position: relative;
 }
 
-/* Success message */
+.osmea-json-editor.saving::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: var(--osmea-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%232563eb' fill-opacity='0.4'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 40px 40px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 40px 40px;
+    }
+}
+
+/* Success/Error Notices */
 .notice.notice-success.osmea-notice {
-    border-left-color: #00a32a;
+    border-left-color: var(--osmea-success);
+    border-radius: var(--osmea-radius);
+    box-shadow: var(--osmea-shadow-sm);
+    padding: 16px 20px;
+    margin: 20px 0;
 }
 
-/* Error message */
 .notice.notice-error.osmea-notice {
-    border-left-color: #d63638;
+    border-left-color: var(--osmea-error);
+    border-radius: var(--osmea-radius);
+    box-shadow: var(--osmea-shadow-sm);
+    padding: 16px 20px;
+    margin: 20px 0;
 }
 
-/* Responsive */
+/* Form Table Enhancements */
+body.wp-admin .osmea-config-wrap .form-table,
+.osmea-config-wrap .form-table {
+    background: #ffffff !important;
+    border-radius: var(--osmea-radius-lg) !important;
+    padding: 24px !important;
+    box-shadow: var(--osmea-shadow) !important;
+    border: 1px solid var(--osmea-gray-200) !important;
+    margin-top: 24px !important;
+}
+
+.osmea-config-wrap .form-table th {
+    padding: 16px 0;
+    font-weight: 600;
+    color: var(--osmea-gray-800);
+    font-size: 15px;
+}
+
+.osmea-config-wrap .form-table td {
+    padding: 16px 0;
+}
+
+/* Submit Button Enhancement */
+body.wp-admin .osmea-config-wrap .submit .button-primary,
+.osmea-config-wrap .submit .button-primary,
+.osmea-config-wrap form .submit input[type="submit"] {
+    background: linear-gradient(135deg, var(--osmea-primary) 0%, var(--osmea-primary-hover) 100%) !important;
+    border: none !important;
+    border-radius: var(--osmea-radius) !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    box-shadow: var(--osmea-shadow) !important;
+    transition: var(--osmea-transition) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #ffffff !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+}
+
+body.wp-admin .osmea-config-wrap .submit .button-primary:hover,
+.osmea-config-wrap .submit .button-primary:hover,
+.osmea-config-wrap form .submit input[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--osmea-primary-hover) 0%, #1e40af 100%) !important;
+    box-shadow: var(--osmea-shadow-lg) !important;
+    transform: translateY(-2px) !important;
+    color: #ffffff !important;
+}
+
+body.wp-admin .osmea-config-wrap .submit .button-primary:active,
+.osmea-config-wrap .submit .button-primary:active,
+.osmea-config-wrap form .submit input[type="submit"]:active {
+    transform: translateY(0) !important;
+}
+
+/* Responsive Design */
 @media screen and (max-width: 782px) {
+    .osmea-config-wrap {
+        padding: 0 12px;
+    }
+
+    .osmea-config-header {
+        padding: 20px;
+        margin: 16px 0;
+    }
+
     .osmea-config-actions {
         flex-direction: column;
+        gap: 10px;
     }
-    
+
     .osmea-config-actions .button {
         width: 100%;
+        justify-content: center;
     }
-    
+
     .osmea-json-editor {
-        font-size: 12px;
-        min-height: 400px;
+        font-size: 13px;
+        min-height: 450px;
+        padding: 16px;
+    }
+
+    .osmea-config-info {
+        padding: 16px 20px;
+    }
+
+    .osmea-config-wrap .form-table {
+        padding: 16px;
     }
 }
 
+/* Dark Mode Support (if WordPress admin is in dark mode) */
+@media (prefers-color-scheme: dark) {
+    .osmea-config-header {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .osmea-json-editor {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .osmea-json-editor:focus {
+        background: #111827;
+        border-color: var(--osmea-primary);
+    }
+
+    .osmea-config-info {
+        background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+        color: #f3f4f6;
+    }
+
+    .osmea-config-info code {
+        background: #374151;
+        color: #60a5fa;
+        border-color: #4b5563;
+    }
+}
+
+/* Smooth scrollbar for textarea */
+.osmea-json-editor::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.osmea-json-editor::-webkit-scrollbar-track {
+    background: var(--osmea-gray-100);
+    border-radius: 6px;
+}
+
+.osmea-json-editor::-webkit-scrollbar-thumb {
+    background: var(--osmea-gray-300);
+    border-radius: 6px;
+    border: 2px solid var(--osmea-gray-100);
+}
+
+.osmea-json-editor::-webkit-scrollbar-thumb:hover {
+    background: var(--osmea-gray-400);
+}
+
+/* Print Styles */
+@media print {
+    .osmea-config-actions,
+    .osmea-config-info,
+    .submit {
+        display: none;
+    }
+
+    .osmea-json-editor {
+        border: 1px solid #ccc;
+        box-shadow: none;
+    }
+}

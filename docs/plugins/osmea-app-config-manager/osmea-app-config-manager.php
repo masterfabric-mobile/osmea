@@ -3,7 +3,7 @@
  * Plugin Name: OSMEA App Config Manager
  * Plugin URI: https://github.com/masterfabric-mobile/osmea
  * Description: Manage Flutter mobile app configuration file (app_config.json) from WordPress admin panel. Mobile app can fetch configuration via REST API endpoint.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: MasterFabric Mobile
  * Author URI: https://github.com/masterfabric-mobile
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('OSMEA_CONFIG_VERSION', '1.0.0');
+define('OSMEA_CONFIG_VERSION', '1.0.1');
 define('OSMEA_CONFIG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('OSMEA_CONFIG_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('OSMEA_CONFIG_OPTION_NAME', 'osmea_app_config_json');
@@ -207,11 +207,16 @@ class OSMEA_App_Config_Manager {
             return;
         }
         
+        // Use filemtime to bust cache
+        $css_version = file_exists(OSMEA_CONFIG_PLUGIN_DIR . 'assets/admin.css') 
+            ? filemtime(OSMEA_CONFIG_PLUGIN_DIR . 'assets/admin.css') 
+            : OSMEA_CONFIG_VERSION;
+        
         wp_enqueue_style(
             'osmea-config-admin',
             OSMEA_CONFIG_PLUGIN_URL . 'assets/admin.css',
             array(),
-            OSMEA_CONFIG_VERSION
+            $css_version
         );
         
         wp_enqueue_script(

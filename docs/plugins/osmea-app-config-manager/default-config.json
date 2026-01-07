@@ -14,9 +14,9 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://localhost:8000",
-    "brand_name": "WooPress Dev",
-    "auth_key": "YOUR_SPECIAL_AUTH_CODE",
+    "store_url": "https://example.com",
+    "brand_name": "example",  
+    "auth_key": "THISISMySpeCiaLAUthCodeExampleExample",
     "version": "v1",
     "verify_ssl": true,
     "query_string_auth": false,
@@ -176,7 +176,7 @@
     },
     "splash_configuration": {
       "enabled": true,
-      "style": "enterprise",
+      "style": "startup",
       "duration_milliseconds": 3000,
       "min_duration_milliseconds": 1500,
       "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true",
@@ -283,7 +283,7 @@
     },
     "loading_configuration": {
       "style": "enterprise",
-      "type": "authentication",
+      "type": "dataLoading",
       "duration_milliseconds": 3000,
       "step_duration_milliseconds": 750,
       "background_color": "#FFFFFF",
@@ -293,13 +293,15 @@
       "show_logo": true,
       "logo_animation_enabled": true,
       "auto_dismiss_enabled": true,
-      "tap_to_dismiss_enabled": true,
-      "show_progress_indicator": true,
-      "show_percentage": true,
+      "tap_to_dismiss_enabled": false,
+      "show_progress_indicator": false,
+      "show_percentage": false,
       "animation_enabled": true,
       "haptic_feedback_enabled": true,
       "steps": [
-       
+        "Loading...",
+        "Almost ready...",
+        "Complete"
       ],
       "custom_messages": {
         "network_error": "Network connection required",
@@ -333,6 +335,7 @@
     },
     "auth_configuration": {
       "ui_style": {
+        "style": "space",
         "tab_container_radius": 12,
         "tab_item_radius": 10,
         "button_radius": 12,
@@ -411,7 +414,262 @@
           "action_button_text": "Explore Products"
         }
       ]
+    },
+    "home_view": {
+      "component_spacing": {
+        "top": 0,
+        "bottom": 16,
+        "horizontal": 20,
+        "title_to_content": 16
+      },
+      "search": {
+        "enabled": true,
+        "order_id": 0,
+        "placeholder": "Search products, brands, categories...",
+        "style": "minimal",
+        "variant": "outlined"
+      },
+      "circle_categories": {
+        "enabled": true,
+        "order_id": 1,
+        "max_items": 10,
+        "circle_size": 64,
+        "show_names": true,
+        "image_size": 64,
+        "spacing": 8
+      },
+      "banner": {
+        "enabled": true,
+        "order_id": 2,
+        "padding": {
+          "top": 0,
+          "bottom": 16
+        },
+        "items": [
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
+            "title": "Summer Collection",
+            "subtitle": "New Arrivals",
+            "text": "Discover the latest fashion trends",
+            "route": "/products"
+          },
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800",
+            "title": "Special Offers",
+            "subtitle": "Limited Time",
+            "text": "Up to 50% off on selected items",
+            "category_id": 1
+          },
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800",
+            "title": "Premium Quality",
+            "subtitle": "Best Products",
+            "text": "Shop the finest selection",
+            "product_id": 1
+          }
+        ]
+      },
+         
+      "promotional_bar": {
+        "enabled": true,
+        "order_id": 3,
+        "border_radius": 7,
+        "height": "short",
+        "items": [
+          {
+            "title": "Common Promo",
+            "subtitle": "Enjoy special offers",
+            "background_color": "#F3E8FF",
+            "text_color": "#1F2937",
+            "accent_color": "#9333EA",
+            "route": "/products"
+          },
+         
+          {
+            "title": "Special Deal",
+            "subtitle": "Limited time offer",
+            "background_color": "#DBEAFE",
+            "text_color": "#1F2937",
+            "accent_color": "#9333EA",
+            "route": "/products"
+          }
+        ]
+      },
+      "campaign_cards": {
+        "enabled": true,
+        "order_id": 4,
+        "title": "Campaigns",
+        "card_height": 160,
+        "card_width": 280,
+        "border_radius": 12,
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        },
+        "items": [
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400",
+            "title": "New Year Gift Guide",
+            "subtitle": "Special Offers",
+            "category_id": 1
+          },
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
+            "title": "Mobile Phones & Accessories",
+            "subtitle": "Discover Discounts",
+            "category_id": 2
+          },
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
+            "title": "Computers & Equipment",
+            "subtitle": "Special Prices",
+            "category_id": 3
+          },
+          {
+            "imageUrl": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400",
+            "title": "Vehicle Needs",
+            "subtitle": "Special Prices",
+            "category_id": 4
+          }
+        ]
+      },
+      "deals_of_day": {
+        "enabled": true,
+        "order_id": 5,
+        "title": "Deals of the Day",
+        "limit": 10,
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
+      },
+      "recommended": {
+        "enabled": true,
+        "order_id": 6,
+        "title": "Recommended for you",
+        "limit": 4,
+        "product_ids": [],
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        }
+      },
+      "campaign_popup_button": {
+        "enabled": true,
+        "text": "KUPON",
+        "amount": "100 TL",
+        "imageUrl": null,
+        "backgroundColor": "#2563EB",
+        "borderColor": "#FFFFFF",
+        "textColor": "#FFFFFF",
+        "position": "right",
+        "size": 100,
+        "showCloseButton": true,
+        "route": "/products",
+        "category_id": null,
+        "product_id": null
+      },
+      "bottom_foreground_banner": {
+        "enabled": true,
+        "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
+        "title": "Special Offer",
+        "description": "Get up to 50% off on selected items",
+        "height": 60,
+        "border_radius": 12,
+        "image_opacity": 0.4,
+        "overlay_color": "#000000",
+        "overlay_opacity": 0.3,
+        "background_color": "#FFFFFF",
+        "text_color": "#FFFFFF",
+        "arrow_icon_color": "#FFFFFF",
+        "tail_height": 8,
+        "tail_width": 40,
+        "tail_bottom_offset": 8,
+        "show_dismiss_button": true,
+        "route": "/products",
+        "category_id": null,
+        "product_id": null
+      }
+    },
+    "product_detail_view": {
+      "images": {
+        "enabled": true,
+        "order_id": 0
+      },
+      "name_and_price": {
+        "enabled": true,
+        "order_id": 1
+      },
+      "attributes": {
+        "enabled": true,
+        "order_id": 3
+      },
+      "description": {
+        "enabled": true,
+        "order_id": 4
+      },
+      "reviews": {
+        "enabled": true,
+        "order_id": 2
+      }
+    },
+    "navbar_configuration": {
+      "enabled": true,
+      "items": [
+        {
+          "id": "home",
+          "order_id": 0,
+          "text": "Home",
+          "iconName": "home_outlined",
+          "route": "/home",
+          "tooltip": "Home"
+        },
+        {
+          "id": "search",
+          "order_id": 1,
+          "text": "Search",
+          "iconName": "search_outlined",
+          "route": "/search",
+          "tooltip": "Search"
+        },
+        {
+          "id": "saved",
+          "order_id": 3,
+          "text": "Saved",
+          "iconName": "favorite_outline",
+          "filledIconName": "favorite",
+          "route": "/saved",
+          "tooltip": "Saved Items",
+          "isAnimated": true,
+          "animationType": "scale",
+          "animationTrigger": "wishlist_count"
+        },
+        {
+          "id": "cart",
+          "order_id": 2,
+          "text": "Cart",
+          "iconName": "shopping_cart_outlined",
+          "route": "/cart",
+          "tooltip": "Shopping Cart"
+        },
+        {
+          "id": "profile",
+          "order_id": 4,
+          "text": "Profile",
+          "iconName": "person_outline",
+          "authIconName": "person_outline",
+          "guestIconName": "login_outlined",
+          "authRoute": "/profile",
+          "guestRoute": "/auth",
+          "authText": "Profile",
+          "guestText": "Sign In",
+          "isConditional": true,
+          "tooltip": "Profile"
+        }
+      ]
     }
 
   }
-
