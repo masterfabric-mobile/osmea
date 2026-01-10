@@ -1,0 +1,17 @@
+# Appfile for iOS app configuration
+# Update these values with your actual app details
+
+app_identifier("com.example.storefront_woo") # The bundle identifier of your app
+apple_id("your-apple-id@example.com") # Your Apple email address
+
+# Optional: Uncomment and set if you have multiple teams
+# team_id("XXXXXXXXXX")
+
+# Optional: Uncomment and set if you want to use a specific team name
+# team_name("Your Team Name")
+
+# Optional: Uncomment and set if you want to use a specific provisioning profile
+# provisioning_profile_name("Your Provisioning Profile Name")
+
+# Optional: Uncomment and set if you want to use a specific certificate
+# cert_name("Your Certificate Name")

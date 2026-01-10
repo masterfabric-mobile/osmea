@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - OSMEA Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      text-align: center;
+      max-width: 400px;
+    }
+    
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #3b82f6;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    
+    p {
+      color: #94a3b8;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #2563eb;
+    }
+    
+    button:active {
+      background: #1d4ed8;
+    }
+    
+    .status {
+      margin-top: 24px;
+      padding: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      font-size: 14px;
+      color: #fca5a5;
+    }
+    
+    .online {
+      background: rgba(34, 197, 94, 0.1);
+      color: #86efac;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+      </svg>
+    </div>
+    
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection. Some features may be unavailable until you're back online.</p>
+    
+    <button onclick="window.location.reload()">Try Again</button>
+    
+    <div id="status" class="status">
+      Waiting for connection...
+    </div>
+  </div>
+  
+  <script>
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      if (navigator.onLine) {
+        statusEl.textContent = 'Connection restored! Click "Try Again" to continue.';
+        statusEl.classList.add('online');
+      } else {
+        statusEl.textContent = 'Still offline. Please check your connection.';
+        statusEl.classList.remove('online');
+      }
+    }
+    
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+  </script>
+</body>
+</html>

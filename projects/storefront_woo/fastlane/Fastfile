@@ -1,0 +1,220 @@
+# Fastfile for OSMEA Storefront Woo
+# This file contains build lanes for iOS and Android
+# Based on VS Code launch.json configuration:
+# - DEV: lib/flavors/main_dev.dart with --flavor dev
+# - PROD: lib/flavors/main_prod.dart with --flavor prod
+
+default_platform(:ios)
+
+# Helper function to map admin panel environment to Flutter flavor
+def map_environment_to_flavor(environment)
+  case environment.to_s.downcase
+  when "development", "dev"
+    "dev"
+  when "staging"
+    "dev" # Staging uses dev flavor
+  when "production", "prod"
+    "prod"
+  else
+    "prod" # Default to prod
+  end
+end
+
+platform :ios do
+  desc "Build iOS app"
+  lane :build do |options|
+    build_type = options[:build_type] || "release"
+    environment = options[:environment] || "production"
+    flavor = options[:flavor] || map_environment_to_flavor(environment)
+    version = options[:version] || "1.0.0"
+    build_number = options[:build_number] || "1"
+    
+    UI.message "Building iOS app..."
+    UI.message "Build Type: #{build_type}"
+    UI.message "Environment: #{environment}"
+    UI.message "Flavor: #{flavor}"
+    UI.message "Version: #{version}"
+    UI.message "Build Number: #{build_number}"
+    
+    # Navigate to project directory (fastlane is in fastlane/ subdirectory)
+    project_path = File.expand_path(File.dirname(__FILE__))
+    
+    # Validate flavor
+    unless ["dev", "prod"].include?(flavor)
+      UI.user_error!("Invalid flavor: #{flavor}. Must be 'dev' or 'prod'")
+    end
+    
+    # Build Flutter iOS app
+    UI.message "Cleaning Flutter project..."
+    sh("cd #{project_path} && flutter clean")
+    
+    UI.message "Getting Flutter dependencies..."
+    sh("cd #{project_path} && flutter pub get")
+    
+    # Build command matches VS Code launch.json configuration
+    UI.message "Building iOS app with flavor: #{flavor}"
+    if build_type == "release"
+      sh("cd #{project_path} && flutter build ios --release --flavor #{flavor}")
+      artifact_path = "#{project_path}/build/ios/iphoneos/Runner.app"
+    else
+      sh("cd #{project_path} && flutter build ios --debug --flavor #{flavor}")
+      artifact_path = "#{project_path}/build/ios/Debug-iphoneos/Runner.app"
+    end
+    
+    UI.success "iOS build completed successfully!"
+    UI.message "Artifact location: #{artifact_path}"
+    
+    {
+      success: true,
+      artifact_path: artifact_path,
+      platform: "ios",
+      build_type: build_type,
+      flavor: flavor,
+      version: version,
+      build_number: build_number
+    }
+  end
+  
+  desc "Build iOS IPA"
+  lane :build_ipa do |options|
+    build_type = options[:build_type] || "release"
+    environment = options[:environment] || "production"
+    flavor = options[:flavor] || map_environment_to_flavor(environment)
+    version = options[:version] || "1.0.0"
+    build_number = options[:build_number] || "1"
+    
+    UI.message "Building iOS IPA..."
+    
+    # First build the app
+    build_result = build(
+      build_type: build_type,
+      environment: environment,
+      flavor: flavor,
+      version: version,
+      build_number: build_number
+    )
+    
+    # Then create IPA (requires Xcode and proper signing)
+    project_path = File.expand_path(File.dirname(__FILE__))
+    workspace_path = "#{project_path}/ios/Runner.xcworkspace"
+    scheme = flavor # Use flavor as scheme name (dev.xcscheme or prod.xcscheme)
+    
+    UI.message "Creating IPA with scheme: #{scheme}"
+    UI.message "Note: IPA creation requires proper code signing configuration"
+    
+    # Use xcodebuild to create archive and IPA
+    # This requires proper provisioning profiles and certificates
+    archive_path = "#{project_path}/build/ios/archive/Runner.xcarchive"
+    
+    # Archive
+    sh("cd #{project_path}/ios && xcodebuild archive " \
+       "-workspace #{workspace_path} " \
+       "-scheme #{scheme} " \
+       "-configuration Release-#{flavor} " \
+       "-archivePath #{archive_path} " \
+       "CODE_SIGN_IDENTITY=\"\" " \
+       "CODE_SIGNING_REQUIRED=NO " \
+       "CODE_SIGNING_ALLOWED=NO")
+    
+    # Export IPA (requires exportOptions.plist)
+    ipa_path = "#{project_path}/build/ios/ipa"
+    sh("cd #{project_path}/ios && xcodebuild -exportArchive " \
+       "-archivePath #{archive_path} " \
+       "-exportPath #{ipa_path} " \
+       "-exportOptionsPlist #{project_path}/ios/ExportOptions.plist " \
+       "CODE_SIGN_IDENTITY=\"\" " \
+       "CODE_SIGNING_REQUIRED=NO")
+    
+    final_ipa_path = "#{ipa_path}/Runner.ipa"
+    
+    {
+      success: true,
+      artifact_path: final_ipa_path,
+      platform: "ios",
+      build_type: build_type,
+      flavor: flavor,
+      version: version,
+      build_number: build_number
+    }
+  rescue => ex
+    UI.message "IPA creation failed: #{ex.message}"
+    UI.message "Falling back to app bundle"
+    build_result
+  end
+end
+
+platform :android do
+  desc "Build Android APK or AAB"
+  lane :build do |options|
+    build_type = options[:build_type] || "release"
+    environment = options[:environment] || "production"
+    flavor = options[:flavor] || map_environment_to_flavor(environment)
+    version = options[:version] || "1.0.0"
+    build_number = options[:build_number] || "1"
+    artifact_type = options[:artifact_type] || "apk"
+    
+    UI.message "Building Android app..."
+    UI.message "Build Type: #{build_type}"
+    UI.message "Environment: #{environment}"
+    UI.message "Flavor: #{flavor}"
+    UI.message "Version: #{version}"
+    UI.message "Build Number: #{build_number}"
+    UI.message "Artifact Type: #{artifact_type}"
+    
+    # Navigate to project directory (fastlane is in fastlane/ subdirectory)
+    project_path = File.expand_path(File.dirname(__FILE__))
+    
+    # Validate flavor
+    unless ["dev", "prod"].include?(flavor)
+      UI.user_error!("Invalid flavor: #{flavor}. Must be 'dev' or 'prod'")
+    end
+    
+    # Build Flutter Android app
+    UI.message "Cleaning Flutter project..."
+    sh("cd #{project_path} && flutter clean")
+    
+    UI.message "Getting Flutter dependencies..."
+    sh("cd #{project_path} && flutter pub get")
+    
+    # Build command matches VS Code launch.json configuration
+    UI.message "Building Android app with flavor: #{flavor}"
+    if artifact_type == "aab"
+      if build_type == "release"
+        sh("cd #{project_path} && flutter build appbundle --release --flavor #{flavor}")
+        # AAB path based on Gradle flavor configuration
+        artifact_path = "#{project_path}/build/app/outputs/bundle/#{flavor}Release/app-#{flavor}-release.aab"
+      else
+        sh("cd #{project_path} && flutter build appbundle --debug --flavor #{flavor}")
+        artifact_path = "#{project_path}/build/app/outputs/bundle/#{flavor}Debug/app-#{flavor}-debug.aab"
+      end
+    else
+      if build_type == "release"
+        sh("cd #{project_path} && flutter build apk --release --flavor #{flavor}")
+        # APK path based on Gradle flavor configuration
+        artifact_path = "#{project_path}/build/app/outputs/flutter-apk/app-#{flavor}-release.apk"
+      else
+        sh("cd #{project_path} && flutter build apk --debug --flavor #{flavor}")
+        artifact_path = "#{project_path}/build/app/outputs/flutter-apk/app-#{flavor}-debug.apk"
+      end
+    end
+    
+    # Verify artifact exists
+    unless File.exist?(artifact_path)
+      UI.user_error!("Build artifact not found at: #{artifact_path}")
+    end
+    
+    UI.success "Android build completed successfully!"
+    UI.message "Artifact location: #{artifact_path}"
+    
+    {
+      success: true,
+      artifact_path: artifact_path,
+      platform: "android",
+      build_type: build_type,
+      artifact_type: artifact_type,
+      flavor: flavor,
+      version: version,
+      build_number: build_number
+    }
+  end
+end
