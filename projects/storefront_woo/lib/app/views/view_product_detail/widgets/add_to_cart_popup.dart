@@ -15,6 +15,48 @@ import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_item_widget.dart';
 
+/// Get color from config
+Color _getColorFromConfig(String key, Color fallback) {
+  try {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'dialog_popup_configuration.add_to_cart_popup.$key',
+    );
+    if (colorString.isNotEmpty && colorString.startsWith('#')) {
+      final hexString = colorString.substring(1);
+      if (hexString.length == 6) {
+        return Color(int.parse('FF$hexString', radix: 16));
+      } else if (hexString.length == 8) {
+        return Color(int.parse(hexString, radix: 16));
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load add_to_cart_popup color $key: $e');
+  }
+  return fallback;
+}
+
+/// Get button color from config
+Color _getButtonColorFromConfig(String key, Color fallback) {
+  try {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'dialog_popup_configuration.buttons.$key',
+    );
+    if (colorString.isNotEmpty && colorString.startsWith('#')) {
+      final hexString = colorString.substring(1);
+      if (hexString.length == 6) {
+        return Color(int.parse('FF$hexString', radix: 16));
+      } else if (hexString.length == 8) {
+        return Color(int.parse(hexString, radix: 16));
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load button color $key: $e');
+  }
+  return fallback;
+}
+
 /// Shows add to cart success bottom sheet with cart summary
 void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
   // Get cart view model and load cart
@@ -28,12 +70,26 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
     cartViewModel.loadCart();
   }
 
+  // Get colors from config
+  final backgroundColor = _getColorFromConfig(
+    'backgroundColor',
+    OsmeaColors.paperWhite,
+  );
+  final footerBackgroundColor = _getColorFromConfig(
+    'footerBackgroundColor',
+    OsmeaColors.paperWhite,
+  );
+  final footerBorderColor = _getColorFromConfig(
+    'footerBorderColor',
+    OsmeaColors.grayMaterial[200]!,
+  );
+
   // Show bottom sheet with cart summary
   OsmeaBottomSheetHelpers.showModal(
     context: context,
     size: BottomSheetSize.large,
     title: 'Product Added to Cart',
-    backgroundColor: OsmeaColors.paperWhite,
+    backgroundColor: backgroundColor,
     footer: BlocBuilder<CartViewModel, CartState>(
       bloc: cartViewModel,
       builder: (context, cartState) {
@@ -42,13 +98,8 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
         }
         return OsmeaComponents.container(
           decoration: BoxDecoration(
-            color: OsmeaColors.paperWhite,
-            border: Border(
-              top: BorderSide(
-                color: OsmeaColors.grayMaterial[200]!,
-                width: 1,
-              ),
-            ),
+            color: footerBackgroundColor,
+            border: Border(top: BorderSide(color: footerBorderColor, width: 1)),
           ),
           padding: EdgeInsets.symmetric(
             horizontal: context.spacing16,
@@ -58,38 +109,73 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Continue shopping button
-              OsmeaComponents.expanded(
-                child: OsmeaComponents.button(
-                  text: 'Continue Shopping',
-                  variant: ButtonVariant.outlined,
-                  size: ButtonSize.small,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
+              Builder(
+                builder: (context) {
+                  final secondaryBgColor = _getButtonColorFromConfig(
+                    'secondary.backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final secondaryTextColor = _getButtonColorFromConfig(
+                    'secondary.textColor',
+                    OsmeaColors.black,
+                  );
+                  final secondaryBorderColor = _getButtonColorFromConfig(
+                    'secondary.borderColor',
+                    OsmeaColors.black,
+                  );
+
+                  return OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      text: 'Continue Shopping',
+                      variant: ButtonVariant.outlined,
+                      size: ButtonSize.small,
+                      backgroundColor: secondaryBgColor,
+                      textColor: secondaryTextColor,
+                      borderColor: secondaryBorderColor,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
+                },
               ),
               OsmeaComponents.sizedBox(width: context.spacing8),
               // Checkout button
-              OsmeaComponents.expanded(
-                child: OsmeaComponents.button(
-                  text: 'Checkout',
-                  variant: ButtonVariant.primary,
-                  size: ButtonSize.small,
-                  onPressed: () {
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      // Navigate to checkout (guest checkout is allowed)
-                      context.go(
-                        '/checkout',
-                        extra: {
-                          'totalAmount': cartState.totalPrice,
-                          'currencySymbol': cartState.currencySymbol,
-                          'currencyCode': cartState.currencyCode,
-                        },
-                      );
-                    }
-                  },
-                ),
+              Builder(
+                builder: (context) {
+                  final primaryBgColor = _getButtonColorFromConfig(
+                    'primary.backgroundColor',
+                    OsmeaColors.black,
+                  );
+                  final primaryTextColor = _getButtonColorFromConfig(
+                    'primary.textColor',
+                    OsmeaColors.white,
+                  );
+
+                  return OsmeaComponents.expanded(
+                    child: OsmeaComponents.button(
+                      text: 'Checkout',
+                      variant: ButtonVariant.primary,
+                      size: ButtonSize.small,
+                      backgroundColor: primaryBgColor,
+                      textColor: primaryTextColor,
+                      onPressed: () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          // Navigate to checkout (guest checkout is allowed)
+                          context.go(
+                            '/checkout',
+                            extra: {
+                              'totalAmount': cartState.totalPrice,
+                              'currencySymbol': cartState.currencySymbol,
+                              'currencyCode': cartState.currencyCode,
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -107,7 +193,10 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
               child: OsmeaComponents.loading(
                 type: LoadingType.circularFade,
                 size: context.iconSizeLarge,
-                color: OsmeaColors.black,
+                color: _getColorFromConfig(
+                  'loadingColor',
+                  const Color(0xFF1976D2),
+                ),
               ),
             ),
           );
@@ -149,41 +238,62 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
               children: [
                 OsmeaComponents.sizedBox(height: context.spacing12),
                 // Success message
-                OsmeaComponents.container(
-                  margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.spacing16,
-                    vertical: context.spacing12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: OsmeaColors.black.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: OsmeaColors.black.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: OsmeaComponents.row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: OsmeaColors.black,
-                        size: context.iconSizeMedium,
+                Builder(
+                  builder: (context) {
+                    final successBgColor = _getColorFromConfig(
+                      'successBackgroundColor',
+                      const Color(0xFFE8F5E9),
+                    );
+                    final successBorderColor = _getColorFromConfig(
+                      'successBorderColor',
+                      const Color(0xFF4CAF50),
+                    );
+                    final successIconColor = _getColorFromConfig(
+                      'successIconColor',
+                      const Color(0xFF4CAF50),
+                    );
+                    final successTextColor = _getColorFromConfig(
+                      'successTextColor',
+                      const Color(0xFF2E7D32),
+                    );
+
+                    return OsmeaComponents.container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: context.spacing16,
                       ),
-                      OsmeaComponents.sizedBox(width: context.spacing10),
-                      OsmeaComponents.expanded(
-                        child: OsmeaComponents.text(
-                          'Product successfully added to cart.',
-                          textAlign: TextAlign.center,
-                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: OsmeaColors.black,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing16,
+                        vertical: context.spacing12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: successBgColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: successBorderColor, width: 1),
+                      ),
+                      child: OsmeaComponents.row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: successIconColor,
+                            size: context.iconSizeMedium,
                           ),
-                        ),
+                          OsmeaComponents.sizedBox(width: context.spacing10),
+                          OsmeaComponents.expanded(
+                            child: OsmeaComponents.text(
+                              'Product successfully added to cart.',
+                              textAlign: TextAlign.center,
+                              textStyle: OsmeaTextStyle.bodySmall(context)
+                                  .copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: successTextColor,
+                                  ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing20),
                 // Cart items list
@@ -210,7 +320,10 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                             textStyle: OsmeaTextStyle.titleSmall(context)
                                 .copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: OsmeaColors.black,
+                                  color: _getColorFromConfig(
+                                    'titleColor',
+                                    const Color(0xFF1976D2),
+                                  ),
                                 ),
                           );
                         }
@@ -219,7 +332,10 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                           textStyle: OsmeaTextStyle.titleSmall(context)
                               .copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: OsmeaColors.black,
+                                color: _getColorFromConfig(
+                                  'titleColor',
+                                  const Color(0xFF1976D2),
+                                ),
                               ),
                         );
                       },

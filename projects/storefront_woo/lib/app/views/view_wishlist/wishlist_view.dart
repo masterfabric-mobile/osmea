@@ -8,6 +8,48 @@ import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_list_wid
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 // Single source of truth: WishlistViewModel
 
+/// Get popup color from config
+Color _getPopupColorFromConfig(String key, Color fallback) {
+  try {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'dialog_popup_configuration.$key',
+    );
+    if (colorString.isNotEmpty && colorString.startsWith('#')) {
+      final hexString = colorString.substring(1);
+      if (hexString.length == 6) {
+        return Color(int.parse('FF$hexString', radix: 16));
+      } else if (hexString.length == 8) {
+        return Color(int.parse(hexString, radix: 16));
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load popup color $key: $e');
+  }
+  return fallback;
+}
+
+/// Get popup button color from config
+Color _getPopupButtonColorFromConfig(String key, Color fallback) {
+  try {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'dialog_popup_configuration.buttons.$key',
+    );
+    if (colorString.isNotEmpty && colorString.startsWith('#')) {
+      final hexString = colorString.substring(1);
+      if (hexString.length == 6) {
+        return Color(int.parse('FF$hexString', radix: 16));
+      } else if (hexString.length == 8) {
+        return Color(int.parse(hexString, radix: 16));
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load popup button color $key: $e');
+  }
+  return fallback;
+}
+
 class WishlistView
     extends MasterViewHydratedCubit<WishlistViewModel, WishlistState> {
   WishlistView({
@@ -27,14 +69,20 @@ class WishlistView
            child: BlocBuilder<WishlistViewModel, WishlistState>(
              bloc: cubit,
              builder: (context, state) {
-               final count = state is WishlistLoadedState ? state.items.length : 0;
+               final count = state is WishlistLoadedState
+                   ? state.items.length
+                   : 0;
                final hasItems = count > 0;
-               
+
                final configHelper = AssetConfigHelper();
-               final appBarConfig = configHelper.getObject('wishlist_view.app_bar');
+               final appBarConfig = configHelper.getObject(
+                 'wishlist_view.app_bar',
+               );
                final title = appBarConfig?['title'] as String? ?? 'Favourites';
-               final titleWithCount = appBarConfig?['titleWithCount'] as String? ?? 'Favourites ({count})';
-               final appBarTitle = count > 0 
+               final titleWithCount =
+                   appBarConfig?['titleWithCount'] as String? ??
+                   'Favourites ({count})';
+               final appBarTitle = count > 0
                    ? titleWithCount.replaceAll('{count}', count.toString())
                    : title;
                final backgroundColor = configHelper.getColor(
@@ -101,70 +149,73 @@ class WishlistView
                      AppBarAction(
                        icon: Icon(Icons.delete_outline, color: iconColor),
                        onPressed: () async {
-                             final confirmed = await OsmeaComponents.showPopup<bool>(
-                               context: context,
-                               variant: PopupVariant.dialog,
-                               title: 'Remove all favorites?',
-                               subtitle:
-                                   'Are you sure you want to remove all items from your favorites? This action cannot be undone.',
-                               padding: context.paddingNormal,
-                               child: OsmeaComponents.column(
-                                 mainAxisSize: MainAxisSize.min,
+                         final confirmed = await OsmeaComponents.showPopup<bool>(
+                           context: context,
+                           variant: PopupVariant.dialog,
+                           title: 'Remove all favorites?',
+                           subtitle:
+                               'Are you sure you want to remove all items from your favorites? This action cannot be undone.',
+                           padding: context.paddingNormal,
+                           child: OsmeaComponents.column(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               OsmeaComponents.row(
                                  children: [
-                                   OsmeaComponents.row(
-                                     children: [
-                                       OsmeaComponents.expanded(
-                                         child: OsmeaComponents.button(
-                                           text: 'Cancel',
-                                           variant: ButtonVariant.outlined,
-                                           onPressed: () =>
-                                               Navigator.of(context).pop(false),
-                                         ),
-                                       ),
-                                       OsmeaComponents.sizedBox(width: context.spacing8),
-                                       OsmeaComponents.expanded(
-                                         child: OsmeaComponents.button(
-                                           text: 'Remove All',
-                                           variant: ButtonVariant.primary,
-                                           onPressed: () =>
-                                               Navigator.of(context).pop(true),
-                                         ),
-                                       ),
-                                     ],
+                                   OsmeaComponents.expanded(
+                                     child: OsmeaComponents.button(
+                                       text: 'Cancel',
+                                       variant: ButtonVariant.outlined,
+                                       onPressed: () =>
+                                           Navigator.of(context).pop(false),
+                                     ),
+                                   ),
+                                   OsmeaComponents.sizedBox(
+                                     width: context.spacing8,
+                                   ),
+                                   OsmeaComponents.expanded(
+                                     child: OsmeaComponents.button(
+                                       text: 'Remove All',
+                                       variant: ButtonVariant.primary,
+                                       onPressed: () =>
+                                           Navigator.of(context).pop(true),
+                                     ),
                                    ),
                                  ],
                                ),
+                             ],
+                           ),
+                         );
+
+                         if (confirmed == true) {
+                           final previousState = state is WishlistLoadedState
+                               ? state
+                               : null;
+                           final previousItems = previousState?.items ?? [];
+
+                           cubit.clearAll();
+
+                           if (previousItems.isNotEmpty) {
+                             context.showSnackbar(
+                               title: 'All favorites removed',
+                               message:
+                                   'All items were removed from your favorites',
+                               type: SnackbarType.error,
+                               style: SnackbarStyle.minimal,
+                               position: SnackbarPosition.bottom,
+                               animation: SnackbarAnimation.slide,
+                               actionLabel: 'Undo',
+                               onAction: () {
+                                 // Restore all items
+                                 for (final item in previousItems) {
+                                   cubit.add(item);
+                                 }
+                               },
                              );
-                             
-                             if (confirmed == true) {
-                               final previousState = state is WishlistLoadedState
-                                   ? state
-                                   : null;
-                               final previousItems = previousState?.items ?? [];
-                               
-                               cubit.clearAll();
-                               
-                               if (previousItems.isNotEmpty) {
-                                 context.showSnackbar(
-                                   title: 'All favorites removed',
-                                   message: 'All items were removed from your favorites',
-                                   type: SnackbarType.error,
-                                   style: SnackbarStyle.minimal,
-                                   position: SnackbarPosition.bottom,
-                                   animation: SnackbarAnimation.slide,
-                                   actionLabel: 'Undo',
-                                   onAction: () {
-                                     // Restore all items
-                                     for (final item in previousItems) {
-                                       cubit.add(item);
-                                     }
-                                   },
-                                 );
-                               }
-                             }
-                           },
-                           tooltip: 'Remove all',
-                         ),
+                           }
+                         }
+                       },
+                       tooltip: 'Remove all',
+                     ),
                  ],
                  centerTitle: false,
                );
@@ -219,11 +270,38 @@ class WishlistView
 
     if (state is WishlistActionPromptState) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Get popup colors from config
+        final configHelper = AssetConfigHelper();
+        final popupBgColor = _getPopupColorFromConfig(
+          'popup.backgroundColor',
+          OsmeaColors.white,
+        );
+        final popupTitleColor = _getPopupColorFromConfig(
+          'popup.titleColor',
+          const Color(0xFF1976D2),
+        );
+        final popupSubtitleColor = _getPopupColorFromConfig(
+          'popup.subtitleColor',
+          OsmeaColors.grayMaterial[400]!,
+        );
+        final popupElevation = configHelper.getDouble(
+          'dialog_popup_configuration.popup.elevation',
+          8.0,
+        );
+
         final result = await OsmeaComponents.showPopup(
           context: context,
           variant: PopupVariant.dialog,
           title: 'Add to cart?',
           subtitle: 'Choose what to do with this saved item.',
+          backgroundColor: popupBgColor,
+          titleStyle: OsmeaTextStyle.titleMedium(
+            context,
+          ).copyWith(color: popupTitleColor, fontWeight: FontWeight.w600),
+          subtitleStyle: OsmeaTextStyle.bodyMedium(
+            context,
+          ).copyWith(color: popupSubtitleColor),
+          elevation: popupElevation,
           padding: context.paddingNormal,
           child: OsmeaComponents.column(
             mainAxisSize: MainAxisSize.min,
@@ -231,13 +309,28 @@ class WishlistView
               OsmeaComponents.row(
                 children: [
                   OsmeaComponents.expanded(
-                    child: OsmeaComponents.button(
-                      text: 'Add & keep saved',
-                      variant: ButtonVariant.primary,
-                      onPressed: () {
-                        Navigator.of(context).pop('add_keep');
-                        // addItemToCartFromWishlist will preserve the wishlist state
-                        viewModel.addItemToCartFromWishlist(state.item.id);
+                    child: Builder(
+                      builder: (context) {
+                        final primaryBgColor = _getPopupButtonColorFromConfig(
+                          'primary.backgroundColor',
+                          OsmeaColors.black,
+                        );
+                        final primaryTextColor = _getPopupButtonColorFromConfig(
+                          'primary.textColor',
+                          OsmeaColors.white,
+                        );
+
+                        return OsmeaComponents.button(
+                          text: 'Add & keep saved',
+                          variant: ButtonVariant.primary,
+                          backgroundColor: primaryBgColor,
+                          textColor: primaryTextColor,
+                          onPressed: () {
+                            Navigator.of(context).pop('add_keep');
+                            // addItemToCartFromWishlist will preserve the wishlist state
+                            viewModel.addItemToCartFromWishlist(state.item.id);
+                          },
+                        );
                       },
                     ),
                   ),
@@ -247,22 +340,56 @@ class WishlistView
               OsmeaComponents.row(
                 children: [
                   OsmeaComponents.expanded(
-                    child: OsmeaComponents.button(
-                      text: 'Add & remove from saved',
-                      variant: ButtonVariant.secondary,
-                      onPressed: () {
-                        Navigator.of(context).pop('add_remove');
-                        viewModel.addItemToCartAndRemoveFromWishlist(state.item.id);
+                    child: Builder(
+                      builder: (context) {
+                        final secondaryBgColor = _getPopupButtonColorFromConfig(
+                          'secondary.backgroundColor',
+                          OsmeaColors.white,
+                        );
+                        final secondaryTextColor =
+                            _getPopupButtonColorFromConfig(
+                              'secondary.textColor',
+                              OsmeaColors.black,
+                            );
+                        final secondaryBorderColor =
+                            _getPopupButtonColorFromConfig(
+                              'secondary.borderColor',
+                              OsmeaColors.black,
+                            );
+
+                        return OsmeaComponents.button(
+                          text: 'Add & remove from saved',
+                          variant: ButtonVariant.outlined,
+                          backgroundColor: secondaryBgColor,
+                          textColor: secondaryTextColor,
+                          borderColor: secondaryBorderColor,
+                          onPressed: () {
+                            Navigator.of(context).pop('add_remove');
+                            viewModel.addItemToCartAndRemoveFromWishlist(
+                              state.item.id,
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
                 ],
               ),
               OsmeaComponents.sizedBox(height: context.spacing8),
-              OsmeaComponents.button(
-                text: 'Cancel',
-                variant: ButtonVariant.ghost,
-                onPressed: () => Navigator.of(context).pop('cancel'),
+              Builder(
+                builder: (context) {
+                  final ghostTextColor = _getPopupButtonColorFromConfig(
+                    'ghost.textColor',
+                    OsmeaColors.black,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Cancel',
+                    variant: ButtonVariant.ghost,
+                    textColor: ghostTextColor,
+                    onPressed: () => Navigator.of(context).pop('cancel'),
+                  );
+                },
               ),
             ],
           ),

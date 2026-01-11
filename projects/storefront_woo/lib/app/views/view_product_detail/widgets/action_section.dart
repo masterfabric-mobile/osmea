@@ -60,6 +60,25 @@ class ActionSection extends StatelessWidget {
     return fallback;
   }
 
+  /// Get popup color from config
+  Color _getPopupColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('dialog_popup_configuration.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load popup color $key: $e');
+    }
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
     final wishlistIconColor = _getColorFromConfig('wishlistIconColor', OsmeaColors.black);
@@ -84,6 +103,11 @@ class ActionSection extends StatelessWidget {
               final bool wasSaved = isInWishlist;
               onToggleWishlist();
 
+              // Get popup colors from config
+              final popupTitleColor = _getPopupColorFromConfig('popup.titleColor', const Color(0xFF1976D2));
+              final popupSubtitleColor = _getPopupColorFromConfig('popup.subtitleColor', OsmeaColors.grayMaterial[400]!);
+              final popupIconColor = _getPopupColorFromConfig('icons.primaryColor', wishlistIconColor);
+              
               // Use OsmeaComponents popup for feedback with Undo support
               OsmeaComponents.showPopup(
                 context: context,
@@ -99,7 +123,7 @@ class ActionSection extends StatelessWidget {
                     children: [
                       Icon(
                         wasSaved ? Icons.favorite_border : Icons.favorite,
-                        color: wishlistIconColor,
+                        color: popupIconColor,
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing10),
                       OsmeaComponents.expanded(
@@ -113,7 +137,7 @@ class ActionSection extends StatelessWidget {
                                   : 'Added to favorites',
                               textStyle: OsmeaTextStyle.titleSmall(
                                 context,
-                              ).copyWith(color: OsmeaColors.black),
+                              ).copyWith(color: popupTitleColor),
                             ),
                             OsmeaComponents.text(
                               wasSaved
@@ -121,7 +145,7 @@ class ActionSection extends StatelessWidget {
                                   : 'Item was added to your favorites',
                               textStyle: OsmeaTextStyle.bodySmall(
                                 context,
-                              ).copyWith(color: OsmeaColors.grayMaterial[400]!),
+                              ).copyWith(color: popupSubtitleColor),
                             ),
                           ],
                         ),

@@ -53,6 +53,24 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     }
   }
   
+  /// Get dialog color from config
+  Color _getDialogColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = _configHelper.getString('dialog_popup_configuration.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load dialog color $key: $e');
+    }
+    return fallback;
+  }
+
   /// Show confirmation dialog before removing item
   void _showRemoveConfirmationDialog(BuildContext context, int productId) {
     // Get product name for the dialog
@@ -70,17 +88,26 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       }
     }
     
+    // Get colors from config
+    final dialogBgColor = _getDialogColorFromConfig('dialog.backgroundColor', OsmeaColors.white);
+    final dialogTitleColor = _getDialogColorFromConfig('dialog.titleColor', const Color(0xFF1976D2));
+    final dialogSubtitleColor = _getDialogColorFromConfig('dialog.subtitleColor', OsmeaColors.grayMaterial[400]!);
+    final cancelButtonColor = _getDialogColorFromConfig('buttons.cancel.textColor', OsmeaColors.grayMaterial[500]!);
+    final dangerButtonColor = _getDialogColorFromConfig('buttons.danger.textColor', OsmeaColors.white);
+    final dialogBorderRadius = _configHelper.getDouble('dialog_popup_configuration.dialog.borderRadius', 12.0);
+    
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
+          backgroundColor: dialogBgColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(dialogBorderRadius),
           ),
           title: OsmeaComponents.text(
             'Remove Item',
             textStyle: OsmeaTextStyle.titleLarge(context),
-            color: OsmeaColors.thunder,
+            color: dialogTitleColor,
           ),
           content: OsmeaComponents.column(
             mainAxisSize: MainAxisSize.min,
@@ -88,7 +115,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
               OsmeaComponents.text(
                 'Are you sure you want to remove "$productName" from your cart?',
                 textStyle: OsmeaTextStyle.bodyMedium(context),
-                color: OsmeaColors.pewter,
+                color: dialogSubtitleColor,
                 textAlign: TextAlign.center,
               ),
             ],
@@ -100,7 +127,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
               child: OsmeaComponents.text(
                 'Cancel',
                 textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: OsmeaColors.pewter,
+                  color: cancelButtonColor,
                 ),
               ),
             ),
@@ -110,10 +137,14 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
                 Navigator.of(dialogContext).pop();
                 _removeItemFromCart(productId);
               },
+              style: TextButton.styleFrom(
+                backgroundColor: _getDialogColorFromConfig('buttons.danger.backgroundColor', const Color(0xFFD32F2F)),
+                foregroundColor: dangerButtonColor,
+              ),
               child: OsmeaComponents.text(
                 'Remove',
                 textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: OsmeaColors.red,
+                  color: dangerButtonColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

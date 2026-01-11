@@ -14,8 +14,8 @@
       "enable_logging": true
     },
   "woocommerce_configuration": {
-    "store_url": "http://masterfabric.store",
-    "brand_name": "masterfabric",  
+    "store_url": "https://example.com",
+    "brand_name": "store_name",  
     "auth_key": "THISISMySpeCiaLAUthCodeexampleexample",
     "version": "v1",
     "verify_ssl": true,
@@ -292,7 +292,7 @@
       ]
     },
     "loading_configuration": {
-      "style": "enterprise",
+      "style": "space",
       "type": "dataLoading",
       "duration_milliseconds": 3000,
       "step_duration_milliseconds": 750,
@@ -330,6 +330,23 @@
           "step": "Loading step",
           "cancel": "Cancel loading",
           "retry": "Retry loading"
+        }
+      },
+      "styles": {
+        "space": {
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "primary_color": "#000000"
+        },
+        "startup": {
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "primary_color": "#000000"
+        },
+        "enterprise": {
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "primary_color": "#000000"
         }
       }
     },
@@ -927,7 +944,7 @@
       "bottom_sheet": {
         "backgroundColor": "#FFFFFF",
         "titleColor": "#000000",
-        "subtitleColor": "#666666",
+        "subtitleColor": "#000000",
         "apply_button_background": "#000000",
         "apply_button_text_color": "#FFFFFF",
         "cancel_button_text_color": "#000000"
@@ -1325,6 +1342,76 @@
           "color": "#000000",
           "strokeWidth": 2
         }
+      }
+    },
+    "dialog_popup_configuration": {
+      "dialog": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 12,
+        "elevation": 8
+      },
+      "bottom_sheet": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 16,
+        "elevation": 0
+      },
+      "popup": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 12,
+        "elevation": 8
+      },
+      "buttons": {
+        "primary": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderColor": "#000000"
+        },
+        "secondary": {
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000",
+          "borderColor": "#000000"
+        },
+        "ghost": {
+          "backgroundColor": "transparent",
+          "textColor": "#000000",
+          "borderColor": "transparent"
+        },
+        "danger": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderColor": "#000000"
+        },
+        "cancel": {
+          "backgroundColor": "transparent",
+          "textColor": "#000000",
+          "borderColor": "transparent"
+        }
+      },
+      "icons": {
+        "primaryColor": "#000000",
+        "secondaryColor": "#000000",
+        "successColor": "#000000",
+        "errorColor": "#000000"
+      },
+      "add_to_cart_popup": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "successBackgroundColor": "#FFFFFF",
+        "successBorderColor": "#000000",
+        "successIconColor": "#000000",
+        "successTextColor": "#000000",
+        "loadingColor": "#000000",
+        "footerBackgroundColor": "#FFFFFF",
+        "footerBorderColor": "#E0E0E0"
       }
     }
 

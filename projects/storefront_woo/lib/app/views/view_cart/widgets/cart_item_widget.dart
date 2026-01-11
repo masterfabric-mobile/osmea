@@ -227,11 +227,20 @@ class CartItemWidget extends StatelessWidget {
   }
 
   Widget _buildRemoveButton(BuildContext context) {
+    // Get remove button color from config
+    final configHelper = AssetConfigHelper();
+    final removeButtonColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.remove_button_color',
+        '#000000',
+      ),
+    );
+    
     return OsmeaComponents.iconButton(
       onPressed: () => viewModel.removeItemFromCart(item.productId),
       icon: Icon(
         Icons.delete_outline_rounded,
-        color: OsmeaColors.amberFlame,
+        color: removeButtonColor,
         size: context.iconSizeSmall,
       ),
       backgroundColor: Colors.transparent,
