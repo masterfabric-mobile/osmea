@@ -42,7 +42,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   // Public trigger functions - HydratedCubit pattern
   void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
-  Future<void> refreshCart({String? cartToken}) async => await _loadCart(cartToken: cartToken);
+  Future<void> refreshCart({String? cartToken}) async =>
+      await _loadCart(cartToken: cartToken);
   Future<void> addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
   void removeItemFromCart(int productId, {BuildContext? context}) {
@@ -52,11 +53,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       _removeItemFromCart(productId);
     }
   }
-  
+
   /// Get dialog color from config
   Color _getDialogColorFromConfig(String key, Color fallback) {
     try {
-      final colorString = _configHelper.getString('dialog_popup_configuration.$key');
+      final colorString = _configHelper.getString(
+        'dialog_popup_configuration.$key',
+      );
       if (colorString.isNotEmpty && colorString.startsWith('#')) {
         final hexString = colorString.substring(1);
         if (hexString.length == 6) {
@@ -87,15 +90,33 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         productName = 'this item';
       }
     }
-    
+
     // Get colors from config
-    final dialogBgColor = _getDialogColorFromConfig('dialog.backgroundColor', OsmeaColors.white);
-    final dialogTitleColor = _getDialogColorFromConfig('dialog.titleColor', const Color(0xFF1976D2));
-    final dialogSubtitleColor = _getDialogColorFromConfig('dialog.subtitleColor', OsmeaColors.grayMaterial[400]!);
-    final cancelButtonColor = _getDialogColorFromConfig('buttons.cancel.textColor', OsmeaColors.grayMaterial[500]!);
-    final dangerButtonColor = _getDialogColorFromConfig('buttons.danger.textColor', OsmeaColors.white);
-    final dialogBorderRadius = _configHelper.getDouble('dialog_popup_configuration.dialog.borderRadius', 12.0);
-    
+    final dialogBgColor = _getDialogColorFromConfig(
+      'dialog.backgroundColor',
+      OsmeaColors.white,
+    );
+    final dialogTitleColor = _getDialogColorFromConfig(
+      'dialog.titleColor',
+      const Color(0xFF1976D2),
+    );
+    final dialogSubtitleColor = _getDialogColorFromConfig(
+      'dialog.subtitleColor',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final cancelButtonColor = _getDialogColorFromConfig(
+      'buttons.cancel.textColor',
+      OsmeaColors.grayMaterial[500]!,
+    );
+    final dangerButtonColor = _getDialogColorFromConfig(
+      'buttons.danger.textColor',
+      OsmeaColors.white,
+    );
+    final dialogBorderRadius = _configHelper.getDouble(
+      'dialog_popup_configuration.dialog.borderRadius',
+      12.0,
+    );
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -126,9 +147,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: OsmeaComponents.text(
                 'Cancel',
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: cancelButtonColor,
-                ),
+                textStyle: OsmeaTextStyle.bodyMedium(
+                  context,
+                ).copyWith(color: cancelButtonColor),
               ),
             ),
             // Remove button
@@ -138,7 +159,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
                 _removeItemFromCart(productId);
               },
               style: TextButton.styleFrom(
-                backgroundColor: _getDialogColorFromConfig('buttons.danger.backgroundColor', const Color(0xFFD32F2F)),
+                backgroundColor: _getDialogColorFromConfig(
+                  'buttons.danger.backgroundColor',
+                  const Color(0xFFD32F2F),
+                ),
                 foregroundColor: dangerButtonColor,
               ),
               child: OsmeaComponents.text(
@@ -154,6 +178,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       },
     );
   }
+
   void updateItemQuantity(int productId, int quantity) =>
       _updateItemQuantity(productId, quantity);
   void clearCart() => _clearCart();
@@ -365,7 +390,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         currencyThousandSeparator: currencyThousandSeparator,
         currencyMinorUnit: currencyMinorUnit,
       );
-      
+
       // Track last loaded state for overlay during updates
       _lastLoadedState = loadedState;
       emit(loadedState);
@@ -416,7 +441,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken ?? '',
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated, null otherwise (interceptor will add it)
+        jwtToken:
+            jwtToken, // JWT token with Bearer prefix if authenticated, null otherwise (interceptor will add it)
         id: productId,
         quantity: quantity,
       );
@@ -666,7 +692,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         shippingAddress: null,
         billingAddress: null,
       );
-      
+
       // Track last loaded state for overlay during updates
       _lastLoadedState = loadedState;
       emit(loadedState);
