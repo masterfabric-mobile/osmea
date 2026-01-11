@@ -120,13 +120,17 @@
 
 ### 📦 **Core Packages** (3)
 
-| Package | Purpose | Status | Key Features |
-|---------|---------|--------|--------------|
-| **[🌐 APIs](packages/apis/)**      | Backend integration      | ✅ Production | REST/GraphQL, Shopify, WooCommerce, Auth, Error handling         |
-|
-| **[🎨 Components](packages/components/)** | UI component library     | ✅ Production | 50+ components, Material Design 3, Responsive layouts            |
-|
-| **[🔧 Core](packages/core/)**      | Foundation utilities      | ✅ Production | DI, Storage, Analytics, Theming, i18n support                    |
+#### 🌐 **[APIs](packages/apis/)** 
+**Backend integration** | ✅ Production Ready  
+REST/GraphQL • Shopify • WooCommerce • Auth • Error handling
+
+#### 🎨 **[Components](packages/components/)**
+**UI component library** | ✅ Production Ready  
+50+ components • Material Design 3 • Responsive layouts
+
+#### 🔧 **[Core](packages/core/)**
+**Foundation utilities** | ✅ Production Ready  
+DI • Storage • Analytics • Theming • i18n support
 
 ### 🚀 **Ready-to-Use Applications** (6)
 
