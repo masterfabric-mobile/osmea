@@ -776,6 +776,26 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
+    // About Route
+    GoRoute(
+      path: '/about',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: AboutView(
+            goRoute: (String path) {
+              debugPrint('🔀 AboutView: goRoute called with path: $path');
+              context.go(path);
+            },
+            // AboutView will load configuration from app_config.json internally
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+
     // Product Detail Route
     GoRoute(
       path: '/product-detail/:productId',

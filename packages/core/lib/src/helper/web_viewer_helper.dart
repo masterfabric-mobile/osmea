@@ -512,9 +512,32 @@ class _WebViewerState extends State<_WebViewer> {
       value: _cubit,
       child: BlocBuilder<_WebViewerCubit, BaseViewState<String>>(
         builder: (context, state) {
+          // If navigation controls are disabled, show only web view
+          if (!widget.showNavigationControls) {
+            return Stack(
+              children: [
+                _buildWebViewWidget(),
+                state.when(
+                  loading: () => Positioned.fill(
+                    child: OsmeaComponents.center(
+                      child: widget.loadingWidget ??
+                          OsmeaComponents.loading(
+                              type: LoadingType.circularFade),
+                    ),
+                  ),
+                  error: (message) => Positioned.fill(
+                    child: widget.errorWidget ?? _buildErrorWidget(message),
+                  ),
+                  content: (_) => const SizedBox.shrink(),
+                ),
+              ],
+            );
+          }
+          
+          // Show navigation controls if enabled
           return OsmeaComponents.column(
             children: [
-              if (widget.showNavigationControls) _buildNavigationControls(),
+              _buildNavigationControls(),
               OsmeaComponents.expanded(
                 child: Stack(
                   children: [

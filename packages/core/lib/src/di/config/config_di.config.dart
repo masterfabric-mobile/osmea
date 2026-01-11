@@ -13,6 +13,7 @@ import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart
     as _i481;
 import 'package:core/src/helper/common_logger_helper/common_logger_helper.dart'
     as _i674;
+import 'package:core/src/views/about/cubit/about_cubit.dart' as _i963;
 import 'package:core/src/views/account/cubit/account_cubit.dart' as _i111;
 import 'package:core/src/views/auth/cubit/auth_cubit.dart' as _i651;
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart' as _i905;
@@ -45,6 +46,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     final commonLoggerModule = _$CommonLoggerModule();
     gh.factory<_i674.CommonLogger>(() => commonLoggerModule.commonLogger);
+    gh.factory<_i963.AboutViewCubit>(() => _i963.AboutViewCubit());
     gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit());
     gh.factory<_i651.AuthCubit>(() => _i651.AuthCubit());
     gh.factory<_i905.EmptyViewCubit>(() => _i905.EmptyViewCubit());

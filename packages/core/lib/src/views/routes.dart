@@ -8,5 +8,6 @@ enum Routes {
   signIn,
   search,
   signUp,
-  account
+  account,
+  about
 }

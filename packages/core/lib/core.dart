@@ -140,8 +140,16 @@ export 'package:core/src/views/loading/loading_view.dart';
 export 'package:core/src/views/loading/cubit/loading_cubit.dart';
 export 'package:core/src/views/loading/cubit/loading_state.dart';
 
+// 📄 Exports the About View
+export 'package:core/src/views/about/about_view.dart';
+export 'package:core/src/views/about/cubit/about_cubit.dart';
+export 'package:core/src/views/about/cubit/about_state.dart';
+
 // 🔄 Exports the loading models
 export 'package:core/src/models/loading_models.dart';
+
+// 📄 Exports the About Models
+export 'package:core/src/models/about_models.dart';
 
 // 🔄 Exports the routes
 export 'package:core/src/views/routes.dart';

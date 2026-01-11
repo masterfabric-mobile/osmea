@@ -78,6 +78,13 @@
             "iconName": "notifications_outlined",
             "iconColor": "#000000",
             "route": "/notifications"
+          },
+          {
+            "id": "about",
+            "title": "About",
+            "iconName": "info_outline",
+            "iconColor": "#000000",
+            "route": "/about"
           }
         ]
       },
@@ -291,8 +298,21 @@
         }
       ]
     },
+    "about_configuration": {
+      "style": "enterprise",
+      "title": "About",
+      "url": "https://www.masterfabric.co/about",
+      "enable_fullscreen_web_view": true,
+      "show_version": true,
+      "show_company_info": true,
+      "company_name": "MasterFabric",
+      "copyright": "© 2025 MasterFabric Inc.",
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "primary_color": "#000000"
+    },
     "loading_configuration": {
-      "style": "space",
+      "style": "enterprise",
       "type": "dataLoading",
       "duration_milliseconds": 3000,
       "step_duration_milliseconds": 750,
