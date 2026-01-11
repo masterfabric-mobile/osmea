@@ -137,33 +137,45 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
             // Get config helper
             final configHelper = AssetConfigHelper();
 
-            // Always show AppBar - get title from model, direct parameter, or config
+            // Always show AppBar - get title from config first, then model, then direct parameter
             String appBarTitle = 'About';
 
-            // Priority 1: From model
-            if (model != null) {
-              appBarTitle = model.title;
-            } else if (title != null && title.isNotEmpty) {
-              // Priority 2: Direct title parameter
-              appBarTitle = title;
-            } else {
-              // Priority 3: Try to get from config synchronously
-              try {
-                final aboutConfigObj =
-                    configHelper.getObject('about_configuration');
-                if (aboutConfigObj != null) {
+            // Priority 1: Try to get from config synchronously (app_config.json)
+            try {
+              final aboutConfigObj =
+                  configHelper.getObject('about_configuration');
+              if (aboutConfigObj != null) {
+                // First try app_bar.title, then fallback to root title
+                final appBarTitleFromConfig = (aboutConfigObj['app_bar']
+                    as Map<String, dynamic>?)?['title'] as String?;
+                if (appBarTitleFromConfig != null &&
+                    appBarTitleFromConfig.isNotEmpty) {
+                  appBarTitle = appBarTitleFromConfig;
+                } else {
                   appBarTitle = aboutConfigObj['title'] as String? ?? 'About';
                 }
-              } catch (e) {
-                debugPrint('⚠️ Could not get about config for AppBar: $e');
               }
+            } catch (e) {
+              debugPrint('⚠️ Could not get about config for AppBar: $e');
+            }
 
-              // Priority 4: Check from config model
-              if (aboutConfig != null && aboutType != null) {
-                final configModel = aboutConfig.getAboutPage(aboutType);
-                if (configModel != null) {
-                  appBarTitle = configModel.title;
-                }
+            // Priority 2: From model (if config didn't provide)
+            if (appBarTitle == 'About' && model != null) {
+              appBarTitle = model.title;
+            }
+
+            // Priority 3: Direct title parameter (if config and model didn't provide)
+            if (appBarTitle == 'About' && title != null && title.isNotEmpty) {
+              appBarTitle = title;
+            }
+
+            // Priority 4: Check from config model (if still default)
+            if (appBarTitle == 'About' &&
+                aboutConfig != null &&
+                aboutType != null) {
+              final configModel = aboutConfig.getAboutPage(aboutType);
+              if (configModel != null) {
+                appBarTitle = configModel.title;
               }
             }
 

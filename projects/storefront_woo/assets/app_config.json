@@ -85,6 +85,20 @@
             "iconName": "info_outline",
             "iconColor": "#000000",
             "route": "/about"
+          },
+          {
+            "id": "contact_us",
+            "title": "Contact Us",
+            "iconName": "email_outlined",
+            "iconColor": "#000000",
+            "route": "/contact-us"
+          },
+          {
+            "id": "faq",
+            "title": "FAQ",
+            "iconName": "help_outline",
+            "iconColor": "#000000",
+            "route": "/faq"
           }
         ]
       },
@@ -300,16 +314,96 @@
     },
     "about_configuration": {
       "style": "enterprise",
-      "title": "About",
-      "url": "https://www.masterfabric.co/about",
+      "title": "About MasterFabric",
+      "description": "Platform-Based Application Development Studio",
+      "html_content": "<div style='padding: 24px; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;'><h1 style='color: #000000; font-size: 28px; font-weight: 600; margin-bottom: 16px;'>About MasterFabric</h1><p style='color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 16px;'>We are a team of mobile application development experts who excel in creating innovative solutions across multiple industries. Our expertise spans cross-platform development, seamless backend integrations, and enterprise-grade mobile solutions.</p><p style='color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 16px;'>We don't limit ourselves to specific sectors - instead, we embrace diverse challenges and deliver exceptional results in healthcare, fintech, e-commerce, education, and logistics.</p><h2 style='color: #000000; font-size: 22px; font-weight: 600; margin-top: 24px; margin-bottom: 12px;'>Our Expertise</h2><ul style='color: #333333; font-size: 16px; line-height: 1.8; padding-left: 24px;'><li>Cross-platform mobile development (Flutter, React Native)</li><li>Native iOS and Android development</li><li>Backend integration and API development</li><li>Enterprise-grade mobile solutions</li><li>UI/UX design and implementation</li><li>Cloud infrastructure and DevOps</li></ul><h2 style='color: #000000; font-size: 22px; font-weight: 600; margin-top: 24px; margin-bottom: 12px;'>Industries We Serve</h2><p style='color: #333333; font-size: 16px; line-height: 1.6;'>Healthcare, Fintech, E-commerce, Education, Logistics, and more.</p></div>",
       "enable_fullscreen_web_view": true,
       "show_version": true,
       "show_company_info": true,
       "company_name": "MasterFabric",
-      "copyright": "© 2025 MasterFabric Inc.",
+      "copyright": "© 2025 MasterFabric Inc. All rights reserved.",
       "background_color": "#FFFFFF",
       "text_color": "#000000",
-      "primary_color": "#000000"
+      "primary_color": "#000000",
+      "app_bar": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0.0
+      }
+    },
+    "contact_us_configuration": {
+      "style": "space",
+      "title": "Contact Us",
+      "description": "Get in touch with us",
+      "email": "info@masterfabric.co",
+      "phone": "+1 (555) 123-4567",
+      "address": "123 Innovation Street, Tech City, TC 12345",
+      "company_name": "MasterFabric",
+      "show_contact_form": true,
+      "show_contact_info": true,
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "primary_color": "#000000",
+      "app_bar": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0.0
+      }
+    },
+    "faq_configuration": {
+      "style": "enterprise",
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to common questions",
+      "allow_multiple_expanded": true,
+      "show_search_bar": true,
+      "show_categories": false,
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "primary_color": "#000000",
+      "app_bar": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "title": "FAQ",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0.0
+      },
+      "items": [
+        {
+          "question": "What is MasterFabric?",
+          "answer": "<p>MasterFabric is a platform-based application development studio that specializes in creating innovative mobile solutions across multiple industries.</p>",
+          "expanded_by_default": false,
+          "category": null
+        },
+        {
+          "question": "What services do you offer?",
+          "answer": "<p>We offer cross-platform mobile development, native iOS and Android development, backend integration, enterprise-grade mobile solutions, UI/UX design, and cloud infrastructure services.</p>",
+          "expanded_by_default": false,
+          "category": null
+        },
+        {
+          "question": "Which industries do you serve?",
+          "answer": "<p>We serve healthcare, fintech, e-commerce, education, logistics, and many other industries. We don't limit ourselves to specific sectors and embrace diverse challenges.</p>",
+          "expanded_by_default": false,
+          "category": null
+        },
+        {
+          "question": "How can I contact you?",
+          "answer": "<p>You can reach us via email at info@masterfabric.co or through our contact form. We're always happy to discuss your project needs.</p>",
+          "expanded_by_default": false,
+          "category": null
+        },
+        {
+          "question": "Do you provide ongoing support?",
+          "answer": "<p>Yes, we provide comprehensive ongoing support and maintenance services for all our applications to ensure they continue to perform optimally.</p>",
+          "expanded_by_default": false,
+          "category": null
+        }
+      ]
     },
     "loading_configuration": {
       "style": "enterprise",

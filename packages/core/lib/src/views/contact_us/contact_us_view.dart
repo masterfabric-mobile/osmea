@@ -130,37 +130,47 @@ class ContactUsView
               return fallback;
             }
 
-            // Always show AppBar - get title from model, direct parameter, or config
+            // Always show AppBar - get title from config first, then model, then direct parameter
             String appBarTitle = 'Contact Us';
 
-            // Priority 1: From model
-            final state = viewModel.state;
-            final model = state.model ?? contactUsPageModel;
-            if (model != null) {
-              appBarTitle = model.title;
-            } else if (title != null && title.isNotEmpty) {
-              // Priority 2: Direct title parameter
-              appBarTitle = title;
-            } else {
-              // Priority 3: Try to get from config synchronously
-              try {
-                final contactUsConfigObj =
-                    configHelper.getObject('contact_us_configuration');
-                if (contactUsConfigObj != null) {
+            // Priority 1: Try to get from config synchronously (app_config.json)
+            try {
+              final contactUsConfigObj =
+                  configHelper.getObject('contact_us_configuration');
+              if (contactUsConfigObj != null) {
+                // First try app_bar.title, then fallback to root title
+                final appBarTitleFromConfig = (contactUsConfigObj['app_bar'] as Map<String, dynamic>?)?['title'] as String?;
+                if (appBarTitleFromConfig != null && appBarTitleFromConfig.isNotEmpty) {
+                  appBarTitle = appBarTitleFromConfig;
+                } else {
                   appBarTitle =
                       contactUsConfigObj['title'] as String? ?? 'Contact Us';
                 }
-              } catch (e) {
-                debugPrint('⚠️ Could not get contact us config for AppBar: $e');
               }
+            } catch (e) {
+              debugPrint('⚠️ Could not get contact us config for AppBar: $e');
+            }
 
-              // Priority 4: Check from config model
-              if (contactUsConfig != null && contactUsType != null) {
-                final configModel =
-                    contactUsConfig.getContactPage(contactUsType);
-                if (configModel != null) {
-                  appBarTitle = configModel.title;
-                }
+            // Priority 2: From model (if config didn't provide)
+            if (appBarTitle == 'Contact Us') {
+              final state = viewModel.state;
+              final model = state.model ?? contactUsPageModel;
+              if (model != null) {
+                appBarTitle = model.title;
+              }
+            }
+
+            // Priority 3: Direct title parameter (if config and model didn't provide)
+            if (appBarTitle == 'Contact Us' && title != null && title.isNotEmpty) {
+              appBarTitle = title;
+            }
+
+            // Priority 4: Check from config model (if still default)
+            if (appBarTitle == 'Contact Us' && contactUsConfig != null && contactUsType != null) {
+              final configModel =
+                  contactUsConfig.getContactPage(contactUsType);
+              if (configModel != null) {
+                appBarTitle = configModel.title;
               }
             }
 
