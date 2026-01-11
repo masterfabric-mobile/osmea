@@ -5,6 +5,8 @@ import 'package:storefront_woo/services/wordpress_config_integration.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:storefront_woo/gen/translations.g.dart' as app_translations;
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// 🚀 Launch the Storefront WooCommerce application
 ///
@@ -252,16 +254,28 @@ launchApp({String environment = 'dev'}) async {
   debugPrint('  - Font Scale: $fontScale');
   debugPrint('  - Debug Mode: $debugMode');
 
+  // Initialize locale settings
+  app_translations.LocaleSettings.useDeviceLocaleSync();
+
   // Run the main application with the specified router and configuration
   runApp(
-    MasterApp(
-      router: appRouter, // The router handles navigation within the app
-      devModeGrid: debugMode, // Use configuration-based debug mode
-      devModeSpacer: debugMode, // Use configuration-based debug mode
-      useConfigurationHelpers:
-          true, // Enable configuration helpers in MasterApp
-      themeMode: appThemeMode, // Apply theme mode from configuration
-      fontScale: fontScale, // Apply font scale from configuration
+    app_translations.TranslationProvider(
+      child: MasterApp(
+        router: appRouter, // The router handles navigation within the app
+        devModeGrid: debugMode, // Use configuration-based debug mode
+        devModeSpacer: debugMode, // Use configuration-based debug mode
+        useConfigurationHelpers:
+            true, // Enable configuration helpers in MasterApp
+        themeMode: appThemeMode, // Apply theme mode from configuration
+        fontScale: fontScale, // Apply font scale from configuration
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: app_translations.AppLocaleUtils.supportedLocales,
+        locale: app_translations.LocaleSettings.currentLocale.flutterLocale,
+      ),
     ),
   );
 

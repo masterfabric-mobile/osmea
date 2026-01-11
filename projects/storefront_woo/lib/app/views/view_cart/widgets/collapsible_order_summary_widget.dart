@@ -12,6 +12,7 @@ import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/order_summary_widget.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Collapsible order summary widget for bottom of cart
 class CollapsibleOrderSummaryWidget extends StatefulWidget {
@@ -127,7 +128,7 @@ class _CollapsibleOrderSummaryWidgetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             OsmeaComponents.text(
-                              'Total',
+                              context.t.cartView.widgets.orderSummary.total,
                               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                                 color: OsmeaColors.pewter,
                               ),
@@ -209,7 +210,7 @@ class _CollapsibleOrderSummaryWidgetState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 OsmeaComponents.text(
-                  'Checkout',
+                  context.t.cartView.widgets.orderSummary.checkout,
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     color: _parseColor(
                       configHelper.getString(
@@ -285,7 +286,7 @@ class _CollapsibleOrderSummaryWidgetState
         // User not authenticated, show message and redirect to auth
         if (context.mounted) {
           context.snackbarWarning(
-            'Please sign in to complete your purchase',
+            context.t.cartView.messages.signInRequired,
             duration: const Duration(seconds: 3),
           );
           await Future.delayed(const Duration(milliseconds: 500));
@@ -316,7 +317,7 @@ class _CollapsibleOrderSummaryWidgetState
     } catch (e) {
       if (context.mounted) {
         context.snackbarError(
-          'Error starting checkout: ${e.toString()}',
+          context.t.cartView.widgets.orderSummary.checkoutError.replaceAll('{error}', e.toString()),
           duration: const Duration(seconds: 3),
         );
       }

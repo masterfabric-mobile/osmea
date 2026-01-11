@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Minimalist error widget for home view
 class HomeErrorWidget extends StatelessWidget {
@@ -124,7 +125,7 @@ class HomeErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Try Again',
+      text: context.t.homeView.error.tryAgain,
       onPressed: onRetry,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
@@ -145,7 +146,7 @@ class HomeErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Go Back',
+      text: context.t.homeView.error.goBack,
       onPressed: () {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();

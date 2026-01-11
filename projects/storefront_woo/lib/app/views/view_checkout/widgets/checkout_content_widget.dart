@@ -9,6 +9,7 @@ import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 class CheckoutContentWidget extends StatefulWidget {
   final CheckoutViewModel viewModel;
@@ -394,7 +395,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Billing Address Section
-            _buildSectionHeader(context, 'Billing Address', Icons.receipt),
+            _buildSectionHeader(context, context.t.checkoutView.sections.billingAddress, Icons.receipt),
             _buildBillingForm(context),
 
             OsmeaComponents.sizedBox(height: 24),
@@ -402,7 +403,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             // Shipping Address Section
             _buildSectionHeader(
               context,
-              'Shipping Address',
+              context.t.checkoutView.sections.shippingAddress,
               Icons.local_shipping,
             ),
             _buildSameAsBillingCheckbox(context),
@@ -475,10 +476,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingFirstNameController,
                   label: '',
-                  hint: 'First name',
+                  hint: context.t.checkoutView.formFields.firstName,
                   icon: Icons.person_outline,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -486,10 +487,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingLastNameController,
                   label: '',
-                  hint: 'Last name',
+                  hint: context.t.checkoutView.formFields.lastName,
                   icon: Icons.person_outline,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -498,12 +499,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           _buildTextFormField(
             controller: _billingEmailController,
             label: '',
-            hint: 'Email',
+            hint: context.t.checkoutView.formFields.email,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Required';
-              if (!value!.contains('@')) return 'Invalid email';
+              if (value?.isEmpty ?? true) return context.t.checkoutView.formFields.required;
+              if (!value!.contains('@')) return context.t.checkoutView.formFields.invalidEmail;
               return null;
             },
           ),
@@ -511,24 +512,24 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           _buildTextFormField(
             controller: _billingPhoneController,
             label: '',
-            hint: 'Phone',
+            hint: context.t.checkoutView.formFields.phone,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
-            validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+            validator: (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingAddress1Controller,
             label: '',
-            hint: 'Address Line 1',
+            hint: context.t.checkoutView.formFields.addressLine1,
             icon: Icons.home_outlined,
-            validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+            validator: (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _billingAddress2Controller,
             label: '',
-            hint: 'Address Line 2 (Optional)',
+            hint: context.t.checkoutView.formFields.addressLine2,
             icon: Icons.home_outlined,
           ),
           OsmeaComponents.sizedBox(height: 12),
@@ -538,10 +539,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingCityController,
                   label: '',
-                  hint: 'City',
+                  hint: context.t.checkoutView.formFields.city,
                   icon: Icons.location_city_outlined,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -549,10 +550,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingStateController,
                   label: '',
-                  hint: 'State',
+                  hint: context.t.checkoutView.formFields.state,
                   icon: Icons.map_outlined,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -564,10 +565,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingPostcodeController,
                   label: '',
-                  hint: 'Postcode',
+                  hint: context.t.checkoutView.formFields.postcode,
                   icon: Icons.markunread_mailbox_outlined,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -575,10 +576,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _billingCountryController,
                   label: '',
-                  hint: 'Country',
+                  hint: context.t.checkoutView.formFields.country,
                   icon: Icons.public,
                   validator: (value) =>
-                      value?.isEmpty ?? true ? 'Required' : null,
+                      value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -623,7 +624,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             ),
             OsmeaComponents.sizedBox(width: 12),
             OsmeaComponents.text(
-              'Same as billing address',
+              context.t.checkoutView.sections.sameAsBilling,
               textStyle: OsmeaTextStyle.bodyMedium(
                 context,
               ).copyWith(fontWeight: FontWeight.w500),
@@ -662,12 +663,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingFirstNameController,
                   label: '',
-                  hint: 'First name',
+                  hint: context.t.checkoutView.formFields.firstName,
                   icon: Icons.person_outline,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -675,12 +676,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingLastNameController,
                   label: '',
-                  hint: 'Last name',
+                  hint: context.t.checkoutView.formFields.lastName,
                   icon: Icons.person_outline,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -689,30 +690,30 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           _buildTextFormField(
             controller: _shippingPhoneController,
             label: '',
-            hint: 'Phone',
+            hint: context.t.checkoutView.formFields.phone,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             enabled: !_sameAsBilling,
             validator: _sameAsBilling
                 ? null
-                : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _shippingAddress1Controller,
             label: '',
-            hint: 'Address Line 1',
+            hint: context.t.checkoutView.formFields.addressLine1,
             icon: Icons.home_outlined,
             enabled: !_sameAsBilling,
             validator: _sameAsBilling
                 ? null
-                : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
           ),
           OsmeaComponents.sizedBox(height: 12),
           _buildTextFormField(
             controller: _shippingAddress2Controller,
             label: '',
-            hint: 'Address Line 2 (Optional)',
+            hint: context.t.checkoutView.formFields.addressLine2,
             icon: Icons.home_outlined,
             enabled: !_sameAsBilling,
           ),
@@ -723,12 +724,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingCityController,
                   label: '',
-                  hint: 'City',
+                  hint: context.t.checkoutView.formFields.city,
                   icon: Icons.location_city_outlined,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -736,12 +737,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingStateController,
                   label: '',
-                  hint: 'State',
+                  hint: context.t.checkoutView.formFields.state,
                   icon: Icons.map_outlined,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -753,12 +754,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingPostcodeController,
                   label: '',
-                  hint: 'Postcode',
+                  hint: context.t.checkoutView.formFields.postcode,
                   icon: Icons.markunread_mailbox_outlined,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
               OsmeaComponents.sizedBox(width: 12),
@@ -766,12 +767,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 child: _buildTextFormField(
                   controller: _shippingCountryController,
                   label: '',
-                  hint: 'Country',
+                  hint: context.t.checkoutView.formFields.country,
                   icon: Icons.public,
                   enabled: !_sameAsBilling,
                   validator: _sameAsBilling
                       ? null
-                      : (value) => value?.isEmpty ?? true ? 'Required' : null,
+                      : (value) => value?.isEmpty ?? true ? context.t.checkoutView.formFields.required : null,
                 ),
               ),
             ],
@@ -868,7 +869,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OsmeaComponents.text(
-                'Order Total',
+                context.t.checkoutView.sections.orderTotal,
                 textStyle: OsmeaTextStyle.bodyMedium(context),
                 color: _getColorFromConfig('order_summary.label_color', OsmeaColors.grayMaterial[400]!),
               ),
@@ -935,7 +936,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       OsmeaComponents.text(
-                        'Bank Transfer',
+                        context.t.checkoutView.payment.bankTransfer,
                         textStyle: OsmeaTextStyle.bodyLarge(
                           context,
                         ).copyWith(fontWeight: FontWeight.w600),
@@ -943,7 +944,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                       ),
                       OsmeaComponents.sizedBox(height: 2),
                       OsmeaComponents.text(
-                        'Havale/EFT',
+                        context.t.checkoutView.payment.bankTransferSubtitle,
                         textStyle: OsmeaTextStyle.bodySmall(context),
                         color: _getColorFromConfig('form_fields.helper_text_color', OsmeaColors.grayMaterial[400]!),
                       ),
@@ -991,7 +992,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   OsmeaComponents.text(
-                    'Complete Order',
+                    context.t.checkoutView.buttons.completeOrder,
                     textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                       color: _getColorFromConfig('order_summary.button_text_color', OsmeaColors.white),
                       fontWeight: FontWeight.w600,
@@ -1012,7 +1013,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
 
   void _handleContinue(BuildContext context) {
     if (!_formKey.currentState!.validate()) {
-      context.snackbarWarning('Please fill in all required fields');
+      context.snackbarWarning(context.t.checkoutView.messages.fillRequiredFields);
       return;
     }
 

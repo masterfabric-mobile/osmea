@@ -13,6 +13,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_attributes_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_section_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product information section
 class ProductInfoSectionWidget extends StatelessWidget {
@@ -40,7 +41,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
             children: [
               // Product name
               OsmeaComponents.text(
-                state.product.name ?? 'Unknown Product',
+                state.product.name ?? context.t.productDetailView.unknownProduct,
                 textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.5,
@@ -88,7 +89,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
               // Description
               if (state.product.description?.isNotEmpty == true) ...[
                 OsmeaComponents.text(
-                  'Details',
+                  context.t.productDetailView.description.details,
                   textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.0,

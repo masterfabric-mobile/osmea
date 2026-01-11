@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 class DescriptionSection extends StatelessWidget {
   final String description;
@@ -70,7 +71,9 @@ class DescriptionSection extends StatelessWidget {
                   ),
                 ),
                 child: OsmeaComponents.text(
-                  state.isDescriptionExpanded ? 'Show Less' : 'Show More',
+                  state.isDescriptionExpanded 
+                      ? context.t.productDetailView.description.showLess
+                      : context.t.productDetailView.description.showMore,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     color: OsmeaColors.black.withOpacity(context.alpha80),
                     fontWeight: FontWeight.w400,

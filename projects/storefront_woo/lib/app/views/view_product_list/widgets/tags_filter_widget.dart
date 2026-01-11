@@ -9,6 +9,7 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 class TagsFilterWidget extends StatefulWidget {
   final ProductListViewModel viewModel;
@@ -66,7 +67,7 @@ class _TagsFilterWidgetState extends State<TagsFilterWidget> {
             '🏷️ TagsFilterWidget: Showing error: ${state.filterOptionsError}',
           );
           return OsmeaComponents.text(
-            'Failed to load tags: ${state.filterOptionsError}',
+            context.t.productListView.widgets.tags.loadError.replaceAll('{error}', state.filterOptionsError ?? ''),
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
             ).copyWith(color: OsmeaColors.red),
@@ -95,7 +96,7 @@ class _TagsFilterWidgetState extends State<TagsFilterWidget> {
             if (tagId == null) return const SizedBox.shrink();
 
             final isSelected = currentSelectedTags.contains(tagId);
-            final tagName = tag.name ?? 'Unnamed Tag';
+            final tagName = tag.name ?? context.t.productListView.widgets.chips.unnamedTag;
 
             return OsmeaComponents.chips(
               text: tagName,

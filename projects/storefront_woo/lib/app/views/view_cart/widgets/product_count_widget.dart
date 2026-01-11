@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget displaying product count
 class ProductCountWidget extends StatelessWidget {
@@ -35,7 +36,7 @@ class ProductCountWidget extends StatelessWidget {
             color: OsmeaColors.thunder,
           ),
           children: [
-            const TextSpan(text: 'Your shopping cart contains a total of '),
+            TextSpan(text: context.t.cartView.widgets.item.productCount.prefix),
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Container(
@@ -59,7 +60,7 @@ class ProductCountWidget extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' ${totalItems == 1 ? 'product' : 'products'}',
+                        text: ' ${totalItems == 1 ? context.t.cartView.widgets.item.productCount.product : context.t.cartView.widgets.item.productCount.products}',
                         style: OsmeaTextStyle.bodyMedium(context).copyWith(
                           color: OsmeaColors.black,
                           fontWeight: FontWeight.w600,
@@ -70,7 +71,7 @@ class ProductCountWidget extends StatelessWidget {
                 ),
               ),
             ),
-            const TextSpan(text: ' in this order'),
+            TextSpan(text: context.t.cartView.widgets.item.productCount.suffix),
           ],
         ),
       ),

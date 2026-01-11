@@ -1,0 +1,327 @@
+{
+    "@@locale": "en",
+    "localLanguageCode": "en_US",
+    "campaignView": {
+        "title": "Campaign",
+        "subtitle": "Special Offer",
+        "loading": "Loading campaign...",
+        "error": "Failed to load campaign",
+        "navigation": "Navigating to home..."
+    },
+    "cartView": {
+        "appBar": {
+            "title": "Shopping Cart",
+            "refreshTooltip": "Refresh cart"
+        },
+        "loading": "Loading cart...",
+        "error": {
+            "tryAgain": "Try Again",
+            "goBack": "Go Back",
+            "retry": "Retry"
+        },
+        "empty": {
+            "title": "Your cart is empty",
+            "subtitle": "Add some products to get started",
+            "continueShopping": "Continue Shopping"
+        },
+        "messages": {
+            "noCartLoaded": "No cart loaded",
+            "noCartToken": "No cart token available",
+            "itemNotFound": "Item not found in cart",
+            "signInRequired": "Please sign in to complete your purchase"
+        },
+        "checkout": {
+            "completePurchase": "Complete Purchase",
+            "authenticationError": "Error checking authentication: {error}"
+        },
+        "widgets": {
+            "item": {
+                "defaultName": "this item",
+                "remove": {
+                    "title": "Remove Item",
+                    "message": "Are you sure you want to remove \"{productName}\" from your cart?",
+                    "cancel": "Cancel",
+                    "confirm": "Remove",
+                    "tooltip": "Remove item",
+                    "swipeLabel": "Remove",
+                    "removedMessage": "Item removed from cart",
+                    "undo": "Undo"
+                },
+                "productCount": {
+                    "prefix": "Your shopping cart contains a total of ",
+                    "product": "product",
+                    "products": "products",
+                    "suffix": " in this order"
+                }
+            },
+            "orderSummary": {
+                "title": "Order Summary",
+                "subtotal": "Subtotal",
+                "discount": "Discount",
+                "shipping": "Shipping",
+                "shippingCalculated": "Calculated at checkout",
+                "tax": "Tax",
+                "taxCalculated": "Calculated at checkout",
+                "total": "Total",
+                "checkout": "Checkout",
+                "checkoutError": "Error starting checkout: {error}"
+            },
+            "coupon": {
+                "inputHint": "Discount code",
+                "apply": "Apply",
+                "removeTooltip": "Remove coupon",
+                "comingSoon": "Apply coupon feature coming soon!"
+            }
+        }
+    },
+    "checkoutView": {
+        "appBar": {
+            "title": "Checkout"
+        },
+        "loading": {
+            "loadingCheckout": "Loading checkout...",
+            "processingOrder": "Processing order...",
+            "creatingOrder": "Creating order..."
+        },
+        "orderSuccess": {
+            "title": "Order Placed Successfully!",
+            "description": "Your order has been received and is being processed.",
+            "totalAmount": "Total Amount",
+            "orderId": "Order ID",
+            "status": "Status",
+            "backToHome": "Back to Home"
+        },
+        "sections": {
+            "billingAddress": "Billing Address",
+            "shippingAddress": "Shipping Address",
+            "sameAsBilling": "Same as billing address",
+            "orderTotal": "Order Total"
+        },
+        "formFields": {
+            "firstName": "First name",
+            "lastName": "Last name",
+            "email": "Email",
+            "phone": "Phone",
+            "addressLine1": "Address Line 1",
+            "addressLine2": "Address Line 2 (Optional)",
+            "city": "City",
+            "state": "State",
+            "postcode": "Postcode",
+            "country": "Country",
+            "required": "Required",
+            "invalidEmail": "Invalid email"
+        },
+        "payment": {
+            "bankTransfer": "Bank Transfer",
+            "bankTransferSubtitle": "Havale/EFT"
+        },
+        "buttons": {
+            "completeOrder": "Complete Order"
+        },
+        "messages": {
+            "fillRequiredFields": "Please fill in all required fields"
+        }
+    },
+    "favoriteCategoriesView": {
+        "appBar": {
+            "title": "Favorite Categories"
+        },
+        "remove": {
+            "title": "Removed from favorites",
+            "message": "Category was removed from your favorites",
+            "undo": "Undo"
+        }
+    },
+    "homeView": {
+        "error": {
+            "tryAgain": "Try Again",
+            "goBack": "Go Back"
+        },
+        "widgets": {
+            "search": {
+                "placeholder": "Search products, brands, categories..."
+            },
+            "recommended": {
+                "title": "Recommended for you",
+                "seeAll": "See all",
+                "defaultProductName": "Product",
+                "wishlist": {
+                    "removed": {
+                        "title": "Removed from favorites",
+                        "message": "Item was removed from your favorites",
+                        "undo": "Undo"
+                    },
+                    "added": {
+                        "title": "Added to favorites",
+                        "message": "Item was added to your favorites",
+                        "undo": "Undo"
+                    }
+                }
+            }
+        }
+    },
+    "productDetailView": {
+        "appBar": {
+            "title": "Product Details"
+        },
+        "error": {
+            "failedToAddToCart": "Failed to add product to cart: {message}",
+            "tryAgain": "Try Again",
+            "goBack": "Go Back"
+        },
+        "addToCart": {
+            "button": "Add to Cart",
+            "popup": {
+                "title": "Product Added to Cart",
+                "successMessage": "Product successfully added to cart.",
+                "continueShopping": "Continue Shopping",
+                "checkout": "Checkout",
+                "failedToLoad": "Failed to load cart",
+                "retry": "Retry",
+                "loading": "Loading cart...",
+                "itemCount": {
+                    "single": "You have 1 item in your cart",
+                    "multiple": "You have {count} different items in your cart"
+                }
+            },
+            "selectAllOptions": "Please select all options"
+        },
+        "wishlist": {
+            "added": {
+                "title": "Added to favorites",
+                "message": "Item was added to your favorites"
+            },
+            "removed": {
+                "title": "Removed from favorites",
+                "message": "Item was removed from your favorites"
+            },
+            "undo": "Undo"
+        },
+        "reviews": {
+            "title": "Reviews",
+            "titleWithCount": "Reviews ({count})",
+            "empty": {
+                "title": "No reviews yet",
+                "message": "No reviews have been made for this product yet."
+            },
+            "anonymous": "Anonymous",
+            "verified": "Verified"
+        },
+        "description": {
+            "showMore": "Show More",
+            "showLess": "Show Less",
+            "details": "Details"
+        },
+        "share": {
+            "failed": "Failed to share product",
+            "error": "Error sharing product"
+        },
+        "unknownProduct": "Unknown Product"
+    },
+    "productListView": {
+        "appBar": {
+            "title": "Products",
+            "backTooltip": "Back"
+        },
+        "actions": {
+            "sort": "Sort",
+            "filters": "Filters"
+        },
+        "sort": {
+            "title": "Sort by",
+            "subtitle": "Select how you want to sort the products"
+        },
+        "filters": {
+            "title": "Filters",
+            "subtitle": "Filter products by categories, price, and more",
+            "apply": "Apply",
+            "cancel": "Cancel"
+        },
+        "empty": {
+            "title": "No products found",
+            "message": "Try adjusting your filters or search terms",
+            "clearAll": "Clear all filters"
+        },
+        "widgets": {
+            "chips": {
+                "onSale": "On Sale",
+                "featured": "Featured",
+                "clearAll": "Clear all",
+                "categoryFallback": "Category {categoryId}",
+                "unnamedTag": "Unnamed Tag"
+            },
+            "stockStatus": {
+                "inStock": "In Stock",
+                "outOfStock": "Out of Stock",
+                "onBackorder": "On Backorder"
+            },
+            "tags": {
+                "loadError": "Failed to load tags: {error}"
+            }
+        }
+    },
+    "wishlistView": {
+        "appBar": {
+            "title": "Favourites",
+            "titleWithCount": "Favourites ({count})",
+            "favoriteCategoriesTooltip": "Favorite Categories",
+            "removeAllTooltip": "Remove all"
+        },
+        "removeAll": {
+            "dialog": {
+                "title": "Remove all favorites?",
+                "subtitle": "Are you sure you want to remove all items from your favorites? This action cannot be undone.",
+                "cancel": "Cancel",
+                "confirm": "Remove All"
+            },
+            "snackbar": {
+                "title": "All favorites removed",
+                "message": "All items were removed from your favorites",
+                "undo": "Undo"
+            }
+        },
+        "addToCart": {
+            "dialog": {
+                "title": "Add to cart?",
+                "subtitle": "Choose what to do with this saved item.",
+                "addKeepSaved": "Add & keep saved",
+                "addRemoveFromSaved": "Add & remove from saved",
+                "cancel": "Cancel"
+            }
+        },
+        "remove": {
+            "dismissible": "Remove",
+            "dialog": {
+                "title": "Remove from favorites?",
+                "subtitle": "Are you sure you want to remove this item from your favorites?",
+                "cancel": "Cancel",
+                "confirm": "Remove"
+            },
+            "snackbar": {
+                "title": "Removed from favorites",
+                "message": "Item was removed from your favorites",
+                "undo": "Undo"
+            }
+        },
+        "defaultProductName": "Product"
+    },
+    "searchView": {
+        "loading": {
+            "categories": "Loading categories...",
+            "brands": "Loading brands...",
+            "almostReady": "Almost ready..."
+        },
+        "error": {
+            "failedToLoadCategories": "Failed to load categories",
+            "retry": "Retry"
+        },
+        "sections": {
+            "brands": "Brands",
+            "categories": "Categories"
+        },
+        "fallbacks": {
+            "brand": "Brand",
+            "category": "Category"
+        }
+    }
+}

@@ -9,6 +9,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product description
 class ProductDescriptionWidget extends StatelessWidget {
@@ -36,7 +37,7 @@ class ProductDescriptionWidget extends StatelessWidget {
         crossAxisAlignment: context.crossStart,
         children: [
           OsmeaComponents.text(
-            'Details',
+            context.t.productDetailView.description.details,
             textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
               fontWeight: FontWeight.w600,
               letterSpacing: 1.0,

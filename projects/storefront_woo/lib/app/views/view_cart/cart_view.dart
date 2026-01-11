@@ -14,6 +14,7 @@ import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_content_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// CartView displays the shopping cart with items and checkout functionality
 class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
@@ -108,7 +109,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
         // Loading state or initial state - show full screen loading
         return UnifiedLoadingWidget(
           goRoute: goRoute,
-          loadingSteps: ['Loading cart...'],
+          loadingSteps: [context.t.cartView.loading],
         );
       },
     );
@@ -204,10 +205,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
   ) {
     final configHelper = AssetConfigHelper();
     
-    final title = configHelper.getString(
-      'cart_view_configuration.app_bar.title',
-      'Shopping Cart',
-    );
+    final title = context.t.cartView.appBar.title;
     final backgroundColor = _parseColor(
       configHelper.getString(
         'cart_view_configuration.app_bar.backgroundColor',
@@ -252,10 +250,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
       'cart_view_configuration.app_bar.show_refresh_button',
       true,
     );
-    final refreshTooltip = configHelper.getString(
-      'cart_view_configuration.app_bar.refresh_tooltip',
-      'Refresh cart',
-    );
+    final refreshTooltip = context.t.cartView.appBar.refreshTooltip;
 
     final variant = _parseAppBarVariant(variantString);
     final size = _parseAppBarSize(sizeString);

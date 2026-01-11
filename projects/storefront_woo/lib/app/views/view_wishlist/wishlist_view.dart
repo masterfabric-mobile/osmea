@@ -6,6 +6,7 @@ import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_mode
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_list_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 // Single source of truth: WishlistViewModel
 
 /// Get popup color from config
@@ -78,10 +79,10 @@ class WishlistView
                final appBarConfig = configHelper.getObject(
                  'wishlist_view.app_bar',
                );
-               final title = appBarConfig?['title'] as String? ?? 'Favourites';
+               final title = appBarConfig?['title'] as String? ?? context.t.wishlistView.appBar.title;
                final titleWithCount =
                    appBarConfig?['titleWithCount'] as String? ??
-                   'Favourites ({count})';
+                   context.t.wishlistView.appBar.titleWithCount;
                final appBarTitle = count > 0
                    ? titleWithCount.replaceAll('{count}', count.toString())
                    : title;
@@ -143,7 +144,7 @@ class WishlistView
                      onPressed: () {
                        context.push('/favorite-categories');
                      },
-                     tooltip: 'Favorite Categories',
+                     tooltip: context.t.wishlistView.appBar.favoriteCategoriesTooltip,
                    ),
                    if (hasItems)
                      AppBarAction(
@@ -152,9 +153,8 @@ class WishlistView
                          final confirmed = await OsmeaComponents.showPopup<bool>(
                            context: context,
                            variant: PopupVariant.dialog,
-                           title: 'Remove all favorites?',
-                           subtitle:
-                               'Are you sure you want to remove all items from your favorites? This action cannot be undone.',
+                           title: context.t.wishlistView.removeAll.dialog.title,
+                           subtitle: context.t.wishlistView.removeAll.dialog.subtitle,
                            padding: context.paddingNormal,
                            child: OsmeaComponents.column(
                              mainAxisSize: MainAxisSize.min,
@@ -163,7 +163,7 @@ class WishlistView
                                  children: [
                                    OsmeaComponents.expanded(
                                      child: OsmeaComponents.button(
-                                       text: 'Cancel',
+                                       text: context.t.wishlistView.removeAll.dialog.cancel,
                                        variant: ButtonVariant.outlined,
                                        onPressed: () =>
                                            Navigator.of(context).pop(false),
@@ -174,7 +174,7 @@ class WishlistView
                                    ),
                                    OsmeaComponents.expanded(
                                      child: OsmeaComponents.button(
-                                       text: 'Remove All',
+                                       text: context.t.wishlistView.removeAll.dialog.confirm,
                                        variant: ButtonVariant.primary,
                                        onPressed: () =>
                                            Navigator.of(context).pop(true),
@@ -196,14 +196,13 @@ class WishlistView
 
                            if (previousItems.isNotEmpty) {
                              context.showSnackbar(
-                               title: 'All favorites removed',
-                               message:
-                                   'All items were removed from your favorites',
+                               title: context.t.wishlistView.removeAll.snackbar.title,
+                               message: context.t.wishlistView.removeAll.snackbar.message,
                                type: SnackbarType.error,
                                style: SnackbarStyle.minimal,
                                position: SnackbarPosition.bottom,
                                animation: SnackbarAnimation.slide,
-                               actionLabel: 'Undo',
+                               actionLabel: context.t.wishlistView.removeAll.snackbar.undo,
                                onAction: () {
                                  // Restore all items
                                  for (final item in previousItems) {
@@ -214,7 +213,7 @@ class WishlistView
                            }
                          }
                        },
-                       tooltip: 'Remove all',
+                       tooltip: context.t.wishlistView.appBar.removeAllTooltip,
                      ),
                  ],
                  centerTitle: false,
@@ -292,8 +291,8 @@ class WishlistView
         final result = await OsmeaComponents.showPopup(
           context: context,
           variant: PopupVariant.dialog,
-          title: 'Add to cart?',
-          subtitle: 'Choose what to do with this saved item.',
+          title: context.t.wishlistView.addToCart.dialog.title,
+          subtitle: context.t.wishlistView.addToCart.dialog.subtitle,
           backgroundColor: popupBgColor,
           titleStyle: OsmeaTextStyle.titleMedium(
             context,
@@ -321,7 +320,7 @@ class WishlistView
                         );
 
                         return OsmeaComponents.button(
-                          text: 'Add & keep saved',
+                          text: context.t.wishlistView.addToCart.dialog.addKeepSaved,
                           variant: ButtonVariant.primary,
                           backgroundColor: primaryBgColor,
                           textColor: primaryTextColor,
@@ -358,7 +357,7 @@ class WishlistView
                             );
 
                         return OsmeaComponents.button(
-                          text: 'Add & remove from saved',
+                          text: context.t.wishlistView.addToCart.dialog.addRemoveFromSaved,
                           variant: ButtonVariant.outlined,
                           backgroundColor: secondaryBgColor,
                           textColor: secondaryTextColor,
@@ -384,7 +383,7 @@ class WishlistView
                   );
 
                   return OsmeaComponents.button(
-                    text: 'Cancel',
+                    text: context.t.wishlistView.addToCart.dialog.cancel,
                     variant: ButtonVariant.ghost,
                     textColor: ghostTextColor,
                     onPressed: () => Navigator.of(context).pop('cancel'),

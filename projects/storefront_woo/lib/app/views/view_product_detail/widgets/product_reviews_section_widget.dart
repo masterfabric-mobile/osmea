@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/review_item_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product reviews section
 class ProductReviewsSectionWidget extends StatelessWidget {
@@ -42,7 +43,9 @@ class ProductReviewsSectionWidget extends StatelessWidget {
       crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.text(
-          validReviews.isEmpty ? 'Reviews' : 'Reviews (${validReviews.length})',
+          validReviews.isEmpty 
+              ? context.t.productDetailView.reviews.title
+              : context.t.productDetailView.reviews.titleWithCount.replaceAll('{count}', validReviews.length.toString()),
           textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.0,
@@ -91,7 +94,7 @@ class _EmptyReviewsWidget extends StatelessWidget {
             ),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
-              'No reviews yet',
+              context.t.productDetailView.reviews.empty.title,
               textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.w500,
                 color: OsmeaColors.black,
@@ -100,7 +103,7 @@ class _EmptyReviewsWidget extends StatelessWidget {
             ),
             OsmeaComponents.sizedBox(height: context.spacing2),
             OsmeaComponents.text(
-              'No reviews have been made for this product yet.',
+              context.t.productDetailView.reviews.empty.message,
               textStyle: OsmeaTextStyle.bodySmall(
                 context,
               ).copyWith(color: OsmeaColors.grayMaterial[400]!),

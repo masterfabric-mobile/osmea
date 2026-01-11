@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Minimalist error widget for cart view
 class CartErrorWidget extends StatelessWidget {
@@ -127,7 +128,7 @@ class CartErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Try Again',
+      text: context.t.cartView.error.tryAgain,
       onPressed: onRetry,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
@@ -148,7 +149,7 @@ class CartErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Go Back',
+      text: context.t.cartView.error.goBack,
       onPressed: () {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();

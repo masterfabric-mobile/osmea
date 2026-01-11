@@ -16,6 +16,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:apis/apis.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 @injectable
 class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
@@ -78,7 +79,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   void _showRemoveConfirmationDialog(BuildContext context, int productId) {
     // Get product name for the dialog
     final currentState = state;
-    String productName = 'this item';
+    String productName = context.t.cartView.widgets.item.defaultName;
     if (currentState is CartLoadedState) {
       try {
         final item = currentState.cartItems.firstWhere(
@@ -87,7 +88,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         productName = item.productName;
       } catch (e) {
         // Item not found, use default name
-        productName = 'this item';
+        productName = t.cartView.widgets.item.defaultName;
       }
     }
 
@@ -126,7 +127,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
             borderRadius: BorderRadius.circular(dialogBorderRadius),
           ),
           title: OsmeaComponents.text(
-            'Remove Item',
+            context.t.cartView.widgets.item.remove.title,
             textStyle: OsmeaTextStyle.titleLarge(context),
             color: dialogTitleColor,
           ),
@@ -134,7 +135,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
             mainAxisSize: MainAxisSize.min,
             children: [
               OsmeaComponents.text(
-                'Are you sure you want to remove "$productName" from your cart?',
+                context.t.cartView.widgets.item.remove.message.replaceAll(
+                  '{productName}',
+                  productName,
+                ),
                 textStyle: OsmeaTextStyle.bodyMedium(context),
                 color: dialogSubtitleColor,
                 textAlign: TextAlign.center,
@@ -146,7 +150,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: OsmeaComponents.text(
-                'Cancel',
+                context.t.cartView.widgets.item.remove.cancel,
                 textStyle: OsmeaTextStyle.bodyMedium(
                   context,
                 ).copyWith(color: cancelButtonColor),
@@ -166,7 +170,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
                 foregroundColor: dangerButtonColor,
               ),
               child: OsmeaComponents.text(
-                'Remove',
+                context.t.cartView.widgets.item.remove.confirm,
                 textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                   color: dangerButtonColor,
                   fontWeight: FontWeight.bold,
@@ -500,7 +504,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (loadedState == null) {
         debugPrint('❌ No cart loaded to remove item from');
-        emit(CartErrorState(message: 'No cart loaded'));
+        emit(CartErrorState(message: t.cartView.messages.noCartLoaded));
         return;
       }
 
@@ -521,7 +525,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for removeItem');
-        emit(CartErrorState(message: 'No cart token available'));
+        emit(CartErrorState(message: t.cartView.messages.noCartToken));
         return;
       }
 
@@ -606,7 +610,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (loadedState == null) {
         debugPrint('❌ No cart loaded to update item in');
-        emit(CartErrorState(message: 'No cart loaded'));
+        emit(CartErrorState(message: t.cartView.messages.noCartLoaded));
         return;
       }
 
@@ -636,13 +640,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (itemKey == null) {
         debugPrint('❌ Item not found in cart: $productId');
-        emit(CartErrorState(message: 'Item not found in cart'));
+        emit(CartErrorState(message: t.cartView.messages.itemNotFound));
         return;
       }
 
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for updateItem');
-        emit(CartErrorState(message: 'No cart token available'));
+        emit(CartErrorState(message: t.cartView.messages.noCartToken));
         return;
       }
 

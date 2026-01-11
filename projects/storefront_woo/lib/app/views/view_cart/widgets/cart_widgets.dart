@@ -10,6 +10,7 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Main content widget for cart view
 class CartContentWidget extends StatelessWidget {
@@ -76,7 +77,7 @@ class CartContentWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         OsmeaComponents.text(
-                          'Complete Purchase',
+                          context.t.cartView.checkout.completePurchase,
                           textStyle: OsmeaTextStyle.titleMedium(context)
                               .copyWith(
                                 color: OsmeaColors.white,
@@ -124,14 +125,14 @@ class CartContentWidget extends StatelessWidget {
           ),
           OsmeaComponents.sizedBox(height: 24),
           OsmeaComponents.text(
-            'Your cart is empty',
+            context.t.cartView.empty.title,
             textStyle: OsmeaTextStyle.headlineSmall(
               context,
             ).copyWith(color: OsmeaColors.black, fontWeight: FontWeight.w500),
           ),
           OsmeaComponents.sizedBox(height: 8),
           OsmeaComponents.text(
-            'Add some products to get started',
+            context.t.cartView.empty.subtitle,
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
             ).copyWith(color: OsmeaColors.pewter),
@@ -148,7 +149,7 @@ class CartContentWidget extends StatelessWidget {
             backgroundColor: OsmeaColors.black,
             textColor: OsmeaColors.white,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            text: 'Continue Shopping',
+            text: context.t.cartView.empty.continueShopping,
             textStyle: OsmeaTextStyle.titleMedium(
               context,
             ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
@@ -306,7 +307,7 @@ class CartContentWidget extends StatelessWidget {
                     horizontal: 16,
                     vertical: 8,
                   ),
-                  text: 'Remove',
+                  text: context.t.cartView.widgets.item.remove.confirm,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     color: OsmeaColors.red,
                     fontWeight: FontWeight.w600,
@@ -351,7 +352,7 @@ class CartContentWidget extends StatelessWidget {
             // Minimal Input Field
             OsmeaComponents.expanded(
               child: OsmeaComponents.textField(
-                hint: 'Discount code',
+                hint: context.t.cartView.widgets.coupon.inputHint,
                 textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                   fontWeight: FontWeight.w400,
                   color: OsmeaColors.thunder,
@@ -365,7 +366,7 @@ class CartContentWidget extends StatelessWidget {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Apply coupon feature coming soon!'),
+                    content: Text(context.t.cartView.widgets.coupon.comingSoon),
                     backgroundColor: OsmeaColors.black,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
@@ -377,7 +378,7 @@ class CartContentWidget extends StatelessWidget {
               backgroundColor: OsmeaColors.black.withValues(alpha: 0.1),
               textColor: OsmeaColors.black,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              text: 'Apply',
+              text: context.t.cartView.widgets.coupon.apply,
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 color: OsmeaColors.black,
                 fontWeight: FontWeight.w600,
@@ -421,7 +422,7 @@ class CartContentWidget extends StatelessWidget {
                 ),
                 OsmeaComponents.sizedBox(width: 8),
                 OsmeaComponents.text(
-                  'Order Summary',
+                  context.t.cartView.widgets.orderSummary.title,
                   textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                     fontWeight: FontWeight.w700,
                     color: OsmeaColors.thunder,
@@ -449,7 +450,7 @@ class CartContentWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       OsmeaComponents.text(
-                        'Subtotal',
+                        context.t.cartView.widgets.orderSummary.subtotal,
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
                           fontWeight: FontWeight.w500,
                           color: OsmeaColors.thunder,
@@ -474,13 +475,13 @@ class CartContentWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       OsmeaComponents.text(
-                        'Shipping',
+                        context.t.cartView.widgets.orderSummary.shipping,
                         textStyle: OsmeaTextStyle.bodyMedium(
                           context,
                         ).copyWith(color: OsmeaColors.pewter),
                       ),
                       OsmeaComponents.text(
-                        'Calculated at checkout',
+                        context.t.cartView.widgets.orderSummary.shippingCalculated,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.pewter.withValues(alpha: 0.8),
                           fontStyle: FontStyle.italic,
@@ -495,13 +496,13 @@ class CartContentWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       OsmeaComponents.text(
-                        'Tax',
+                        context.t.cartView.widgets.orderSummary.tax,
                         textStyle: OsmeaTextStyle.bodyMedium(
                           context,
                         ).copyWith(color: OsmeaColors.pewter),
                       ),
                       OsmeaComponents.text(
-                        'Calculated at checkout',
+                        context.t.cartView.widgets.orderSummary.taxCalculated,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.pewter.withValues(alpha: 0.8),
                           fontStyle: FontStyle.italic,
@@ -520,7 +521,7 @@ class CartContentWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       OsmeaComponents.text(
-                        'Total',
+                        context.t.cartView.widgets.orderSummary.total,
                         textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                           fontWeight: FontWeight.w800,
                           color: OsmeaColors.thunder,
@@ -591,7 +592,7 @@ class CartContentWidget extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error checking authentication: $e'),
+            content: Text(context.t.cartView.checkout.authenticationError.replaceAll('{error}', e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -635,7 +636,7 @@ class CartErrorWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.button(onPressed: onRetry, text: 'Retry'),
+          OsmeaComponents.button(onPressed: onRetry, text: context.t.cartView.error.retry),
         ],
       ),
     );

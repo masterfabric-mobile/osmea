@@ -15,6 +15,7 @@ import 'package:storefront_woo/app/views/view_product_detail/widgets/product_det
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_error_widget.dart';
 import 'package:osmea_components/src/utils/toast_extensions.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// ProductDetailView displays detailed information about a single product
 class ProductDetailView
@@ -112,7 +113,7 @@ class ProductDetailView
             state.message,
           );
           context.snackbarError(
-            'Failed to add product to cart: $userFriendlyMessage',
+            context.t.productDetailView.error.failedToAddToCart.replaceAll('{message}', userFriendlyMessage),
             duration: context.durationVeryLong,
           );
           // Recover to previous state
@@ -185,7 +186,7 @@ PreferredSizeWidget productDetailCoreAppBar(
   
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
-      'Product Details',
+      context.t.productDetailView.appBar.title,
       color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(context),
     ),

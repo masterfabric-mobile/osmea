@@ -10,6 +10,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/variations_text_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Individual cart item widget
 class CartItemWidget extends StatelessWidget {
@@ -245,7 +246,7 @@ class CartItemWidget extends StatelessWidget {
       ),
       backgroundColor: Colors.transparent,
       size: ButtonSize.extraSmall,
-      tooltip: 'Remove item',
+      tooltip: context.t.cartView.widgets.item.remove.tooltip,
     );
   }
 

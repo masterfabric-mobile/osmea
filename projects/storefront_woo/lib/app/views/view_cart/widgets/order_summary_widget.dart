@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for order summary
 class OrderSummaryWidget extends StatelessWidget {
@@ -41,7 +42,7 @@ class OrderSummaryWidget extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return OsmeaComponents.text(
-      'Order Summary',
+      context.t.cartView.widgets.orderSummary.title,
       textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
         fontWeight: FontWeight.w700,
         color: OsmeaColors.thunder,
@@ -53,7 +54,7 @@ class OrderSummaryWidget extends StatelessWidget {
     return OsmeaComponents.column(
       children: [
         _SummaryRowWidget(
-          label: 'Subtotal',
+          label: context.t.cartView.widgets.orderSummary.subtotal,
           value: PriceInfoCurrencyHelper.formatPrice(
             state.totalPrice + state.totalDiscount,
             currencyCode: state.currencyCode,
@@ -66,7 +67,7 @@ class OrderSummaryWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing10),
         if (state.totalDiscount > 0) ...[
           _SummaryRowWidget(
-            label: 'Discount',
+            label: context.t.cartView.widgets.orderSummary.discount,
             value:
                 '-${PriceInfoCurrencyHelper.formatPrice(state.totalDiscount, currencyCode: state.currencyCode, currencyDecimalSeparator: state.currencyDecimalSeparator, currencyThousandSeparator: state.currencyThousandSeparator, decimalPlaces: state.currencyMinorUnit ?? 2, removeTrailingZeros: true)}',
             isDiscount: true,
@@ -74,21 +75,21 @@ class OrderSummaryWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing10),
         ],
         _SummaryRowWidget(
-          label: 'Shipping',
-          value: 'Calculated at checkout',
+          label: context.t.cartView.widgets.orderSummary.shipping,
+          value: context.t.cartView.widgets.orderSummary.shippingCalculated,
           isSecondary: true,
         ),
         OsmeaComponents.sizedBox(height: context.spacing10),
         _SummaryRowWidget(
-          label: 'Tax',
-          value: 'Calculated at checkout',
+          label: context.t.cartView.widgets.orderSummary.tax,
+          value: context.t.cartView.widgets.orderSummary.taxCalculated,
           isSecondary: true,
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
         OsmeaComponents.divider(),
         OsmeaComponents.sizedBox(height: context.spacing12),
         _SummaryRowWidget(
-          label: 'Total',
+          label: context.t.cartView.widgets.orderSummary.total,
           value: PriceInfoCurrencyHelper.formatPrice(
             state.totalPrice,
             currencyCode: state.currencyCode,

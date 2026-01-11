@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 // Replaced custom quantity selector with OsmeaCounter
 
@@ -133,16 +134,16 @@ class ActionSection extends StatelessWidget {
                           children: [
                             OsmeaComponents.text(
                               wasSaved
-                                  ? 'Removed from favorites'
-                                  : 'Added to favorites',
+                                  ? context.t.productDetailView.wishlist.removed.title
+                                  : context.t.productDetailView.wishlist.added.title,
                               textStyle: OsmeaTextStyle.titleSmall(
                                 context,
                               ).copyWith(color: popupTitleColor),
                             ),
                             OsmeaComponents.text(
                               wasSaved
-                                  ? 'Item was removed from your favorites'
-                                  : 'Item was added to your favorites',
+                                  ? context.t.productDetailView.wishlist.removed.message
+                                  : context.t.productDetailView.wishlist.added.message,
                               textStyle: OsmeaTextStyle.bodySmall(
                                 context,
                               ).copyWith(color: popupSubtitleColor),
@@ -152,7 +153,7 @@ class ActionSection extends StatelessWidget {
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing10),
                       OsmeaComponents.button(
-                        text: 'Undo',
+                        text: context.t.productDetailView.wishlist.undo,
                         variant: ButtonVariant.ghost,
                         onPressed: () {
                           Navigator.of(context).maybePop();
@@ -224,7 +225,7 @@ class ActionSection extends StatelessWidget {
                   onAddSuccessNavigateToCart!();
                 }
               },
-              text: 'Add to Cart',
+              text: context.t.productDetailView.addToCart.button,
               backgroundColor: _getColorFromConfig('addToCartButton.backgroundColor', OsmeaColors.black),
               textColor: _getColorFromConfig('addToCartButton.textColor', OsmeaColors.white),
               borderColor: _getColorFromConfig('addToCartButton.borderColor', OsmeaColors.black),

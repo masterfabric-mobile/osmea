@@ -9,6 +9,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_item_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Cart item with swipe-to-delete functionality
 class CartItemSwipeWidget extends StatelessWidget {
@@ -58,7 +59,7 @@ class CartItemSwipeWidget extends StatelessWidget {
           ),
           OsmeaComponents.sizedBox(width: context.spacing12),
           OsmeaComponents.text(
-            'Remove',
+            context.t.cartView.widgets.item.remove.swipeLabel,
             textStyle: OsmeaTextStyle.titleMedium(
               context,
             ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
@@ -72,7 +73,9 @@ class CartItemSwipeWidget extends StatelessWidget {
   Color _getDialogColorFromConfig(String key, Color fallback) {
     try {
       final configHelper = AssetConfigHelper();
-      final colorString = configHelper.getString('dialog_popup_configuration.$key');
+      final colorString = configHelper.getString(
+        'dialog_popup_configuration.$key',
+      );
       if (colorString.isNotEmpty && colorString.startsWith('#')) {
         final hexString = colorString.substring(1);
         if (hexString.length == 6) {
@@ -89,39 +92,48 @@ class CartItemSwipeWidget extends StatelessWidget {
 
   Future<bool> _showConfirmDialog(BuildContext context) async {
     // Get colors from config
-    final dialogTitleColor = _getDialogColorFromConfig('dialog.titleColor', const Color(0xFF1976D2));
-    final dialogSubtitleColor = _getDialogColorFromConfig('dialog.subtitleColor', OsmeaColors.grayMaterial[400]!);
-    final cancelButtonColor = _getDialogColorFromConfig('buttons.cancel.textColor', OsmeaColors.grayMaterial[500]!);
-    
+    final dialogTitleColor = _getDialogColorFromConfig(
+      'dialog.titleColor',
+      const Color(0xFF1976D2),
+    );
+    final dialogSubtitleColor = _getDialogColorFromConfig(
+      'dialog.subtitleColor',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final cancelButtonColor = _getDialogColorFromConfig(
+      'buttons.cancel.textColor',
+      OsmeaColors.grayMaterial[500]!,
+    );
+
     return await OsmeaComponents.showPopup<bool>(
           context: context,
           variant: PopupVariant.dialog,
           size: PopupSize.medium,
-          title: 'Remove item?',
+          title: context.t.cartView.widgets.item.remove.title,
           titleStyle: OsmeaTextStyle.titleMedium(
             context,
-          ).copyWith(
-            fontWeight: FontWeight.w600,
-            color: dialogTitleColor,
-          ),
+          ).copyWith(fontWeight: FontWeight.w600, color: dialogTitleColor),
           child: OsmeaComponents.text(
-            'Are you sure you want to remove "${item.productName}" from your cart?',
-            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: dialogSubtitleColor,
+            context.t.cartView.widgets.item.remove.message.replaceAll(
+              '{productName}',
+              item.productName,
             ),
+            textStyle: OsmeaTextStyle.bodyMedium(
+              context,
+            ).copyWith(color: dialogSubtitleColor),
           ),
           footer: OsmeaComponents.row(
             mainAxisAlignment: context.spaceBetween,
             children: [
               OsmeaComponents.button(
-                text: 'Cancel',
+                text: context.t.cartView.widgets.item.remove.cancel,
                 onPressed: () => Navigator.of(context).pop(false),
                 variant: ButtonVariant.ghost,
                 textColor: cancelButtonColor,
                 size: ButtonSize.medium,
               ),
               OsmeaComponents.button(
-                text: 'Remove',
+                text: context.t.cartView.widgets.item.remove.confirm,
                 onPressed: () => Navigator.of(context).pop(true),
                 variant: ButtonVariant.danger,
                 size: ButtonSize.medium,
@@ -136,9 +148,9 @@ class CartItemSwipeWidget extends StatelessWidget {
   void _handleDismiss(BuildContext context) {
     viewModel.removeItemFromCart(item.productId);
     context.snackbarInfo(
-      'Item removed from cart',
+      context.t.cartView.widgets.item.remove.removedMessage,
       duration: context.durationVeryLong,
-      actionLabel: 'Undo',
+      actionLabel: context.t.cartView.widgets.item.remove.undo,
       onAction: () {
         viewModel.addItemToCart(item.productId, quantity: item.quantity);
       },

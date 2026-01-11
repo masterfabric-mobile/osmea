@@ -18,6 +18,7 @@ import 'package:storefront_woo/app/views/view_product_detail/widgets/product_des
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Component model with orderID
 class _ProductDetailComponent {
@@ -142,7 +143,7 @@ class ProductDetailContentWidget extends StatelessWidget {
                         if (missingAttributes.isNotEmpty) {
                           // Show snackbar using OsmeaComponents
                           context.snackbarError(
-                            'Please select all options',
+                            context.t.productDetailView.addToCart.selectAllOptions,
                             duration: context.durationLong,
                           );
 
@@ -333,13 +334,13 @@ class ProductDetailContentWidget extends StatelessWidget {
       } else {
         debugPrint('⚠️ Failed to share product');
         if (context.mounted) {
-          context.snackbarError('Failed to share product');
+          context.snackbarError(context.t.productDetailView.share.failed);
         }
       }
     } catch (e) {
       debugPrint('❌ Error sharing product: $e');
       if (context.mounted) {
-        context.snackbarError('Error sharing product');
+        context.snackbarError(context.t.productDetailView.share.error);
       }
     }
   }

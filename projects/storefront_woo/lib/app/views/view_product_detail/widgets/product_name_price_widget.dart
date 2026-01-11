@@ -9,6 +9,7 @@ import 'package:core/core.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/retrieve_product_response_model.dart'
     as product_models;
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product name and price
 class ProductNamePriceWidget extends StatelessWidget {
@@ -67,7 +68,7 @@ class ProductNamePriceWidget extends StatelessWidget {
         children: [
           // Product name
           OsmeaComponents.text(
-            state.product.name ?? 'Unknown Product',
+            state.product.name ?? context.t.productDetailView.unknownProduct,
             textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
               fontWeight: FontWeight.w600,
               letterSpacing: -0.5,

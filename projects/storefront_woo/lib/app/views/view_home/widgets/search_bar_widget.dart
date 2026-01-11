@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Search bar widget for home view
 class SearchBarWidget extends StatefulWidget {
@@ -57,7 +58,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
     final placeholder =
         config?['placeholder'] as String? ??
-        'Search products, brands, categories...';
+        context.t.homeView.widgets.search.placeholder;
     final variant = config?['variant'] as String? ?? 'outlined';
 
     return OsmeaComponents.padding(

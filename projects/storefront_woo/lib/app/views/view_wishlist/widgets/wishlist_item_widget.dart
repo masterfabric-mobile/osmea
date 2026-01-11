@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_item_price_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 class WishlistItemWidget extends StatelessWidget {
   final WishlistItem item;
@@ -53,7 +54,7 @@ class WishlistItemWidget extends StatelessWidget {
                 ),
                 OsmeaComponents.sizedBox(width: context.spacing8),
                 OsmeaComponents.text(
-                  'Remove',
+                  context.t.wishlistView.remove.dismissible,
                   textStyle: OsmeaTextStyle.bodyMedium(
                     context,
                   ).copyWith(
@@ -74,9 +75,8 @@ class WishlistItemWidget extends StatelessWidget {
         return await OsmeaComponents.showPopup<bool>(
               context: context,
               variant: PopupVariant.dialog,
-              title: 'Remove from favorites?',
-              subtitle:
-                  'Are you sure you want to remove this item from your favorites?',
+              title: context.t.wishlistView.remove.dialog.title,
+              subtitle: context.t.wishlistView.remove.dialog.subtitle,
               padding: context.paddingNormal,
               child: OsmeaComponents.column(
                 mainAxisSize: MainAxisSize.min,
@@ -85,7 +85,7 @@ class WishlistItemWidget extends StatelessWidget {
                     children: [
                       OsmeaComponents.expanded(
                         child: OsmeaComponents.button(
-                          text: 'Cancel',
+                          text: context.t.wishlistView.remove.dialog.cancel,
                           variant: ButtonVariant.outlined,
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
@@ -93,7 +93,7 @@ class WishlistItemWidget extends StatelessWidget {
                       OsmeaComponents.sizedBox(width: context.spacing8),
                       OsmeaComponents.expanded(
                         child: OsmeaComponents.button(
-                          text: 'Remove',
+                          text: context.t.wishlistView.remove.dialog.confirm,
                           variant: ButtonVariant.primary,
                           onPressed: () => Navigator.of(context).pop(true),
                         ),
@@ -109,26 +109,14 @@ class WishlistItemWidget extends StatelessWidget {
         // Remove from wishlist
         viewModel.remove(item.id);
         // Show snackbar with Undo
-        final snackbarTitle = _configHelper.getString(
-          'wishlist_view.snackbar.title',
-          'Removed from favorites',
-        );
-        final snackbarMessage = _configHelper.getString(
-          'wishlist_view.snackbar.message',
-          'Item was removed from your favorites',
-        );
-        final snackbarActionLabel = _configHelper.getString(
-          'wishlist_view.snackbar.actionLabel',
-          'Undo',
-        );
         context.showSnackbar(
-          title: snackbarTitle,
-          message: snackbarMessage,
+          title: context.t.wishlistView.remove.snackbar.title,
+          message: context.t.wishlistView.remove.snackbar.message,
           type: SnackbarType.error,
           style: SnackbarStyle.minimal,
           position: SnackbarPosition.bottom,
           animation: SnackbarAnimation.slide,
-          actionLabel: snackbarActionLabel,
+          actionLabel: context.t.wishlistView.remove.snackbar.undo,
           onAction: () => viewModel.toggle(item),
         );
       },
@@ -147,7 +135,7 @@ class WishlistItemWidget extends StatelessWidget {
             );
 
             return OsmeaComponents.text(
-              item.name ?? 'Product',
+              item.name ?? context.t.wishlistView.defaultProductName,
               color: titleColor,
               textStyle: OsmeaTextStyle.titleSmall(
                 context,
@@ -242,19 +230,6 @@ class WishlistItemWidget extends StatelessWidget {
               'wishlist_view.action_buttons.spacing',
               context.spacing4,
             );
-            final snackbarTitle = _configHelper.getString(
-              'wishlist_view.snackbar.title',
-              'Removed from favorites',
-            );
-            final snackbarMessage = _configHelper.getString(
-              'wishlist_view.snackbar.message',
-              'Item was removed from your favorites',
-            );
-            final snackbarActionLabel = _configHelper.getString(
-              'wishlist_view.snackbar.actionLabel',
-              'Undo',
-            );
-
             return OsmeaComponents.row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -285,13 +260,13 @@ class WishlistItemWidget extends StatelessWidget {
                   onPressed: () {
                     viewModel.remove(item.id);
                     context.showSnackbar(
-                      title: snackbarTitle,
-                      message: snackbarMessage,
+                      title: context.t.wishlistView.remove.snackbar.title,
+                      message: context.t.wishlistView.remove.snackbar.message,
                       type: SnackbarType.error,
                       style: SnackbarStyle.minimal,
                       position: SnackbarPosition.bottom,
                       animation: SnackbarAnimation.slide,
-                      actionLabel: snackbarActionLabel,
+                      actionLabel: context.t.wishlistView.remove.snackbar.undo,
                       onAction: () => viewModel.toggle(item),
                     );
                   },

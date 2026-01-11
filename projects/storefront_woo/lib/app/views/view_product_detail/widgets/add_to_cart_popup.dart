@@ -14,6 +14,7 @@ import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_item_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Get color from config
 Color _getColorFromConfig(String key, Color fallback) {
@@ -88,7 +89,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
   OsmeaBottomSheetHelpers.showModal(
     context: context,
     size: BottomSheetSize.large,
-    title: 'Product Added to Cart',
+    title: context.t.productDetailView.addToCart.popup.title,
     backgroundColor: backgroundColor,
     footer: BlocBuilder<CartViewModel, CartState>(
       bloc: cartViewModel,
@@ -126,7 +127,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
 
                   return OsmeaComponents.expanded(
                     child: OsmeaComponents.button(
-                      text: 'Continue Shopping',
+                      text: context.t.productDetailView.addToCart.popup.continueShopping,
                       variant: ButtonVariant.outlined,
                       size: ButtonSize.small,
                       backgroundColor: secondaryBgColor,
@@ -154,7 +155,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
 
                   return OsmeaComponents.expanded(
                     child: OsmeaComponents.button(
-                      text: 'Checkout',
+                      text: context.t.productDetailView.addToCart.popup.checkout,
                       variant: ButtonVariant.primary,
                       size: ButtonSize.small,
                       backgroundColor: primaryBgColor,
@@ -209,13 +210,13 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.text(
-                  'Failed to load cart',
+                  context.t.productDetailView.addToCart.popup.failedToLoad,
                   textStyle: OsmeaTextStyle.bodyMedium(context),
                   color: OsmeaColors.grayMaterial[400]!,
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing16),
                 OsmeaComponents.button(
-                  text: 'Retry',
+                  text: context.t.productDetailView.addToCart.popup.retry,
                   onPressed: () {
                     if (cartToken != null && cartToken.isNotEmpty) {
                       cartViewModel.loadCart(cartToken: cartToken);
@@ -281,7 +282,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                           OsmeaComponents.sizedBox(width: context.spacing10),
                           OsmeaComponents.expanded(
                             child: OsmeaComponents.text(
-                              'Product successfully added to cart.',
+                              context.t.productDetailView.addToCart.popup.successMessage,
                               textAlign: TextAlign.center,
                               textStyle: OsmeaTextStyle.bodySmall(context)
                                   .copyWith(
@@ -315,8 +316,8 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                           final itemCount = state.cartItems.length;
                           return OsmeaComponents.text(
                             itemCount == 1
-                                ? 'You have 1 item in your cart'
-                                : 'You have $itemCount different items in your cart',
+                                ? context.t.productDetailView.addToCart.popup.itemCount.single
+                                : context.t.productDetailView.addToCart.popup.itemCount.multiple.replaceAll('{count}', itemCount.toString()),
                             textStyle: OsmeaTextStyle.titleSmall(context)
                                 .copyWith(
                                   fontWeight: FontWeight.w600,
@@ -328,7 +329,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                           );
                         }
                         return OsmeaComponents.text(
-                          'You have ${cartState.cartItems.length} different items in your cart',
+                          context.t.productDetailView.addToCart.popup.itemCount.multiple.replaceAll('{count}', cartState.cartItems.length.toString()),
                           textStyle: OsmeaTextStyle.titleSmall(context)
                               .copyWith(
                                 fontWeight: FontWeight.w600,
@@ -374,7 +375,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
         return OsmeaComponents.container(
           padding: EdgeInsets.all(context.spacing24),
           child: OsmeaComponents.text(
-            'Loading cart...',
+            context.t.productDetailView.addToCart.popup.loading,
             textStyle: OsmeaTextStyle.bodyMedium(context),
             color: OsmeaColors.grayMaterial[400]!,
           ),

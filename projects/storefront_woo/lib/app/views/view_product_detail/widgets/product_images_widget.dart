@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product images with carousel and overlay actions
 class ProductImagesWidget extends StatelessWidget {
@@ -190,13 +191,13 @@ class ProductImagesWidget extends StatelessWidget {
       } else {
         debugPrint('⚠️ Failed to share product');
         if (context.mounted) {
-          context.snackbarError('Failed to share product');
+          context.snackbarError(context.t.productDetailView.share.failed);
         }
       }
     } catch (e) {
       debugPrint('❌ Error sharing product: $e');
       if (context.mounted) {
-        context.snackbarError('Error sharing product');
+        context.snackbarError(context.t.productDetailView.share.error);
       }
     }
   }

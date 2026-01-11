@@ -10,6 +10,7 @@ import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_mode
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_content_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// CheckoutView displays checkout form with billing and shipping addresses
 class CheckoutView
@@ -52,7 +53,7 @@ class CheckoutView
       return fallback;
     }
     
-    final title = configHelper.getString('checkout_view_configuration.app_bar.title', 'Checkout');
+    final title = context.t.checkoutView.appBar.title;
     final backgroundColor = getColor('backgroundColor', OsmeaColors.white);
     final foregroundColor = getColor('foregroundColor', OsmeaColors.black);
     final titleColor = getColor('titleColor', OsmeaColors.black);
@@ -122,8 +123,8 @@ class CheckoutView
       return UnifiedLoadingWidget(
         goRoute: goRoute,
         loadingSteps: state is CheckoutProcessingOrderState
-            ? ['Processing order...', 'Creating order...']
-            : ['Loading checkout...'],
+            ? [context.t.checkoutView.loading.processingOrder, context.t.checkoutView.loading.creatingOrder]
+            : [context.t.checkoutView.loading.loadingCheckout],
       );
     }
 
@@ -137,7 +138,7 @@ class CheckoutView
 
     return UnifiedLoadingWidget(
       goRoute: goRoute,
-      loadingSteps: ['Loading checkout...'],
+      loadingSteps: [context.t.checkoutView.loading.loadingCheckout],
     );
   }
 
@@ -220,7 +221,7 @@ class CheckoutView
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing24),
             child: OsmeaComponents.text(
-              'Order Placed Successfully!',
+              context.t.checkoutView.orderSuccess.title,
               textStyle: OsmeaTextStyle.headlineSmall(
                 context,
               ).copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
@@ -232,7 +233,7 @@ class CheckoutView
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing24),
             child: OsmeaComponents.text(
-              'Your order has been received and is being processed.',
+              context.t.checkoutView.orderSuccess.description,
               textStyle: OsmeaTextStyle.bodyMedium(context),
               textAlign: TextAlign.center,
               color: descriptionColor,
@@ -272,7 +273,7 @@ class CheckoutView
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         OsmeaComponents.text(
-                          'Total Amount',
+                          context.t.checkoutView.orderSuccess.totalAmount,
                           textStyle: OsmeaTextStyle.bodySmall(context),
                           color: totalLabelColor,
                         ),
@@ -291,11 +292,11 @@ class CheckoutView
                   ),
                 ),
                 OsmeaComponents.sizedBox(height: 20),
-                _buildOrderDetailRow(context, 'Order ID', '#${state.orderId}'),
+                _buildOrderDetailRow(context, context.t.checkoutView.orderSuccess.orderId, '#${state.orderId}'),
                 // _buildOrderDetailRow(context, 'Order Key', state.orderKey),
                 _buildOrderDetailRow(
                   context,
-                  'Status',
+                  context.t.checkoutView.orderSuccess.status,
                   state.status.toUpperCase(),
                   isStatus: true,
                 ),
@@ -322,7 +323,7 @@ class CheckoutView
                   Icon(Icons.home_rounded, color: buttonIconColor, size: 20),
                   OsmeaComponents.sizedBox(width: 8),
                   OsmeaComponents.text(
-                    'Back to Home',
+                    context.t.checkoutView.orderSuccess.backToHome,
                     textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                       color: buttonTextColor,
                       fontWeight: FontWeight.w600,

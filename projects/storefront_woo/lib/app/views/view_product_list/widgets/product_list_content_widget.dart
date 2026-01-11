@@ -20,6 +20,7 @@ import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_mode
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Main content widget for product list view
 class ProductListContentWidget extends StatefulWidget {
@@ -241,7 +242,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             child: _buildModernActionButton(
               context: context,
               icon: Icons.sort_rounded,
-              label: 'Sort',
+              label: context.t.productListView.actions.sort,
               onPressed: () => _showSortBottomSheet(context),
               hasBadge: false,
             ),
@@ -257,7 +258,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             child: _buildModernActionButton(
               context: context,
               icon: Icons.tune_rounded,
-              label: 'Filters',
+              label: context.t.productListView.actions.filters,
               onPressed: () => _showFiltersBottomSheet(context),
               hasBadge: hasActiveFilters,
             ),
@@ -405,8 +406,8 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.medium,
-      title: 'Sort by',
-      subtitle: 'Select how you want to sort the products',
+      title: context.t.productListView.sort.title,
+      subtitle: context.t.productListView.sort.subtitle,
       backgroundColor: bottomSheetBgColor,
       leftAction: _buildCancelButton(context),
       rightAction: _buildApplyButton(context),
@@ -431,8 +432,8 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.large,
-      title: 'Filters',
-      subtitle: 'Filter products by categories, price, and more',
+      title: context.t.productListView.filters.title,
+      subtitle: context.t.productListView.filters.subtitle,
       backgroundColor: bottomSheetBgColor,
       leftAction: _buildCancelButton(context),
       rightAction: BlocBuilder<ProductListViewModel, ProductListState>(
@@ -462,7 +463,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     );
 
     return OsmeaComponents.button(
-      text: 'Apply',
+      text: context.t.productListView.filters.apply,
       onPressed: () {
         widget.viewModel.applyFilters();
         Navigator.pop(context);
@@ -482,7 +483,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     );
 
     return OsmeaComponents.button(
-      text: 'Cancel',
+      text: context.t.productListView.filters.cancel,
       onPressed: () {
         Navigator.pop(context);
       },
@@ -532,7 +533,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             ),
             OsmeaComponents.sizedBox(height: context.spacing16),
             OsmeaComponents.text(
-              'No products found',
+              context.t.productListView.empty.title,
               textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                 fontWeight: FontWeight.w600,
                 color: titleColor,
@@ -541,7 +542,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             ),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
-              'Try adjusting your filters or search terms',
+              context.t.productListView.empty.message,
               textStyle: OsmeaTextStyle.bodyMedium(
                 context,
               ).copyWith(color: descriptionColor),
@@ -550,7 +551,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             if (widget.viewModel.filters.hasActiveFilters) ...[
               OsmeaComponents.sizedBox(height: context.spacing16),
               OsmeaComponents.button(
-                text: 'Clear all filters',
+                text: context.t.productListView.empty.clearAll,
                 onPressed: () => widget.viewModel.clearFilters(),
                 variant: ButtonVariant.outlined,
                 size: ButtonSize.medium,
@@ -601,7 +602,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               const ListProductCategoriesResponseModel(id: null, name: null),
         );
 
-        final categoryName = category.name ?? 'Category $categoryId';
+        final categoryName = category.name ?? context.t.productListView.widgets.chips.categoryFallback.replaceAll('{categoryId}', categoryId.toString());
         final categoryChipBgColor = _configHelper.getColor(
           'product_list_view.filter_chips.category.backgroundColor',
           OsmeaColors.black,
@@ -661,7 +662,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             ),
           ),
           child: OsmeaComponents.chips(
-            text: 'On Sale',
+            text: context.t.productListView.widgets.chips.onSale,
             variant: ChipsVariant.primary,
             style: ChipsStyle.normal,
             selected: true,
@@ -694,7 +695,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             ),
           ),
           child: OsmeaComponents.chips(
-            text: 'Featured',
+            text: context.t.productListView.widgets.chips.featured,
             variant: ChipsVariant.secondary,
             style: ChipsStyle.normal,
             selected: true,
@@ -772,7 +773,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                 return OsmeaComponents.padding(
                   padding: context.onlyLeftPaddingLow,
                   child: OsmeaComponents.chips(
-                    text: 'Clear all',
+                    text: context.t.productListView.widgets.chips.clearAll,
                     variant: ChipsVariant.neutral,
                     style: ChipsStyle.outlined,
                     icon: Icon(
@@ -796,11 +797,11 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   String _formatStockStatus(String status) {
     switch (status.toLowerCase()) {
       case 'instock':
-        return 'In Stock';
+        return context.t.productListView.widgets.stockStatus.inStock;
       case 'outofstock':
-        return 'Out of Stock';
+        return context.t.productListView.widgets.stockStatus.outOfStock;
       case 'onbackorder':
-        return 'On Backorder';
+        return context.t.productListView.widgets.stockStatus.onBackorder;
       default:
         return status;
     }

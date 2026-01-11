@@ -12,6 +12,7 @@ import 'package:storefront_woo/app/views/view_product_list/models/product_list_v
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// ProductListView displays a filtered list of products
 class ProductListView
@@ -87,7 +88,7 @@ PreferredSizeWidget _buildProductListAppBar(
   final configHelper = AssetConfigHelper();
   final appBarConfig = configHelper.getObject('product_list_view.app_bar');
   
-  final title = appBarConfig?['title'] as String? ?? 'Products';
+  final title = appBarConfig?['title'] as String? ?? context.t.productListView.appBar.title;
   final backgroundColor = configHelper.getColor(
     'product_list_view.app_bar.backgroundColor',
     OsmeaColors.white,
@@ -128,7 +129,7 @@ PreferredSizeWidget _buildProductListAppBar(
         }
       },
       backgroundColor: OsmeaColors.transparent,
-      tooltip: 'Back',
+      tooltip: context.t.productListView.appBar.backTooltip,
     ),
   );
 }

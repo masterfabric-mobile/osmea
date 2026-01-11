@@ -7,6 +7,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_categories_api
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart'
     as brand_models;
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget to load and display categories and brands in search empty state
 class SearchEmptyStateWidget extends StatefulWidget {
@@ -65,7 +66,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
       debugPrint('❌ Failed to load categories: $e');
       if (mounted) {
         setState(() {
-          _error = 'Failed to load categories';
+          _error = context.t.searchView.error.failedToLoadCategories;
           _isLoading = false;
         });
       }
@@ -215,9 +216,9 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         },
         loadingType: LoadingModelType.networkRequest,
         loadingSteps: [
-          'Loading categories...',
-          'Loading brands...',
-          'Almost ready...',
+          context.t.searchView.loading.categories,
+          context.t.searchView.loading.brands,
+          context.t.searchView.loading.almostReady,
         ],
         stepDuration: const Duration(milliseconds: 500),
         showProgress: true,
@@ -242,7 +243,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
               ),
               SizedBox(height: context.spacing16),
               OsmeaComponents.button(
-                text: 'Retry',
+                text: context.t.searchView.error.retry,
                 onPressed: () {
                   setState(() {
                     _isLoading = true;
@@ -266,7 +267,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         // Brands section with horizontal scroll
         if (_brands.isNotEmpty) ...[
           OsmeaComponents.text(
-            'Brands',
+            context.t.searchView.sections.brands,
             textStyle: OsmeaTextStyle.titleMedium(context),
           ),
           OsmeaComponents.sizedBox(height: context.spacing8),
@@ -289,7 +290,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         ],
         // Categories section
         OsmeaComponents.text(
-          'Categories',
+          context.t.searchView.sections.categories,
           textStyle: OsmeaTextStyle.titleMedium(
             context,
           ).copyWith(fontWeight: FontWeight.bold),
@@ -332,7 +333,7 @@ class _BrandCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = brand.image?.thumbnail ?? brand.image?.src;
-    final brandName = brand.name ?? 'Brand';
+    final brandName = brand.name ?? context.t.searchView.fallbacks.brand;
     final circleSize = 64.0;
 
     return Container(
@@ -417,7 +418,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = category.image?.src ?? category.image?.thumbnail;
-    final categoryName = category.name ?? 'Category';
+    final categoryName = category.name ?? context.t.searchView.fallbacks.category;
 
     return Container(
       decoration: BoxDecoration(

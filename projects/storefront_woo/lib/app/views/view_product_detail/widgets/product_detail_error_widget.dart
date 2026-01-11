@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Minimalist error widget for product detail view
 class ProductDetailErrorWidget extends StatelessWidget {
@@ -149,7 +150,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Try Again',
+      text: context.t.productDetailView.error.tryAgain,
       onPressed: onRetry,
       variant: ButtonVariant.primary,
       size: ButtonSize.large,
@@ -170,7 +171,7 @@ class ProductDetailErrorWidget extends StatelessWidget {
     );
 
     return OsmeaComponents.button(
-      text: 'Go Back',
+      text: context.t.productDetailView.error.goBack,
       onPressed: () {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();

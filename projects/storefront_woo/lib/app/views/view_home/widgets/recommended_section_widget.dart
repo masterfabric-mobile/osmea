@@ -14,6 +14,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Recommended section widget
 class RecommendedSectionWidget extends StatelessWidget {
@@ -106,7 +107,7 @@ class RecommendedSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _loadRecommendedConfig();
-    final sectionTitle = config?['title'] as String? ?? 'Recommended for you';
+    final sectionTitle = config?['title'] as String? ?? context.t.homeView.widgets.recommended.title;
     final showSection = config?['enabled'] as bool? ?? true;
 
     if (!showSection) return const SizedBox.shrink();
@@ -142,7 +143,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                   context.push('/products');
                 },
                 child: OsmeaComponents.text(
-                  'See all',
+                  context.t.homeView.widgets.recommended.seeAll,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize:
                         context.fontSizeExtraSmallMedium *
@@ -324,27 +325,27 @@ class RecommendedSectionWidget extends StatelessWidget {
                           // Optimistic update - show snackbar immediately
                           if (wasSaved) {
                             context.showSnackbar(
-                              title: 'Removed from favorites',
-                              message: 'Item was removed from your favorites',
+                              title: context.t.homeView.widgets.recommended.wishlist.removed.title,
+                              message: context.t.homeView.widgets.recommended.wishlist.removed.message,
                               type: SnackbarType.info,
                               style: SnackbarStyle.minimal,
                               position: SnackbarPosition.bottom,
                               animation: SnackbarAnimation.slide,
                               duration: const Duration(seconds: 2),
-                              actionLabel: 'Undo',
+                              actionLabel: context.t.homeView.widgets.recommended.wishlist.removed.undo,
                               onAction: () =>
                                   viewModel.addProductToWishlist(productId),
                             );
                           } else {
                             context.showSnackbar(
-                              title: 'Added to favorites',
-                              message: 'Item was added to your favorites',
+                              title: context.t.homeView.widgets.recommended.wishlist.added.title,
+                              message: context.t.homeView.widgets.recommended.wishlist.added.message,
                               type: SnackbarType.success,
                               style: SnackbarStyle.minimal,
                               position: SnackbarPosition.bottom,
                               animation: SnackbarAnimation.slide,
                               duration: const Duration(seconds: 2),
-                              actionLabel: 'Undo',
+                              actionLabel: context.t.homeView.widgets.recommended.wishlist.added.undo,
                               onAction: () =>
                                   viewModel.addProductToWishlist(productId),
                             );
@@ -455,7 +456,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                 OsmeaComponents.sizedBox(height: context.spacing4),
                 // Product name
                 OsmeaComponents.text(
-                  product.name ?? 'Product',
+                  product.name ?? context.t.homeView.widgets.recommended.defaultProductName,
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                     fontSize:
                         context.fontSizeExtraSmallMedium *

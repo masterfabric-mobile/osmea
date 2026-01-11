@@ -11,15 +11,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Campaign view that displays full-screen campaign images
 class CampaignView extends StatefulWidget {
   final Function(String) goRoute;
 
-  const CampaignView({
-    super.key,
-    required this.goRoute,
-  });
+  const CampaignView({super.key, required this.goRoute});
 
   @override
   State<CampaignView> createState() => _CampaignViewState();
@@ -70,37 +68,28 @@ class _CampaignViewState extends State<CampaignView>
   void _initializeAnimations() {
     final animConfig = _getAnimationConfig();
     final duration = Duration(
-      milliseconds: (animConfig?['duration_milliseconds'] as num?)?.toInt() ?? 800,
+      milliseconds:
+          (animConfig?['duration_milliseconds'] as num?)?.toInt() ?? 800,
     );
-    
-    _animationController = AnimationController(
-      vsync: this,
-      duration: duration,
-    );
+
+    _animationController = AnimationController(vsync: this, duration: duration);
 
     final fadeBegin = (animConfig?['fade_begin'] as num?)?.toDouble() ?? 0.0;
     final fadeEnd = (animConfig?['fade_end'] as num?)?.toDouble() ?? 1.0;
     final scaleBegin = (animConfig?['scale_begin'] as num?)?.toDouble() ?? 0.8;
     final scaleEnd = (animConfig?['scale_end'] as num?)?.toDouble() ?? 1.0;
     final curveName = animConfig?['curve'] as String? ?? 'easeInOut';
-    
+
     final curve = _getCurveFromString(curveName);
 
     _fadeAnimation = Tween<double>(
       begin: fadeBegin,
       end: fadeEnd,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: curve,
-    ));
+    ).animate(CurvedAnimation(parent: _animationController, curve: curve));
 
-    _scaleAnimation = Tween<double>(
-      begin: scaleBegin,
-      end: scaleEnd,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _scaleAnimation = Tween<double>(begin: scaleBegin, end: scaleEnd).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
   }
 
   /// Get curve from string name
@@ -122,7 +111,7 @@ class _CampaignViewState extends State<CampaignView>
   /// Load campaign configuration from app_config.json
   void _loadCampaignConfig() {
     _configHelper = AssetConfigHelper();
-    
+
     // Load config asynchronously
     _configHelper?.loadConfig('assets/app_config.json').then((_) {
       if (mounted) {
@@ -163,7 +152,8 @@ class _CampaignViewState extends State<CampaignView>
   Duration _getNavigationTimerDuration() {
     try {
       final navConfig = _configHelper?.getObject('campaign_view.navigation');
-      final durationMs = (navConfig?['timer_duration_milliseconds'] as num?)?.toInt() ?? 1500;
+      final durationMs =
+          (navConfig?['timer_duration_milliseconds'] as num?)?.toInt() ?? 1500;
       return Duration(milliseconds: durationMs);
     } catch (e) {
       debugPrint('⚠️ Failed to load navigation timer config: $e');
@@ -185,7 +175,9 @@ class _CampaignViewState extends State<CampaignView>
   /// Get background color from config
   Color _getBackgroundColor() {
     try {
-      final colorString = _configHelper?.getString('campaign_view.backgroundColor') ?? '#FFFFFF';
+      final colorString =
+          _configHelper?.getString('campaign_view.backgroundColor') ??
+          '#FFFFFF';
       if (colorString.startsWith('#')) {
         final hexString = colorString.substring(1);
         if (hexString.length == 6) {
@@ -259,12 +251,12 @@ class _CampaignViewState extends State<CampaignView>
               errorWidget: _buildErrorWidget(),
             ),
           ),
-        // Optional: Gradient overlay for text readability
-        if (_shouldShowGradientOverlay(currentCampaign))
-          _buildGradientOverlay(),
-        // Optional: Text overlay
-        if (currentCampaign.title != null || currentCampaign.subtitle != null)
-          _buildTextOverlay(context, currentCampaign),
+          // Optional: Gradient overlay for text readability
+          if (_shouldShowGradientOverlay(currentCampaign))
+            _buildGradientOverlay(),
+          // Optional: Text overlay
+          if (currentCampaign.title != null || currentCampaign.subtitle != null)
+            _buildTextOverlay(context, currentCampaign),
         ],
       ),
     );
@@ -273,8 +265,11 @@ class _CampaignViewState extends State<CampaignView>
   /// Build error widget with config colors
   Widget _buildErrorWidget() {
     try {
-      final errorConfig = _configHelper?.getObject('campaign_view.error_widget');
-      final bgColorString = errorConfig?['backgroundColor'] as String? ?? '#F9FAFB';
+      final errorConfig = _configHelper?.getObject(
+        'campaign_view.error_widget',
+      );
+      final bgColorString =
+          errorConfig?['backgroundColor'] as String? ?? '#F9FAFB';
       final iconColorString = errorConfig?['iconColor'] as String? ?? '#9CA3AF';
       final iconSize = (errorConfig?['iconSize'] as num?)?.toDouble() ?? 64.0;
 
@@ -320,7 +315,9 @@ class _CampaignViewState extends State<CampaignView>
   /// Check if gradient overlay should be shown
   bool _shouldShowGradientOverlay(CampaignImageItem campaign) {
     try {
-      final gradientConfig = _configHelper?.getObject('campaign_view.gradient_overlay');
+      final gradientConfig = _configHelper?.getObject(
+        'campaign_view.gradient_overlay',
+      );
       final enabled = gradientConfig?['enabled'] as bool? ?? true;
       return enabled && (campaign.title != null || campaign.subtitle != null);
     } catch (e) {
@@ -332,10 +329,15 @@ class _CampaignViewState extends State<CampaignView>
   /// Build gradient overlay with config colors
   Widget _buildGradientOverlay() {
     try {
-      final gradientConfig = _configHelper?.getObject('campaign_view.gradient_overlay');
-      final startColorString = gradientConfig?['startColor'] as String? ?? '#00000000';
-      final endColorString = gradientConfig?['endColor'] as String? ?? '#000000';
-      final endColorOpacity = (gradientConfig?['endColorOpacity'] as num?)?.toDouble() ?? 0.6;
+      final gradientConfig = _configHelper?.getObject(
+        'campaign_view.gradient_overlay',
+      );
+      final startColorString =
+          gradientConfig?['startColor'] as String? ?? '#00000000';
+      final endColorString =
+          gradientConfig?['endColor'] as String? ?? '#000000';
+      final endColorOpacity =
+          (gradientConfig?['endColorOpacity'] as num?)?.toDouble() ?? 0.6;
       final beginStr = gradientConfig?['begin'] as String? ?? 'topCenter';
       final endStr = gradientConfig?['end'] as String? ?? 'bottomCenter';
 
@@ -380,7 +382,10 @@ class _CampaignViewState extends State<CampaignView>
               end: getAlignment(endStr),
               colors: [
                 getColor(startColorString, Colors.transparent),
-                getColor(endColorString, OsmeaColors.black).withOpacity(endColorOpacity),
+                getColor(
+                  endColorString,
+                  OsmeaColors.black,
+                ).withOpacity(endColorOpacity),
               ],
             ),
           ),
@@ -394,15 +399,39 @@ class _CampaignViewState extends State<CampaignView>
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                OsmeaColors.black.withOpacity(0.6),
-              ],
+              colors: [Colors.transparent, OsmeaColors.black.withOpacity(0.6)],
             ),
           ),
         ),
       );
     }
+  }
+
+  /// Get translated text from slang or return original text
+  /// If the text starts with '@', it's treated as a translation key
+  String _getTranslatedText(BuildContext context, String? text) {
+    if (text == null || text.isEmpty) return '';
+    // If text starts with '@', treat it as a translation key
+    if (text.startsWith('@')) {
+      final key = text.substring(1);
+      try {
+        // Try to get translation from campaign namespace
+        switch (key) {
+          case 'campaign.title':
+            return context.t.campaignView.title;
+          case 'campaign.subtitle':
+            return context.t.campaignView.subtitle;
+          default:
+            // Try direct access to translations
+            return context.t[key] ?? text;
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to translate key: $key - $e');
+        return text;
+      }
+    }
+    // Return original text if not a translation key
+    return text;
   }
 
   /// Build text overlay with config colors
@@ -433,8 +462,10 @@ class _CampaignViewState extends State<CampaignView>
         titleConfig?['shadowColor'] as String?,
         OsmeaColors.black,
       );
-      final titleShadowBlur = (titleConfig?['shadowBlur'] as num?)?.toDouble() ?? 4.0;
-      final titleFontWeight = (titleConfig?['fontWeight'] as num?)?.toInt() ?? 700;
+      final titleShadowBlur =
+          (titleConfig?['shadowBlur'] as num?)?.toDouble() ?? 4.0;
+      final titleFontWeight =
+          (titleConfig?['fontWeight'] as num?)?.toInt() ?? 700;
       final titleMaxLines = (titleConfig?['maxLines'] as num?)?.toInt() ?? 2;
 
       final subtitleColor = getColor(
@@ -445,8 +476,14 @@ class _CampaignViewState extends State<CampaignView>
         subtitleConfig?['shadowColor'] as String?,
         OsmeaColors.black,
       );
-      final subtitleShadowBlur = (subtitleConfig?['shadowBlur'] as num?)?.toDouble() ?? 4.0;
-      final subtitleMaxLines = (subtitleConfig?['maxLines'] as num?)?.toInt() ?? 1;
+      final subtitleShadowBlur =
+          (subtitleConfig?['shadowBlur'] as num?)?.toDouble() ?? 4.0;
+      final subtitleMaxLines =
+          (subtitleConfig?['maxLines'] as num?)?.toInt() ?? 1;
+
+      // Get translated texts
+      final translatedTitle = _getTranslatedText(context, campaign.title);
+      final translatedSubtitle = _getTranslatedText(context, campaign.subtitle);
 
       return Positioned(
         bottom: 0,
@@ -458,9 +495,9 @@ class _CampaignViewState extends State<CampaignView>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (campaign.title != null)
+              if (translatedTitle.isNotEmpty)
                 OsmeaComponents.text(
-                  campaign.title!,
+                  translatedTitle,
                   textStyle: OsmeaTextStyle.headlineMedium(context).copyWith(
                     fontWeight: FontWeight.values.firstWhere(
                       (w) => w.value == titleFontWeight,
@@ -477,11 +514,11 @@ class _CampaignViewState extends State<CampaignView>
                   maxLines: titleMaxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
-              if (campaign.title != null && campaign.subtitle != null)
+              if (translatedTitle.isNotEmpty && translatedSubtitle.isNotEmpty)
                 OsmeaComponents.sizedBox(height: context.spacing8),
-              if (campaign.subtitle != null)
+              if (translatedSubtitle.isNotEmpty)
                 OsmeaComponents.text(
-                  campaign.subtitle!,
+                  translatedSubtitle,
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     color: subtitleColor,
                     shadows: [
@@ -500,7 +537,10 @@ class _CampaignViewState extends State<CampaignView>
       );
     } catch (e) {
       debugPrint('⚠️ Failed to build text overlay: $e');
-      // Fallback to default
+      // Fallback to default with translations
+      final translatedTitle = _getTranslatedText(context, campaign.title);
+      final translatedSubtitle = _getTranslatedText(context, campaign.subtitle);
+
       return Positioned(
         bottom: 0,
         left: 0,
@@ -511,9 +551,9 @@ class _CampaignViewState extends State<CampaignView>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (campaign.title != null)
+              if (translatedTitle.isNotEmpty)
                 OsmeaComponents.text(
-                  campaign.title!,
+                  translatedTitle,
                   textStyle: OsmeaTextStyle.headlineMedium(context).copyWith(
                     fontWeight: FontWeight.w700,
                     color: OsmeaColors.white,
@@ -527,11 +567,11 @@ class _CampaignViewState extends State<CampaignView>
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-              if (campaign.title != null && campaign.subtitle != null)
+              if (translatedTitle.isNotEmpty && translatedSubtitle.isNotEmpty)
                 OsmeaComponents.sizedBox(height: context.spacing8),
-              if (campaign.subtitle != null)
+              if (translatedSubtitle.isNotEmpty)
                 OsmeaComponents.text(
-                  campaign.subtitle!,
+                  translatedSubtitle,
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     color: OsmeaColors.white,
                     shadows: [
@@ -558,10 +598,5 @@ class CampaignImageItem {
   final String? title;
   final String? subtitle;
 
-  CampaignImageItem({
-    required this.imageUrl,
-    this.title,
-    this.subtitle,
-  });
+  CampaignImageItem({required this.imageUrl, this.title, this.subtitle});
 }
-

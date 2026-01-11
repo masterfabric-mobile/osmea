@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_reviews_api/freezed_model/response/list_product_reviews_response_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying a single product review
 class ReviewItemWidget extends StatelessWidget {
@@ -112,7 +113,7 @@ class ReviewItemWidget extends StatelessWidget {
                   crossAxisAlignment: context.crossStart,
                   children: [
                     OsmeaComponents.text(
-                      review.reviewer ?? 'Anonymous',
+                      review.reviewer ?? context.t.productDetailView.reviews.anonymous,
                       textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                         fontWeight: FontWeight.w600,
                         color: nameColor,
@@ -156,7 +157,7 @@ class ReviewItemWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(context.spacing8),
                   ),
                   child: OsmeaComponents.text(
-                    'Verified',
+                    context.t.productDetailView.reviews.verified,
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                       color: verifiedBadgeTextColor,
                       fontWeight: FontWeight.w600,

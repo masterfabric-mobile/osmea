@@ -11,6 +11,7 @@ import 'package:storefront_woo/app/views/view_favorite_categories/models/favorit
 import 'package:storefront_woo/app/views/view_favorite_categories/models/states.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/models/favorite_category.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 class FavoriteCategoriesView
     extends
@@ -58,7 +59,10 @@ class FavoriteCategoriesView
       return fallback;
     }
     
-    final title = configHelper.getString('favorite_categories_view_configuration.app_bar.title', 'Favorite Categories');
+    final titleConfig = configHelper.getString('favorite_categories_view_configuration.app_bar.title', '');
+    final title = titleConfig.isNotEmpty 
+        ? titleConfig 
+        : context.t.favoriteCategoriesView.appBar.title;
     final backgroundColor = getColor('backgroundColor', OsmeaColors.white);
     final foregroundColor = getColor('foregroundColor', OsmeaColors.black);
     final titleColor = getColor('titleColor', OsmeaColors.black);
@@ -388,13 +392,13 @@ class FavoriteCategoriesView
           onTap: () {
             viewModel.removeFavorite(category.id);
             context.showSnackbar(
-              title: 'Removed from favorites',
-              message: 'Category was removed from your favorites',
+              title: context.t.favoriteCategoriesView.remove.title,
+              message: context.t.favoriteCategoriesView.remove.message,
               type: SnackbarType.error,
               style: SnackbarStyle.minimal,
               position: SnackbarPosition.bottom,
               animation: SnackbarAnimation.slide,
-              actionLabel: 'Undo',
+              actionLabel: context.t.favoriteCategoriesView.remove.undo,
               onAction: () => viewModel.toggleFavorite(
                 category.id,
                 category.name,
