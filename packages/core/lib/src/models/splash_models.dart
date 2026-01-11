@@ -45,6 +45,9 @@ class SplashConfigModel {
   /// Primary color hex code
   final String? primaryColor;
 
+  /// Loading indicator color hex code
+  final String? loadingIndicatorColor;
+
   /// Text color hex code
   final String? textColor;
 
@@ -89,6 +92,7 @@ class SplashConfigModel {
     required this.animationDuration,
     this.style = SplashStyle.startup,
     this.primaryColor,
+    this.loadingIndicatorColor,
     this.textColor,
     this.backgroundColor,
     this.appName,
@@ -117,6 +121,7 @@ class SplashConfigModel {
         orElse: () => SplashStyle.startup,
       ),
       primaryColor: json['primary_color'] as String?,
+      loadingIndicatorColor: json['loading_indicator_color'] as String?,
       textColor: json['text_color'] as String?,
       backgroundColor: json['background_color'] as String?,
       appName: json['app_name'] as String?,
@@ -143,6 +148,7 @@ class SplashConfigModel {
       'animation_duration': animationDuration,
       'style': style.name,
       'primary_color': primaryColor,
+      'loading_indicator_color': loadingIndicatorColor,
       'text_color': textColor,
       'background_color': backgroundColor,
       'app_name': appName,
@@ -154,6 +160,15 @@ class SplashConfigModel {
   Color? getPrimaryColor() {
     if (primaryColor == null) return null;
     return _parseColor(primaryColor!);
+  }
+
+  /// Convert loading indicator color string to Color
+  Color? getLoadingIndicatorColor() {
+    if (loadingIndicatorColor != null) {
+      return _parseColor(loadingIndicatorColor!);
+    }
+    // Fallback to primary color if loading indicator color is not set
+    return getPrimaryColor();
   }
 
   /// Convert text color string to Color
@@ -210,6 +225,7 @@ class SplashConfigModel {
         other.showCopyright == showCopyright &&
         other.copyrightText == copyrightText &&
         other.primaryColor == primaryColor &&
+        other.loadingIndicatorColor == loadingIndicatorColor &&
         other.textColor == textColor &&
         other.backgroundColor == backgroundColor &&
         other.appName == appName &&
@@ -234,6 +250,7 @@ class SplashConfigModel {
         showCopyright.hashCode ^
         copyrightText.hashCode ^
         primaryColor.hashCode ^
+        loadingIndicatorColor.hashCode ^
         textColor.hashCode ^
         backgroundColor.hashCode ^
         appName.hashCode ^

@@ -79,6 +79,64 @@ class AuthWidget extends StatelessWidget {
     return OsmeaColors.nordicBlue;
   }
 
+  /// Get button color from config
+  Color _getButtonColor(String buttonType, String colorType, Color defaultColor) {
+    if (config != null && config!.containsKey('buttons')) {
+      final buttonsConfig = config!['buttons'] as Map<String, dynamic>?;
+      if (buttonsConfig != null && buttonsConfig.containsKey(buttonType)) {
+        final buttonConfig = buttonsConfig[buttonType] as Map<String, dynamic>?;
+        if (buttonConfig != null && buttonConfig.containsKey(colorType)) {
+          final colorString = buttonConfig[colorType] as String?;
+          if (colorString != null) {
+            try {
+              String hex = colorString;
+              if (hex.startsWith('#')) {
+                hex = hex.substring(1);
+                if (hex.length == 8) {
+                  return Color(int.parse('FF${hex.substring(0, 6)}', radix: 16));
+                } else if (hex.length == 6) {
+                  return Color(int.parse('FF$hex', radix: 16));
+                }
+              }
+            } catch (e) {
+              debugPrint('⚠️ Invalid button color: $colorString');
+            }
+          }
+        }
+      }
+    }
+    return defaultColor;
+  }
+
+  /// Get text link color from config
+  Color _getTextLinkColor(String linkType, Color defaultColor) {
+    if (config != null && config!.containsKey('text_links')) {
+      final textLinksConfig = config!['text_links'] as Map<String, dynamic>?;
+      if (textLinksConfig != null && textLinksConfig.containsKey(linkType)) {
+        final linkConfig = textLinksConfig[linkType] as Map<String, dynamic>?;
+        if (linkConfig != null && linkConfig.containsKey('color')) {
+          final colorString = linkConfig['color'] as String?;
+          if (colorString != null) {
+            try {
+              String hex = colorString;
+              if (hex.startsWith('#')) {
+                hex = hex.substring(1);
+                if (hex.length == 8) {
+                  return Color(int.parse('FF${hex.substring(0, 6)}', radix: 16));
+                } else if (hex.length == 6) {
+                  return Color(int.parse('FF$hex', radix: 16));
+                }
+              }
+            } catch (e) {
+              debugPrint('⚠️ Invalid text link color: $colorString');
+            }
+          }
+        }
+      }
+    }
+    return defaultColor;
+  }
+
   /// Get background color from config
   Color _getBackgroundColor() {
     if (config != null && config!.containsKey('ui_style')) {
@@ -550,6 +608,12 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled = state.isSignInValid && !isLoading;
 
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_in', 'backgroundColor', primaryColor);
+    final buttonTextColor = _getButtonColor('sign_in', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_in', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_in', 'disabledTextColor', OsmeaColors.white);
+
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(
@@ -558,10 +622,12 @@ class AuthWidget extends StatelessWidget {
       onPressed: isEnabled ? cubit.signIn : null,
       variant: ButtonVariant.secondary,
       size: ButtonSize.large,
-      state: isLoading ? ButtonState.loading : ButtonState.enabled,
+      state: isLoading ? ButtonState.loading : (isEnabled ? ButtonState.enabled : ButtonState.disabled),
       fullWidth: true,
-      backgroundColor: primaryColor,
-      textColor: OsmeaColors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }
@@ -776,6 +842,13 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled =
         state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
+    final buttonTextColor = _getButtonColor('sign_up', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_up', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_up', 'disabledTextColor', OsmeaColors.white);
+
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(
@@ -786,12 +859,14 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.large,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !state.isSignUpValid
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
-      backgroundColor: primaryColor,
-      textColor: OsmeaColors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }
@@ -999,6 +1074,12 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled = state.isSignInValid && !isLoading;
 
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_in', 'backgroundColor', OsmeaColors.thunder);
+    final buttonTextColor = _getButtonColor('sign_in', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_in', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_in', 'disabledTextColor', OsmeaColors.white);
+
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(
@@ -1007,10 +1088,12 @@ class AuthWidget extends StatelessWidget {
       onPressed: isEnabled ? cubit.signIn : null,
       variant: ButtonVariant.primary,
       size: ButtonSize.medium,
-      state: isLoading ? ButtonState.loading : ButtonState.enabled,
+      state: isLoading ? ButtonState.loading : (isEnabled ? ButtonState.enabled : ButtonState.disabled),
       fullWidth: true,
-      backgroundColor: OsmeaColors.thunder,
-      textColor: OsmeaColors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }
@@ -1030,6 +1113,8 @@ class AuthWidget extends StatelessWidget {
   }
 
   Widget _buildSpaceSignUpLink(BuildContext context, AuthCubit cubit) {
+    final linkColor = _getTextLinkColor('sign_up_link', OsmeaColors.thunder);
+    
     return OsmeaComponents.center(
       child: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1044,7 +1129,7 @@ class AuthWidget extends StatelessWidget {
             child: OsmeaComponents.text(
               'Sign Up',
               variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.thunder,
+              color: linkColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1233,7 +1318,13 @@ class AuthWidget extends StatelessWidget {
   Widget _buildSpaceSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = state.isSignUpValid && !isLoading;
+    final isEnabled = state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', OsmeaColors.thunder);
+    final buttonTextColor = _getButtonColor('sign_up', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_up', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_up', 'disabledTextColor', OsmeaColors.white);
 
     return OsmeaComponents.button(
       text: isLoading
@@ -1245,17 +1336,21 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !state.isSignUpValid
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
-      backgroundColor: OsmeaColors.thunder,
-      textColor: OsmeaColors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }
 
   Widget _buildSpaceSignInLink(BuildContext context, AuthCubit cubit) {
+    final linkColor = _getTextLinkColor('sign_in_link', OsmeaColors.thunder);
+    
     return OsmeaComponents.center(
       child: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1270,7 +1365,7 @@ class AuthWidget extends StatelessWidget {
             child: OsmeaComponents.text(
               'Sign In',
               variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.thunder,
+              color: linkColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1421,6 +1516,8 @@ class AuthWidget extends StatelessWidget {
 
   /// 🔗 Startup Sign In Link (for Sign Up page)
   Widget _buildStartupSignInLink(BuildContext context, AuthCubit cubit) {
+    final linkColor = _getTextLinkColor('sign_in_link', OsmeaColors.black);
+    
     return OsmeaComponents.center(
       child: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1435,7 +1532,7 @@ class AuthWidget extends StatelessWidget {
             child: OsmeaComponents.text(
               'Sign In',
               variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.nordicBlue,
+              color: linkColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1518,6 +1615,12 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled = state.isSignInValid && !isLoading;
 
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_in', 'backgroundColor', primaryColor);
+    final buttonTextColor = _getButtonColor('sign_in', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_in', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_in', 'disabledTextColor', OsmeaColors.white);
+
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(
@@ -1526,10 +1629,12 @@ class AuthWidget extends StatelessWidget {
       onPressed: isEnabled ? cubit.signIn : null,
       variant: ButtonVariant.primary,
       size: ButtonSize.medium,
-      state: isLoading ? ButtonState.loading : ButtonState.enabled,
+      state: isLoading ? ButtonState.loading : (isEnabled ? ButtonState.enabled : ButtonState.disabled),
       fullWidth: true,
-      backgroundColor: OsmeaColors.nordicBlue,
-      textColor: Colors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }
@@ -1552,6 +1657,8 @@ class AuthWidget extends StatelessWidget {
 
   /// 🔗 Startup Sign Up Link
   Widget _buildStartupSignUpLink(BuildContext context, AuthCubit cubit) {
+    final linkColor = _getTextLinkColor('sign_up_link', OsmeaColors.black);
+    
     return OsmeaComponents.center(
       child: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1566,7 +1673,7 @@ class AuthWidget extends StatelessWidget {
             child: OsmeaComponents.text(
               'Sign Up',
               variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.nordicBlue,
+              color: linkColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1732,6 +1839,13 @@ class AuthWidget extends StatelessWidget {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
     final isEnabled =
         state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    
+    // Get button colors from config
+    final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
+    final buttonTextColor = _getButtonColor('sign_up', 'textColor', OsmeaColors.white);
+    final disabledBgColor = _getButtonColor('sign_up', 'disabledBackgroundColor', OsmeaColors.grayMaterial[400] ?? OsmeaColors.pewter);
+    final disabledTextColor = _getButtonColor('sign_up', 'disabledTextColor', OsmeaColors.white);
+
     return OsmeaComponents.button(
       text: isLoading
           ? _getConfigValue(
@@ -1742,12 +1856,14 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !state.isSignUpValid
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
-      backgroundColor: OsmeaColors.nordicBlue,
-      textColor: OsmeaColors.white,
+      backgroundColor: buttonBgColor,
+      textColor: buttonTextColor,
+      disabledBackgroundColor: disabledBgColor,
+      disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
   }

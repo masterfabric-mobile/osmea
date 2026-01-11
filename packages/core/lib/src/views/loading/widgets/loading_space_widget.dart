@@ -68,7 +68,7 @@ class LoadingSpaceWidget extends StatelessWidget {
 
   /// Build main content with space theme
   Widget _buildMainContent(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.thunder;
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +128,7 @@ class LoadingSpaceWidget extends StatelessWidget {
   /// Build cosmic loading indicator
   Widget _buildCosmicLoadingIndicator(
       BuildContext context, LoadingViewState state) {
-    final progressColor = model.getProgressColor() ?? OsmeaColors.nordicBlue;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return Stack(
       alignment: Alignment.center,
@@ -183,8 +183,8 @@ class LoadingSpaceWidget extends StatelessWidget {
 
   /// Build bottom section with space theme
   Widget _buildBottomSection(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.thunder;
-    final progressColor = model.getProgressColor() ?? OsmeaColors.nordicBlue;
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.column(
       children: [

@@ -138,7 +138,7 @@ class SplashStartupWidget extends StatelessWidget {
             OsmeaComponents.loading(
               type: LoadingType.circularFade,
               size: config.loadingIndicatorSize.toDouble(),
-              color: _getPrimaryColor(context, state),
+              color: _getLoadingIndicatorColor(context, state),
             ),
             OsmeaComponents.sizedBox(height: context.spacing16),
             OsmeaComponents.text(
@@ -189,28 +189,20 @@ class SplashStartupWidget extends StatelessWidget {
     return OsmeaColors.thunder;
   }
 
-  /// 🎨 Get primary color from config
-  Color _getPrimaryColor(BuildContext context, SplashState state) {
+  /// 🎨 Get loading indicator color from config (prefers loadingIndicatorColor, falls back to primaryColor)
+  Color _getLoadingIndicatorColor(BuildContext context, SplashState state) {
     final config = state.config;
-    if (config?.primaryColor != null) {
-      try {
-        String colorString = config!.primaryColor!;
-        // Handle both 6-digit (#RRGGBB) and 8-digit (#RRGGBBAA) hex colors
-        if (colorString.startsWith('#')) {
-          colorString = colorString.substring(1); // Remove #
-          if (colorString.length == 8) {
-            // 8-digit hex: RRGGBBAA - keep as is, just add FF prefix for full opacity
-            return Color(
-                int.parse('FF${colorString.substring(0, 6)}', radix: 16));
-          } else if (colorString.length == 6) {
-            // 6-digit hex: RRGGBB - add FF prefix for full opacity
-            return Color(int.parse('FF$colorString', radix: 16));
-          }
-        }
-      } catch (e) {
-        debugPrint('⚠️ Invalid primary color: ${config!.primaryColor}');
-      }
+    // First try loading indicator color
+    final loadingColor = config?.getLoadingIndicatorColor();
+    if (loadingColor != null) {
+      return loadingColor;
     }
-    return OsmeaColors.nordicBlue;
+    // Fallback to primary color
+    final primaryColor = config?.getPrimaryColor();
+    if (primaryColor != null) {
+      return primaryColor;
+    }
+    // Default fallback
+    return OsmeaColors.black;
   }
 }

@@ -77,7 +77,7 @@ class LoadingEnterpriseWidget extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: model.getProgressColor() ?? const Color(0xFF2563EB),
+              color: model.getProgressColor() ?? OsmeaColors.black,
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
@@ -93,7 +93,7 @@ class LoadingEnterpriseWidget extends StatelessWidget {
           OsmeaComponents.text(
             'OSMEA',
             variant: OsmeaTextVariant.titleMedium,
-            color: const Color(0xFF1F2937),
+            color: OsmeaColors.black,
             fontWeight: FontWeight.w600,
           ),
         ],
@@ -103,7 +103,7 @@ class LoadingEnterpriseWidget extends StatelessWidget {
 
   /// Build main content with enterprise styling
   Widget _buildMainContent(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? const Color(0xFF374151);
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.container(
       padding: EdgeInsets.symmetric(horizontal: context.spacing32),
@@ -141,10 +141,10 @@ class LoadingEnterpriseWidget extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(context.spacing16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
+                color: OsmeaColors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: const Color(0xFFE5E7EB),
+                  color: OsmeaColors.silver,
                   width: 1,
                 ),
               ),
@@ -164,7 +164,7 @@ class LoadingEnterpriseWidget extends StatelessWidget {
   /// Build enterprise loading indicator
   Widget _buildEnterpriseLoadingIndicator(
       BuildContext context, LoadingViewState state) {
-    final progressColor = model.getProgressColor() ?? const Color(0xFF2563EB);
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.container(
       width: 100,
@@ -209,17 +209,17 @@ class LoadingEnterpriseWidget extends StatelessWidget {
 
   /// Build bottom section with enterprise styling
   Widget _buildBottomSection(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? const Color(0xFF374151);
-    final progressColor = model.getProgressColor() ?? const Color(0xFF2563EB);
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.container(
       width: double.infinity,
       padding: EdgeInsets.all(context.spacing24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
         border: Border(
           top: BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: OsmeaColors.silver,
             width: 1,
           ),
         ),

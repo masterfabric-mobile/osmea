@@ -272,28 +272,10 @@ class LoadingView extends MasterViewCubit<LoadingViewCubit, LoadingViewState> {
   }
 
   /// Convert LoadingModelType to LoadingStyle
+  /// All loading types now use space style
   LoadingStyle _convertModelTypeToStyle(LoadingModelType modelType) {
-    switch (modelType) {
-      case LoadingModelType.initialization:
-      case LoadingModelType.appStartup:
-        return LoadingStyle.startup;
-      case LoadingModelType.dataSync:
-      case LoadingModelType.synchronization:
-      case LoadingModelType.networkRequest:
-        return LoadingStyle.space;
-      case LoadingModelType.fileProcessing:
-      case LoadingModelType.authentication:
-      case LoadingModelType.databaseOperation:
-        return LoadingStyle.enterprise;
-      case LoadingModelType.general:
-      case LoadingModelType.dataLoading:
-      case LoadingModelType.fileTransfer:
-      case LoadingModelType.cacheBuilding:
-      case LoadingModelType.updating:
-      case LoadingModelType.configuration:
-      case LoadingModelType.imageProcessing:
-        return LoadingStyle.startup; // Default to startup for general cases
-    }
+    // All loading types use space style
+    return LoadingStyle.space;
   }
 
   /// Get appropriate loading widget based on style

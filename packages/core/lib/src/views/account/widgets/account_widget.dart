@@ -449,6 +449,25 @@ mixin AccountWidget {
     Color textColor,
   ) {
     final isAuthenticated = _isAuthenticated(context);
+    final configHelper = AssetConfigHelper();
+
+    // Get button colors from config
+    final signOutBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.backgroundColor',
+      primaryColor,
+    );
+    final signOutTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.textColor',
+      OsmeaColors.white,
+    );
+    final signInBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.backgroundColor',
+      primaryColor,
+    );
+    final signInTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.textColor',
+      OsmeaColors.white,
+    );
 
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -458,11 +477,11 @@ mixin AccountWidget {
             onPressed: () => _signOut(context, viewModel),
             variant: ButtonVariant.secondary,
             size: ButtonSize.large,
-            backgroundColor: primaryColor,
-            textColor: OsmeaColors.white,
+            backgroundColor: signOutBgColor,
+            textColor: signOutTextColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.white,
+              color: signOutTextColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -471,11 +490,11 @@ mixin AccountWidget {
             onPressed: () => _navigate(context, '/auth'),
             variant: ButtonVariant.primary,
             size: ButtonSize.large,
-            backgroundColor: primaryColor,
-            textColor: OsmeaColors.white,
+            backgroundColor: signInBgColor,
+            textColor: signInTextColor,
             text: 'Sign In',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.white,
+              color: signInTextColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1138,6 +1157,25 @@ mixin AccountWidget {
     AccountCubit viewModel,
   ) {
     final isAuthenticated = _isAuthenticated(context);
+    final configHelper = AssetConfigHelper();
+
+    // Get button colors from config
+    final signOutBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.backgroundColor',
+      OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+    );
+    final signOutTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.textColor',
+      OsmeaColors.white,
+    );
+    final signInBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.backgroundColor',
+      OsmeaColors.black,
+    );
+    final signInTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.textColor',
+      OsmeaColors.white,
+    );
 
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1147,22 +1185,24 @@ mixin AccountWidget {
             onPressed: () => _signOut(context, viewModel),
             variant: ButtonVariant.secondary,
             size: ButtonSize.large,
-            backgroundColor: OsmeaColors.red,
-            textColor: OsmeaColors.white,
+            backgroundColor: signOutBgColor,
+            textColor: signOutTextColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
-            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+            ).copyWith(color: signOutTextColor, fontWeight: FontWeight.w600),
           ),
         if (!isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _navigate(context, '/auth'),
             variant: ButtonVariant.primary,
             size: ButtonSize.large,
+            backgroundColor: signInBgColor,
+            textColor: signInTextColor,
             text: 'Sign In',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
-            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+            ).copyWith(color: signInTextColor, fontWeight: FontWeight.w600),
           ),
       ],
     );

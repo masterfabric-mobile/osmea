@@ -55,7 +55,7 @@ class LoadingStartupWidget extends StatelessWidget {
 
   /// Build main content area
   Widget _buildMainContent(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.thunder;
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +100,7 @@ class LoadingStartupWidget extends StatelessWidget {
 
   /// Build loading indicator
   Widget _buildLoadingIndicator(BuildContext context, LoadingViewState state) {
-    final progressColor = model.getProgressColor() ?? OsmeaColors.nordicBlue;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.container(
       width: 80,
@@ -116,8 +116,8 @@ class LoadingStartupWidget extends StatelessWidget {
 
   /// Build bottom section
   Widget _buildBottomSection(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.thunder;
-    final progressColor = model.getProgressColor() ?? OsmeaColors.nordicBlue;
+    final textColor = model.getTextColor() ?? OsmeaColors.black;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
 
     return OsmeaComponents.column(
       children: [

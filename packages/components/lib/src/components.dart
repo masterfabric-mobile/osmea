@@ -230,6 +230,7 @@ class OsmeaComponents {
     String? tooltip,
     bool autofocus = false,
     Color? backgroundColor,
+    Color? borderColor,
   }) {
     return OsmeaIconButton(
       key: key,
@@ -243,6 +244,7 @@ class OsmeaComponents {
       tooltip: tooltip,
       autofocus: autofocus,
       backgroundColor: backgroundColor,
+      borderColor: borderColor,
       borderRadius: borderRadius,
       elevation: elevation,
     );

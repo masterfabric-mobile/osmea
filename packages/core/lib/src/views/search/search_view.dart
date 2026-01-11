@@ -536,18 +536,53 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
   // Override buildLoading to use LoadingView instead of CircularProgressIndicator
   @override
-  Widget buildLoading({Color color = Colors.blue, double size = 50.0}) {
+  Widget buildLoading({Color color = Colors.black, double size = 50.0}) {
+    // Load loading configuration from app_config.json
+    final configHelper = AssetConfigHelper();
+    final loadingConfig = configHelper.getObject('search_view_configuration.loading');
+    
+    // Get loading color (default to black)
+    final loadingColorHex = loadingConfig?['color'] as String? ?? '#000000';
+    
+    // Get loading steps from config or use defaults
+    final loadingSteps = (loadingConfig?['loadingSteps'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [
+          'Initializing search...',
+          'Loading configuration...',
+          'Almost ready...',
+        ];
+    
+    // Get step duration from config or use default
+    final stepDurationMs = (loadingConfig?['stepDuration'] as num?)?.toInt() ?? 400;
+    final stepDuration = Duration(milliseconds: stepDurationMs);
+    
+    // Get other settings from config
+    final showProgress = loadingConfig?['showProgress'] as bool? ?? true;
+    final showCancelButton = loadingConfig?['showCancelButton'] as bool? ?? false;
+    
+    // Create LoadingPageModel with config values
+    final loadingPageModel = LoadingPageModel(
+      title: 'Searching',
+      description: 'Please wait...',
+      loadingType: LoadingModelType.initialization,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDurationMs,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
+      autoNavigateOnComplete: false,
+      progressColor: loadingColorHex,
+    );
+    
     return LoadingView(
       goRoute: goRoute,
       loadingType: LoadingModelType.initialization,
-      loadingSteps: [
-        'Initializing search...',
-        'Loading configuration...',
-        'Almost ready...',
-      ],
-      stepDuration: const Duration(milliseconds: 400),
-      showProgress: true,
-      showCancelButton: false,
+      loadingPageModel: loadingPageModel,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDuration,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
     );
   }
 
@@ -671,17 +706,52 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
   /// Loading view using LoadingView
   Widget _buildLoadingView(BuildContext context) {
+    // Load loading configuration from app_config.json
+    final configHelper = AssetConfigHelper();
+    final loadingConfig = configHelper.getObject('search_view_configuration.loading');
+    
+    // Get loading color (default to black)
+    final loadingColorHex = loadingConfig?['color'] as String? ?? '#000000';
+    
+    // Get loading steps from config or use defaults
+    final loadingSteps = (loadingConfig?['loadingSteps'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [
+          'Searching products...',
+          'Fetching results...',
+          'Almost there...',
+        ];
+    
+    // Get step duration from config or use default
+    final stepDurationMs = (loadingConfig?['stepDuration'] as num?)?.toInt() ?? 500;
+    final stepDuration = Duration(milliseconds: stepDurationMs);
+    
+    // Get other settings from config
+    final showProgress = loadingConfig?['showProgress'] as bool? ?? true;
+    final showCancelButton = loadingConfig?['showCancelButton'] as bool? ?? false;
+    
+    // Create LoadingPageModel with config values
+    final loadingPageModel = LoadingPageModel(
+      title: 'Searching',
+      description: 'Please wait...',
+      loadingType: LoadingModelType.networkRequest,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDurationMs,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
+      autoNavigateOnComplete: false,
+      progressColor: loadingColorHex,
+    );
+    
     return LoadingView(
       goRoute: goRoute,
       loadingType: LoadingModelType.networkRequest,
-      loadingSteps: [
-        'Searching products...',
-        'Fetching results...',
-        'Almost there...',
-      ],
-      stepDuration: const Duration(milliseconds: 500),
-      showProgress: true,
-      showCancelButton: false,
+      loadingPageModel: loadingPageModel,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDuration,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
     );
   }
 
