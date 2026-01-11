@@ -100,7 +100,8 @@ class AboutPageModel {
       ),
       showVersion: json['show_version'] as bool? ?? true,
       showCompanyInfo: json['show_company_info'] as bool? ?? true,
-      enableFullscreenWebView: json['enable_fullscreen_web_view'] as bool? ?? true,
+      enableFullscreenWebView:
+          json['enable_fullscreen_web_view'] as bool? ?? true,
     );
   }
 
@@ -149,17 +150,17 @@ class AboutPageModel {
     try {
       // Remove # if present
       String hex = colorString.replaceAll('#', '');
-      
+
       // Handle 6 digit hex
       if (hex.length == 6) {
         return Color(int.parse('FF$hex', radix: 16));
       }
-      
+
       // Handle 8 digit hex (with alpha)
       if (hex.length == 8) {
         return Color(int.parse(hex, radix: 16));
       }
-      
+
       // Fallback to black
       return const Color(0xFF000000);
     } catch (e) {
@@ -198,7 +199,7 @@ class AboutConfigModel {
   /// Create AboutConfigModel from JSON
   factory AboutConfigModel.fromJson(Map<String, dynamic> json) {
     final pages = <String, AboutPageModel>{};
-    
+
     if (json['about_pages'] is Map) {
       final pagesMap = json['about_pages'] as Map<String, dynamic>;
       pagesMap.forEach((key, value) {
@@ -207,7 +208,7 @@ class AboutConfigModel {
         }
       });
     }
-    
+
     return AboutConfigModel(aboutPages: pages);
   }
 

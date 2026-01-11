@@ -125,50 +125,34 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
             // Get config helper
             final configHelper = AssetConfigHelper();
 
-            // Determine if we should show AppBar (URL exists)
-            bool shouldShowAppBar = false;
+            // Always show AppBar - get title from model, direct parameter, or config
             String appBarTitle = 'About';
 
-            // Check if model exists and has URL
-            if (model != null && model.hasUrl) {
-              shouldShowAppBar = true;
+            // Priority 1: From model
+            if (model != null) {
               appBarTitle = model.title;
-            } else if (url != null && url.isNotEmpty) {
-              // Check if URL is provided directly
-              shouldShowAppBar = true;
-              appBarTitle = title ?? 'About';
+            } else if (title != null && title.isNotEmpty) {
+              // Priority 2: Direct title parameter
+              appBarTitle = title;
             } else {
-              // Try to get from config synchronously
+              // Priority 3: Try to get from config synchronously
               try {
                 final aboutConfigObj =
                     configHelper.getObject('about_configuration');
-                if (aboutConfigObj != null && aboutConfigObj['url'] != null) {
-                  shouldShowAppBar = true;
+                if (aboutConfigObj != null) {
                   appBarTitle = aboutConfigObj['title'] as String? ?? 'About';
                 }
               } catch (e) {
                 debugPrint('⚠️ Could not get about config for AppBar: $e');
               }
 
-              // Check from config model
-              if (!shouldShowAppBar &&
-                  aboutConfig != null &&
-                  aboutType != null) {
+              // Priority 4: Check from config model
+              if (aboutConfig != null && aboutType != null) {
                 final configModel = aboutConfig.getAboutPage(aboutType);
-                if (configModel != null && configModel.hasUrl) {
-                  shouldShowAppBar = true;
+                if (configModel != null) {
                   appBarTitle = configModel.title;
                 }
               }
-            }
-
-            // If no URL found, return empty AppBar (will be hidden)
-            if (!shouldShowAppBar) {
-              return OsmeaComponents.appBar(
-                title: const SizedBox.shrink(),
-                backgroundColor: OsmeaColors.white,
-                elevation: 0,
-              );
             }
 
             // Get colors from config - same pattern as other views (CartView, HomeView, etc.)
@@ -275,6 +259,8 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
     // Try to get all values from config
     AboutStyle style = AboutStyle.startup;
     String? configTitle;
+    String? configDescription;
+    String? configHtmlContent;
     String? configUrl;
     bool? configEnableFullscreenWebView;
     bool? configShowVersion;
@@ -284,6 +270,9 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
     String? configBackgroundColor;
     String? configTextColor;
     String? configPrimaryColor;
+    String? configVersion;
+    String? configBuildNumber;
+    String? configAppName;
 
     try {
       final configHelper = AssetConfigHelper();
@@ -296,8 +285,10 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
           style = _stringToAboutStyle(styleString) ?? AboutStyle.startup;
         }
 
-        // Get other values from config
+        // Get all values from about_configuration
         configTitle = aboutConfig['title'] as String?;
+        configDescription = aboutConfig['description'] as String?;
+        configHtmlContent = aboutConfig['html_content'] as String?;
         configUrl = aboutConfig['url'] as String?;
         configEnableFullscreenWebView =
             aboutConfig['enable_fullscreen_web_view'] as bool?;
@@ -308,6 +299,21 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
         configBackgroundColor = aboutConfig['background_color'] as String?;
         configTextColor = aboutConfig['text_color'] as String?;
         configPrimaryColor = aboutConfig['primary_color'] as String?;
+        configVersion = aboutConfig['version'] as String?;
+        configBuildNumber = aboutConfig['build_number'] as String?;
+        configAppName = aboutConfig['app_name'] as String?;
+      }
+
+      // Get app info from app_settings if not in about_configuration
+      if (configVersion == null ||
+          configBuildNumber == null ||
+          configAppName == null) {
+        final appSettings = configHelper.getObject('app_settings');
+        if (appSettings != null) {
+          configAppName ??= appSettings['app_name'] as String?;
+          configVersion ??= appSettings['app_version'] as String?;
+          configBuildNumber ??= appSettings['build_number'] as String?;
+        }
       }
     } catch (e) {
       debugPrint('⚠️ Could not load about config: $e');
@@ -315,8 +321,8 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
 
     return AboutPageModel(
       title: title ?? configTitle ?? 'About',
-      description: description,
-      htmlContent: htmlContent,
+      description: description ?? configDescription,
+      htmlContent: htmlContent ?? configHtmlContent,
       url: url ?? configUrl,
       style: style,
       enableFullscreenWebView: configEnableFullscreenWebView ?? true,
@@ -327,6 +333,9 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
       backgroundColor: configBackgroundColor,
       textColor: configTextColor,
       primaryColor: configPrimaryColor,
+      version: configVersion,
+      buildNumber: configBuildNumber,
+      appName: configAppName,
     );
   }
 
