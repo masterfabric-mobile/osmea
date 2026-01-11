@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
@@ -106,18 +107,36 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
         final title = state.emptyTitle;
         final description = state.emptyDescription;
 
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: OsmeaComponents.container(
-              color: backgroundColor,
+        return OsmeaComponents.scaffold(
+          backgroundColor: backgroundColor,
+          appBar: OsmeaComponents.appBar(
+            title: OsmeaComponents.text(
+              title,
+              color: textColor,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            backgroundColor: backgroundColor,
+            foregroundColor: textColor,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: textColor),
+              onPressed: () {
+                context.go('/home');
+              },
+            ),
+          ),
+          body: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
               child: SafeArea(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: screenSize.height -
                         MediaQuery.of(context).viewPadding.top -
-                        MediaQuery.of(context).viewPadding.bottom,
+                        MediaQuery.of(context).viewPadding.bottom -
+                        kToolbarHeight,
                   ),
                   child: SingleChildScrollView(
                     child: OsmeaComponents.container(
@@ -130,15 +149,19 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             // Image or Icon
-                            if (state.imagePath != null || state.iconPath != null)
-                              _buildImageOrIcon(context, state, config, accentColor),
+                            if (state.imagePath != null ||
+                                state.iconPath != null)
+                              _buildImageOrIcon(
+                                  context, state, config, accentColor),
 
-                            if (state.imagePath != null || state.iconPath != null)
+                            if (state.imagePath != null ||
+                                state.iconPath != null)
                               OsmeaComponents.sizedBox(
                                   height: screenSize.height * 0.03),
 
                             // Icon Circle (if no image/icon provided)
-                            if (state.imagePath == null && state.iconPath == null)
+                            if (state.imagePath == null &&
+                                state.iconPath == null)
                               OsmeaComponents.container(
                                 width: 80,
                                 height: 80,
@@ -153,7 +176,8 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                                 ),
                               ),
 
-                            if (state.imagePath == null && state.iconPath == null)
+                            if (state.imagePath == null &&
+                                state.iconPath == null)
                               OsmeaComponents.sizedBox(
                                   height: screenSize.height * 0.03),
 
@@ -162,8 +186,8 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                               title,
                               color: textColor,
                               textAlign: TextAlign.center,
-                              textStyle:
-                                  OsmeaTextStyle.headlineMedium(context).copyWith(
+                              textStyle: OsmeaTextStyle.headlineMedium(context)
+                                  .copyWith(
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: -0.5,
                               ),
