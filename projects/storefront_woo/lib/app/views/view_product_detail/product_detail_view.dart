@@ -13,6 +13,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/product_deta
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_error_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_skeleton_widget.dart';
 import 'package:osmea_components/src/utils/toast_extensions.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
@@ -136,7 +137,8 @@ class ProductDetailView
 
     // Loading state
     if (state is ProductDetailLoadingState) {
-      return buildUnifiedLoading(goRoute: goRoute);
+      // Show skeleton loading instead of unified loading
+      return const ProductDetailSkeletonWidget();
     }
 
     // Loaded state
@@ -148,8 +150,8 @@ class ProductDetailView
       );
     }
 
-    // Initial state
-    return buildUnifiedLoading(goRoute: goRoute);
+    // Initial state - show skeleton loading
+    return const ProductDetailSkeletonWidget();
   }
 }
 

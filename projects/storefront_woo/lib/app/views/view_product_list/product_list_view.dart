@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_skeleton_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -68,15 +69,16 @@ class ProductListView
     }
 
     if (state is ProductListLoadingState) {
-      return buildUnifiedLoading(goRoute: goRoute);
+      // Show skeleton loading instead of unified loading
+      return const ProductListSkeletonWidget(isGridView: true);
     }
 
     if (state is ProductListLoadedState) {
       return ProductListContentWidget(state: state, viewModel: viewModel);
     }
 
-    // Initial state - show loading
-    return buildUnifiedLoading(goRoute: goRoute);
+    // Initial state - show skeleton loading
+    return const ProductListSkeletonWidget(isGridView: true);
   }
 }
 
