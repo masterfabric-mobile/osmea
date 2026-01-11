@@ -245,37 +245,57 @@ class LoadingView extends MasterViewCubit<LoadingViewCubit, LoadingViewState> {
     );
   }
 
-  /// Get loading style from model type, with config fallback
+  /// Get loading style from config, with fallback to model type
   Future<LoadingStyle> _getLoadingStyleFromConfig() async {
-    final effectiveModel = _getEffectiveLoadingModel();
-
-    // Priority 1: Convert LoadingModelType directly to LoadingStyle
-    // This ensures each LoadingModelType gets its appropriate visual style
-    final styleFromModelType =
-        _convertModelTypeToStyle(effectiveModel.loadingType);
-
-    debugPrint(
-        '🎨 Loading style from LoadingModelType.${effectiveModel.loadingType.name} -> $styleFromModelType');
-
-    // Return the style based on LoadingModelType
-    // Config is loaded for other settings but style is determined by LoadingModelType
     try {
       final configHelper = AssetConfigHelper();
       await configHelper.loadConfig('assets/app_config.json');
-      debugPrint(
-          '✅ Loading config loaded successfully for additional settings');
+
+      // Priority 1: Read style from config
+      final styleString = configHelper.getString('loading_configuration.style', '');
+      if (styleString.isNotEmpty) {
+        // Convert string to LoadingStyle enum
+        final style = _stringToLoadingStyle(styleString);
+        if (style != null) {
+          debugPrint('✅ Loading style from config: $styleString -> $style');
+          return style;
+        } else {
+          debugPrint('⚠️ Invalid style in config: $styleString, using fallback');
+        }
+      } else {
+        debugPrint('⚠️ No style found in config, using fallback');
+      }
     } catch (e) {
-      debugPrint('⚠️ Could not load config for additional settings: $e');
+      debugPrint('⚠️ Could not load style from config: $e');
     }
 
+    // Priority 2: Fallback to model type conversion
+    final effectiveModel = _getEffectiveLoadingModel();
+    final styleFromModelType =
+        _convertModelTypeToStyle(effectiveModel.loadingType);
+    debugPrint(
+        '🎨 Loading style from LoadingModelType.${effectiveModel.loadingType.name} -> $styleFromModelType');
     return styleFromModelType;
   }
 
-  /// Convert LoadingModelType to LoadingStyle
-  /// All loading types now use space style
+  /// Convert string to LoadingStyle enum
+  LoadingStyle? _stringToLoadingStyle(String styleString) {
+    switch (styleString.toLowerCase()) {
+      case 'startup':
+        return LoadingStyle.startup;
+      case 'space':
+        return LoadingStyle.space;
+      case 'enterprise':
+        return LoadingStyle.enterprise;
+      default:
+        return null;
+    }
+  }
+
+  /// Convert LoadingModelType to LoadingStyle (fallback)
   LoadingStyle _convertModelTypeToStyle(LoadingModelType modelType) {
-    // All loading types use space style
-    return LoadingStyle.space;
+    // Default fallback: use startup style
+    return LoadingStyle.startup;
   }
 
   /// Get appropriate loading widget based on style
