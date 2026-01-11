@@ -151,6 +151,14 @@ export 'package:core/src/models/loading_models.dart';
 // 📄 Exports the About Models
 export 'package:core/src/models/about_models.dart';
 
+// 📧 Exports the Contact Us Models
+export 'package:core/src/models/contact_us_models.dart';
+
+// 📧 Exports the Contact Us View
+export 'package:core/src/views/contact_us/contact_us_view.dart';
+export 'package:core/src/views/contact_us/cubit/contact_us_cubit.dart';
+export 'package:core/src/views/contact_us/cubit/contact_us_state.dart';
+
 // 🔄 Exports the routes
 export 'package:core/src/views/routes.dart';
 

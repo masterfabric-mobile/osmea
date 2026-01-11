@@ -16,6 +16,7 @@ import 'package:core/src/helper/common_logger_helper/common_logger_helper.dart'
 import 'package:core/src/views/about/cubit/about_cubit.dart' as _i963;
 import 'package:core/src/views/account/cubit/account_cubit.dart' as _i111;
 import 'package:core/src/views/auth/cubit/auth_cubit.dart' as _i651;
+import 'package:core/src/views/contact_us/cubit/contact_us_cubit.dart' as _i516;
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart' as _i905;
 import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart'
     as _i183;
@@ -49,6 +50,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i963.AboutViewCubit>(() => _i963.AboutViewCubit());
     gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit());
     gh.factory<_i651.AuthCubit>(() => _i651.AuthCubit());
+    gh.factory<_i516.ContactUsViewCubit>(() => _i516.ContactUsViewCubit());
     gh.factory<_i905.EmptyViewCubit>(() => _i905.EmptyViewCubit());
     gh.factory<_i183.ErrorHandlingCubit>(() => _i183.ErrorHandlingCubit());
     gh.factory<_i508.ImageDetailCubit>(() => _i508.ImageDetailCubit());

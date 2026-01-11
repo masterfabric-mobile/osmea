@@ -533,7 +533,7 @@ class _WebViewerState extends State<_WebViewer> {
               ],
             );
           }
-          
+
           // Show navigation controls if enabled
           return OsmeaComponents.column(
             children: [
@@ -889,5 +889,3 @@ class _WebViewerState extends State<_WebViewer> {
     );
   }
 }
-
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:core/src/views/contact_us/contact_us_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
@@ -787,6 +788,25 @@ final GoRouter appRouter = GoRouter(
               context.go(path);
             },
             // AboutView will load configuration from app_config.json internally
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
+    ),
+    // Contact Us Route
+    GoRoute(
+      path: '/contact-us',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CustomTransitionPage(
+          child: ContactUsView(
+            goRoute: (String path) {
+              debugPrint('🔀 ContactUsView: goRoute called with path: $path');
+              context.go(path);
+            },
+            // ContactUsView will load configuration from app_config.json internally
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
