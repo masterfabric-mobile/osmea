@@ -11,7 +11,7 @@ import 'package:osmea_components/osmea_components.dart';
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
 /// Professional enterprise-themed loading style
-/// Clean, corporate design with progress indicators
+/// Clean, minimal corporate design with structured layout
 ///
 /// {@category Widgets}
 /// {@subCategory LoadingEnterprise}
@@ -30,21 +30,21 @@ class LoadingEnterpriseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoadingViewCubit, LoadingViewState>(
       builder: (context, state) {
+        final bgColor = model.getBackgroundColor() ?? OsmeaColors.snow;
+
         return SizedBox.expand(
           child: OsmeaComponents.container(
-            color: model.getBackgroundColor() ?? const Color(0xFFF8F9FA),
+            color: bgColor,
             child: SafeArea(
               child: OsmeaComponents.column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Top section with branding
-                  _buildTopSection(context),
-
-                  // Main content area
+                  // Main content
                   Expanded(
                     child: _buildMainContent(context, state),
                   ),
 
-                  // Bottom section with progress
+                  // Bottom progress section
                   _buildBottomSection(context, state),
                 ],
               ),
@@ -55,65 +55,20 @@ class LoadingEnterpriseWidget extends StatelessWidget {
     );
   }
 
-  /// Build top section with enterprise branding
-  Widget _buildTopSection(BuildContext context) {
-    return OsmeaComponents.container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.spacing24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Logo placeholder
-          OsmeaComponents.container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: model.getProgressColor() ?? OsmeaColors.black,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.business,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-
-          OsmeaComponents.sizedBox(width: context.spacing12),
-
-          // Company branding
-          OsmeaComponents.text(
-            'OSMEA',
-            variant: OsmeaTextVariant.titleMedium,
-            color: OsmeaColors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build main content with enterprise styling
+  /// Build main content
   Widget _buildMainContent(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.black;
+    final textColor = model.getTextColor() ?? OsmeaColors.shark;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.deepSea;
 
     return OsmeaComponents.container(
       padding: EdgeInsets.symmetric(horizontal: context.spacing32),
       child: OsmeaComponents.column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Professional loading indicator
-          _buildEnterpriseLoadingIndicator(context, state),
+          // Enterprise progress indicator
+          _buildProgressIndicator(context, state),
 
-          OsmeaComponents.sizedBox(height: context.spacing32),
+          OsmeaComponents.sizedBox(height: context.spacing40),
 
           // Title
           OsmeaComponents.text(
@@ -129,14 +84,14 @@ class LoadingEnterpriseWidget extends StatelessWidget {
           // Description
           OsmeaComponents.text(
             model.description,
-            variant: OsmeaTextVariant.bodyLarge,
+            variant: OsmeaTextVariant.bodyMedium,
             color: textColor.withOpacity(0.7),
             textAlign: TextAlign.center,
             maxLines: 2,
           ),
 
           if (state.message != null) ...[
-            OsmeaComponents.sizedBox(height: context.spacing20),
+            OsmeaComponents.sizedBox(height: context.spacing24),
             OsmeaComponents.container(
               width: double.infinity,
               padding: EdgeInsets.all(context.spacing16),
@@ -148,11 +103,22 @@ class LoadingEnterpriseWidget extends StatelessWidget {
                   width: 1,
                 ),
               ),
-              child: OsmeaComponents.text(
-                state.message!,
-                variant: OsmeaTextVariant.bodyMedium,
-                color: textColor.withOpacity(0.8),
-                textAlign: TextAlign.center,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: progressColor,
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing12),
+                  Expanded(
+                    child: OsmeaComponents.text(
+                      state.message!,
+                      variant: OsmeaTextVariant.bodySmall,
+                      color: textColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -161,38 +127,42 @@ class LoadingEnterpriseWidget extends StatelessWidget {
     );
   }
 
-  /// Build enterprise loading indicator
-  Widget _buildEnterpriseLoadingIndicator(
+  /// Build enterprise progress indicator
+  Widget _buildProgressIndicator(
       BuildContext context, LoadingViewState state) {
-    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.deepSea;
 
     return OsmeaComponents.container(
-      width: 100,
-      height: 100,
+      width: 72,
+      height: 72,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
+        color: OsmeaColors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: OsmeaColors.silver,
+          width: 1,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 16,
-            spreadRadius: 0,
-            offset: Offset(0, 4),
+            color: OsmeaColors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background circle
+          // Progress ring
           SizedBox(
-            width: 60,
-            height: 60,
+            width: 64,
+            height: 64,
             child: CircularProgressIndicator(
               value: state.isLoading ? null : state.progress,
-              strokeWidth: 3,
+              strokeWidth: 2.5,
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
               backgroundColor: progressColor.withOpacity(0.1),
+              strokeCap: StrokeCap.round,
             ),
           ),
 
@@ -200,17 +170,17 @@ class LoadingEnterpriseWidget extends StatelessWidget {
           Icon(
             Icons.sync,
             color: progressColor,
-            size: 24,
+            size: 20,
           ),
         ],
       ),
     );
   }
 
-  /// Build bottom section with enterprise styling
+  /// Build bottom section
   Widget _buildBottomSection(BuildContext context, LoadingViewState state) {
-    final textColor = model.getTextColor() ?? OsmeaColors.black;
-    final progressColor = model.getProgressColor() ?? OsmeaColors.black;
+    final textColor = model.getTextColor() ?? OsmeaColors.shark;
+    final progressColor = model.getProgressColor() ?? OsmeaColors.deepSea;
 
     return OsmeaComponents.container(
       width: double.infinity,
@@ -226,14 +196,15 @@ class LoadingEnterpriseWidget extends StatelessWidget {
       ),
       child: OsmeaComponents.column(
         children: [
-          // Progress bar
+          // Progress section
           if (model.showProgress) ...[
             Row(
               children: [
                 OsmeaComponents.text(
-                  'Progress:',
-                  variant: OsmeaTextVariant.bodyMedium,
-                  color: textColor.withOpacity(0.7),
+                  'Progress',
+                  variant: OsmeaTextVariant.bodySmall,
+                  color: textColor.withOpacity(0.6),
+                  fontWeight: FontWeight.w500,
                 ),
                 const Spacer(),
                 OsmeaComponents.text(
@@ -244,18 +215,18 @@ class LoadingEnterpriseWidget extends StatelessWidget {
                 ),
               ],
             ),
-            OsmeaComponents.sizedBox(height: context.spacing8),
-            // Linear progress indicator
+            OsmeaComponents.sizedBox(height: context.spacing12),
+            // Linear progress bar
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
                 value: state.progress,
-                minHeight: 6,
+                minHeight: 3,
                 valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 backgroundColor: progressColor.withOpacity(0.1),
               ),
             ),
-            OsmeaComponents.sizedBox(height: context.spacing16),
+            OsmeaComponents.sizedBox(height: context.spacing20),
           ],
 
           // Cancel button
@@ -263,14 +234,15 @@ class LoadingEnterpriseWidget extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OsmeaComponents.button(
-                text: model.cancelButtonText ?? 'Cancel Process',
+                text: model.cancelButtonText ?? 'Cancel',
                 onPressed: onCancel,
                 variant: ButtonVariant.outlined,
                 size: ButtonSize.medium,
                 textColor: textColor.withOpacity(0.7),
               ),
             ),
-          ],
+          ] else if (!model.showProgress)
+            OsmeaComponents.sizedBox(height: context.spacing8),
         ],
       ),
     );
