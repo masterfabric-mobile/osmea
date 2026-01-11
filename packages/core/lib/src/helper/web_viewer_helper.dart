@@ -616,10 +616,14 @@ class _WebViewerState extends State<_WebViewer> {
         _cubit.currentUrl.isNotEmpty ? _cubit.currentUrl : widget.url;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => Scaffold(
+        builder: (context) => Scaffold(
           backgroundColor: OsmeaColors.white,
           appBar: AppBar(
             title: const Text('WebView'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
           body: SafeArea(
             child: OsmeaComponents.container(

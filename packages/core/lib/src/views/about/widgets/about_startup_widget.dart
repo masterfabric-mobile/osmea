@@ -34,20 +34,20 @@ class AboutStartupWidget extends StatelessWidget {
 
     return OsmeaComponents.container(
       color: bgColor,
-      child: OsmeaComponents.column(
-        children: [
-          // Header
-          _buildHeader(context, textColor, primaryColor),
+      child: SingleChildScrollView(
+        child: OsmeaComponents.column(
+          children: [
+            // Header
+            _buildHeader(context, textColor, primaryColor),
 
-          // Content
-          Expanded(
-            child: _buildContent(context, textColor),
-          ),
+            // Content
+            _buildContent(context, textColor),
 
-          // Footer
-          if (model.showVersion || model.showCompanyInfo)
-            _buildFooter(context, textColor, primaryColor),
-        ],
+            // Footer
+            if (model.showVersion || model.showCompanyInfo)
+              _buildFooter(context, textColor, primaryColor),
+          ],
+        ),
       ),
     );
   }
@@ -55,8 +55,13 @@ class AboutStartupWidget extends StatelessWidget {
   /// Build header section
   Widget _buildHeader(
       BuildContext context, Color textColor, Color primaryColor) {
-    return OsmeaComponents.container(
-      padding: EdgeInsets.all(context.spacing24),
+    return Padding(
+      padding: EdgeInsets.only(
+        left: context.spacing24,
+        right: context.spacing24,
+        top: context.spacing8,
+        bottom: context.spacing24,
+      ),
       child: OsmeaComponents.column(
         children: [
           // Title
@@ -89,13 +94,13 @@ class AboutStartupWidget extends StatelessWidget {
       return WebViewerHelper.url(
         model.url!,
         showNavigationControls: false,
-        enableFullscreen: false,
+        enableFullscreen: model.enableFullscreenWebView,
       );
     }
 
     // If HTML content is provided
     if (model.hasHtmlContent) {
-      return OsmeaComponents.container(
+      return Padding(
         padding: EdgeInsets.all(context.spacing24),
         child: WebViewerHelper.html(
           model.htmlContent!,
@@ -117,16 +122,8 @@ class AboutStartupWidget extends StatelessWidget {
   /// Build footer section
   Widget _buildFooter(
       BuildContext context, Color textColor, Color primaryColor) {
-    return OsmeaComponents.container(
+    return Padding(
       padding: EdgeInsets.all(context.spacing24),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: textColor.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-      ),
       child: OsmeaComponents.column(
         children: [
           if (model.showVersion && model.version != null) ...[
@@ -158,5 +155,4 @@ class AboutStartupWidget extends StatelessWidget {
       ),
     );
   }
-
 }

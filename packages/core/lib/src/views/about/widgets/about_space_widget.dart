@@ -33,22 +33,23 @@ class AboutSpaceWidget extends StatelessWidget {
 
     return OsmeaComponents.container(
       color: bgColor,
-      child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Generous top spacing
-          const Expanded(flex: 2, child: SizedBox()),
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: OsmeaComponents.column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Minimalist content
+              _buildMinimalContent(context, textColor),
 
-          // Minimalist content
-          _buildMinimalContent(context, textColor),
-
-          // Generous bottom spacing
-          const Expanded(flex: 2, child: SizedBox()),
-
-          // Minimal footer
-          if (model.showVersion || model.showCompanyInfo)
-            _buildMinimalFooter(context, textColor),
-        ],
+              // Minimal footer
+              if (model.showVersion || model.showCompanyInfo)
+                _buildMinimalFooter(context, textColor),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -60,13 +61,13 @@ class AboutSpaceWidget extends StatelessWidget {
       return WebViewerHelper.url(
         model.url!,
         showNavigationControls: false,
-        enableFullscreen: false,
+        enableFullscreen: model.enableFullscreenWebView,
       );
     }
 
     // If HTML content is provided
     if (model.hasHtmlContent) {
-      return OsmeaComponents.container(
+      return Padding(
         padding: EdgeInsets.symmetric(horizontal: context.spacing32),
         child: WebViewerHelper.html(
           model.htmlContent!,
@@ -101,7 +102,7 @@ class AboutSpaceWidget extends StatelessWidget {
 
   /// Build minimal footer
   Widget _buildMinimalFooter(BuildContext context, Color textColor) {
-    return OsmeaComponents.container(
+    return Padding(
       padding: EdgeInsets.all(context.spacing24),
       child: OsmeaComponents.column(
         children: [
@@ -127,5 +128,4 @@ class AboutSpaceWidget extends StatelessWidget {
       ),
     );
   }
-
 }

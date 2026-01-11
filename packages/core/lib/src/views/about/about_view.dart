@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/views/about/widgets/about_startup_widget.dart';
 import 'package:core/src/views/about/widgets/about_space_widget.dart';
 import 'package:core/src/views/about/widgets/about_enterprise_widget.dart';
@@ -98,7 +99,18 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
           footerSpacer: const SpacerVisibility.disabled(),
           verticalPadding: const PaddingVisibility.disabled(),
           horizontalPadding: const PaddingVisibility.enabled(),
-          useSafeArea: false,
+          useSafeArea: () {
+            // Check if URL exists - if yes, disable SafeArea for web view
+            // Otherwise, enable SafeArea for regular content
+            // Priority: direct url parameter > aboutPageModel.url > config
+            if (url != null && url.isNotEmpty) {
+              return false; // Web view - no SafeArea
+            }
+            if (aboutPageModel?.hasUrl == true) {
+              return false; // Web view - no SafeArea
+            }
+            return true; // Regular content - use SafeArea
+          }(),
           coreAppBar: (context, viewModel) {
             // Check if URL exists from state or model
             final state = viewModel.state;
@@ -203,7 +215,14 @@ class AboutView extends MasterViewCubit<AboutViewCubit, AboutViewState> {
               foregroundColor: foregroundColor,
               elevation: elevation,
               leading: OsmeaComponents.iconButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  // Use goRoute from app router
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    goRoute('/profile'); // Navigate to profile using app router
+                  }
+                },
                 icon: Icon(
                   Icons.arrow_back,
                   color: iconColor,
