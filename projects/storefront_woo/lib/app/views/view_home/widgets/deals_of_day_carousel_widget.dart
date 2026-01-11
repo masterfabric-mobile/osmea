@@ -281,10 +281,10 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                         vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
-                        color: OsmeaColors.nordicBlue,
+                        color: OsmeaColors.black,
                         borderRadius: BorderRadius.circular(context.spacing20),
                         border: Border.all(
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                           width: context.borderWidth,
                         ),
                       ),
@@ -326,7 +326,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                           ),
                           textStyle: OsmeaTextStyle.titleSmall(context)
                               .copyWith(
-                                color: OsmeaColors.nordicBlue,
+                                color: OsmeaColors.black,
                                 fontWeight: FontWeight.w700,
                               ),
                         ),

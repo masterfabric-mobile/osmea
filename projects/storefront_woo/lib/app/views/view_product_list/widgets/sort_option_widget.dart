@@ -45,11 +45,11 @@ class SortOptionWidget extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? OsmeaColors.nordicBlue.withOpacity(0.08)
+                ? OsmeaColors.black.withOpacity(0.08)
                 : Colors.transparent,
             border: isSelected
                 ? Border.all(
-                    color: OsmeaColors.nordicBlue,
+                    color: OsmeaColors.black,
                     width: 1,
                   )
                 : null,
@@ -63,7 +63,7 @@ class SortOptionWidget extends StatelessWidget {
                 label,
                 textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
                   color: isSelected
-                      ? OsmeaColors.nordicBlue
+                      ? OsmeaColors.black
                       : OsmeaColors.thunder,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -73,7 +73,7 @@ class SortOptionWidget extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(context.spacing4),
                   decoration: BoxDecoration(
-                    color: OsmeaColors.nordicBlue,
+                    color: OsmeaColors.black,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

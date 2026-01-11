@@ -45,7 +45,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.5,
                   height: 1.2,
-                  color: OsmeaColors.thunder,
+                  color: OsmeaColors.black,
                 ),
               ),
 
@@ -55,7 +55,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
               OsmeaComponents.text(
                 _formatPrice(state.product.prices),
                 textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                  color: OsmeaColors.nordicBlue,
+                  color: OsmeaColors.black,
                   fontWeight: FontWeight.w500,
                   letterSpacing: -0.3,
                   height: 1.1,
@@ -92,7 +92,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
                   textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.0,
-                    color: OsmeaColors.thunder.withValues(alpha: 0.8),
+                    color: OsmeaColors.black,
                   ),
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing4),

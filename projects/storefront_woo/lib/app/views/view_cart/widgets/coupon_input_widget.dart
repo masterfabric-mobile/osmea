@@ -60,7 +60,7 @@ class CouponInputWidget extends StatelessWidget {
                   child: OsmeaComponents.text(
                     'Apply',
                     textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: OsmeaColors.nordicBlue,
+                      color: OsmeaColors.black,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

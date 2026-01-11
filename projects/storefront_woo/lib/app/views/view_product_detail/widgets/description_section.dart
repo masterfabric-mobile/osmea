@@ -15,16 +15,39 @@ class DescriptionSection extends StatelessWidget {
     required this.state,
   });
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('product_detail_view.description.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load description color $key: $e');
+    }
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = _getColorFromConfig('backgroundColor', OsmeaColors.white);
+    final borderColor = _getColorFromConfig('borderColor', OsmeaColors.silver);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.container(
           padding: context.paddingLow,
           decoration: BoxDecoration(
-            color: OsmeaColors.pewter.withOpacity(context.alpha5),
+            color: backgroundColor,
             borderRadius: context.borderRadiusNormal,
+            border: Border.all(color: borderColor, width: 1),
           ),
           child: state.isDescriptionExpanded
               ? _buildExpandedDescription(context)
@@ -41,7 +64,7 @@ class DescriptionSection extends StatelessWidget {
                   vertical: context.spacing6,
                 ),
                 decoration: BoxDecoration(
-                  color: OsmeaColors.nordicBlue.withOpacity(context.alpha5),
+                  color: OsmeaColors.black.withOpacity(context.alpha5),
                   borderRadius: BorderRadius.circular(
                     context.radiusNormal - context.width1,
                   ),
@@ -49,7 +72,7 @@ class DescriptionSection extends StatelessWidget {
                 child: OsmeaComponents.text(
                   state.isDescriptionExpanded ? 'Show Less' : 'Show More',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    color: OsmeaColors.nordicBlue.withOpacity(context.alpha80),
+                    color: OsmeaColors.black.withOpacity(context.alpha80),
                     fontWeight: FontWeight.w400,
                     letterSpacing: 0.5,
                   ),
@@ -92,7 +115,7 @@ class DescriptionSection extends StatelessWidget {
                   context.fontSizeExtraSmallMedium * context.textScaleFactor,
               fontWeight: FontWeight.bold,
             ),
-            color: OsmeaColors.pewter,
+            color: _getColorFromConfig('textColor', OsmeaColors.black).withOpacity(0.5),
           ),
         ],
       ],
@@ -145,6 +168,8 @@ class DescriptionSection extends StatelessWidget {
   }
 
   Widget _buildBulletPoint(BuildContext context, String text) {
+    final textColor = _getColorFromConfig('textColor', OsmeaColors.black);
+    
     return OsmeaComponents.padding(
       padding: context.onlyBottomPaddingZero,
       child: OsmeaComponents.row(
@@ -158,7 +183,7 @@ class DescriptionSection extends StatelessWidget {
               right: context.spacing12,
             ),
             decoration: BoxDecoration(
-              color: OsmeaColors.nordicBlue.withOpacity(context.alpha40),
+              color: OsmeaColors.black.withOpacity(context.alpha40),
               borderRadius: BorderRadius.circular(context.spacing2 - 0.5),
             ),
           ),
@@ -171,7 +196,7 @@ class DescriptionSection extends StatelessWidget {
                 height: 1.7,
                 fontWeight: FontWeight.w200,
                 letterSpacing: 0.3,
-                color: OsmeaColors.thunder.withOpacity(context.alpha70),
+                color: textColor.withOpacity(context.alpha70),
               ),
             ),
           ),

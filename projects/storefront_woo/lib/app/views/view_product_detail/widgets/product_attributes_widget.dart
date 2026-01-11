@@ -112,7 +112,7 @@ class ProductAttributesWidget extends StatelessWidget {
                     ? RichText(
                         text: TextSpan(
                           style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                            color: OsmeaColors.thunder,
+                            color: OsmeaColors.black,
                             fontWeight: FontWeight.w600,
                           ),
                           children: [
@@ -120,7 +120,7 @@ class ProductAttributesWidget extends StatelessWidget {
                             TextSpan(
                               text: selectedValue.capitalizeFirst(),
                               style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                                color: OsmeaColors.thunder,
+                                color: OsmeaColors.black,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -130,7 +130,7 @@ class ProductAttributesWidget extends StatelessWidget {
                     : OsmeaComponents.text(
                         displayName,
                         textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: OsmeaColors.thunder,
+                          color: OsmeaColors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -178,7 +178,7 @@ class ProductAttributesWidget extends StatelessWidget {
                   OsmeaComponents.text(
                     ((attr['name'] as String?) ?? '').capitalizeFirst(),
                     textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                      color: OsmeaColors.thunder,
+                      color: OsmeaColors.black,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -226,19 +226,41 @@ class ProductAttributesWidget extends StatelessWidget {
       state.selectedAttributes,
     );
 
+    // Get colors from config
+    final configHelper = AssetConfigHelper();
+    Color getAttributeColor(String key, Color fallback) {
+      try {
+        final colorString = configHelper.getString('product_detail_view.attributes.$key');
+        if (colorString.isNotEmpty && colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            return Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            return Color(int.parse(hexString, radix: 16));
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to load attribute color $key: $e');
+      }
+      return fallback;
+    }
+    
+    final selectedColor = getAttributeColor('selectedColor', OsmeaColors.black);
+    final unselectedColor = getAttributeColor('unselectedColor', OsmeaColors.grayMaterial[300]!);
+    final highlightedColor = getAttributeColor('highlightedColor', OsmeaColors.black);
+    
     final borderColor = isHighlighted
-        ? OsmeaColors.amberFlame
+        ? highlightedColor
         : (isSelected
-            ? OsmeaColors.nordicBlue
+            ? selectedColor
             : (isAvailable
-                ? OsmeaColors.grayMaterial[300]!
-                    .withValues(alpha: context.alpha60)
+                ? unselectedColor.withValues(alpha: context.alpha60)
                 : OsmeaColors.grayMaterial[200]!));
 
     final backgroundColor = isHighlighted
-        ? OsmeaColors.amberFlame.withValues(alpha: 0.08)
+        ? OsmeaColors.black.withValues(alpha: 0.08)
         : (isSelected
-            ? OsmeaColors.nordicBlue.withValues(alpha: 0.15)
+            ? OsmeaColors.black.withValues(alpha: 0.15)
             : Colors.transparent);
 
     return OsmeaComponents.chips(
@@ -257,12 +279,12 @@ class ProductAttributesWidget extends StatelessWidget {
       borderColor: borderColor,
       borderWidth: isHighlighted ? context.width1 + 0.5 : context.width1,
       textColor: isHighlighted
-          ? OsmeaColors.amberFlame
+          ? highlightedColor
           : (isSelected
-              ? OsmeaColors.nordicBlue
+              ? selectedColor
               : (isAvailable
-                  ? OsmeaColors.thunder
-                  : OsmeaColors.pewter.withValues(alpha: context.alpha50))),
+                  ? OsmeaColors.black
+                  : OsmeaColors.grayMaterial[400]!.withValues(alpha: context.alpha50))),
       textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
         fontWeight: isSelected || isHighlighted
             ? FontWeight.w600

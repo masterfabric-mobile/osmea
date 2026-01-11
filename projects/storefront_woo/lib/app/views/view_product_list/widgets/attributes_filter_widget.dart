@@ -29,7 +29,7 @@ class AttributesFilterWidget extends StatelessWidget {
             padding: EdgeInsets.all(context.spacing16),
             child: OsmeaComponents.center(
               child: CircularProgressIndicator(
-                color: OsmeaColors.nordicBlue,
+                color: OsmeaColors.black,
               ),
             ),
           );

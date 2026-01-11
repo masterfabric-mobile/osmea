@@ -52,11 +52,11 @@ class CartContentWidget extends StatelessWidget {
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: OsmeaColors.nordicBlue,
+                color: OsmeaColors.black,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
+                    color: OsmeaColors.black.withValues(alpha: 0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                     spreadRadius: 0,
@@ -113,13 +113,13 @@ class CartContentWidget extends StatelessWidget {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter.withValues(alpha: 0.1),
+              color: OsmeaColors.black.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(60),
             ),
             child: Icon(
               Icons.shopping_cart_outlined,
               size: 60,
-              color: OsmeaColors.pewter,
+              color: OsmeaColors.black,
             ),
           ),
           OsmeaComponents.sizedBox(height: 24),
@@ -127,7 +127,7 @@ class CartContentWidget extends StatelessWidget {
             'Your cart is empty',
             textStyle: OsmeaTextStyle.headlineSmall(
               context,
-            ).copyWith(color: OsmeaColors.thunder, fontWeight: FontWeight.w500),
+            ).copyWith(color: OsmeaColors.black, fontWeight: FontWeight.w500),
           ),
           OsmeaComponents.sizedBox(height: 8),
           OsmeaComponents.text(
@@ -145,7 +145,7 @@ class CartContentWidget extends StatelessWidget {
                 context.go('/home');
               }
             },
-            backgroundColor: OsmeaColors.nordicBlue,
+            backgroundColor: OsmeaColors.black,
             textColor: OsmeaColors.white,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             text: 'Continue Shopping',
@@ -228,7 +228,7 @@ class CartContentWidget extends StatelessWidget {
                           currencyCode: state.currencyCode,
                         ),
                         textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -285,7 +285,7 @@ class CartContentWidget extends StatelessWidget {
                         ),
                         icon: Icon(
                           Icons.add,
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                           size: 16,
                         ),
                         backgroundColor: Colors.transparent,
@@ -343,7 +343,7 @@ class CartContentWidget extends StatelessWidget {
             // Minimal Icon
             Icon(
               Icons.local_offer_outlined,
-              color: OsmeaColors.nordicBlue.withValues(alpha: 0.7),
+              color: OsmeaColors.black.withValues(alpha: 0.7),
               size: 20,
             ),
             OsmeaComponents.sizedBox(width: 12),
@@ -366,7 +366,7 @@ class CartContentWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Apply coupon feature coming soon!'),
-                    backgroundColor: OsmeaColors.nordicBlue,
+                    backgroundColor: OsmeaColors.black,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -374,12 +374,12 @@ class CartContentWidget extends StatelessWidget {
                   ),
                 );
               },
-              backgroundColor: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
-              textColor: OsmeaColors.nordicBlue,
+              backgroundColor: OsmeaColors.black.withValues(alpha: 0.1),
+              textColor: OsmeaColors.black,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               text: 'Apply',
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                color: OsmeaColors.nordicBlue,
+                color: OsmeaColors.black,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -416,7 +416,7 @@ class CartContentWidget extends StatelessWidget {
               children: [
                 Icon(
                   Icons.receipt_long_outlined,
-                  color: OsmeaColors.nordicBlue,
+                  color: OsmeaColors.black,
                   size: 24,
                 ),
                 OsmeaComponents.sizedBox(width: 8),
@@ -532,7 +532,7 @@ class CartContentWidget extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
+                          color: OsmeaColors.black.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: OsmeaComponents.text(
@@ -542,7 +542,7 @@ class CartContentWidget extends StatelessWidget {
                           ),
                           textStyle: OsmeaTextStyle.titleLarge(context)
                               .copyWith(
-                                color: OsmeaColors.nordicBlue,
+                                color: OsmeaColors.black,
                                 fontWeight: FontWeight.w800,
                               ),
                         ),

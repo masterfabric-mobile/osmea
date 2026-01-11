@@ -29,38 +29,7 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     super.horizontalPadding = const PaddingVisibility.enabled(),
     required super.goRoute,
   }) : super(
-         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-           title: OsmeaComponents.text(
-             'Shopping Cart',
-             color: OsmeaColors.thunder,
-             textStyle: OsmeaTextStyle.titleLarge(context),
-           ),
-           backgroundColor: OsmeaColors.paperWhite,
-           elevation: 0,
-           foregroundColor: OsmeaColors.thunder,
-           variant: AppBarVariant.standard,
-           size: AppBarSize.standard,
-           leading: OsmeaComponents.iconButton(
-             onPressed: () => context.go('/home'),
-             icon: Icon(
-               Icons.arrow_back,
-               color: OsmeaColors.thunder,
-               size: context.iconSizeNormal,
-             ),
-           ),
-           actions: [
-             AppBarAction(
-               type: AppBarActionType.refresh,
-               icon: Icon(
-                 Icons.refresh,
-                 color: OsmeaColors.thunder,
-                 size: context.iconSizeNormal,
-               ),
-               onPressed: () => viewModel.loadCart(),
-               tooltip: 'Refresh cart',
-             ),
-           ],
-         ),
+         coreAppBar: (context, viewModel) => _buildCartAppBar(context, viewModel),
        ) {
     debugPrint('🛒 CartView: Constructor called');
   }
@@ -161,10 +130,10 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
             // Cart content
             RefreshIndicator(
               onRefresh: () => viewModel.refreshCart(),
-              color: OsmeaColors.nordicBlue,
-              backgroundColor: OsmeaColors.white,
-              strokeWidth: 2.0,
-              displacement: 40,
+              color: _getRefreshIndicatorColor(context),
+              backgroundColor: _getRefreshIndicatorBackgroundColor(context),
+              strokeWidth: _getRefreshIndicatorStrokeWidth(context),
+              displacement: _getRefreshIndicatorDisplacement(context),
               child: ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
                 child: CartContentWidget(viewModel: viewModel, state: state),
@@ -174,20 +143,25 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
             if (isCurrentlyLoading)
               Positioned.fill(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  filter: ImageFilter.blur(
+                    sigmaX: _getLoadingBlurSigma(context),
+                    sigmaY: _getLoadingBlurSigma(context),
+                  ),
                   child: Container(
-                    color: OsmeaColors.white.withValues(alpha: 0.7),
+                    color: _getLoadingOverlayBackgroundColor(context),
                     child: OsmeaComponents.center(
                       child: OsmeaComponents.container(
                         padding: EdgeInsets.all(context.spacing24),
                         decoration: BoxDecoration(
-                          color: OsmeaColors.white,
-                          borderRadius: BorderRadius.circular(16),
+                          color: _getLoadingContainerBackgroundColor(context),
+                          borderRadius: BorderRadius.circular(
+                            _getLoadingContainerBorderRadius(context),
+                          ),
                         ),
                         child: OsmeaComponents.loading(
                           type: LoadingType.circularFade,
-                          size: context.iconSizeLarge,
-                          color: OsmeaColors.nordicBlue,
+                          size: _getLoadingSize(context),
+                          color: _getLoadingColor(context),
                         ),
                       ),
                     ),
@@ -215,11 +189,300 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
         child: OsmeaComponents.center(
           child: OsmeaComponents.loading(
             type: LoadingType.circularFade,
-            size: context.iconSizeLarge,
-            color: OsmeaColors.nordicBlue,
+            size: _getLoadingSize(context),
+            color: _getLoadingColor(context),
           ),
         ),
       ),
     );
+  }
+
+  /// Builds cart app bar from config
+  static PreferredSizeWidget _buildCartAppBar(
+    BuildContext context,
+    CartViewModel? viewModel,
+  ) {
+    final configHelper = AssetConfigHelper();
+    
+    final title = configHelper.getString(
+      'cart_view_configuration.app_bar.title',
+      'Shopping Cart',
+    );
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.app_bar.backgroundColor',
+        '#FFFFFF',
+      ),
+    );
+    final foregroundColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.app_bar.foregroundColor',
+        '#000000',
+      ),
+    );
+    final titleColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.app_bar.titleColor',
+        '#000000',
+      ),
+    );
+    final iconColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.app_bar.iconColor',
+        '#000000',
+      ),
+    );
+    final elevation = configHelper.getDouble(
+      'cart_view_configuration.app_bar.elevation',
+      0.0,
+    );
+    final variantString = configHelper.getString(
+      'cart_view_configuration.app_bar.variant',
+      'standard',
+    );
+    final sizeString = configHelper.getString(
+      'cart_view_configuration.app_bar.size',
+      'standard',
+    );
+    final showBackButton = configHelper.getBool(
+      'cart_view_configuration.app_bar.show_back_button',
+      true,
+    );
+    final showRefreshButton = configHelper.getBool(
+      'cart_view_configuration.app_bar.show_refresh_button',
+      true,
+    );
+    final refreshTooltip = configHelper.getString(
+      'cart_view_configuration.app_bar.refresh_tooltip',
+      'Refresh cart',
+    );
+
+    final variant = _parseAppBarVariant(variantString);
+    final size = _parseAppBarSize(sizeString);
+
+    return OsmeaComponents.appBar(
+      title: OsmeaComponents.text(
+        title,
+        color: titleColor,
+        textStyle: OsmeaTextStyle.titleLarge(context),
+      ),
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      foregroundColor: foregroundColor,
+      variant: variant,
+      size: size,
+      leading: showBackButton
+          ? OsmeaComponents.iconButton(
+              onPressed: () => context.go('/home'),
+              icon: Icon(
+                Icons.arrow_back,
+                color: iconColor,
+                size: context.iconSizeNormal,
+              ),
+            )
+          : null,
+      actions: showRefreshButton
+          ? [
+              AppBarAction(
+                type: AppBarActionType.refresh,
+                icon: Icon(
+                  Icons.refresh,
+                  color: iconColor,
+                  size: context.iconSizeNormal,
+                ),
+                onPressed: () => viewModel?.loadCart(),
+                tooltip: refreshTooltip,
+              ),
+            ]
+          : [],
+    );
+  }
+
+  /// Gets refresh indicator color from config
+  static Color _getRefreshIndicatorColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.refresh_indicator.color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets refresh indicator background color from config
+  static Color _getRefreshIndicatorBackgroundColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.refresh_indicator.backgroundColor',
+        '#FFFFFF',
+      ),
+    );
+  }
+
+  /// Gets refresh indicator stroke width from config
+  static double _getRefreshIndicatorStrokeWidth(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getDouble(
+      'cart_view_configuration.refresh_indicator.strokeWidth',
+      2.0,
+    );
+  }
+
+  /// Gets refresh indicator displacement from config
+  static double _getRefreshIndicatorDisplacement(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getDouble(
+      'cart_view_configuration.refresh_indicator.displacement',
+      40.0,
+    );
+  }
+
+  /// Gets loading overlay blur sigma from config
+  static double _getLoadingBlurSigma(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getDouble(
+      'cart_view_configuration.loading_overlay.blur_sigma',
+      4.0,
+    );
+  }
+
+  /// Gets loading overlay background color from config
+  static Color _getLoadingOverlayBackgroundColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'cart_view_configuration.loading_overlay.background_color',
+      '#FFFFFF',
+    );
+    final alpha = configHelper.getDouble(
+      'cart_view_configuration.loading_overlay.background_alpha',
+      0.7,
+    );
+    return _parseColor(colorString).withValues(alpha: alpha);
+  }
+
+  /// Gets loading container background color from config
+  static Color _getLoadingContainerBackgroundColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.loading_overlay.container_background_color',
+        '#FFFFFF',
+      ),
+    );
+  }
+
+  /// Gets loading container border radius from config
+  static double _getLoadingContainerBorderRadius(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return configHelper.getDouble(
+      'cart_view_configuration.loading_overlay.container_border_radius',
+      16.0,
+    );
+  }
+
+  /// Gets loading color from config
+  static Color _getLoadingColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.loading_overlay.loading_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets loading size from config
+  static double _getLoadingSize(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final sizeString = configHelper.getString(
+      'cart_view_configuration.loading_overlay.loading_size',
+      'large',
+    );
+    switch (sizeString.toLowerCase()) {
+      case 'small':
+        return context.iconSizeSmall;
+      case 'medium':
+        return context.iconSizeNormal;
+      case 'large':
+        return context.iconSizeLarge;
+      default:
+        return context.iconSizeLarge;
+    }
+  }
+
+  /// Parses color string to Color
+  static Color _parseColor(String colorString) {
+    try {
+      // Remove # if present
+      String hex = colorString.replaceAll('#', '');
+      
+      // Handle ARGB format (8 characters)
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      
+      // Handle RGB format (6 characters)
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      
+      // Fallback to black
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
+  }
+
+  /// Parses app bar variant string to AppBarVariant
+  static AppBarVariant _parseAppBarVariant(String variantString) {
+    switch (variantString.toLowerCase()) {
+      case 'standard':
+        return AppBarVariant.standard;
+      case 'transparent':
+        return AppBarVariant.transparent;
+      case 'primary':
+        return AppBarVariant.primary;
+      case 'secondary':
+        return AppBarVariant.secondary;
+      case 'surface':
+        return AppBarVariant.surface;
+      case 'glass':
+        return AppBarVariant.glass;
+      case 'gradient':
+        return AppBarVariant.gradient;
+      case 'outlined':
+        return AppBarVariant.outlined;
+      case 'elevated':
+        return AppBarVariant.elevated;
+      default:
+        return AppBarVariant.standard;
+    }
+  }
+
+  /// Parses app bar size string to AppBarSize
+  static AppBarSize _parseAppBarSize(String sizeString) {
+    switch (sizeString.toLowerCase()) {
+      case 'compact':
+        return AppBarSize.compact;
+      case 'standard':
+        return AppBarSize.standard;
+      case 'comfortable':
+        return AppBarSize.comfortable;
+      case 'large':
+        return AppBarSize.large;
+      case 'extralarge':
+        return AppBarSize.extraLarge;
+      default:
+        return AppBarSize.standard;
+    }
   }
 }

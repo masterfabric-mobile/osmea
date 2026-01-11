@@ -55,7 +55,7 @@ class _TagsFilterWidgetState extends State<TagsFilterWidget> {
             child: OsmeaComponents.loading(
               type: LoadingType.circularFade,
               size: 32,
-              color: OsmeaColors.nordicBlue,
+              color: OsmeaColors.black,
             ),
           );
         }
@@ -105,7 +105,7 @@ class _TagsFilterWidgetState extends State<TagsFilterWidget> {
               style: isSelected ? ChipsStyle.normal : ChipsStyle.outlined,
               selected: isSelected,
               borderWidth: isSelected ? 2.0 : null,
-              backgroundColor: isSelected ? OsmeaColors.nordicBlue : null,
+              backgroundColor: isSelected ? OsmeaColors.black : null,
               textColor: isSelected ? OsmeaColors.white : null,
               onTap: () {
                 final newSelectedTags = List<int>.from(currentSelectedTags);

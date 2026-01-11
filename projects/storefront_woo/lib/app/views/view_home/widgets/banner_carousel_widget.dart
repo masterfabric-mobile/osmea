@@ -109,7 +109,7 @@ class BannerCarouselWidget extends StatelessWidget {
               )
             else
               Container(
-                color: OsmeaColors.nordicBlue,
+                color: OsmeaColors.black,
               ),
             // Gradient overlay for text readability
             if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty)

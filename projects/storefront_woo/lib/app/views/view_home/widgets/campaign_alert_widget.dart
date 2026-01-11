@@ -241,12 +241,12 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
 
   Color _parseColor(String? colorString) {
     if (colorString == null || colorString.isEmpty) {
-      return OsmeaColors.nordicBlue;
+      return OsmeaColors.black;
     }
     try {
       return Color(int.parse(colorString.replaceFirst('#', '0xFF')));
     } catch (e) {
-      return OsmeaColors.nordicBlue;
+      return OsmeaColors.black;
     }
   }
 }

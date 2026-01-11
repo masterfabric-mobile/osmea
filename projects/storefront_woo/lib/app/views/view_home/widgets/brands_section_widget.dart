@@ -112,7 +112,7 @@ class BrandsSectionWidget extends StatelessWidget {
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    color: OsmeaColors.nordicBlue,
+                    color: OsmeaColors.black,
                   ),
                 ),
               ),

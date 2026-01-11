@@ -46,7 +46,7 @@ class ProductReviewsSectionWidget extends StatelessWidget {
           textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.0,
-            color: OsmeaColors.thunder.withValues(alpha: 0.8),
+            color: OsmeaColors.black,
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing6),
@@ -87,14 +87,14 @@ class _EmptyReviewsWidget extends StatelessWidget {
             Icon(
               Icons.reviews_outlined,
               size: context.iconSizeHigh,
-              color: OsmeaColors.pewter.withValues(alpha: 0.5),
+              color: OsmeaColors.grayMaterial[400]!,
             ),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
               'No reviews yet',
               textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.w500,
-                color: OsmeaColors.thunder.withValues(alpha: 0.7),
+                color: OsmeaColors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -103,7 +103,7 @@ class _EmptyReviewsWidget extends StatelessWidget {
               'No reviews have been made for this product yet.',
               textStyle: OsmeaTextStyle.bodySmall(
                 context,
-              ).copyWith(color: OsmeaColors.pewter),
+              ).copyWith(color: OsmeaColors.grayMaterial[400]!),
               textAlign: TextAlign.center,
             ),
           ],

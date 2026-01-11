@@ -85,6 +85,24 @@ class RecommendedSectionWidget extends StatelessWidget {
     return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
   }
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = configHelper.getString('home_view.recommended.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load recommended color $key: $e');
+    }
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
     final config = _loadRecommendedConfig();
@@ -108,30 +126,15 @@ class RecommendedSectionWidget extends StatelessWidget {
             mainAxisAlignment: context.spaceBetween,
             crossAxisAlignment: context.crossCenter,
             children: [
-              OsmeaComponents.row(
-                children: [
-                  OsmeaComponents.text(
-                    sectionTitle,
-                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                      fontSize: context.fontSizeNormal * context.textScaleFactor,
-                      fontWeight: FontWeight.w600, // Semi Bold
-                      height: context.lineHeightTight, // line height 20px
-                      letterSpacing: -0.2,
-                      color: OsmeaColors.thunder,
-                    ),
-                  ),
-                  OsmeaComponents.sizedBox(width: context.spacing4),
-                  OsmeaComponents.text(
-                    '(${recommendedProducts.length})',
-                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                      fontSize: (context.fontSizeNormal * context.textScaleFactor) * 0.7,
-                      fontWeight: FontWeight.w600, // Semi Bold
-                      height: context.lineHeightTight, // line height 20px
-                      letterSpacing: -0.2,
-                      color: OsmeaColors.thunder,
-                    ),
-                  ),
-                ],
+              OsmeaComponents.text(
+                sectionTitle,
+                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                  fontSize: context.fontSizeNormal * context.textScaleFactor,
+                  fontWeight: FontWeight.w600, // Semi Bold
+                  height: context.lineHeightTight, // line height 20px
+                  letterSpacing: -0.2,
+                  color: _getColorFromConfig('titleColor', OsmeaColors.black),
+                ),
               ),
               // See all button
               GestureDetector(
@@ -145,7 +148,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                         context.fontSizeExtraSmallMedium *
                         context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    color: OsmeaColors.nordicBlue,
+                    color: _getColorFromConfig('seeAllColor', OsmeaColors.black),
                   ),
                 ),
               ),
@@ -215,8 +218,16 @@ class RecommendedSectionWidget extends StatelessWidget {
           Container(
             height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter,
-              borderRadius: context.borderRadiusNormal,
+              color: _getColorFromConfig('card.imageBackgroundColor', OsmeaColors.white),
+              borderRadius: BorderRadius.circular(
+                configHelper.getDouble('home_view.recommended.card.borderRadius', 12.0),
+              ),
+              border: configHelper.getBool('home_view.recommended.card.showBorder', false)
+                  ? Border.all(
+                      color: _getColorFromConfig('card.borderColor', OsmeaColors.silver),
+                      width: configHelper.getDouble('home_view.recommended.card.borderWidth', 0.0),
+                    )
+                  : null,
             ),
             child: Stack(
               children: [
@@ -228,7 +239,9 @@ class RecommendedSectionWidget extends StatelessWidget {
                   width: double.infinity,
                   height: context.height160 + context.spacing10,
                   fit: BoxFit.cover,
-                  borderRadius: context.borderRadiusNormal,
+                  borderRadius: BorderRadius.circular(
+                    configHelper.getDouble('home_view.recommended.card.borderRadius', 12.0),
+                  ),
                   variant: ImageVariant.normal,
                   cacheWidth: 400, // Limit image size for performance
                   showLoadingIndicator: true,
@@ -255,13 +268,15 @@ class RecommendedSectionWidget extends StatelessWidget {
                         vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
-                        color: OsmeaColors.nordicBlue,
-                        borderRadius: BorderRadius.circular(context.spacing6),
+                        color: _getColorFromConfig('discountBadge.backgroundColor', OsmeaColors.black),
+                        borderRadius: BorderRadius.circular(
+                          configHelper.getDouble('home_view.recommended.discountBadge.borderRadius', 6.0),
+                        ),
                       ),
                       child: OsmeaComponents.text(
                         '$discountPct% OFF',
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.white,
+                          color: _getColorFromConfig('discountBadge.textColor', OsmeaColors.white),
                           fontSize:
                               context.fontSizeExtraSmall *
                               context.textScaleFactor,
@@ -342,21 +357,23 @@ class RecommendedSectionWidget extends StatelessWidget {
                           width: context.width32,
                           height: context.height32,
                           decoration: BoxDecoration(
-                            color: OsmeaColors.white,
+                            color: _getColorFromConfig('wishlistButton.backgroundColor', OsmeaColors.white),
                             borderRadius: BorderRadius.circular(
-                              context.spacing24,
+                              configHelper.getDouble('home_view.recommended.wishlistButton.borderRadius', 24.0),
                             ),
-                            border: Border.all(
-                              color: OsmeaColors.thunder,
-                              width: context.borderWidth,
-                            ),
+                            border: configHelper.getDouble('home_view.recommended.wishlistButton.borderWidth', 0.0) > 0
+                                ? Border.all(
+                                    color: _getColorFromConfig('wishlistButton.borderColor', OsmeaColors.silver),
+                                    width: configHelper.getDouble('home_view.recommended.wishlistButton.borderWidth', 0.0),
+                                  )
+                                : null,
                           ),
                           child: Icon(
                             isSaved ? Icons.favorite : Icons.favorite_border,
                             size: context.iconSizeExtraSmall,
                             color: isSaved
-                                ? OsmeaColors.nordicBlue
-                                : OsmeaColors.thunder,
+                                ? _getColorFromConfig('wishlistButton.iconColorSelected', OsmeaColors.black)
+                                : _getColorFromConfig('wishlistButton.iconColor', OsmeaColors.black),
                           ),
                         ),
                       );
@@ -392,7 +409,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                               context.fontSizeExtraSmallMedium *
                               context.textScaleFactor,
                           fontWeight: FontWeight.w700,
-                          color: OsmeaColors.nordicBlue,
+                          color: _getColorFromConfig('price.salePriceColor', OsmeaColors.black),
                         ),
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing6),
@@ -409,7 +426,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           fontSize:
                               context.fontSizeSmall * context.textScaleFactor,
-                          color: OsmeaColors.pewter,
+                          color: _getColorFromConfig('price.strikethroughPriceColor', OsmeaColors.grayMaterial[400]!),
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
@@ -431,7 +448,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                           context.fontSizeExtraSmallMedium *
                           context.textScaleFactor,
                       fontWeight: FontWeight.w700,
-                      color: OsmeaColors.thunder,
+                      color: _getColorFromConfig('price.regularPriceColor', OsmeaColors.black),
                     ),
                   ),
                 ],
@@ -445,7 +462,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                         context.textScaleFactor,
                     fontWeight: FontWeight.w500, // Medium
                     height: 1.14, // line height 16px
-                    color: OsmeaColors.thunder,
+                    color: _getColorFromConfig('productName.color', OsmeaColors.black),
                   ),
                   maxLines: context.maxLineTwo,
                   overflow: TextOverflow.ellipsis,
@@ -461,7 +478,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                           context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
                       height: 1.2,
-                      color: OsmeaColors.pewter,
+                      color: _getColorFromConfig('description.color', OsmeaColors.grayMaterial[400]!),
                     ),
                     maxLines: context.maxLineOne,
                     overflow: TextOverflow.ellipsis,

@@ -30,8 +30,41 @@ class ActionSection extends StatelessWidget {
     this.showWishlistAndShare = true,
   });
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('product_detail_view.action_section.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load action_section color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Get double from config
+  double _getDoubleFromConfig(String key, double fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      return configHelper.getDouble('product_detail_view.action_section.$key', fallback);
+    } catch (e) {
+      debugPrint('⚠️ Failed to load action_section double $key: $e');
+    }
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final wishlistIconColor = _getColorFromConfig('wishlistIconColor', OsmeaColors.black);
+    final wishlistUnselectedColor = _getColorFromConfig('wishlistUnselectedColor', OsmeaColors.grayMaterial[400]!);
+    final shareIconColor = _getColorFromConfig('shareIconColor', OsmeaColors.black);
     return OsmeaComponents.row(
       children: [
         if (showWishlistAndShare)
@@ -39,14 +72,14 @@ class ActionSection extends StatelessWidget {
             icon: Icon(
               isInWishlist ? Icons.favorite : Icons.favorite_outline,
               color: isInWishlist
-                  ? OsmeaColors.nordicBlue
-                  : OsmeaColors.pewter.withOpacity(context.alpha70),
+                  ? wishlistIconColor
+                  : wishlistUnselectedColor,
             ),
             size: ButtonSize.small,
             variant: ButtonVariant.ghost,
             backgroundColor: isInWishlist
-                ? OsmeaColors.nordicBlue.withOpacity(context.alpha10)
-                : OsmeaColors.pewter.withOpacity(context.alpha5),
+                ? wishlistIconColor.withOpacity(context.alpha10)
+                : OsmeaColors.white,
             onPressed: () {
               final bool wasSaved = isInWishlist;
               onToggleWishlist();
@@ -66,7 +99,7 @@ class ActionSection extends StatelessWidget {
                     children: [
                       Icon(
                         wasSaved ? Icons.favorite_border : Icons.favorite,
-                        color: OsmeaColors.nordicBlue,
+                        color: wishlistIconColor,
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing10),
                       OsmeaComponents.expanded(
@@ -80,7 +113,7 @@ class ActionSection extends StatelessWidget {
                                   : 'Added to favorites',
                               textStyle: OsmeaTextStyle.titleSmall(
                                 context,
-                              ).copyWith(color: OsmeaColors.thunder),
+                              ).copyWith(color: OsmeaColors.black),
                             ),
                             OsmeaComponents.text(
                               wasSaved
@@ -88,7 +121,7 @@ class ActionSection extends StatelessWidget {
                                   : 'Item was added to your favorites',
                               textStyle: OsmeaTextStyle.bodySmall(
                                 context,
-                              ).copyWith(color: OsmeaColors.pewter),
+                              ).copyWith(color: OsmeaColors.grayMaterial[400]!),
                             ),
                           ],
                         ),
@@ -112,29 +145,53 @@ class ActionSection extends StatelessWidget {
           OsmeaComponents.sizedBox(width: context.spacing8),
         if (showWishlistAndShare)
           OsmeaComponents.iconButton(
-            icon: const Icon(Icons.share_outlined),
+            icon: Icon(Icons.share_outlined, color: shareIconColor),
             size: ButtonSize.small,
             variant: ButtonVariant.ghost,
-            backgroundColor: OsmeaColors.pewter.withOpacity(context.alpha5),
+            backgroundColor: OsmeaColors.white,
             onPressed: onShare ?? () {},
           ),
         if (showWishlistAndShare)
           OsmeaComponents.sizedBox(width: context.spacing8),
         // Counter always visible - shows cart quantity if in cart, otherwise 1
-        OsmeaComponents.counter(
-          initialValue: selectedQuantity,
-          minValue: 1,
-          maxValue: 99,
-          // Use default counter look for consistency
-          size: CounterSize.medium,
-          variant: CounterVariant.filled,
-          onChanged: onUpdateQuantity,
+        Builder(
+          builder: (context) {
+            final counterBgColor = _getColorFromConfig('counter.backgroundColor', OsmeaColors.white);
+            final counterBorderColor = _getColorFromConfig('counter.borderColor', OsmeaColors.silver);
+            final counterButtonColor = _getColorFromConfig('counter.buttonColor', OsmeaColors.black);
+            final counterButtonIconColor = _getColorFromConfig('counter.buttonIconColor', OsmeaColors.white);
+            final counterValueTextColor = _getColorFromConfig('counter.valueTextColor', OsmeaColors.black);
+            final counterBorderRadius = _getDoubleFromConfig('counter.borderRadius', 8.0);
+
+            return OsmeaComponents.counter(
+              initialValue: selectedQuantity,
+              minValue: 1,
+              maxValue: 99,
+              size: CounterSize.medium,
+              variant: CounterVariant.filled,
+              backgroundColor: counterBgColor,
+              borderColor: counterBorderColor,
+              buttonColor: counterButtonColor,
+              borderRadius: BorderRadius.circular(counterBorderRadius),
+              valueTextStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: counterValueTextColor,
+              ),
+              incrementIcon: Icon(
+                Icons.add,
+                color: counterButtonIconColor,
+              ),
+              decrementIcon: Icon(
+                Icons.remove,
+                color: counterButtonIconColor,
+              ),
+              onChanged: onUpdateQuantity,
+            );
+          },
         ),
         OsmeaComponents.sizedBox(width: context.spacing8),
         // Add to Cart button always active - adds to cart or updates quantity
         OsmeaComponents.expanded(
           child: OsmeaComponents.sizedBox(
-            // Use default button without extra borders or overrides
             child: OsmeaComponents.button(
               onPressed: () async {
                 await onAddToCart();
@@ -144,6 +201,10 @@ class ActionSection extends StatelessWidget {
                 }
               },
               text: 'Add to Cart',
+              backgroundColor: _getColorFromConfig('addToCartButton.backgroundColor', OsmeaColors.black),
+              textColor: _getColorFromConfig('addToCartButton.textColor', OsmeaColors.white),
+              borderColor: _getColorFromConfig('addToCartButton.borderColor', OsmeaColors.black),
+              borderRadius: _getDoubleFromConfig('addToCartButton.borderRadius', 8.0),
             ),
           ),
         ),

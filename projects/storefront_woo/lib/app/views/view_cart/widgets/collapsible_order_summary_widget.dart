@@ -179,10 +179,22 @@ class _CollapsibleOrderSummaryWidgetState
   }
 
   Widget _buildCheckoutButton(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final buttonColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.order_summary.checkout_button_background',
+        '#000000',
+      ),
+    );
+    final borderRadius = configHelper.getDouble(
+      'cart_view_configuration.order_summary.checkout_button_border_radius',
+      16.0,
+    );
+    
     return OsmeaComponents.container(
       decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue,
-        borderRadius: BorderRadius.circular(16),
+        color: buttonColor,
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Material(
         color: Colors.transparent,
@@ -190,7 +202,7 @@ class _CollapsibleOrderSummaryWidgetState
           onTap: () {
             _handleCheckout(context);
           },
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(borderRadius),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: OsmeaComponents.row(
@@ -199,14 +211,24 @@ class _CollapsibleOrderSummaryWidgetState
                 OsmeaComponents.text(
                   'Checkout',
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    color: OsmeaColors.white,
+                    color: _parseColor(
+                      configHelper.getString(
+                        'cart_view_configuration.order_summary.checkout_button_text_color',
+                        '#FFFFFF',
+                      ),
+                    ),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 OsmeaComponents.sizedBox(width: 8),
                 Icon(
                   Icons.arrow_forward_rounded,
-                  color: OsmeaColors.white,
+                  color: _parseColor(
+                    configHelper.getString(
+                      'cart_view_configuration.order_summary.checkout_button_icon_color',
+                      '#FFFFFF',
+                    ),
+                  ),
                   size: 20,
                 ),
               ],
@@ -215,6 +237,30 @@ class _CollapsibleOrderSummaryWidgetState
         ),
       ),
     );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
   }
 
   void _handleCheckout(BuildContext context) async {

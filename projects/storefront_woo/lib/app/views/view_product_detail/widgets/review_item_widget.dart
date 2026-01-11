@@ -17,16 +17,44 @@ class ReviewItemWidget extends StatelessWidget {
     required this.review,
   });
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('product_detail_view.reviews.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load reviews color $key: $e');
+    }
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = _getColorFromConfig('backgroundColor', OsmeaColors.white);
+    final borderColor = _getColorFromConfig('borderColor', OsmeaColors.silver);
+    final starColor = _getColorFromConfig('starColor', OsmeaColors.black);
+    final textColor = _getColorFromConfig('textColor', OsmeaColors.black);
+    final nameColor = _getColorFromConfig('nameColor', OsmeaColors.black);
+    final dateColor = _getColorFromConfig('dateColor', OsmeaColors.grayMaterial[400]!);
+    final verifiedBadgeColor = _getColorFromConfig('verifiedBadgeColor', OsmeaColors.black);
+    final verifiedBadgeTextColor = _getColorFromConfig('verifiedBadgeTextColor', OsmeaColors.white);
+    
     return OsmeaComponents.container(
       margin: context.onlyBottomPaddingLow,
       padding: context.paddingLow,
       decoration: BoxDecoration(
-        color: OsmeaColors.white,
+        color: backgroundColor,
         borderRadius: context.borderRadiusNormal,
         border: Border.all(
-          color: OsmeaColors.grayMaterial[200]!,
+          color: borderColor,
           width: context.width1,
         ),
       ),
@@ -58,7 +86,7 @@ class ReviewItemWidget extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.person,
-                      color: OsmeaColors.pewter,
+                      color: textColor.withOpacity(0.5),
                       size: context.iconSizeSmall,
                     ),
                   ),
@@ -73,7 +101,7 @@ class ReviewItemWidget extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.person,
-                    color: OsmeaColors.pewter,
+                    color: OsmeaColors.grayMaterial[400]!,
                     size: context.iconSizeSmall,
                   ),
                 ),
@@ -87,7 +115,7 @@ class ReviewItemWidget extends StatelessWidget {
                       review.reviewer ?? 'Anonymous',
                       textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                         fontWeight: FontWeight.w600,
-                        color: OsmeaColors.thunder,
+                        color: nameColor,
                       ),
                     ),
                     if (review.rating != null) ...[
@@ -99,7 +127,7 @@ class ReviewItemWidget extends StatelessWidget {
                               index < (review.rating ?? 0)
                                   ? Icons.star
                                   : Icons.star_border,
-                              color: OsmeaColors.nordicBlue,
+                              color: starColor,
                               size: context.iconSizeExtraSmall,
                             );
                           }),
@@ -108,7 +136,7 @@ class ReviewItemWidget extends StatelessWidget {
                             '${review.rating}/5',
                             textStyle: OsmeaTextStyle.bodySmall(
                               context,
-                            ).copyWith(color: OsmeaColors.pewter),
+                            ).copyWith(color: dateColor),
                           ),
                         ],
                       ),
@@ -124,13 +152,13 @@ class ReviewItemWidget extends StatelessWidget {
                     vertical: context.spacing4,
                   ),
                   decoration: BoxDecoration(
-                    color: OsmeaColors.nordicBlue.withValues(alpha: 0.1),
+                    color: verifiedBadgeColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(context.spacing8),
                   ),
                   child: OsmeaComponents.text(
                     'Verified',
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      color: OsmeaColors.nordicBlue,
+                      color: verifiedBadgeTextColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -149,7 +177,7 @@ class ReviewItemWidget extends StatelessWidget {
               review.formattedDateCreated ?? review.dateCreated ?? '',
               textStyle: OsmeaTextStyle.bodySmall(
                 context,
-              ).copyWith(color: OsmeaColors.pewter),
+              ).copyWith(color: OsmeaColors.grayMaterial[400]!),
             ),
           ],
         ],

@@ -158,7 +158,7 @@ class CartItemWidget extends StatelessWidget {
         removeTrailingZeros: true,
       ),
       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-        color: OsmeaColors.nordicBlue,
+        color: _getPriceColor(context),
         fontWeight: FontWeight.w600,
         fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
       ),
@@ -215,7 +215,7 @@ class CartItemWidget extends StatelessWidget {
                 viewModel.updateItemQuantity(item.productId, item.quantity + 1),
             icon: Icon(
               Icons.add_rounded,
-              color: OsmeaColors.nordicBlue,
+              color: _getQuantityIconColor(context),
               size: context.iconSizeExtraSmall,
             ),
             backgroundColor: Colors.transparent,
@@ -238,5 +238,51 @@ class CartItemWidget extends StatelessWidget {
       size: ButtonSize.extraSmall,
       tooltip: 'Remove item',
     );
+  }
+
+  /// Gets price color from config
+  Color _getPriceColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.price_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets quantity icon color from config
+  Color _getQuantityIconColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.quantity_selector_icon_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
   }
 }

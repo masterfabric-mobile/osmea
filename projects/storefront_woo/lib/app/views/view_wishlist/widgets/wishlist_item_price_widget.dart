@@ -4,8 +4,9 @@ import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart
 
 class WishlistItemPriceWidget extends StatelessWidget {
   final WishlistItem item;
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
 
-  const WishlistItemPriceWidget({super.key, required this.item});
+  WishlistItemPriceWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,28 @@ class WishlistItemPriceWidget extends StatelessWidget {
         item.regularPrice!.isNotEmpty &&
         item.salePrice != item.regularPrice;
 
+    // Get colors from config - ensure they are black/white/gray
+    final salePriceColor = _configHelper.getColor(
+      'wishlist_view.price.salePriceColor',
+      OsmeaColors.black,
+    );
+    final regularPriceColor = _configHelper.getColor(
+      'wishlist_view.price.regularPriceColor',
+      OsmeaColors.black,
+    );
+    final strikethroughPriceColor = _configHelper.getColor(
+      'wishlist_view.price.strikethroughPriceColor',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final defaultPriceColor = _configHelper.getColor(
+      'wishlist_view.price.defaultPriceColor',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final priceFontWeight = _configHelper.getInt(
+      'wishlist_view.price.fontWeight',
+      600,
+    );
+
     // For products on sale: show sale price + regular price (strikethrough)
     if (hasSale) {
       return OsmeaComponents.row(
@@ -24,16 +47,19 @@ class WishlistItemPriceWidget extends StatelessWidget {
         children: [
           OsmeaComponents.text(
             _formatPrice(item.salePrice, item.currencyCode),
+            color: salePriceColor,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.nordicBlue,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.values.firstWhere(
+                (w) => w.value == priceFontWeight,
+                orElse: () => FontWeight.w600,
+              ),
             ),
           ),
           OsmeaComponents.sizedBox(width: context.spacing6),
           OsmeaComponents.text(
             _formatPrice(item.regularPrice, item.currencyCode),
+            color: strikethroughPriceColor,
             textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-              color: OsmeaColors.pewter,
               decoration: TextDecoration.lineThrough,
             ),
           ),
@@ -46,18 +72,23 @@ class WishlistItemPriceWidget extends StatelessWidget {
     if (regularPrice != null && regularPrice.isNotEmpty) {
       return OsmeaComponents.text(
         _formatPrice(regularPrice, item.currencyCode),
-        textStyle: OsmeaTextStyle.bodyMedium(
-          context,
-        ).copyWith(color: OsmeaColors.nordicBlue, fontWeight: FontWeight.w600),
+        color: regularPriceColor,
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          fontWeight: FontWeight.values.firstWhere(
+            (w) => w.value == priceFontWeight,
+            orElse: () => FontWeight.w600,
+          ),
+        ),
       );
     }
 
     // If no price, show default price
     return OsmeaComponents.text(
       PriceInfoCurrencyHelper.getDefaultPrice(),
-      textStyle: OsmeaTextStyle.bodyMedium(
-        context,
-      ).copyWith(color: OsmeaColors.pewter, fontWeight: FontWeight.w400),
+      color: defaultPriceColor,
+      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        fontWeight: FontWeight.w400,
+      ),
     );
   }
 

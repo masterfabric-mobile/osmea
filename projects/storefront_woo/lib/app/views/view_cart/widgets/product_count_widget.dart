@@ -45,7 +45,7 @@ class ProductCountWidget extends StatelessWidget {
                 ),
                 margin: EdgeInsets.symmetric(horizontal: context.spacing4),
                 decoration: BoxDecoration(
-                  color: OsmeaColors.nordicBlue.withValues(alpha: 0.15),
+                  color: OsmeaColors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(context.borderRadiusLow.topLeft.x),
                 ),
                 child: RichText(
@@ -54,14 +54,14 @@ class ProductCountWidget extends StatelessWidget {
                       TextSpan(
                         text: totalItems.toString(),
                         style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       TextSpan(
                         text: ' ${totalItems == 1 ? 'product' : 'products'}',
                         style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

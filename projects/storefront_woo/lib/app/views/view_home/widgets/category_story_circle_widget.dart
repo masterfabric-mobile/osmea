@@ -185,13 +185,13 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                   height: circleSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: OsmeaColors.nordicBlue, width: 2),
+                    border: Border.all(color: OsmeaColors.black, width: 2),
                     gradient: LinearGradient(
                       begin: context.topLeft,
                       end: context.bottomRight,
                       colors: [
-                        OsmeaColors.nordicBlue,
-                        OsmeaColors.nordicBlue.withOpacity(0.7),
+                        OsmeaColors.black,
+                        OsmeaColors.black.withOpacity(0.7),
                       ],
                     ),
                   ),

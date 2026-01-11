@@ -84,20 +84,41 @@ PreferredSizeWidget _buildProductListAppBar(
   BuildContext context,
   ProductListViewModel? viewModel,
 ) {
+  final configHelper = AssetConfigHelper();
+  final appBarConfig = configHelper.getObject('product_list_view.app_bar');
+  
+  final title = appBarConfig?['title'] as String? ?? 'Products';
+  final backgroundColor = configHelper.getColor(
+    'product_list_view.app_bar.backgroundColor',
+    OsmeaColors.white,
+  );
+  final foregroundColor = configHelper.getColor(
+    'product_list_view.app_bar.foregroundColor',
+    OsmeaColors.thunder,
+  );
+  final titleColor = configHelper.getColor(
+    'product_list_view.app_bar.titleColor',
+    OsmeaColors.thunder,
+  );
+  final iconColor = configHelper.getColor(
+    'product_list_view.app_bar.iconColor',
+    OsmeaColors.thunder,
+  );
+
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
-      'Products',
-      color: OsmeaColors.thunder,
+      title,
+      color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(
         context,
       ).copyWith(fontWeight: FontWeight.w700),
     ),
     variant: AppBarVariant.standard,
     size: AppBarSize.standard,
-    backgroundColor: OsmeaColors.white,
-    foregroundColor: OsmeaColors.thunder,
+    backgroundColor: backgroundColor,
+    foregroundColor: foregroundColor,
     leading: OsmeaComponents.iconButton(
-      icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+      icon: Icon(Icons.arrow_back, color: iconColor),
       onPressed: () {
         // Check if we can pop, otherwise navigate to home
         if (context.canPop()) {

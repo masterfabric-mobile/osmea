@@ -152,6 +152,28 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     return widget.configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
   }
 
+  /// Gets background color from config
+  Color _getBackgroundColor() {
+    try {
+      final config = _loadFlashSaleConfig();
+      final colorString = config?['backgroundColor'] as String?;
+      if (colorString != null && colorString.isNotEmpty) {
+        // Handle hex color strings
+        if (colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            return Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            return Color(int.parse(hexString, radix: 16));
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load flash sale background color: $e');
+    }
+    return OsmeaColors.white;
+  }
+
   String _formatDuration(Duration duration) {
     final days = duration.inDays;
     final hours = duration.inHours.remainder(24);
@@ -178,10 +200,31 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     if (flashSaleProducts.isEmpty) return const SizedBox.shrink();
 
     final horizontalPadding = _getHorizontalPadding();
+    final backgroundColor = _getBackgroundColor();
 
-    return OsmeaComponents.column(
-      crossAxisAlignment: context.crossStart,
-      children: [
+    return OsmeaComponents.container(
+      margin: EdgeInsets.symmetric(vertical: context.spacing8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border(
+          left: BorderSide(
+            color: OsmeaColors.silver,
+            width: 1,
+          ),
+          right: BorderSide(
+            color: OsmeaColors.silver,
+            width: 1,
+          ),
+          bottom: BorderSide(
+            color: OsmeaColors.silver,
+            width: 1,
+          ),
+        ),
+        borderRadius: BorderRadius.circular(context.spacing12),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: context.crossStart,
+        children: [
         // Section header with countdown timer
         OsmeaComponents.padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -209,7 +252,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                       vertical: context.spacing4,
                     ),
                     decoration: BoxDecoration(
-                      color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                      color: OsmeaColors.black.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.spacing8),
                     ),
                     child: OsmeaComponents.row(
@@ -217,7 +260,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         Icon(
                           Icons.access_time,
                           size: context.iconSizeSmall,
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                         ),
                         OsmeaComponents.sizedBox(width: context.spacing4),
                         OsmeaComponents.text(
@@ -225,7 +268,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                           textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                             fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                             fontWeight: FontWeight.w700,
-                            color: OsmeaColors.nordicBlue,
+                            color: OsmeaColors.black,
                           ),
                         ),
                       ],
@@ -243,7 +286,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    color: OsmeaColors.nordicBlue,
+                            color: OsmeaColors.black,
                   ),
                 ),
               ),
@@ -270,13 +313,14 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
             }).toList(),
             width: context.allWidth,
             customPadding: context.paddingZero,
-            backgroundColor: OsmeaColors.transparent,
+            backgroundColor: backgroundColor,
             showIndicators: false,
             showArrows: false,
             autoPlay: CarouselAutoPlay.none,
           ),
         ),
       ],
+      ),
     );
   }
 
@@ -325,9 +369,14 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
           Container(
             height: context.height160 + context.spacing10,
             decoration: BoxDecoration(
-              color: OsmeaColors.pewter,
+              color: OsmeaColors.white,
               borderRadius: context.borderRadiusNormal,
+              border: Border.all(
+                color: OsmeaColors.silver,
+                width: 1,
+              ),
             ),
+            clipBehavior: Clip.antiAlias,
             child: Stack(
               children: [
                 // Product image
@@ -336,12 +385,12 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                       ? product.images!.first.src
                       : null,
                   width: double.infinity,
-                  height: context.height160 + context.spacing10,
-                  fit: BoxFit.cover,
+                  height: double.infinity,
+                  fit: BoxFit.contain,
                   borderRadius: context.borderRadiusNormal,
                   variant: ImageVariant.normal,
-                  cacheWidth: 1024,
-                  cacheHeight: 1024,
+                  cacheWidth: 400,
+                  cacheHeight: 400,
                   showLoadingIndicator: true,
                   errorWidget: OsmeaComponents.container(
                     width: double.infinity,
@@ -366,7 +415,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
-                        color: OsmeaColors.nordicBlue,
+                            color: OsmeaColors.black,
                         borderRadius: BorderRadius.circular(context.spacing6),
                       ),
                       child: OsmeaComponents.text(
@@ -427,7 +476,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                             isSaved ? Icons.favorite : Icons.favorite_border,
                             size: context.iconSizeExtraSmall,
                             color: isSaved
-                                ? OsmeaColors.nordicBlue
+                                ? OsmeaColors.black
                                 : OsmeaColors.thunder,
                           ),
                         ),
@@ -460,7 +509,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                           fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                           fontWeight: FontWeight.w700,
-                          color: OsmeaColors.nordicBlue,
+                          color: OsmeaColors.black,
                         ),
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing6),

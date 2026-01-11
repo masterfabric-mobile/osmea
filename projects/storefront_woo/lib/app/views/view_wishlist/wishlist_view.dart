@@ -30,20 +30,56 @@ class WishlistView
                final count = state is WishlistLoadedState ? state.items.length : 0;
                final hasItems = count > 0;
                
+               final configHelper = AssetConfigHelper();
+               final appBarConfig = configHelper.getObject('wishlist_view.app_bar');
+               final title = appBarConfig?['title'] as String? ?? 'Favourites';
+               final titleWithCount = appBarConfig?['titleWithCount'] as String? ?? 'Favourites ({count})';
+               final appBarTitle = count > 0 
+                   ? titleWithCount.replaceAll('{count}', count.toString())
+                   : title;
+               final backgroundColor = configHelper.getColor(
+                 'wishlist_view.app_bar.backgroundColor',
+                 OsmeaColors.white,
+               );
+               final foregroundColor = configHelper.getColor(
+                 'wishlist_view.app_bar.foregroundColor',
+                 OsmeaColors.black,
+               );
+               final titleColor = configHelper.getColor(
+                 'wishlist_view.app_bar.titleColor',
+                 OsmeaColors.black,
+               );
+               final iconColor = configHelper.getColor(
+                 'wishlist_view.app_bar.iconColor',
+                 OsmeaColors.black,
+               );
+               final elevation = configHelper.getDouble(
+                 'wishlist_view.app_bar.elevation',
+                 0.0,
+               );
+               final surfaceTintColor = configHelper.getColor(
+                 'wishlist_view.app_bar.surfaceTintColor',
+                 OsmeaColors.transparent,
+               );
+               final shadowColor = configHelper.getColor(
+                 'wishlist_view.app_bar.shadowColor',
+                 OsmeaColors.transparent,
+               );
+
                return OsmeaComponents.appBar(
                  title: OsmeaComponents.text(
-                   count > 0 ? 'Favourites ($count)' : 'Favourites',
+                   appBarTitle,
                    variant: OsmeaTextVariant.headlineMedium,
-                   color: OsmeaColors.black,
+                   color: titleColor,
                    fontWeight: FontWeight.w600,
                  ),
-                 backgroundColor: OsmeaColors.white,
-                 foregroundColor: OsmeaColors.black,
-                 elevation: 0,
-                 surfaceTintColor: OsmeaColors.transparent,
-                 shadowColor: OsmeaColors.transparent,
+                 backgroundColor: backgroundColor,
+                 foregroundColor: foregroundColor,
+                 elevation: elevation,
+                 surfaceTintColor: surfaceTintColor,
+                 shadowColor: shadowColor,
                  leading: OsmeaComponents.iconButton(
-                   icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
+                   icon: Icon(Icons.arrow_back_ios_new, color: iconColor),
                    onPressed: () {
                      if (context.canPop()) {
                        context.pop();
@@ -55,7 +91,7 @@ class WishlistView
                  ),
                  actions: [
                    AppBarAction(
-                     icon: Icon(Icons.category_outlined, color: OsmeaColors.black),
+                     icon: Icon(Icons.category_outlined, color: iconColor),
                      onPressed: () {
                        context.push('/favorite-categories');
                      },
@@ -63,7 +99,7 @@ class WishlistView
                    ),
                    if (hasItems)
                      AppBarAction(
-                       icon: Icon(Icons.delete_outline, color: OsmeaColors.black),
+                       icon: Icon(Icons.delete_outline, color: iconColor),
                        onPressed: () async {
                              final confirmed = await OsmeaComponents.showPopup<bool>(
                                context: context,

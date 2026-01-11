@@ -8,8 +8,9 @@ import 'package:storefront_woo/app/views/view_wishlist/widgets/wishlist_item_wid
 class WishlistListWidget extends StatelessWidget {
   final List<WishlistItem> items;
   final WishlistViewModel viewModel;
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
 
-  const WishlistListWidget({
+  WishlistListWidget({
     super.key,
     required this.items,
     required this.viewModel,
@@ -26,10 +27,27 @@ class WishlistListWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final horizontalPadding = _configHelper.getDouble(
+      'wishlist_view.component_spacing.horizontal',
+      context.spacing12,
+    );
+    final verticalPadding = _configHelper.getDouble(
+      'wishlist_view.component_spacing.vertical',
+      context.spacing8,
+    );
+    final dividerColor = _configHelper.getColor(
+      'wishlist_view.divider.color',
+      OsmeaColors.silver,
+    );
+    final dividerHeight = _configHelper.getDouble(
+      'wishlist_view.divider.height',
+      context.height1,
+    );
+
     return OsmeaComponents.singleChildScrollView(
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing12,
-        vertical: context.spacing8,
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
       ),
       child: OsmeaComponents.column(
         children: [
@@ -37,8 +55,8 @@ class WishlistListWidget extends StatelessWidget {
             WishlistItemWidget(item: items[i], viewModel: viewModel),
             if (i < items.length - 1)
               OsmeaComponents.divider(
-                color: OsmeaColors.platinum,
-                height: context.height1,
+                color: dividerColor,
+                height: dividerHeight,
               ),
           ],
         ],

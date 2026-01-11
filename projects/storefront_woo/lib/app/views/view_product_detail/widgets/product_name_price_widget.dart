@@ -19,13 +19,49 @@ class ProductNamePriceWidget extends StatelessWidget {
     required this.state,
   });
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('product_detail_view.name_and_price.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load name_and_price color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Get padding from config
+  EdgeInsets _getPadding() {
+    try {
+      final configHelper = AssetConfigHelper();
+      final paddingConfig = configHelper.getObject('product_detail_view.name_and_price.padding');
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble() ?? 16.0;
+        final vertical = (paddingConfig['vertical'] as num?)?.toDouble() ?? 4.0;
+        return EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load name_and_price padding: $e');
+    }
+    return EdgeInsets.symmetric(horizontal: 16, vertical: 4);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final nameColor = _getColorFromConfig('nameColor', OsmeaColors.black);
+    final priceColor = _getColorFromConfig('priceColor', OsmeaColors.black);
+    final padding = _getPadding();
+    
     return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing16,
-        vertical: context.spacing4,
-      ),
+      padding: padding,
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
@@ -36,7 +72,7 @@ class ProductNamePriceWidget extends StatelessWidget {
               fontWeight: FontWeight.w600,
               letterSpacing: -0.5,
               height: 1.2,
-              color: OsmeaColors.thunder,
+              color: nameColor,
             ),
           ),
 
@@ -46,7 +82,7 @@ class ProductNamePriceWidget extends StatelessWidget {
           OsmeaComponents.text(
             _formatPrice(state.product.prices),
             textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-              color: OsmeaColors.nordicBlue,
+              color: priceColor,
               fontWeight: FontWeight.w500,
               letterSpacing: -0.3,
               height: 1.1,

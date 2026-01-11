@@ -121,10 +121,10 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (BuildContext context, GoRouterState state) {
             // Create focus node for auto-focusing search input
             final searchFocusNode = FocusNode();
-            
+
             // Extract query from URL if present
             final query = state.uri.queryParameters['query'];
-            
+
             return CustomTransitionPage(
               child: _AutoFocusSearchView(
                 searchFocusNode: searchFocusNode,
@@ -312,10 +312,7 @@ final GoRouter appRouter = GoRouter(
             },
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
+            return FadeTransition(opacity: animation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 600),
         );
@@ -823,10 +820,7 @@ final GoRouter appRouter = GoRouter(
       path: '/checkout',
       pageBuilder: (BuildContext context, GoRouterState state) {
         final extra = state.extra as Map<String, dynamic>?;
-        final arguments = {
-          'checkout': true,
-          if (extra != null) ...extra,
-        };
+        final arguments = {'checkout': true, if (extra != null) ...extra};
         return CustomTransitionPage(
           child: CheckoutView(
             arguments: arguments,
@@ -842,15 +836,16 @@ final GoRouter appRouter = GoRouter(
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.0, 1.0),
-                end: Offset.zero,
-              ).animate(
-                CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeInOutCubic,
-                ),
-              ),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0.0, 1.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOutCubic,
+                    ),
+                  ),
               child: child,
             );
           },
@@ -964,6 +959,135 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
+/// Get navbar colors from config
+Color _getNavbarColor(
+  AssetConfigHelper configHelper,
+  String key,
+  Color defaultValue,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final colorString = navbarConfig?[key] as String?;
+    if (colorString != null && colorString.isNotEmpty) {
+      // Handle hex color strings
+      if (colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar color $key: $e');
+  }
+  return defaultValue;
+}
+
+/// Get navbar elevation from config
+double _getNavbarElevation(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final elevation = navbarConfig?['elevation'] as num?;
+    if (elevation != null) {
+      return elevation.toDouble();
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar elevation: $e');
+  }
+  return 0.5;
+}
+
+/// Get navbar variant from config
+NavbarVariant _getNavbarVariant(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final variantString = navbarConfig?['variant'] as String?;
+    if (variantString != null) {
+      switch (variantString.toLowerCase()) {
+        case 'primary':
+          return NavbarVariant.primary;
+        case 'secondary':
+          return NavbarVariant.secondary;
+        case 'transparent':
+          return NavbarVariant.transparent;
+        case 'glass':
+          return NavbarVariant.glass;
+        case 'outlined':
+          return NavbarVariant.outlined;
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar variant: $e');
+  }
+  return NavbarVariant.transparent;
+}
+
+/// Get navbar size from config
+NavbarSize _getNavbarSize(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final sizeString = navbarConfig?['size'] as String?;
+    if (sizeString != null) {
+      switch (sizeString.toLowerCase()) {
+        case 'small':
+          return NavbarSize.small;
+        case 'medium':
+          return NavbarSize.medium;
+        case 'large':
+          return NavbarSize.large;
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar size: $e');
+  }
+  return NavbarSize.medium;
+}
+
+/// Get navbar position from config
+NavbarPosition _getNavbarPosition(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final positionString = navbarConfig?['position'] as String?;
+    if (positionString != null) {
+      switch (positionString.toLowerCase()) {
+        case 'top':
+          return NavbarPosition.top;
+        case 'bottom':
+          return NavbarPosition.bottom;
+        case 'left':
+          return NavbarPosition.left;
+        case 'right':
+          return NavbarPosition.right;
+        case 'floating':
+          return NavbarPosition.floating;
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar position: $e');
+  }
+  return NavbarPosition.bottom;
+}
+
+/// Get navbar boolean property from config
+bool _getNavbarBool(
+  AssetConfigHelper configHelper,
+  String key,
+  bool defaultValue,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key] as bool?;
+    if (value != null) {
+      return value;
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return defaultValue;
+}
 
 /// Get navbar for specific route
 /// Calculates currentIndex from navbar configuration
@@ -1097,14 +1221,61 @@ Widget? _getNavbarForRoute(String location) {
                     wishlistCount,
                   );
 
+                  // Get all properties from config
+                  final configHelper = AssetConfigHelper();
+                  final variant = _getNavbarVariant(configHelper);
+                  final size = _getNavbarSize(configHelper);
+                  final position = _getNavbarPosition(configHelper);
+                  final backgroundColor = _getNavbarColor(
+                    configHelper,
+                    'backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final borderColor = _getNavbarColor(
+                    configHelper,
+                    'borderColor',
+                    OsmeaColors.silver,
+                  );
+                  final activeColor = _getNavbarColor(
+                    configHelper,
+                    'selectedIconColor',
+                    OsmeaColors.black,
+                  );
+                  final inactiveColor = _getNavbarColor(
+                    configHelper,
+                    'unselectedIconColor',
+                    OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+                  );
+                  final elevation = _getNavbarElevation(configHelper);
+                  final showLabels = _getNavbarBool(
+                    configHelper,
+                    'showLabels',
+                    true,
+                  );
+                  final showIcons = _getNavbarBool(
+                    configHelper,
+                    'showIcons',
+                    true,
+                  );
+                  final centerItems = _getNavbarBool(
+                    configHelper,
+                    'centerItems',
+                    true,
+                  );
+
                   return OsmeaComponents.navbar(
-                    variant: NavbarVariant.transparent,
-                    size: NavbarSize.medium,
-                    position: NavbarPosition.bottom,
+                    variant: variant,
+                    size: size,
+                    position: position,
                     currentIndex: finalCurrentIndex,
-                    borderColor: OsmeaColors.silver,
-                    elevation: .5,
-                    backgroundColor: OsmeaColors.white,
+                    borderColor: borderColor,
+                    elevation: elevation,
+                    backgroundColor: backgroundColor,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                    showLabels: showLabels,
+                    showIcons: showIcons,
+                    centerItems: centerItems,
                     items: items,
                     onItemTap: (index) =>
                         _navigateToPage(context, index, isAuthenticated),
@@ -1134,14 +1305,57 @@ Widget? _getNavbarForRoute(String location) {
                 wishlistCount,
               );
 
+              // Get all properties from config
+              final configHelper = AssetConfigHelper();
+              final variant = _getNavbarVariant(configHelper);
+              final size = _getNavbarSize(configHelper);
+              final position = _getNavbarPosition(configHelper);
+              final backgroundColor = _getNavbarColor(
+                configHelper,
+                'backgroundColor',
+                OsmeaColors.white,
+              );
+              final borderColor = _getNavbarColor(
+                configHelper,
+                'borderColor',
+                OsmeaColors.silver,
+              );
+              final activeColor = _getNavbarColor(
+                configHelper,
+                'selectedIconColor',
+                OsmeaColors.black,
+              );
+              final inactiveColor = _getNavbarColor(
+                configHelper,
+                'unselectedIconColor',
+                OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+              );
+              final elevation = _getNavbarElevation(configHelper);
+              final showLabels = _getNavbarBool(
+                configHelper,
+                'showLabels',
+                true,
+              );
+              final showIcons = _getNavbarBool(configHelper, 'showIcons', true);
+              final centerItems = _getNavbarBool(
+                configHelper,
+                'centerItems',
+                true,
+              );
+
               return OsmeaComponents.navbar(
-                variant: NavbarVariant.transparent,
-                size: NavbarSize.medium,
-                position: NavbarPosition.bottom,
+                variant: variant,
+                size: size,
+                position: position,
                 currentIndex: finalCurrentIndex,
-                borderColor: OsmeaColors.silver,
-                elevation: .5,
-                backgroundColor: OsmeaColors.white,
+                borderColor: borderColor,
+                elevation: elevation,
+                backgroundColor: backgroundColor,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
+                showLabels: showLabels,
+                showIcons: showIcons,
+                centerItems: centerItems,
                 items: items,
                 onItemTap: (index) =>
                     _navigateToPage(context, index, isAuthenticated),
@@ -1217,17 +1431,67 @@ Widget? _getNavbarForRouteFallback(String location) {
                     wishlistCount,
                   );
 
+                  // Get all properties from config
+                  final configHelper = AssetConfigHelper();
+                  final variant = _getNavbarVariant(configHelper);
+                  final size = _getNavbarSize(configHelper);
+                  final position = _getNavbarPosition(configHelper);
+                  final backgroundColor = _getNavbarColor(
+                    configHelper,
+                    'backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final borderColor = _getNavbarColor(
+                    configHelper,
+                    'borderColor',
+                    OsmeaColors.silver,
+                  );
+                  final activeColor = _getNavbarColor(
+                    configHelper,
+                    'selectedIconColor',
+                    OsmeaColors.black,
+                  );
+                  final inactiveColor = _getNavbarColor(
+                    configHelper,
+                    'unselectedIconColor',
+                    OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+                  );
+                  final elevation = _getNavbarElevation(configHelper);
+                  final showLabels = _getNavbarBool(
+                    configHelper,
+                    'showLabels',
+                    true,
+                  );
+                  final showIcons = _getNavbarBool(
+                    configHelper,
+                    'showIcons',
+                    true,
+                  );
+                  final centerItems = _getNavbarBool(
+                    configHelper,
+                    'centerItems',
+                    true,
+                  );
+
                   return OsmeaComponents.navbar(
-                    variant: NavbarVariant.transparent,
-                    size: NavbarSize.medium,
-                    position: NavbarPosition.bottom,
+                    variant: variant,
+                    size: size,
+                    position: position,
                     currentIndex: currentIndex,
-                    borderColor: OsmeaColors.silver,
-                    elevation: .5,
-                    backgroundColor: OsmeaColors.white,
+                    borderColor: borderColor,
+                    elevation: elevation,
+                    backgroundColor: backgroundColor,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                    showLabels: showLabels,
+                    showIcons: showIcons,
+                    centerItems: centerItems,
                     items: items,
-                    onItemTap: (index) =>
-                        _navigateToPageFallback(context, index, isAuthenticated),
+                    onItemTap: (index) => _navigateToPageFallback(
+                      context,
+                      index,
+                      isAuthenticated,
+                    ),
                   );
                 },
               );
@@ -1252,14 +1516,57 @@ Widget? _getNavbarForRouteFallback(String location) {
                 wishlistCount,
               );
 
+              // Get all properties from config
+              final configHelper = AssetConfigHelper();
+              final variant = _getNavbarVariant(configHelper);
+              final size = _getNavbarSize(configHelper);
+              final position = _getNavbarPosition(configHelper);
+              final backgroundColor = _getNavbarColor(
+                configHelper,
+                'backgroundColor',
+                OsmeaColors.white,
+              );
+              final borderColor = _getNavbarColor(
+                configHelper,
+                'borderColor',
+                OsmeaColors.silver,
+              );
+              final activeColor = _getNavbarColor(
+                configHelper,
+                'selectedIconColor',
+                OsmeaColors.black,
+              );
+              final inactiveColor = _getNavbarColor(
+                configHelper,
+                'unselectedIconColor',
+                OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+              );
+              final elevation = _getNavbarElevation(configHelper);
+              final showLabels = _getNavbarBool(
+                configHelper,
+                'showLabels',
+                true,
+              );
+              final showIcons = _getNavbarBool(configHelper, 'showIcons', true);
+              final centerItems = _getNavbarBool(
+                configHelper,
+                'centerItems',
+                true,
+              );
+
               return OsmeaComponents.navbar(
-                variant: NavbarVariant.transparent,
-                size: NavbarSize.medium,
-                position: NavbarPosition.bottom,
+                variant: variant,
+                size: size,
+                position: position,
                 currentIndex: currentIndex,
-                borderColor: OsmeaColors.silver,
-                elevation: .5,
-                backgroundColor: OsmeaColors.white,
+                borderColor: borderColor,
+                elevation: elevation,
+                backgroundColor: backgroundColor,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
+                showLabels: showLabels,
+                showIcons: showIcons,
+                centerItems: centerItems,
                 items: items,
                 onItemTap: (index) =>
                     _navigateToPageFallback(context, index, isAuthenticated),
@@ -1359,7 +1666,7 @@ NavbarItem _buildNavbarItemFromModel(
       value: wishlistCount,
       filledIcon: filledIcon,
       emptyIcon: emptyIcon,
-      filledColor: OsmeaColors.nordicBlue,
+      filledColor: OsmeaColors.black,
     );
   } else {
     // Standard icon
@@ -1434,7 +1741,7 @@ List<NavbarItem> _buildFallbackNavbarItems(
         value: wishlistCount,
         filledIcon: Icons.favorite,
         emptyIcon: Icons.favorite_outline,
-        filledColor: OsmeaColors.nordicBlue,
+        filledColor: OsmeaColors.black,
       ),
       onTap: () => context.go('/saved'),
       tooltip: 'Saved Items',
@@ -1547,7 +1854,11 @@ void _navigateToPage(BuildContext context, int index, bool isAuthenticated) {
 }
 
 /// Fallback navigation if config fails
-void _navigateToPageFallback(BuildContext context, int index, bool isAuthenticated) {
+void _navigateToPageFallback(
+  BuildContext context,
+  int index,
+  bool isAuthenticated,
+) {
   switch (index) {
     case 0: // Home
       context.go('/home');
@@ -1598,7 +1909,7 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
-    
+
     // Request focus after the frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && widget.searchFocusNode.canRequestFocus) {

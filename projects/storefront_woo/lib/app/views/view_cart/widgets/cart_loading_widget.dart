@@ -17,7 +17,7 @@ class CartLoadingWidget extends StatelessWidget {
       child: OsmeaComponents.loading(
         type: LoadingType.circularFade,
         size: context.iconSizeLarge,
-        color: OsmeaColors.nordicBlue,
+        color: OsmeaColors.black,
       ),
     );
   }

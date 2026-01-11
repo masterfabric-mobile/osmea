@@ -106,7 +106,7 @@ class ProductCardWidget extends StatelessWidget {
                               child: CircularProgressIndicator(
                                 strokeWidth: context.width2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  OsmeaColors.nordicBlue,
+                                  _getLoadingIndicatorColor(context),
                                 ),
                               ),
                             );
@@ -135,13 +135,13 @@ class ProductCardWidget extends StatelessWidget {
                         vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
-                        color: OsmeaColors.nordicBlue,
+                        color: _getDiscountBadgeBackgroundColor(context),
                         borderRadius: BorderRadius.circular(context.spacing6),
                       ),
                       child: OsmeaComponents.text(
                         '$discountPct% OFF',
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.white,
+                          color: _getDiscountBadgeTextColor(context),
                           fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                         ),
@@ -169,8 +169,8 @@ class ProductCardWidget extends StatelessWidget {
                         isSaved ? Icons.favorite : Icons.favorite_border,
                         size: context.iconSizeExtraSmall,
                         color: isSaved
-                            ? OsmeaColors.nordicBlue
-                            : OsmeaColors.thunder,
+                            ? _getWishlistIconSavedColor(context)
+                            : _getWishlistIconUnsavedColor(context),
                       ),
                     ),
                   ),
@@ -200,7 +200,7 @@ class ProductCardWidget extends StatelessWidget {
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                           fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                           fontWeight: FontWeight.w700,
-                          color: OsmeaColors.nordicBlue,
+                          color: _getSalePriceColor(context),
                         ),
                       ),
                       OsmeaComponents.sizedBox(width: context.spacing6),
@@ -232,7 +232,7 @@ class ProductCardWidget extends StatelessWidget {
                     textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                       fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                       fontWeight: FontWeight.w700,
-                      color: OsmeaColors.thunder,
+                      color: _getRegularPriceColor(context),
                     ),
                   ),
                 ],
@@ -244,7 +244,7 @@ class ProductCardWidget extends StatelessWidget {
                     fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
                     fontWeight: FontWeight.w500,
                     height: 1.14,
-                    color: OsmeaColors.thunder,
+                    color: _getProductNameColor(context),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -259,7 +259,7 @@ class ProductCardWidget extends StatelessWidget {
                       fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
                       height: 1.2,
-                      color: OsmeaColors.pewter,
+                      color: _getDescriptionColor(context),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -308,5 +308,128 @@ class ProductCardWidget extends StatelessWidget {
   /// Strips HTML tags from description
   String _stripHtml(String input) {
     return input.replaceAll(RegExp(r'<[^>]*>'), '');
+  }
+
+  /// Gets loading indicator color from config
+  Color _getLoadingIndicatorColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.loading_indicator_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets discount badge background color from config
+  Color _getDiscountBadgeBackgroundColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.discount_badge_background',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets discount badge text color from config
+  Color _getDiscountBadgeTextColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.discount_badge_text_color',
+        '#FFFFFF',
+      ),
+    );
+  }
+
+  /// Gets wishlist icon saved color from config
+  Color _getWishlistIconSavedColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.wishlist_icon_saved_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets wishlist icon unsaved color from config
+  Color _getWishlistIconUnsavedColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.wishlist_icon_unsaved_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets sale price color from config
+  Color _getSalePriceColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.sale_price_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets regular price color from config
+  Color _getRegularPriceColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.regular_price_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets product name color from config
+  Color _getProductNameColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.product_name_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets description color from config
+  Color _getDescriptionColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'product_list_view.product_card.description_color',
+        '#666666',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
   }
 }

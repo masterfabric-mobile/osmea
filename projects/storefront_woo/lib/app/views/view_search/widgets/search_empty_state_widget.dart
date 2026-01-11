@@ -202,7 +202,27 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      // Use LoadingView from core instead of CircularProgressIndicator
+      return LoadingView(
+        goRoute: (String path) {
+          if (path.contains('home')) {
+            context.go('/home');
+          } else if (path.contains('product-detail')) {
+            context.go('/product-detail');
+          } else {
+            context.go('/search');
+          }
+        },
+        loadingType: LoadingModelType.networkRequest,
+        loadingSteps: [
+          'Loading categories...',
+          'Loading brands...',
+          'Almost ready...',
+        ],
+        stepDuration: const Duration(milliseconds: 500),
+        showProgress: true,
+        showCancelButton: false,
+      );
     }
 
     if (_error != null) {
@@ -212,13 +232,13 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           child: Column(
             mainAxisAlignment: context.centerMain,
             children: [
-              Icon(Icons.error_outline, size: 64, color: OsmeaColors.pewter),
+              Icon(Icons.error_outline, size: 64, color: OsmeaColors.black),
               SizedBox(height: context.spacing16),
               OsmeaComponents.text(
                 _error!,
                 textStyle: OsmeaTextStyle.bodyMedium(
                   context,
-                ).copyWith(color: OsmeaColors.pewter),
+                ).copyWith(color: OsmeaColors.black),
               ),
               SizedBox(height: context.spacing16),
               OsmeaComponents.button(
@@ -327,13 +347,13 @@ class _BrandCard extends StatelessWidget {
               height: circleSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: OsmeaColors.nordicBlue, width: 2),
+                border: Border.all(color: OsmeaColors.black, width: 2),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    OsmeaColors.nordicBlue,
-                    OsmeaColors.nordicBlue.withOpacity(0.7),
+                    OsmeaColors.black,
+                    OsmeaColors.black.withOpacity(0.7),
                   ],
                 ),
               ),
@@ -361,7 +381,7 @@ class _BrandCard extends StatelessWidget {
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
                 fontWeight: FontWeight.w500,
-                color: OsmeaColors.thunder,
+                color: OsmeaColors.black,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -377,11 +397,11 @@ class _BrandCard extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      color: OsmeaColors.pewter,
+      color: OsmeaColors.black,
       child: Icon(
         Icons.branding_watermark,
         size: size * 0.5,
-        color: OsmeaColors.thunder,
+        color: OsmeaColors.black,
       ),
     );
   }
@@ -435,7 +455,7 @@ class _CategoryCard extends StatelessWidget {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                OsmeaColors.nordicBlue,
+                                OsmeaColors.black,
                               ),
                             ),
                           ),

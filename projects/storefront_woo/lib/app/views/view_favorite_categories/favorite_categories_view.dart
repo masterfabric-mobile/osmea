@@ -26,25 +26,7 @@ class FavoriteCategoriesView
          appBarPadding: const AppBarPaddingVisibility.disabled(),
          navbarSpacer: const SpacerVisibility.disabled(),
          footerSpacer: const SpacerVisibility.disabled(),
-         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-           title: OsmeaComponents.text(
-             'Favorite Categories',
-             variant: OsmeaTextVariant.headlineMedium,
-             color: OsmeaColors.black,
-             fontWeight: FontWeight.w600,
-           ),
-           backgroundColor: OsmeaColors.white,
-           foregroundColor: OsmeaColors.black,
-           elevation: 0,
-           surfaceTintColor: OsmeaColors.transparent,
-           shadowColor: OsmeaColors.transparent,
-           leading: OsmeaComponents.iconButton(
-             icon: Icon(Icons.arrow_back_ios_new, color: OsmeaColors.black),
-             onPressed: () => Navigator.of(context).maybePop(),
-             backgroundColor: OsmeaColors.transparent,
-           ),
-           centerTitle: false,
-         ),
+         coreAppBar: (context, viewModel) => _buildAppBar(context),
        );
 
   @override
@@ -53,6 +35,55 @@ class FavoriteCategoriesView
     BuildContext context,
   ) {
     viewModel.initial();
+  }
+
+  /// Build app bar with config colors
+  static PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    
+    Color getColor(String key, Color fallback) {
+      try {
+        final colorString = configHelper.getString('favorite_categories_view_configuration.app_bar.$key');
+        if (colorString.isNotEmpty && colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            return Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            return Color(int.parse(hexString, radix: 16));
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to load app bar color $key: $e');
+      }
+      return fallback;
+    }
+    
+    final title = configHelper.getString('favorite_categories_view_configuration.app_bar.title', 'Favorite Categories');
+    final backgroundColor = getColor('backgroundColor', OsmeaColors.white);
+    final foregroundColor = getColor('foregroundColor', OsmeaColors.black);
+    final titleColor = getColor('titleColor', OsmeaColors.black);
+    final iconColor = getColor('iconColor', OsmeaColors.black);
+    final elevation = configHelper.getDouble('favorite_categories_view_configuration.app_bar.elevation', 0.0);
+    
+    return OsmeaComponents.appBar(
+      title: OsmeaComponents.text(
+        title,
+        variant: OsmeaTextVariant.headlineMedium,
+        color: titleColor,
+        fontWeight: FontWeight.w600,
+      ),
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      elevation: elevation,
+      surfaceTintColor: OsmeaColors.transparent,
+      shadowColor: OsmeaColors.transparent,
+      leading: OsmeaComponents.iconButton(
+        icon: Icon(Icons.arrow_back_ios_new, color: iconColor),
+        onPressed: () => Navigator.of(context).maybePop(),
+        backgroundColor: OsmeaColors.transparent,
+      ),
+      centerTitle: false,
+    );
   }
 
   @override
@@ -88,16 +119,24 @@ class FavoriteCategoriesView
         return const SizedBox.shrink();
       }
 
+      final configHelper = AssetConfigHelper();
+      final gridConfig = configHelper.getObject('favorite_categories_view_configuration.grid');
+      final crossAxisCount = (gridConfig?['crossAxisCount'] as num?)?.toInt() ?? 2;
+      final crossAxisSpacing = (gridConfig?['crossAxisSpacing'] as num?)?.toDouble() ?? 12.0;
+      final mainAxisSpacing = (gridConfig?['mainAxisSpacing'] as num?)?.toDouble() ?? 12.0;
+      final childAspectRatio = (gridConfig?['childAspectRatio'] as num?)?.toDouble() ?? 0.85;
+      final padding = (gridConfig?['padding'] as num?)?.toDouble() ?? 16.0;
+      
       return SingleChildScrollView(
-        padding: EdgeInsets.all(context.spacing16),
+        padding: EdgeInsets.all(padding),
         child: GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: context.spacing12,
-            mainAxisSpacing: context.spacing12,
-            childAspectRatio: 0.85,
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: crossAxisSpacing,
+            mainAxisSpacing: mainAxisSpacing,
+            childAspectRatio: childAspectRatio,
           ),
           itemCount: state.categories.length,
           itemBuilder: (context, index) {
@@ -114,22 +153,50 @@ class FavoriteCategoriesView
     return UnifiedLoadingWidget(goRoute: goRoute);
   }
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('favorite_categories_view_configuration.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load color $key: $e');
+    }
+    return fallback;
+  }
+
   Widget _buildCategoryCard(
     BuildContext context,
     FavoriteCategory category,
     FavoriteCategoriesViewModel viewModel,
   ) {
+    final configHelper = AssetConfigHelper();
     final imageUrl = category.imageUrl;
     final categoryName = category.name;
+    
+    // Get card config
+    final cardConfig = configHelper.getObject('favorite_categories_view_configuration.category_card');
+    final borderRadius = (cardConfig?['borderRadius'] as num?)?.toDouble() ?? 16.0;
+    final shadowColor = _getColorFromConfig('category_card.shadowColor', OsmeaColors.black);
+    final shadowOpacity = (cardConfig?['shadowOpacity'] as num?)?.toDouble() ?? 0.05;
+    final shadowBlur = (cardConfig?['shadowBlur'] as num?)?.toDouble() ?? 8.0;
+    final shadowOffset = (cardConfig?['shadowOffset'] as num?)?.toDouble() ?? 2.0;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: shadowColor.withOpacity(shadowOpacity),
+            blurRadius: shadowBlur,
+            offset: Offset(0, shadowOffset),
           ),
         ],
       ),
@@ -139,9 +206,9 @@ class FavoriteCategoriesView
           onTap: () {
             goRoute('/products?category_id=${category.id}');
           },
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(borderRadius),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(borderRadius),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -154,109 +221,15 @@ class FavoriteCategoriesView
                         fit: BoxFit.cover,
                         variant: ImageVariant.normal,
                         errorWidget: _buildImagePlaceholder(context),
-                        placeholder: Container(
-                          color: Colors.grey.shade100,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                OsmeaColors.nordicBlue,
-                              ),
-                            ),
-                          ),
-                        ),
+                        placeholder: _buildLoadingPlaceholder(context),
                       )
                     : _buildImagePlaceholder(context),
                 // Gradient overlay from bottom - darker
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.85),
-                          Colors.black.withOpacity(0.65),
-                          Colors.black.withOpacity(0.3),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.3, 0.7, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildGradientOverlay(context),
                 // Category name on gradient
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Padding(
-                    padding: EdgeInsets.all(context.spacing12),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: OsmeaComponents.text(
-                        categoryName,
-                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
+                _buildCategoryName(context, categoryName),
                 // Favorite button overlay
-                Positioned(
-                  top: context.spacing8,
-                  right: context.spacing8,
-                  child: Material(
-                    color: Colors.white,
-                    shape: const CircleBorder(),
-                    elevation: 2,
-                    child: InkWell(
-                      onTap: () {
-                        viewModel.removeFavorite(category.id);
-                        context.showSnackbar(
-                          title: 'Removed from favorites',
-                          message: 'Category was removed from your favorites',
-                          type: SnackbarType.error,
-                          style: SnackbarStyle.minimal,
-                          position: SnackbarPosition.bottom,
-                          animation: SnackbarAnimation.slide,
-                          actionLabel: 'Undo',
-                          onAction: () => viewModel.toggleFavorite(
-                            category.id,
-                            category.name,
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        padding: const EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.favorite,
-                          color: OsmeaColors.nordicBlue,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                _buildFavoriteButton(context, category, viewModel),
               ],
             ),
           ),
@@ -265,7 +238,215 @@ class FavoriteCategoriesView
     );
   }
 
+  /// Build loading placeholder
+  Widget _buildLoadingPlaceholder(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final loadingConfig = configHelper.getObject('favorite_categories_view_configuration.category_card.loading_indicator');
+    final loadingColor = _getColorFromConfig('category_card.loading_indicator.color', OsmeaColors.black);
+    final strokeWidth = (loadingConfig?['strokeWidth'] as num?)?.toDouble() ?? 2.0;
+    
+    return Container(
+      color: Colors.grey.shade100,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: strokeWidth,
+          valueColor: AlwaysStoppedAnimation<Color>(loadingColor),
+        ),
+      ),
+    );
+  }
+
+  /// Build gradient overlay
+  Widget _buildGradientOverlay(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final gradientConfig = configHelper.getObject('favorite_categories_view_configuration.category_card.gradient_overlay');
+    final enabled = gradientConfig?['enabled'] as bool? ?? true;
+    
+    if (!enabled) {
+      return const SizedBox.shrink();
+    }
+    
+    final height = (gradientConfig?['height'] as num?)?.toDouble() ?? 120.0;
+    final colorsList = gradientConfig?['colors'] as List<dynamic>?;
+    final stopsList = gradientConfig?['stops'] as List<dynamic>?;
+    
+    List<Color> gradientColors = [
+      Colors.black.withOpacity(0.85),
+      Colors.black.withOpacity(0.65),
+      Colors.black.withOpacity(0.3),
+      Colors.transparent,
+    ];
+    
+    List<double> gradientStops = const [0.0, 0.3, 0.7, 1.0];
+    
+    if (colorsList != null && colorsList.isNotEmpty) {
+      gradientColors = colorsList.map((colorMap) {
+        final colorString = colorMap['color'] as String? ?? '#000000';
+        final opacity = (colorMap['opacity'] as num?)?.toDouble() ?? 1.0;
+        Color baseColor = Colors.black;
+        if (colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            baseColor = Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            baseColor = Color(int.parse(hexString, radix: 16));
+          }
+        }
+        return baseColor.withOpacity(opacity);
+      }).toList();
+    }
+    
+    if (stopsList != null && stopsList.isNotEmpty) {
+      gradientStops = stopsList.map((stop) => (stop as num).toDouble()).toList();
+    }
+    
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: gradientColors,
+            stops: gradientStops,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build category name
+  Widget _buildCategoryName(BuildContext context, String categoryName) {
+    final configHelper = AssetConfigHelper();
+    final nameConfig = configHelper.getObject('favorite_categories_view_configuration.category_card.category_name');
+    final nameColor = _getColorFromConfig('category_card.category_name.color', OsmeaColors.white);
+    final shadowColor = _getColorFromConfig('category_card.category_name.shadowColor', OsmeaColors.black);
+    final shadowOpacity = (nameConfig?['shadowOpacity'] as num?)?.toDouble() ?? 0.3;
+    final shadowBlur = (nameConfig?['shadowBlur'] as num?)?.toDouble() ?? 4.0;
+    final shadowOffset = (nameConfig?['shadowOffset'] as num?)?.toDouble() ?? 1.0;
+    final fontWeight = (nameConfig?['fontWeight'] as num?)?.toInt() ?? 600;
+    final fontSize = (nameConfig?['fontSize'] as num?)?.toDouble() ?? 14.0;
+    final maxLines = (nameConfig?['maxLines'] as num?)?.toInt() ?? 2;
+    
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Padding(
+        padding: EdgeInsets.all(context.spacing12),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: OsmeaComponents.text(
+            categoryName,
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+              color: nameColor,
+              fontWeight: FontWeight.values.firstWhere(
+                (w) => w.value == fontWeight,
+                orElse: () => FontWeight.w600,
+              ),
+              fontSize: fontSize,
+              shadows: [
+                Shadow(
+                  color: shadowColor.withOpacity(shadowOpacity),
+                  blurRadius: shadowBlur,
+                  offset: Offset(0, shadowOffset),
+                ),
+              ],
+            ),
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build favorite button
+  Widget _buildFavoriteButton(
+    BuildContext context,
+    FavoriteCategory category,
+    FavoriteCategoriesViewModel viewModel,
+  ) {
+    final configHelper = AssetConfigHelper();
+    final buttonConfig = configHelper.getObject('favorite_categories_view_configuration.category_card.favorite_button');
+    final buttonBgColor = _getColorFromConfig('category_card.favorite_button.backgroundColor', OsmeaColors.white);
+    final buttonIconColor = _getColorFromConfig('category_card.favorite_button.iconColor', OsmeaColors.black);
+    final buttonSize = (buttonConfig?['size'] as num?)?.toDouble() ?? 36.0;
+    final elevation = (buttonConfig?['elevation'] as num?)?.toDouble() ?? 2.0;
+    
+    return Positioned(
+      top: context.spacing8,
+      right: context.spacing8,
+      child: Material(
+        color: buttonBgColor,
+        shape: const CircleBorder(),
+        elevation: elevation,
+        child: InkWell(
+          onTap: () {
+            viewModel.removeFavorite(category.id);
+            context.showSnackbar(
+              title: 'Removed from favorites',
+              message: 'Category was removed from your favorites',
+              type: SnackbarType.error,
+              style: SnackbarStyle.minimal,
+              position: SnackbarPosition.bottom,
+              animation: SnackbarAnimation.slide,
+              actionLabel: 'Undo',
+              onAction: () => viewModel.toggleFavorite(
+                category.id,
+                category.name,
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: buttonSize,
+            height: buttonSize,
+            padding: const EdgeInsets.all(8),
+            child: Icon(
+              Icons.favorite,
+              color: buttonIconColor,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildImagePlaceholder(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final placeholderConfig = configHelper.getObject('favorite_categories_view_configuration.category_card.placeholder');
+    
+    Color getColor(String colorString, Color fallback) {
+      if (colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+      return fallback;
+    }
+    
+    final gradientStart = getColor(
+      placeholderConfig?['gradient_start'] as String? ?? '#F5F5F5',
+      Colors.grey.shade100,
+    );
+    final gradientEnd = getColor(
+      placeholderConfig?['gradient_end'] as String? ?? '#E0E0E0',
+      Colors.grey.shade200,
+    );
+    final iconColor = getColor(
+      placeholderConfig?['iconColor'] as String? ?? '#BDBDBD',
+      Colors.grey.shade400,
+    );
+    final iconSize = (placeholderConfig?['iconSize'] as num?)?.toDouble() ?? 48.0;
+    
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -273,14 +454,14 @@ class FavoriteCategoriesView
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.grey.shade100, Colors.grey.shade200],
+          colors: [gradientStart, gradientEnd],
         ),
       ),
       child: Center(
         child: Icon(
           Icons.category_outlined,
-          color: Colors.grey.shade400,
-          size: 48,
+          color: iconColor,
+          size: iconSize,
         ),
       ),
     );

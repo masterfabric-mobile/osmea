@@ -319,7 +319,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
           // iOS-styled pull-to-refresh
           RefreshIndicator(
             onRefresh: _handleRefresh,
-            color: OsmeaColors.nordicBlue,
+            color: OsmeaColors.black,
             backgroundColor: OsmeaColors.white,
             strokeWidth: 2.0,
             displacement: 40,

@@ -95,7 +95,7 @@ class _CartContentWidgetState extends State<CartContentWidget> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
                 child: Container(
-                  color: OsmeaColors.white.withValues(alpha: 0.3),
+                  color: _getBlurOverlayColor(context),
                 ),
               ),
             ),
@@ -138,7 +138,7 @@ class _CartContentWidgetState extends State<CartContentWidget> {
             OsmeaComponents.container(
               margin: EdgeInsets.symmetric(horizontal: context.spacing16),
               height: context.height1,
-              color: OsmeaColors.grayMaterial[200],
+              color: _getSeparatorColor(context),
             ),
         ],
       );
@@ -184,3 +184,57 @@ class _BottomWidgetMeasurerState extends State<_BottomWidgetMeasurer> {
   }
 }
 
+/// Helper methods for cart content widget
+extension _CartContentWidgetHelpers on _CartContentWidgetState {
+  /// Gets blur overlay color from config
+  Color _getBlurOverlayColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'cart_view_configuration.loading_overlay.background_color',
+      '#FFFFFF',
+    );
+    return _parseColor(colorString).withValues(alpha: 0.3);
+  }
+
+  /// Gets separator color from config
+  Color _getSeparatorColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.separator_color',
+        '#E5E5E5',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      // Remove # if present
+      String hex = colorString.replaceAll('#', '');
+      
+      // Handle ARGB format (8 characters)
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      
+      // Handle RGB format (6 characters)
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      
+      // Fallback to gray
+      return OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter;
+    }
+  }
+}

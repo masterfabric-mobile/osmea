@@ -121,6 +121,9 @@ class _SummaryRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final discountColor = _getDiscountColor(context);
+    final totalAmountColor = _getTotalAmountColor(context);
+    
     return OsmeaComponents.row(
       mainAxisAlignment: context.spaceBetween,
       crossAxisAlignment: context.crossCenter,
@@ -135,7 +138,7 @@ class _SummaryRowWidget extends StatelessWidget {
               : OsmeaTextStyle.bodyMedium(context).copyWith(
                   fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w500,
                   color: isDiscount
-                      ? OsmeaColors.nordicBlue
+                      ? discountColor
                       : isSecondary
                           ? OsmeaColors.pewter
                           : OsmeaColors.thunder,
@@ -146,12 +149,12 @@ class _SummaryRowWidget extends StatelessWidget {
           textStyle: isPrimary
               ? OsmeaTextStyle.titleMedium(context).copyWith(
                   fontWeight: FontWeight.w700,
-                  color: OsmeaColors.nordicBlue,
+                  color: totalAmountColor,
                 )
               : isDiscount
                   ? OsmeaTextStyle.bodyMedium(context).copyWith(
                       fontWeight: FontWeight.w700,
-                      color: OsmeaColors.nordicBlue,
+                      color: discountColor,
                     )
                   : OsmeaTextStyle.bodySmall(context).copyWith(
                       fontWeight: FontWeight.w500,
@@ -164,6 +167,52 @@ class _SummaryRowWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Gets discount color from config
+  Color _getDiscountColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.order_summary.discount_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets total amount color from config
+  Color _getTotalAmountColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.order_summary.total_amount_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
   }
 }
 

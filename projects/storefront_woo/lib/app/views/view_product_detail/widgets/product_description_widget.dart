@@ -40,7 +40,7 @@ class ProductDescriptionWidget extends StatelessWidget {
             textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
               fontWeight: FontWeight.w600,
               letterSpacing: 1.0,
-              color: OsmeaColors.thunder.withValues(alpha: 0.8),
+              color: OsmeaColors.black,
             ),
           ),
           OsmeaComponents.sizedBox(height: context.spacing4),

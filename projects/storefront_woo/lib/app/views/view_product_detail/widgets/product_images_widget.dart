@@ -29,6 +29,33 @@ class ProductImagesWidget extends StatelessWidget {
     this.productName,
   });
 
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString('product_detail_view.images.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load images color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Get wishlist icon color
+  Color _getWishlistIconColor(bool isInWishlist) {
+    if (isInWishlist) {
+      return _getColorFromConfig('wishlistIconColor', OsmeaColors.black);
+    }
+    return OsmeaColors.grayMaterial[400]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (imageUrls.isEmpty) {
@@ -40,7 +67,7 @@ class ProductImagesWidget extends StatelessWidget {
           child: Icon(
             Icons.image,
             size: context.iconSizeExtraHigh * 2.5,
-            color: OsmeaColors.pewter.withOpacity(context.alpha30),
+            color: OsmeaColors.grayMaterial[300]!,
           ),
         ),
       );
@@ -83,7 +110,7 @@ class ProductImagesWidget extends StatelessWidget {
                     child: Icon(
                       Icons.image,
                       size: context.iconSizeExtraHigh * 2.5,
-                      color: OsmeaColors.pewter.withOpacity(context.alpha30),
+                      color: OsmeaColors.grayMaterial[300]!,
                     ),
                   ),
                 ),
@@ -93,7 +120,7 @@ class ProductImagesWidget extends StatelessWidget {
                     child: Icon(
                       Icons.broken_image,
                       size: context.iconSizeExtraHigh * 2.5,
-                      color: OsmeaColors.pewter.withOpacity(context.alpha30),
+                      color: OsmeaColors.grayMaterial[300]!,
                     ),
                   ),
                 ),
@@ -121,9 +148,7 @@ class ProductImagesWidget extends StatelessWidget {
                 OsmeaComponents.iconButton(
                   icon: Icon(
                     isInWishlist ? Icons.favorite : Icons.favorite_outline,
-                    color: isInWishlist
-                        ? OsmeaColors.nordicBlue
-                        : OsmeaColors.thunder,
+                    color: _getWishlistIconColor(isInWishlist),
                   ),
                   size: ButtonSize.medium,
                   variant: ButtonVariant.ghost,

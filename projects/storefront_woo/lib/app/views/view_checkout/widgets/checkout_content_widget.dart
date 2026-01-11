@@ -26,6 +26,25 @@ class CheckoutContentWidget extends StatefulWidget {
 
 class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   final _formKey = GlobalKey<FormState>();
+  final _configHelper = AssetConfigHelper();
+
+  /// Get color from config
+  Color _getColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = _configHelper.getString('checkout_view_configuration.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load color $key: $e');
+    }
+    return fallback;
+  }
 
   final _billingFirstNameController = TextEditingController();
   final _billingLastNameController = TextEditingController();
@@ -427,10 +446,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           OsmeaComponents.container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: OsmeaColors.nordicBlue.withOpacity(0.1),
+              color: _getColorFromConfig('section_header.icon_background_color', OsmeaColors.black).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: OsmeaColors.nordicBlue, size: 20),
+            child: Icon(icon, color: _getColorFromConfig('section_header.icon_color', OsmeaColors.black), size: 20),
           ),
           OsmeaComponents.sizedBox(width: 12),
           OsmeaComponents.text(
@@ -438,7 +457,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             textStyle: OsmeaTextStyle.titleMedium(
               context,
             ).copyWith(fontWeight: FontWeight.w600),
-            color: OsmeaColors.thunder,
+            color: _getColorFromConfig('section_header.title_color', OsmeaColors.black),
           ),
         ],
       ),
@@ -574,12 +593,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       margin: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: 8),
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue.withOpacity(0.05),
+        color: _getColorFromConfig('form_fields.input_background_color', OsmeaColors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _sameAsBilling
-              ? OsmeaColors.nordicBlue
-              : OsmeaColors.silver.withOpacity(0.3),
+              ? _getColorFromConfig('form_fields.input_focused_border_color', OsmeaColors.black)
+              : _getColorFromConfig('form_fields.input_border_color', OsmeaColors.silver).withOpacity(0.3),
           width: 1.5,
         ),
       ),
@@ -598,8 +617,8 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             Icon(
               _sameAsBilling ? Icons.check_box : Icons.check_box_outline_blank,
               color: _sameAsBilling
-                  ? OsmeaColors.nordicBlue
-                  : OsmeaColors.pewter,
+                  ? _getColorFromConfig('form_fields.input_focused_border_color', OsmeaColors.black)
+                  : _getColorFromConfig('form_fields.input_hint_color', OsmeaColors.grayMaterial[400]!),
               size: 24,
             ),
             OsmeaComponents.sizedBox(width: 12),
@@ -608,7 +627,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
               textStyle: OsmeaTextStyle.bodyMedium(
                 context,
               ).copyWith(fontWeight: FontWeight.w500),
-              color: OsmeaColors.thunder,
+              color: _getColorFromConfig('form_fields.label_color', OsmeaColors.black),
             ),
           ],
         ),
@@ -781,34 +800,34 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       decoration: InputDecoration(
         labelText: hint,
         labelStyle: OsmeaTextStyle.bodySmall(currentContext).copyWith(
-          color: OsmeaColors.pewter,
+          color: _getColorFromConfig('form_fields.input_hint_color', OsmeaColors.grayMaterial[400]!),
         ),
         floatingLabelStyle: OsmeaTextStyle.bodySmall(currentContext).copyWith(
-          color: OsmeaColors.nordicBlue,
+          color: _getColorFromConfig('form_fields.input_focused_border_color', OsmeaColors.black),
         ),
-        prefixIcon: Icon(icon, color: OsmeaColors.nordicBlue, size: 20),
+        prefixIcon: Icon(icon, color: _getColorFromConfig('form_fields.prefix_icon_color', OsmeaColors.black), size: 20),
         filled: true,
-        fillColor: OsmeaColors.paperWhite,
+        fillColor: _getColorFromConfig('form_fields.input_background_color', OsmeaColors.white),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.silver.withOpacity(0.3)),
+          borderSide: BorderSide(color: _getColorFromConfig('form_fields.input_border_color', OsmeaColors.silver).withOpacity(0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.silver.withOpacity(0.3)),
+          borderSide: BorderSide(color: _getColorFromConfig('form_fields.input_border_color', OsmeaColors.silver).withOpacity(0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.nordicBlue, width: 1.5),
+          borderSide: BorderSide(color: _getColorFromConfig('form_fields.input_focused_border_color', OsmeaColors.black), width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.amberFlame, width: 1.5),
+          borderSide: BorderSide(color: _getColorFromConfig('form_fields.input_error_border_color', OsmeaColors.black), width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: OsmeaColors.amberFlame, width: 1.5),
+          borderSide: BorderSide(color: _getColorFromConfig('form_fields.input_error_border_color', OsmeaColors.black), width: 1.5),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -830,15 +849,15 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            OsmeaColors.nordicBlue.withOpacity(0.05),
-            OsmeaColors.nordicBlue.withOpacity(0.02),
+            _getColorFromConfig('order_summary.total_background_start', OsmeaColors.black).withOpacity(0.05),
+            _getColorFromConfig('order_summary.total_background_end', OsmeaColors.black).withOpacity(0.02),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: OsmeaColors.nordicBlue.withOpacity(0.2),
+          color: _getColorFromConfig('order_summary.border_color', OsmeaColors.silver).withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -851,7 +870,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
               OsmeaComponents.text(
                 'Order Total',
                 textStyle: OsmeaTextStyle.bodyMedium(context),
-                color: OsmeaColors.pewter,
+                color: _getColorFromConfig('order_summary.label_color', OsmeaColors.grayMaterial[400]!),
               ),
               OsmeaComponents.sizedBox(height: 4),
               OsmeaComponents.text(
@@ -859,19 +878,19 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 textStyle: OsmeaTextStyle.headlineSmall(
                   context,
                 ).copyWith(fontWeight: FontWeight.bold),
-                color: OsmeaColors.nordicBlue,
+                color: _getColorFromConfig('order_summary.total_amount_color', OsmeaColors.black),
               ),
             ],
           ),
           OsmeaComponents.container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: OsmeaColors.nordicBlue.withOpacity(0.1),
+              color: _getColorFromConfig('order_summary.total_background_start', OsmeaColors.black).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.shopping_bag_outlined,
-              color: OsmeaColors.nordicBlue,
+              color: _getColorFromConfig('order_summary.total_amount_color', OsmeaColors.black),
               size: 28,
             ),
           ),
@@ -889,10 +908,10 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           OsmeaComponents.container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: OsmeaColors.paperWhite,
+              color: _getColorFromConfig('order_summary.background_color', OsmeaColors.white),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: OsmeaColors.nordicBlue.withOpacity(0.3),
+                color: _getColorFromConfig('order_summary.border_color', OsmeaColors.silver).withOpacity(0.3),
                 width: 1.5,
               ),
             ),
@@ -901,12 +920,12 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 OsmeaComponents.container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: OsmeaColors.nordicBlue.withOpacity(0.1),
+                    color: _getColorFromConfig('order_summary.total_background_start', OsmeaColors.black).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     Icons.account_balance,
-                    color: OsmeaColors.nordicBlue,
+                    color: _getColorFromConfig('order_summary.total_amount_color', OsmeaColors.black),
                     size: 24,
                   ),
                 ),
@@ -920,20 +939,20 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                         textStyle: OsmeaTextStyle.bodyLarge(
                           context,
                         ).copyWith(fontWeight: FontWeight.w600),
-                        color: OsmeaColors.thunder,
+                        color: _getColorFromConfig('form_fields.label_color', OsmeaColors.black),
                       ),
                       OsmeaComponents.sizedBox(height: 2),
                       OsmeaComponents.text(
                         'Havale/EFT',
                         textStyle: OsmeaTextStyle.bodySmall(context),
-                        color: OsmeaColors.pewter,
+                        color: _getColorFromConfig('form_fields.helper_text_color', OsmeaColors.grayMaterial[400]!),
                       ),
                     ],
                   ),
                 ),
                 Icon(
                   Icons.check_circle,
-                  color: OsmeaColors.forestHeart,
+                  color: _getColorFromConfig('order_summary.total_amount_color', OsmeaColors.black),
                   size: 24,
                 ),
               ],
@@ -950,11 +969,11 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : () => _handleContinue(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: OsmeaColors.nordicBlue,
-          disabledBackgroundColor: OsmeaColors.pewter.withOpacity(0.3),
+          backgroundColor: _getColorFromConfig('order_summary.button_background_color', OsmeaColors.black),
+          disabledBackgroundColor: _getColorFromConfig('order_summary.button_disabled_background_color', OsmeaColors.grayMaterial[400]!).withOpacity(0.3),
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(_configHelper.getDouble('checkout_view_configuration.order_summary.button_border_radius', 12.0)),
           ),
           elevation: 0,
           shadowColor: Colors.transparent,
@@ -965,7 +984,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                 width: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(_getColorFromConfig('order_summary.button_text_color', OsmeaColors.white)),
                 ),
               )
             : OsmeaComponents.row(
@@ -974,7 +993,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                   OsmeaComponents.text(
                     'Complete Order',
                     textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                      color: OsmeaColors.white,
+                      color: _getColorFromConfig('order_summary.button_text_color', OsmeaColors.white),
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.3,
                     ),
@@ -982,7 +1001,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
                   OsmeaComponents.sizedBox(width: 8),
                   Icon(
                     Icons.arrow_forward_rounded,
-                    color: OsmeaColors.white,
+                    color: _getColorFromConfig('order_summary.button_text_color', OsmeaColors.white),
                     size: 20,
                   ),
                 ],

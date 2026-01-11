@@ -158,17 +158,42 @@ PreferredSizeWidget productDetailCoreAppBar(
   ProductDetailViewModel? viewModel,
   Map<String, dynamic>? arguments,
 ]) {
+  final configHelper = AssetConfigHelper();
+  
+  // Get appBar colors from config
+  Color getAppBarColor(String key, Color fallback) {
+    try {
+      final colorString = configHelper.getString('product_detail_view.appBar.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load appBar color $key: $e');
+    }
+    return fallback;
+  }
+  
+  final backgroundColor = getAppBarColor('backgroundColor', OsmeaColors.white);
+  final titleColor = getAppBarColor('titleColor', OsmeaColors.black);
+  final iconColor = getAppBarColor('iconColor', OsmeaColors.black);
+  final elevation = configHelper.getDouble('product_detail_view.appBar.elevation', 0.0);
+  
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
       'Product Details',
-      color: OsmeaColors.thunder,
+      color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(context),
     ),
-    backgroundColor: OsmeaColors.paperWhite,
-    elevation: 0,
+    backgroundColor: backgroundColor,
+    elevation: elevation,
     leading: OsmeaComponents.iconButton(
       onPressed: () => Navigator.of(context).pop(),
-      icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+      icon: Icon(Icons.arrow_back, color: iconColor),
     ),
     actions: const [], // Cart icon removed
   );

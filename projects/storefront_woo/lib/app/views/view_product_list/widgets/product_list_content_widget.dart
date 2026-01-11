@@ -40,6 +40,7 @@ class ProductListContentWidget extends StatefulWidget {
 class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollToTop = false;
+  final AssetConfigHelper _configHelper = AssetConfigHelper();
 
   @override
   void initState() {
@@ -111,8 +112,14 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             if (_hasChipWorthyFilters())
               OsmeaComponents.padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing20,
-                  vertical: context.spacing12,
+                  horizontal: _configHelper.getDouble(
+                    'product_list_view.component_spacing.horizontal',
+                    context.spacing20,
+                  ),
+                  vertical: _configHelper.getDouble(
+                    'product_list_view.component_spacing.vertical',
+                    context.spacing12,
+                  ),
                 ),
                 child: _buildActiveFilterChips(context),
               ),
@@ -142,10 +149,24 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             bottom: context.spacing24,
             right: context.spacing24,
             child: Material(
-              color: OsmeaColors.nordicBlue,
+              color: _configHelper.getColor(
+                'product_list_view.scroll_to_top.backgroundColor',
+                OsmeaColors.black,
+              ),
               shape: const CircleBorder(),
-              elevation: 8,
-              shadowColor: OsmeaColors.nordicBlue.withOpacity(0.4),
+              elevation: _configHelper.getDouble(
+                'product_list_view.scroll_to_top.elevation',
+                8.0,
+              ),
+              shadowColor: _configHelper.getColor(
+                'product_list_view.scroll_to_top.shadowColor',
+                OsmeaColors.black,
+              ).withOpacity(
+                _configHelper.getDouble(
+                  'product_list_view.scroll_to_top.shadowOpacity',
+                  0.4,
+                ),
+              ),
               child: InkWell(
                 onTap: _scrollToTop,
                 borderRadius: BorderRadius.circular(context.spacing32),
@@ -156,16 +177,38 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: OsmeaColors.nordicBlue.withOpacity(0.3),
-                        blurRadius: context.blurRadius12,
-                        offset: context.offsetVerticalCustom(context.spacing4),
-                        spreadRadius: 1,
+                        color: _configHelper.getColor(
+                          'product_list_view.scroll_to_top.shadowColor',
+                          OsmeaColors.black,
+                        ).withOpacity(
+                          _configHelper.getDouble(
+                            'product_list_view.scroll_to_top.shadowOpacity',
+                            0.3,
+                          ),
+                        ),
+                        blurRadius: _configHelper.getDouble(
+                          'product_list_view.scroll_to_top.shadowBlur',
+                          context.blurRadius12,
+                        ),
+                        offset: context.offsetVerticalCustom(
+                          _configHelper.getDouble(
+                            'product_list_view.scroll_to_top.shadowOffset',
+                            context.spacing4,
+                          ),
+                        ),
+                        spreadRadius: _configHelper.getDouble(
+                          'product_list_view.scroll_to_top.shadowSpread',
+                          1.0,
+                        ),
                       ),
                     ],
                   ),
                   child: Icon(
                     Icons.keyboard_arrow_up,
-                    color: OsmeaColors.white,
+                    color: _configHelper.getColor(
+                      'product_list_view.scroll_to_top.iconColor',
+                      OsmeaColors.white,
+                    ),
                     size: context.iconSizeNormal,
                   ),
                 ),
@@ -182,8 +225,14 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
 
     return OsmeaComponents.padding(
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing20,
-        vertical: context.spacing12,
+        horizontal: _configHelper.getDouble(
+          'product_list_view.component_spacing.horizontal',
+          context.spacing20,
+        ),
+        vertical: _configHelper.getDouble(
+          'product_list_view.component_spacing.vertical',
+          context.spacing12,
+        ),
       ),
       child: OsmeaComponents.row(
         children: [
@@ -197,7 +246,12 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               hasBadge: false,
             ),
           ),
-          OsmeaComponents.sizedBox(width: context.spacing12),
+          OsmeaComponents.sizedBox(
+            width: _configHelper.getDouble(
+              'product_list_view.component_spacing.action_buttons_spacing',
+              context.spacing12,
+            ),
+          ),
           // Filter button
           Expanded(
             child: _buildModernActionButton(
@@ -221,25 +275,74 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     required VoidCallback onPressed,
     required bool hasBadge,
   }) {
+    final backgroundColor = _configHelper.getColor(
+      'product_list_view.action_buttons.backgroundColor',
+      OsmeaColors.white,
+    );
+    final borderColor = _configHelper.getColor(
+      'product_list_view.action_buttons.borderColor',
+      OsmeaColors.silver,
+    );
+    final textColor = _configHelper.getColor(
+      'product_list_view.action_buttons.textColor',
+      OsmeaColors.thunder,
+    );
+    final iconColor = _configHelper.getColor(
+      'product_list_view.action_buttons.iconColor',
+      OsmeaColors.thunder,
+    );
+    final badgeColor = _configHelper.getColor(
+      'product_list_view.action_buttons.badgeColor',
+      OsmeaColors.black,
+    );
+    final badgeBorderColor = _configHelper.getColor(
+      'product_list_view.action_buttons.badgeBorderColor',
+      OsmeaColors.white,
+    );
+    final borderRadius = _configHelper.getDouble(
+      'product_list_view.action_buttons.borderRadius',
+      context.spacing12,
+    );
+    final borderWidth = _configHelper.getDouble(
+      'product_list_view.action_buttons.borderWidth',
+      1.0,
+    );
+    final shadowColor = _configHelper.getColor(
+      'product_list_view.action_buttons.shadowColor',
+      OsmeaColors.black,
+    );
+    final shadowOpacity = _configHelper.getDouble(
+      'product_list_view.action_buttons.shadowOpacity',
+      0.04,
+    );
+    final shadowBlur = _configHelper.getDouble(
+      'product_list_view.action_buttons.shadowBlur',
+      context.blurRadius8,
+    );
+    final shadowOffset = _configHelper.getDouble(
+      'product_list_view.action_buttons.shadowOffset',
+      context.spacing2,
+    );
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(context.spacing12),
+        borderRadius: BorderRadius.circular(borderRadius),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: context.spacing12,
             vertical: context.spacing10,
           ),
           decoration: BoxDecoration(
-            color: OsmeaColors.white,
-            borderRadius: BorderRadius.circular(context.spacing12),
-            border: Border.all(color: OsmeaColors.silver, width: 1),
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(color: borderColor, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: OsmeaColors.black.withOpacity(0.04),
-                blurRadius: context.blurRadius8,
-                offset: context.offsetVerticalCustom(context.spacing2),
+                color: shadowColor.withOpacity(shadowOpacity),
+                blurRadius: shadowBlur,
+                offset: context.offsetVerticalCustom(shadowOffset),
                 spreadRadius: 0,
               ),
             ],
@@ -253,7 +356,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                 children: [
                   Icon(
                     icon,
-                    color: OsmeaColors.thunder,
+                    color: iconColor,
                     size: context.iconSizeNormal,
                   ),
                   if (hasBadge)
@@ -264,10 +367,10 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: OsmeaColors.nordicBlue,
+                          color: badgeColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: OsmeaColors.white,
+                            color: badgeBorderColor,
                             width: 1.5,
                           ),
                         ),
@@ -280,7 +383,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                 label,
                 textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                   fontWeight: FontWeight.w500,
-                  color: OsmeaColors.thunder,
+                  color: textColor,
                 ),
               ),
             ],
@@ -294,29 +397,19 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   void _showSortBottomSheet(BuildContext context) {
     widget.viewModel.resetDialogInit();
 
+    final bottomSheetBgColor = _configHelper.getColor(
+      'product_list_view.bottom_sheet.backgroundColor',
+      OsmeaColors.white,
+    );
+
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.medium,
       title: 'Sort by',
       subtitle: 'Select how you want to sort the products',
-      backgroundColor: OsmeaColors.white,
-      leftAction: OsmeaComponents.button(
-        text: 'Cancel',
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        variant: ButtonVariant.ghost,
-        size: ButtonSize.small,
-      ),
-      rightAction: OsmeaComponents.button(
-        text: 'Apply',
-        onPressed: () {
-          widget.viewModel.applyFilters();
-          Navigator.pop(context);
-        },
-        variant: ButtonVariant.primary,
-        size: ButtonSize.small,
-      ),
+      backgroundColor: bottomSheetBgColor,
+      leftAction: _buildCancelButton(context),
+      rightAction: _buildApplyButton(context),
       child: ProductListFiltersWidget(
         viewModel: widget.viewModel,
         showOnlySort: true,
@@ -330,32 +423,22 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   void _showFiltersBottomSheet(BuildContext context) {
     widget.viewModel.resetDialogInit();
 
+    final bottomSheetBgColor = _configHelper.getColor(
+      'product_list_view.bottom_sheet.backgroundColor',
+      OsmeaColors.white,
+    );
+
     OsmeaBottomSheetHelpers.showModal(
       context: context,
       size: BottomSheetSize.large,
       title: 'Filters',
       subtitle: 'Filter products by categories, price, and more',
-      backgroundColor: OsmeaColors.white,
-      leftAction: OsmeaComponents.button(
-        text: 'Cancel',
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        variant: ButtonVariant.ghost,
-        size: ButtonSize.small,
-      ),
+      backgroundColor: bottomSheetBgColor,
+      leftAction: _buildCancelButton(context),
       rightAction: BlocBuilder<ProductListViewModel, ProductListState>(
         bloc: widget.viewModel,
         builder: (context, state) {
-          return OsmeaComponents.button(
-            text: 'Apply',
-            onPressed: () {
-              widget.viewModel.applyFilters();
-              Navigator.pop(context);
-            },
-            variant: ButtonVariant.primary,
-            size: ButtonSize.small,
-          );
+          return _buildApplyButton(context);
         },
       ),
       child: ProductListFiltersWidget(
@@ -367,8 +450,67 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     });
   }
 
+  /// Builds Apply button with config colors
+  Widget _buildApplyButton(BuildContext context) {
+    final backgroundColor = _configHelper.getColor(
+      'product_list_view.bottom_sheet.apply_button_background',
+      OsmeaColors.black,
+    );
+    final textColor = _configHelper.getColor(
+      'product_list_view.bottom_sheet.apply_button_text_color',
+      OsmeaColors.white,
+    );
+
+    return OsmeaComponents.button(
+      text: 'Apply',
+      onPressed: () {
+        widget.viewModel.applyFilters();
+        Navigator.pop(context);
+      },
+      variant: ButtonVariant.primary,
+      size: ButtonSize.small,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+
+  /// Builds Cancel button with config colors
+  Widget _buildCancelButton(BuildContext context) {
+    final textColor = _configHelper.getColor(
+      'product_list_view.bottom_sheet.cancel_button_text_color',
+      OsmeaColors.black,
+    );
+
+    return OsmeaComponents.button(
+      text: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.small,
+      textColor: textColor,
+    );
+  }
+
   /// Builds empty view using OSMEA components
   Widget _buildEmptyView(BuildContext context) {
+    final iconBgColor = _configHelper.getColor(
+      'product_list_view.empty_view.iconBackgroundColor',
+      OsmeaColors.black,
+    );
+    final iconColor = _configHelper.getColor(
+      'product_list_view.empty_view.iconColor',
+      OsmeaColors.white,
+    );
+    final titleColor = _configHelper.getColor(
+      'product_list_view.empty_view.titleColor',
+      OsmeaColors.thunder,
+    );
+    final descriptionColor = _configHelper.getColor(
+      'product_list_view.empty_view.descriptionColor',
+      OsmeaColors.black,
+    );
+
     return OsmeaComponents.center(
       child: OsmeaComponents.singleChildScrollView(
         child: OsmeaComponents.column(
@@ -379,13 +521,13 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: OsmeaColors.nordicBlue,
+                color: iconBgColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.inventory_2_outlined,
                 size: context.iconSizeExtraHigh,
-                color: OsmeaColors.nordicBlue,
+                color: iconColor,
               ),
             ),
             OsmeaComponents.sizedBox(height: context.spacing16),
@@ -393,7 +535,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               'No products found',
               textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                 fontWeight: FontWeight.w600,
-                color: OsmeaColors.thunder,
+                color: titleColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -402,7 +544,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               'Try adjusting your filters or search terms',
               textStyle: OsmeaTextStyle.bodyMedium(
                 context,
-              ).copyWith(color: OsmeaColors.pewter),
+              ).copyWith(color: descriptionColor),
               textAlign: TextAlign.center,
             ),
             if (widget.viewModel.filters.hasActiveFilters) ...[
@@ -460,17 +602,30 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         );
 
         final categoryName = category.name ?? 'Category $categoryId';
+        final categoryChipBgColor = _configHelper.getColor(
+          'product_list_view.filter_chips.category.backgroundColor',
+          OsmeaColors.black,
+        );
+        final categoryChipTextColor = _configHelper.getColor(
+          'product_list_view.filter_chips.category.textColor',
+          OsmeaColors.white,
+        );
         chips.add(
           OsmeaComponents.padding(
-            padding: EdgeInsets.only(right: context.spacing8),
+            padding: EdgeInsets.only(
+              right: _configHelper.getDouble(
+                'product_list_view.component_spacing.filter_chips_spacing',
+                context.spacing8,
+              ),
+            ),
             child: OsmeaComponents.chips(
               text: categoryName,
               variant: ChipsVariant.primary,
               style: ChipsStyle.normal,
               selected: true,
               closable: true,
-              backgroundColor: OsmeaColors.nordicBlue,
-              textColor: OsmeaColors.white,
+              backgroundColor: categoryChipBgColor,
+              textColor: categoryChipTextColor,
               onClose: () {
                 final newSelectedCategories = List<int>.from(
                   filters.selectedCategories!,
@@ -489,17 +644,30 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     }
 
     if (filters.onSale == true) {
+      final onSaleChipBgColor = _configHelper.getColor(
+        'product_list_view.filter_chips.on_sale.backgroundColor',
+        OsmeaColors.black,
+      );
+      final onSaleChipTextColor = _configHelper.getColor(
+        'product_list_view.filter_chips.on_sale.textColor',
+        OsmeaColors.white,
+      );
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: EdgeInsets.only(
+            right: _configHelper.getDouble(
+              'product_list_view.component_spacing.filter_chips_spacing',
+              context.spacing8,
+            ),
+          ),
           child: OsmeaComponents.chips(
             text: 'On Sale',
             variant: ChipsVariant.primary,
             style: ChipsStyle.normal,
             selected: true,
             closable: true,
-            backgroundColor: OsmeaColors.nordicBlue,
-            textColor: OsmeaColors.white,
+            backgroundColor: onSaleChipBgColor,
+            textColor: onSaleChipTextColor,
             onClose: () {
               widget.viewModel.updateFilter(onSale: null);
             },
@@ -509,15 +677,30 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     }
 
     if (filters.featured == true) {
+      final featuredChipBgColor = _configHelper.getColor(
+        'product_list_view.filter_chips.featured.backgroundColor',
+        OsmeaColors.white,
+      );
+      final featuredChipTextColor = _configHelper.getColor(
+        'product_list_view.filter_chips.featured.textColor',
+        OsmeaColors.thunder,
+      );
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: EdgeInsets.only(
+            right: _configHelper.getDouble(
+              'product_list_view.component_spacing.filter_chips_spacing',
+              context.spacing8,
+            ),
+          ),
           child: OsmeaComponents.chips(
             text: 'Featured',
             variant: ChipsVariant.secondary,
             style: ChipsStyle.normal,
             selected: true,
             closable: true,
+            backgroundColor: featuredChipBgColor,
+            textColor: featuredChipTextColor,
             onClose: () {
               widget.viewModel.updateFilter(featured: null);
             },
@@ -527,15 +710,30 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     }
 
     if (filters.stockStatus != null) {
+      final stockChipBgColor = _configHelper.getColor(
+        'product_list_view.filter_chips.stock_status.backgroundColor',
+        OsmeaColors.white,
+      );
+      final stockChipTextColor = _configHelper.getColor(
+        'product_list_view.filter_chips.stock_status.textColor',
+        OsmeaColors.thunder,
+      );
       chips.add(
         OsmeaComponents.padding(
-          padding: EdgeInsets.only(right: context.spacing8),
+          padding: EdgeInsets.only(
+            right: _configHelper.getDouble(
+              'product_list_view.component_spacing.filter_chips_spacing',
+              context.spacing8,
+            ),
+          ),
           child: OsmeaComponents.chips(
             text: _formatStockStatus(filters.stockStatus!),
             variant: ChipsVariant.info,
             style: ChipsStyle.normal,
             selected: true,
             closable: true,
+            backgroundColor: stockChipBgColor,
+            textColor: stockChipTextColor,
             onClose: () {
               widget.viewModel.updateFilter(stockStatus: null);
             },
@@ -565,20 +763,28 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
           children: [
             ...chips,
             // Clear all button
-            OsmeaComponents.padding(
-              padding: context.onlyLeftPaddingLow,
-              child: OsmeaComponents.chips(
-                text: 'Clear all',
-                variant: ChipsVariant.neutral,
-                style: ChipsStyle.outlined,
-                icon: Icon(
-                  Icons.close,
-                  size: context.iconSizeExtraSmall,
-                  color: OsmeaColors.pewter,
-                ),
-                iconPosition: ChipsIconPosition.start,
-                onTap: () => widget.viewModel.clearFilters(),
-              ),
+            Builder(
+              builder: (context) {
+                final clearAllIconColor = _configHelper.getColor(
+                  'product_list_view.filter_chips.clear_all.iconColor',
+                  OsmeaColors.pewter,
+                );
+                return OsmeaComponents.padding(
+                  padding: context.onlyLeftPaddingLow,
+                  child: OsmeaComponents.chips(
+                    text: 'Clear all',
+                    variant: ChipsVariant.neutral,
+                    style: ChipsStyle.outlined,
+                    icon: Icon(
+                      Icons.close,
+                      size: context.iconSizeExtraSmall,
+                      color: clearAllIconColor,
+                    ),
+                    iconPosition: ChipsIconPosition.start,
+                    onTap: () => widget.viewModel.clearFilters(),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -604,25 +810,51 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   Widget _buildProductGrid(BuildContext context) {
     final state = widget.state;
     final bool isTablet = context.allWidth >= 768;
-    final double crossAxisSpacing = context.spacing8;
-    final double mainAxisSpacing = context.spacing8;
+    final double crossAxisSpacing = _configHelper.getDouble(
+      'product_list_view.grid.crossAxisSpacing',
+      context.spacing8,
+    );
+    final double mainAxisSpacing = _configHelper.getDouble(
+      'product_list_view.grid.mainAxisSpacing',
+      context.spacing8,
+    );
+    final int columnsTablet = _configHelper.getInt(
+      'product_list_view.grid.columns_tablet',
+      3,
+    );
+    final int columnsMobile = _configHelper.getInt(
+      'product_list_view.grid.columns_mobile',
+      2,
+    );
+    final double estimatedCardHeight = _configHelper.getDouble(
+      'product_list_view.grid.estimatedCardHeight',
+      280.0,
+    );
 
     // Calculate card width similar to recommended section
-    final double horizontalPadding = context.spacing12 * 2;
+    final double horizontalPadding = _configHelper.getDouble(
+      'product_list_view.component_spacing.grid_padding',
+      context.spacing12,
+    ) * 2;
     final double cardWidth =
         (context.allWidth - horizontalPadding - crossAxisSpacing) /
-        (isTablet ? 3 : 2);
-    final double estimatedCardHeight = 280;
+        (isTablet ? columnsTablet : columnsMobile);
     final double childAspectRatio = cardWidth / estimatedCardHeight;
 
     return GridView.builder(
       controller: _scrollController,
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing12,
-        vertical: context.spacing8,
+        horizontal: _configHelper.getDouble(
+          'product_list_view.component_spacing.grid_padding',
+          context.spacing12,
+        ),
+        vertical: _configHelper.getDouble(
+          'product_list_view.component_spacing.grid_spacing',
+          context.spacing8,
+        ),
       ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isTablet ? 3 : 2,
+        crossAxisCount: isTablet ? columnsTablet : columnsMobile,
         childAspectRatio: childAspectRatio,
         crossAxisSpacing: crossAxisSpacing,
         mainAxisSpacing: mainAxisSpacing,
@@ -639,7 +871,10 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               child: OsmeaComponents.loading(
                 type: LoadingType.circularFade,
                 size: context.iconSizeExtraHigh,
-                color: OsmeaColors.nordicBlue,
+                color: _configHelper.getColor(
+                  'product_list_view.empty_view.iconBackgroundColor',
+                  OsmeaColors.black,
+                ),
               ),
             );
           }
