@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
@@ -163,8 +164,8 @@ class _RelatedProductsWidgetState extends State<RelatedProductsWidget> {
                         await wishlistVm.toggle(item);
                       },
                       onTap: () {
-                        // Navigate to product detail
-                        widget.goRoute('/product-detail/$productId');
+                        // Navigate to product detail - use push to stay in navigation stack
+                        context.push('/product-detail/$productId');
                       },
                     ),
                   ),
