@@ -17,12 +17,14 @@ class CartItemWidget extends StatelessWidget {
   final CartItem item;
   final CartViewModel viewModel;
   final CartLoadedState state;
+  final bool isInBottomSheet;
 
   const CartItemWidget({
     super.key,
     required this.item,
     required this.viewModel,
     required this.state,
+    this.isInBottomSheet = false,
   });
 
   @override

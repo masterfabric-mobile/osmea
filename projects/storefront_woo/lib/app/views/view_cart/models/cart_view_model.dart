@@ -6,6 +6,7 @@
  * Integrates with APIs package for cart operations.
  */
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
@@ -30,6 +31,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   // Track last loaded state to show overlay during updates
   CartLoadedState? _lastLoadedState;
   CartLoadedState? get lastLoadedState => _lastLoadedState;
+
+  // Debouncing for cart reload to prevent bottom sheet from closing
+  Timer? _reloadDebounceTimer;
+  bool _hasPendingUpdate = false;
 
   // Arguments holder for route/widget inputs
   final Map<String, dynamic> _arguments = {};
@@ -614,8 +619,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return;
       }
 
-      // Emit loading state to show overlay (after we've saved the loaded state)
-      emit(CartLoadingState());
+      // DON'T emit loading state - use optimistic update instead
+      // This prevents bottom sheet from showing "Failed to load cart" error
+      // emit(CartLoadingState());
 
       // Get tokens before API call
       final cartToken = await _getCartToken();
@@ -650,6 +656,29 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return;
       }
 
+      // Optimistic update: Update UI immediately before API call
+      final updatedItems = loadedState.cartItems.map((item) {
+        if (item.productId == productId) {
+          return item.copyWith(quantity: quantity);
+        }
+        return item;
+      }).toList();
+
+      // Calculate new total
+      double newTotal = 0.0;
+      for (final item in updatedItems) {
+        newTotal += item.price * item.quantity;
+      }
+
+      // Emit optimistic state
+      final optimisticState = loadedState.copyWith(
+        cartItems: updatedItems,
+        totalPrice: newTotal,
+      );
+      _lastLoadedState = optimisticState;
+      emit(optimisticState);
+
+      // Now make API call in background
       final response = await _cartService.updateItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
@@ -666,6 +695,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API update item error: ${response.errors!.first}');
+        // Revert to previous state on error
+        _lastLoadedState = loadedState;
+        emit(loadedState);
         emit(
           CartErrorState(
             message: ApiErrorUtils.getErrorMessage(response.errors!.first),
@@ -675,11 +707,32 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       }
 
       debugPrint('✅ Successfully updated item in API cart');
-      // Reload cart to get updated data from API
-      await _loadCartFromAPI();
+      
+      // Mark that we have a pending update
+      _hasPendingUpdate = true;
+      
+      // Debounce cart reload to prevent bottom sheet from closing during rapid updates
+      _reloadDebounceTimer?.cancel();
+      _reloadDebounceTimer = Timer(const Duration(milliseconds: 800), () async {
+        if (_hasPendingUpdate) {
+          _hasPendingUpdate = false;
+          debugPrint('🔄 CartViewModel: Debounced reload - syncing with server');
+          await _loadCartFromAPI();
+        }
+      });
     } catch (e) {
       debugPrint('❌ Failed to update item in API cart: $e');
-      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
+      // Cancel pending reload on error
+      _reloadDebounceTimer?.cancel();
+      _hasPendingUpdate = false;
+      
+      // Try to reload cart to get correct state
+      try {
+        await _loadCartFromAPI();
+      } catch (reloadError) {
+        debugPrint('❌ Failed to reload cart after update error: $reloadError');
+        emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
+      }
     }
   }
 
@@ -853,6 +906,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       debugPrint('❌ CartViewModel: Failed to remove coupon: $e');
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _reloadDebounceTimer?.cancel();
+    return super.close();
   }
 
   @override

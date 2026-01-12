@@ -30,6 +30,27 @@ class CartItem {
 
   double get totalPrice => price * quantity;
   
+  /// Copy with method for optimistic updates
+  CartItem copyWith({
+    int? productId,
+    String? productName,
+    double? price,
+    int? quantity,
+    String? imageUrl,
+    List<Map<String, String>>? variations,
+    String? key,
+  }) {
+    return CartItem(
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+      imageUrl: imageUrl ?? this.imageUrl,
+      variations: variations ?? this.variations,
+      key: key ?? this.key,
+    );
+  }
+  
   /// Get formatted variation string for display (e.g., "Color: Bronz, Size: 42")
   String get formattedVariations {
     if (variations == null || variations!.isEmpty) {

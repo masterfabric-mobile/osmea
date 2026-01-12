@@ -391,6 +391,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                           item: item,
                           viewModel: cartViewModel,
                           state: cartState,
+                          isInBottomSheet: true,
                         ),
                         if (index < cartState.cartItems.length - 1)
                           OsmeaComponents.container(
