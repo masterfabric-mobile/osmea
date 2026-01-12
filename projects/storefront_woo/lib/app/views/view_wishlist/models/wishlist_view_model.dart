@@ -61,6 +61,22 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       ? (state as WishlistLoadedState).items.length
       : 0;
 
+  // Helper: Get API namespace from config
+  String get _namespace {
+    return _config.getString(
+      'woocommerce_configuration.wishlist_namespace',
+      'masterfabric-wishlist',
+    );
+  }
+
+  // Helper: Get API version from config
+  String get _apiVersion {
+    return _config.getString(
+      'woocommerce_configuration.version',
+      'v1',
+    );
+  }
+
   // Public triggers (OSMEA style)
   Future<void> initial() => _syncFromServer();
   Future<void> syncFromServer({int? groupId}) =>
@@ -189,11 +205,6 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         return;
       }
 
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-        'v1',
-      );
-
       // Find the item to get itemId if available
       final s = state;
       WishlistItem? itemToRemove;
@@ -221,7 +232,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             '💖 Background remove: Deleting by itemId: ${itemToRemove!.itemId}',
           );
           final response = await _wishlistService.deleteItemById(
-            apiVersion: apiVersion,
+            namespace: _namespace,
+            apiVersion: _apiVersion,
             itemId: itemToRemove.itemId!,
           );
 
@@ -248,7 +260,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           );
 
           final response = await _wishlistService.deleteItemByProduct(
-            apiVersion: apiVersion,
+            namespace: _namespace,
+            apiVersion: _apiVersion,
             request: request,
           );
 
@@ -362,10 +375,6 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       emit(WishlistLoadingState());
       debugPrint('💖 Wishlist: Starting sync from server...');
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-        'v1',
-      );
 
       debugPrint('💖 Wishlist: Fetching wishlist items from server...');
 
@@ -374,7 +383,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       try {
         final paged = await _wishlistService.getWishlistItems(
-          apiVersion: apiVersion,
+          namespace: _namespace,
+          apiVersion: _apiVersion,
           groupId: groupId,
           page: 1,
           perPage: 100,
@@ -458,7 +468,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
               '💖 Wishlist: Fetching product details for productId: $productId',
             );
             final product = await _productService.retrieveProduct(
-              apiVersion: apiVersion,
+              apiVersion: _apiVersion,
               productId: productId,
             );
 
@@ -654,17 +664,13 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         }
       }
 
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-        'v1',
-      );
-
       // Call API to add item - THIS IS THE CRITICAL CALL
       debugPrint(
         '💖 Wishlist: Sending API request to add item (productId: ${item.id}, groupId: ${groupId ?? 0})',
       );
       final response = await _wishlistService.addItemToWishlist(
-        apiVersion: apiVersion,
+        namespace: _namespace,
+        apiVersion: _apiVersion,
         request: AddWishlistItemRequest(
           productId: item.id,
           groupId: groupId ?? 0,
@@ -866,11 +872,6 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       final items = currentItems.where((e) => e.id != productId).toList();
       emit(WishlistLoadedState(items: items));
 
-      final apiVersion = _config.getString(
-        'woocommerce_configuration.version',
-        'v1',
-      );
-
       // Try DELETE by itemId first (preferred method as per API explorer)
       bool deleteSuccess = false;
       if (itemToRemove?.itemId != null) {
@@ -879,7 +880,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             '💖 Wishlist: Deleting by itemId: ${itemToRemove!.itemId}',
           );
           final response = await _wishlistService.deleteItemById(
-            apiVersion: apiVersion,
+            namespace: _namespace,
+            apiVersion: _apiVersion,
             itemId: itemToRemove.itemId!,
           );
 
@@ -907,7 +909,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             '💖 Wishlist: Deleting by productId: $productId, groupId: ${groupId ?? 0}',
           );
           final response = await _wishlistService.deleteItemByProduct(
-            apiVersion: apiVersion,
+            namespace: _namespace,
+            apiVersion: _apiVersion,
             request: DeleteWishlistItemRequest(
               productId: productId,
               groupId: groupId ?? 0,

@@ -18,6 +18,7 @@
     "brand_name": "store_name", 
     "auth_key": "THISISMySpeCiaLAUthCodeexampleexample",
     "version": "v1",
+    "wishlist_namespace": "masterfabric-wishlist",
     "verify_ssl": true,
     "query_string_auth": false,
     "products_per_page": 20,
