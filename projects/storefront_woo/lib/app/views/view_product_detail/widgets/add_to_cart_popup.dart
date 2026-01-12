@@ -72,7 +72,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
     footer: BlocBuilder<CartViewModel, CartState>(
       bloc: cartViewModel,
       builder: (context, cartState) {
-        if (cartState is! CartLoadedState) {
+        if (cartState is! CartLoadedState || cartState.cartItems.isEmpty) {
           return const SizedBox.shrink();
         }
         return OsmeaComponents.container(
