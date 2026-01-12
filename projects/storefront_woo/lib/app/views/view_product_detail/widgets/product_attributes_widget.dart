@@ -73,137 +73,69 @@ class ProductAttributesWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Separate collapsible attributes (color, size, material, fit, usage area) from others
-    final collapsibleAttributeNames = [
-      'color', 'renk',
-      'size', 'beden',
-      'material', 'materyal',
-      'kalıp', 'kalip', 'fit',
-      'kullanım alanı', 'kullanim alani', 'usage area', 'usage'
-    ];
-    final collapsibleAttributes = <Map<String, dynamic>>[];
-    final regularAttributes = <Map<String, dynamic>>[];
+    // All attributes are now collapsible menu items
+    return OsmeaComponents.collapse(
+      size: CollapseSize.medium,
+      variant: CollapseVariant.ghost,
+      mode: CollapseBehaviorMode.multiple,
+      children: normalized.map((attr) {
+        final attrName = (attr['name'] as String?) ?? '';
+        final selectedValue = state.selectedAttributes[attrName];
+        final displayName = attrName.capitalizeFirst();
 
-    for (final attr in normalized) {
-      final attrName = ((attr['name'] as String?) ?? '').toLowerCase();
-      if (collapsibleAttributeNames.any((name) => attrName.contains(name))) {
-        collapsibleAttributes.add(attr);
-      } else {
-        regularAttributes.add(attr);
-      }
-    }
-
-    return OsmeaComponents.column(
-      crossAxisAlignment: context.crossStart,
-      children: [
-        // Collapsible attributes (Color, Size, Material) - full width edge to edge
-        if (collapsibleAttributes.isNotEmpty)
-          OsmeaComponents.collapse(
-            size: CollapseSize.medium,
-            variant: CollapseVariant.ghost,
-            mode: CollapseBehaviorMode.multiple,
-            children: collapsibleAttributes.map((attr) {
-              final attrName = (attr['name'] as String?) ?? '';
-              final selectedValue = state.selectedAttributes[attrName];
-              final displayName = attrName.capitalizeFirst();
-
-              return OsmeaCollapsePanel(
-                header: selectedValue != null
-                    ? RichText(
-                        text: TextSpan(
-                          style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                            color: OsmeaColors.black,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          children: [
-                            TextSpan(text: '$displayName: '),
-                            TextSpan(
-                              text: selectedValue.capitalizeFirst(),
-                              style: OsmeaTextStyle.bodyMedium(context).copyWith(
-                                color: OsmeaColors.black,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : OsmeaComponents.text(
-                        displayName,
-                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: OsmeaColors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                value: attrName.toLowerCase(),
-                body: OsmeaComponents.padding(
-                  padding: EdgeInsets.only(
-                    top: context.spacing6,
-                    bottom: context.spacing4,
-                    left: context.spacing16,
-                    right: context.spacing16,
-                  ),
-                  child: Wrap(
-                    spacing: context.spacing8,
-                    runSpacing: context.spacing8,
-                    children: [
-                      for (final opt in (attr['options'] as List<String>)) ...[
-                        _buildChip(
-                          context,
-                          attrName,
-                          opt,
-                          state,
-                          viewModel,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        if (collapsibleAttributes.isNotEmpty && regularAttributes.isNotEmpty)
-          OsmeaComponents.padding(
-            padding: EdgeInsets.symmetric(horizontal: context.spacing16),
-            child: OsmeaComponents.sizedBox(height: context.spacing8),
-          ),
-
-        // Regular attributes (non-collapsible) - with padding
-        if (regularAttributes.isNotEmpty)
-          OsmeaComponents.padding(
-            padding: EdgeInsets.symmetric(horizontal: context.spacing16),
-            child: OsmeaComponents.column(
-              crossAxisAlignment: context.crossStart,
-              children: [
-                for (final attr in regularAttributes) ...[
-                  OsmeaComponents.text(
-                    ((attr['name'] as String?) ?? '').capitalizeFirst(),
-                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        return OsmeaCollapsePanel(
+          header: selectedValue != null
+              ? RichText(
+                  text: TextSpan(
+                    style: OsmeaTextStyle.bodyMedium(context).copyWith(
                       color: OsmeaColors.black,
                       fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  OsmeaComponents.sizedBox(height: context.spacing6),
-                  Wrap(
-                    spacing: context.spacing8,
-                    runSpacing: context.spacing8,
                     children: [
-                      for (final opt in (attr['options'] as List<String>)) ...[
-                        _buildChip(
-                          context,
-                          (attr['name'] as String?) ?? '',
-                          opt,
-                          state,
-                          viewModel,
+                      TextSpan(text: '$displayName: '),
+                      TextSpan(
+                        text: selectedValue.capitalizeFirst(),
+                        style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: OsmeaColors.black,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ],
+                      ),
                     ],
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing8),
+                )
+              : OsmeaComponents.text(
+                  displayName,
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: OsmeaColors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+          value: attrName.toLowerCase(),
+          body: OsmeaComponents.padding(
+            padding: EdgeInsets.only(
+              top: context.spacing4,
+              bottom: context.spacing4,
+              left: context.spacing12,
+              right: context.spacing12,
+            ),
+            child: Wrap(
+              spacing: 0,
+              runSpacing: 0,
+              children: [
+                for (final opt in (attr['options'] as List<String>)) ...[
+                  _buildChip(
+                    context,
+                    attrName,
+                    opt,
+                    state,
+                    viewModel,
+                  ),
                 ],
               ],
             ),
           ),
-      ],
+        );
+      }).toList(),
     );
   }
 
@@ -226,83 +158,81 @@ class ProductAttributesWidget extends StatelessWidget {
       state.selectedAttributes,
     );
 
-    // Get colors from config
-    final configHelper = AssetConfigHelper();
-    Color getAttributeColor(String key, Color fallback) {
-      try {
-        final colorString = configHelper.getString('product_detail_view.attributes.$key');
-        if (colorString.isNotEmpty && colorString.startsWith('#')) {
-          final hexString = colorString.substring(1);
-          if (hexString.length == 6) {
-            return Color(int.parse('FF$hexString', radix: 16));
-          } else if (hexString.length == 8) {
-            return Color(int.parse(hexString, radix: 16));
-          }
-        }
-      } catch (e) {
-        debugPrint('⚠️ Failed to load attribute color $key: $e');
-      }
-      return fallback;
-    }
-    
-    final selectedColor = getAttributeColor('selectedColor', OsmeaColors.black);
-    final unselectedColor = getAttributeColor('unselectedColor', OsmeaColors.grayMaterial[300]!);
-    final highlightedColor = getAttributeColor('highlightedColor', OsmeaColors.black);
-    
-    final borderColor = isHighlighted
-        ? highlightedColor
-        : (isSelected
-            ? selectedColor
-            : (isAvailable
-                ? unselectedColor.withValues(alpha: context.alpha60)
-                : OsmeaColors.grayMaterial[200]!));
 
-    final backgroundColor = isHighlighted
-        ? OsmeaColors.black.withValues(alpha: 0.08)
-        : (isSelected
-            ? OsmeaColors.black.withValues(alpha: 0.15)
-            : Colors.transparent);
-
-    return OsmeaComponents.chips(
-      text: opt.capitalizeFirst(),
-      selected: isSelected,
-      state: isAvailable || isSelected
-          ? (isSelected ? ChipsState.selected : ChipsState.normal)
-          : ChipsState.disabled,
-      variant: isHighlighted
-          ? ChipsVariant.danger
-          : (isSelected ? ChipsVariant.primary : ChipsVariant.neutral),
-      style: isSelected ? ChipsStyle.soft : ChipsStyle.outlined,
-      size: ChipsSize.medium,
-      shape: ChipsShape.rounded,
-      backgroundColor: backgroundColor,
-      borderColor: borderColor,
-      borderWidth: isHighlighted ? context.width1 + 0.5 : context.width1,
-      textColor: isHighlighted
-          ? highlightedColor
-          : (isSelected
-              ? selectedColor
-              : (isAvailable
+    // Elegant chip design with refined visual feedback
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(
+        right: context.spacing6,
+        bottom: context.spacing6,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: (isAvailable || isSelected)
+              ? () async {
+                  if (isSelected) {
+                    await viewModel.clearSelectedAttribute(attrName);
+                  } else {
+                    await viewModel.setSelectedAttribute(attrName, opt);
+                  }
+                }
+              : null,
+          borderRadius: BorderRadius.circular(8),
+          child: OsmeaComponents.container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing10,
+              vertical: context.spacing8,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected
                   ? OsmeaColors.black
-                  : OsmeaColors.grayMaterial[400]!.withValues(alpha: context.alpha50))),
-      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-        fontWeight: isSelected || isHighlighted
-            ? FontWeight.w600
-            : FontWeight.w500,
+                  : (isHighlighted
+                      ? OsmeaColors.black.withValues(alpha: 0.04)
+                      : (isAvailable
+                          ? OsmeaColors.white
+                          : OsmeaColors.grayMaterial[50]!)),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isHighlighted
+                    ? OsmeaColors.black.withValues(alpha: 0.6)
+                    : (isSelected
+                        ? OsmeaColors.black
+                        : (isAvailable
+                            ? OsmeaColors.black.withValues(alpha: 0.15)
+                            : OsmeaColors.grayMaterial[300]!)),
+                width: isSelected || isHighlighted ? 1.5 : 1,
+              ),
+            ),
+            child: OsmeaComponents.row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OsmeaComponents.text(
+                  opt.capitalizeFirst(),
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected
+                        ? OsmeaColors.white
+                        : (isHighlighted
+                            ? OsmeaColors.black
+                            : (isAvailable
+                                ? OsmeaColors.black
+                                : OsmeaColors.grayMaterial[400]!)),
+                    letterSpacing: 0.1,
+                  ),
+                ),
+                if (isSelected) ...[
+                  OsmeaComponents.sizedBox(width: context.spacing6),
+                  Icon(
+                    Icons.check,
+                    size: 16,
+                    color: OsmeaColors.white,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing12,
-        vertical: context.spacing6,
-      ),
-      onTap: (isAvailable || isSelected)
-          ? () async {
-              if (isSelected) {
-                await viewModel.clearSelectedAttribute(attrName);
-              } else {
-                await viewModel.setSelectedAttribute(attrName, opt);
-              }
-            }
-          : null,
     );
   }
 

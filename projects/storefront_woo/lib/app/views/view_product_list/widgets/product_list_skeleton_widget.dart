@@ -108,10 +108,7 @@ class _ProductListSkeletonWidgetState extends State<ProductListSkeletonWidget>
       ),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return _ShimmerContainer(
-          animation: _controller,
-          child: _buildProductCardSkeleton(context),
-        );
+        return _buildProductCardSkeleton(context);
       },
     );
   }
@@ -136,67 +133,84 @@ class _ProductListSkeletonWidgetState extends State<ProductListSkeletonWidget>
   Widget _buildProductCardSkeleton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: OsmeaColors.grayMaterial[200],
+        color: OsmeaColors.grayMaterial[50],
         borderRadius: BorderRadius.circular(context.radiusMedium),
       ),
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Image skeleton - 60% of card height
-          Container(
-            height: (context.height160 + context.spacing10) * 0.6,
-            width: double.infinity,
-            color: OsmeaColors.grayMaterial[300],
+          // Image skeleton with gradient shimmer
+          _ShimmerGradientContainer(
+            animation: _controller,
+            child: Container(
+              height: context.height160 + context.spacing10,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: OsmeaColors.grayMaterial[100],
+                borderRadius: context.borderRadiusNormal,
+              ),
+            ),
           ),
-          // Content skeleton - 40% of card height
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(context.spacing8),
-              child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Title skeleton
-                  Container(
-                    height: context.fontSizeSmall * 1.2,
+          OsmeaComponents.sizedBox(height: context.spacing8),
+          // Product info skeleton - matches ProductCardWidget padding
+          OsmeaComponents.padding(
+            padding: context.onlyLeftPaddingLow,
+            child: OsmeaComponents.column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Price skeleton - matches ProductCardWidget price style
+                _ShimmerGradientContainer(
+                  animation: _controller,
+                  child: Container(
+                    height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.2,
+                    width: context.allWidth * 0.35,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[100],
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing4),
+                // Product name skeleton - matches ProductCardWidget name (2 lines max)
+                _ShimmerGradientContainer(
+                  animation: _controller,
+                  child: Container(
+                    height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.14,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: OsmeaColors.grayMaterial[300],
-                      borderRadius: BorderRadius.circular(4),
+                      color: OsmeaColors.grayMaterial[100],
+                      borderRadius: BorderRadius.circular(6),
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing4),
-                  Container(
-                    height: context.fontSizeSmall * 1.2,
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing2),
+                _ShimmerGradientContainer(
+                  animation: _controller,
+                  child: Container(
+                    height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.14,
+                    width: context.allWidth * 0.7,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[100],
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing2),
+                // Description skeleton - matches ProductCardWidget description (1 line max)
+                _ShimmerGradientContainer(
+                  animation: _controller,
+                  child: Container(
+                    height: context.fontSizeExtraSmall * context.textScaleFactor * 1.2,
                     width: context.allWidth * 0.6,
                     decoration: BoxDecoration(
-                      color: OsmeaColors.grayMaterial[300],
-                      borderRadius: BorderRadius.circular(4),
+                      color: OsmeaColors.grayMaterial[100],
+                      borderRadius: BorderRadius.circular(6),
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing8),
-                  // Price skeleton
-                  Container(
-                    height: context.fontSizeMedium * 1.2,
-                    width: context.allWidth * 0.4,
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.grayMaterial[300],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  OsmeaComponents.sizedBox(height: context.spacing8),
-                  // Rating/badge skeleton
-                  Container(
-                    height: context.iconSizeSmall,
-                    width: context.allWidth * 0.5,
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.grayMaterial[300],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -305,6 +319,61 @@ class _ShimmerContainer extends StatelessWidget {
         return Opacity(
           opacity: opacity.clamp(0.3, 0.7),
           child: child,
+        );
+      },
+      child: child,
+    );
+  }
+}
+
+/// Modern gradient shimmer effect container
+class _ShimmerGradientContainer extends StatelessWidget {
+  final Animation<double> animation;
+  final Widget child;
+
+  const _ShimmerGradientContainer({
+    required this.animation,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return ClipRect(
+          child: Stack(
+            children: [
+              child!,
+              Positioned.fill(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final value = animation.value;
+                    final shimmerWidth = constraints.maxWidth * 0.6;
+                    final shimmerPosition = (value * 2 - 1) * (constraints.maxWidth + shimmerWidth) - shimmerWidth;
+                    
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.transparent,
+                            Colors.white.withOpacity(0.4),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.4),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+                        ),
+                      ),
+                      transform: Matrix4.translationValues(shimmerPosition, 0, 0),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
       child: child,

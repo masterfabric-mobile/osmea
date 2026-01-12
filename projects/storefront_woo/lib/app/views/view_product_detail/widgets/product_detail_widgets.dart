@@ -13,10 +13,9 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_product_detail/widgets/action_section.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_images_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_name_price_widget.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/product_attributes_widget.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/product_description_widget.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_widget.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_sections_list_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/attribute_selection_modal.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/related_products_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -57,16 +56,27 @@ class ProductDetailContentWidget extends StatelessWidget {
     final configHelper = AssetConfigHelper();
     final orderedComponents = _buildOrderedComponents(context, configHelper, isInWishlist, productId);
 
-        return Stack(
+    return Stack(
           children: [
             OsmeaComponents.singleChildScrollView(
-              padding: EdgeInsets.only(bottom: context.dynamicHeight(0.10)),
+              padding: EdgeInsets.only(
+                bottom: context.dynamicHeight(0.08),
+                top: context.spacing4,
+              ),
               child: OsmeaComponents.column(
                 crossAxisAlignment: context.crossStart,
-                children: orderedComponents,
+                children: [
+                  // Add spacing between components
+                  ...orderedComponents.expand((widget) => [
+                    widget,
+                    OsmeaComponents.sizedBox(height: context.spacing16),
+                  ]).toList()..removeLast(), // Remove last spacing
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                ],
               ),
             ),
 
+            // Elegant bottom bar - refined and clean
             Positioned(
               left: 0,
               right: 0,
@@ -75,25 +85,25 @@ class ProductDetailContentWidget extends StatelessWidget {
                 top: false,
                 child: OsmeaComponents.container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.spacing16,
-                    vertical: context.spacing10,
+                    horizontal: context.spacing12,
+                    vertical: context.spacing12,
                   ),
                   decoration: BoxDecoration(
                     color: OsmeaColors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: OsmeaColors.black.withValues(alpha: 0.06),
-                        blurRadius: context.blurRadius12,
-                        offset: context.offsetVerticalCustom(-context.spacing6),
+                    border: Border(
+                      top: BorderSide(
+                        color: OsmeaColors.black.withValues(alpha: 0.1),
+                        width: 0.5,
                       ),
-                    ],
+                    ),
                   ),
-                  child: ActionSection(
+                child: ActionSection(
                     isInWishlist: isInWishlist,
                     onToggleWishlist: () {
                       viewModel.addProductToWishlistFire(productId);
                     },
                     isInCart: state.isInCart,
+                    prices: state.product.prices,
                     onAddToCart: () async {
                       // Check if all required attributes are selected before adding
                       final product = state.product;
@@ -141,60 +151,46 @@ class ProductDetailContentWidget extends StatelessWidget {
                             .toSet();
 
                         if (missingAttributes.isNotEmpty) {
-                          // Show snackbar using OsmeaComponents
-                          context.snackbarError(
-                            context.t.productDetailView.addToCart.selectAllOptions,
-                            duration: context.durationLong,
+                          // Show step-by-step attribute selection modal
+                          showDialog(
+                            context: context,
+                            barrierColor: OsmeaColors.black.withValues(alpha: 0.5),
+                            builder: (modalContext) => AttributeSelectionModal(
+                              viewModel: viewModel,
+                              state: state,
+                              missingAttributes: missingAttributes,
+                              onComplete: (selectedAttributes) async {
+                                // Update state with selected attributes first
+                                final currentState = viewModel.state;
+                                if (currentState is ProductDetailLoadedState) {
+                                  for (final entry in selectedAttributes.entries) {
+                                    await viewModel.setSelectedAttribute(
+                                      entry.key,
+                                      entry.value,
+                                    );
+                                  }
+                                  
+                                  // Retry adding to cart - viewmodel will handle showing popup via state
+                                  await viewModel.addProductToCart(
+                                    state.product.id ?? 0,
+                                    quantity: state.selectedQuantity,
+                                  );
+                                }
+                              },
+                            ),
                           );
-
-                          // Highlight missing attributes
-                          final currentState = viewModel.state;
-                          if (currentState is ProductDetailLoadedState) {
-                            viewModel.stateChanger(
-                              currentState.copyWith(
-                                highlightedAttributes: missingAttributes,
-                              ),
-                            );
-
-                            // Reset highlighting after 2 seconds
-                            Future.delayed(context.durationLong, () {
-                              final stateAfterDelay = viewModel.state;
-                              if (stateAfterDelay is ProductDetailLoadedState) {
-                                viewModel.stateChanger(
-                                  stateAfterDelay.copyWith(
-                                    highlightedAttributes: {},
-                                  ),
-                                );
-                              }
-                            });
-                          }
                           return;
                         }
                       }
 
-                      // Add product to cart
+                      // Add product to cart - viewmodel will handle showing popup via state
                       await viewModel.addProductToCart(
                         state.product.id ?? 0,
                         quantity: state.selectedQuantity,
                       );
-
-                      // Check if add was successful (check state)
-                      final currentState = viewModel.state;
-                      if (currentState is ProductDetailLoadedState &&
-                          currentState.isInCart) {
-                        // Show success popup with cart token for navigation
-                        final cartToken = await viewModel
-                            .getCartTokenForNavigation();
-                        showAddToCartSuccessPopup(
-                          context,
-                          cartToken: cartToken,
-                        );
-                      }
                     },
-                    selectedQuantity: state.selectedQuantity,
-                    onUpdateQuantity: (q) => viewModel.updateQuantityFire(q),
                     onShare: () => _shareProduct(context, state),
-                    showWishlistAndShare: false,
+                    showWishlistAndShare: false, // Moved to image overlay
                   ),
                 ),
               ),
@@ -264,44 +260,29 @@ class ProductDetailContentWidget extends StatelessWidget {
       );
     }
 
-    // Attributes
-    if (_isEnabled(configHelper, 'attributes') &&
-        state.product.attributes != null &&
-        state.product.attributes!.isNotEmpty) {
-      components.add(
-        _ProductDetailComponent(
-          orderId: _getOrderId(configHelper, 'attributes'),
-          widget: ProductAttributesWidget(
-            viewModel: viewModel,
-            state: state,
-          ),
-          name: 'attributes',
+    // Sections list (Attributes, Description, Reviews) - modern expandable list
+    components.add(
+      _ProductDetailComponent(
+        orderId: _getOrderId(configHelper, 'sections'),
+        widget: ProductSectionsListWidget(
+          viewModel: viewModel,
+          state: state,
+          goRoute: goRoute,
         ),
-      );
-    }
+        name: 'sections',
+      ),
+    );
 
-    // Description
-    if (_isEnabled(configHelper, 'description') &&
-        state.product.description?.isNotEmpty == true) {
+    // Related products section - at the bottom
+    if (_isEnabled(configHelper, 'related_products')) {
       components.add(
         _ProductDetailComponent(
-          orderId: _getOrderId(configHelper, 'description'),
-          widget: ProductDescriptionWidget(
-            viewModel: viewModel,
-            state: state,
+          orderId: _getOrderId(configHelper, 'related_products'),
+          widget: RelatedProductsWidget(
+            currentProductId: productId,
+            goRoute: goRoute,
           ),
-          name: 'description',
-        ),
-      );
-    }
-
-    // Reviews
-    if (_isEnabled(configHelper, 'reviews')) {
-      components.add(
-        _ProductDetailComponent(
-          orderId: _getOrderId(configHelper, 'reviews'),
-          widget: ProductReviewsWidget(state: state),
-          name: 'reviews',
+          name: 'related_products',
         ),
       );
     }

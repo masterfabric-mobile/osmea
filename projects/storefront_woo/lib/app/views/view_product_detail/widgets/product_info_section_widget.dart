@@ -39,7 +39,7 @@ class ProductInfoSectionWidget extends StatelessWidget {
           child: OsmeaComponents.column(
             crossAxisAlignment: context.crossStart,
             children: [
-              // Product name
+              // Product name only - price is shown in footer
               OsmeaComponents.text(
                 state.product.name ?? context.t.productDetailView.unknownProduct,
                 textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
@@ -47,19 +47,6 @@ class ProductInfoSectionWidget extends StatelessWidget {
                   letterSpacing: -0.5,
                   height: 1.2,
                   color: OsmeaColors.black,
-                ),
-              ),
-
-              OsmeaComponents.sizedBox(height: context.spacing4),
-
-              // Price
-              OsmeaComponents.text(
-                _formatPrice(state.product.prices),
-                textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                  color: OsmeaColors.black,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.3,
-                  height: 1.1,
                 ),
               ),
 

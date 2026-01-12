@@ -29,6 +29,7 @@ class ProductDetailLoadedState extends ProductDetailState {
   final Map<String, String> selectedAttributes;
   final List<ListProductReviewsResponseModel> reviews;
   final Set<String> highlightedAttributes; // Attributes to highlight in red
+  final bool shouldShowAddToCartPopup; // Flag to trigger bottom sheet
 
   ProductDetailLoadedState({
     required this.product,
@@ -41,6 +42,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     this.selectedAttributes = const {},
     this.reviews = const [],
     this.highlightedAttributes = const {},
+    this.shouldShowAddToCartPopup = false,
   });
 
   ProductDetailLoadedState copyWith({
@@ -54,6 +56,7 @@ class ProductDetailLoadedState extends ProductDetailState {
     Map<String, String>? selectedAttributes,
     List<ListProductReviewsResponseModel>? reviews,
     Set<String>? highlightedAttributes,
+    bool? shouldShowAddToCartPopup,
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
@@ -67,6 +70,7 @@ class ProductDetailLoadedState extends ProductDetailState {
       selectedAttributes: selectedAttributes ?? this.selectedAttributes,
       reviews: reviews ?? this.reviews,
       highlightedAttributes: highlightedAttributes ?? this.highlightedAttributes,
+      shouldShowAddToCartPopup: shouldShowAddToCartPopup ?? this.shouldShowAddToCartPopup,
     );
   }
 }

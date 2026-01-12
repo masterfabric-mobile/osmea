@@ -5,11 +5,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
-import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product description
 class ProductDescriptionWidget extends StatelessWidget {
@@ -28,30 +26,11 @@ class ProductDescriptionWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing16,
-        vertical: context.spacing4,
-      ),
-      child: OsmeaComponents.column(
-        crossAxisAlignment: context.crossStart,
-        children: [
-          OsmeaComponents.text(
-            context.t.productDetailView.description.details,
-            textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.0,
-              color: OsmeaColors.black,
-            ),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing4),
-          DescriptionSection(
-            description: state.product.description!,
-            viewModel: viewModel,
-            state: state,
-          ),
-        ],
-      ),
+    // Just show the description section without duplicate title
+    return DescriptionSection(
+      description: state.product.description!,
+      viewModel: viewModel,
+      state: state,
     );
   }
 }

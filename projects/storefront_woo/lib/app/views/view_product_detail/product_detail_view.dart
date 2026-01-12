@@ -14,6 +14,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_error_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_skeleton_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:osmea_components/src/utils/toast_extensions.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
@@ -143,6 +144,31 @@ class ProductDetailView
 
     // Loaded state
     if (state is ProductDetailLoadedState) {
+      // Check if we should show add to cart popup
+      if (state.shouldShowAddToCartPopup) {
+        // Reset the flag immediately to prevent multiple popups
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // Get cart token
+          final cartToken = await viewModel.getCartTokenForNavigation();
+          
+          // Show bottom sheet
+          if (context.mounted) {
+            showAddToCartSuccessPopup(
+              context,
+              cartToken: cartToken,
+            );
+          }
+          
+          // Reset flag after showing popup
+          final currentState = viewModel.state;
+          if (currentState is ProductDetailLoadedState) {
+            viewModel.stateChanger(
+              currentState.copyWith(shouldShowAddToCartPopup: false),
+            );
+          }
+        });
+      }
+      
       return ProductDetailContentWidget(
         viewModel: viewModel,
         state: state,

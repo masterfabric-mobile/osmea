@@ -11,6 +11,7 @@ import 'package:flutter/material.dart' as FlutterMaterial show Image;
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
     hide Image;
 import 'package:core/core.dart';
+// Animation helpers are now imported from core
 
 /// Product card widget - matches home recommended section design
 class ProductCardWidget extends StatelessWidget {
@@ -59,7 +60,7 @@ class ProductCardWidget extends StatelessWidget {
       }
     }
 
-    return GestureDetector(
+    return AnimatedCard(
       onTap: onTap,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,15 +75,17 @@ class ProductCardWidget extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Product image
+                // Product image with Hero animation
                 ClipRRect(
                   borderRadius: context.borderRadiusNormal,
                   child: product.images?.isNotEmpty == true
-                      ? FlutterMaterial.Image.network(
-                          product.images!.first.src ?? '',
-                          width: double.infinity,
-                          height: context.height160 + context.spacing10,
-                          fit: BoxFit.cover,
+                      ? Hero(
+                          tag: 'product-image-${product.id ?? 0}',
+                          child: FlutterMaterial.Image.network(
+                            product.images!.first.src ?? '',
+                            width: double.infinity,
+                            height: context.height160 + context.spacing10,
+                            fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               width: double.infinity,
@@ -111,6 +114,7 @@ class ProductCardWidget extends StatelessWidget {
                               ),
                             );
                           },
+                          ),
                         )
                       : Container(
                           width: double.infinity,
@@ -148,12 +152,12 @@ class ProductCardWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                // Wishlist button - top right
+                // Wishlist button - top right with animation
                 Positioned(
                   top: context.spacing8,
                   right: context.spacing8,
-                  child: GestureDetector(
-                    onTap: onWishlistTap,
+                  child: AnimatedButton(
+                    onPressed: onWishlistTap,
                     child: OsmeaComponents.container(
                       width: context.iconSizeNormal * 1.25,
                       height: context.iconSizeNormal * 1.25,

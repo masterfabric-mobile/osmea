@@ -70,6 +70,9 @@ export 'package:core/src/helper/url_launcher_helper.dart';
 // 🗂️ Exports the asset configuration helper for JSON config management
 export 'package:core/src/helper/asset_config_helper.dart';
 
+// 🎨 Exports the color helper for hex color parsing and conversion
+export 'package:core/src/helper/color_helper.dart';
+
 // 🔥 Exports the remote configuration helper for Firebase Remote Config
 export 'package:core/src/helper/remote_config_helper.dart';
 
@@ -169,6 +172,9 @@ export 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
 
 // 🔐 Exports the auth storage helper
 export 'package:core/src/helper/auth_storage_helper.dart';
+
+// 🎬 Exports the animation helper for common animations and transitions
+export 'package:core/src/helper/animation_helper.dart';
 
 // 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
 export 'package:core/src/views/auth/auth_view.dart';

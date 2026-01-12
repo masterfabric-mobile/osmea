@@ -188,6 +188,9 @@ class _HtmlViewerCubit extends Cubit<BaseViewState<String>> {
   String _sanitizeHtml(String html) {
     String sanitized = html;
 
+    // Decode ALL HTML entities - flutter_html will handle HTML tags properly
+    sanitized = _decodeAllHtmlEntities(sanitized);
+
     // Remove script tags
     sanitized = sanitized.replaceAll(
         RegExp(r'<script[^>]*>.*?</script>', caseSensitive: false), '');
@@ -203,6 +206,124 @@ class _HtmlViewerCubit extends Cubit<BaseViewState<String>> {
         RegExp(r"\son\w+\s*=\s*'[^']*'", caseSensitive: false), '');
 
     return sanitized;
+  }
+
+  /// Decodes ALL HTML entities in the entire string
+  /// Flutter_html will properly render HTML tags after entities are decoded
+  String _decodeAllHtmlEntities(String text) {
+    if (text.isEmpty) return text;
+    
+    // Decode all entities - no need to preserve tags as flutter_html handles them
+    return _decodeEntitiesInString(text);
+  }
+
+  /// Decodes all HTML entities in a string (numeric and named)
+  /// This handles both &#8217; style and &nbsp; style entities
+  /// Decodes &lt; and &gt; as well (safe because this is only called on text content, not HTML tags)
+  String _decodeEntitiesInString(String text) {
+    if (text.isEmpty) return text;
+    
+    // First decode numeric entities (&#8217;, &#8220;, etc.) - most common
+    // This catches ALL numeric entities like &#8217;, &#8220;, &#39;, etc.
+    String decoded = text.replaceAllMapped(
+      RegExp(r'&#(\d+);'),
+      (match) {
+        try {
+          final code = int.parse(match.group(1)!);
+          if (code >= 0 && code <= 0x10FFFF) {
+            return String.fromCharCode(code);
+          }
+        } catch (e) {
+          // If parsing fails, return original
+        }
+        return match.group(0)!;
+      },
+    );
+    
+    // Then decode hex entities (&#x8217;, etc.)
+    decoded = decoded.replaceAllMapped(
+      RegExp(r'&#x([0-9a-fA-F]+);', caseSensitive: false),
+      (match) {
+        try {
+          final code = int.parse(match.group(1)!, radix: 16);
+          if (code >= 0 && code <= 0x10FFFF) {
+            return String.fromCharCode(code);
+          }
+        } catch (e) {
+          // If parsing fails, return original
+        }
+        return match.group(0)!;
+      },
+    );
+    
+    // Finally decode named entities (comprehensive list)
+    // Decode &lt; and &gt; as well, but only in text content (not in actual HTML tags)
+    decoded = decoded
+        // Basic entities (decode &lt; and &gt; last to avoid breaking HTML tags)
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&apos;', "'")
+        .replaceAll('&#39;', "'")
+        // Quotes
+        .replaceAll('&lsquo;', ''')
+        .replaceAll('&rsquo;', ''')
+        .replaceAll('&ldquo;', '"')
+        .replaceAll('&rdquo;', '"')
+        .replaceAll('&sbquo;', '‚')
+        .replaceAll('&bdquo;', '„')
+        // Dashes
+        .replaceAll('&mdash;', '—')
+        .replaceAll('&ndash;', '–')
+        // Symbols
+        .replaceAll('&copy;', '©')
+        .replaceAll('&reg;', '®')
+        .replaceAll('&trade;', '™')
+        .replaceAll('&hellip;', '…')
+        .replaceAll('&bull;', '•')
+        .replaceAll('&middot;', '·')
+        // Currency
+        .replaceAll('&euro;', '€')
+        .replaceAll('&pound;', '£')
+        .replaceAll('&yen;', '¥')
+        .replaceAll('&cent;', '¢')
+        .replaceAll('&dollar;', '\$')
+        // Math
+        .replaceAll('&times;', '×')
+        .replaceAll('&divide;', '÷')
+        .replaceAll('&plusmn;', '±')
+        // Arrows
+        .replaceAll('&larr;', '←')
+        .replaceAll('&rarr;', '→')
+        .replaceAll('&uarr;', '↑')
+        .replaceAll('&darr;', '↓')
+        // Fractions
+        .replaceAll('&frac12;', '½')
+        .replaceAll('&frac14;', '¼')
+        .replaceAll('&frac34;', '¾')
+        // Other common entities
+        .replaceAll('&deg;', '°')
+        .replaceAll('&sup2;', '²')
+        .replaceAll('&sup3;', '³')
+        .replaceAll('&micro;', 'µ')
+        .replaceAll('&para;', '¶')
+        .replaceAll('&sect;', '§')
+        .replaceAll('&uml;', '¨')
+        .replaceAll('&ordf;', 'ª')
+        .replaceAll('&ordm;', 'º')
+        .replaceAll('&not;', '¬')
+        .replaceAll('&shy;', '')
+        .replaceAll('&macr;', '¯')
+        .replaceAll('&sup1;', '¹')
+        .replaceAll('&frac18;', '⅛')
+        .replaceAll('&frac38;', '⅜')
+        .replaceAll('&frac58;', '⅝')
+        .replaceAll('&frac78;', '⅞')
+        // Decode &lt; and &gt; as well (these are in text content, not actual HTML tags)
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>');
+    
+    return decoded;
   }
 }
 

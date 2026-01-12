@@ -1,7 +1,7 @@
 /*
  * Product Images Widget
  * ---------------------
- * Widget for displaying product images in a carousel with overlay actions.
+ * Modern product images carousel with smooth animations and beautiful indicators.
  */
 
 import 'package:flutter/material.dart';
@@ -9,8 +9,8 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
-/// Widget for displaying product images with carousel and overlay actions
-class ProductImagesWidget extends StatelessWidget {
+/// Modern widget for displaying product images with carousel and overlay actions
+class ProductImagesWidget extends StatefulWidget {
   final List<String> imageUrls;
   final ProductDetailViewModel viewModel;
   final Function(String path) goRoute;
@@ -30,146 +30,231 @@ class ProductImagesWidget extends StatelessWidget {
     this.productName,
   });
 
-  /// Get color from config
-  Color _getColorFromConfig(String key, Color fallback) {
-    try {
-      final configHelper = AssetConfigHelper();
-      final colorString = configHelper.getString('product_detail_view.images.$key');
-      if (colorString.isNotEmpty && colorString.startsWith('#')) {
-        final hexString = colorString.substring(1);
-        if (hexString.length == 6) {
-          return Color(int.parse('FF$hexString', radix: 16));
-        } else if (hexString.length == 8) {
-          return Color(int.parse(hexString, radix: 16));
-        }
-      }
-    } catch (e) {
-      debugPrint('⚠️ Failed to load images color $key: $e');
-    }
-    return fallback;
-  }
+  @override
+  State<ProductImagesWidget> createState() => _ProductImagesWidgetState();
+}
 
-  /// Get wishlist icon color
-  Color _getWishlistIconColor(bool isInWishlist) {
-    if (isInWishlist) {
-      return _getColorFromConfig('wishlistIconColor', OsmeaColors.black);
-    }
-    return OsmeaColors.grayMaterial[400]!;
+class _ProductImagesWidgetState extends State<ProductImagesWidget> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    if (imageUrls.isEmpty) {
+    if (widget.imageUrls.isEmpty) {
       return OsmeaComponents.container(
-        height: context.dynamicHeight(0.45),
+        height: context.dynamicHeight(0.50),
         width: context.infinity,
-        color: OsmeaColors.white,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              OsmeaColors.grayMaterial[50]!,
+              OsmeaColors.grayMaterial[100]!,
+            ],
+          ),
+        ),
         child: OsmeaComponents.center(
-          child: Icon(
-            Icons.image,
-            size: context.iconSizeExtraHigh * 2.5,
-            color: OsmeaColors.grayMaterial[300]!,
+          child: OsmeaComponents.column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.image_outlined,
+                size: context.iconSizeExtraHigh * 2,
+                color: OsmeaColors.grayMaterial[300]!,
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+              OsmeaComponents.text(
+                'No Image Available',
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  color: OsmeaColors.grayMaterial[400]!,
+                ),
+              ),
+            ],
           ),
         ),
       );
     }
 
-    // Better aspect ratio for product images - taller for better visibility
-    final height = context.allHeight < 700
-        ? context.dynamicHeight(0.45)
-        : context.dynamicHeight(0.50);
-
-    final pager = PageView.builder(
-      itemCount: imageUrls.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ImageDetailScreen(
-                  goRoute: goRoute,
-                  imageUrls: imageUrls,
-                  initialIndex: index,
-                ),
-              ),
-            );
-          },
-          child: OsmeaComponents.container(
-            width: context.infinity,
-            height: height,
-            color: OsmeaColors.white,
-            child: OsmeaComponents.center(
-              child: OsmeaComponents.image(
-                imageUrl: imageUrls[index],
-                width: context.infinity,
-                height: height,
-                fit: BoxFit.contain,
-                alignment: context.center,
-                placeholder: OsmeaComponents.container(
-                  color: OsmeaColors.white,
-                  child: OsmeaComponents.center(
-                    child: Icon(
-                      Icons.image,
-                      size: context.iconSizeExtraHigh * 2.5,
-                      color: OsmeaColors.grayMaterial[300]!,
-                    ),
-                  ),
-                ),
-                errorWidget: OsmeaComponents.container(
-                  color: OsmeaColors.white,
-                  child: OsmeaComponents.center(
-                    child: Icon(
-                      Icons.broken_image,
-                      size: context.iconSizeExtraHigh * 2.5,
-                      color: OsmeaColors.grayMaterial[300]!,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    if (!withOverlays) {
-      return OsmeaComponents.sizedBox(height: height, child: pager);
-    }
+    // Elegant image area - refined proportions
+    final height = context.dynamicHeight(0.55);
 
     return OsmeaComponents.sizedBox(
       height: height,
       child: Stack(
         children: [
-          pager,
-          Positioned(
-            right: context.spacing10,
-            top: context.spacing16,
-            child: OsmeaComponents.column(
-              children: [
-                OsmeaComponents.iconButton(
-                  icon: Icon(
-                    isInWishlist ? Icons.favorite : Icons.favorite_outline,
-                    color: _getWishlistIconColor(isInWishlist),
+          // Main image carousel - Pull & Bear style
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              final heroTag = index == 0
+                  ? 'product-image-${widget.productId}'
+                  : 'product_image_${widget.productId}_$index';
+              
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ImageDetailScreen(
+                        goRoute: widget.goRoute,
+                        imageUrls: widget.imageUrls,
+                        initialIndex: index,
+                      ),
+                    ),
+                  );
+                },
+                child: Hero(
+                  tag: heroTag,
+                  child: OsmeaComponents.container(
+                    width: context.infinity,
+                    height: height,
+                    color: OsmeaColors.white,
+                    child: OsmeaComponents.image(
+                      imageUrl: widget.imageUrls[index],
+                      width: context.infinity,
+                      height: height,
+                      fit: BoxFit.contain,
+                      alignment: context.center,
+                      placeholder: OsmeaComponents.container(
+                        color: OsmeaColors.grayMaterial[50],
+                        child: OsmeaComponents.center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: OsmeaColors.black,
+                          ),
+                        ),
+                      ),
+                      errorWidget: OsmeaComponents.container(
+                        color: OsmeaColors.grayMaterial[50],
+                        child: OsmeaComponents.center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            size: context.iconSizeExtraHigh * 1.5,
+                            color: OsmeaColors.grayMaterial[300]!,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  size: ButtonSize.medium,
-                  variant: ButtonVariant.ghost,
-                  backgroundColor: OsmeaColors.white.withValues(alpha: 0.9),
-                  borderRadius: context.width24,
-                  onPressed: () =>
-                      viewModel.addProductToWishlistFire(productId),
                 ),
-                OsmeaComponents.sizedBox(height: context.spacing6),
-                OsmeaComponents.iconButton(
-                  icon: const Icon(Icons.share_outlined),
-                  size: ButtonSize.medium,
-                  variant: ButtonVariant.ghost,
-                  backgroundColor: OsmeaColors.white.withValues(alpha: 0.9),
-                  borderRadius: context.width24,
-                  onPressed: () => _shareProduct(context),
-                ),
-              ],
-            ),
+              );
+            },
           ),
+
+          // Image indicators - elegant and refined
+          if (widget.imageUrls.length > 1)
+            Positioned(
+              bottom: context.spacing16,
+              left: 0,
+              right: 0,
+              child: OsmeaComponents.center(
+                child: OsmeaComponents.row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    widget.imageUrls.length,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      child: OsmeaComponents.container(
+                        margin: EdgeInsets.symmetric(horizontal: 3),
+                        width: _currentPage == index ? 20 : 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: _currentPage == index
+                              ? OsmeaColors.white
+                              : OsmeaColors.white.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Overlay actions - elegant and refined
+          if (widget.withOverlays)
+            Positioned(
+              right: context.spacing12,
+              top: context.spacing12,
+              child: OsmeaComponents.column(
+                children: [
+                  // Wishlist button - elegant
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => widget.viewModel.addProductToWishlistFire(widget.productId),
+                      borderRadius: BorderRadius.circular(20),
+                      child: OsmeaComponents.container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: OsmeaComponents.center(
+                          child: Icon(
+                            widget.isInWishlist
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                            color: OsmeaColors.black,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(height: context.spacing6),
+                  // Share button - elegant
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _shareProduct(context),
+                      borderRadius: BorderRadius.circular(20),
+                      child: OsmeaComponents.container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: OsmeaComponents.center(
+                          child: Icon(
+                            Icons.share_outlined,
+                            color: OsmeaColors.black,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -178,8 +263,8 @@ class ProductImagesWidget extends StatelessWidget {
   /// Shares product information
   Future<void> _shareProduct(BuildContext context) async {
     try {
-      final name = productName ?? 'Product';
-      final shareText = '$name\n\n/product-detail/$productId';
+      final name = widget.productName ?? 'Product';
+      final shareText = '$name\n\n/product-detail/${widget.productId}';
       
       final success = await ApplicationShareHelper.shareText(
         shareText,

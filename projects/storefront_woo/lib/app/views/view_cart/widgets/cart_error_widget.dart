@@ -31,40 +31,42 @@ class CartErrorWidget extends StatelessWidget {
       ),
     );
 
-    return OsmeaComponents.container(
-      color: backgroundColor,
-      child: OsmeaComponents.center(
-        child: OsmeaComponents.singleChildScrollView(
-          padding: context.paddingHigh,
-          child: OsmeaComponents.column(
-            mainAxisAlignment: context.centerMain,
-            crossAxisAlignment: context.crossCenter,
-            children: [
-              // Simple icon
-              _buildErrorIcon(context, Icons.shopping_cart_outlined),
+    return SizedBox.expand(
+      child: OsmeaComponents.container(
+        color: backgroundColor,
+        child: OsmeaComponents.center(
+          child: OsmeaComponents.singleChildScrollView(
+            padding: context.paddingHigh,
+            child: OsmeaComponents.column(
+              mainAxisAlignment: context.centerMain,
+              crossAxisAlignment: context.crossCenter,
+              children: [
+                // Simple icon
+                _buildErrorIcon(context, Icons.shopping_cart_outlined),
 
-              OsmeaComponents.sizedBox(height: context.spacing32),
+                OsmeaComponents.sizedBox(height: context.spacing32),
 
-              // Error message
-              OsmeaComponents.text(
-                message,
-                textStyle: OsmeaTextStyle.bodyLarge(
-                  context,
-                ).copyWith(color: _getTextColor(context), height: 1.6),
-                textAlign: TextAlign.center,
-                maxLines: 4,
-              ),
+                // Error message
+                OsmeaComponents.text(
+                  message,
+                  textStyle: OsmeaTextStyle.bodyLarge(
+                    context,
+                  ).copyWith(color: _getTextColor(context), height: 1.6),
+                  textAlign: TextAlign.center,
+                  maxLines: 4,
+                ),
 
-              OsmeaComponents.sizedBox(height: context.spacing48),
+                OsmeaComponents.sizedBox(height: context.spacing48),
 
-              // Retry button
-              _buildRetryButton(context),
+                // Retry button
+                _buildRetryButton(context),
 
-              OsmeaComponents.sizedBox(height: context.spacing12),
+                OsmeaComponents.sizedBox(height: context.spacing12),
 
-              // Go back button
-              _buildGoBackButton(context),
-            ],
+                // Go back button
+                _buildGoBackButton(context),
+              ],
+            ),
           ),
         ),
       ),

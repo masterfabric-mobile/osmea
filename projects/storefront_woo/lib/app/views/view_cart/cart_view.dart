@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_content_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/cart_error_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -68,14 +69,11 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     CartViewModel viewModel,
     CartState state,
   ) {
-    // Error state
+    // Error state - show full-screen error widget
     if (state is CartErrorState) {
-      return ErrorHandlingView(
-        goRoute: goRoute,
-        customRetryFunction: () async {
-          viewModel.loadCart();
-          return true;
-        },
+      return CartErrorWidget(
+        message: state.message,
+        onRetry: () => viewModel.loadCart(),
       );
     }
 

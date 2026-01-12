@@ -19,6 +19,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
+// Animation helpers are now imported from core
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -889,14 +890,17 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         final wishlistVm = GetIt.I<WishlistViewModel>();
         final isSaved = wishlistVm.isSaved(productId);
 
-        return ClipRect(
-          child: ProductCardWidget(
-            product: product,
-            isSaved: isSaved,
-            onWishlistTap: () {
-              GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-            },
-            onTap: () => context.push('/product-detail/$productId'),
+        return StaggeredAnimation(
+          index: index,
+          child: ClipRect(
+            child: ProductCardWidget(
+              product: product,
+              isSaved: isSaved,
+              onWishlistTap: () {
+                GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+              },
+              onTap: () => context.push('/product-detail/$productId'),
+            ),
           ),
         );
       },

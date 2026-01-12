@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+// Animation helpers are now imported from core
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -163,16 +164,21 @@ class RecommendedSectionWidget extends StatelessWidget {
           child: Wrap(
             spacing: context.spacing16,
             runSpacing: context.height16,
-            children: recommendedProducts.map((product) {
+            children: recommendedProducts.asMap().entries.map((entry) {
+              final index = entry.key;
+              final product = entry.value;
               // Use RepaintBoundary to isolate each card and prevent unnecessary repaints
               return RepaintBoundary(
-                child: SizedBox(
-                  width:
-                      (context.allWidth -
-                          (horizontalPadding * 2) -
-                          context.spacing16) /
-                      2,
-                  child: _buildRecommendedCard(context, product),
+                child: StaggeredAnimation(
+                  index: index,
+                  child: SizedBox(
+                    width:
+                        (context.allWidth -
+                            (horizontalPadding * 2) -
+                            context.spacing16) /
+                        2,
+                    child: _buildRecommendedCard(context, product),
+                  ),
                 ),
               );
             }).toList(),
@@ -207,7 +213,7 @@ class RecommendedSectionWidget extends StatelessWidget {
       }
     }
 
-    return GestureDetector(
+    return AnimatedCard(
       onTap: () {
         viewModel.selectProduct(product);
         context.push('/product-detail/${product.id ?? 0}');

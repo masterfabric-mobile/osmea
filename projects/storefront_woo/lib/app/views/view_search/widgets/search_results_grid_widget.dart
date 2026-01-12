@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+// Animation helpers are now imported from core
 
 class SearchResultsGridWidget extends StatelessWidget {
   final List<dynamic> products;
@@ -24,23 +25,28 @@ class SearchResultsGridWidget extends StatelessWidget {
       child: Wrap(
         spacing: 15, // Same as Recommended section horizontal spacing
         runSpacing: 16, // Same as Recommended section vertical spacing
-        children: products.map((product) {
+        children: products.asMap().entries.map((entry) {
+          final index = entry.key;
+          final product = entry.value;
           final productId = product.id ?? 0;
 
           // Direct check without BlocBuilder to prevent blocking
           final wishlistVm = GetIt.I<WishlistViewModel>();
           final isSaved = wishlistVm.isSaved(productId);
 
-          return SizedBox(
-            width: (MediaQuery.of(context).size.width - 55) / 2,
-            child: ProductCardWidget(
-              product: product,
-              isSaved: isSaved,
-              onWishlistTap: () {
-                // Use shared HomeViewModel for wishlist to keep messages/state in sync
-                GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-              },
-              onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+          return StaggeredAnimation(
+            index: index,
+            child: SizedBox(
+              width: (MediaQuery.of(context).size.width - 55) / 2,
+              child: ProductCardWidget(
+                product: product,
+                isSaved: isSaved,
+                onWishlistTap: () {
+                  // Use shared HomeViewModel for wishlist to keep messages/state in sync
+                  GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+                },
+                onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+              ),
             ),
           );
         }).toList(),

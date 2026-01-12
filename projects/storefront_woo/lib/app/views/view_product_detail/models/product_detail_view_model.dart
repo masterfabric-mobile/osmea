@@ -1089,12 +1089,14 @@ class ProductDetailViewModel
       }
 
       // Update state to show product is in cart and update quantity
+      // Also set flag to show add to cart popup
       final finalState = state;
       if (finalState is ProductDetailLoadedState) {
         emit(
           finalState.copyWith(
             isInCart: true,
             selectedQuantity: finalQuantity, // Update to actual cart quantity
+            shouldShowAddToCartPopup: true, // Trigger bottom sheet
           ),
         );
         _selectedQuantity = finalQuantity;

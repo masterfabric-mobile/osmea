@@ -18,44 +18,22 @@ import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Get color from config
 Color _getColorFromConfig(String key, Color fallback) {
-  try {
-    final configHelper = AssetConfigHelper();
-    final colorString = configHelper.getString(
-      'dialog_popup_configuration.add_to_cart_popup.$key',
-    );
-    if (colorString.isNotEmpty && colorString.startsWith('#')) {
-      final hexString = colorString.substring(1);
-      if (hexString.length == 6) {
-        return Color(int.parse('FF$hexString', radix: 16));
-      } else if (hexString.length == 8) {
-        return Color(int.parse(hexString, radix: 16));
-      }
-    }
-  } catch (e) {
-    debugPrint('⚠️ Failed to load add_to_cart_popup color $key: $e');
-  }
-  return fallback;
+  final configHelper = AssetConfigHelper();
+  return ColorHelper.getColorFromConfig(
+    configHelper,
+    'dialog_popup_configuration.add_to_cart_popup.$key',
+    fallback: fallback,
+  );
 }
 
 /// Get button color from config
 Color _getButtonColorFromConfig(String key, Color fallback) {
-  try {
-    final configHelper = AssetConfigHelper();
-    final colorString = configHelper.getString(
-      'dialog_popup_configuration.buttons.$key',
-    );
-    if (colorString.isNotEmpty && colorString.startsWith('#')) {
-      final hexString = colorString.substring(1);
-      if (hexString.length == 6) {
-        return Color(int.parse('FF$hexString', radix: 16));
-      } else if (hexString.length == 8) {
-        return Color(int.parse(hexString, radix: 16));
-      }
-    }
-  } catch (e) {
-    debugPrint('⚠️ Failed to load button color $key: $e');
-  }
-  return fallback;
+  final configHelper = AssetConfigHelper();
+  return ColorHelper.getColorFromConfig(
+    configHelper,
+    'dialog_popup_configuration.buttons.$key',
+    fallback: fallback,
+  );
 }
 
 /// Shows add to cart success bottom sheet with cart summary
@@ -106,77 +84,138 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             horizontal: context.spacing16,
             vertical: context.spacing12,
           ),
-          child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: OsmeaComponents.column(
             children: [
-              // Continue shopping button
-              Builder(
-                builder: (context) {
-                  final secondaryBgColor = _getButtonColorFromConfig(
-                    'secondary.backgroundColor',
-                    OsmeaColors.white,
-                  );
-                  final secondaryTextColor = _getButtonColorFromConfig(
-                    'secondary.textColor',
-                    OsmeaColors.black,
-                  );
-                  final secondaryBorderColor = _getButtonColorFromConfig(
-                    'secondary.borderColor',
-                    OsmeaColors.black,
-                  );
-
-                  return OsmeaComponents.expanded(
-                    child: OsmeaComponents.button(
-                      text: context.t.productDetailView.addToCart.popup.continueShopping,
-                      variant: ButtonVariant.outlined,
-                      size: ButtonSize.small,
-                      backgroundColor: secondaryBgColor,
-                      textColor: secondaryTextColor,
-                      borderColor: secondaryBorderColor,
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  );
-                },
+              // Price and item count info
+              OsmeaComponents.row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Item count
+                  OsmeaComponents.column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      OsmeaComponents.text(
+                        'Items',
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      OsmeaComponents.sizedBox(height: context.spacing2),
+                      OsmeaComponents.text(
+                        '${cartState.totalItems}',
+                        textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                          color: OsmeaColors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Total price
+                  OsmeaComponents.column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      OsmeaComponents.text(
+                        'Total',
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      OsmeaComponents.sizedBox(height: context.spacing2),
+                      OsmeaComponents.text(
+                        PriceInfoCurrencyHelper.formatPrice(
+                          cartState.totalPrice,
+                          currencyCode: cartState.currencyCode,
+                          currencyDecimalSeparator: cartState.currencyDecimalSeparator,
+                          currencyThousandSeparator: cartState.currencyThousandSeparator,
+                          decimalPlaces: cartState.currencyMinorUnit ?? 2,
+                          removeTrailingZeros: true,
+                        ),
+                        textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                          color: OsmeaColors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              OsmeaComponents.sizedBox(width: context.spacing8),
-              // Checkout button
-              Builder(
-                builder: (context) {
-                  final primaryBgColor = _getButtonColorFromConfig(
-                    'primary.backgroundColor',
-                    OsmeaColors.black,
-                  );
-                  final primaryTextColor = _getButtonColorFromConfig(
-                    'primary.textColor',
-                    OsmeaColors.white,
-                  );
+              OsmeaComponents.sizedBox(height: context.spacing12),
+              // Buttons row
+              OsmeaComponents.row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Continue shopping button
+                  Builder(
+                    builder: (context) {
+                      final secondaryBgColor = _getButtonColorFromConfig(
+                        'secondary.backgroundColor',
+                        OsmeaColors.white,
+                      );
+                      final secondaryTextColor = _getButtonColorFromConfig(
+                        'secondary.textColor',
+                        OsmeaColors.black,
+                      );
+                      final secondaryBorderColor = _getButtonColorFromConfig(
+                        'secondary.borderColor',
+                        OsmeaColors.black,
+                      );
 
-                  return OsmeaComponents.expanded(
-                    child: OsmeaComponents.button(
-                      text: context.t.productDetailView.addToCart.popup.checkout,
-                      variant: ButtonVariant.primary,
-                      size: ButtonSize.small,
-                      backgroundColor: primaryBgColor,
-                      textColor: primaryTextColor,
-                      onPressed: () {
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          // Navigate to checkout (guest checkout is allowed)
-                          context.go(
-                            '/checkout',
-                            extra: {
-                              'totalAmount': cartState.totalPrice,
-                              'currencySymbol': cartState.currencySymbol,
-                              'currencyCode': cartState.currencyCode,
-                            },
-                          );
-                        }
-                      },
-                    ),
-                  );
-                },
+                      return OsmeaComponents.expanded(
+                        child: OsmeaComponents.button(
+                          text: context.t.productDetailView.addToCart.popup.continueShopping,
+                          variant: ButtonVariant.outlined,
+                          size: ButtonSize.small,
+                          backgroundColor: secondaryBgColor,
+                          textColor: secondaryTextColor,
+                          borderColor: secondaryBorderColor,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing8),
+                  // Checkout button
+                  Builder(
+                    builder: (context) {
+                      final primaryBgColor = _getButtonColorFromConfig(
+                        'primary.backgroundColor',
+                        OsmeaColors.black,
+                      );
+                      final primaryTextColor = _getButtonColorFromConfig(
+                        'primary.textColor',
+                        OsmeaColors.white,
+                      );
+
+                      return OsmeaComponents.expanded(
+                        child: OsmeaComponents.button(
+                          text: context.t.productDetailView.addToCart.popup.checkout,
+                          variant: ButtonVariant.primary,
+                          size: ButtonSize.small,
+                          backgroundColor: primaryBgColor,
+                          textColor: primaryTextColor,
+                          onPressed: () {
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              // Navigate to checkout (guest checkout is allowed)
+                              context.go(
+                                '/checkout',
+                                extra: {
+                                  'totalAmount': cartState.totalPrice,
+                                  'currencySymbol': cartState.currencySymbol,
+                                  'currencyCode': cartState.currencyCode,
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
