@@ -277,67 +277,104 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.sizedBox(height: context.spacing12),
-                // Success message
-                Builder(
-                  builder: (context) {
-                    final successBgColor = _getColorFromConfig(
-                      'successBackgroundColor',
-                      const Color(0xFFE8F5E9),
-                    );
-                    final successBorderColor = _getColorFromConfig(
-                      'successBorderColor',
-                      const Color(0xFF4CAF50),
-                    );
-                    final successIconColor = _getColorFromConfig(
-                      'successIconColor',
-                      const Color(0xFF4CAF50),
-                    );
-                    final successTextColor = _getColorFromConfig(
-                      'successTextColor',
-                      const Color(0xFF2E7D32),
-                    );
+                // Success message - only show when cart is not empty
+                if (cartState.cartItems.isNotEmpty)
+                  Builder(
+                    builder: (context) {
+                      final successBgColor = _getColorFromConfig(
+                        'successBackgroundColor',
+                        const Color(0xFFE8F5E9),
+                      );
+                      final successBorderColor = _getColorFromConfig(
+                        'successBorderColor',
+                        const Color(0xFF4CAF50),
+                      );
+                      final successIconColor = _getColorFromConfig(
+                        'successIconColor',
+                        const Color(0xFF4CAF50),
+                      );
+                      final successTextColor = _getColorFromConfig(
+                        'successTextColor',
+                        const Color(0xFF2E7D32),
+                      );
 
-                    return OsmeaComponents.container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: context.spacing16,
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.spacing16,
-                        vertical: context.spacing12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: successBgColor,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: successBorderColor, width: 1),
-                      ),
-                      child: OsmeaComponents.row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: successIconColor,
-                            size: context.iconSizeMedium,
-                          ),
-                          OsmeaComponents.sizedBox(width: context.spacing10),
-                          OsmeaComponents.expanded(
-                            child: OsmeaComponents.text(
-                              context.t.productDetailView.addToCart.popup.successMessage,
-                              textAlign: TextAlign.center,
-                              textStyle: OsmeaTextStyle.bodySmall(context)
-                                  .copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: successTextColor,
-                                  ),
+                      return OsmeaComponents.container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: context.spacing16,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing16,
+                          vertical: context.spacing12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: successBgColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: successBorderColor, width: 1),
+                        ),
+                        child: OsmeaComponents.row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: successIconColor,
+                              size: context.iconSizeMedium,
                             ),
+                            OsmeaComponents.sizedBox(width: context.spacing10),
+                            OsmeaComponents.expanded(
+                              child: OsmeaComponents.text(
+                                context.t.productDetailView.addToCart.popup.successMessage,
+                                textAlign: TextAlign.center,
+                                textStyle: OsmeaTextStyle.bodySmall(context)
+                                    .copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: successTextColor,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                if (cartState.cartItems.isNotEmpty)
+                  OsmeaComponents.sizedBox(height: context.spacing20),
+                // Cart items list or empty state
+                if (cartState.cartItems.isEmpty) ...[
+                  // Empty cart message
+                  OsmeaComponents.container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing24,
+                      vertical: context.spacing32,
+                    ),
+                    child: OsmeaComponents.column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart_outlined,
+                          size: context.iconSizeLarge * 1.5,
+                          color: OsmeaColors.grayMaterial[300],
+                        ),
+                        OsmeaComponents.sizedBox(height: context.spacing16),
+                        OsmeaComponents.text(
+                          context.t.cartView.empty.title,
+                          textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: OsmeaColors.grayMaterial[600],
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing20),
-                // Cart items list
-                if (cartState.cartItems.isNotEmpty) ...[
+                          textAlign: TextAlign.center,
+                        ),
+                        OsmeaComponents.sizedBox(height: context.spacing8),
+                        OsmeaComponents.text(
+                          context.t.cartView.empty.subtitle,
+                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                            color: OsmeaColors.grayMaterial[400],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
                   OsmeaComponents.container(
                     margin: EdgeInsets.symmetric(horizontal: context.spacing16),
                     padding: EdgeInsets.symmetric(
@@ -424,3 +461,4 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
     ),
   );
 }
+ 
