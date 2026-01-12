@@ -12,7 +12,6 @@ import 'package:storefront_woo/app/views/view_product_list/models/product_list_v
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_skeleton_widget.dart';
-import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
 /// ProductListView displays a filtered list of products
@@ -40,11 +39,15 @@ class ProductListView
     debugPrint('🚀 ProductListView.initialContent called');
     debugPrint('🚀 Arguments: $arguments');
     viewModel.setArguments(arguments);
-    debugPrint('🚀 Calling loadProducts(refresh: true)');
-    viewModel.loadProducts(refresh: true);
+    
+    // Load categories first so category names are available for filter chips
+    viewModel.loadCategories().then((_) {
+      debugPrint('🚀 Categories loaded, now loading products');
+      viewModel.loadProducts(refresh: true);
+    });
+    
     // Load attributes early so they're available when filter dialog opens
     viewModel.loadAttributes();
-    debugPrint('🚀 loadProducts call completed');
   }
 
   @override

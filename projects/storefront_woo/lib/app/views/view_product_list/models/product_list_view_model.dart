@@ -185,6 +185,29 @@ class ProductListViewModel
     _arguments
       ..clear()
       ..addAll(args);
+    
+    // Parse category_id from arguments/query parameters
+    if (args.containsKey('category_id')) {
+      final categoryIdValue = args['category_id'];
+      int? categoryId;
+      
+      if (categoryIdValue is int) {
+        categoryId = categoryIdValue;
+      } else if (categoryIdValue is String) {
+        categoryId = int.tryParse(categoryIdValue);
+      }
+      
+      if (categoryId != null) {
+        // Apply category filter - use both selectedCategories and category for compatibility
+        _filters = _filters.copyWith(
+          selectedCategories: [categoryId],
+          category: categoryId,
+        );
+        debugPrint('✅ ProductListViewModel: Applied category filter from arguments: $categoryId');
+        debugPrint('✅ ProductListViewModel: Filter selectedCategories: ${_filters.selectedCategories}');
+        debugPrint('✅ ProductListViewModel: Filter category: ${_filters.category}');
+      }
+    }
   }
 
   Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
@@ -1395,10 +1418,16 @@ class ProductListViewModel
         'v1',
       );
 
+      // If we have selected categories, include them to ensure they're loaded
+      final includeCategories = _filters.selectedCategories?.isNotEmpty == true
+          ? _filters.selectedCategories
+          : null;
+
       final categories = await _categoriesService.listProductCategories(
         apiVersion: apiVersion,
         perPage: 100, // Get all categories
         hideEmpty: true, // Only get categories with products
+        include: includeCategories, // Include selected categories to ensure they're loaded
       );
 
       _categories = categories;

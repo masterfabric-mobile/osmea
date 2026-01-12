@@ -603,6 +603,12 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               const ListProductCategoriesResponseModel(id: null, name: null),
         );
 
+        // Only show chip if category name is available (categories are loaded)
+        // Skip if category name is null and we're still loading
+        if (category.name == null && widget.state.isLoadingFilterOptions) {
+          continue; // Skip this chip until categories are loaded
+        }
+
         final categoryName = category.name ?? context.t.productListView.widgets.chips.categoryFallback.replaceAll('{categoryId}', categoryId.toString());
         final categoryChipBgColor = _configHelper.getColor(
           'product_list_view.filter_chips.category.backgroundColor',

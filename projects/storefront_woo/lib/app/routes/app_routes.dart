@@ -241,9 +241,26 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/products',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Parse query parameters
+            final queryParams = state.uri.queryParameters;
+            final arguments = <String, dynamic>{
+              'products': true,
+            };
+            
+            // Add category_id from query parameters if present
+            if (queryParams.containsKey('category_id')) {
+              final categoryIdStr = queryParams['category_id'];
+              if (categoryIdStr != null) {
+                final categoryId = int.tryParse(categoryIdStr);
+                if (categoryId != null) {
+                  arguments['category_id'] = categoryId;
+                }
+              }
+            }
+            
             return CustomTransitionPage(
               child: ProductListView(
-                arguments: const {'products': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
