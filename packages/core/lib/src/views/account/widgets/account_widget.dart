@@ -74,11 +74,12 @@ mixin AccountWidget {
                 )),
 
             // Account Details Section (only if authenticated)
-            if (_isAuthenticated(context)) ...[
-              OsmeaComponents.sizedBox(height: context.spacing8),
-              _buildStartupAccountSection(context),
-              OsmeaComponents.sizedBox(height: context.spacing24),
-            ],
+            // Hidden: JWT token and cart token sections should not be visible
+            // if (_isAuthenticated(context)) ...[
+            //   OsmeaComponents.sizedBox(height: context.spacing8),
+            //   _buildStartupAccountSection(context),
+            //   OsmeaComponents.sizedBox(height: context.spacing24),
+            // ],
 
             // Actions
             _buildStartupActions(context, viewModel),
@@ -165,17 +166,18 @@ mixin AccountWidget {
                   ]),
 
               // Account Details Section (only if authenticated)
-              if (_isAuthenticated(context)) ...[
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: separatorColor,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-                _buildSpaceAccountSection(
-                    context, textColor, iconColor, separatorColor),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-              ],
+              // Hidden: JWT token and cart token sections should not be visible
+              // if (_isAuthenticated(context)) ...[
+              //   Divider(
+              //     height: 1,
+              //     thickness: 1,
+              //     color: separatorColor,
+              //   ),
+              //   OsmeaComponents.sizedBox(height: context.spacing24),
+              //   _buildSpaceAccountSection(
+              //       context, textColor, iconColor, separatorColor),
+              //   OsmeaComponents.sizedBox(height: context.spacing24),
+              // ],
 
               // Actions
               _buildSpaceActions(context, viewModel, primaryColor, textColor),
@@ -339,6 +341,8 @@ mixin AccountWidget {
   }
 
   /// Build space style account section
+  /// Hidden: JWT token and cart token sections should not be visible
+  // ignore: unused_element
   Widget _buildSpaceAccountSection(
     BuildContext context,
     Color textColor,
@@ -910,6 +914,8 @@ mixin AccountWidget {
   }
 
   /// Build startup style account section
+  /// Hidden: JWT token and cart token sections should not be visible
+  // ignore: unused_element
   Widget _buildStartupAccountSection(BuildContext context) {
     return _buildCardWrapper(
       context: context,
