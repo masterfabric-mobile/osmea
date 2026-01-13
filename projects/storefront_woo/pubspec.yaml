@@ -11,9 +11,15 @@ dependencies:
     sdk: flutter
 
   core:
-    path: ../../packages/core # Shared business logic, constants, utilities
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core # Shared business logic, constants, utilities
   apis:
-    path: ../../packages/apis # Networking layer (REST, GraphQL, etc.)
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/apis # Networking layer (REST, GraphQL, etc.)
 
   cupertino_icons: ^1.0.8
   flutter_dotenv: ^5.1.0
