@@ -713,6 +713,52 @@ class ConfigCache {
 - No internet connection
 - Solution: Implement retry logic and fallback to local config
 
+### Incomplete Configuration Data
+
+**Symptoms:**
+- Only partial configuration data is loaded in WordPress
+- Some configuration keys are missing after plugin activation
+- Default config file has 32 keys but only 22 are saved
+
+**Possible Causes:**
+- WordPress `wp_options` table uses `TEXT` type instead of `LONGTEXT` (rare)
+- Database column size limitation
+- Activation hook error (check PHP error logs)
+
+**Solutions:**
+
+1. **Check Database Column Type (phpMyAdmin):**
+   - Log in to phpMyAdmin through your WordPress hosting panel
+   - Select your WordPress database
+   - Find the `wp_options` table
+   - Click on "Structure" tab
+   - Check the `option_value` column type
+   - If it shows `TEXT`, change it to `LONGTEXT`:
+     - Click "Change" button for `option_value` column
+     - Select `LONGTEXT` from the type dropdown
+     - Click "Save"
+
+2. **Check Database Column Type (SQL Command):**
+   - Open phpMyAdmin SQL tab or database terminal
+   - Run this SQL command:
+     ```sql
+     ALTER TABLE `wp_options` MODIFY `option_value` LONGTEXT;
+     ```
+   - **Note:** Replace `wp_` with your actual WordPress table prefix if different
+
+3. **Check PHP Error Logs:**
+   - Check WordPress debug log for activation errors
+   - Enable `WP_DEBUG` in `wp-config.php` if not already enabled
+   - Look for JSON decode/encode errors
+
+4. **Manually Import Configuration:**
+   - Go to WordPress Admin → Settings → OSMEA App Config
+   - Click "Reset to Default" button
+   - Or manually copy the content from `default-config.json` file
+   - Click "Format JSON" and then "Save Configuration"
+
+**Note:** WordPress `wp_options` table typically uses `LONGTEXT` type by default, so this issue is rare. Most cases are due to activation hook errors or manual configuration edits.
+
 ## 📁 File Structure
 
 ```

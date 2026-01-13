@@ -121,21 +121,36 @@
          * Reset to default config
          */
         function resetToDefault() {
+            const $resetBtn = $('#osmea-reset-config');
+            const originalText = $resetBtn.text();
+            $resetBtn.text(osmeaConfig.strings.resetting || 'Resetting...').prop('disabled', true);
+            
             $.ajax({
-                url: osmeaConfig.restUrl,
-                method: 'GET',
+                url: osmeaConfig.resetUrl,
+                method: 'POST',
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-WP-Nonce', osmeaConfig.nonce);
                 },
                 success: function(response) {
-                    // This would need to fetch default from somewhere
-                    // For now, we'll just clear and let user know
-                    if (confirm('Reload the page to load default configuration. Continue?')) {
-                        location.reload();
+                    if (response.success && response.config) {
+                        // Update the editor with the default config
+                        const formatted = JSON.stringify(response.config, null, 2);
+                        $editor.val(formatted);
+                        validateJSON();
+                        showStatus('valid', osmeaConfig.strings.resetSuccess || '✓ Configuration reset to default successfully!');
+                        
+                        // Auto-save by submitting the form after a brief delay
+                        alert(osmeaConfig.strings.resetSuccess || 'Configuration reset to default successfully! Click OK and then Save Configuration to apply changes.');
                     }
+                    $resetBtn.text(originalText).prop('disabled', false);
                 },
-                error: function() {
-                    alert(osmeaConfig.strings.error);
+                error: function(xhr) {
+                    let errorMessage = osmeaConfig.strings.error;
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage += ': ' + xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                    $resetBtn.text(originalText).prop('disabled', false);
                 }
             });
         }
