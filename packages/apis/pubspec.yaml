@@ -38,7 +38,10 @@ dependencies:
   logger: ^2.5.0
 
   core:
-    path: ../core
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
 
   # Code generation and annotations
   json_annotation: ^4.9.0
