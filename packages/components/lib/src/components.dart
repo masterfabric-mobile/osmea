@@ -1144,7 +1144,7 @@ class OsmeaComponents {
   /// Example:
   /// ```dart
   /// OsmeaComponents.navbar(
-  ///   variant: NavbarVariant.primary,
+  ///   variant: NavbarVariant.retailMain,
   ///   size: NavbarSize.medium,
   ///   position: NavbarPosition.top,
   ///   items: [
@@ -1166,7 +1166,7 @@ class OsmeaComponents {
     CoreTheme? customTheme,
     required List<NavbarItem> items,
     NavbarSize size = NavbarSize.medium,
-    NavbarVariant variant = NavbarVariant.primary,
+    NavbarVariant variant = NavbarVariant.retailMain,
     NavbarPosition position = NavbarPosition.top,
     Color? backgroundColor,
     Color? textColor,

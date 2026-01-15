@@ -21,7 +21,8 @@ import 'package:osmea_components/src/utils/text_extensions.dart';
 /// ```dart
 /// final sizeConfig = NavbarSize.medium.config(context);
 /// final isHorizontal = NavbarPosition.top.isHorizontal;
-/// final needsScaffold = NavbarType.fixed.needsScaffoldIntegration;
+/// final isIconOnly = NavbarStyle.iconOnly.isIconOnly;
+/// final hasIndicator = NavbarIndicatorStyle.line.hasVisualIndicator;
 /// ```
 ///
 /// @category Utils
@@ -235,40 +236,155 @@ extension NavbarPositionExtension on NavbarPosition {
 
 /// Extension for navbar variant utilities
 extension NavbarVariantExtension on NavbarVariant {
-  /// 🎨 Check if variant is primary
-  bool get isPrimary => this == NavbarVariant.primary;
+  /// 🛒 Check if variant is retail main
+  bool get isRetailMain => this == NavbarVariant.retailMain;
 
-  /// 🎨 Check if variant is secondary
-  bool get isSecondary => this == NavbarVariant.secondary;
+  /// 🏪 Check if variant is retail sidebar
+  bool get isRetailSidebar => this == NavbarVariant.retailSidebar;
 
-  /// 👻 Check if variant is transparent
-  bool get isTransparent => this == NavbarVariant.transparent;
+  /// 🏥 Check if variant is healthcare minimal
+  bool get isHealthcareMinimal => this == NavbarVariant.healthcareMinimal;
 
-  /// ✨ Check if variant is glass/frosted
-  bool get isGlass => this == NavbarVariant.glass;
+  /// 💼 Check if variant is finance bordered
+  bool get isFinanceBordered => this == NavbarVariant.financeBordered;
 
-  /// 📋 Check if variant is outlined
-  bool get isOutlined => this == NavbarVariant.outlined;
+  /// 🎬 Check if variant is media overlay
+  bool get isMediaOverlay => this == NavbarVariant.mediaOverlay;
+
+  /// 📱 Check if variant is social glass
+  bool get isSocialGlass => this == NavbarVariant.socialGlass;
+
+  /// 🏢 Check if variant is enterprise main
+  bool get isEnterpriseMain => this == NavbarVariant.enterpriseMain;
+
+  /// 🏛️ Check if variant is enterprise sidebar
+  bool get isEnterpriseSidebar => this == NavbarVariant.enterpriseSidebar;
 
   /// 🎯 Check if variant has transparent background
-  bool get hasTransparentBackground => isTransparent || isGlass;
+  bool get hasTransparentBackground => isMediaOverlay || isSocialGlass;
 
   /// 🎯 Check if variant needs backdrop blur
-  bool get needsBackdropBlur => isGlass;
+  bool get needsBackdropBlur => isSocialGlass;
 
   /// 🎯 Check if variant needs border
-  bool get needsBorder => isOutlined || isGlass;
+  bool get needsBorder => isHealthcareMinimal || isFinanceBordered;
+
+  /// 🎯 Check if variant is for e-commerce/retail sector
+  bool get isForRetail => isRetailMain || isRetailSidebar;
+
+  /// 🎯 Check if variant is for healthcare sector
+  bool get isForHealthcare => isHealthcareMinimal;
+
+  /// 🎯 Check if variant is for finance sector
+  bool get isForFinance => isFinanceBordered;
+
+  /// 🎯 Check if variant is for media/entertainment sector
+  bool get isForMedia => isMediaOverlay;
+
+  /// 🎯 Check if variant is for social media sector
+  bool get isForSocial => isSocialGlass;
+
+  /// 🎯 Check if variant is for enterprise sector
+  bool get isForEnterprise => isEnterpriseMain || isEnterpriseSidebar;
 
   /// 🎯 Get relative opacity level (0.0 to 1.0)
   double get opacity {
     switch (this) {
-      case NavbarVariant.primary:
-      case NavbarVariant.secondary:
-      case NavbarVariant.outlined:
+      case NavbarVariant.retailMain:
+      case NavbarVariant.retailSidebar:
+      case NavbarVariant.healthcareMinimal:
+      case NavbarVariant.financeBordered:
+      case NavbarVariant.enterpriseMain:
+      case NavbarVariant.enterpriseSidebar:
         return 1.0;
-      case NavbarVariant.glass:
+      case NavbarVariant.socialGlass:
         return 0.8;
-      case NavbarVariant.transparent:
+      case NavbarVariant.mediaOverlay:
+        return 0.0;
+    }
+  }
+}
+
+/// Extension for navbar style utilities
+extension NavbarStyleExtension on NavbarStyle {
+  /// 🎭 Check if style is icon-only
+  bool get isIconOnly => this == NavbarStyle.iconOnly;
+
+  /// 📱 Check if style shows text
+  bool get showsText =>
+      this == NavbarStyle.iconWithText ||
+      this == NavbarStyle.iconWithSubtext ||
+      this == NavbarStyle.textOnly ||
+      this == NavbarStyle.iconAndTextHorizontal;
+
+  /// 📋 Check if style shows subtext
+  bool get showsSubtext => this == NavbarStyle.iconWithSubtext;
+
+  /// 🎯 Check if style is horizontal layout
+  bool get isHorizontalLayout =>
+      this == NavbarStyle.iconAndTextHorizontal || this == NavbarStyle.textOnly;
+
+  /// 🎯 Check if style is vertical layout
+  bool get isVerticalLayout =>
+      this == NavbarStyle.iconWithText ||
+      this == NavbarStyle.iconWithSubtext ||
+      this == NavbarStyle.iconOnly;
+
+  /// 🎯 Check if style requires icon
+  bool get requiresIcon =>
+      this != NavbarStyle.textOnly && this != NavbarStyle.iconAndTextHorizontal;
+
+  /// 🎯 Check if style requires text
+  bool get requiresText => this != NavbarStyle.iconOnly;
+
+  /// 📱 Check if style is app bar pattern
+  bool get isAppBar =>
+      this == NavbarStyle.appBar || this == NavbarStyle.appBarWithSearch;
+
+  /// 🍔 Check if style is drawer trigger
+  bool get isDrawerTrigger => this == NavbarStyle.drawerTrigger;
+
+  /// 📑 Check if style is tab bar
+  bool get isTabBar => this == NavbarStyle.topTabBar;
+
+  /// 🎯 Check if style is mobile-specific
+  bool get isMobileSpecific =>
+      isAppBar || isDrawerTrigger || isTabBar || this == NavbarStyle.iconWithText;
+}
+
+/// Extension for navbar indicator style utilities
+extension NavbarIndicatorStyleExtension on NavbarIndicatorStyle {
+  /// 🎯 Check if indicator has visual element
+  bool get hasVisualIndicator => this != NavbarIndicatorStyle.none;
+
+  /// 🎯 Check if indicator is line-based
+  bool get isLineBased =>
+      this == NavbarIndicatorStyle.line ||
+      this == NavbarIndicatorStyle.underline;
+
+  /// 🎯 Check if indicator is shape-based
+  bool get isShapeBased =>
+      this == NavbarIndicatorStyle.dot ||
+      this == NavbarIndicatorStyle.fill ||
+      this == NavbarIndicatorStyle.border;
+
+  /// 🎯 Check if indicator affects background
+  bool get affectsBackground => this == NavbarIndicatorStyle.fill;
+
+  /// 🎯 Check if indicator affects border
+  bool get affectsBorder =>
+      this == NavbarIndicatorStyle.border ||
+      this == NavbarIndicatorStyle.line;
+
+  /// 🎯 Get indicator thickness (for line/underline)
+  double get thickness {
+    switch (this) {
+      case NavbarIndicatorStyle.line:
+      case NavbarIndicatorStyle.underline:
+        return 3.0;
+      case NavbarIndicatorStyle.border:
+        return 2.0;
+      default:
         return 0.0;
     }
   }

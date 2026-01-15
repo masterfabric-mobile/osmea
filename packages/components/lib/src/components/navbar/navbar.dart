@@ -15,40 +15,102 @@ import 'package:osmea_components/src/core/container_widget.dart';
 /// {@subCategory Navigation}
 ///
 /// Features:
-/// * 🎨 Multiple style variants (primary, secondary, transparent, glass, outlined)
+/// * 🎨 Sector-based style variants (retailMain, retailSidebar, healthcareMinimal, financeBordered, mediaOverlay, socialGlass, enterpriseMain, enterpriseSidebar)
+/// * 🎭 Multiple design styles (iconOnly, iconWithText, iconWithSubtext, textOnly, iconAndTextHorizontal, appBar, appBarWithSearch, drawerTrigger, topTabBar)
+/// * 🎯 Multiple indicator styles (none, line, dot, fill, border, underline)
 /// * 📏 Three size options (small, medium, large)
 /// * 📍 Flexible positioning (top, bottom, left, right, floating)
+/// * 📋 Subtext/caption support for detailed navigation items
+/// * 🍔 Mobile app bar with hamburger menu, title, and actions
+/// * 🔍 Search bar integration for app bars
 /// * 🎯 Interactive navbar items with states
 /// * ♿ Full accessibility support
 /// * 🌐 RTL/LTR language support
 /// * 📱 Responsive design
 /// * 🎭 Custom theming capabilities
 ///
+/// **Bottom Navigation Bar (E-commerce):**
 /// ```dart
 /// OsmeaNavbar(
-///   variant: NavbarVariant.primary,
+///   variant: NavbarVariant.retailMain,
 ///   size: NavbarSize.medium,
+///   position: NavbarPosition.bottom,
+///   style: NavbarStyle.iconWithText,
+///   indicatorStyle: NavbarIndicatorStyle.line,
+///   items: [
+///     NavbarItem(text: 'Home', icon: Icon(Icons.home)),
+///     NavbarItem(text: 'Search', icon: Icon(Icons.search)),
+///     NavbarItem(text: 'Profile', icon: Icon(Icons.person)),
+///   ],
+/// )
+/// ```
+///
+/// **App Bar with Hamburger Menu (Enterprise):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.retailMain,
 ///   position: NavbarPosition.top,
+///   style: NavbarStyle.appBar,
 ///   items: [
 ///     NavbarItem(
-///       text: 'Home',
-///       icon: Icon(Icons.home),
-///       onTap: () => Navigator.pushNamed(context, '/home'),
-///     ),
-///     NavbarItem(
-///       text: 'Profile',
-///       icon: Icon(Icons.person),
-///       onTap: () => Navigator.pushNamed(context, '/profile'),
+///       text: 'My App',
+///       title: 'My App',
+///       leadingIcon: IconButton(
+///         icon: Icon(Icons.menu),
+///         onPressed: () => Scaffold.of(context).openDrawer(),
+///       ),
+///       trailingActions: [
+///         IconButton(icon: Icon(Icons.search), onPressed: () {}),
+///         IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
+///       ],
 ///     ),
 ///   ],
 /// )
 /// ```
 ///
+/// **App Bar with Search (E-commerce):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.retailMain,
+///   position: NavbarPosition.top,
+///   style: NavbarStyle.appBarWithSearch,
+///   items: [
+///     NavbarItem(
+///       text: 'Search',
+///       leadingIcon: IconButton(
+///         icon: Icon(Icons.menu),
+///         onPressed: () => Scaffold.of(context).openDrawer(),
+///       ),
+///       searchBar: TextField(
+///         decoration: InputDecoration(hintText: 'Search...'),
+///       ),
+///       trailingActions: [
+///         IconButton(icon: Icon(Icons.filter_list), onPressed: () {}),
+///       ],
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// **Navbar with Custom Border (Healthcare):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.healthcareMinimal,
+///   position: NavbarPosition.bottom,
+///   showBorder: true,
+///   borderWidth: 2.0,
+///   borderColor: OsmeaColors.nordicBlue,
+///   borderStyle: BorderStyle.solid,
+///   items: navigationItems,
+/// )
+/// ```
+///
 /// See also:
 /// * [NavbarVariant] - Style variants enum
+/// * [NavbarStyle] - Design style patterns enum
+/// * [NavbarIndicatorStyle] - Indicator style enum
 /// * [NavbarSize] - Size variants enum
 /// * [NavbarPosition] - Position options enum
-/// * [NavbarType] - Type variants enum
 /// * [NavbarItem] - Individual navigation item
 
 /// 📄 **Navbar Item Data Class**
@@ -59,6 +121,7 @@ class NavbarItem {
   const NavbarItem({
     required this.text,
     this.icon,
+    this.subtext,
     this.onTap,
     this.state = NavbarItemState.inactive,
     this.badge,
@@ -69,6 +132,11 @@ class NavbarItem {
     this.animationTrigger,
     this.animationDuration,
     this.animationCurve = Curves.elasticOut,
+    // Mobile app bar specific properties
+    this.leadingIcon,
+    this.trailingActions,
+    this.title,
+    this.searchBar,
   });
 
   /// 📝 Display text for the navbar item
@@ -76,6 +144,10 @@ class NavbarItem {
 
   /// 🎯 Optional icon for the navbar item
   final Widget? icon;
+
+  /// 📋 Optional subtext/caption for the navbar item
+  /// Displayed below the main text when style supports it
+  final String? subtext;
 
   /// 🖱️ Callback when item is tapped
   final VoidCallback? onTap;
@@ -91,6 +163,22 @@ class NavbarItem {
 
   /// 🛣️ Route path for navigation
   final String? route;
+
+  /// 🍔 Leading icon (hamburger menu, back button, etc.) for app bar style
+  /// Displayed on the left side of app bar
+  final Widget? leadingIcon;
+
+  /// ⚙️ Trailing action buttons (search, notifications, etc.) for app bar style
+  /// Displayed on the right side of app bar
+  final List<Widget>? trailingActions;
+
+  /// 📋 Title text for app bar style
+  /// Overrides text property when style is appBar or appBarWithSearch
+  final String? title;
+
+  /// 🔍 Search bar widget for appBarWithSearch style
+  /// Custom search bar implementation
+  final Widget? searchBar;
 
   /// 🎬 Optional animation trigger value for icon animation
   /// When this value changes, icon animation will be triggered
@@ -118,6 +206,7 @@ class NavbarItem {
   NavbarItem copyWith({
     String? text,
     Widget? icon,
+    String? subtext,
     VoidCallback? onTap,
     NavbarItemState? state,
     Widget? badge,
@@ -128,10 +217,15 @@ class NavbarItem {
     dynamic animationTrigger,
     Duration? animationDuration,
     Curve? animationCurve,
+    Widget? leadingIcon,
+    List<Widget>? trailingActions,
+    String? title,
+    Widget? searchBar,
   }) {
     return NavbarItem(
       text: text ?? this.text,
       icon: icon ?? this.icon,
+      subtext: subtext ?? this.subtext,
       onTap: onTap ?? this.onTap,
       state: state ?? this.state,
       badge: badge ?? this.badge,
@@ -142,6 +236,10 @@ class NavbarItem {
       animationTrigger: animationTrigger ?? this.animationTrigger,
       animationDuration: animationDuration ?? this.animationDuration,
       animationCurve: animationCurve ?? this.animationCurve,
+      leadingIcon: leadingIcon ?? this.leadingIcon,
+      trailingActions: trailingActions ?? this.trailingActions,
+      title: title ?? this.title,
+      searchBar: searchBar ?? this.searchBar,
     );
   }
 }
@@ -154,18 +252,26 @@ class NavbarItem {
 /// **Features:**
 /// - 📏 Multiple size variants (small, medium, large)
 /// - 🎨 Theme-aware colors and styles
-/// - 📍 Flexible positioning options
-/// - 🔄 Different navbar types and behaviors
-/// - 🎯 Interactive navbar items
+/// - 🎭 Multiple design styles (iconOnly, iconWithText, iconWithSubtext, textOnly, iconAndTextHorizontal, appBar, appBarWithSearch, drawerTrigger, topTabBar)
+/// - 🎯 Multiple indicator styles (none, line, dot, fill, border, underline)
+/// - 📍 Flexible positioning options (top, bottom, left, right, floating)
+/// - 📋 Subtext/caption support for detailed navigation
+/// - 🔲 Customizable border (width, style, color)
+/// - 🍔 Mobile app bar with hamburger menu, title, and actions
+/// - 🔍 Search bar integration for app bars
+/// - 🎯 Interactive navbar items with states
 /// - ✨ Built-in animations and hover effects
 /// - 🔧 Fully customizable
 ///
 /// **Example:**
 /// ```dart
 /// OsmeaNavbar(
-///   variant: NavbarVariant.primary,
+///   variant: NavbarVariant.retailMain,
 ///   size: NavbarSize.medium,
-///   position: NavbarPosition.top,
+///   position: NavbarPosition.bottom,
+///   style: NavbarStyle.iconWithText,
+///   indicatorStyle: NavbarIndicatorStyle.line,
+///   indicatorColor: OsmeaColors.nordicBlue,
 ///   items: navigationItems,
 /// )
 /// ```
@@ -175,14 +281,20 @@ class OsmeaNavbar extends CoreContainer {
     super.customTheme,
     required this.items,
     this.size = NavbarSize.medium,
-    this.variant = NavbarVariant.primary,
+    this.variant = NavbarVariant.retailMain,
     this.position = NavbarPosition.top,
+    this.style,
+    this.indicatorStyle = NavbarIndicatorStyle.none,
     this.backgroundColor,
     this.textColor,
     this.activeColor,
     this.inactiveColor,
     this.borderColor,
     this.shadowColor,
+    this.indicatorColor,
+    this.borderWidth,
+    this.borderStyle,
+    this.showBorder,
     super.padding,
     super.margin,
     this.animationDuration,
@@ -208,6 +320,13 @@ class OsmeaNavbar extends CoreContainer {
   /// 📍 The position of the navbar
   final NavbarPosition position;
 
+  /// 🎭 The design style/layout pattern of the navbar
+  /// If null, automatically determined based on items and position
+  final NavbarStyle? style;
+
+  /// 🎯 The indicator style for active items
+  final NavbarIndicatorStyle indicatorStyle;
+
   /// 🎨 Custom background color that overrides the default variant background
   final Color? backgroundColor;
 
@@ -225,6 +344,22 @@ class OsmeaNavbar extends CoreContainer {
 
   /// ✨ Shadow color for elevated navbars
   final Color? shadowColor;
+
+  /// 🎯 Color for the active indicator (line, dot, fill, etc.)
+  final Color? indicatorColor;
+
+  /// 📏 Border width (thickness)
+  /// If null, uses default based on variant (1.0 for outlined, 0.0 for others)
+  final double? borderWidth;
+
+  /// 🎨 Border style (solid, dashed, dotted)
+  /// If null, uses BorderStyle.solid
+  final BorderStyle? borderStyle;
+
+  /// 🔲 Whether to show border
+  /// If null, automatically determined based on variant
+  /// true for outlined variant, false for others
+  final bool? showBorder;
 
   /// ⏱️ Duration for navbar animations
   final Duration? animationDuration;
@@ -257,13 +392,63 @@ class OsmeaNavbar extends CoreContainer {
   Widget buildWidget(BuildContext context) {
     final config = size.config(context);
     final colors = _getNavbarColors(context);
+    final effectiveStyle = _getEffectiveStyle();
 
-    Widget navbar = _buildNavbar(context, config, colors);
+    Widget navbar = _buildNavbar(context, config, colors, effectiveStyle);
 
     // Apply positioning wrapper
     navbar = _buildPositionWrapper(context, navbar, config);
 
     return navbar;
+  }
+
+  /// Determine the effective style based on items and position
+  NavbarStyle _getEffectiveStyle() {
+    if (style != null) return style!;
+
+    // Auto-determine style based on items and position
+    final hasIcons = items.any((item) => item.icon != null);
+    final hasSubtext = items.any((item) => item.subtext != null);
+    final hasLeadingIcon = items.any((item) => item.leadingIcon != null);
+    final hasTrailingActions = items.any((item) => item.trailingActions != null && item.trailingActions!.isNotEmpty);
+    final hasSearchBar = items.any((item) => item.searchBar != null);
+    final isBottomNav = position == NavbarPosition.bottom;
+    final isTopNav = position == NavbarPosition.top;
+
+    // Check for mobile app bar patterns
+    if (hasLeadingIcon && (hasTrailingActions || hasSearchBar)) {
+      if (hasSearchBar) {
+        return NavbarStyle.appBarWithSearch;
+      }
+      return NavbarStyle.appBar;
+    }
+
+    // Check for drawer trigger
+    if (hasLeadingIcon && items.length == 1 && !hasIcons) {
+      return NavbarStyle.drawerTrigger;
+    }
+
+    // Check for tab bar
+    if (isTopNav && items.length > 1 && hasIcons) {
+      return NavbarStyle.topTabBar;
+    }
+
+    // Standard patterns
+    if (!hasIcons && showIcons) {
+      return NavbarStyle.textOnly;
+    } else if (hasSubtext) {
+      return NavbarStyle.iconWithSubtext;
+    } else if (isBottomNav || isTopNav) {
+      if (!showLabels) {
+        return NavbarStyle.iconOnly;
+      } else if (position.isHorizontal) {
+        return NavbarStyle.iconWithText;
+      } else {
+        return NavbarStyle.iconAndTextHorizontal;
+      }
+    } else {
+      return NavbarStyle.iconAndTextHorizontal;
+    }
   }
 
   Widget _buildPositionWrapper(
@@ -292,6 +477,7 @@ class OsmeaNavbar extends CoreContainer {
     BuildContext context,
     NavbarSizeConfig config,
     _NavbarColors colors,
+    NavbarStyle effectiveStyle,
   ) {
     return Container(
       height: position.isHorizontal ? config.height : null,
@@ -299,7 +485,7 @@ class OsmeaNavbar extends CoreContainer {
       padding: padding ?? config.padding,
       margin: margin,
       decoration: _buildDecoration(colors, config),
-      child: _buildContent(context, config, colors),
+      child: _buildContent(context, config, colors, effectiveStyle),
     );
   }
 
@@ -307,6 +493,7 @@ class OsmeaNavbar extends CoreContainer {
     BuildContext context,
     NavbarSizeConfig config,
     _NavbarColors colors,
+    NavbarStyle effectiveStyle,
   ) {
     final itemWidgets = items.asMap().entries.map((entry) {
       final index = entry.key;
@@ -320,6 +507,7 @@ class OsmeaNavbar extends CoreContainer {
         config,
         colors,
         index,
+        effectiveStyle,
       );
     }).toList();
 
@@ -385,6 +573,7 @@ class OsmeaNavbar extends CoreContainer {
     NavbarSizeConfig config,
     _NavbarColors colors,
     int index,
+    NavbarStyle effectiveStyle,
   ) {
     final isActive = item.state == NavbarItemState.active;
     final isDisabled = item.state == NavbarItemState.disabled;
@@ -397,7 +586,14 @@ class OsmeaNavbar extends CoreContainer {
         minHeight: config.height * 0.8,
       ),
       padding: config.itemPadding,
-      child: _buildItemContent(context, item, config, colors, isActive),
+      child: _buildItemContent(
+        context,
+        item,
+        config,
+        colors,
+        isActive,
+        effectiveStyle,
+      ),
     );
 
     if (item.tooltip != null) {
@@ -427,9 +623,22 @@ class OsmeaNavbar extends CoreContainer {
       child = _AnimatedNavbarItemWrapper(
         animationType: item.animationType,
         animationTrigger: item.animationTrigger,
-        duration: item.animationDuration ?? animationDuration ?? context.animationMedium,
+        duration: item.animationDuration ??
+            animationDuration ??
+            context.animationMedium,
         curve: item.animationCurve,
         child: child,
+      );
+    }
+
+    // Wrap with indicator if needed
+    if (indicatorStyle != NavbarIndicatorStyle.none && isActive) {
+      child = _buildIndicatorWrapper(
+        context,
+        child,
+        colors,
+        isActive,
+        effectiveStyle,
       );
     }
 
@@ -454,142 +663,667 @@ class OsmeaNavbar extends CoreContainer {
     );
   }
 
+  /// Build indicator wrapper around navbar item
+  Widget _buildIndicatorWrapper(
+    BuildContext context,
+    Widget child,
+    _NavbarColors colors,
+    bool isActive,
+    NavbarStyle effectiveStyle,
+  ) {
+    final effectiveIndicatorColor = indicatorColor ?? colors.active;
+
+    switch (indicatorStyle) {
+      case NavbarIndicatorStyle.none:
+        return child;
+
+      case NavbarIndicatorStyle.line:
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: position.isHorizontal ? 0 : null,
+              top: position.isHorizontal ? null : 0,
+              left: position.isHorizontal ? null : 0,
+              right: position.isHorizontal ? null : 0,
+              child: Container(
+                height: position.isHorizontal ? 3.0 : null,
+                width: position.isHorizontal ? null : 3.0,
+                color: effectiveIndicatorColor,
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.dot:
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              top: position.isHorizontal ? 4.0 : null,
+              bottom: position.isHorizontal ? null : 4.0,
+              left: position.isHorizontal ? null : 4.0,
+              right: position.isHorizontal ? null : 4.0,
+              child: Container(
+                width: 6.0,
+                height: 6.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.fill:
+        return Container(
+          decoration: BoxDecoration(
+            color: effectiveIndicatorColor.withValues(alpha: context.alpha10),
+            borderRadius: borderRadius ?? BorderRadius.circular(8.0),
+          ),
+          child: child,
+        );
+
+      case NavbarIndicatorStyle.border:
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: effectiveIndicatorColor,
+              width: 2.0,
+            ),
+            borderRadius: borderRadius ?? BorderRadius.circular(8.0),
+          ),
+          child: child,
+        );
+
+      case NavbarIndicatorStyle.underline:
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 2.0,
+                color: effectiveIndicatorColor,
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
   Widget _buildItemContent(
     BuildContext context,
     NavbarItem item,
     NavbarSizeConfig config,
     _NavbarColors colors,
     bool isActive,
+    NavbarStyle effectiveStyle,
   ) {
     final textColor = isActive ? colors.active : colors.inactive;
+    final subtextColor = textColor.withValues(alpha: context.alpha70);
+
+    // Handle loading state
+    if (item.state == NavbarItemState.loading) {
+      return Center(
+        child: SizedBox(
+          width: config.iconSize,
+          height: config.iconSize,
+          child: CircularProgressIndicator(
+            strokeWidth: context.width2,
+            valueColor: AlwaysStoppedAnimation<Color>(textColor),
+          ),
+        ),
+      );
+    }
+
+    // Build content based on style
+    switch (effectiveStyle) {
+      case NavbarStyle.iconOnly:
+        return _buildIconOnlyContent(context, item, config, textColor);
+
+      case NavbarStyle.iconWithText:
+        return _buildIconWithTextContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.iconWithSubtext:
+        return _buildIconWithSubtextContent(
+          context,
+          item,
+          config,
+          textColor,
+          subtextColor,
+          isActive,
+        );
+
+      case NavbarStyle.textOnly:
+        return _buildTextOnlyContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.iconAndTextHorizontal:
+        return _buildIconAndTextHorizontalContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.appBar:
+        return _buildAppBarContent(
+          context,
+          item,
+          config,
+          textColor,
+          colors,
+        );
+
+      case NavbarStyle.appBarWithSearch:
+        return _buildAppBarWithSearchContent(
+          context,
+          item,
+          config,
+          textColor,
+          colors,
+        );
+
+      case NavbarStyle.drawerTrigger:
+        return _buildDrawerTriggerContent(
+          context,
+          item,
+          config,
+          textColor,
+        );
+
+      case NavbarStyle.topTabBar:
+        return _buildTopTabBarContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+    }
+  }
+
+  /// Build icon-only content
+  Widget _buildIconOnlyContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color iconColor,
+  ) {
+    if (item.icon == null) return const SizedBox.shrink();
+
+    return Center(
+      child: IconTheme(
+        data: IconThemeData(
+          size: config.iconSize,
+          color: iconColor,
+        ),
+        child: item.icon!,
+      ),
+    );
+  }
+
+  /// Build icon with text content (icon above text)
+  Widget _buildIconWithTextContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
     final List<Widget> children = [];
 
     // Add icon if present and should show
     if (item.icon != null && showIcons) {
       children.add(
-        FittedBox(
-          fit: contain,
-          child: IconTheme(
-            data: IconThemeData(
-              size: config.iconSize,
-              color: textColor,
-            ),
-            child: item.icon!,
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
           ),
+          child: item.icon!,
         ),
       );
     }
 
     // Add text if should show labels
     if (showLabels) {
-      TextStyle baseStyle;
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(const SizedBox(height: 4.0));
+      children.add(
+        OsmeaText(
+          item.text,
+          style: baseStyle.copyWith(
+            fontWeight: isActive ? context.semiBold : context.normal,
+            color: textColor,
+          ),
+          maxLines: 1,
+          overflow: ellipsis,
+          textAlign: textCenter,
+        ),
+      );
+    }
 
-      // Select appropriate text style based on navbar size
-      switch (size) {
-        case NavbarSize.small:
-          baseStyle = OsmeaTextStyle.labelSmall(context);
-          break;
-        case NavbarSize.medium:
-          baseStyle = OsmeaTextStyle.labelMedium(context);
-          break;
-        case NavbarSize.large:
-          baseStyle = OsmeaTextStyle.labelLarge(context);
-          break;
+    return Column(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build icon with subtext content
+  Widget _buildIconWithSubtextContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    Color subtextColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present and should show
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
+      final captionStyle = _getCaptionStyleForSize(context);
+
+      children.add(const SizedBox(height: 4.0));
+      children.add(
+        OsmeaText(
+          item.text,
+          style: baseStyle.copyWith(
+            fontWeight: isActive ? context.semiBold : context.normal,
+            color: textColor,
+          ),
+          maxLines: 1,
+          overflow: ellipsis,
+          textAlign: textCenter,
+        ),
+      );
+
+      // Add subtext if available
+      if (item.subtext != null && item.subtext!.isNotEmpty) {
+        children.add(const SizedBox(height: 2.0));
+        children.add(
+          OsmeaText(
+            item.subtext!,
+            style: captionStyle.copyWith(
+              color: subtextColor,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
+        );
       }
+    }
 
+    return Column(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build text-only content
+  Widget _buildTextOnlyContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    if (!showLabels) return const SizedBox.shrink();
+
+    final baseStyle = _getTextStyleForSize(context);
+
+    return Center(
+      child: OsmeaText(
+        item.text,
+        style: baseStyle.copyWith(
+          fontWeight: isActive ? context.semiBold : context.normal,
+          color: textColor,
+        ),
+        maxLines: 1,
+        overflow: ellipsis,
+        textAlign: textCenter,
+      ),
+    );
+  }
+
+  /// Build icon and text horizontal content
+  Widget _buildIconAndTextHorizontalContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present and should show
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+      children.add(SizedBox(
+          width:
+              config.itemSpacing / 2)); // Can't be const due to dynamic value
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
       children.add(
         Flexible(
-          flex: size == NavbarSize.large ? 2 : 1,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Use FittedBox for smaller constraints to prevent overflow
-              if (constraints.maxWidth < context.width80 ||
-                  size == NavbarSize.small) {
-                return FittedBox(
-                  fit: scaleDown,
-                  alignment: center,
-                  child: OsmeaText(
-                    item.text,
-                    style: baseStyle.copyWith(
-                      fontWeight: isActive ? context.semiBold : context.normal,
-                      color: textColor,
-                    ),
-                    maxLines: 1,
-                    overflow: ellipsis,
-                    textAlign: textCenter,
-                  ),
-                );
-              } else {
-                return Text(
-                  item.text,
-                  style: baseStyle.copyWith(
-                    fontWeight: isActive ? context.semiBold : context.normal,
-                    color: textColor,
-                  ),
-                  maxLines: size == NavbarSize.large ? 2 : 1,
-                  overflow: ellipsis,
-                  textAlign: textCenter,
-                );
-              }
-            },
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textStart,
           ),
         ),
       );
     }
 
-    // Handle loading state
-    if (item.state == NavbarItemState.loading) {
-      children.clear();
+    return Row(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Get text style based on navbar size
+  TextStyle _getTextStyleForSize(BuildContext context) {
+    switch (size) {
+      case NavbarSize.small:
+        return OsmeaTextStyle.labelSmall(context);
+      case NavbarSize.medium:
+        return OsmeaTextStyle.labelMedium(context);
+      case NavbarSize.large:
+        return OsmeaTextStyle.labelLarge(context);
+    }
+  }
+
+  /// Get caption style for subtext based on navbar size
+  TextStyle _getCaptionStyleForSize(BuildContext context) {
+    switch (size) {
+      case NavbarSize.small:
+        return OsmeaTextStyle.captionSmall(context);
+      case NavbarSize.medium:
+        return OsmeaTextStyle.captionMedium(context);
+      case NavbarSize.large:
+        return OsmeaTextStyle.captionLarge(context);
+    }
+  }
+
+  /// Build app bar content (hamburger menu + title + actions)
+  Widget _buildAppBarContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    _NavbarColors colors,
+  ) {
+    final List<Widget> children = [];
+
+    // Leading icon (hamburger menu or back button)
+    if (item.leadingIcon != null) {
       children.add(
-        FittedBox(
-          fit: contain,
-          child: SizedBox(
-            width: config.iconSize,
-            height: config.iconSize,
-            child: CircularProgressIndicator(
-              strokeWidth: context.width2,
-              valueColor: AlwaysStoppedAnimation<Color>(textColor),
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.leadingIcon!,
+        ),
+      );
+      children.add(SizedBox(width: context.normalValue * 0.5));
+    }
+
+    // Title
+    final titleText = item.title ?? item.text;
+    if (titleText.isNotEmpty) {
+      final titleStyle = _getTextStyleForSize(context).copyWith(
+        fontWeight: context.semiBold,
+        color: textColor,
+      );
+      children.add(
+        Expanded(
+          child: OsmeaText(
+            titleText,
+            style: titleStyle,
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textStart,
+          ),
+        ),
+      );
+    }
+
+    // Trailing actions
+    if (item.trailingActions != null && item.trailingActions!.isNotEmpty) {
+      children.add(SizedBox(width: context.normalValue * 0.5));
+      children.add(
+        Row(
+          mainAxisSize: min,
+          children: item.trailingActions!
+              .map((action) => Padding(
+                    padding: EdgeInsets.only(left: context.lowValue * 0.5),
+                    child: action,
+                  ))
+              .toList(),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: spaceBetween,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build app bar with search content
+  Widget _buildAppBarWithSearchContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    _NavbarColors colors,
+  ) {
+    final List<Widget> children = [];
+
+    // Leading icon (hamburger menu)
+    if (item.leadingIcon != null) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.leadingIcon!,
+        ),
+      );
+      children.add(SizedBox(width: context.normalValue * 0.5));
+    }
+
+    // Search bar or title
+    if (item.searchBar != null) {
+      children.add(Expanded(child: item.searchBar!));
+    } else {
+      final titleText = item.title ?? item.text;
+      if (titleText.isNotEmpty) {
+        final titleStyle = _getTextStyleForSize(context).copyWith(
+          fontWeight: context.semiBold,
+          color: textColor,
+        );
+        children.add(
+          Expanded(
+            child: OsmeaText(
+              titleText,
+              style: titleStyle,
+              maxLines: 1,
+              overflow: ellipsis,
+              textAlign: textStart,
             ),
           ),
+        );
+      }
+    }
+
+    // Trailing actions
+    if (item.trailingActions != null && item.trailingActions!.isNotEmpty) {
+      children.add(SizedBox(width: context.normalValue * 0.5));
+      children.add(
+        Row(
+          mainAxisSize: min,
+          children: item.trailingActions!
+              .map((action) => Padding(
+                    padding: EdgeInsets.only(left: context.lowValue * 0.5),
+                    child: action,
+                  ))
+              .toList(),
         ),
       );
     }
 
-    // Layout children based on navbar orientation
-    if (position.isVertical || (item.icon != null && showLabels && showIcons)) {
-      return Column(
-        mainAxisSize: min,
-        mainAxisAlignment: centerMain,
-        crossAxisAlignment: crossCenter,
-        children: children
-            .expand((widget) => [
-                  widget,
-                  if (widget != children.last)
-                    SizedBox(height: size == NavbarSize.large ? 6.0 : 4.0),
-                ])
-            .toList(),
+    return Row(
+      mainAxisAlignment: spaceBetween,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build drawer trigger content (hamburger menu button)
+  Widget _buildDrawerTriggerContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color iconColor,
+  ) {
+    // Use leadingIcon if provided, otherwise use default hamburger icon
+    final icon = item.leadingIcon ??
+        Icon(
+          Icons.menu,
+          size: config.iconSize,
+          color: iconColor,
+        );
+
+    return Center(
+      child: IconTheme(
+        data: IconThemeData(
+          size: config.iconSize,
+          color: iconColor,
+        ),
+        child: icon,
+      ),
+    );
+  }
+
+  /// Build top tab bar content
+  Widget _buildTopTabBarContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.8, // Slightly smaller for tabs
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
       );
-    } else {
-      return Row(
-        mainAxisSize: min,
-        mainAxisAlignment: centerMain,
-        crossAxisAlignment: crossCenter,
-        children: children
-            .expand((widget) => [
-                  widget,
-                  if (widget != children.last)
-                    SizedBox(width: config.itemSpacing / 2),
-                ])
-            .toList(),
+      if (showLabels) {
+        children.add(SizedBox(width: context.lowValue * 0.5));
+      }
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
+        ),
       );
     }
+
+    return Row(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
   }
 
   BoxDecoration _buildDecoration(
       _NavbarColors colors, NavbarSizeConfig config) {
     List<BoxShadow> shadows = [];
 
-    if (variant != NavbarVariant.transparent &&
+    if (variant != NavbarVariant.mediaOverlay &&
         (elevation ?? config.elevation) > 0) {
       shadows.add(
         BoxShadow(
@@ -600,12 +1334,27 @@ class OsmeaNavbar extends CoreContainer {
       );
     }
 
+    // Determine if border should be shown
+    final shouldShowBorder = showBorder ?? 
+        (variant == NavbarVariant.healthcareMinimal || 
+         variant == NavbarVariant.financeBordered);
+    
     Border? border;
-    if (variant == NavbarVariant.outlined) {
-      border = Border.all(
-        color: borderColor ?? colors.border,
-        width: 1.0,
-      );
+    if (shouldShowBorder) {
+      final effectiveBorderWidth = borderWidth ??
+          ((variant == NavbarVariant.healthcareMinimal || 
+            variant == NavbarVariant.financeBordered) ? 1.0 : 0.0);
+      
+      if (effectiveBorderWidth > 0) {
+        final effectiveBorderStyle = borderStyle ?? BorderStyle.solid;
+        final effectiveBorderColor = borderColor ?? colors.border;
+
+        border = Border.all(
+          color: effectiveBorderColor,
+          width: effectiveBorderWidth,
+          style: effectiveBorderStyle,
+        );
+      }
     }
 
     return BoxDecoration(
@@ -618,7 +1367,7 @@ class OsmeaNavbar extends CoreContainer {
 
   _NavbarColors _getNavbarColors(BuildContext context) {
     switch (variant) {
-      case NavbarVariant.primary:
+      case NavbarVariant.retailMain:
         return _NavbarColors(
           background: OsmeaColors.nordicBlue,
           active: OsmeaColors.crystalBay,
@@ -626,7 +1375,7 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.deepSea,
         );
 
-      case NavbarVariant.secondary:
+      case NavbarVariant.retailSidebar:
         return _NavbarColors(
           background: OsmeaColors.ash,
           active: OsmeaColors.nordicBlue,
@@ -634,7 +1383,23 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.transparent:
+      case NavbarVariant.healthcareMinimal:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.financeBordered:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.mediaOverlay:
         return _NavbarColors(
           background: OsmeaColors.transparent,
           active: activeColor ?? OsmeaColors.nordicBlue,
@@ -642,7 +1407,7 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.glass:
+      case NavbarVariant.socialGlass:
         return _NavbarColors(
           background: OsmeaColors.white.withValues(alpha: context.alpha10),
           active: OsmeaColors.nordicBlue,
@@ -650,9 +1415,17 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver.withValues(alpha: context.alpha30),
         );
 
-      case NavbarVariant.outlined:
+      case NavbarVariant.enterpriseMain:
         return _NavbarColors(
-          background: OsmeaColors.white,
+          background: OsmeaColors.nordicBlue,
+          active: OsmeaColors.crystalBay,
+          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: OsmeaColors.deepSea,
+        );
+
+      case NavbarVariant.enterpriseSidebar:
+        return _NavbarColors(
+          background: OsmeaColors.ash,
           active: OsmeaColors.nordicBlue,
           inactive: OsmeaColors.pewter,
           border: OsmeaColors.silver,
@@ -697,8 +1470,7 @@ class _AnimatedNavbarItemWrapper extends StatefulWidget {
       _AnimatedNavbarItemWrapperState();
 }
 
-class _AnimatedNavbarItemWrapperState
-    extends State<_AnimatedNavbarItemWrapper>
+class _AnimatedNavbarItemWrapperState extends State<_AnimatedNavbarItemWrapper>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
