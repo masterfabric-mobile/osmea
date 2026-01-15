@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.dart';
@@ -150,7 +151,7 @@ class _HomeViewWithRouteAwareState extends State<_HomeViewWithRouteAware>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final currentRoute = GoRouterState.of(context).uri.toString();
-    
+
     // Only refresh if route changed (navigated back) or first time
     if (!_hasInitialized || _lastRoute != currentRoute) {
       _lastRoute = currentRoute;
@@ -181,7 +182,7 @@ PreferredSizeWidget _buildHomeAppBar(
   HomeViewModel? viewModel,
 ) {
   final configHelper = AssetConfigHelper();
-  
+
   // Get title from config
   final titleSource = configHelper.getString(
     'home_view.app_bar.title_source',
@@ -192,32 +193,20 @@ PreferredSizeWidget _buildHomeAppBar(
     'MasterFabric',
   );
   final title = configHelper.getString(titleSource, fallbackTitle);
-  
+
   // Get colors from config
   final backgroundColor = _parseColor(
-    configHelper.getString(
-      'home_view.app_bar.backgroundColor',
-      '#FFFFFF',
-    ),
+    configHelper.getString('home_view.app_bar.backgroundColor', '#FFFFFF'),
   );
   final foregroundColor = _parseColor(
-    configHelper.getString(
-      'home_view.app_bar.foregroundColor',
-      '#000000',
-    ),
+    configHelper.getString('home_view.app_bar.foregroundColor', '#000000'),
   );
   final titleColor = _parseColor(
-    configHelper.getString(
-      'home_view.app_bar.titleColor',
-      '#000000',
-    ),
+    configHelper.getString('home_view.app_bar.titleColor', '#000000'),
   );
-  
+
   // Get other properties from config
-  final elevation = configHelper.getDouble(
-    'home_view.app_bar.elevation',
-    0.0,
-  );
+  final elevation = configHelper.getDouble('home_view.app_bar.elevation', 0.0);
   final variantString = configHelper.getString(
     'home_view.app_bar.variant',
     'standard',
@@ -230,14 +219,37 @@ PreferredSizeWidget _buildHomeAppBar(
     'home_view.app_bar.titleFontWeight',
     700,
   );
-  
+
   final variant = _parseAppBarVariant(variantString);
   final size = _parseAppBarSize(sizeString);
-  
+
   // Parse font weight (100-900, must be multiple of 100)
   final fontWeight = _parseFontWeight(titleFontWeight);
 
-  return OsmeaComponents.appBar(
+  // Get search config
+  final searchConfig = configHelper.getObject('home_view.search');
+  final searchPlaceholder =
+      searchConfig?['placeholder'] as String? ??
+      context.t.homeView.widgets.search.placeholder;
+  final searchVariant = searchConfig?['variant'] as String? ?? 'outlined';
+
+  // Create controllers for home searchbar (just for navigation)
+  final searchFocusNode = FocusNode();
+  final searchController = TextEditingController();
+  
+  // Listen for focus changes to navigate on tap (same as search view)
+  searchFocusNode.addListener(() {
+    if (searchFocusNode.hasFocus) {
+      // Navigate to search when searchbar is focused (tapped)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          context.push('/search');
+        }
+      });
+    }
+  });
+
+  return OsmeaComponents.appBarWithSearchBar(
     title: OsmeaComponents.text(
       title,
       color: titleColor,
@@ -245,11 +257,49 @@ PreferredSizeWidget _buildHomeAppBar(
         context,
       ).copyWith(fontWeight: fontWeight),
     ),
-    variant: variant,
-    size: size,
-    backgroundColor: backgroundColor,
-    foregroundColor: foregroundColor,
-    elevation: elevation,
+    titleAlignment: AppBarTitleAlignment.center,
+    centerTitle: true,
+    appBarVariant: variant,
+    appBarSize: size,
+    appBarBackgroundColor: backgroundColor,
+    appBarForegroundColor: foregroundColor,
+    appBarElevation: elevation,
+    searchHint: searchPlaceholder,
+    searchController: searchController,
+    searchFocusNode: searchFocusNode,
+    searchBarVariant: searchVariant == 'outlined'
+        ? SearchbarVariant.outlined
+        : SearchbarVariant.borderless,
+    searchBarSize: TextFieldSize.medium,
+    showBackButton: false,
+    showClearButton: true,
+    showSearchIcon: true,
+    onSearch: (query) {
+      // Navigate to search with query
+      if (query.trim().isNotEmpty) {
+        context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+      } else {
+        context.push('/search');
+      }
+    },
+    onSearchSubmitted: (query) {
+      // Navigate to search with query
+      if (query.trim().isNotEmpty) {
+        context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+      } else {
+        context.push('/search');
+      }
+    },
+    onSearchChanged: (query) {
+      // When user starts typing, navigate to search
+      if (query.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+          }
+        });
+      }
+    },
     actions: const [],
   );
 }
@@ -259,7 +309,7 @@ Color _parseColor(String colorString) {
   try {
     // Remove # if present
     String hex = colorString.replaceAll('#', '');
-    
+
     // Handle ARGB format (8 characters)
     if (hex.length == 8) {
       final alpha = int.parse(hex.substring(0, 2), radix: 16);
@@ -268,7 +318,7 @@ Color _parseColor(String colorString) {
       final blue = int.parse(hex.substring(6, 8), radix: 16);
       return Color.fromARGB(alpha, red, green, blue);
     }
-    
+
     // Handle RGB format (6 characters)
     if (hex.length == 6) {
       final red = int.parse(hex.substring(0, 2), radix: 16);
@@ -276,7 +326,7 @@ Color _parseColor(String colorString) {
       final blue = int.parse(hex.substring(4, 6), radix: 16);
       return Color.fromRGBO(red, green, blue, 1.0);
     }
-    
+
     // Fallback to black
     return OsmeaColors.black;
   } catch (e) {
@@ -334,7 +384,7 @@ FontWeight _parseFontWeight(int weight) {
   // Clamp to valid range (100-900, multiples of 100)
   final clampedWeight = weight.clamp(100, 900);
   final normalizedWeight = (clampedWeight ~/ 100) * 100;
-  
+
   switch (normalizedWeight) {
     case 100:
       return FontWeight.w100;

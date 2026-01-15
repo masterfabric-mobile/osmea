@@ -136,17 +136,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     final configHelper = _configHelper ?? AssetConfigHelper();
     final List<_SkeletonComponent> components = [];
 
-    // Search bar skeleton
-    if (_isEnabled(configHelper, 'search')) {
-      components.add(
-        _SkeletonComponent(
-          orderId: _getOrderId(configHelper, 'search'),
-          widget: _buildSearchBarSkeleton(context),
-          name: 'search',
-        ),
-      );
-    }
-
+    // Search bar is now in appbar, so we don't add it here anymore
     // Category circles skeleton
     if (_isEnabled(configHelper, 'circle_categories')) {
       components.add(
@@ -295,27 +285,6 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSearchBarSkeleton(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        context.spacing16,
-        context.spacing20,
-        context.spacing16,
-      ),
-      child: _ShimmerContainer(
-        animation: _controller,
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: OsmeaColors.grayMaterial[200],
-            borderRadius: BorderRadius.circular(context.radiusMedium),
-          ),
-        ),
-      ),
     );
   }
 

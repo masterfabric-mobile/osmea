@@ -14,7 +14,6 @@ import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/banner_carousel_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/deals_of_day_carousel_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/recommended_section_widget.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/search_bar_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/category_story_circle_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button_widget.dart';
@@ -147,17 +146,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     final configHelper = _configHelper ?? AssetConfigHelper();
     final List<_HomeComponent> components = [];
 
-    // Search bar
-    if (_isEnabled(configHelper, 'search')) {
-      components.add(
-        _HomeComponent(
-          orderId: _getOrderId(configHelper, 'search'),
-          widget: SearchBarWidget(configHelper: configHelper),
-          name: 'search',
-        ),
-      );
-    }
-
+    // Search bar is now in appbar, so we don't add it here anymore
     // Category story circles
     if (_isEnabled(configHelper, 'circle_categories')) {
       components.add(
