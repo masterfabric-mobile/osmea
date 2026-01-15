@@ -265,15 +265,42 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         vertical: context.spacing10,
       ),
       children: [
-        // Grid toggle button - aligned right
-        Padding(
-          padding: EdgeInsets.only(
-            right: context.spacing8,
-            bottom: context.spacing12,
+        // Brands section with horizontal scroll
+        if (_brands.isNotEmpty) ...[
+          OsmeaComponents.text(
+            context.t.searchView.sections.brands,
+            textStyle: OsmeaTextStyle.titleMedium(context),
           ),
+          OsmeaComponents.sizedBox(height: context.spacing8),
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: context.horizontalPaddingZero,
+              itemCount: _brands.length,
+              itemBuilder: (context, index) {
+                final brand = _brands[index];
+                return _BrandCard(
+                  brand: brand,
+                  onTap: () => _searchByBrand(brand.name ?? '', brand.id),
+                );
+              },
+            ),
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing16),
+        ],
+        // Categories section with toggle button
+        Padding(
+          padding: EdgeInsets.only(right: context.spacing8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              OsmeaComponents.text(
+                context.t.searchView.sections.categories,
+                textStyle: OsmeaTextStyle.titleMedium(
+                  context,
+                ).copyWith(fontWeight: FontWeight.bold),
+              ),
               Container(
                 decoration: BoxDecoration(
                   color: OsmeaColors.snow,
@@ -313,37 +340,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
               ),
             ],
           ),
-        ),
-        // Brands section with horizontal scroll
-        if (_brands.isNotEmpty) ...[
-          OsmeaComponents.text(
-            context.t.searchView.sections.brands,
-            textStyle: OsmeaTextStyle.titleMedium(context),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          SizedBox(
-            height: 100,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: context.horizontalPaddingZero,
-              itemCount: _brands.length,
-              itemBuilder: (context, index) {
-                final brand = _brands[index];
-                return _BrandCard(
-                  brand: brand,
-                  onTap: () => _searchByBrand(brand.name ?? '', brand.id),
-                );
-              },
-            ),
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-        ],
-        // Categories section
-        OsmeaComponents.text(
-          context.t.searchView.sections.categories,
-          textStyle: OsmeaTextStyle.titleMedium(
-            context,
-          ).copyWith(fontWeight: FontWeight.bold),
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
         // Categories grid with images
