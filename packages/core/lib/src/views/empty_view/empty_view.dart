@@ -7,6 +7,7 @@ import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
 import 'package:core/src/views/empty_view/widgets/empty_view_startup_widget.dart';
 import 'package:core/src/views/empty_view/widgets/empty_view_enterprise_widget.dart';
 import 'package:core/src/views/empty_view/widgets/empty_view_space_widget.dart';
+import 'package:core/src/helper/asset_config_helper.dart';
 import 'package:osmea_components/osmea_components.dart';
 
 /// 🎯 **OSMEA Empty View**
@@ -53,7 +54,12 @@ class EmptyView
     this.customDescription,
     this.customImagePath,
     this.customIconPath,
-  });
+  }) : super(
+          coreAppBar: (context, viewModel) => _buildEmptyViewAppBar(
+            context,
+            viewModel,
+          ),
+        );
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -76,6 +82,84 @@ class EmptyView
       onActionPressed: onActionPressed,
       overrideStyle: overrideStyle,
     );
+  }
+
+  /// Build default empty view app bar from config
+  static PreferredSizeWidget _buildEmptyViewAppBar(
+    BuildContext context,
+    EmptyViewCubit viewModel,
+  ) {
+    final configHelper = AssetConfigHelper();
+    final state = viewModel.state;
+    
+    final title = state.emptyTitle;
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'empty_view_configuration.app_bar.backgroundColor',
+        '#FFFFFF',
+      ),
+    );
+    final foregroundColor = _parseColor(
+      configHelper.getString(
+        'empty_view_configuration.app_bar.foregroundColor',
+        '#000000',
+      ),
+    );
+    final titleColor = _parseColor(
+      configHelper.getString(
+        'empty_view_configuration.app_bar.titleColor',
+        '#000000',
+      ),
+    );
+    final iconColor = _parseColor(
+      configHelper.getString(
+        'empty_view_configuration.app_bar.iconColor',
+        '#000000',
+      ),
+    );
+    final elevation = configHelper.getDouble(
+      'empty_view_configuration.app_bar.elevation',
+      0.0,
+    );
+    final showBackButton = configHelper.getBool(
+      'empty_view_configuration.app_bar.show_back_button',
+      true,
+    );
+
+    return OsmeaComponents.appBar(
+      title: OsmeaComponents.text(
+        title,
+        color: titleColor,
+        textStyle: OsmeaTextStyle.titleLarge(context),
+      ),
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      foregroundColor: foregroundColor,
+      leading: showBackButton
+          ? OsmeaComponents.iconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(
+                Icons.arrow_back,
+                color: iconColor,
+                size: context.iconSizeNormal,
+              ),
+            )
+          : null,
+      actions: const [],
+    );
+  }
+
+  /// Parse color string to Color
+  static Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 6) {
+        hex = 'FF$hex';
+      }
+      return Color(int.parse(hex, radix: 16));
+    } catch (e) {
+      return OsmeaColors.white;
+    }
   }
 }
 
