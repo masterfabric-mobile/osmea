@@ -339,6 +339,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                       searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
                 },
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped
+                  if (searchFocusNode != null) {
+                    searchFocusNode!.requestFocus();
+                  }
+                },
                 onSearchChanged: (query) {
                   viewModel.updateQuery(query);
                   onSearchChanged?.call(query);
@@ -458,6 +464,12 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   hintColor: configHelper.getSearchViewHintTextColor(),
                   focusColor: configHelper.getSearchViewFocusColor(),
                   errorColor: configHelper.getSearchViewErrorColor(),
+                  onTap: () {
+                    // Request focus when searchbar is tapped
+                    if (searchFocusNode != null) {
+                      searchFocusNode!.requestFocus();
+                    }
+                  },
                   onChanged: (query) {
                     viewModel.updateQuery(query);
                     onSearchChanged?.call(query);
