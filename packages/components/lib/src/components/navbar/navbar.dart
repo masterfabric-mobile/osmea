@@ -829,6 +829,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -838,6 +839,7 @@ class OsmeaNavbar extends CoreContainer {
             borderRadius: BorderRadius.circular(8.0),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -846,6 +848,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -866,6 +869,7 @@ class OsmeaNavbar extends CoreContainer {
             ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -874,6 +878,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -889,6 +894,7 @@ class OsmeaNavbar extends CoreContainer {
             ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -897,6 +903,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -912,6 +919,7 @@ class OsmeaNavbar extends CoreContainer {
             borderRadius: BorderRadius.circular(6.0),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -920,9 +928,11 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -931,6 +941,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -946,6 +957,7 @@ class OsmeaNavbar extends CoreContainer {
                   ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -954,6 +966,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -965,6 +978,7 @@ class OsmeaNavbar extends CoreContainer {
             ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -973,6 +987,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -993,6 +1008,7 @@ class OsmeaNavbar extends CoreContainer {
             ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -1001,6 +1017,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -1010,6 +1027,7 @@ class OsmeaNavbar extends CoreContainer {
             borderRadius: BorderRadius.circular(12.0),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -1018,6 +1036,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -1033,6 +1052,7 @@ class OsmeaNavbar extends CoreContainer {
                   ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -1041,6 +1061,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -1056,6 +1077,7 @@ class OsmeaNavbar extends CoreContainer {
             ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -1064,6 +1086,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -1083,6 +1106,7 @@ class OsmeaNavbar extends CoreContainer {
                   ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
 
@@ -1091,6 +1115,7 @@ class OsmeaNavbar extends CoreContainer {
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
+            minHeight: 0,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
@@ -1106,6 +1131,7 @@ class OsmeaNavbar extends CoreContainer {
                   ),
           ),
           padding: padding,
+          clipBehavior: Clip.hardEdge,
           child: content,
         );
     }
@@ -1743,7 +1769,7 @@ class OsmeaNavbar extends CoreContainer {
       children.add(
         IconTheme(
           data: IconThemeData(
-            size: config.iconSize,
+            size: config.iconSize * 0.9,
             color: textColor,
           ),
           child: item.icon!,
@@ -1754,7 +1780,7 @@ class OsmeaNavbar extends CoreContainer {
     // Add text if should show labels
     if (showLabels) {
       final baseStyle = _getTextStyleForSize(context);
-      children.add(const SizedBox(height: 2.0));
+      children.add(const SizedBox(height: 1.0));
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
@@ -1767,7 +1793,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.9, // Slightly smaller to prevent overflow
+              fontSize: config.fontSize * 0.8, // Smaller to prevent overflow
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -1777,11 +1803,17 @@ class OsmeaNavbar extends CoreContainer {
       );
     }
 
-    return Column(
-      mainAxisSize: min,
-      mainAxisAlignment: centerMain,
-      crossAxisAlignment: crossCenter,
-      children: children,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
     );
   }
 
@@ -1801,7 +1833,7 @@ class OsmeaNavbar extends CoreContainer {
       children.add(
         IconTheme(
           data: IconThemeData(
-            size: config.iconSize,
+            size: config.iconSize * 0.9,
             color: textColor,
           ),
           child: item.icon!,
@@ -1814,7 +1846,7 @@ class OsmeaNavbar extends CoreContainer {
       final baseStyle = _getTextStyleForSize(context);
       final captionStyle = _getCaptionStyleForSize(context);
 
-      children.add(const SizedBox(height: 2.0));
+      children.add(const SizedBox(height: 1.0));
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
@@ -1827,7 +1859,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.9, // Slightly smaller to prevent overflow
+              fontSize: config.fontSize * 0.8, // Smaller to prevent overflow
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -1838,7 +1870,7 @@ class OsmeaNavbar extends CoreContainer {
 
       // Add subtext if available
       if (item.subtext != null && item.subtext!.isNotEmpty) {
-        children.add(const SizedBox(height: 1.0));
+        children.add(const SizedBox(height: 0.5));
         children.add(
           ConstrainedBox(
             constraints: BoxConstraints(
@@ -1860,11 +1892,17 @@ class OsmeaNavbar extends CoreContainer {
       }
     }
 
-    return Column(
-      mainAxisSize: min,
-      mainAxisAlignment: centerMain,
-      crossAxisAlignment: crossCenter,
-      children: children,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
     );
   }
 
@@ -2304,7 +2342,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.85,
+              fontSize: config.fontSize * 0.8,
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2384,7 +2422,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.85,
+              fontSize: config.fontSize * 0.8,
             ),
             maxLines: 2,
             overflow: ellipsis,
@@ -2394,11 +2432,17 @@ class OsmeaNavbar extends CoreContainer {
       );
     }
 
-    return Column(
-      mainAxisSize: min,
-      mainAxisAlignment: centerMain,
-      crossAxisAlignment: crossCenter,
-      children: children,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
     );
   }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
@@ -20,10 +19,12 @@ import 'package:osmea_components/osmea_components.dart';
 
 class EmptyViewSpaceWidget extends StatefulWidget {
   final VoidCallback? onActionPressed;
+  final VoidCallback? onBackPressed;
 
   const EmptyViewSpaceWidget({
     super.key,
     this.onActionPressed,
+    this.onBackPressed,
   });
 
   @override
@@ -119,12 +120,12 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
             backgroundColor: backgroundColor,
             foregroundColor: textColor,
             elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: textColor),
-              onPressed: () {
-                context.go('/home');
-              },
-            ),
+            leading: widget.onBackPressed != null
+                ? IconButton(
+                    icon: Icon(Icons.arrow_back, color: textColor),
+                    onPressed: widget.onBackPressed,
+                  )
+                : null,
           ),
           body: FadeTransition(
             opacity: _fadeAnimation,
