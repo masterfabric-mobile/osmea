@@ -510,8 +510,8 @@ class _CategoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
-            blurRadius: 2,
+            color: Colors.black.withOpacity(0.005),
+            blurRadius: 1,
             offset: const Offset(0, 0.5),
           ),
         ],
