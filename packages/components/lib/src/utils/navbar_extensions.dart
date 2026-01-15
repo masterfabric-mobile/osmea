@@ -315,24 +315,32 @@ extension NavbarStyleExtension on NavbarStyle {
       this == NavbarStyle.iconWithText ||
       this == NavbarStyle.iconWithSubtext ||
       this == NavbarStyle.textOnly ||
-      this == NavbarStyle.iconAndTextHorizontal;
+      this == NavbarStyle.iconAndTextHorizontal ||
+      this == NavbarStyle.segmentedControl ||
+      this == NavbarStyle.navigationRail;
 
   /// 📋 Check if style shows subtext
   bool get showsSubtext => this == NavbarStyle.iconWithSubtext;
 
   /// 🎯 Check if style is horizontal layout
   bool get isHorizontalLayout =>
-      this == NavbarStyle.iconAndTextHorizontal || this == NavbarStyle.textOnly;
+      this == NavbarStyle.iconAndTextHorizontal ||
+      this == NavbarStyle.textOnly ||
+      this == NavbarStyle.topTabBar ||
+      this == NavbarStyle.segmentedControl;
 
   /// 🎯 Check if style is vertical layout
   bool get isVerticalLayout =>
       this == NavbarStyle.iconWithText ||
       this == NavbarStyle.iconWithSubtext ||
-      this == NavbarStyle.iconOnly;
+      this == NavbarStyle.iconOnly ||
+      this == NavbarStyle.navigationRail;
 
   /// 🎯 Check if style requires icon
   bool get requiresIcon =>
-      this != NavbarStyle.textOnly && this != NavbarStyle.iconAndTextHorizontal;
+      this != NavbarStyle.textOnly &&
+      this != NavbarStyle.iconAndTextHorizontal &&
+      this != NavbarStyle.segmentedControl;
 
   /// 🎯 Check if style requires text
   bool get requiresText => this != NavbarStyle.iconOnly;
@@ -347,9 +355,49 @@ extension NavbarStyleExtension on NavbarStyle {
   /// 📑 Check if style is tab bar
   bool get isTabBar => this == NavbarStyle.topTabBar;
 
+  /// 🎚️ Check if style is segmented control
+  bool get isSegmentedControl => this == NavbarStyle.segmentedControl;
+
+  /// 🎈 Check if style is floating bottom bar
+  bool get isFloatingBottomBar => this == NavbarStyle.floatingBottomBar;
+
+  /// 📦 Check if style is dense/compact
+  bool get isDenseCompact => this == NavbarStyle.denseCompact;
+
+  /// 📉 Check if style is collapsible
+  bool get isCollapsible => this == NavbarStyle.collapsible;
+
+  /// 🚂 Check if style is navigation rail
+  bool get isNavigationRail => this == NavbarStyle.navigationRail;
+
+  /// 📄 Check if style is bottom sheet navigation
+  bool get isBottomSheetNav => this == NavbarStyle.bottomSheetNav;
+
   /// 🎯 Check if style is mobile-specific
   bool get isMobileSpecific =>
-      isAppBar || isDrawerTrigger || isTabBar || this == NavbarStyle.iconWithText;
+      isAppBar ||
+      isDrawerTrigger ||
+      isTabBar ||
+      isSegmentedControl ||
+      isFloatingBottomBar ||
+      isBottomSheetNav ||
+      this == NavbarStyle.iconWithText ||
+      this == NavbarStyle.iconOnly;
+
+  /// 🎯 Check if style is bottom navigation pattern
+  bool get isBottomNavigation =>
+      this == NavbarStyle.iconOnly ||
+      this == NavbarStyle.iconWithText ||
+      this == NavbarStyle.floatingBottomBar ||
+      this == NavbarStyle.bottomSheetNav;
+
+  /// 🎯 Check if style needs elevation/shadow
+  bool get needsElevation =>
+      isFloatingBottomBar || isBottomSheetNav || isAppBar;
+
+  /// 🎯 Check if style has rounded corners
+  bool get hasRoundedCorners =>
+      isFloatingBottomBar || isBottomSheetNav || isSegmentedControl;
 }
 
 /// Extension for navbar indicator style utilities

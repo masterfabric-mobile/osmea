@@ -161,6 +161,46 @@ enum NavbarVariant {
   /// - Use for: Admin sidebars, Settings navigation, Configuration menus, Secondary navigation
   /// - Sectors: Enterprise, B2B, SaaS, Business, All sectors (secondary navigation)
   enterpriseSidebar,
+
+  /// 🎨 **Gradient Modern** - Modern gradient background navigation
+  /// - Background: Gradient (colorful, vibrant)
+  /// - Text: White/Contrast
+  /// - Border: None (gradient fills)
+  /// - Use for: Modern apps, Creative apps, Lifestyle apps, Gaming apps
+  /// - Sectors: Creative, Gaming, Lifestyle, Entertainment, Social
+  gradientModern,
+
+  /// 🎯 **Capsule Rounded** - Capsule-shaped rounded navigation
+  /// - Background: Light/Dark (adaptive)
+  /// - Text: Adaptive contrast
+  /// - Border: None (capsule shape)
+  /// - Use for: iOS-style apps, Modern mobile apps, Clean interfaces
+  /// - Sectors: All sectors (modern design)
+  capsuleRounded,
+
+  /// 🔘 **Badge Indicator** - Navigation with badge-style indicators
+  /// - Background: Neutral/Light
+  /// - Text: Dark
+  /// - Border: None (badge indicators)
+  /// - Use for: Notification-heavy apps, Social apps, Messaging apps
+  /// - Sectors: Social, Messaging, Communication, All sectors
+  badgeIndicator,
+
+  /// ✨ **Neon Glow** - Neon glow effect navigation
+  /// - Background: Dark/Black
+  /// - Text: Bright/Neon colors
+  /// - Border: None (glow effects)
+  /// - Use for: Gaming apps, Dark mode apps, Entertainment apps
+  /// - Sectors: Gaming, Entertainment, Creative, Tech
+  neonGlow,
+
+  /// 🎴 **Card Floating** - Floating card-style navigation
+  /// - Background: White/Light (card)
+  /// - Text: Dark
+  /// - Border: Shadow (floating effect)
+  /// - Use for: Modern mobile apps, Material Design 3, Card-based UIs
+  /// - Sectors: All sectors (modern design)
+  cardFloating,
 }
 
 /// 📍 **Navbar Position Options**
@@ -331,7 +371,7 @@ enum NavbarItemAnimationType {
 /// Defines the visual design pattern and layout of navbar items.
 /// Each style determines how icons, text, and subtext are displayed.
 ///
-/// **Style Guidelines:**
+/// **Mobile Navigation Patterns:**
 /// - `iconOnly`: Only icons, no text (compact mobile navigation)
 /// - `iconWithText`: Icon above text (standard bottom navigation)
 /// - `iconWithSubtext`: Icon with main text and subtext (detailed navigation)
@@ -341,6 +381,12 @@ enum NavbarItemAnimationType {
 /// - `appBarWithSearch`: App bar with integrated search bar
 /// - `drawerTrigger`: Hamburger menu button for drawer navigation
 /// - `topTabBar`: Top tab bar navigation (Material Design tabs)
+/// - `segmentedControl`: iOS-style segmented control navigation
+/// - `floatingBottomBar`: Floating bottom navigation bar with elevation
+/// - `denseCompact`: Dense/compact navigation for limited space
+/// - `collapsible`: Collapsible/expandable navigation bar
+/// - `navigationRail`: Material 3 navigation rail (vertical)
+/// - `bottomSheetNav`: Bottom sheet style navigation
 ///
 /// **Usage:**
 /// ```dart
@@ -405,6 +451,42 @@ enum NavbarStyle {
   /// - Icon + text or text only
   /// - Use for: Tab navigation, category navigation, segmented content
   topTabBar,
+
+  /// 🎚️ **Segmented Control** - iOS-style segmented control navigation
+  /// - Pill-shaped segments with rounded corners
+  /// - Text or icon + text
+  /// - Use for: iOS apps, filter selection, category switching
+  segmentedControl,
+
+  /// 🎈 **Floating Bottom Bar** - Floating bottom navigation bar with elevation
+  /// - Elevated above content with shadow
+  /// - Rounded top corners
+  /// - Use for: Modern mobile apps, floating navigation
+  floatingBottomBar,
+
+  /// 📦 **Dense Compact** - Dense/compact navigation for limited space
+  /// - Reduced padding and spacing
+  /// - Smaller icons and text
+  /// - Use for: Small screens, tablet portrait, compact layouts
+  denseCompact,
+
+  /// 📉 **Collapsible** - Collapsible/expandable navigation bar
+  /// - Can collapse to icon-only or expand to full
+  /// - Smooth animation transitions
+  /// - Use for: Adaptive navigation, space-saving interfaces
+  collapsible,
+
+  /// 🚂 **Navigation Rail** - Material 3 navigation rail (vertical)
+  /// - Vertical navigation on left/right side
+  /// - Icon + text or icon-only
+  /// - Use for: Material 3 apps, tablet navigation, desktop sidebars
+  navigationRail,
+
+  /// 📄 **Bottom Sheet Nav** - Bottom sheet style navigation
+  /// - Slides up from bottom
+  /// - Rounded top corners
+  /// - Use for: Modal navigation, quick actions, context menus
+  bottomSheetNav,
 }
 
 /// 🎯 **Navbar Indicator Style**
@@ -464,4 +546,34 @@ enum NavbarIndicatorStyle {
   /// - Classic navigation pattern
   /// - Use for: Top navigation bars, menu items
   underline,
+
+  /// 🌈 **Gradient** - Gradient fill indicator
+  /// - Gradient background for active item
+  /// - Colorful, vibrant effect
+  /// - Use for: Modern apps, Creative apps, Gaming apps
+  gradient,
+
+  /// 🔔 **Badge** - Badge-style indicator
+  /// - Small badge above/below item
+  /// - Notification-style indicator
+  /// - Use for: Social apps, Messaging apps, Notification-heavy apps
+  badge,
+
+  /// ✨ **Glow** - Glow effect indicator
+  /// - Glowing halo around active item
+  /// - Neon/modern effect
+  /// - Use for: Gaming apps, Dark mode apps, Entertainment apps
+  glow,
+
+  /// 💫 **Pulse** - Pulsing animation indicator
+  /// - Animated pulsing effect
+  /// - Attention-grabbing
+  /// - Use for: Important navigation, Live updates, Status indicators
+  pulse,
+
+  /// 🎯 **Capsule** - Capsule-shaped indicator
+  /// - Rounded capsule background
+  /// - iOS-style indicator
+  /// - Use for: iOS apps, Modern mobile apps, Clean interfaces
+  capsule,
 }
