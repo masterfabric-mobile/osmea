@@ -292,6 +292,401 @@ final GoRouter appRouter = GoRouter(
             );
           },
         ),
+
+        // Favorite Categories Route
+        GoRoute(
+          path: '/favorite-categories',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: FavoriteCategoriesView(
+                arguments: const {'favorite_categories': true},
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('products')) {
+                    context.go(path);
+                  } else {
+                    context.go('/favorite-categories');
+                  }
+                },
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Profile Route (using AccountView from core package)
+        GoRoute(
+          path: '/profile',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            // Get AccountCubit and AuthCubit for platform-specific auth state listening
+            final accountCubit = GetIt.I<AccountCubit>();
+            final authCubit = GetIt.I<AuthCubit>();
+
+            // Load user API data and set it to AccountCubit
+            // This ensures profile data is always fresh (user can update their info)
+            _loadUserApiData(accountCubit);
+
+            return CustomTransitionPage(
+              child: BlocListener<AuthCubit, AuthState>(
+                bloc: authCubit,
+                listener: (context, authState) {
+                  // If AuthCubit becomes authenticated, refresh profile data
+                  if (authState is AuthAuthenticatedState) {
+                    debugPrint(
+                      '👤 Route: AuthCubit authenticated, refreshing profile...',
+                    );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      // Reload user API data and refresh profile
+                      _loadUserApiData(accountCubit);
+                      accountCubit.refreshProfile();
+                    });
+                  }
+                },
+                child: AccountView(
+                  arguments: const {'account': true},
+                  goRoute: (String path) {
+                    debugPrint('🔀 AccountView: goRoute called with path: $path');
+                    if (path.contains('home') || path == '/home') {
+                      debugPrint('🔀 AccountView: Navigating to /home');
+                      context.go('/home');
+                    } else if (path.contains('cart') || path == '/cart') {
+                      debugPrint('🔀 AccountView: Navigating to /cart');
+                      context.go('/cart');
+                    } else if (path.contains('saved') || path == '/saved') {
+                      debugPrint('🔀 AccountView: Navigating to /saved');
+                      context.go('/saved');
+                    } else if (path.contains('auth') || path == '/auth') {
+                      debugPrint('🔀 AccountView: Navigating to /auth');
+                      context.go('/auth');
+                    } else {
+                      debugPrint('🔀 AccountView: Navigating to path: $path');
+                      context.go(path);
+                    }
+                  },
+                  onSignOut: () async {
+                    // AccountCubit handles its own state clearing
+                    // Platform-specific cleanup is provided via callback
+                    await accountCubit.signOut(
+                      onSignOut: () async {
+                        // Platform-specific cleanup: cookies, wishlist, cart tokens, AuthCubit
+                        debugPrint(
+                          '🚪 Route: Starting platform-specific cleanup...',
+                        );
+
+                        // Step 1: Sign out from AuthCubit
+                        try {
+                          await authCubit.signOut();
+                          debugPrint('✅ Route: AuthCubit signed out');
+                        } catch (e) {
+                          debugPrint(
+                            '⚠️ Route: Failed to sign out from AuthCubit: $e',
+                          );
+                        }
+
+                        // Step 2: Clear WooCommerce JWT token
+                        try {
+                          await WooJwtTokenStorage.clearToken();
+                          debugPrint('✅ Route: WooJWT token cleared');
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
+                        }
+
+                        // Step 3: Clear cart token
+                        try {
+                          await WooCartTokenStorage.clearCartToken();
+                          debugPrint('✅ Route: WooCartToken cleared');
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
+                        }
+
+                        // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+                        try {
+                          await ApiDioClient.clearAllCookies();
+                          debugPrint(
+                            '✅ Route: All cookies cleared (including WP cookies)',
+                          );
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear cookies: $e');
+                        }
+
+                        // Step 5: Clear wishlist (user-specific data)
+                        try {
+                          final wishlistViewModel = GetIt.I<WishlistViewModel>();
+                          wishlistViewModel.clearAll();
+                          debugPrint('✅ Route: Wishlist cleared');
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear wishlist: $e');
+                        }
+
+                        debugPrint('✅ Route: Platform-specific cleanup completed');
+                      },
+                    );
+
+                    // Step 5: Navigate to home after sign out
+                    await Future.delayed(const Duration(milliseconds: 300));
+                    if (context.mounted) {
+                      debugPrint('🔀 Route: Navigating to /home after sign out...');
+                      context.go('/home');
+                      debugPrint('✅ Route: Navigation to /home completed');
+                    } else {
+                      debugPrint('⚠️ Route: Context not mounted, cannot navigate');
+                    }
+                  },
+                ),
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // About Route
+        GoRoute(
+          path: '/about',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: AboutView(
+                goRoute: (String path) {
+                  debugPrint('🔀 AboutView: goRoute called with path: $path');
+                  context.go(path);
+                },
+                // AboutView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Contact Us Route
+        GoRoute(
+          path: '/contact-us',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: ContactUsView(
+                goRoute: (String path) {
+                  debugPrint('🔀 ContactUsView: goRoute called with path: $path');
+                  context.go(path);
+                },
+                // ContactUsView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // FAQ Route
+        GoRoute(
+          path: '/faq',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: FAQView(
+                goRoute: (String path) {
+                  debugPrint('🔀 FAQView: goRoute called with path: $path');
+                  context.go(path);
+                },
+                // FAQView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Product Detail Route
+        GoRoute(
+          path: '/product-detail/:productId',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final productId = int.tryParse(
+              state.pathParameters['productId'] ?? '0',
+            );
+            // Get cart token from extra (route params) or use default
+            final extra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'productDetail': true,
+              if (extra != null && extra.containsKey('cartToken'))
+                'cartToken': extra['cartToken'] as String?,
+            };
+            return CustomTransitionPage(
+              child: ProductDetailView(
+                productId: productId ?? 0,
+                arguments: arguments,
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return ScaleTransition(
+                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
+                  ),
+                  child: FadeTransition(opacity: animation, child: child),
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 500),
+            );
+          },
+        ),
+
+        // Checkout Route
+        GoRoute(
+          path: '/checkout',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final arguments = {'checkout': true, if (extra != null) ...extra};
+            return CustomTransitionPage(
+              child: CheckoutView(
+                arguments: arguments,
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return SlideTransition(
+                  position:
+                      Tween<Offset>(
+                        begin: const Offset(0.0, 1.0),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOutCubic,
+                        ),
+                      ),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(milliseconds: 400),
+            );
+          },
+        ),
+
+        // Empty View Route
+        GoRoute(
+          path: '/empty/:emptyType',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
+            final emptyType = EmptyType.values.firstWhere(
+              (type) => type.name == emptyTypeStr,
+              orElse: () => EmptyType.general,
+            );
+
+            // Get custom parameters from query
+            final queryParams = state.uri.queryParameters;
+            final customTitle = queryParams['title'];
+            final customDescription = queryParams['description'];
+            final customImagePath = queryParams['imagePath'];
+            final customIconPath = queryParams['iconPath'];
+            final actionPath = queryParams['actionPath'] ?? '/home';
+
+            return CustomTransitionPage(
+              child: EmptyView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('saved')) {
+                    context.go('/saved');
+                  } else {
+                    context.go(path);
+                  }
+                },
+                emptyType: emptyType,
+                customTitle: customTitle,
+                customDescription: customDescription,
+                customImagePath: customImagePath,
+                customIconPath: customIconPath,
+                onActionPressed: () {
+                  context.go(actionPath);
+                },
+                arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Loading View Route
+        GoRoute(
+          path: '/loading/:loadingType',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final loadingTypeStr = state.pathParameters['loadingType'] ?? 'general';
+            final loadingType = LoadingModelType.values.firstWhere(
+              (type) => type.name == loadingTypeStr,
+              orElse: () => LoadingModelType.general,
+            );
+
+            // Get custom parameters from query
+            final queryParams = state.uri.queryParameters;
+            final customTitle = queryParams['title'];
+            final customDescription = queryParams['description'];
+            final targetRoute = queryParams['targetRoute'];
+
+            return CustomTransitionPage(
+              child: LoadingView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('saved')) {
+                    context.go('/saved');
+                  } else {
+                    context.go(path);
+                  }
+                },
+                loadingType: loadingType,
+                loadingPageModel: customTitle != null || customDescription != null
+                    ? LoadingPageModel(
+                        title: customTitle ?? 'Loading...',
+                        description: customDescription ?? 'Please wait',
+                        loadingType: loadingType,
+                        autoNavigateOnComplete: targetRoute != null,
+                        targetRoute: targetRoute,
+                      )
+                    : null,
+                onCompleted: targetRoute != null
+                    ? () {
+                        // Navigate to target route when loading completes
+                        context.go(targetRoute);
+                      }
+                    : null,
+                arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
+              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
       ],
     ),
 
@@ -367,31 +762,6 @@ final GoRouter appRouter = GoRouter(
             return FadeTransition(opacity: animation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 600),
-        );
-      },
-    ),
-
-    // Favorite Categories Route
-    GoRoute(
-      path: '/favorite-categories',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: FavoriteCategoriesView(
-            arguments: const {'favorite_categories': true},
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('products')) {
-                context.go(path);
-              } else {
-                context.go('/favorite-categories');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
         );
       },
     ),
@@ -699,374 +1069,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Profile Route (using AccountView from core package)
-    GoRoute(
-      path: '/profile',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        // Get AccountCubit and AuthCubit for platform-specific auth state listening
-        final accountCubit = GetIt.I<AccountCubit>();
-        final authCubit = GetIt.I<AuthCubit>();
-
-        // Load user API data and set it to AccountCubit
-        // This ensures profile data is always fresh (user can update their info)
-        _loadUserApiData(accountCubit);
-
-        return CustomTransitionPage(
-          child: BlocListener<AuthCubit, AuthState>(
-            bloc: authCubit,
-            listener: (context, authState) {
-              // If AuthCubit becomes authenticated, refresh profile data
-              if (authState is AuthAuthenticatedState) {
-                debugPrint(
-                  '👤 Route: AuthCubit authenticated, refreshing profile...',
-                );
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // Reload user API data and refresh profile
-                  _loadUserApiData(accountCubit);
-                  accountCubit.refreshProfile();
-                });
-              }
-            },
-            child: AccountView(
-              arguments: const {'account': true},
-              goRoute: (String path) {
-                debugPrint('🔀 AccountView: goRoute called with path: $path');
-                if (path.contains('home') || path == '/home') {
-                  debugPrint('🔀 AccountView: Navigating to /home');
-                  context.go('/home');
-                } else if (path.contains('cart') || path == '/cart') {
-                  debugPrint('🔀 AccountView: Navigating to /cart');
-                  context.go('/cart');
-                } else if (path.contains('saved') || path == '/saved') {
-                  debugPrint('🔀 AccountView: Navigating to /saved');
-                  context.go('/saved');
-                } else if (path.contains('auth') || path == '/auth') {
-                  debugPrint('🔀 AccountView: Navigating to /auth');
-                  context.go('/auth');
-                } else {
-                  debugPrint('🔀 AccountView: Navigating to path: $path');
-                  context.go(path);
-                }
-              },
-              onSignOut: () async {
-                // AccountCubit handles its own state clearing
-                // Platform-specific cleanup is provided via callback
-                await accountCubit.signOut(
-                  onSignOut: () async {
-                    // Platform-specific cleanup: cookies, wishlist, cart tokens, AuthCubit
-                    debugPrint(
-                      '🚪 Route: Starting platform-specific cleanup...',
-                    );
-
-                    // Step 1: Sign out from AuthCubit
-                    try {
-                      await authCubit.signOut();
-                      debugPrint('✅ Route: AuthCubit signed out');
-                    } catch (e) {
-                      debugPrint(
-                        '⚠️ Route: Failed to sign out from AuthCubit: $e',
-                      );
-                    }
-
-                    // Step 2: Clear WooCommerce JWT token
-                    try {
-                      await WooJwtTokenStorage.clearToken();
-                      debugPrint('✅ Route: WooJWT token cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
-                    }
-
-                    // Step 3: Clear cart token
-                    try {
-                      await WooCartTokenStorage.clearCartToken();
-                      debugPrint('✅ Route: WooCartToken cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
-                    }
-
-                    // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
-                    try {
-                      await ApiDioClient.clearAllCookies();
-                      debugPrint(
-                        '✅ Route: All cookies cleared (including WP cookies)',
-                      );
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear cookies: $e');
-                    }
-
-                    // Step 5: Clear wishlist (user-specific data)
-                    try {
-                      final wishlistViewModel = GetIt.I<WishlistViewModel>();
-                      wishlistViewModel.clearAll();
-                      debugPrint('✅ Route: Wishlist cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear wishlist: $e');
-                    }
-
-                    debugPrint('✅ Route: Platform-specific cleanup completed');
-                  },
-                );
-
-                // Step 5: Navigate to home after sign out
-                await Future.delayed(const Duration(milliseconds: 300));
-                if (context.mounted) {
-                  debugPrint('🔀 Route: Navigating to /home after sign out...');
-                  context.go('/home');
-                  debugPrint('✅ Route: Navigation to /home completed');
-                } else {
-                  debugPrint('⚠️ Route: Context not mounted, cannot navigate');
-                }
-              },
-              bottomNavigationBar: _getNavbarForRoute(state.uri.path),
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // About Route
-    GoRoute(
-      path: '/about',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: AboutView(
-            goRoute: (String path) {
-              debugPrint('🔀 AboutView: goRoute called with path: $path');
-              context.go(path);
-            },
-            // AboutView will load configuration from app_config.json internally
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-    // Contact Us Route
-    GoRoute(
-      path: '/contact-us',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: ContactUsView(
-            goRoute: (String path) {
-              debugPrint('🔀 ContactUsView: goRoute called with path: $path');
-              context.go(path);
-            },
-            // ContactUsView will load configuration from app_config.json internally
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-    // FAQ Route
-    GoRoute(
-      path: '/faq',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: FAQView(
-            goRoute: (String path) {
-              debugPrint('🔀 FAQView: goRoute called with path: $path');
-              context.go(path);
-            },
-            // FAQView will load configuration from app_config.json internally
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Product Detail Route
-    GoRoute(
-      path: '/product-detail/:productId',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final productId = int.tryParse(
-          state.pathParameters['productId'] ?? '0',
-        );
-        // Get cart token from extra (route params) or use default
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = {
-          'productDetail': true,
-          if (extra != null && extra.containsKey('cartToken'))
-            'cartToken': extra['cartToken'] as String?,
-        };
-        return CustomTransitionPage(
-          child: ProductDetailView(
-            productId: productId ?? 0,
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return ScaleTransition(
-              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
-              ),
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 500),
-        );
-      },
-    ),
-
-    // Checkout Route
-    GoRoute(
-      path: '/checkout',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = {'checkout': true, if (extra != null) ...extra};
-        return CustomTransitionPage(
-          child: CheckoutView(
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(0.0, 1.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInOutCubic,
-                    ),
-                  ),
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        );
-      },
-    ),
-
-    // Empty View Route
-    GoRoute(
-      path: '/empty/:emptyType',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
-        final emptyType = EmptyType.values.firstWhere(
-          (type) => type.name == emptyTypeStr,
-          orElse: () => EmptyType.general,
-        );
-
-        // Get custom parameters from query
-        final queryParams = state.uri.queryParameters;
-        final customTitle = queryParams['title'];
-        final customDescription = queryParams['description'];
-        final customImagePath = queryParams['imagePath'];
-        final customIconPath = queryParams['iconPath'];
-        final actionPath = queryParams['actionPath'] ?? '/home';
-
-        return CustomTransitionPage(
-          child: EmptyView(
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else if (path.contains('saved')) {
-                context.go('/saved');
-              } else {
-                context.go(path);
-              }
-            },
-            emptyType: emptyType,
-            customTitle: customTitle,
-            customDescription: customDescription,
-            customImagePath: customImagePath,
-            customIconPath: customIconPath,
-            onActionPressed: () {
-              context.go(actionPath);
-            },
-            arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Loading View Route
-    GoRoute(
-      path: '/loading/:loadingType',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final loadingTypeStr = state.pathParameters['loadingType'] ?? 'general';
-        final loadingType = LoadingModelType.values.firstWhere(
-          (type) => type.name == loadingTypeStr,
-          orElse: () => LoadingModelType.general,
-        );
-
-        // Get custom parameters from query
-        final queryParams = state.uri.queryParameters;
-        final customTitle = queryParams['title'];
-        final customDescription = queryParams['description'];
-        final targetRoute = queryParams['targetRoute'];
-
-        return CustomTransitionPage(
-          child: LoadingView(
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else if (path.contains('saved')) {
-                context.go('/saved');
-              } else {
-                context.go(path);
-              }
-            },
-            loadingType: loadingType,
-            loadingPageModel: customTitle != null || customDescription != null
-                ? LoadingPageModel(
-                    title: customTitle ?? 'Loading...',
-                    description: customDescription ?? 'Please wait',
-                    loadingType: loadingType,
-                    autoNavigateOnComplete: targetRoute != null,
-                    targetRoute: targetRoute,
-                  )
-                : null,
-            onCompleted: targetRoute != null
-                ? () {
-                    // Navigate to target route when loading completes
-                    context.go(targetRoute);
-                  }
-                : null,
-            arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
   ],
 );
 
