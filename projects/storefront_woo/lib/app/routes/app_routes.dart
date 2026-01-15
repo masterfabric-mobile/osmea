@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
-import 'package:core/src/views/faq/faq_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:storefront_woo/app/views/view_home/home_view.dart';
@@ -1774,8 +1773,7 @@ Widget? _getNavbarForRouteFallback(String location) {
                 'showBorder',
                 false,
               );
-              final borderStyleString = (configHelper.getObject('navbar_configuration')
-                  as Map<String, dynamic>?)?['borderStyle'] as String?;
+              final borderStyleString = (configHelper.getObject('navbar_configuration'))?['borderStyle'] as String?;
               BorderStyle? borderStyle;
               if (borderStyleString != null) {
                 switch (borderStyleString.toLowerCase()) {

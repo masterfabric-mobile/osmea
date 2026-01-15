@@ -1429,7 +1429,6 @@ class OsmeaNavbar extends CoreContainer {
           ],
         );
 
-
       case NavbarIndicatorStyle.capsule:
         // Capsule-shaped indicator
         return Container(
@@ -1784,9 +1783,8 @@ class OsmeaNavbar extends CoreContainer {
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: position.isHorizontal 
-                ? config.height * 0.8 
-                : double.infinity,
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
           ),
           child: OsmeaText(
             item.text,
@@ -1850,9 +1848,8 @@ class OsmeaNavbar extends CoreContainer {
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: position.isHorizontal 
-                ? config.height * 0.8 
-                : double.infinity,
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
           ),
           child: OsmeaText(
             item.text,
@@ -1874,9 +1871,8 @@ class OsmeaNavbar extends CoreContainer {
         children.add(
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: position.isHorizontal 
-                  ? config.height * 0.8 
-                  : double.infinity,
+              maxWidth:
+                  position.isHorizontal ? config.height * 0.8 : double.infinity,
             ),
             child: OsmeaText(
               item.subtext!,
@@ -1922,9 +1918,8 @@ class OsmeaNavbar extends CoreContainer {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: position.isHorizontal 
-              ? config.height * 0.8 
-              : double.infinity,
+          maxWidth:
+              position.isHorizontal ? config.height * 0.8 : double.infinity,
         ),
         child: OsmeaText(
           item.text,
@@ -2419,9 +2414,8 @@ class OsmeaNavbar extends CoreContainer {
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: position.isHorizontal 
-                ? config.height * 0.8 
-                : double.infinity,
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
           ),
           child: OsmeaText(
             item.text,
