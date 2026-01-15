@@ -296,10 +296,15 @@ extension NavbarVariantExtension on NavbarVariant {
       case NavbarVariant.financeBordered:
       case NavbarVariant.enterpriseMain:
       case NavbarVariant.enterpriseSidebar:
+      case NavbarVariant.gradientModern:
+      case NavbarVariant.capsuleRounded:
+      case NavbarVariant.badgeIndicator:
+      case NavbarVariant.cardFloating:
         return 1.0;
       case NavbarVariant.socialGlass:
         return 0.8;
       case NavbarVariant.mediaOverlay:
+      case NavbarVariant.neonGlow:
         return 0.0;
     }
   }
