@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
-import 'package:core/src/views/contact_us/contact_us_view.dart';
 import 'package:core/src/views/faq/faq_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -1146,24 +1145,11 @@ NavbarVariant _getNavbarVariant(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final variantString = navbarConfig?['variant'] as String?;
-    if (variantString != null) {
-      switch (variantString.toLowerCase()) {
-        case 'primary':
-          return NavbarVariant.primary;
-        case 'secondary':
-          return NavbarVariant.secondary;
-        case 'transparent':
-          return NavbarVariant.transparent;
-        case 'glass':
-          return NavbarVariant.glass;
-        case 'outlined':
-          return NavbarVariant.outlined;
-      }
-    }
+    return NavbarVariantStringExtension.fromString(variantString) ?? NavbarVariant.retailMain;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar variant: $e');
+    return NavbarVariant.retailMain;
   }
-  return NavbarVariant.transparent;
 }
 
 /// Get navbar size from config
@@ -1171,20 +1157,11 @@ NavbarSize _getNavbarSize(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final sizeString = navbarConfig?['size'] as String?;
-    if (sizeString != null) {
-      switch (sizeString.toLowerCase()) {
-        case 'small':
-          return NavbarSize.small;
-        case 'medium':
-          return NavbarSize.medium;
-        case 'large':
-          return NavbarSize.large;
-      }
-    }
+    return NavbarSizeStringExtension.fromString(sizeString) ?? NavbarSize.medium;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar size: $e');
+    return NavbarSize.medium;
   }
-  return NavbarSize.medium;
 }
 
 /// Get navbar position from config
@@ -1192,24 +1169,11 @@ NavbarPosition _getNavbarPosition(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final positionString = navbarConfig?['position'] as String?;
-    if (positionString != null) {
-      switch (positionString.toLowerCase()) {
-        case 'top':
-          return NavbarPosition.top;
-        case 'bottom':
-          return NavbarPosition.bottom;
-        case 'left':
-          return NavbarPosition.left;
-        case 'right':
-          return NavbarPosition.right;
-        case 'floating':
-          return NavbarPosition.floating;
-      }
-    }
+    return NavbarPositionStringExtension.fromString(positionString) ?? NavbarPosition.bottom;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar position: $e');
+    return NavbarPosition.bottom;
   }
-  return NavbarPosition.bottom;
 }
 
 /// Get navbar boolean property from config
@@ -1228,6 +1192,47 @@ bool _getNavbarBool(
     debugPrint('⚠️ Failed to load navbar $key: $e');
   }
   return defaultValue;
+}
+
+/// Get navbar style from config
+NavbarStyle? _getNavbarStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final styleString = navbarConfig?['style'] as String?;
+    return NavbarStyleStringExtension.fromString(styleString);
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar style: $e');
+    return null; // Auto-detect if not specified
+  }
+}
+
+/// Get navbar indicator style from config
+NavbarIndicatorStyle _getNavbarIndicatorStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final indicatorString = navbarConfig?['indicatorStyle'] as String?;
+    return NavbarIndicatorStyleStringExtension.fromString(indicatorString) ?? NavbarIndicatorStyle.none;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar indicator style: $e');
+    return NavbarIndicatorStyle.none;
+  }
+}
+
+/// Get navbar numeric property from config
+double? _getNavbarDouble(
+  AssetConfigHelper configHelper,
+  String key,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key];
+    if (value is num) {
+      return value.toDouble();
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return null;
 }
 
 /// Get navbar for specific route
@@ -1403,13 +1408,44 @@ Widget? _getNavbarForRoute(String location) {
                     'centerItems',
                     true,
                   );
+                  final style = _getNavbarStyle(configHelper);
+                  final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+                  final indicatorColor = _getNavbarColor(
+                    configHelper,
+                    'indicatorColor',
+                    activeColor,
+                  );
+                  final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+                  final showBorder = _getNavbarBool(
+                    configHelper,
+                    'showBorder',
+                    false,
+                  );
+                  final borderStyleString = configHelper.getObject('navbar_configuration')?['borderStyle'] as String?;
+                  BorderStyle? borderStyle;
+                  if (borderStyleString != null) {
+                    switch (borderStyleString.toLowerCase()) {
+                      case 'solid':
+                        borderStyle = BorderStyle.solid;
+                        break;
+                      case 'none':
+                        borderStyle = BorderStyle.none;
+                        break;
+                    }
+                  }
 
                   return OsmeaComponents.navbar(
                     variant: variant,
                     size: size,
                     position: position,
+                    style: style,
+                    indicatorStyle: indicatorStyle,
+                    indicatorColor: indicatorColor,
                     currentIndex: finalCurrentIndex,
                     borderColor: borderColor,
+                    borderWidth: borderWidth,
+                    borderStyle: borderStyle,
+                    showBorder: showBorder,
                     elevation: elevation,
                     backgroundColor: backgroundColor,
                     activeColor: activeColor,
@@ -1613,13 +1649,44 @@ Widget? _getNavbarForRouteFallback(String location) {
                     'centerItems',
                     true,
                   );
+                  final style = _getNavbarStyle(configHelper);
+                  final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+                  final indicatorColor = _getNavbarColor(
+                    configHelper,
+                    'indicatorColor',
+                    activeColor,
+                  );
+                  final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+                  final showBorder = _getNavbarBool(
+                    configHelper,
+                    'showBorder',
+                    false,
+                  );
+                  final borderStyleString = configHelper.getObject('navbar_configuration')?['borderStyle'] as String?;
+                  BorderStyle? borderStyle;
+                  if (borderStyleString != null) {
+                    switch (borderStyleString.toLowerCase()) {
+                      case 'solid':
+                        borderStyle = BorderStyle.solid;
+                        break;
+                      case 'none':
+                        borderStyle = BorderStyle.none;
+                        break;
+                    }
+                  }
 
                   return OsmeaComponents.navbar(
                     variant: variant,
                     size: size,
                     position: position,
+                    style: style,
+                    indicatorStyle: indicatorStyle,
+                    indicatorColor: indicatorColor,
                     currentIndex: currentIndex,
                     borderColor: borderColor,
+                    borderWidth: borderWidth,
+                    borderStyle: borderStyle,
+                    showBorder: showBorder,
                     elevation: elevation,
                     backgroundColor: backgroundColor,
                     activeColor: activeColor,
@@ -1694,13 +1761,45 @@ Widget? _getNavbarForRouteFallback(String location) {
                 'centerItems',
                 true,
               );
+              final style = _getNavbarStyle(configHelper);
+              final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+              final indicatorColor = _getNavbarColor(
+                configHelper,
+                'indicatorColor',
+                activeColor,
+              );
+              final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+              final showBorder = _getNavbarBool(
+                configHelper,
+                'showBorder',
+                false,
+              );
+              final borderStyleString = (configHelper.getObject('navbar_configuration')
+                  as Map<String, dynamic>?)?['borderStyle'] as String?;
+              BorderStyle? borderStyle;
+              if (borderStyleString != null) {
+                switch (borderStyleString.toLowerCase()) {
+                  case 'solid':
+                    borderStyle = BorderStyle.solid;
+                    break;
+                  case 'none':
+                    borderStyle = BorderStyle.none;
+                    break;
+                }
+              }
 
               return OsmeaComponents.navbar(
                 variant: variant,
                 size: size,
                 position: position,
+                style: style,
+                indicatorStyle: indicatorStyle,
+                indicatorColor: indicatorColor,
                 currentIndex: currentIndex,
                 borderColor: borderColor,
+                borderWidth: borderWidth,
+                borderStyle: borderStyle,
+                showBorder: showBorder,
                 elevation: elevation,
                 backgroundColor: backgroundColor,
                 activeColor: activeColor,
