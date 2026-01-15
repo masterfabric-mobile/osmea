@@ -712,7 +712,7 @@ class OsmeaNavbar extends CoreContainer {
 
     // Get variant-specific item padding
     final variantItemPadding = _getVariantItemPadding(context, config);
-    
+
     // Build item content
     Widget itemContent = _buildItemContent(
       context,
@@ -822,7 +822,8 @@ class OsmeaNavbar extends CoreContainer {
               borderRadius: BorderRadius.circular(8.0),
               boxShadow: [
                 BoxShadow(
-                  color: effectiveIndicatorColor.withValues(alpha: context.alpha20),
+                  color: effectiveIndicatorColor.withValues(
+                      alpha: context.alpha20),
                   blurRadius: 8.0,
                   offset: const Offset(0, 2),
                 ),
@@ -936,7 +937,8 @@ class OsmeaNavbar extends CoreContainer {
               borderRadius: BorderRadius.circular(28.0),
               boxShadow: [
                 BoxShadow(
-                  color: effectiveIndicatorColor.withValues(alpha: context.alpha15),
+                  color: effectiveIndicatorColor.withValues(
+                      alpha: context.alpha15),
                   blurRadius: 12.0,
                   spreadRadius: 1.0,
                 ),
@@ -1020,7 +1022,8 @@ class OsmeaNavbar extends CoreContainer {
               borderRadius: BorderRadius.circular(12.0),
               boxShadow: [
                 BoxShadow(
-                  color: effectiveIndicatorColor.withValues(alpha: context.alpha30),
+                  color: effectiveIndicatorColor.withValues(
+                      alpha: context.alpha30),
                   blurRadius: 16.0,
                   spreadRadius: 2.0,
                 ),
@@ -1099,7 +1102,8 @@ class OsmeaNavbar extends CoreContainer {
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: effectiveIndicatorColor.withValues(alpha: context.alpha50),
+                      color: effectiveIndicatorColor.withValues(
+                          alpha: context.alpha50),
                       blurRadius: 20.0,
                       spreadRadius: 2.0,
                     ),
@@ -1194,7 +1198,8 @@ class OsmeaNavbar extends CoreContainer {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: effectiveIndicatorColor.withValues(alpha: context.alpha50),
+                      color: effectiveIndicatorColor.withValues(
+                          alpha: context.alpha50),
                       blurRadius: 4.0,
                       spreadRadius: 1.0,
                     ),
@@ -1221,11 +1226,13 @@ class OsmeaNavbar extends CoreContainer {
                   width: config.iconSize * 1.6,
                   height: config.iconSize * 1.6,
                   decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(alpha: context.alpha20),
+                    color: effectiveIndicatorColor.withValues(
+                        alpha: context.alpha20),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: effectiveIndicatorColor.withValues(alpha: context.alpha30),
+                        color: effectiveIndicatorColor.withValues(
+                            alpha: context.alpha30),
                         blurRadius: 12.0,
                         spreadRadius: 2.0,
                       ),
@@ -1249,7 +1256,8 @@ class OsmeaNavbar extends CoreContainer {
                     borderRadius: BorderRadius.circular(2.0),
                     boxShadow: [
                       BoxShadow(
-                        color: effectiveIndicatorColor.withValues(alpha: context.alpha50),
+                        color: effectiveIndicatorColor.withValues(
+                            alpha: context.alpha50),
                         blurRadius: 4.0,
                       ),
                     ],
@@ -1302,7 +1310,8 @@ class OsmeaNavbar extends CoreContainer {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: effectiveIndicatorColor.withValues(alpha: context.alpha50),
+                      color: effectiveIndicatorColor.withValues(
+                          alpha: context.alpha50),
                       blurRadius: 6.0,
                       spreadRadius: 1.0,
                     ),
@@ -1322,11 +1331,13 @@ class OsmeaNavbar extends CoreContainer {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  color: effectiveIndicatorColor.withValues(alpha: context.alpha20),
+                  color: effectiveIndicatorColor.withValues(
+                      alpha: context.alpha20),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: effectiveIndicatorColor.withValues(alpha: context.alpha60),
+                      color: effectiveIndicatorColor.withValues(
+                          alpha: context.alpha60),
                       blurRadius: 24.0,
                       spreadRadius: 4.0,
                     ),
@@ -1495,11 +1506,13 @@ class OsmeaNavbar extends CoreContainer {
                   width: config.iconSize * 1.8,
                   height: config.iconSize * 1.8,
                   decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(alpha: context.alpha25),
+                    color: effectiveIndicatorColor.withValues(
+                        alpha: context.alpha25),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: effectiveIndicatorColor.withValues(alpha: context.alpha50),
+                        color: effectiveIndicatorColor.withValues(
+                            alpha: context.alpha50),
                         blurRadius: 20.0,
                         spreadRadius: 4.0,
                       ),
@@ -1524,7 +1537,8 @@ class OsmeaNavbar extends CoreContainer {
                   width: config.iconSize * 1.2,
                   height: config.iconSize * 1.2,
                   decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(alpha: context.alpha30),
+                    color: effectiveIndicatorColor.withValues(
+                        alpha: context.alpha30),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -1679,7 +1693,6 @@ class OsmeaNavbar extends CoreContainer {
         );
     }
   }
-
 
   Widget _buildItemContent(
     BuildContext context,
