@@ -410,7 +410,8 @@ class OsmeaNavbar extends CoreContainer {
     final hasIcons = items.any((item) => item.icon != null);
     final hasSubtext = items.any((item) => item.subtext != null);
     final hasLeadingIcon = items.any((item) => item.leadingIcon != null);
-    final hasTrailingActions = items.any((item) => item.trailingActions != null && item.trailingActions!.isNotEmpty);
+    final hasTrailingActions = items.any((item) =>
+        item.trailingActions != null && item.trailingActions!.isNotEmpty);
     final hasSearchBar = items.any((item) => item.searchBar != null);
     final isBottomNav = position == NavbarPosition.bottom;
     final isTopNav = position == NavbarPosition.top;
@@ -1335,16 +1336,18 @@ class OsmeaNavbar extends CoreContainer {
     }
 
     // Determine if border should be shown
-    final shouldShowBorder = showBorder ?? 
-        (variant == NavbarVariant.healthcareMinimal || 
-         variant == NavbarVariant.financeBordered);
-    
+    final shouldShowBorder = showBorder ??
+        (variant == NavbarVariant.healthcareMinimal ||
+            variant == NavbarVariant.financeBordered);
+
     Border? border;
     if (shouldShowBorder) {
       final effectiveBorderWidth = borderWidth ??
-          ((variant == NavbarVariant.healthcareMinimal || 
-            variant == NavbarVariant.financeBordered) ? 1.0 : 0.0);
-      
+          ((variant == NavbarVariant.healthcareMinimal ||
+                  variant == NavbarVariant.financeBordered)
+              ? 1.0
+              : 0.0);
+
       if (effectiveBorderWidth > 0) {
         final effectiveBorderStyle = borderStyle ?? BorderStyle.solid;
         final effectiveBorderColor = borderColor ?? colors.border;
