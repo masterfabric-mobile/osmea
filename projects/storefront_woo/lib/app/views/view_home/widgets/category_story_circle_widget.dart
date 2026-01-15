@@ -41,7 +41,9 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
   Future<void> _loadFavoriteStatus() async {
     try {
       final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
-      debugPrint('💖 CategoryStoryCircle: Loaded ${favoriteIds.length} favorite category IDs: $favoriteIds');
+      debugPrint(
+        '💖 CategoryStoryCircle: Loaded ${favoriteIds.length} favorite category IDs: $favoriteIds',
+      );
       if (mounted) {
         setState(() {
           _favoriteStatus = {for (var id in favoriteIds) id: true};
@@ -59,7 +61,7 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
 
   Future<void> _toggleFavorite(int categoryId, String categoryName) async {
     final wasFavorite = _favoriteStatus[categoryId] ?? false;
-    
+
     // Optimistically update UI first
     if (mounted) {
       setState(() {
@@ -282,9 +284,7 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
           height: size * 0.4,
           child: CircularProgressIndicator(
             strokeWidth: 2.0,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              OsmeaColors.black,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.black),
           ),
         ),
       ),

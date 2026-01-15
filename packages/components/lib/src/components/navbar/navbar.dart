@@ -483,10 +483,10 @@ class OsmeaNavbar extends CoreContainer {
     NavbarStyle effectiveStyle,
   ) {
     final variantStyle = _getVariantStyle(context, config);
-    
+
     // Apply variant-specific padding adjustments
     final effectivePadding = _getVariantPadding(context, config, variantStyle);
-    
+
     Widget navbar = Container(
       height: position.isHorizontal ? config.height : null,
       width: position.isVertical ? config.height : null,
@@ -509,7 +509,7 @@ class OsmeaNavbar extends CoreContainer {
     _NavbarVariantStyle variantStyle,
   ) {
     final basePadding = config.padding as EdgeInsets;
-    
+
     switch (variant) {
       case NavbarVariant.retailMain:
         // More padding for modern look
@@ -682,7 +682,7 @@ class OsmeaNavbar extends CoreContainer {
 
     // Get variant-specific item padding
     final variantItemPadding = _getVariantItemPadding(context, config);
-    
+
     Widget child = Container(
       constraints: BoxConstraints(
         maxHeight: config.height,
@@ -834,7 +834,8 @@ class OsmeaNavbar extends CoreContainer {
                   width: config.iconSize * 1.4,
                   height: config.iconSize * 1.4,
                   decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(alpha: context.alpha15),
+                    color: effectiveIndicatorColor.withValues(
+                        alpha: context.alpha15),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -890,8 +891,10 @@ class OsmeaNavbar extends CoreContainer {
                   height: position.isHorizontal ? 2.0 : null,
                   width: position.isHorizontal ? null : 2.0,
                   constraints: BoxConstraints(
-                    maxWidth: position.isHorizontal ? config.iconSize * 0.6 : 2.0,
-                    maxHeight: position.isHorizontal ? 2.0 : config.iconSize * 0.6,
+                    maxWidth:
+                        position.isHorizontal ? config.iconSize * 0.6 : 2.0,
+                    maxHeight:
+                        position.isHorizontal ? 2.0 : config.iconSize * 0.6,
                   ),
                   decoration: BoxDecoration(
                     color: effectiveIndicatorColor,
@@ -911,7 +914,7 @@ class OsmeaNavbar extends CoreContainer {
     NavbarSizeConfig config,
   ) {
     final basePadding = config.itemPadding as EdgeInsets;
-    
+
     switch (variant) {
       case NavbarVariant.retailMain:
         // More padding for full segment highlight
@@ -1570,7 +1573,7 @@ class OsmeaNavbar extends CoreContainer {
       BuildContext context, NavbarSizeConfig config, _NavbarColors colors) {
     // Get variant-specific style properties
     final variantStyle = _getVariantStyle(context, config);
-    
+
     List<BoxShadow> shadows = [];
 
     // Apply elevation based on variant style
@@ -1614,7 +1617,8 @@ class OsmeaNavbar extends CoreContainer {
   }
 
   /// Get variant-specific style properties
-  _NavbarVariantStyle _getVariantStyle(BuildContext context, NavbarSizeConfig config) {
+  _NavbarVariantStyle _getVariantStyle(
+      BuildContext context, NavbarSizeConfig config) {
     switch (variant) {
       case NavbarVariant.retailMain:
         // Modern, rounded, with shadow - e-commerce friendly
