@@ -111,15 +111,16 @@ final GoRouter appRouter = GoRouter(
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 1.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeInOutCubic,
-                        ),
-                      ),
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.0, 1.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
                       child: child,
                     );
                   },
@@ -175,15 +176,16 @@ final GoRouter appRouter = GoRouter(
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 1.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeInOutCubic,
-                        ),
-                      ),
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.0, 1.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
                       child: child,
                     );
                   },
@@ -243,10 +245,8 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (BuildContext context, GoRouterState state) {
             // Parse query parameters
             final queryParams = state.uri.queryParameters;
-            final arguments = <String, dynamic>{
-              'products': true,
-            };
-            
+            final arguments = <String, dynamic>{'products': true};
+
             // Add category_id from query parameters if present
             if (queryParams.containsKey('category_id')) {
               final categoryIdStr = queryParams['category_id'];
@@ -257,7 +257,7 @@ final GoRouter appRouter = GoRouter(
                 }
               }
             }
-            
+
             return CustomTransitionPage(
               child: ProductListView(
                 arguments: arguments,
@@ -276,15 +276,16 @@ final GoRouter appRouter = GoRouter(
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeInOutCubic,
-                        ),
-                      ),
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
                       child: child,
                     );
                   },
@@ -310,9 +311,10 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -349,7 +351,9 @@ final GoRouter appRouter = GoRouter(
                 child: AccountView(
                   arguments: const {'account': true},
                   goRoute: (String path) {
-                    debugPrint('🔀 AccountView: goRoute called with path: $path');
+                    debugPrint(
+                      '🔀 AccountView: goRoute called with path: $path',
+                    );
                     if (path.contains('home') || path == '/home') {
                       debugPrint('🔀 AccountView: Navigating to /home');
                       context.go('/home');
@@ -392,7 +396,9 @@ final GoRouter appRouter = GoRouter(
                           await WooJwtTokenStorage.clearToken();
                           debugPrint('✅ Route: WooJWT token cleared');
                         } catch (e) {
-                          debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
+                          debugPrint(
+                            '⚠️ Route: Failed to clear WooJWT token: $e',
+                          );
                         }
 
                         // Step 3: Clear cart token
@@ -400,7 +406,9 @@ final GoRouter appRouter = GoRouter(
                           await WooCartTokenStorage.clearCartToken();
                           debugPrint('✅ Route: WooCartToken cleared');
                         } catch (e) {
-                          debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
+                          debugPrint(
+                            '⚠️ Route: Failed to clear WooCartToken: $e',
+                          );
                         }
 
                         // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
@@ -415,32 +423,40 @@ final GoRouter appRouter = GoRouter(
 
                         // Step 5: Clear wishlist (user-specific data)
                         try {
-                          final wishlistViewModel = GetIt.I<WishlistViewModel>();
+                          final wishlistViewModel =
+                              GetIt.I<WishlistViewModel>();
                           wishlistViewModel.clearAll();
                           debugPrint('✅ Route: Wishlist cleared');
                         } catch (e) {
                           debugPrint('⚠️ Route: Failed to clear wishlist: $e');
                         }
 
-                        debugPrint('✅ Route: Platform-specific cleanup completed');
+                        debugPrint(
+                          '✅ Route: Platform-specific cleanup completed',
+                        );
                       },
                     );
 
                     // Step 5: Navigate to home after sign out
                     await Future.delayed(const Duration(milliseconds: 300));
                     if (context.mounted) {
-                      debugPrint('🔀 Route: Navigating to /home after sign out...');
+                      debugPrint(
+                        '🔀 Route: Navigating to /home after sign out...',
+                      );
                       context.go('/home');
                       debugPrint('✅ Route: Navigation to /home completed');
                     } else {
-                      debugPrint('⚠️ Route: Context not mounted, cannot navigate');
+                      debugPrint(
+                        '⚠️ Route: Context not mounted, cannot navigate',
+                      );
                     }
                   },
                 ),
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -458,9 +474,10 @@ final GoRouter appRouter = GoRouter(
                 },
                 // AboutView will load configuration from app_config.json internally
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -473,14 +490,17 @@ final GoRouter appRouter = GoRouter(
             return CustomTransitionPage(
               child: ContactUsView(
                 goRoute: (String path) {
-                  debugPrint('🔀 ContactUsView: goRoute called with path: $path');
+                  debugPrint(
+                    '🔀 ContactUsView: goRoute called with path: $path',
+                  );
                   context.go(path);
                 },
                 // ContactUsView will load configuration from app_config.json internally
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -498,9 +518,10 @@ final GoRouter appRouter = GoRouter(
                 },
                 // FAQView will load configuration from app_config.json internally
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -532,14 +553,18 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return ScaleTransition(
-                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
-                  ),
-                  child: FadeTransition(opacity: animation, child: child),
-                );
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return ScaleTransition(
+                      scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOutBack,
+                        ),
+                      ),
+                      child: FadeTransition(opacity: animation, child: child),
+                    );
+                  },
               transitionDuration: const Duration(milliseconds: 500),
             );
           },
@@ -564,21 +589,22 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position:
-                      Tween<Offset>(
-                        begin: const Offset(0.0, 1.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeInOutCubic,
-                        ),
-                      ),
-                  child: child,
-                );
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.0, 1.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
               transitionDuration: const Duration(milliseconds: 400),
             );
           },
@@ -625,9 +651,10 @@ final GoRouter appRouter = GoRouter(
                 },
                 arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -637,7 +664,8 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/loading/:loadingType',
           pageBuilder: (BuildContext context, GoRouterState state) {
-            final loadingTypeStr = state.pathParameters['loadingType'] ?? 'general';
+            final loadingTypeStr =
+                state.pathParameters['loadingType'] ?? 'general';
             final loadingType = LoadingModelType.values.firstWhere(
               (type) => type.name == loadingTypeStr,
               orElse: () => LoadingModelType.general,
@@ -663,7 +691,8 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
                 loadingType: loadingType,
-                loadingPageModel: customTitle != null || customDescription != null
+                loadingPageModel:
+                    customTitle != null || customDescription != null
                     ? LoadingPageModel(
                         title: customTitle ?? 'Loading...',
                         description: customDescription ?? 'Please wait',
@@ -680,9 +709,10 @@ final GoRouter appRouter = GoRouter(
                     : null,
                 arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             );
           },
@@ -1068,7 +1098,6 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
-
   ],
 );
 
@@ -2022,12 +2051,13 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
-    
+
     // Check if we came from navbar (no auto-focus) or from searchbar tap (auto-focus)
     // We'll determine this based on whether there's an initial query or not
     // If there's an initial query, it means user typed in home searchbar, so auto-focus
     // If no initial query, it means user tapped navbar, so don't auto-focus
-    _shouldAutoFocus = widget.initialQuery != null && widget.initialQuery!.isNotEmpty;
+    _shouldAutoFocus =
+        widget.initialQuery != null && widget.initialQuery!.isNotEmpty;
 
     // Request focus after the frame is built only if should auto-focus
     if (_shouldAutoFocus) {

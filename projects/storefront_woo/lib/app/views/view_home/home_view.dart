@@ -236,7 +236,7 @@ PreferredSizeWidget _buildHomeAppBar(
   // Create controllers for home searchbar (just for navigation)
   final searchFocusNode = FocusNode();
   final searchController = TextEditingController();
-  
+
   // Listen for focus changes to navigate on tap (same as search view)
   searchFocusNode.addListener(() {
     if (searchFocusNode.hasFocus) {
