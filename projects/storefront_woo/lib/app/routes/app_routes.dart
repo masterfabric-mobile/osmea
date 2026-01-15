@@ -2086,6 +2086,8 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
       searchFocusNode: widget.searchFocusNode,
       showBackButton: true,
       showTitle: false,
+      titleAlignment: AppBarTitleAlignment.center,
+      showSearchIcon: true,
       onBackPressed: () => widget.goRoute('/home'),
       searchProvider: widget.searchProvider,
       resultBuilder: (context, results) {
