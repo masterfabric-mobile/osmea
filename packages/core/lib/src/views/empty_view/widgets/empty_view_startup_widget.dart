@@ -19,12 +19,10 @@ import 'package:osmea_components/osmea_components.dart';
 
 class EmptyViewStartupWidget extends StatefulWidget {
   final VoidCallback? onActionPressed;
-  final VoidCallback? onBackPressed;
 
   const EmptyViewStartupWidget({
     super.key,
     this.onActionPressed,
-    this.onBackPressed,
   });
 
   @override
@@ -97,37 +95,18 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
         final title = state.emptyTitle;
         final description = state.emptyDescription;
 
-        return OsmeaComponents.scaffold(
-          backgroundColor: backgroundColor,
-          appBar: OsmeaComponents.appBar(
-            title: OsmeaComponents.text(
-              title,
-              color: textColor,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            backgroundColor: backgroundColor,
-            foregroundColor: textColor,
-            elevation: 0,
-            leading: widget.onBackPressed != null
-                ? IconButton(
-                    icon: Icon(Icons.arrow_back, color: textColor),
-                    onPressed: widget.onBackPressed,
-                  )
-                : null,
-          ),
-          body: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SizedBox.expand(
-              child: OsmeaComponents.center(
-                child: OsmeaComponents.container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.1,
-                  ),
-                  child: OsmeaComponents.column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: SizedBox.expand(
+            child: OsmeaComponents.center(
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.1,
+                ),
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                       // Large minimalist icon
                       _buildMinimalistIcon(context, state, config, textColor),
 
