@@ -180,27 +180,15 @@ class _EmptyViewContentState extends State<_EmptyViewContent>
     }
   }
 
-  /// ⏳ Loading view
+  /// ⏳ Loading view - minimalist, no text
   Widget _buildLoadingView(BuildContext context) {
     return OsmeaComponents.container(
       padding: context.paddingNormal,
       child: OsmeaComponents.center(
-        child: OsmeaComponents.column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OsmeaComponents.loading(
-              type: LoadingType.circularFade,
-              size: 32,
-              color: OsmeaColors.nordicBlue,
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing16),
-            OsmeaComponents.text(
-              'Preparing empty view...',
-              variant: OsmeaTextVariant.bodyMedium,
-              color: OsmeaColors.pewter,
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 48,
+          color: OsmeaColors.nordicBlue,
         ),
       ),
     );
