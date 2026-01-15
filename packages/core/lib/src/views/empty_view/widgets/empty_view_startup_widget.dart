@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
@@ -96,99 +95,74 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
         final title = state.emptyTitle;
         final description = state.emptyDescription;
 
-        return OsmeaComponents.scaffold(
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            backgroundColor: backgroundColor,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            toolbarHeight: 56,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: textColor),
-              onPressed: () {
-                context.go('/home');
-              },
-            ),
-            title: Text(
-              title,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            centerTitle: false,
-          ),
-          body: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SizedBox.expand(
-              child: OsmeaComponents.center(
-                child: OsmeaComponents.container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.1,
-                  ),
-                  child: OsmeaComponents.column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Large minimalist icon
-                      _buildMinimalistIcon(context, state, config, textColor),
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: SizedBox.expand(
+            child: OsmeaComponents.center(
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.1,
+                ),
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Large minimalist icon
+                    _buildMinimalistIcon(context, state, config, textColor),
 
-                      OsmeaComponents.sizedBox(height: context.spacing40),
+                    OsmeaComponents.sizedBox(height: context.spacing40),
 
-                      // Clean Title
-                      OsmeaComponents.text(
-                        title,
+                    // Clean Title
+                    OsmeaComponents.text(
+                      title,
+                      color: textColor,
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.headlineLarge(context).copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.8,
+                      ),
+                    ),
+
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+
+                    // Minimal underline
+                    OsmeaComponents.container(
+                      width: 40,
+                      height: 3,
+                      decoration: BoxDecoration(
                         color: textColor,
-                        textAlign: TextAlign.center,
-                        textStyle:
-                            OsmeaTextStyle.headlineLarge(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.8,
-                        ),
+                        borderRadius: BorderRadius.circular(1.5),
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing12),
+                    OsmeaComponents.sizedBox(height: context.spacing24),
 
-                      // Minimal underline
-                      OsmeaComponents.container(
-                        width: 40,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: textColor,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
+                    // Simple Description
+                    OsmeaComponents.text(
+                      description,
+                      color: textColor.withOpacity(0.6),
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                        letterSpacing: 0.2,
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing24),
+                    OsmeaComponents.sizedBox(height: context.spacing40),
 
-                      // Simple Description
-                      OsmeaComponents.text(
-                        description,
-                        color: textColor.withOpacity(0.6),
-                        textAlign: TextAlign.center,
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                          letterSpacing: 0.2,
-                        ),
+                    // Bold primary button
+                    if (config?.showActionButton == true &&
+                        widget.onActionPressed != null)
+                      OsmeaComponents.button(
+                        text: state.actionButtonText ?? 'Get Started',
+                        onPressed: widget.onActionPressed,
+                        variant: ButtonVariant.primary,
+                        size: ButtonSize.large,
+                        backgroundColor: textColor,
+                        textColor: backgroundColor,
                       ),
-
-                      OsmeaComponents.sizedBox(height: context.spacing40),
-
-                      // Bold primary button
-                      if (config?.showActionButton == true &&
-                          widget.onActionPressed != null)
-                        OsmeaComponents.button(
-                          text: state.actionButtonText ?? 'Get Started',
-                          onPressed: widget.onActionPressed,
-                          variant: ButtonVariant.primary,
-                          size: ButtonSize.large,
-                          backgroundColor: textColor,
-                          textColor: backgroundColor,
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),

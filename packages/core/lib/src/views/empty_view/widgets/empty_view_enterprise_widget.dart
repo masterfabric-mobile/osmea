@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_state.dart';
@@ -85,10 +84,6 @@ class _EmptyViewEnterpriseWidgetState extends State<EmptyViewEnterpriseWidget>
         }
 
         // Get colors from config
-        final backgroundColor = currentEmptyPage?.getBackgroundColor() ??
-            config?.getBackgroundColor() ??
-            config?.getPrimaryColor() ??
-            OsmeaColors.white;
         final textColor = currentEmptyPage?.getTextColor() ??
             config?.getTextColor() ??
             OsmeaColors.black;
@@ -97,99 +92,75 @@ class _EmptyViewEnterpriseWidgetState extends State<EmptyViewEnterpriseWidget>
         final title = state.emptyTitle;
         final description = state.emptyDescription;
 
-        return OsmeaComponents.scaffold(
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            backgroundColor: backgroundColor,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            toolbarHeight: 56,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: textColor),
-              onPressed: () {
-                context.go('/home');
-              },
-            ),
-            title: Text(
-              title,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            centerTitle: false,
-          ),
-          body: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SizedBox.expand(
-              child: OsmeaComponents.center(
-                child: OsmeaComponents.container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.08,
-                  ),
-                  child: OsmeaComponents.column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Professional icon circle
-                      _buildIconCircle(context, state, config, textColor),
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: SizedBox.expand(
+            child: OsmeaComponents.center(
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.08,
+                ),
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Professional icon circle
+                    _buildIconCircle(context, state, config, textColor),
 
-                      OsmeaComponents.sizedBox(height: context.spacing32),
+                    OsmeaComponents.sizedBox(height: context.spacing32),
 
-                      // Empty Title - Professional centered
-                      OsmeaComponents.text(
-                        title,
-                        color: textColor,
-                        textAlign: TextAlign.center,
-                        textStyle:
-                            OsmeaTextStyle.headlineMedium(context).copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.5,
-                        ),
+                    // Empty Title - Professional centered
+                    OsmeaComponents.text(
+                      title,
+                      color: textColor,
+                      textAlign: TextAlign.center,
+                      textStyle:
+                          OsmeaTextStyle.headlineMedium(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.5,
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing16),
+                    OsmeaComponents.sizedBox(height: context.spacing16),
 
-                      // Professional divider
-                      OsmeaComponents.container(
-                        width: 60,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          color: textColor.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
+                    // Professional divider
+                    OsmeaComponents.container(
+                      width: 60,
+                      height: 2,
+                      decoration: BoxDecoration(
+                        color: textColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(1),
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing20),
+                    OsmeaComponents.sizedBox(height: context.spacing20),
 
-                      // Empty Description - Professional centered
-                      OsmeaComponents.text(
-                        description,
-                        color: textColor.withOpacity(0.7),
-                        textAlign: TextAlign.center,
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                        ),
+                    // Empty Description - Professional centered
+                    OsmeaComponents.text(
+                      description,
+                      color: textColor.withOpacity(0.7),
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing32),
+                    OsmeaComponents.sizedBox(height: context.spacing32),
 
-                      // Action Button - Professional style
-                      if (config?.showActionButton == true &&
-                          widget.onActionPressed != null)
-                        OsmeaComponents.button(
-                          text: state.actionButtonText ?? 'Continue',
-                          onPressed: widget.onActionPressed,
-                          variant: ButtonVariant.outlined,
-                          size: ButtonSize.medium,
-                          backgroundColor: Colors.transparent,
-                          textColor: textColor,
-                          borderColor: textColor.withOpacity(0.3),
-                        ),
-                    ],
-                  ),
+                    // Action Button - Professional style
+                    if (config?.showActionButton == true &&
+                        widget.onActionPressed != null)
+                      OsmeaComponents.button(
+                        text: state.actionButtonText ?? 'Continue',
+                        onPressed: widget.onActionPressed,
+                        variant: ButtonVariant.outlined,
+                        size: ButtonSize.medium,
+                        backgroundColor: Colors.transparent,
+                        textColor: textColor,
+                        borderColor: textColor.withOpacity(0.3),
+                      ),
+                  ],
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
@@ -20,8 +21,7 @@ import 'package:osmea_components/osmea_components.dart';
 /// {@category Views}
 /// {@subCategory EmptyView}
 
-class EmptyView
-    extends MasterViewCubit<EmptyViewCubit, EmptyViewState> {
+class EmptyView extends MasterViewCubit<EmptyViewCubit, EmptyViewState> {
   /// Callback to be called when action button is pressed
   final VoidCallback? onActionPressed;
 
@@ -53,7 +53,55 @@ class EmptyView
     this.customDescription,
     this.customImagePath,
     this.customIconPath,
-  });
+  }) : super(
+          coreAppBar: (context, viewModel) => PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: BlocBuilder<EmptyViewCubit, EmptyViewState>(
+              bloc: viewModel,
+              builder: (context, state) {
+                final currentEmptyPage = state.currentEmptyPage;
+                final config = state.config;
+
+                final backgroundColor =
+                    currentEmptyPage?.getBackgroundColor() ??
+                        config?.getBackgroundColor() ??
+                        config?.getPrimaryColor() ??
+                        OsmeaColors.white;
+                final textColor = currentEmptyPage?.getTextColor() ??
+                    config?.getTextColor() ??
+                    OsmeaColors.black;
+
+                final title = state.emptyTitle;
+
+                return OsmeaComponents.appBar(
+                  title: OsmeaComponents.text(
+                    title,
+                    variant: OsmeaTextVariant.headlineMedium,
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  backgroundColor: backgroundColor,
+                  foregroundColor: textColor,
+                  elevation: 0,
+                  surfaceTintColor: OsmeaColors.transparent,
+                  shadowColor: OsmeaColors.transparent,
+                  leading: OsmeaComponents.iconButton(
+                    icon: Icon(Icons.arrow_back_ios_new, color: textColor),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/home');
+                      }
+                    },
+                    backgroundColor: OsmeaColors.transparent,
+                  ),
+                );
+              },
+            ),
+          ),
+          backgroundColor: OsmeaColors.white,
+        );
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -111,8 +159,7 @@ class _EmptyViewContentState extends State<_EmptyViewContent>
   /// 🎮 Initialize animations
   void _initializeAnimations() {
     // Get animation duration from config or use default
-    final animationDuration =
-        widget.state.config?.animationDuration ?? 400;
+    final animationDuration = widget.state.config?.animationDuration ?? 400;
 
     _animationController = AnimationController(
       vsync: this,
