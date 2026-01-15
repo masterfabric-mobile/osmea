@@ -366,9 +366,17 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   viewModel.clearSearch();
                   onSearchClear?.call();
                 },
+                onSearchSubmitted: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
                 searchSuggestionProvider: searchSuggestionProvider,
               );
             } else {
+              // showTitle is false - use appBarWithSearchBar but without showing title (same structure as home)
               // Build actions inline
               List<Widget> effectiveActions = [];
               if (searchBarActions.isNotEmpty) {
@@ -431,14 +439,14 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 }
               }
 
-              return OsmeaComponents.appBar(
-                backgroundColor: appBarBackgroundColor ??
-                    configHelper.getSearchAppBarColor(),
-                elevation: elevation,
-                size: AppBarSize.large,
+              // Use appBarWithSearchBar even when showTitle is false (same structure as home)
+              return OsmeaComponents.appBarWithSearchBar(
+                title: null, // Don't show title when showTitle is false
+                titleAlignment: titleAlignment,
+                centerTitle: titleAlignment == AppBarTitleAlignment.center,
                 leading: showBackButton
                     ? OsmeaComponents.iconButton(
-                        icon: const Icon(Icons.arrow_back, size: 24),
+                        icon: const Icon(Icons.arrow_back),
                         onPressed:
                             onBackPressed ?? () => Navigator.of(context).pop(),
                         variant: ButtonVariant.ghost,
@@ -446,63 +454,64 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                         backgroundColor: Colors.transparent,
                       )
                     : null,
-                title: OsmeaComponents.searchbar(
-                  controller: searchController,
-                  focusNode: searchFocusNode,
-                  hint: searchHint ?? 'Search...',
-                  size: searchBarSize,
-                  showBackButton: showBackButton,
-                  searchIcon: showSearchIcon
-                      ? const Icon(Icons.search, size: 20)
-                      : null,
-                  borderColor: searchBarBorderColor ??
-                      configHelper.getSearchBarBorderColor(),
-                  variant: TextFieldVariant.outlined,
-                  backgroundColor: searchBarBackgroundColor ??
-                      configHelper.getSearchInputBackgroundColor(),
-                  textColor: configHelper.getSearchViewTextColor(),
-                  hintColor: configHelper.getSearchViewHintTextColor(),
-                  focusColor: configHelper.getSearchViewFocusColor(),
-                  errorColor: configHelper.getSearchViewErrorColor(),
-                  onTap: () {
-                    // Request focus when searchbar is tapped
-                    if (searchFocusNode != null) {
-                      searchFocusNode!.requestFocus();
-                    }
-                  },
-                  onChanged: (query) {
-                    viewModel.updateQuery(query);
-                    onSearchChanged?.call(query);
+                appBarBackgroundColor: appBarBackgroundColor ??
+                    configHelper.getSearchAppBarColor(),
+                searchBarBackgroundColor: searchBarBackgroundColor ??
+                    configHelper.getSearchInputBackgroundColor(),
+                searchBarBorderColor: searchBarBorderColor ??
+                    configHelper.getSearchBarBorderColor(),
+                searchBarTextColor: configHelper.getSearchViewTextColor(),
+                searchBarHintColor: configHelper.getSearchViewHintTextColor(),
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(),
+                searchBarErrorColor: configHelper.getSearchViewErrorColor(),
+                searchBarActions: effectiveActions,
+                searchBarActionMargin: searchBarActionMargin,
+                searchBarActionAlignment: searchBarActionAlignment,
+                appBarVariant: appBarVariant,
+                appBarSize: appBarSize,
+                searchBarVariant: searchBarVariant,
+                searchHint: searchHint ?? 'Search...',
+                searchController: searchController,
+                searchFocusNode: searchFocusNode,
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped
+                  if (searchFocusNode != null) {
+                    searchFocusNode!.requestFocus();
+                  }
+                },
+                onSearch: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchChanged: (query) {
+                  viewModel.updateQuery(query);
+                  onSearchChanged?.call(query);
 
-                    // Trigger search if query length meets minimum requirement
-                    if (query.trim().length >= minQueryLength) {
-                      viewModel.performSearch(query,
-                          searchProvider: searchProvider);
-                    } else if (query.trim().isEmpty) {
-                      viewModel.clearSearch();
-                    }
-
-                    if (searchSuggestionProvider != null) {
-                      viewModel.getSuggestions(query,
-                          suggestionProvider: searchSuggestionProvider);
-                    }
-                  },
-                  onSubmitted: (query) {
+                  // Trigger search if query length meets minimum requirement
+                  if (query.trim().length >= minQueryLength) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider, immediate: true);
-                    onSearchSubmitted?.call(query);
-                  },
-                  onClear: () {
+                        searchProvider: searchProvider);
+                  } else if (query.trim().isEmpty) {
                     viewModel.clearSearch();
-                    onSearchClear?.call();
-                  },
-                  showClearButton: showClearButton,
-                  showSearchIcon: showSearchIcon,
-                  actions: effectiveActions,
-                  actionMargin: searchBarActionMargin,
-                  actionAlignment: searchBarActionAlignment,
-                ),
-                actions: [],
+                  }
+
+                  if (searchSuggestionProvider != null) {
+                    viewModel.getSuggestions(query,
+                        suggestionProvider: searchSuggestionProvider);
+                  }
+                },
+                onSearchSubmitted: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchClear: () {
+                  viewModel.clearSearch();
+                  onSearchClear?.call();
+                },
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
               );
             }
           },
