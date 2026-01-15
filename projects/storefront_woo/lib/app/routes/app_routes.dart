@@ -2016,18 +2016,27 @@ class _AutoFocusSearchView extends StatefulWidget {
 
 class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
   late TextEditingController _searchController;
+  bool _shouldAutoFocus = false;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
+    
+    // Check if we came from navbar (no auto-focus) or from searchbar tap (auto-focus)
+    // We'll determine this based on whether there's an initial query or not
+    // If there's an initial query, it means user typed in home searchbar, so auto-focus
+    // If no initial query, it means user tapped navbar, so don't auto-focus
+    _shouldAutoFocus = widget.initialQuery != null && widget.initialQuery!.isNotEmpty;
 
-    // Request focus after the frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget.searchFocusNode.canRequestFocus) {
-        widget.searchFocusNode.requestFocus();
-      }
-    });
+    // Request focus after the frame is built only if should auto-focus
+    if (_shouldAutoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.searchFocusNode.canRequestFocus) {
+          widget.searchFocusNode.requestFocus();
+        }
+      });
+    }
   }
 
   @override
