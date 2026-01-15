@@ -77,6 +77,51 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     }
   }
 
+  /// Gets bottom spacing for a component from config
+  /// Returns spacing value in pixels (not EdgeInsets)
+  double _getComponentBottomSpacing(
+    AssetConfigHelper configHelper,
+    String componentName,
+  ) {
+    try {
+      final config = configHelper.getObject('home_view.$componentName');
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final bottom = (paddingConfig['bottom'] as num?)?.toDouble();
+        if (bottom != null && bottom > 0) {
+          return bottom;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load spacing for $componentName: $e');
+    }
+    // Default spacing from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.bottom', 16.0);
+  }
+
+  /// Gets horizontal padding from config for a component
+  double _getHorizontalPadding(AssetConfigHelper configHelper, String componentName) {
+    try {
+      final config = configHelper.getObject('home_view.$componentName');
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+        if (horizontal != null && horizontal > 0) {
+          return horizontal;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load horizontal padding: $e');
+    }
+    // Default from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+  }
+
+  /// Gets title to content spacing from config
+  double _getTitleSpacing(AssetConfigHelper configHelper) {
+    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+  }
+
   /// Builds all skeleton components sorted by orderID
   List<Widget> _buildOrderedSkeletonComponents(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
@@ -195,12 +240,21 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     // Sort by orderID
     components.sort((a, b) => a.orderId.compareTo(b.orderId));
 
-    // Convert to widgets list with spacing
+    // Convert to widgets list with spacing between components
+    // Use SizedBox for spacing instead of padding
     final List<Widget> widgets = [];
     for (int i = 0; i < components.length; i++) {
-      widgets.add(components[i].widget);
+      final component = components[i];
+      
+      // Add the component widget
+      widgets.add(component.widget);
+      
+      // Add spacing after component (except for the last one)
       if (i < components.length - 1) {
-        widgets.add(OsmeaComponents.sizedBox(height: context.spacing16));
+        final bottomSpacing = _getComponentBottomSpacing(configHelper, component.name);
+        if (bottomSpacing > 0) {
+          widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));
+        }
       }
     }
 
@@ -209,13 +263,15 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   @override
   Widget build(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         return OsmeaComponents.singleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.only(
-            top: context.spacing16,
-            bottom: context.spacing24 * 2,
+            bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
           ),
           child: OsmeaComponents.column(
             children: _buildOrderedSkeletonComponents(context),
@@ -227,7 +283,12 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildSearchBarSkeleton(BuildContext context) {
     return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+      padding: EdgeInsets.fromLTRB(
+        context.spacing20,
+        context.spacing16,
+        context.spacing20,
+        context.spacing16,
+      ),
       child: _ShimmerContainer(
         animation: _controller,
         child: Container(
@@ -242,39 +303,45 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   Widget _buildCategoryCirclesSkeleton(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
-      child: SizedBox(
-        height: 100,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 8,
-          itemBuilder: (context, index) {
-            return _ShimmerContainer(
-              animation: _controller,
-              child: Container(
-                margin: EdgeInsets.only(right: context.spacing16),
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.grayMaterial[200],
-                  shape: BoxShape.circle,
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(left: context.spacing8),
+        itemCount: 8,
+        itemBuilder: (context, index) {
+          return _ShimmerContainer(
+            animation: _controller,
+            child: Container(
+              margin: EdgeInsets.only(right: context.spacing16),
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: OsmeaColors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: OsmeaColors.black,
+                  width: 0.5,
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildBannerSkeleton(BuildContext context) {
     return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+      padding: EdgeInsets.only(
+        bottom: context.spacing16,
+        left: context.spacing16,
+        right: context.spacing16,
+      ),
       child: _ShimmerContainer(
         animation: _controller,
         child: Container(
-          height: 180,
+          height: context.height160,
           decoration: BoxDecoration(
             color: OsmeaColors.grayMaterial[200],
             borderRadius: BorderRadius.circular(context.radiusMedium),
@@ -285,10 +352,12 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   Widget _buildPromotionalBarSkeleton(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    
     // Get height from config
     double getSkeletonHeight() {
       try {
-        final config = _configHelper?.getObject('home_view.promotional_bar');
+        final config = configHelper.getObject('home_view.promotional_bar');
         final heightStr = config?['height'] as String? ?? 'medium';
         
         switch (heightStr.toLowerCase()) {
@@ -307,10 +376,29 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
       }
     }
 
+    // Get horizontal padding from config
+    double getHorizontalPadding() {
+      try {
+        final config = configHelper.getObject('home_view.promotional_bar');
+        final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+        if (paddingConfig != null) {
+          final horizontal = (paddingConfig['horizontal'] as num?)?.toDouble();
+          if (horizontal != null && horizontal > 0) {
+            return horizontal;
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to load horizontal padding: $e');
+      }
+      // Default from component_spacing
+      return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    }
+
     final skeletonHeight = getSkeletonHeight();
+    final horizontalPadding = getHorizontalPadding();
 
     return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: OsmeaComponents.row(
         children: [
           // Left promotional bar item skeleton
@@ -355,63 +443,145 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   Widget _buildCampaignCardsSkeleton(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
-      child: SizedBox(
-        height: 160,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return _ShimmerContainer(
-              animation: _controller,
-              child: Container(
-                margin: EdgeInsets.only(right: context.spacing12),
-                width: 280,
-                height: 160,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.grayMaterial[200],
-                  borderRadius: BorderRadius.circular(context.radiusMedium),
-                ),
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'campaign_cards');
+    final titleSpacing = _getTitleSpacing(configHelper);
+    
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: _ShimmerContainer(
+            animation: _controller,
+            child: Container(
+              height: 20,
+              width: 100,
+              decoration: BoxDecoration(
+                color: OsmeaColors.grayMaterial[200],
+                borderRadius: BorderRadius.circular(4),
               ),
-            );
-          },
+            ),
+          ),
         ),
-      ),
+        OsmeaComponents.sizedBox(height: titleSpacing),
+        // Horizontal scrollable campaign cards
+        OsmeaComponents.singleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: OsmeaComponents.row(
+            children: List.generate(3, (index) {
+              return _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  margin: EdgeInsets.only(right: context.spacing12),
+                  width: 280,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(context.radiusMedium),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildDealsOfDaySkeleton(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
-      child: SizedBox(
-        height: 280,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return _ShimmerContainer(
-              animation: _controller,
-              child: Container(
-                margin: EdgeInsets.only(right: context.spacing12),
-                width: 200,
-                height: 280,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.grayMaterial[200],
-                  borderRadius: BorderRadius.circular(context.radiusMedium),
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'deals_of_day');
+    final titleSpacing = _getTitleSpacing(configHelper);
+    final bannerHeight = context.height160;
+    
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 20,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-            );
-          },
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 16,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        OsmeaComponents.sizedBox(height: titleSpacing),
+        // Banner carousel skeleton
+        SizedBox(height: bannerHeight),
+      ],
     );
   }
 
   Widget _buildProductsGridSkeleton(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
-      child: GridView.builder(
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'recommended');
+    final titleSpacing = _getTitleSpacing(configHelper);
+    
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 20,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 16,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: titleSpacing),
+        // Products grid skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -509,12 +679,16 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
           );
         },
       ),
+        ),
+      ],
     );
   }
 
   Widget _buildCampaignAlertSkeleton(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'campaign_alert');
     return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: _ShimmerContainer(
         animation: _controller,
         child: Container(
@@ -580,12 +754,16 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   Widget _buildFlashSaleSkeleton(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'flash_sale');
+    final titleSpacing = _getTitleSpacing(configHelper);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header skeleton
         OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -631,10 +809,10 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
             ],
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing16),
+        OsmeaComponents.sizedBox(height: titleSpacing),
         // Product carousel skeleton
         OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: SizedBox(
             height: context.height160 + context.spacing10 + context.height80,
             child: ListView.builder(
@@ -647,7 +825,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
                     margin: EdgeInsets.only(
                       right: index < 2 ? context.spacing8 : 0,
                     ),
-                    width: (context.allWidth - (context.spacing20 * 2) - context.spacing16) / 2,
+                    width: (context.allWidth - (horizontalPadding * 2) - context.spacing16) / 2,
                     child: OsmeaComponents.column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -697,38 +875,48 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   Widget _buildBrandsSkeleton(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'brands');
+    final titleSpacing = _getTitleSpacing(configHelper);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header skeleton
         OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: OsmeaComponents.row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: 20,
-                width: 120,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.grayMaterial[200],
-                  borderRadius: BorderRadius.circular(4),
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 20,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-              Container(
-                height: 16,
-                width: 60,
-                decoration: BoxDecoration(
-                  color: OsmeaColors.grayMaterial[200],
-                  borderRadius: BorderRadius.circular(4),
+              _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  height: 16,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.grayMaterial[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ],
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing16),
+        OsmeaComponents.sizedBox(height: titleSpacing),
         // Brands grid skeleton
         OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: context.spacing20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Wrap(
             spacing: context.spacing16,
             runSpacing: context.height16,
@@ -736,7 +924,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
               return _ShimmerContainer(
                 animation: _controller,
                 child: SizedBox(
-                  width: (context.allWidth - (context.spacing20 * 2) - (context.spacing16 * 2)) / 3,
+                  width: (context.allWidth - (horizontalPadding * 2) - (context.spacing16 * 2)) / 3,
                   child: Container(
                     height: context.height80,
                     decoration: BoxDecoration(

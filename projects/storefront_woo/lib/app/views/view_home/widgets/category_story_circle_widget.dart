@@ -185,15 +185,20 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                   height: circleSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: OsmeaColors.black, width: 2),
-                    gradient: LinearGradient(
-                      begin: context.topLeft,
-                      end: context.bottomRight,
-                      colors: [
-                        OsmeaColors.black,
-                        OsmeaColors.black.withOpacity(0.7),
-                      ],
-                    ),
+                    border: Border.all(color: OsmeaColors.black, width: 0.5),
+                    color: imageUrl != null && imageUrl.isNotEmpty
+                        ? null
+                        : OsmeaColors.white,
+                    gradient: imageUrl != null && imageUrl.isNotEmpty
+                        ? LinearGradient(
+                            begin: context.topLeft,
+                            end: context.bottomRight,
+                            colors: [
+                              OsmeaColors.black,
+                              OsmeaColors.black.withOpacity(0.7),
+                            ],
+                          )
+                        : null,
                   ),
                   child: ClipOval(
                     child: imageUrl != null && imageUrl.isNotEmpty
@@ -210,10 +215,17 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                               width: circleSize,
                               height: circleSize,
                               color: OsmeaColors.white,
-                              child: Icon(
-                                Icons.category_outlined,
-                                size: circleSize * 0.5,
-                                color: OsmeaColors.thunder,
+                              child: Center(
+                                child: SizedBox(
+                                  width: circleSize * 0.4,
+                                  height: circleSize * 0.4,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      OsmeaColors.black,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           )
@@ -276,10 +288,17 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
       width: size,
       height: size,
       color: OsmeaColors.white,
-      child: Icon(
-        Icons.category_outlined,
-        size: size * 0.5,
-        color: OsmeaColors.thunder,
+      child: Center(
+        child: SizedBox(
+          width: size * 0.4,
+          height: size * 0.4,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.0,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              OsmeaColors.black,
+            ),
+          ),
+        ),
       ),
     );
   }
