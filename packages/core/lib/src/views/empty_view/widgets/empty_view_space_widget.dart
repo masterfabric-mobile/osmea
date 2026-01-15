@@ -122,89 +122,84 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                       child: OsmeaComponents.column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                            // Image or Icon
-                            if (state.imagePath != null ||
-                                state.iconPath != null)
-                              _buildImageOrIcon(
-                                  context, state, config, accentColor),
+                          // Image or Icon
+                          if (state.imagePath != null || state.iconPath != null)
+                            _buildImageOrIcon(
+                                context, state, config, accentColor),
 
-                            if (state.imagePath != null ||
-                                state.iconPath != null)
-                              OsmeaComponents.sizedBox(
-                                  height: screenSize.height * 0.03),
+                          if (state.imagePath != null || state.iconPath != null)
+                            OsmeaComponents.sizedBox(
+                                height: screenSize.height * 0.03),
 
-                            // Icon Circle (if no image/icon provided)
-                            if (state.imagePath == null &&
-                                state.iconPath == null)
-                              OsmeaComponents.container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: accentColor.withValues(alpha: 0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  _getEmptyIcon(state.currentEmptyType),
-                                  size: 40,
-                                  color: accentColor,
-                                ),
+                          // Icon Circle (if no image/icon provided)
+                          if (state.imagePath == null && state.iconPath == null)
+                            OsmeaComponents.container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: accentColor.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
                               ),
-
-                            if (state.imagePath == null &&
-                                state.iconPath == null)
-                              OsmeaComponents.sizedBox(
-                                  height: screenSize.height * 0.03),
-
-                            // Main Empty Title
-                            OsmeaComponents.text(
-                              title,
-                              color: textColor,
-                              textAlign: TextAlign.center,
-                              textStyle: OsmeaTextStyle.headlineMedium(context)
-                                  .copyWith(
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.5,
+                              child: Icon(
+                                _getEmptyIcon(state.currentEmptyType),
+                                size: 40,
+                                color: accentColor,
                               ),
                             ),
 
+                          if (state.imagePath == null && state.iconPath == null)
                             OsmeaComponents.sizedBox(
-                                height: screenSize.height * 0.02),
+                                height: screenSize.height * 0.03),
 
-                            // Empty Description
-                            OsmeaComponents.text(
-                              description,
-                              color: textColor.withValues(alpha: 0.7),
-                              textAlign: TextAlign.center,
-                              textStyle:
-                                  OsmeaTextStyle.bodyLarge(context).copyWith(
-                                fontWeight: FontWeight.w300,
-                                height: 1.6,
+                          // Main Empty Title
+                          OsmeaComponents.text(
+                            title,
+                            color: textColor,
+                            textAlign: TextAlign.center,
+                            textStyle:
+                                OsmeaTextStyle.headlineMedium(context).copyWith(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+
+                          OsmeaComponents.sizedBox(
+                              height: screenSize.height * 0.02),
+
+                          // Empty Description
+                          OsmeaComponents.text(
+                            description,
+                            color: textColor.withValues(alpha: 0.7),
+                            textAlign: TextAlign.center,
+                            textStyle:
+                                OsmeaTextStyle.bodyLarge(context).copyWith(
+                              fontWeight: FontWeight.w300,
+                              height: 1.6,
+                            ),
+                          ),
+
+                          OsmeaComponents.sizedBox(
+                              height: screenSize.height * 0.05),
+
+                          // Action Button (if enabled in config and callback provided)
+                          if (config?.showActionButton == true &&
+                              widget.onActionPressed != null)
+                            SizedBox(
+                              width: 200,
+                              child: OsmeaComponents.button(
+                                text: state.actionButtonText ?? 'Continue',
+                                onPressed: widget.onActionPressed,
+                                variant: ButtonVariant.primary,
+                                size: ButtonSize.medium,
                               ),
                             ),
-
-                            OsmeaComponents.sizedBox(
-                                height: screenSize.height * 0.05),
-
-                            // Action Button (if enabled in config and callback provided)
-                            if (config?.showActionButton == true &&
-                                widget.onActionPressed != null)
-                              SizedBox(
-                                width: 200,
-                                child: OsmeaComponents.button(
-                                  text: state.actionButtonText ?? 'Continue',
-                                  onPressed: widget.onActionPressed,
-                                  variant: ButtonVariant.primary,
-                                  size: ButtonSize.medium,
-                                ),
-                              ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            
+            ),
           ),
         );
       },
