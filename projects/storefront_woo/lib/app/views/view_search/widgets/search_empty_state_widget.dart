@@ -548,24 +548,24 @@ class _CategoryCard extends StatelessWidget {
                         ),
                       )
                     : _buildImagePlaceholder(context),
-                // Gradient overlay from bottom - darker
+                // Gradient overlay from bottom - minimal
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    height: 120,
+                    height: 60,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.85),
-                          Colors.black.withOpacity(0.65),
-                          Colors.black.withOpacity(0.3),
+                          Colors.black.withOpacity(0.35),
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.05),
                           Colors.transparent,
                         ],
-                        stops: const [0.0, 0.3, 0.7, 1.0],
+                        stops: const [0.0, 0.4, 0.7, 1.0],
                       ),
                     ),
                   ),
