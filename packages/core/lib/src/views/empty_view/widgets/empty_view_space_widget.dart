@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/models/empty_view_models.dart';
@@ -92,10 +91,6 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
         }
 
         // Get colors from config
-        final backgroundColor = currentEmptyPage?.getBackgroundColor() ??
-            config?.getBackgroundColor() ??
-            config?.getPrimaryColor() ??
-            OsmeaColors.white;
         final textColor = currentEmptyPage?.getTextColor() ??
             config?.getTextColor() ??
             OsmeaColors.black;
@@ -115,8 +110,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                 constraints: BoxConstraints(
                   minHeight: screenSize.height -
                       MediaQuery.of(context).viewPadding.top -
-                      MediaQuery.of(context).viewPadding.bottom -
-                      kToolbarHeight,
+                      MediaQuery.of(context).viewPadding.bottom,
                 ),
                 child: SingleChildScrollView(
                   child: OsmeaComponents.container(
@@ -146,7 +140,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: accentColor.withOpacity(0.1),
+                                  color: accentColor.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -179,7 +173,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                             // Empty Description
                             OsmeaComponents.text(
                               description,
-                              color: textColor.withOpacity(0.7),
+                              color: textColor.withValues(alpha: 0.7),
                               textAlign: TextAlign.center,
                               textStyle:
                                   OsmeaTextStyle.bodyLarge(context).copyWith(
@@ -210,7 +204,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
                   ),
                 ),
               ),
-            ),
+            
           ),
         );
       },
@@ -282,7 +276,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: accentColor.withOpacity(0.1),
+        color: accentColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(

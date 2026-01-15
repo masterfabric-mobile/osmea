@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/models/empty_view_models.dart';
@@ -83,13 +82,13 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
         }
 
         // Get colors from config
+        final textColor = currentEmptyPage?.getTextColor() ??
+            config?.getTextColor() ??
+            OsmeaColors.black;
         final backgroundColor = currentEmptyPage?.getBackgroundColor() ??
             config?.getBackgroundColor() ??
             config?.getPrimaryColor() ??
             OsmeaColors.white;
-        final textColor = currentEmptyPage?.getTextColor() ??
-            config?.getTextColor() ??
-            OsmeaColors.black;
 
         // Get messages from config
         final title = state.emptyTitle;
@@ -107,64 +106,62 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                      // Large minimalist icon
-                      _buildMinimalistIcon(context, state, config, textColor),
+                    // Large minimalist icon
+                    _buildMinimalistIcon(context, state, config, textColor),
 
-                      OsmeaComponents.sizedBox(height: context.spacing40),
+                    OsmeaComponents.sizedBox(height: context.spacing40),
 
-                      // Clean Title
-                      OsmeaComponents.text(
-                        title,
+                    // Clean Title
+                    OsmeaComponents.text(
+                      title,
+                      color: textColor,
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.headlineLarge(context).copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.8,
+                      ),
+                    ),
+
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+
+                    // Minimal underline
+                    OsmeaComponents.container(
+                      width: 40,
+                      height: 3,
+                      decoration: BoxDecoration(
                         color: textColor,
-                        textAlign: TextAlign.center,
-                        textStyle:
-                            OsmeaTextStyle.headlineLarge(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.8,
-                        ),
+                        borderRadius: BorderRadius.circular(1.5),
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing12),
+                    OsmeaComponents.sizedBox(height: context.spacing24),
 
-                      // Minimal underline
-                      OsmeaComponents.container(
-                        width: 40,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: textColor,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
+                    // Simple Description
+                    OsmeaComponents.text(
+                      description,
+                      color: textColor.withValues(alpha: 0.6),
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                        letterSpacing: 0.2,
                       ),
+                    ),
 
-                      OsmeaComponents.sizedBox(height: context.spacing24),
+                    OsmeaComponents.sizedBox(height: context.spacing40),
 
-                      // Simple Description
-                      OsmeaComponents.text(
-                        description,
-                        color: textColor.withOpacity(0.6),
-                        textAlign: TextAlign.center,
-                        textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                          letterSpacing: 0.2,
-                        ),
+                    // Bold primary button
+                    if (config?.showActionButton == true &&
+                        widget.onActionPressed != null)
+                      OsmeaComponents.button(
+                        text: state.actionButtonText ?? 'Get Started',
+                        onPressed: widget.onActionPressed,
+                        variant: ButtonVariant.primary,
+                        size: ButtonSize.large,
+                        backgroundColor: textColor,
+                        textColor: backgroundColor,
                       ),
-
-                      OsmeaComponents.sizedBox(height: context.spacing40),
-
-                      // Bold primary button
-                      if (config?.showActionButton == true &&
-                          widget.onActionPressed != null)
-                        OsmeaComponents.button(
-                          text: state.actionButtonText ?? 'Get Started',
-                          onPressed: widget.onActionPressed,
-                          variant: ButtonVariant.primary,
-                          size: ButtonSize.large,
-                          backgroundColor: textColor,
-                          textColor: backgroundColor,
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -188,7 +185,7 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: textColor.withOpacity(0.2),
+          color: textColor.withValues(alpha: 0.2),
           width: 2,
         ),
       ),
@@ -196,7 +193,7 @@ class _EmptyViewStartupWidgetState extends State<EmptyViewStartupWidget>
         child: Icon(
           icon,
           size: 40,
-          color: textColor.withOpacity(0.8),
+          color: textColor.withValues(alpha: 0.8),
         ),
       ),
     );

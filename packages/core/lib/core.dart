@@ -205,3 +205,11 @@ export 'package:core/src/views/account/cubit/account_cubit.dart';
 export 'package:core/src/views/account/cubit/account_state.dart';
 export 'package:core/src/views/account/widgets/account_widget.dart';
 export 'package:core/src/views/account/widgets/orders_list_widget.dart';
+
+// ❓ Exports the FAQ models
+export 'package:core/src/models/faq_models.dart';
+
+// ❓ Exports the FAQ view and cubit
+export 'package:core/src/views/faq/faq_view.dart';
+export 'package:core/src/views/faq/cubit/faq_cubit.dart';
+export 'package:core/src/views/faq/cubit/faq_state.dart';
