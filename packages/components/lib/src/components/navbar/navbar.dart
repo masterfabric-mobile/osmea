@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:osmea_components/osmea_components.dart';
 import 'package:osmea_components/src/components/text/text.dart';
@@ -480,14 +482,112 @@ class OsmeaNavbar extends CoreContainer {
     _NavbarColors colors,
     NavbarStyle effectiveStyle,
   ) {
-    return Container(
+    final variantStyle = _getVariantStyle(context, config);
+    
+    // Apply variant-specific padding adjustments
+    final effectivePadding = _getVariantPadding(context, config, variantStyle);
+    
+    Widget navbar = Container(
       height: position.isHorizontal ? config.height : null,
       width: position.isVertical ? config.height : null,
-      padding: padding ?? config.padding,
+      padding: padding ?? effectivePadding,
       margin: margin,
-      decoration: _buildDecoration(colors, config),
+      decoration: _buildDecoration(context, config, colors),
       child: _buildContent(context, config, colors, effectiveStyle),
     );
+
+    // Apply variant-specific effects (blur for glass, etc.)
+    navbar = _applyVariantEffects(context, navbar, variantStyle);
+
+    return navbar;
+  }
+
+  /// Get variant-specific padding
+  EdgeInsetsGeometry _getVariantPadding(
+    BuildContext context,
+    NavbarSizeConfig config,
+    _NavbarVariantStyle variantStyle,
+  ) {
+    final basePadding = config.padding as EdgeInsets;
+    
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // More padding for modern look
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.2,
+          vertical: basePadding.vertical * 1.1,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // Standard padding
+        return config.padding;
+
+      case NavbarVariant.healthcareMinimal:
+        // Minimal padding for clean look
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.9,
+          vertical: basePadding.vertical * 0.8,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Professional, adequate padding
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.1,
+          vertical: basePadding.vertical,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Minimal padding for overlay
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.7,
+        );
+
+      case NavbarVariant.socialGlass:
+        // More padding for glass effect
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.15,
+          vertical: basePadding.vertical * 1.05,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        // Standard corporate padding
+        return config.padding;
+
+      case NavbarVariant.enterpriseSidebar:
+        // Minimal sidebar padding
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.85,
+          vertical: basePadding.vertical * 0.9,
+        );
+    }
+  }
+
+  /// Apply variant-specific visual effects
+  Widget _applyVariantEffects(
+    BuildContext context,
+    Widget child,
+    _NavbarVariantStyle variantStyle,
+  ) {
+    switch (variant) {
+      case NavbarVariant.socialGlass:
+        // Apply blur effect for glass morphism
+        return ClipRRect(
+          borderRadius: variantStyle.borderRadius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: child,
+          ),
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // No additional effects for overlay
+        return child;
+
+      default:
+        // No special effects for other variants
+        return child;
+    }
   }
 
   Widget _buildContent(
@@ -580,13 +680,16 @@ class OsmeaNavbar extends CoreContainer {
     final isDisabled = item.state == NavbarItemState.disabled;
     final isLoading = item.state == NavbarItemState.loading;
 
+    // Get variant-specific item padding
+    final variantItemPadding = _getVariantItemPadding(context, config);
+    
     Widget child = Container(
       constraints: BoxConstraints(
         maxHeight: config.height,
         maxWidth: position.isHorizontal ? double.infinity : config.height,
         minHeight: config.height * 0.8,
       ),
-      padding: config.itemPadding,
+      padding: variantItemPadding,
       child: _buildItemContent(
         context,
         item,
@@ -632,14 +735,15 @@ class OsmeaNavbar extends CoreContainer {
       );
     }
 
-    // Wrap with indicator if needed
-    if (indicatorStyle != NavbarIndicatorStyle.none && isActive) {
-      child = _buildIndicatorWrapper(
+    // Wrap with variant-specific indicator
+    if (isActive) {
+      child = _buildVariantIndicator(
         context,
         child,
         colors,
         isActive,
         effectiveStyle,
+        config,
       );
     }
 
@@ -664,52 +768,38 @@ class OsmeaNavbar extends CoreContainer {
     );
   }
 
-  /// Build indicator wrapper around navbar item
-  Widget _buildIndicatorWrapper(
+  /// Build variant-specific indicator based on sector design
+  Widget _buildVariantIndicator(
     BuildContext context,
     Widget child,
     _NavbarColors colors,
     bool isActive,
     NavbarStyle effectiveStyle,
+    NavbarSizeConfig config,
   ) {
     final effectiveIndicatorColor = indicatorColor ?? colors.active;
 
-    switch (indicatorStyle) {
+    // Override indicatorStyle if variant has specific design
+    final effectiveIndicatorStyle = _getVariantIndicatorStyle();
+
+    switch (effectiveIndicatorStyle) {
       case NavbarIndicatorStyle.none:
         return child;
 
-      case NavbarIndicatorStyle.line:
-        return Stack(
-          clipBehavior: clipNone,
-          children: [
-            child,
-            Positioned(
-              bottom: position.isHorizontal ? 0 : null,
-              top: position.isHorizontal ? null : 0,
-              left: position.isHorizontal ? null : 0,
-              right: position.isHorizontal ? null : 0,
-              child: Container(
-                height: position.isHorizontal ? 3.0 : null,
-                width: position.isHorizontal ? null : 3.0,
-                color: effectiveIndicatorColor,
-              ),
-            ),
-          ],
-        );
-
       case NavbarIndicatorStyle.dot:
+        // Style 1: Dot Indicator (Healthcare Minimal)
         return Stack(
           clipBehavior: clipNone,
           children: [
             child,
             Positioned(
-              top: position.isHorizontal ? 4.0 : null,
-              bottom: position.isHorizontal ? null : 4.0,
+              bottom: position.isHorizontal ? 4.0 : null,
+              top: position.isHorizontal ? null : 4.0,
               left: position.isHorizontal ? null : 4.0,
               right: position.isHorizontal ? null : 4.0,
               child: Container(
-                width: 6.0,
-                height: 6.0,
+                width: 8.0,
+                height: 8.0,
                 decoration: BoxDecoration(
                   color: effectiveIndicatorColor,
                   shape: BoxShape.circle,
@@ -720,42 +810,198 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarIndicatorStyle.fill:
+        // Style 2: Full Segment Highlight (Retail Main) - Entire segment highlighted
         return Container(
+          width: double.infinity,
+          height: double.infinity,
           decoration: BoxDecoration(
-            color: effectiveIndicatorColor.withValues(alpha: context.alpha10),
-            borderRadius: borderRadius ?? BorderRadius.circular(8.0),
+            color: effectiveIndicatorColor.withValues(alpha: context.alpha25),
+            borderRadius: BorderRadius.zero,
           ),
-          child: child,
-        );
-
-      case NavbarIndicatorStyle.border:
-        return Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: effectiveIndicatorColor,
-              width: 2.0,
-            ),
-            borderRadius: borderRadius ?? BorderRadius.circular(8.0),
-          ),
-          child: child,
+          child: Center(child: child),
         );
 
       case NavbarIndicatorStyle.underline:
+        // Style 3: Glowing Icon with Underline (Media Overlay)
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            // Glow effect around icon (subtle halo)
+            Positioned.fill(
+              child: Center(
+                child: Container(
+                  width: config.iconSize * 1.4,
+                  height: config.iconSize * 1.4,
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor.withValues(alpha: context.alpha15),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+            child,
+            // Underline - centered, shorter than full width
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: config.iconSize * 0.8,
+                  height: 3.0,
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.border:
+        // Style 4: Pill-shaped Background (Social Glass) - Rounded pill container
+        return Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.normalValue * 0.75,
+            vertical: context.lowValue * 0.75,
+          ),
+          decoration: BoxDecoration(
+            color: effectiveIndicatorColor.withValues(alpha: context.alpha25),
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: child,
+        );
+
+      case NavbarIndicatorStyle.line:
+        // Style 5: Thin Line Indicator (Finance Bordered, Enterprise Main)
         return Stack(
           clipBehavior: clipNone,
           children: [
             child,
             Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 2.0,
-                color: effectiveIndicatorColor,
+              bottom: position.isHorizontal ? 0 : null,
+              top: position.isHorizontal ? null : 0,
+              left: position.isHorizontal ? null : 0,
+              right: position.isHorizontal ? null : 0,
+              child: Center(
+                child: Container(
+                  height: position.isHorizontal ? 2.0 : null,
+                  width: position.isHorizontal ? null : 2.0,
+                  constraints: BoxConstraints(
+                    maxWidth: position.isHorizontal ? config.iconSize * 0.6 : 2.0,
+                    maxHeight: position.isHorizontal ? 2.0 : config.iconSize * 0.6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor,
+                    borderRadius: BorderRadius.circular(1.0),
+                  ),
+                ),
               ),
             ),
           ],
         );
+    }
+  }
+
+  /// Get variant-specific item padding
+  EdgeInsetsGeometry _getVariantItemPadding(
+    BuildContext context,
+    NavbarSizeConfig config,
+  ) {
+    final basePadding = config.itemPadding as EdgeInsets;
+    
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // More padding for full segment highlight
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.3,
+          vertical: basePadding.vertical * 1.2,
+        );
+
+      case NavbarVariant.retailSidebar:
+        return config.itemPadding;
+
+      case NavbarVariant.healthcareMinimal:
+        // Minimal padding for clean look
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.9,
+          vertical: basePadding.vertical * 0.85,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Professional padding
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.1,
+          vertical: basePadding.vertical,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Compact padding for overlay
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.85,
+          vertical: basePadding.vertical * 0.8,
+        );
+
+      case NavbarVariant.socialGlass:
+        // More padding for pill shape
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 1.2,
+          vertical: basePadding.vertical * 1.1,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        return config.itemPadding;
+
+      case NavbarVariant.enterpriseSidebar:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.9,
+          vertical: basePadding.vertical * 0.9,
+        );
+    }
+  }
+
+  /// Get variant-specific indicator style
+  NavbarIndicatorStyle _getVariantIndicatorStyle() {
+    // If user explicitly set indicatorStyle, use it
+    if (indicatorStyle != NavbarIndicatorStyle.none) {
+      return indicatorStyle;
+    }
+
+    // Otherwise, use variant-specific default
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // Full segment highlight for e-commerce
+        return NavbarIndicatorStyle.fill;
+
+      case NavbarVariant.retailSidebar:
+        // Thin line for sidebar
+        return NavbarIndicatorStyle.line;
+
+      case NavbarVariant.healthcareMinimal:
+        // Dot indicator for minimal healthcare design
+        return NavbarIndicatorStyle.dot;
+
+      case NavbarVariant.financeBordered:
+        // Thin line for professional finance
+        return NavbarIndicatorStyle.line;
+
+      case NavbarVariant.mediaOverlay:
+        // Glowing icon with underline for media
+        return NavbarIndicatorStyle.underline;
+
+      case NavbarVariant.socialGlass:
+        // Pill-shaped for modern social media
+        return NavbarIndicatorStyle.border;
+
+      case NavbarVariant.enterpriseMain:
+        // Thin line for corporate
+        return NavbarIndicatorStyle.line;
+
+      case NavbarVariant.enterpriseSidebar:
+        // Dot for sidebar
+        return NavbarIndicatorStyle.dot;
     }
   }
 
@@ -1321,35 +1567,34 @@ class OsmeaNavbar extends CoreContainer {
   }
 
   BoxDecoration _buildDecoration(
-      _NavbarColors colors, NavbarSizeConfig config) {
+      BuildContext context, NavbarSizeConfig config, _NavbarColors colors) {
+    // Get variant-specific style properties
+    final variantStyle = _getVariantStyle(context, config);
+    
     List<BoxShadow> shadows = [];
 
-    if (variant != NavbarVariant.mediaOverlay &&
-        (elevation ?? config.elevation) > 0) {
+    // Apply elevation based on variant style
+    final effectiveElevation = elevation ?? variantStyle.elevation;
+    if (variant != NavbarVariant.mediaOverlay && effectiveElevation > 0) {
       shadows.add(
         BoxShadow(
           color: shadowColor ?? OsmeaColors.shadowLight,
-          blurRadius: elevation ?? config.elevation,
+          blurRadius: effectiveElevation,
           offset: Offset(0, position.isTop ? 2 : -2),
+          spreadRadius: variantStyle.shadowSpread,
         ),
       );
     }
 
     // Determine if border should be shown
-    final shouldShowBorder = showBorder ??
-        (variant == NavbarVariant.healthcareMinimal ||
-            variant == NavbarVariant.financeBordered);
+    final shouldShowBorder = showBorder ?? variantStyle.hasBorder;
 
     Border? border;
     if (shouldShowBorder) {
-      final effectiveBorderWidth = borderWidth ??
-          ((variant == NavbarVariant.healthcareMinimal ||
-                  variant == NavbarVariant.financeBordered)
-              ? 1.0
-              : 0.0);
+      final effectiveBorderWidth = borderWidth ?? variantStyle.borderWidth;
 
       if (effectiveBorderWidth > 0) {
-        final effectiveBorderStyle = borderStyle ?? BorderStyle.solid;
+        final effectiveBorderStyle = borderStyle ?? variantStyle.borderStyle;
         final effectiveBorderColor = borderColor ?? colors.border;
 
         border = Border.all(
@@ -1362,10 +1607,125 @@ class OsmeaNavbar extends CoreContainer {
 
     return BoxDecoration(
       color: backgroundColor ?? colors.background,
-      borderRadius: borderRadius ?? config.borderRadius,
+      borderRadius: borderRadius ?? variantStyle.borderRadius,
       boxShadow: shadows,
       border: border,
     );
+  }
+
+  /// Get variant-specific style properties
+  _NavbarVariantStyle _getVariantStyle(BuildContext context, NavbarSizeConfig config) {
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // Modern, rounded, with shadow - e-commerce friendly
+        final borderRadius = position.isBottom
+            ? BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              )
+            : position.isTop
+                ? BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  )
+                : BorderRadius.circular(20);
+        return _NavbarVariantStyle(
+          borderRadius: borderRadius,
+          elevation: 8.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // Minimal, flat, clean - sidebar style
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.healthcareMinimal:
+        // Very clean, minimal border, flat design
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: true,
+          borderWidth: 1.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Professional, sharp corners, prominent border
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 2.0,
+          shadowSpread: 0.0,
+          hasBorder: true,
+          borderWidth: 1.5,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Floating, no border, no shadow (transparent overlay)
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.socialGlass:
+        // Glass morphism, rounded, subtle shadow
+        final borderRadius = position.isBottom
+            ? BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              )
+            : position.isTop
+                ? BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  )
+                : BorderRadius.circular(24);
+        return _NavbarVariantStyle(
+          borderRadius: borderRadius,
+          elevation: 4.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        // Corporate, flat, subtle shadow
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 4.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.enterpriseSidebar:
+        // Minimal, flat, clean sidebar
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+    }
   }
 
   _NavbarColors _getNavbarColors(BuildContext context) {
@@ -1449,6 +1809,25 @@ class _NavbarColors {
     required this.active,
     required this.inactive,
     required this.border,
+  });
+}
+
+/// Internal helper class for variant-specific style properties
+class _NavbarVariantStyle {
+  final BorderRadius borderRadius;
+  final double elevation;
+  final double shadowSpread;
+  final bool hasBorder;
+  final double borderWidth;
+  final BorderStyle borderStyle;
+
+  const _NavbarVariantStyle({
+    required this.borderRadius,
+    required this.elevation,
+    required this.shadowSpread,
+    required this.hasBorder,
+    required this.borderWidth,
+    required this.borderStyle,
   });
 }
 
