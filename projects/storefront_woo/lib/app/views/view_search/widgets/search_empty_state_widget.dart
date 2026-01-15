@@ -25,6 +25,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   bool _isLoading = true;
   String? _error;
   int _columnCount = 2; // Default to 2 columns for category grid
+  bool _isListView = false; // Default to grid view
 
   @override
   void initState() {
@@ -322,8 +323,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                   children: [
                     _buildToggleButton(
                       icon: Icons.grid_view,
-                      isActive: _columnCount == 2,
-                      onTap: () => setState(() => _columnCount = 2),
+                      isActive: !_isListView && _columnCount == 2,
+                      onTap: () => setState(() {
+                        _isListView = false;
+                        _columnCount = 2;
+                      }),
                     ),
                     Container(
                       width: 1,
@@ -332,8 +336,21 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                     ),
                     _buildToggleButton(
                       icon: Icons.apps,
-                      isActive: _columnCount == 3,
-                      onTap: () => setState(() => _columnCount = 3),
+                      isActive: !_isListView && _columnCount == 3,
+                      onTap: () => setState(() {
+                        _isListView = false;
+                        _columnCount = 3;
+                      }),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: Colors.grey.shade300,
+                    ),
+                    _buildToggleButton(
+                      icon: Icons.list,
+                      isActive: _isListView,
+                      onTap: () => setState(() => _isListView = true),
                     ),
                   ],
                 ),
@@ -342,29 +359,46 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
-        // Categories grid with images
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _columnCount,
-            crossAxisSpacing: context.spacing12,
-            mainAxisSpacing: context.spacing12,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: _categories.length,
-          itemBuilder: (context, index) {
-            final category = _categories[index];
-            return _CategoryCard(
-              category: category,
-              onTap: () {
-                if (category.id != null) {
-                  _searchByCategory(category.id as int, category.name ?? '');
-                }
-              },
-            );
-          },
-        ),
+        // Categories grid or list view
+        _isListView
+            ? ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
+                  return _CategoryListItem(
+                    category: category,
+                    onTap: () {
+                      if (category.id != null) {
+                        _searchByCategory(category.id as int, category.name ?? '');
+                      }
+                    },
+                  );
+                },
+              )
+            : GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _columnCount,
+                  crossAxisSpacing: context.spacing12,
+                  mainAxisSpacing: context.spacing12,
+                  childAspectRatio: 0.85,
+                ),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
+                  return _CategoryCard(
+                    category: category,
+                    onTap: () {
+                      if (category.id != null) {
+                        _searchByCategory(category.id as int, category.name ?? '');
+                      }
+                    },
+                  );
+                },
+              ),
       ],
     );
   }
@@ -610,6 +644,111 @@ class _CategoryCard extends StatelessWidget {
           color: Colors.grey.shade400,
           size: 48,
         ),
+      ),
+    );
+  }
+}
+
+/// Category list item widget for list view
+class _CategoryListItem extends StatelessWidget {
+  final dynamic category;
+  final VoidCallback onTap;
+
+  const _CategoryListItem({required this.category, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = category.image?.src ?? category.image?.thumbnail;
+    final categoryName = category.name ?? context.t.searchView.fallbacks.category;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.spacing8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing12,
+              vertical: context.spacing12,
+            ),
+            decoration: BoxDecoration(
+              color: OsmeaColors.snow,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey.shade200,
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                // Category image icon
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey.shade100,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? OsmeaComponents.image(
+                            imageUrl: imageUrl,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                            variant: ImageVariant.normal,
+                            cacheWidth: 112,
+                            errorWidget: _buildIconPlaceholder(context),
+                          )
+                        : _buildIconPlaceholder(context),
+                  ),
+                ),
+                SizedBox(width: context.spacing16),
+                // Category name
+                Expanded(
+                  child: OsmeaComponents.text(
+                    categoryName,
+                    textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.slate,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: context.spacing12),
+                // Arrow icon
+                Icon(
+                  Icons.chevron_right,
+                  color: OsmeaColors.pewter,
+                  size: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconPlaceholder(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.grey.shade200, Colors.grey.shade300],
+        ),
+      ),
+      child: Icon(
+        Icons.category_outlined,
+        color: Colors.grey.shade500,
+        size: 28,
       ),
     );
   }
