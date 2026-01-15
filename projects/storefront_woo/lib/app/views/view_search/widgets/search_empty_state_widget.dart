@@ -302,58 +302,33 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                   context,
                 ).copyWith(fontWeight: FontWeight.bold),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: OsmeaColors.snow,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildIconButton(
+                    icon: Icons.grid_view,
+                    isActive: !_isListView && _columnCount == 2,
+                    onTap: () => setState(() {
+                      _isListView = false;
+                      _columnCount = 2;
+                    }),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildToggleButton(
-                      icon: Icons.grid_view,
-                      isActive: !_isListView && _columnCount == 2,
-                      onTap: () => setState(() {
-                        _isListView = false;
-                        _columnCount = 2;
-                      }),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 24,
-                      color: Colors.grey.shade300,
-                    ),
-                    _buildToggleButton(
-                      icon: Icons.apps,
-                      isActive: !_isListView && _columnCount == 3,
-                      onTap: () => setState(() {
-                        _isListView = false;
-                        _columnCount = 3;
-                      }),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 24,
-                      color: Colors.grey.shade300,
-                    ),
-                    _buildToggleButton(
-                      icon: Icons.list,
-                      isActive: _isListView,
-                      onTap: () => setState(() => _isListView = true),
-                    ),
-                  ],
-                ),
+                  SizedBox(width: context.spacing8),
+                  _buildIconButton(
+                    icon: Icons.apps,
+                    isActive: !_isListView && _columnCount == 3,
+                    onTap: () => setState(() {
+                      _isListView = false;
+                      _columnCount = 3;
+                    }),
+                  ),
+                  SizedBox(width: context.spacing8),
+                  _buildIconButton(
+                    icon: Icons.list,
+                    isActive: _isListView,
+                    onTap: () => setState(() => _isListView = true),
+                  ),
+                ],
               ),
             ],
           ),
@@ -403,26 +378,31 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
     );
   }
 
-  Widget _buildToggleButton({
+  Widget _buildIconButton({
     required IconData icon,
     required bool isActive,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 10,
-        ),
-        decoration: BoxDecoration(
-          color: isActive ? OsmeaColors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          size: 22,
-          color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isActive ? OsmeaColors.black : OsmeaColors.snow,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isActive ? OsmeaColors.black : Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+          ),
         ),
       ),
     );

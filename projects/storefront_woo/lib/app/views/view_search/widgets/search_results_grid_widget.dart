@@ -39,35 +39,21 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: OsmeaColors.snow,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey.shade200,
-                    width: 1,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildIconButton(
+                    icon: Icons.grid_view,
+                    isActive: _columnCount == 2,
+                    onTap: () => setState(() => _columnCount = 2),
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildToggleButton(
-                      icon: Icons.grid_view,
-                      isActive: _columnCount == 2,
-                      onTap: () => setState(() => _columnCount = 2),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 24,
-                      color: Colors.grey.shade200,
-                    ),
-                    _buildToggleButton(
-                      icon: Icons.apps,
-                      isActive: _columnCount == 3,
-                      onTap: () => setState(() => _columnCount = 3),
-                    ),
-                  ],
-                ),
+                  SizedBox(width: context.spacing8),
+                  _buildIconButton(
+                    icon: Icons.apps,
+                    isActive: _columnCount == 3,
+                    onTap: () => setState(() => _columnCount = 3),
+                  ),
+                ],
               ),
             ],
           ),
@@ -116,26 +102,31 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
     );
   }
 
-  Widget _buildToggleButton({
+  Widget _buildIconButton({
     required IconData icon,
     required bool isActive,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: isActive ? OsmeaColors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isActive ? OsmeaColors.black : OsmeaColors.snow,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isActive ? OsmeaColors.black : Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+          ),
         ),
       ),
     );
