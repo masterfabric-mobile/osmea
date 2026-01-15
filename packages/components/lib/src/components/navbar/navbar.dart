@@ -932,7 +932,7 @@ class OsmeaNavbar extends CoreContainer {
             maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           padding: padding,
-          clipBehavior: Clip.hardEdge,
+          clipBehavior: Clip.none,
           child: content,
         );
 
