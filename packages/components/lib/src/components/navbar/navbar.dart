@@ -1793,7 +1793,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.8, // Smaller to prevent overflow
+              fontSize: config.fontSize * 0.65, // Much smaller text
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -1859,7 +1859,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.8, // Smaller to prevent overflow
+              fontSize: config.fontSize * 0.65, // Much smaller text
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -1882,6 +1882,7 @@ class OsmeaNavbar extends CoreContainer {
               item.subtext!,
               style: captionStyle.copyWith(
                 color: subtextColor,
+                fontSize: config.fontSize * 0.55,
               ),
               maxLines: 1,
               overflow: ellipsis,
@@ -1930,6 +1931,7 @@ class OsmeaNavbar extends CoreContainer {
           style: baseStyle.copyWith(
             fontWeight: isActive ? context.semiBold : context.normal,
             color: textColor,
+            fontSize: config.fontSize * 0.65,
           ),
           maxLines: 1,
           overflow: ellipsis,
@@ -1975,6 +1977,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
+              fontSize: config.fontSize * 0.65,
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2046,6 +2049,7 @@ class OsmeaNavbar extends CoreContainer {
       final titleStyle = _getTextStyleForSize(context).copyWith(
         fontWeight: context.semiBold,
         color: textColor,
+        fontSize: config.fontSize * 0.7,
       );
       children.add(
         Expanded(
@@ -2116,6 +2120,7 @@ class OsmeaNavbar extends CoreContainer {
         final titleStyle = _getTextStyleForSize(context).copyWith(
           fontWeight: context.semiBold,
           color: textColor,
+          fontSize: config.fontSize * 0.7,
         );
         children.add(
           Expanded(
@@ -2216,6 +2221,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
+              fontSize: config.fontSize * 0.65,
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2267,7 +2273,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.9,
+              fontSize: config.fontSize * 0.6,
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2342,7 +2348,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.8,
+              fontSize: config.fontSize * 0.65,
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2422,7 +2428,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.8,
+              fontSize: config.fontSize * 0.65,
             ),
             maxLines: 2,
             overflow: ellipsis,
