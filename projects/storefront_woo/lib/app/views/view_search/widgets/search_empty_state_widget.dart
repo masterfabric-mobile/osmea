@@ -24,6 +24,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   List<brand_models.ListProductBrandsResponseModel> _brands = [];
   bool _isLoading = true;
   String? _error;
+  int _columnCount = 2; // Default to 2 columns for category grid
 
   @override
   void initState() {
@@ -264,6 +265,55 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         vertical: context.spacing10,
       ),
       children: [
+        // Grid toggle button - aligned right
+        Padding(
+          padding: EdgeInsets.only(
+            right: context.spacing8,
+            bottom: context.spacing12,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: OsmeaColors.snow,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildToggleButton(
+                      icon: Icons.grid_view,
+                      isActive: _columnCount == 2,
+                      onTap: () => setState(() => _columnCount = 2),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: Colors.grey.shade300,
+                    ),
+                    _buildToggleButton(
+                      icon: Icons.apps,
+                      isActive: _columnCount == 3,
+                      onTap: () => setState(() => _columnCount = 3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
         // Brands section with horizontal scroll
         if (_brands.isNotEmpty) ...[
           OsmeaComponents.text(
@@ -301,7 +351,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: _columnCount,
             crossAxisSpacing: context.spacing12,
             mainAxisSpacing: context.spacing12,
             childAspectRatio: 0.85,
@@ -320,6 +370,31 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildToggleButton({
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? OsmeaColors.black : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+        ),
+      ),
     );
   }
 }
@@ -425,9 +500,9 @@ class _CategoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.01),
+            blurRadius: 2,
+            offset: const Offset(0, 0.5),
           ),
         ],
       ),

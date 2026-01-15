@@ -7,49 +7,136 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 // Animation helpers are now imported from core
 
-class SearchResultsGridWidget extends StatelessWidget {
+class SearchResultsGridWidget extends StatefulWidget {
   final List<dynamic> products;
 
   const SearchResultsGridWidget({super.key, required this.products});
 
   @override
+  State<SearchResultsGridWidget> createState() => _SearchResultsGridWidgetState();
+}
+
+class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
+  int _columnCount = 2; // Default to 2 columns
+
+  @override
   Widget build(BuildContext context) {
-    // Use Wrap widget exactly like Recommended section for same spacing behavior
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        context.height16,
-        context.spacing20,
-        0,
-      ), // Same padding as Recommended section
-      child: Wrap(
-        spacing: 15, // Same as Recommended section horizontal spacing
-        runSpacing: 16, // Same as Recommended section vertical spacing
-        children: products.asMap().entries.map((entry) {
-          final index = entry.key;
-          final product = entry.value;
-          final productId = product.id ?? 0;
+    // Calculate item width based on column count
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = context.spacing20 * 2;
+    final spacing = _columnCount == 2 ? 15.0 : 12.0;
+    final totalSpacing = spacing * (_columnCount - 1);
+    final itemWidth = (screenWidth - horizontalPadding - totalSpacing) / _columnCount;
 
-          // Direct check without BlocBuilder to prevent blocking
-          final wishlistVm = GetIt.I<WishlistViewModel>();
-          final isSaved = wishlistVm.isSaved(productId);
-
-          return StaggeredAnimation(
-            index: index,
-            child: SizedBox(
-              width: (MediaQuery.of(context).size.width - 55) / 2,
-              child: ProductCardWidget(
-                product: product,
-                isSaved: isSaved,
-                onWishlistTap: () {
-                  // Use shared HomeViewModel for wishlist to keep messages/state in sync
-                  GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-                },
-                onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+    return Column(
+      children: [
+        // Grid toggle button - aligned right
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing20,
+            vertical: context.spacing8,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: OsmeaColors.snow,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey.shade200,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildToggleButton(
+                      icon: Icons.grid_view,
+                      isActive: _columnCount == 2,
+                      onTap: () => setState(() => _columnCount = 2),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: Colors.grey.shade200,
+                    ),
+                    _buildToggleButton(
+                      icon: Icons.apps,
+                      isActive: _columnCount == 3,
+                      onTap: () => setState(() => _columnCount = 3),
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+        ),
+        // Product grid
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              context.spacing20,
+              0,
+              context.spacing20,
+              context.height16,
             ),
-          );
-        }).toList(),
+            child: Wrap(
+              spacing: spacing,
+              runSpacing: 16,
+              children: widget.products.asMap().entries.map((entry) {
+                final index = entry.key;
+                final product = entry.value;
+                final productId = product.id ?? 0;
+
+                // Direct check without BlocBuilder to prevent blocking
+                final wishlistVm = GetIt.I<WishlistViewModel>();
+                final isSaved = wishlistVm.isSaved(productId);
+
+                return StaggeredAnimation(
+                  index: index,
+                  child: SizedBox(
+                    width: itemWidth,
+                    child: ProductCardWidget(
+                      product: product,
+                      isSaved: isSaved,
+                      onWishlistTap: () {
+                        // Use shared HomeViewModel for wishlist to keep messages/state in sync
+                        GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+                      },
+                      onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToggleButton({
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? OsmeaColors.black : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
+        ),
       ),
     );
   }
