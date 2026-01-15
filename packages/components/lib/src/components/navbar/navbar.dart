@@ -493,7 +493,13 @@ class OsmeaNavbar extends CoreContainer {
       padding: padding ?? effectivePadding,
       margin: margin,
       decoration: _buildDecoration(context, config, colors),
-      child: _buildContent(context, config, colors, effectiveStyle),
+      child: ClipRect(
+        child: SizedBox(
+          height: position.isHorizontal ? config.height : null,
+          width: position.isVertical ? config.height : null,
+          child: _buildContent(context, config, colors, effectiveStyle),
+        ),
+      ),
     );
 
     // Apply variant-specific effects (blur for glass, etc.)
@@ -512,10 +518,10 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // More padding for modern look
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.2,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.retailSidebar:
@@ -525,15 +531,15 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.healthcareMinimal:
         // Minimal padding for clean look
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.9,
-          vertical: basePadding.vertical * 0.8,
+          horizontal: basePadding.horizontal * 0.7,
+          vertical: basePadding.vertical * 0.5,
         );
 
       case NavbarVariant.financeBordered:
-        // Professional, adequate padding
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.mediaOverlay:
@@ -544,10 +550,10 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.socialGlass:
-        // More padding for glass effect
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.15,
-          vertical: basePadding.vertical * 1.05,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.enterpriseMain:
@@ -557,38 +563,38 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.enterpriseSidebar:
         // Minimal sidebar padding
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.85,
-          vertical: basePadding.vertical * 0.9,
+          horizontal: basePadding.horizontal * 0.7,
+          vertical: basePadding.vertical * 0.5,
         );
 
       case NavbarVariant.gradientModern:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.2,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.capsuleRounded:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.badgeIndicator:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.0,
-          vertical: basePadding.vertical * 0.9,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.darkMinimal:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical * 1.0,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
 
       case NavbarVariant.cardFloating:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.15,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
         );
     }
   }
@@ -659,7 +665,12 @@ class OsmeaNavbar extends CoreContainer {
           mainAxisAlignment: spaceEvenly,
           children: itemWidgets
               .map((widget) => Expanded(
-                    child: Center(child: widget),
+                    child: Center(
+                      child: SizedBox(
+                        height: config.height,
+                        child: widget,
+                      ),
+                    ),
                   ))
               .toList(),
         );
@@ -772,6 +783,7 @@ class OsmeaNavbar extends CoreContainer {
     child = _applyVariantItemDesign(
       context,
       child,
+      item,
       colors,
       isActive,
       effectiveStyle,
@@ -813,59 +825,28 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // 🛒 STYLE 1: FULL SEGMENT HIGHLIGHT - Entire container filled, rounded, with shadow
-        // Design: Full-width/height container with brand color fill, rounded corners, prominent shadow
-        return Container(
-          width: isActive ? double.infinity : null,
-          height: isActive ? double.infinity : null,
-          constraints: isActive
-              ? null
-              : BoxConstraints(
-                  maxHeight: config.height,
-                  maxWidth:
-                      position.isHorizontal ? double.infinity : config.height,
-                  minHeight: config.height * 0.8,
-                ),
-          decoration: BoxDecoration(
-            color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha35)
-                : colors.background.withValues(alpha: context.alpha60),
-            borderRadius: BorderRadius.circular(10.0),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha25),
-                      blurRadius: 12.0,
-                      spreadRadius: 1.0,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha5),
-                      blurRadius: 2.0,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-          ),
-          padding: isActive
-              ? EdgeInsets.symmetric(
-                  horizontal: context.normalValue * 1.2,
-                  vertical: context.lowValue * 1.1,
-                )
-              : padding,
-          child: isActive ? Center(child: content) : content,
-        );
-
-      case NavbarVariant.retailSidebar:
-        // 🏪 STYLE 2: LEFT BORDER ACCENT - Left border with rounded right corners
-        // Design: Prominent left border (4px), subtle background tint, rounded right corners
+        // 🛒 RETAIL MAIN - Düz, standart tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha50),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          padding: padding,
+          child: content,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // 🏪 RETAIL SIDEBAR - Sol border ile düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
           decoration: BoxDecoration(
             color: isActive
@@ -876,59 +857,47 @@ class OsmeaNavbar extends CoreContainer {
                 color: isActive
                     ? effectiveIndicatorColor
                     : colors.border.withValues(alpha: context.alpha20),
-                width: isActive ? 4.0 : 1.0,
+                width: isActive ? 3.0 : 1.0,
               ),
             ),
             borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(8.0),
-              bottomRight: Radius.circular(8.0),
+              topRight: Radius.circular(6.0),
+              bottomRight: Radius.circular(6.0),
             ),
           ),
-          padding: EdgeInsets.only(
-            left: isActive ? context.normalValue * 1.1 : padding.horizontal / 2,
-            right: padding.horizontal / 2,
-            top: padding.vertical,
-            bottom: padding.vertical,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.healthcareMinimal:
-        // 🏥 STYLE 3: CLEAN MINIMAL WITH DOT - Minimal border, subtle background, dot indicator
-        // Design: Clean white background, thin border (1px), subtle active background, dot indicator added separately
+        // 🏥 HEALTHCARE MINIMAL - Düz, minimal border tasarımı
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: isActive
                 ? effectiveIndicatorColor.withValues(alpha: context.alpha10)
                 : Colors.white,
-            borderRadius: BorderRadius.circular(6.0),
+            borderRadius: BorderRadius.circular(4.0),
             border: Border.all(
               color: isActive
                   ? effectiveIndicatorColor.withValues(alpha: context.alpha40)
-                  : colors.border.withValues(alpha: context.alpha35),
-              width: isActive ? 1.0 : 0.8,
+                  : colors.border.withValues(alpha: context.alpha30),
+              width: isActive ? 1.5 : 1.0,
             ),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 0.9,
-            vertical: context.lowValue * 0.85,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.financeBordered:
-        // 💼 STYLE 4: BORDERED RECTANGLE - Professional bordered container with shadow
-        // Design: Prominent border (2px active, 1px inactive), subtle shadow, professional look
+        // 💼 FINANCE BORDERED - Düz, standart border tasarımı
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: isActive
@@ -937,132 +906,74 @@ class OsmeaNavbar extends CoreContainer {
             border: Border.all(
               color: isActive
                   ? effectiveIndicatorColor
-                  : colors.border.withValues(alpha: context.alpha45),
-              width: isActive ? 2.5 : 1.2,
+                  : colors.border.withValues(alpha: context.alpha40),
+              width: isActive ? 2.0 : 1.0,
             ),
-            borderRadius: BorderRadius.circular(8.0),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha15),
-                      blurRadius: 6.0,
-                      spreadRadius: 0.5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha5),
-                      blurRadius: 2.0,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
+            borderRadius: BorderRadius.circular(6.0),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 1.15,
-            vertical: context.lowValue * 1.05,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.mediaOverlay:
-        // 🎬 STYLE 5: FLOATING GLOW - Transparent container, glow effect added separately
-        // Design: Completely transparent, glow and underline effects added in _applyVariantItemDesign
+        // 🎬 MEDIA OVERLAY - Şeffaf, düz tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 0.85,
-            vertical: context.lowValue * 0.75,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.socialGlass:
-        // 📱 STYLE 6: PILL-SHAPED GLASS - Rounded pill with glass morphism effect
-        // Design: Large rounded pill (28px radius), glass effect background, prominent shadow when active
+        // 📱 SOCIAL GLASS - Düz, yuvarlak tasarım
         return Container(
-          padding: isActive
-              ? EdgeInsets.symmetric(
-                  horizontal: context.normalValue * 1.0,
-                  vertical: context.lowValue * 0.9,
-                )
-              : padding,
-          constraints: isActive
-              ? null
-              : BoxConstraints(
-                  maxHeight: config.height,
-                  maxWidth:
-                      position.isHorizontal ? double.infinity : config.height,
-                  minHeight: config.height * 0.8,
-                ),
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
           decoration: BoxDecoration(
             color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
-                : colors.background.withValues(alpha: context.alpha35),
-            borderRadius: BorderRadius.circular(30.0),
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha40),
+            borderRadius: BorderRadius.circular(20.0),
             border: isActive
                 ? null
                 : Border.all(
                     color: colors.border.withValues(alpha: context.alpha20),
                     width: 0.5,
                   ),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha20),
-                      blurRadius: 16.0,
-                      spreadRadius: 2.0,
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha5),
-                      blurRadius: 6.0,
-                      spreadRadius: 0,
-                    ),
-                  ],
           ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.enterpriseMain:
-        // 🏢 STYLE 7: BOTTOM LINE ACCENT - Professional bottom line indicator
-        // Design: Clean container with prominent bottom border (4px) when active, no background
+        // 🏢 ENTERPRISE MAIN - Alt border ile düz tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
                 color: isActive ? effectiveIndicatorColor : Colors.transparent,
-                width: isActive ? 4.0 : 0.0,
+                width: isActive ? 3.0 : 0.0,
               ),
             ),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 1.1,
-            vertical: context.lowValue,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.enterpriseSidebar:
-        // 🏢 STYLE 8: SIDEBAR ACCENT - Right border with background tint
-        // Design: Right border (3px), subtle background tint, rounded left corners
+        // 🏢 ENTERPRISE SIDEBAR - Sağ border ile düz tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: isActive
@@ -1073,7 +984,7 @@ class OsmeaNavbar extends CoreContainer {
                 color: isActive
                     ? effectiveIndicatorColor
                     : colors.border.withValues(alpha: context.alpha25),
-                width: isActive ? 3.5 : 1.0,
+                width: isActive ? 3.0 : 1.0,
               ),
             ),
             borderRadius: const BorderRadius.only(
@@ -1081,102 +992,39 @@ class OsmeaNavbar extends CoreContainer {
               bottomLeft: Radius.circular(6.0),
             ),
           ),
-          padding: EdgeInsets.only(
-            left: padding.horizontal / 2,
-            right:
-                isActive ? context.normalValue * 1.0 : padding.horizontal / 2,
-            top: padding.vertical,
-            bottom: padding.vertical,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.gradientModern:
-        // 🎨 STYLE 9: GRADIENT MODERN - Vibrant gradient background
-        // Design: Full-width gradient fill when active, subtle gradient when inactive, prominent shadow
+        // 🎨 GRADIENT MODERN - Düz, standart tasarım (gradient yok)
         return Container(
-          width: isActive ? double.infinity : null,
-          height: isActive ? double.infinity : null,
-          constraints: isActive
-              ? null
-              : BoxConstraints(
-                  maxHeight: config.height,
-                  maxWidth:
-                      position.isHorizontal ? double.infinity : config.height,
-                  minHeight: config.height * 0.8,
-                ),
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? LinearGradient(
-                    colors: [
-                      effectiveIndicatorColor,
-                      effectiveIndicatorColor.withValues(
-                          alpha: context.alpha75),
-                      effectiveIndicatorColor.withValues(
-                          alpha: context.alpha60),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : LinearGradient(
-                    colors: [
-                      colors.background,
-                      colors.background.withValues(alpha: context.alpha80),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-            borderRadius: BorderRadius.circular(14.0),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha35),
-                      blurRadius: 20.0,
-                      spreadRadius: 3.0,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha5),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
           ),
-          padding: isActive
-              ? EdgeInsets.symmetric(
-                  horizontal: context.normalValue * 1.3,
-                  vertical: context.lowValue * 1.2,
-                )
-              : padding,
-          child: isActive ? Center(child: content) : content,
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
+                : colors.background.withValues(alpha: context.alpha50),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          padding: padding,
+          child: content,
         );
 
       case NavbarVariant.capsuleRounded:
-        // 🎯 STYLE 10: CAPSULE ROUNDED - iOS-style capsule shape
-        // Design: Large rounded capsule (24px radius), subtle border when inactive, clean iOS look
+        // 🎯 CAPSULE ROUNDED - Yuvarlak kapsül tasarımı
         return Container(
-          padding: isActive
-              ? EdgeInsets.symmetric(
-                  horizontal: context.normalValue * 1.15,
-                  vertical: context.lowValue * 0.85,
-                )
-              : padding,
-          constraints: isActive
-              ? null
-              : BoxConstraints(
-                  maxHeight: config.height,
-                  maxWidth:
-                      position.isHorizontal ? double.infinity : config.height,
-                  minHeight: config.height * 0.8,
-                ),
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
           decoration: BoxDecoration(
             color: isActive
                 ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
                 : colors.background.withValues(alpha: context.alpha45),
-            borderRadius: BorderRadius.circular(24.0),
+            borderRadius: BorderRadius.circular(20.0),
             border: isActive
                 ? null
                 : Border.all(
@@ -1184,23 +1032,22 @@ class OsmeaNavbar extends CoreContainer {
                     width: 0.8,
                   ),
           ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.badgeIndicator:
-        // 🔘 STYLE 11: BADGE INDICATOR - Badge-style container with border
-        // Design: Rounded container (10px), border accent, badge indicator added separately
+        // 🔘 BADGE INDICATOR - Badge stili, düz tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: isActive
                 ? effectiveIndicatorColor.withValues(alpha: context.alpha15)
                 : colors.background.withValues(alpha: context.alpha35),
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(8.0),
             border: Border.all(
               color: isActive
                   ? effectiveIndicatorColor.withValues(alpha: context.alpha35)
@@ -1208,120 +1055,57 @@ class OsmeaNavbar extends CoreContainer {
               width: isActive ? 1.5 : 0.8,
             ),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 1.05,
-            vertical: context.lowValue * 0.95,
-          ),
+          padding: padding,
           child: content,
         );
 
-      case NavbarVariant.neonGlow:
-        // ✨ STYLE 12: NEON GLOW - Dark background with prominent glow effect
-        // Design: Dark background, neon border when active, strong glow shadow (24px blur)
+      case NavbarVariant.darkMinimal:
+        // 🌙 DARK MINIMAL - Koyu arka plan, düz tasarım
         return Container(
           constraints: BoxConstraints(
             maxHeight: config.height,
             maxWidth: position.isHorizontal ? double.infinity : config.height,
-            minHeight: config.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
-                : colors.background.withValues(alpha: context.alpha70),
-            borderRadius: BorderRadius.circular(10.0),
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha80),
+            borderRadius: BorderRadius.circular(8.0),
             border: isActive
                 ? Border.all(
                     color: effectiveIndicatorColor.withValues(
-                        alpha: context.alpha50),
-                    width: 1.5,
+                        alpha: context.alpha40),
+                    width: 1.0,
                   )
                 : Border.all(
-                    color: colors.border.withValues(alpha: context.alpha25),
-                    width: 0.8,
+                    color: colors.border.withValues(alpha: context.alpha20),
+                    width: 0.5,
                   ),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha60),
-                      blurRadius: 24.0,
-                      spreadRadius: 3.0,
-                    ),
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha30),
-                      blurRadius: 12.0,
-                      spreadRadius: 1.0,
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha40),
-                      blurRadius: 6.0,
-                      spreadRadius: 0,
-                    ),
-                  ],
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 1.1,
-            vertical: context.lowValue * 1.0,
-          ),
+          padding: padding,
           child: content,
         );
 
       case NavbarVariant.cardFloating:
-        // 🎴 STYLE 13: CARD FLOATING - Floating card with prominent shadow
-        // Design: White card background when active, prominent shadow (24px blur), rounded corners
+        // 🎴 CARD FLOATING - Düz, standart card tasarımı
         return Container(
-          constraints: isActive
-              ? null
-              : BoxConstraints(
-                  maxHeight: config.height,
-                  maxWidth:
-                      position.isHorizontal ? double.infinity : config.height,
-                  minHeight: config.height * 0.8,
-                ),
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
           decoration: BoxDecoration(
             color: isActive
                 ? Colors.white
                 : colors.background.withValues(alpha: context.alpha50),
-            borderRadius: BorderRadius.circular(14.0),
+            borderRadius: BorderRadius.circular(12.0),
             border: isActive
                 ? null
                 : Border.all(
-                    color: colors.border.withValues(alpha: context.alpha35),
+                    color: colors.border.withValues(alpha: context.alpha30),
                     width: 0.8,
                   ),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha25),
-                      blurRadius: 24.0,
-                      offset: const Offset(0, 6),
-                      spreadRadius: 1.0,
-                    ),
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha10),
-                      blurRadius: 8.0,
-                      offset: const Offset(0, 2),
-                      spreadRadius: 0,
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: context.alpha5),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                      spreadRadius: 0,
-                    ),
-                  ],
           ),
-          padding: isActive
-              ? EdgeInsets.symmetric(
-                  horizontal: context.normalValue * 1.2,
-                  vertical: context.lowValue * 1.1,
-                )
-              : padding,
+          padding: padding,
           child: content,
         );
     }
@@ -1331,12 +1115,16 @@ class OsmeaNavbar extends CoreContainer {
   Widget _applyVariantItemDesign(
     BuildContext context,
     Widget child,
+    NavbarItem item,
     _NavbarColors colors,
     bool isActive,
     NavbarStyle effectiveStyle,
     NavbarSizeConfig config,
   ) {
     final effectiveIndicatorColor = indicatorColor ?? colors.active;
+
+    // Eğer text varsa indicator gösterilmesin
+    final hasText = showLabels && item.text.isNotEmpty;
 
     // Always apply variant-specific design first
     Widget result = child;
@@ -1351,7 +1139,8 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.healthcareMinimal:
-        // 🏥 DOT INDICATOR - Small dot at bottom/right
+        // 🏥 DOT INDICATOR - Small dot at bottom/right (sadece text yoksa)
+        if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
           children: [
@@ -1367,14 +1156,6 @@ class OsmeaNavbar extends CoreContainer {
                 decoration: BoxDecoration(
                   color: effectiveIndicatorColor,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha50),
-                      blurRadius: 4.0,
-                      spreadRadius: 1.0,
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -1386,32 +1167,11 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.mediaOverlay:
-        // 🎬 GLOWING ICON WITH UNDERLINE - Glow halo + centered underline
+        // 🎬 MEDIA OVERLAY - Düz underline indicator (sadece text yoksa)
+        if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
           children: [
-            // Glow effect around icon (subtle halo)
-            Positioned.fill(
-              child: Center(
-                child: Container(
-                  width: config.iconSize * 1.6,
-                  height: config.iconSize * 1.6,
-                  decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(
-                        alpha: context.alpha20),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: effectiveIndicatorColor.withValues(
-                            alpha: context.alpha30),
-                        blurRadius: 12.0,
-                        spreadRadius: 2.0,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
             child,
             // Underline - centered, shorter than full width
             Positioned(
@@ -1420,18 +1180,11 @@ class OsmeaNavbar extends CoreContainer {
               right: 0,
               child: Center(
                 child: Container(
-                  width: config.iconSize * 0.9,
-                  height: 3.5,
+                  width: config.iconSize * 0.8,
+                  height: 2.0,
                   decoration: BoxDecoration(
                     color: effectiveIndicatorColor,
-                    borderRadius: BorderRadius.circular(2.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: effectiveIndicatorColor.withValues(
-                            alpha: context.alpha50),
-                        blurRadius: 4.0,
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(1.0),
                   ),
                 ),
               ),
@@ -1460,7 +1213,8 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.badgeIndicator:
-        // 🔘 BADGE INDICATOR - Badge above item
+        // 🔘 BADGE INDICATOR - Badge above item (sadece text yoksa)
+        if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
           children: [
@@ -1479,46 +1233,15 @@ class OsmeaNavbar extends CoreContainer {
                     color: Colors.white,
                     width: 2.0,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha50),
-                      blurRadius: 6.0,
-                      spreadRadius: 1.0,
-                    ),
-                  ],
                 ),
               ),
             ),
           ],
         );
 
-      case NavbarVariant.neonGlow:
-        // ✨ NEON GLOW - Glow effect around item
-        return Stack(
-          clipBehavior: clipNone,
-          children: [
-            // Outer glow
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: effectiveIndicatorColor.withValues(
-                      alpha: context.alpha20),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: effectiveIndicatorColor.withValues(
-                          alpha: context.alpha60),
-                      blurRadius: 24.0,
-                      spreadRadius: 4.0,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            child,
-          ],
-        );
+      case NavbarVariant.darkMinimal:
+        // 🌙 DARK MINIMAL - Simple dark indicator, no glow
+        return child;
 
       case NavbarVariant.cardFloating:
         // 🎴 Already handled in container (floating card)
@@ -1526,8 +1249,9 @@ class OsmeaNavbar extends CoreContainer {
         break;
     }
 
-    // If user explicitly set indicatorStyle AND item is active, apply it as additional style
-    if (isActive && indicatorStyle != NavbarIndicatorStyle.none) {
+    // If user explicitly set indicatorStyle AND item is active AND no text, apply it as additional style
+    // Text varsa indicator gösterilmesin
+    if (isActive && indicatorStyle != NavbarIndicatorStyle.none && !hasText) {
       result = _applyIndicatorStyle(
         context,
         result,
@@ -1679,58 +1403,6 @@ class OsmeaNavbar extends CoreContainer {
           ],
         );
 
-      case NavbarIndicatorStyle.glow:
-        // Glow effect indicator
-        return Stack(
-          clipBehavior: clipNone,
-          children: [
-            Positioned.fill(
-              child: Center(
-                child: Container(
-                  width: config.iconSize * 1.8,
-                  height: config.iconSize * 1.8,
-                  decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(
-                        alpha: context.alpha25),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: effectiveIndicatorColor.withValues(
-                            alpha: context.alpha50),
-                        blurRadius: 20.0,
-                        spreadRadius: 4.0,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            child,
-          ],
-        );
-
-      case NavbarIndicatorStyle.pulse:
-        // Pulse animation indicator (static version, animation can be added)
-        return Stack(
-          clipBehavior: clipNone,
-          children: [
-            child,
-            Positioned.fill(
-              child: Center(
-                child: Container(
-                  width: config.iconSize * 1.2,
-                  height: config.iconSize * 1.2,
-                  decoration: BoxDecoration(
-                    color: effectiveIndicatorColor.withValues(
-                        alpha: context.alpha30),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ),
-            child,
-          ],
-        );
 
       case NavbarIndicatorStyle.capsule:
         // Capsule-shaped indicator
@@ -1783,7 +1455,7 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.badgeIndicator:
         return BorderRadius.circular(8.0);
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.darkMinimal:
         return BorderRadius.circular(8.0);
 
       case NavbarVariant.cardFloating:
@@ -1800,10 +1472,10 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // More padding for full segment highlight
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.3,
-          vertical: basePadding.vertical * 1.2,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.retailSidebar:
@@ -1812,29 +1484,29 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.healthcareMinimal:
         // Minimal padding for clean look
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.9,
-          vertical: basePadding.vertical * 0.85,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.financeBordered:
-        // Professional padding
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.mediaOverlay:
-        // Compact padding for overlay
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.85,
-          vertical: basePadding.vertical * 0.8,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.socialGlass:
-        // More padding for pill shape
+        // Minimal padding to prevent overflow
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.2,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.enterpriseMain:
@@ -1842,38 +1514,38 @@ class OsmeaNavbar extends CoreContainer {
 
       case NavbarVariant.enterpriseSidebar:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.9,
-          vertical: basePadding.vertical * 0.9,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.gradientModern:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.2,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.capsuleRounded:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.badgeIndicator:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.0,
-          vertical: basePadding.vertical * 0.9,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.darkMinimal:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.1,
-          vertical: basePadding.vertical * 1.0,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.cardFloating:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 1.15,
-          vertical: basePadding.vertical * 1.1,
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
         );
     }
   }
@@ -2082,17 +1754,25 @@ class OsmeaNavbar extends CoreContainer {
     // Add text if should show labels
     if (showLabels) {
       final baseStyle = _getTextStyleForSize(context);
-      children.add(const SizedBox(height: 4.0));
+      children.add(const SizedBox(height: 2.0));
       children.add(
-        OsmeaText(
-          item.text,
-          style: baseStyle.copyWith(
-            fontWeight: isActive ? context.semiBold : context.normal,
-            color: textColor,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: position.isHorizontal 
+                ? config.height * 0.8 
+                : double.infinity,
           ),
-          maxLines: 1,
-          overflow: ellipsis,
-          textAlign: textCenter,
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.9, // Slightly smaller to prevent overflow
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
         ),
       );
     }
@@ -2134,32 +1814,47 @@ class OsmeaNavbar extends CoreContainer {
       final baseStyle = _getTextStyleForSize(context);
       final captionStyle = _getCaptionStyleForSize(context);
 
-      children.add(const SizedBox(height: 4.0));
+      children.add(const SizedBox(height: 2.0));
       children.add(
-        OsmeaText(
-          item.text,
-          style: baseStyle.copyWith(
-            fontWeight: isActive ? context.semiBold : context.normal,
-            color: textColor,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: position.isHorizontal 
+                ? config.height * 0.8 
+                : double.infinity,
           ),
-          maxLines: 1,
-          overflow: ellipsis,
-          textAlign: textCenter,
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.9, // Slightly smaller to prevent overflow
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
         ),
       );
 
       // Add subtext if available
       if (item.subtext != null && item.subtext!.isNotEmpty) {
-        children.add(const SizedBox(height: 2.0));
+        children.add(const SizedBox(height: 1.0));
         children.add(
-          OsmeaText(
-            item.subtext!,
-            style: captionStyle.copyWith(
-              color: subtextColor,
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: position.isHorizontal 
+                  ? config.height * 0.8 
+                  : double.infinity,
             ),
-            maxLines: 1,
-            overflow: ellipsis,
-            textAlign: textCenter,
+            child: OsmeaText(
+              item.subtext!,
+              style: captionStyle.copyWith(
+                color: subtextColor,
+              ),
+              maxLines: 1,
+              overflow: ellipsis,
+              textAlign: textCenter,
+            ),
           ),
         );
       }
@@ -2186,15 +1881,22 @@ class OsmeaNavbar extends CoreContainer {
     final baseStyle = _getTextStyleForSize(context);
 
     return Center(
-      child: OsmeaText(
-        item.text,
-        style: baseStyle.copyWith(
-          fontWeight: isActive ? context.semiBold : context.normal,
-          color: textColor,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: position.isHorizontal 
+              ? config.height * 0.8 
+              : double.infinity,
         ),
-        maxLines: 1,
-        overflow: ellipsis,
-        textAlign: textCenter,
+        child: OsmeaText(
+          item.text,
+          style: baseStyle.copyWith(
+            fontWeight: isActive ? context.semiBold : context.normal,
+            color: textColor,
+          ),
+          maxLines: 1,
+          overflow: ellipsis,
+          textAlign: textCenter,
+        ),
       ),
     );
   }
@@ -2521,15 +2223,17 @@ class OsmeaNavbar extends CoreContainer {
     if (showLabels && item.text.isNotEmpty) {
       final baseStyle = _getTextStyleForSize(context);
       children.add(
-        OsmeaText(
-          item.text,
-          style: baseStyle.copyWith(
-            fontWeight: isActive ? context.semiBold : context.normal,
-            color: textColor,
-            fontSize: config.fontSize * 0.9,
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.9,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
           ),
-          maxLines: 1,
-          overflow: ellipsis,
         ),
       );
     }
@@ -2669,16 +2373,23 @@ class OsmeaNavbar extends CoreContainer {
       children.add(SizedBox(height: context.lowValue * 0.5));
       final baseStyle = _getTextStyleForSize(context);
       children.add(
-        OsmeaText(
-          item.text,
-          style: baseStyle.copyWith(
-            fontWeight: isActive ? context.semiBold : context.normal,
-            color: textColor,
-            fontSize: config.fontSize * 0.85,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: position.isHorizontal 
+                ? config.height * 0.8 
+                : double.infinity,
           ),
-          maxLines: 2,
-          overflow: ellipsis,
-          textAlign: textCenter,
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.85,
+            ),
+            maxLines: 2,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
         ),
       );
     }
@@ -2716,18 +2427,8 @@ class OsmeaNavbar extends CoreContainer {
 
     List<BoxShadow> shadows = [];
 
-    // Apply elevation based on variant style
-    final effectiveElevation = elevation ?? variantStyle.elevation;
-    if (variant != NavbarVariant.mediaOverlay && effectiveElevation > 0) {
-      shadows.add(
-        BoxShadow(
-          color: shadowColor ?? OsmeaColors.shadowLight,
-          blurRadius: effectiveElevation,
-          offset: Offset(0, position.isTop ? 2 : -2),
-          spreadRadius: variantStyle.shadowSpread,
-        ),
-      );
-    }
+    // Shadow'lar kaldırıldı - düz, standart tasarım
+    // shadows listesi boş kalıyor
 
     // Determine if border should be shown
     final shouldShowBorder = showBorder ?? variantStyle.hasBorder;
@@ -2775,7 +2476,7 @@ class OsmeaNavbar extends CoreContainer {
                 : BorderRadius.circular(20);
         return _NavbarVariantStyle(
           borderRadius: borderRadius,
-          elevation: 8.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
@@ -2808,7 +2509,7 @@ class OsmeaNavbar extends CoreContainer {
         // Professional, sharp corners, prominent border
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.zero,
-          elevation: 2.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: true,
           borderWidth: 1.5,
@@ -2841,7 +2542,7 @@ class OsmeaNavbar extends CoreContainer {
                 : BorderRadius.circular(24);
         return _NavbarVariantStyle(
           borderRadius: borderRadius,
-          elevation: 4.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
@@ -2852,7 +2553,7 @@ class OsmeaNavbar extends CoreContainer {
         // Corporate, flat, subtle shadow
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.zero,
-          elevation: 4.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
@@ -2874,8 +2575,8 @@ class OsmeaNavbar extends CoreContainer {
         // Modern gradient with rounded corners
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(16.0),
-          elevation: 6.0,
-          shadowSpread: 1.0,
+          elevation: 0.0,
+          shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
           borderStyle: BorderStyle.solid,
@@ -2885,7 +2586,7 @@ class OsmeaNavbar extends CoreContainer {
         // iOS-style capsule with rounded corners
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(24.0),
-          elevation: 2.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
@@ -2896,19 +2597,19 @@ class OsmeaNavbar extends CoreContainer {
         // Badge style with subtle elevation
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(12.0),
-          elevation: 3.0,
+          elevation: 0.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
           borderStyle: BorderStyle.solid,
         );
 
-      case NavbarVariant.neonGlow:
-        // Neon glow with dark background
+      case NavbarVariant.darkMinimal:
+        // Dark minimal - düz, standart tasarım
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(12.0),
-          elevation: 8.0,
-          shadowSpread: 2.0,
+          elevation: 0.0,
+          shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
           borderStyle: BorderStyle.solid,
@@ -3017,7 +2718,7 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.darkMinimal:
         return _NavbarColors(
           background: OsmeaColors.black,
           active: OsmeaColors.crystalBay,

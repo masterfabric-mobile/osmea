@@ -186,13 +186,13 @@ enum NavbarVariant {
   /// - Sectors: Social, Messaging, Communication, All sectors
   badgeIndicator,
 
-  /// ✨ **Neon Glow** - Neon glow effect navigation
+  /// 🌙 **Dark Minimal** - Dark mode minimal navigation
   /// - Background: Dark/Black
-  /// - Text: Bright/Neon colors
-  /// - Border: None (glow effects)
-  /// - Use for: Gaming apps, Dark mode apps, Entertainment apps
+  /// - Text: Light colors
+  /// - Border: Subtle border
+  /// - Use for: Dark mode apps, Gaming apps, Entertainment apps
   /// - Sectors: Gaming, Entertainment, Creative, Tech
-  neonGlow,
+  darkMinimal,
 
   /// 🎴 **Card Floating** - Floating card-style navigation
   /// - Background: White/Light (card)
@@ -559,17 +559,6 @@ enum NavbarIndicatorStyle {
   /// - Use for: Social apps, Messaging apps, Notification-heavy apps
   badge,
 
-  /// ✨ **Glow** - Glow effect indicator
-  /// - Glowing halo around active item
-  /// - Neon/modern effect
-  /// - Use for: Gaming apps, Dark mode apps, Entertainment apps
-  glow,
-
-  /// 💫 **Pulse** - Pulsing animation indicator
-  /// - Animated pulsing effect
-  /// - Attention-grabbing
-  /// - Use for: Important navigation, Live updates, Status indicators
-  pulse,
 
   /// 🎯 **Capsule** - Capsule-shaped indicator
   /// - Rounded capsule background

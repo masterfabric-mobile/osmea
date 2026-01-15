@@ -86,15 +86,14 @@ extension NavbarSizeExtension on NavbarSize {
     switch (this) {
       case NavbarSize.small:
         return NavbarSizeConfig(
-          height:
-              context.highValue * 0.75, // Increased for better text visibility
+          height: 56.0, // Fixed height to prevent overflow
           padding: EdgeInsets.symmetric(
             horizontal: context.lowValue,
-            vertical: context.lowValue * 0.5,
+            vertical: context.lowValue * 0.3,
           ),
           itemPadding: EdgeInsets.symmetric(
-            horizontal: context.lowValue * 0.75,
-            vertical: context.lowValue * 0.25,
+            horizontal: context.lowValue * 0.5,
+            vertical: context.lowValue * 0.2,
           ),
           iconSize: context.iconSizeSmall, // Using sizer extension
           fontSize: context.fontSizeSmall, // Using sizer extension
@@ -105,15 +104,14 @@ extension NavbarSizeExtension on NavbarSize {
 
       case NavbarSize.medium:
         return NavbarSizeConfig(
-          height:
-              context.highValue * 0.85, // Increased for better text visibility
+          height: 64.0, // Fixed height to prevent overflow
           padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 0.75,
-            vertical: context.lowValue * 0.75,
+            horizontal: context.normalValue * 0.5,
+            vertical: context.lowValue * 0.4,
           ),
           itemPadding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 0.5,
-            vertical: context.lowValue * 0.5,
+            horizontal: context.normalValue * 0.4,
+            vertical: context.lowValue * 0.3,
           ),
           iconSize: context.iconSizeNormal, // Using sizer extension
           fontSize: context.fontSizeNormal, // Using sizer extension
@@ -124,15 +122,14 @@ extension NavbarSizeExtension on NavbarSize {
 
       case NavbarSize.large:
         return NavbarSizeConfig(
-          height:
-              context.highValue, // Increased height for better text visibility
+          height: 72.0, // Fixed height to prevent overflow
           padding: EdgeInsets.symmetric(
-            horizontal: context.normalValue, // Adequate padding
-            vertical: context.normalValue * 0.25,
+            horizontal: context.normalValue * 0.5,
+            vertical: context.lowValue * 0.4,
           ),
           itemPadding: EdgeInsets.symmetric(
-            horizontal: context.normalValue * 0.75,
-            vertical: context.normalValue * 0.25,
+            horizontal: context.normalValue * 0.4,
+            vertical: context.lowValue * 0.3,
           ),
           iconSize: context.normalValue * 1.5, // Using sizer extension
           fontSize: context.fontSizeNormal, // Using sizer extension
@@ -304,7 +301,7 @@ extension NavbarVariantExtension on NavbarVariant {
       case NavbarVariant.socialGlass:
         return 0.8;
       case NavbarVariant.mediaOverlay:
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.darkMinimal:
         return 0.0;
     }
   }
@@ -439,6 +436,170 @@ extension NavbarIndicatorStyleExtension on NavbarIndicatorStyle {
         return 2.0;
       default:
         return 0.0;
+    }
+  }
+}
+
+/// Extension for parsing NavbarVariant from string
+extension NavbarVariantStringExtension on NavbarVariant {
+  /// Parse NavbarVariant from string (case-insensitive)
+  /// Supports both new sectoral names and legacy names
+  static NavbarVariant? fromString(String? value) {
+    if (value == null) return null;
+    switch (value.toLowerCase().replaceAll('_', '').replaceAll('-', '')) {
+      // New sectoral variants
+      case 'retailmain':
+        return NavbarVariant.retailMain;
+      case 'retailsidebar':
+        return NavbarVariant.retailSidebar;
+      case 'healthcareminimal':
+        return NavbarVariant.healthcareMinimal;
+      case 'financebordered':
+        return NavbarVariant.financeBordered;
+      case 'mediaoverlay':
+        return NavbarVariant.mediaOverlay;
+      case 'socialglass':
+        return NavbarVariant.socialGlass;
+      case 'enterprisemain':
+        return NavbarVariant.enterpriseMain;
+      case 'enterprisesidebar':
+        return NavbarVariant.enterpriseSidebar;
+      case 'gradientmodern':
+        return NavbarVariant.gradientModern;
+      case 'capsulerounded':
+        return NavbarVariant.capsuleRounded;
+      case 'badgeindicator':
+        return NavbarVariant.badgeIndicator;
+      case 'darkminimal':
+        return NavbarVariant.darkMinimal;
+      case 'cardfloating':
+        return NavbarVariant.cardFloating;
+      // Legacy support (backward compatibility)
+      case 'primary':
+        return NavbarVariant.retailMain;
+      case 'secondary':
+        return NavbarVariant.retailSidebar;
+      case 'transparent':
+        return NavbarVariant.mediaOverlay;
+      case 'glass':
+        return NavbarVariant.socialGlass;
+      case 'outlined':
+        return NavbarVariant.healthcareMinimal;
+      default:
+        return null;
+    }
+  }
+}
+
+/// Extension for parsing NavbarStyle from string
+extension NavbarStyleStringExtension on NavbarStyle {
+  /// Parse NavbarStyle from string (case-insensitive)
+  static NavbarStyle? fromString(String? value) {
+    if (value == null) return null;
+    switch (value.toLowerCase().replaceAll('_', '').replaceAll('-', '')) {
+      case 'icononly':
+        return NavbarStyle.iconOnly;
+      case 'iconwithtext':
+        return NavbarStyle.iconWithText;
+      case 'iconwithsubtext':
+        return NavbarStyle.iconWithSubtext;
+      case 'textonly':
+        return NavbarStyle.textOnly;
+      case 'iconandtexthorizontal':
+        return NavbarStyle.iconAndTextHorizontal;
+      case 'appbar':
+        return NavbarStyle.appBar;
+      case 'appbarwithsearch':
+        return NavbarStyle.appBarWithSearch;
+      case 'drawertrigger':
+        return NavbarStyle.drawerTrigger;
+      case 'toptabbar':
+        return NavbarStyle.topTabBar;
+      case 'segmentedcontrol':
+        return NavbarStyle.segmentedControl;
+      case 'floatingbottombar':
+        return NavbarStyle.floatingBottomBar;
+      case 'densecompact':
+        return NavbarStyle.denseCompact;
+      case 'collapsible':
+        return NavbarStyle.collapsible;
+      case 'navigationrail':
+        return NavbarStyle.navigationRail;
+      case 'bottomsheetnav':
+        return NavbarStyle.bottomSheetNav;
+      default:
+        return null;
+    }
+  }
+}
+
+/// Extension for parsing NavbarIndicatorStyle from string
+extension NavbarIndicatorStyleStringExtension on NavbarIndicatorStyle {
+  /// Parse NavbarIndicatorStyle from string (case-insensitive)
+  static NavbarIndicatorStyle? fromString(String? value) {
+    if (value == null) return null;
+    switch (value.toLowerCase()) {
+      case 'none':
+        return NavbarIndicatorStyle.none;
+      case 'line':
+        return NavbarIndicatorStyle.line;
+      case 'dot':
+        return NavbarIndicatorStyle.dot;
+      case 'fill':
+        return NavbarIndicatorStyle.fill;
+      case 'border':
+        return NavbarIndicatorStyle.border;
+      case 'underline':
+        return NavbarIndicatorStyle.underline;
+      case 'gradient':
+        return NavbarIndicatorStyle.gradient;
+      case 'badge':
+        return NavbarIndicatorStyle.badge;
+      case 'glow':
+      case 'capsule':
+        return NavbarIndicatorStyle.capsule;
+      default:
+        return null;
+    }
+  }
+}
+
+/// Extension for parsing NavbarSize from string
+extension NavbarSizeStringExtension on NavbarSize {
+  /// Parse NavbarSize from string (case-insensitive)
+  static NavbarSize? fromString(String? value) {
+    if (value == null) return null;
+    switch (value.toLowerCase()) {
+      case 'small':
+        return NavbarSize.small;
+      case 'medium':
+        return NavbarSize.medium;
+      case 'large':
+        return NavbarSize.large;
+      default:
+        return null;
+    }
+  }
+}
+
+/// Extension for parsing NavbarPosition from string
+extension NavbarPositionStringExtension on NavbarPosition {
+  /// Parse NavbarPosition from string (case-insensitive)
+  static NavbarPosition? fromString(String? value) {
+    if (value == null) return null;
+    switch (value.toLowerCase()) {
+      case 'top':
+        return NavbarPosition.top;
+      case 'bottom':
+        return NavbarPosition.bottom;
+      case 'left':
+        return NavbarPosition.left;
+      case 'right':
+        return NavbarPosition.right;
+      case 'floating':
+        return NavbarPosition.floating;
+      default:
+        return null;
     }
   }
 }
