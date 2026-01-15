@@ -100,7 +100,10 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   }
 
   /// Gets horizontal padding from config for a component
-  double _getHorizontalPadding(AssetConfigHelper configHelper, String componentName) {
+  double _getHorizontalPadding(
+    AssetConfigHelper configHelper,
+    String componentName,
+  ) {
     try {
       final config = configHelper.getObject('home_view.$componentName');
       final paddingConfig = config?['padding'] as Map<String, dynamic>?;
@@ -114,12 +117,18 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
       debugPrint('⚠️ Failed to load horizontal padding: $e');
     }
     // Default from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing(AssetConfigHelper configHelper) {
-    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   /// Builds all skeleton components sorted by orderID
@@ -245,13 +254,16 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     final List<Widget> widgets = [];
     for (int i = 0; i < components.length; i++) {
       final component = components[i];
-      
+
       // Add the component widget
       widgets.add(component.widget);
-      
+
       // Add spacing after component (except for the last one)
       if (i < components.length - 1) {
-        final bottomSpacing = _getComponentBottomSpacing(configHelper, component.name);
+        final bottomSpacing = _getComponentBottomSpacing(
+          configHelper,
+          component.name,
+        );
         if (bottomSpacing > 0) {
           widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));
         }
@@ -264,14 +276,19 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
   @override
   Widget build(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         return OsmeaComponents.singleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.only(
-            bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
+            bottom:
+                configHelper.getDouble(
+                  'home_view.component_spacing.bottom',
+                  16.0,
+                ) *
+                2,
           ),
           child: OsmeaComponents.column(
             children: _buildOrderedSkeletonComponents(context),
@@ -319,10 +336,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
               decoration: BoxDecoration(
                 color: OsmeaColors.white,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: OsmeaColors.black,
-                  width: 0.5,
-                ),
+                border: Border.all(color: OsmeaColors.black, width: 0.5),
               ),
             ),
           );
@@ -353,13 +367,13 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildPromotionalBarSkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    
+
     // Get height from config
     double getSkeletonHeight() {
       try {
         final config = configHelper.getObject('home_view.promotional_bar');
         final heightStr = config?['height'] as String? ?? 'medium';
-        
+
         switch (heightStr.toLowerCase()) {
           case 'short':
             return 60.0; // Short
@@ -391,7 +405,10 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
         debugPrint('⚠️ Failed to load horizontal padding: $e');
       }
       // Default from component_spacing
-      return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+      return configHelper.getDouble(
+        'home_view.component_spacing.horizontal',
+        20.0,
+      );
     }
 
     final skeletonHeight = getSkeletonHeight();
@@ -444,9 +461,12 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildCampaignCardsSkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    final horizontalPadding = _getHorizontalPadding(configHelper, 'campaign_cards');
+    final horizontalPadding = _getHorizontalPadding(
+      configHelper,
+      'campaign_cards',
+    );
     final titleSpacing = _getTitleSpacing(configHelper);
-    
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -493,10 +513,13 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildDealsOfDaySkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    final horizontalPadding = _getHorizontalPadding(configHelper, 'deals_of_day');
+    final horizontalPadding = _getHorizontalPadding(
+      configHelper,
+      'deals_of_day',
+    );
     final titleSpacing = _getTitleSpacing(configHelper);
     final bannerHeight = context.height160;
-    
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -540,9 +563,12 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildProductsGridSkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    final horizontalPadding = _getHorizontalPadding(configHelper, 'recommended');
+    final horizontalPadding = _getHorizontalPadding(
+      configHelper,
+      'recommended',
+    );
     final titleSpacing = _getTitleSpacing(configHelper);
-    
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -582,103 +608,115 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
         OsmeaComponents.padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: context.spacing12,
-          mainAxisSpacing: context.spacing12,
-          childAspectRatio: 0.58, // Match actual product grid aspect ratio
-        ),
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              color: OsmeaColors.grayMaterial[50],
-              borderRadius: BorderRadius.circular(context.radiusMedium),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: context.spacing12,
+              mainAxisSpacing: context.spacing12,
+              childAspectRatio: 0.58, // Match actual product grid aspect ratio
             ),
-            clipBehavior: Clip.antiAlias,
-            child: OsmeaComponents.column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Image skeleton with gradient shimmer
-                _ShimmerGradientContainer(
-                  animation: _controller,
-                  child: Container(
-                    height: context.height160 + context.spacing10,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.grayMaterial[100],
-                      borderRadius: context.borderRadiusNormal,
+            itemCount: 6,
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: OsmeaColors.grayMaterial[50],
+                  borderRadius: BorderRadius.circular(context.radiusMedium),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Image skeleton with gradient shimmer
+                    _ShimmerGradientContainer(
+                      animation: _controller,
+                      child: Container(
+                        height: context.height160 + context.spacing10,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.grayMaterial[100],
+                          borderRadius: context.borderRadiusNormal,
+                        ),
+                      ),
                     ),
-                  ),
+                    OsmeaComponents.sizedBox(height: context.spacing8),
+                    // Product info skeleton - matches ProductCardWidget padding
+                    OsmeaComponents.padding(
+                      padding: context.onlyLeftPaddingLow,
+                      child: OsmeaComponents.column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Price skeleton - matches ProductCardWidget price style
+                          _ShimmerGradientContainer(
+                            animation: _controller,
+                            child: Container(
+                              height:
+                                  context.fontSizeExtraSmallMedium *
+                                  context.textScaleFactor *
+                                  1.2,
+                              width: context.allWidth * 0.35,
+                              decoration: BoxDecoration(
+                                color: OsmeaColors.grayMaterial[100],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing4),
+                          // Product name skeleton - matches ProductCardWidget name (2 lines max)
+                          _ShimmerGradientContainer(
+                            animation: _controller,
+                            child: Container(
+                              height:
+                                  context.fontSizeExtraSmallMedium *
+                                  context.textScaleFactor *
+                                  1.14,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: OsmeaColors.grayMaterial[100],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing2),
+                          _ShimmerGradientContainer(
+                            animation: _controller,
+                            child: Container(
+                              height:
+                                  context.fontSizeExtraSmallMedium *
+                                  context.textScaleFactor *
+                                  1.14,
+                              width: context.allWidth * 0.7,
+                              decoration: BoxDecoration(
+                                color: OsmeaColors.grayMaterial[100],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                          OsmeaComponents.sizedBox(height: context.spacing2),
+                          // Description skeleton - matches ProductCardWidget description (1 line max)
+                          _ShimmerGradientContainer(
+                            animation: _controller,
+                            child: Container(
+                              height:
+                                  context.fontSizeExtraSmall *
+                                  context.textScaleFactor *
+                                  1.2,
+                              width: context.allWidth * 0.6,
+                              decoration: BoxDecoration(
+                                color: OsmeaColors.grayMaterial[100],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                OsmeaComponents.sizedBox(height: context.spacing8),
-                // Product info skeleton - matches ProductCardWidget padding
-                OsmeaComponents.padding(
-                  padding: context.onlyLeftPaddingLow,
-                  child: OsmeaComponents.column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Price skeleton - matches ProductCardWidget price style
-                      _ShimmerGradientContainer(
-                        animation: _controller,
-                        child: Container(
-                          height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.2,
-                          width: context.allWidth * 0.35,
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.grayMaterial[100],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                      OsmeaComponents.sizedBox(height: context.spacing4),
-                      // Product name skeleton - matches ProductCardWidget name (2 lines max)
-                      _ShimmerGradientContainer(
-                        animation: _controller,
-                        child: Container(
-                          height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.14,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.grayMaterial[100],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                      OsmeaComponents.sizedBox(height: context.spacing2),
-                      _ShimmerGradientContainer(
-                        animation: _controller,
-                        child: Container(
-                          height: context.fontSizeExtraSmallMedium * context.textScaleFactor * 1.14,
-                          width: context.allWidth * 0.7,
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.grayMaterial[100],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                      OsmeaComponents.sizedBox(height: context.spacing2),
-                      // Description skeleton - matches ProductCardWidget description (1 line max)
-                      _ShimmerGradientContainer(
-                        animation: _controller,
-                        child: Container(
-                          height: context.fontSizeExtraSmall * context.textScaleFactor * 1.2,
-                          width: context.allWidth * 0.6,
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.grayMaterial[100],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
         ),
       ],
     );
@@ -686,7 +724,10 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildCampaignAlertSkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    final horizontalPadding = _getHorizontalPadding(configHelper, 'campaign_alert');
+    final horizontalPadding = _getHorizontalPadding(
+      configHelper,
+      'campaign_alert',
+    );
     return OsmeaComponents.padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: _ShimmerContainer(
@@ -757,7 +798,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     final configHelper = _configHelper ?? AssetConfigHelper();
     final horizontalPadding = _getHorizontalPadding(configHelper, 'flash_sale');
     final titleSpacing = _getTitleSpacing(configHelper);
-    
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -825,7 +866,11 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
                     margin: EdgeInsets.only(
                       right: index < 2 ? context.spacing8 : 0,
                     ),
-                    width: (context.allWidth - (horizontalPadding * 2) - context.spacing16) / 2,
+                    width:
+                        (context.allWidth -
+                            (horizontalPadding * 2) -
+                            context.spacing16) /
+                        2,
                     child: OsmeaComponents.column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -850,7 +895,9 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              OsmeaComponents.sizedBox(height: context.spacing4),
+                              OsmeaComponents.sizedBox(
+                                height: context.spacing4,
+                              ),
                               Container(
                                 height: 14,
                                 width: double.infinity,
@@ -878,7 +925,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     final configHelper = _configHelper ?? AssetConfigHelper();
     final horizontalPadding = _getHorizontalPadding(configHelper, 'brands');
     final titleSpacing = _getTitleSpacing(configHelper);
-    
+
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -924,7 +971,11 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
               return _ShimmerContainer(
                 animation: _controller,
                 child: SizedBox(
-                  width: (context.allWidth - (horizontalPadding * 2) - (context.spacing16 * 2)) / 3,
+                  width:
+                      (context.allWidth -
+                          (horizontalPadding * 2) -
+                          (context.spacing16 * 2)) /
+                      3,
                   child: Container(
                     height: context.height80,
                     decoration: BoxDecoration(
@@ -951,10 +1002,7 @@ class _ShimmerContainer extends StatelessWidget {
   final Animation<double> animation;
   final Widget child;
 
-  const _ShimmerContainer({
-    required this.animation,
-    required this.child,
-  });
+  const _ShimmerContainer({required this.animation, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -963,10 +1011,7 @@ class _ShimmerContainer extends StatelessWidget {
       builder: (context, child) {
         final value = animation.value;
         final opacity = 0.5 + (math.sin(value * 2 * math.pi) + 1) / 4;
-        return Opacity(
-          opacity: opacity.clamp(0.3, 0.7),
-          child: child,
-        );
+        return Opacity(opacity: opacity.clamp(0.3, 0.7), child: child);
       },
       child: child,
     );
@@ -996,8 +1041,9 @@ class _ShimmerGradientContainer extends StatelessWidget {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final value = animation.value;
-                    final shimmerPosition = (value * 2 - 1) * constraints.maxWidth * 1.5;
-                    
+                    final shimmerPosition =
+                        (value * 2 - 1) * constraints.maxWidth * 1.5;
+
                     return Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -1012,7 +1058,11 @@ class _ShimmerGradientContainer extends StatelessWidget {
                           transform: GradientRotation(0),
                         ),
                       ),
-                      transform: Matrix4.translationValues(shimmerPosition, 0, 0),
+                      transform: Matrix4.translationValues(
+                        shimmerPosition,
+                        0,
+                        0,
+                      ),
                     );
                   },
                 ),

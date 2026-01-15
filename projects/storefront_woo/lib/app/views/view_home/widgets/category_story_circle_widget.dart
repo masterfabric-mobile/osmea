@@ -186,19 +186,7 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: OsmeaColors.black, width: 0.5),
-                    color: imageUrl != null && imageUrl.isNotEmpty
-                        ? null
-                        : OsmeaColors.white,
-                    gradient: imageUrl != null && imageUrl.isNotEmpty
-                        ? LinearGradient(
-                            begin: context.topLeft,
-                            end: context.bottomRight,
-                            colors: [
-                              OsmeaColors.black,
-                              OsmeaColors.black.withOpacity(0.7),
-                            ],
-                          )
-                        : null,
+                    color: OsmeaColors.white,
                   ),
                   child: ClipOval(
                     child: imageUrl != null && imageUrl.isNotEmpty
@@ -209,7 +197,7 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                             fit: BoxFit.cover,
                             variant: ImageVariant.normal,
                             cacheWidth: imageSize.toInt(),
-                            showLoadingIndicator: true,
+                            showLoadingIndicator: false,
                             errorWidget: _buildDefaultIcon(context, circleSize),
                             placeholder: Container(
                               width: circleSize,
