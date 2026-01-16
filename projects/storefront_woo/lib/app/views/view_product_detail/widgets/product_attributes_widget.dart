@@ -177,7 +177,7 @@ class ProductAttributesWidget extends StatelessWidget {
                   }
                 }
               : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
           child: OsmeaComponents.container(
             padding: EdgeInsets.symmetric(
               horizontal: context.spacing10,
@@ -191,7 +191,7 @@ class ProductAttributesWidget extends StatelessWidget {
                       : (isAvailable
                           ? OsmeaColors.white
                           : OsmeaColors.grayMaterial[50]!)),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(4),
               border: Border.all(
                 color: isHighlighted
                     ? OsmeaColors.black.withValues(alpha: 0.6)
