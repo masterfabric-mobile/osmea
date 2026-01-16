@@ -39,8 +39,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     super.useSafeArea = false,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
-    // Keep app bar visible for back button
-    super.appBarPadding = const AppBarPaddingVisibility.enabled(),
+    // Disable app bar padding to match other views
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     super.backgroundColor = Colors.transparent,
     this.onSignInSuccess,
     this.onSignInError,
@@ -81,18 +81,11 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             }
 
             // Determine colors based on variant
-            // Startup variant uses black background, space uses white background
-            final backgroundColor = variant == AuthDesignVariant.space
-                ? OsmeaColors.paperWhite // White background for space
-                : Colors
-                    .transparent; // Transparent for enterprise and startup (colored/black background)
-
-            final foregroundColor = variant == AuthDesignVariant.space
-                ? OsmeaColors
-                    .thunder // Dark color for space (white background)
-                : variant == AuthDesignVariant.startup
-                    ? Colors.white // White color for startup (black background)
-                    : Colors.white; // White color for enterprise (colored background)
+            // For all variants, use white background for better visibility
+            final backgroundColor = OsmeaColors.white;
+            
+            // Use dark icon for visibility on white background
+            final foregroundColor = OsmeaColors.black;
 
             // Get title from config based on current tab
             final currentTab = cubit.state is AuthFormState
@@ -113,8 +106,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
               }
             }
 
-            // App bar following cart view pattern
-            // Same parameters for both startup and enterprise variants
+            // App bar with white background and dark icons for visibility
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
                 titleText,
@@ -122,7 +114,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                 textStyle: OsmeaTextStyle.titleLarge(context),
               ),
               backgroundColor: backgroundColor,
-              elevation: 0,
+              elevation: 2,
               foregroundColor: foregroundColor,
               variant: AppBarVariant.standard,
               size: AppBarSize.standard,
