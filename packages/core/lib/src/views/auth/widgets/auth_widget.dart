@@ -580,14 +580,14 @@ class AuthWidget extends StatelessWidget {
             OsmeaComponents.checkbox(
               value: state.signInRememberMe,
               onChanged: (value) => cubit.toggleRememberMe(),
-              activeColor: primaryColor,
+              activeColor: OsmeaColors.black,
               size: CheckboxSize.small,
             ),
             OsmeaComponents.sizedBox(width: context.spacing8),
             OsmeaComponents.text(
               _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
               variant: OsmeaTextVariant.bodySmall,
-              color: OsmeaColors.thunder,
+              color: OsmeaColors.black,
               fontWeight: FontWeight.w400,
             ),
           ],
@@ -810,7 +810,7 @@ class AuthWidget extends StatelessWidget {
                   OsmeaComponents.checkbox(
                     value: isChecked,
                     onChanged: (value) => cubit.toggleChecklist(id),
-                    activeColor: primaryColor,
+                    activeColor: OsmeaColors.black,
                     size: CheckboxSize.small,
                   ),
                   OsmeaComponents.sizedBox(width: context.spacing8),
@@ -1087,7 +1087,7 @@ class AuthWidget extends StatelessWidget {
         OsmeaComponents.checkbox(
           value: state.signInRememberMe,
           onChanged: (value) => cubit.toggleRememberMe(),
-          activeColor: OsmeaColors.thunder,
+          activeColor: OsmeaColors.black,
           size: CheckboxSize.small,
         ),
         OsmeaComponents.sizedBox(width: context.spacing8),
@@ -1656,7 +1656,7 @@ class AuthWidget extends StatelessWidget {
         OsmeaComponents.checkbox(
           value: state.signInRememberMe,
           onChanged: (value) => cubit.toggleRememberMe(),
-          activeColor: primaryColor,
+          activeColor: OsmeaColors.black,
           size: CheckboxSize.small,
         ),
         OsmeaComponents.sizedBox(width: context.spacing8),
