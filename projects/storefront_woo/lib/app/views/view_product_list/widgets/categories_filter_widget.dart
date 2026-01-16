@@ -78,11 +78,10 @@ class _CategoriesFilterWidgetState extends State<CategoriesFilterWidget> {
 
             return OsmeaComponents.chips(
               text: categoryName,
-              icon: isSelected ? Icons.check_circle : null,
+              icon: isSelected ? Icons.check : null,
               iconPosition: ChipsIconPosition.start,
               variant: isSelected ? ChipsVariant.primary : ChipsVariant.neutral,
               style: isSelected ? ChipsStyle.normal : ChipsStyle.outlined,
-              selected: isSelected,
               borderWidth: isSelected ? 2.0 : null,
               backgroundColor: isSelected ? OsmeaColors.black : null,
               textColor: isSelected ? OsmeaColors.white : null,
