@@ -26,9 +26,13 @@ class OnSaleFilterWidget extends StatelessWidget {
       children: [
         OsmeaComponents.chips(
           text: 'On sale only',
+          icon: isOnSale ? Icons.check : null,
+          iconPosition: ChipsIconPosition.start,
           variant: isOnSale ? ChipsVariant.primary : ChipsVariant.neutral,
           style: isOnSale ? ChipsStyle.normal : ChipsStyle.outlined,
-          selected: isOnSale,
+          backgroundColor: isOnSale ? OsmeaColors.black : null,
+          textColor: isOnSale ? OsmeaColors.white : null,
+          borderWidth: isOnSale ? 2.0 : null,
           onTap: () {
             viewModel.updateTempFilter(onSale: isOnSale ? null : true);
           },
