@@ -1329,7 +1329,7 @@ mixin AccountWidget {
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
                 style: TextButton.styleFrom(
-                  foregroundColor: OsmeaColors.red,
+                  foregroundColor: OsmeaColors.nordicBlue,
                 ),
                 child: const Text('Sign Out'),
               ),
