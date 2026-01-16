@@ -1251,6 +1251,75 @@ mixin AccountWidget {
   /// Comprehensive logout that clears all user data, tokens, and cached information
   /// Platform-specific cleanup (cookies, wishlist, cart) is handled via onSignOutCallback
   Future<void> _signOut(BuildContext context, AccountCubit viewModel) async {
+    // Show confirmation dialog using OsmeaComponents styling
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(context.spacing24),
+            child: OsmeaComponents.column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                OsmeaComponents.text(
+                  'Sign Out',
+                  textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: OsmeaColors.black,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing16),
+                // Message
+                OsmeaComponents.text(
+                  'Are you sure you want to sign out?',
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing24),
+                // Buttons
+                OsmeaComponents.row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Cancel Button
+                    OsmeaComponents.button(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      variant: ButtonVariant.ghost,
+                      size: ButtonSize.medium,
+                      text: 'Cancel',
+                      textColor: OsmeaColors.black,
+                    ),
+                    OsmeaComponents.sizedBox(width: context.spacing12),
+                    // Sign Out Button
+                    OsmeaComponents.button(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      variant: ButtonVariant.primary,
+                      size: ButtonSize.medium,
+                      backgroundColor: OsmeaColors.red,
+                      text: 'Sign Out',
+                      textColor: OsmeaColors.white,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    // If user cancelled, don't proceed
+    if (confirmed != true) {
+      debugPrint('🚫 AccountWidget: Sign out cancelled by user');
+      return;
+    }
+
     try {
       debugPrint('🚪 AccountWidget: Starting comprehensive sign out process...');
 
