@@ -92,9 +92,19 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
 
     if (state.products.isEmpty) {
       debugPrint(
-        '⚠️ ProductListContentWidget: Products list is empty, showing empty view',
+        '⚠️ ProductListContentWidget: Products list is empty, navigating to empty view',
       );
-      return _buildEmptyView(context);
+      // Navigate to empty view route - similar to wishlist pattern
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          final hasFilters = viewModel.filters.hasActiveFilters;
+          // If there are active filters, pass clearFilters action
+          final actionPath = hasFilters ? '/products?clearFilters=true' : '/home';
+          context.go('/empty/products?actionPath=$actionPath');
+        }
+      });
+      // Return empty container while navigating
+      return const SizedBox.shrink();
     }
 
     debugPrint(
@@ -493,76 +503,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       variant: ButtonVariant.ghost,
       size: ButtonSize.small,
       textColor: textColor,
-    );
-  }
-
-  /// Builds empty view using OSMEA components
-  Widget _buildEmptyView(BuildContext context) {
-    final iconBgColor = _configHelper.getColor(
-      'product_list_view.empty_view.iconBackgroundColor',
-      OsmeaColors.black,
-    );
-    final iconColor = _configHelper.getColor(
-      'product_list_view.empty_view.iconColor',
-      OsmeaColors.white,
-    );
-    final titleColor = _configHelper.getColor(
-      'product_list_view.empty_view.titleColor',
-      OsmeaColors.thunder,
-    );
-    final descriptionColor = _configHelper.getColor(
-      'product_list_view.empty_view.descriptionColor',
-      OsmeaColors.black,
-    );
-
-    return OsmeaComponents.center(
-      child: OsmeaComponents.singleChildScrollView(
-        child: OsmeaComponents.column(
-          mainAxisAlignment: context.centerMain,
-          crossAxisAlignment: context.crossCenter,
-          children: [
-            OsmeaComponents.container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.inventory_2_outlined,
-                size: context.iconSizeExtraHigh,
-                color: iconColor,
-              ),
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing16),
-            OsmeaComponents.text(
-              context.t.productListView.empty.title,
-              textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                fontWeight: FontWeight.w600,
-                color: titleColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing8),
-            OsmeaComponents.text(
-              context.t.productListView.empty.message,
-              textStyle: OsmeaTextStyle.bodyMedium(
-                context,
-              ).copyWith(color: descriptionColor),
-              textAlign: TextAlign.center,
-            ),
-            if (widget.viewModel.filters.hasActiveFilters) ...[
-              OsmeaComponents.sizedBox(height: context.spacing16),
-              OsmeaComponents.button(
-                text: context.t.productListView.empty.clearAll,
-                onPressed: () => widget.viewModel.clearFilters(),
-                variant: ButtonVariant.outlined,
-                size: ButtonSize.medium,
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 
