@@ -175,6 +175,19 @@
       "stepDuration": 500,
       "showProgress": true,
       "showCancelButton": false
+    },
+    "category_card": {
+      "gradient_overlay": {
+        "enabled": true,
+        "height": 40,
+        "colors": [
+          {"color": "#000000", "opacity": 0.55},
+          {"color": "#000000", "opacity": 0.35},
+          {"color": "#000000", "opacity": 0.15},
+          {"color": "#000000", "opacity": 0.0}
+        ],
+        "stops": [0.0, 0.4, 0.7, 1.0]
+      }
     }
   },
     "security_configuration": {
