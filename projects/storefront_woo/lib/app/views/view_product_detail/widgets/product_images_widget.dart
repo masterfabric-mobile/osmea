@@ -90,7 +90,7 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
     }
 
     // Elegant image area - refined proportions
-    final height = context.dynamicHeight(0.55);
+    final height = context.dynamicHeight(0.40);
 
     return OsmeaComponents.sizedBox(
       height: height,
