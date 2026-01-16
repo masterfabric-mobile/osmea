@@ -328,9 +328,14 @@ class OsmeaBottomSheet extends CoreContainer {
   }
 
   Widget _buildActionBar(BuildContext context, _BottomSheetColors colors) {
+    // Use the same background color as the main bottom sheet if not explicitly provided
+    final effectiveActionBarBgColor = actionBarBackgroundColor ?? 
+        backgroundColor ?? 
+        colors.background;
+    
     return Container(
       decoration: BoxDecoration(
-        color: actionBarBackgroundColor ?? colors.background,
+        color: effectiveActionBarBgColor,
         border: showActionBorder
             ? Border(
                 bottom: BorderSide(

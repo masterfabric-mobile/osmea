@@ -410,6 +410,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       title: context.t.productListView.sort.title,
       subtitle: context.t.productListView.sort.subtitle,
       backgroundColor: bottomSheetBgColor,
+      actionBarBackgroundColor: bottomSheetBgColor,
       leftAction: _buildCancelButton(context),
       rightAction: _buildApplyButton(context),
       child: ProductListFiltersWidget(
@@ -436,6 +437,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       title: context.t.productListView.filters.title,
       subtitle: context.t.productListView.filters.subtitle,
       backgroundColor: bottomSheetBgColor,
+      actionBarBackgroundColor: bottomSheetBgColor,
       leftAction: _buildCancelButton(context),
       rightAction: BlocBuilder<ProductListViewModel, ProductListState>(
         bloc: widget.viewModel,
