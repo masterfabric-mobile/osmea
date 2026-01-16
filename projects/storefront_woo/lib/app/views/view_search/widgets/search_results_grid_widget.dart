@@ -58,7 +58,7 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
             ],
           ),
         ),
-        // Product grid
+        // Product grid with Wrap for proper alignment
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
@@ -67,34 +67,38 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
               context.spacing20,
               context.height16,
             ),
-            child: Wrap(
-              spacing: spacing,
-              runSpacing: 16,
-              children: widget.products.asMap().entries.map((entry) {
-                final index = entry.key;
-                final product = entry.value;
-                final productId = product.id ?? 0;
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Wrap(
+                spacing: spacing,
+                runSpacing: 16,
+                alignment: WrapAlignment.start,
+                children: widget.products.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final product = entry.value;
+                  final productId = product.id ?? 0;
 
-                // Direct check without BlocBuilder to prevent blocking
-                final wishlistVm = GetIt.I<WishlistViewModel>();
-                final isSaved = wishlistVm.isSaved(productId);
+                  // Direct check without BlocBuilder to prevent blocking
+                  final wishlistVm = GetIt.I<WishlistViewModel>();
+                  final isSaved = wishlistVm.isSaved(productId);
 
-                return StaggeredAnimation(
-                  index: index,
-                  child: SizedBox(
-                    width: itemWidth,
-                    child: ProductCardWidget(
-                      product: product,
-                      isSaved: isSaved,
-                      onWishlistTap: () {
-                        // Use shared HomeViewModel for wishlist to keep messages/state in sync
-                        GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-                      },
-                      onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+                  return StaggeredAnimation(
+                    index: index,
+                    child: SizedBox(
+                      width: itemWidth,
+                      child: ProductCardWidget(
+                        product: product,
+                        isSaved: isSaved,
+                        onWishlistTap: () {
+                          // Use shared HomeViewModel for wishlist to keep messages/state in sync
+                          GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+                        },
+                        onTap: () => context.push('/product-detail/${product.id ?? 0}'),
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ),

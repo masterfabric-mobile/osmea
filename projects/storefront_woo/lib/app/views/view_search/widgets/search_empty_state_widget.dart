@@ -366,27 +366,29 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                   );
                 },
               )
-            : GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: _columnCount,
-                  crossAxisSpacing: context.spacing12,
-                  mainAxisSpacing: context.spacing12,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: _categories.length,
-                itemBuilder: (context, index) {
-                  final category = _categories[index];
-                  return _CategoryCard(
-                    category: category,
-                    onTap: () {
-                      if (category.id != null) {
-                        _searchByCategory(category.id as int, category.name ?? '');
-                      }
-                    },
+            : Wrap(
+                spacing: context.spacing12,
+                runSpacing: context.spacing12,
+                alignment: WrapAlignment.start,
+                children: _categories.map((category) {
+                  final itemWidth = (MediaQuery.of(context).size.width - 
+                                    (context.spacing12 * (_columnCount - 1)) - 
+                                    (context.spacing16 * 2)) / _columnCount;
+                  return SizedBox(
+                    width: itemWidth,
+                    child: AspectRatio(
+                      aspectRatio: 0.85,
+                      child: _CategoryCard(
+                        category: category,
+                        onTap: () {
+                          if (category.id != null) {
+                            _searchByCategory(category.id as int, category.name ?? '');
+                          }
+                        },
+                      ),
+                    ),
                   );
-                },
+                }).toList(),
               ),
       ],
     );
