@@ -84,9 +84,8 @@ class _ProductListFiltersWidgetState extends State<ProductListFiltersWidget> {
     String selectedOrder,
   ) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-        top: context.spacing12,
-        bottom: context.spacing12,
+      padding: EdgeInsets.symmetric(
+        vertical: context.spacing8,
       ),
       child: SortOptionsWidget(
         viewModel: widget.viewModel,

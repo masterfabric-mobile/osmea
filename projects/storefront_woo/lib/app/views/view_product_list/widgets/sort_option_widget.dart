@@ -36,53 +36,40 @@ class SortOptionWidget extends StatelessWidget {
         onTap: () {
           viewModel.updateTempFilter(orderBy: orderBy, order: order);
         },
-        borderRadius: BorderRadius.circular(7),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(
-            horizontal: context.spacing20,
-            vertical: context.spacing16,
+            horizontal: context.spacing16,
+            vertical: context.spacing12,
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? OsmeaColors.black.withOpacity(0.08)
+                ? OsmeaColors.black.withOpacity(0.06)
                 : Colors.transparent,
-            border: isSelected
-                ? Border.all(
-                    color: OsmeaColors.black,
-                    width: 1,
-                  )
-                : null,
-            borderRadius: BorderRadius.circular(7),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              OsmeaComponents.text(
-                label,
-                textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                  color: isSelected
-                      ? OsmeaColors.black
-                      : OsmeaColors.thunder,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              Expanded(
+                child: OsmeaComponents.text(
+                  label,
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: isSelected
+                        ? OsmeaColors.black
+                        : OsmeaColors.thunder,
+                    fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                  ),
                 ),
               ),
-              if (isSelected) ...[
-                SizedBox(width: context.spacing8),
-                Container(
-                  padding: EdgeInsets.all(context.spacing4),
-                  decoration: BoxDecoration(
-                    color: OsmeaColors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_rounded,
-                    color: OsmeaColors.white,
-                    size: context.iconSizeSmall,
-                  ),
+              if (isSelected)
+                Icon(
+                  Icons.check_rounded,
+                  color: OsmeaColors.black,
+                  size: context.iconSizeSmall,
                 ),
-              ],
             ],
           ),
         ),

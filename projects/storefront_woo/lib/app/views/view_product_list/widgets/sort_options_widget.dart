@@ -34,7 +34,7 @@ class SortOptionsWidget extends StatelessWidget {
           selectedSortBy: selectedSortBy,
           selectedOrder: selectedOrder,
         ),
-        SizedBox(height: context.spacing2),
+        SizedBox(height: context.spacing4),
         SortOptionWidget(
           viewModel: viewModel,
           label: 'Date (Oldest)',
@@ -43,7 +43,7 @@ class SortOptionsWidget extends StatelessWidget {
           selectedSortBy: selectedSortBy,
           selectedOrder: selectedOrder,
         ),
-        SizedBox(height: context.spacing2),
+        SizedBox(height: context.spacing4),
         SortOptionWidget(
           viewModel: viewModel,
           label: 'Price (Low to High)',
@@ -52,7 +52,7 @@ class SortOptionsWidget extends StatelessWidget {
           selectedSortBy: selectedSortBy,
           selectedOrder: selectedOrder,
         ),
-        SizedBox(height: context.spacing2),
+        SizedBox(height: context.spacing4),
         SortOptionWidget(
           viewModel: viewModel,
           label: 'Price (High to Low)',
@@ -61,7 +61,7 @@ class SortOptionsWidget extends StatelessWidget {
           selectedSortBy: selectedSortBy,
           selectedOrder: selectedOrder,
         ),
-        SizedBox(height: context.spacing2),
+        SizedBox(height: context.spacing4),
         SortOptionWidget(
           viewModel: viewModel,
           label: 'Name (A-Z)',
@@ -70,7 +70,7 @@ class SortOptionsWidget extends StatelessWidget {
           selectedSortBy: selectedSortBy,
           selectedOrder: selectedOrder,
         ),
-        SizedBox(height: context.spacing2),
+        SizedBox(height: context.spacing4),
         SortOptionWidget(
           viewModel: viewModel,
           label: 'Name (Z-A)',
