@@ -139,13 +139,7 @@ class WishlistView
                    backgroundColor: OsmeaColors.transparent,
                  ),
                  actions: [
-                   AppBarAction(
-                     icon: Icon(Icons.category_outlined, color: iconColor),
-                     onPressed: () {
-                       context.push('/favorite-categories');
-                     },
-                     tooltip: context.t.wishlistView.appBar.favoriteCategoriesTooltip,
-                   ),
+                  
                    if (hasItems)
                      AppBarAction(
                        icon: Icon(Icons.delete_outline, color: iconColor),
