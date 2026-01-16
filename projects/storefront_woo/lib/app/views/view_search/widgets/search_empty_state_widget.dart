@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
@@ -12,8 +13,13 @@ import 'package:storefront_woo/gen/translations.g.dart';
 /// Widget to load and display categories and brands in search empty state
 class SearchEmptyStateWidget extends StatefulWidget {
   final SearchCubit? searchCubit;
+  final bool showSkeleton;
 
-  const SearchEmptyStateWidget({super.key, this.searchCubit});
+  const SearchEmptyStateWidget({
+    super.key,
+    this.searchCubit,
+    this.showSkeleton = false,
+  });
 
   @override
   State<SearchEmptyStateWidget> createState() => _SearchEmptyStateWidgetState();
@@ -204,6 +210,14 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Show skeleton if requested and loading
+    if (widget.showSkeleton && _isLoading) {
+      return _SearchEmptyStateSkeleton(
+        columnCount: _columnCount,
+        isListView: _isListView,
+      );
+    }
+
     if (_isLoading) {
       // Use LoadingView from core instead of CircularProgressIndicator
       return LoadingView(
@@ -772,6 +786,362 @@ class _CategoryListItem extends StatelessWidget {
         color: Colors.grey.shade500,
         size: 28,
       ),
+    );
+  }
+}
+
+/// Skeleton widget for search empty state
+class _SearchEmptyStateSkeleton extends StatefulWidget {
+  final int columnCount;
+  final bool isListView;
+
+  const _SearchEmptyStateSkeleton({
+    required this.columnCount,
+    required this.isListView,
+  });
+
+  @override
+  State<_SearchEmptyStateSkeleton> createState() =>
+      _SearchEmptyStateSkeletonState();
+}
+
+class _SearchEmptyStateSkeletonState extends State<_SearchEmptyStateSkeleton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ListView(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing12,
+            vertical: context.spacing10,
+          ),
+          children: [
+            // Brands section skeleton
+            _buildBrandsSkeleton(context),
+            OsmeaComponents.sizedBox(height: context.spacing16),
+            // Categories section skeleton
+            _buildCategoriesSkeleton(context),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBrandsSkeleton(BuildContext context) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ShimmerContainer(
+          animation: _controller,
+          child: Container(
+            height: 20,
+            width: 80,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing8),
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return _ShimmerContainer(
+                animation: _controller,
+                child: Container(
+                  margin: EdgeInsets.only(right: context.spacing12),
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoriesSkeleton(BuildContext context) {
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title and view toggle skeleton
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _ShimmerContainer(
+              animation: _controller,
+              child: Container(
+                height: 20,
+                width: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(
+                3,
+                (index) => Padding(
+                  padding: EdgeInsets.only(left: context.spacing8),
+                  child: _ShimmerContainer(
+                    animation: _controller,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing12),
+        // Categories grid/list skeleton
+        widget.isListView
+            ? _buildCategoryListSkeleton(context)
+            : _buildCategoryGridSkeleton(context),
+      ],
+    );
+  }
+
+  Widget _buildCategoryGridSkeleton(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: widget.columnCount,
+        crossAxisSpacing: context.spacing12,
+        mainAxisSpacing: context.spacing12,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return _buildCategoryCardSkeleton(context);
+      },
+    );
+  }
+
+  Widget _buildCategoryListSkeleton(BuildContext context) {
+    return OsmeaComponents.column(
+      children: List.generate(
+        6,
+        (index) => Padding(
+          padding: EdgeInsets.only(bottom: context.spacing8),
+          child: _ShimmerContainer(
+            animation: _controller,
+            child: Container(
+              padding: EdgeInsets.all(context.spacing12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  SizedBox(width: context.spacing16),
+                  Expanded(
+                    child: Container(
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCardSkeleton(BuildContext context) {
+    return _ShimmerGradientContainer(
+      animation: _controller,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Image skeleton
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            // Gradient overlay skeleton
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.3),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+            // Text skeleton
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: EdgeInsets.all(context.spacing12),
+                child: Container(
+                  height: 16,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shimmer effect container
+class _ShimmerContainer extends StatelessWidget {
+  final Animation<double> animation;
+  final Widget child;
+
+  const _ShimmerContainer({
+    required this.animation,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        final value = animation.value;
+        final opacity = 0.5 + (math.sin(value * 2 * math.pi) + 1) / 4;
+        return Opacity(
+          opacity: opacity.clamp(0.3, 0.7),
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
+}
+
+/// Modern gradient shimmer effect container
+class _ShimmerGradientContainer extends StatelessWidget {
+  final Animation<double> animation;
+  final Widget child;
+
+  const _ShimmerGradientContainer({
+    required this.animation,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return ClipRect(
+          child: Stack(
+            children: [
+              child!,
+              Positioned.fill(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final value = animation.value;
+                    final shimmerWidth = constraints.maxWidth * 0.6;
+                    final shimmerPosition = (value * 2 - 1) *
+                            (constraints.maxWidth + shimmerWidth) -
+                        shimmerWidth;
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.transparent,
+                            Colors.white.withOpacity(0.4),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.4),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+                        ),
+                      ),
+                      transform: Matrix4.translationValues(shimmerPosition, 0, 0),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

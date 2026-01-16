@@ -11,7 +11,10 @@
  * {@subCategory AccountWidget}
  */
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
@@ -1247,72 +1250,102 @@ mixin AccountWidget {
     );
   }
 
+  /// Show native sign out confirmation dialog
+  /// Uses CupertinoAlertDialog on iOS and AlertDialog on Android
+  /// Follows DeviceInfoHelper pattern for platform detection
+  Future<bool?> _showNativeSignOutDialog(BuildContext context) async {
+    // Use Platform.isIOS pattern (same as DeviceInfoHelper in core)
+    // Check web first to avoid Platform calls on web
+    if (kIsWeb) {
+      debugPrint('🌐 AccountWidget: Showing Material dialog for Web');
+      // Web: Use Material dialog as fallback
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: OsmeaColors.red,
+                ),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    
+    // Mobile platforms: Use Platform.isIOS (same pattern as DeviceInfoHelper)
+    if (Platform.isIOS) {
+      debugPrint('🍎 AccountWidget: Showing CupertinoAlertDialog for iOS');
+      // iOS native dialog - Cupertino style
+      // Use showCupertinoDialog which works even in MaterialApp context
+      return showCupertinoDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return CupertinoAlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                isDefaultAction: false,
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      debugPrint('🤖 AccountWidget: Showing AlertDialog for Android');
+      // Android native dialog - Material style
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: OsmeaColors.red,
+                ),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   /// Sign out helper
   /// Comprehensive logout that clears all user data, tokens, and cached information
   /// Platform-specific cleanup (cookies, wishlist, cart) is handled via onSignOutCallback
   Future<void> _signOut(BuildContext context, AccountCubit viewModel) async {
-    // Show confirmation dialog using OsmeaComponents styling
-    final confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(context.spacing24),
-            child: OsmeaComponents.column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                OsmeaComponents.text(
-                  'Sign Out',
-                  textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: OsmeaColors.black,
-                  ),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-                // Message
-                OsmeaComponents.text(
-                  'Are you sure you want to sign out?',
-                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    color: OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
-                  ),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-                // Buttons
-                OsmeaComponents.row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // Cancel Button
-                    OsmeaComponents.button(
-                      onPressed: () => Navigator.of(dialogContext).pop(false),
-                      variant: ButtonVariant.ghost,
-                      size: ButtonSize.medium,
-                      text: 'Cancel',
-                      textColor: OsmeaColors.black,
-                    ),
-                    OsmeaComponents.sizedBox(width: context.spacing12),
-                    // Sign Out Button
-                    OsmeaComponents.button(
-                      onPressed: () => Navigator.of(dialogContext).pop(true),
-                      variant: ButtonVariant.primary,
-                      size: ButtonSize.medium,
-                      backgroundColor: OsmeaColors.red,
-                      text: 'Sign Out',
-                      textColor: OsmeaColors.white,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    // Show native confirmation dialog based on platform
+    final confirmed = await _showNativeSignOutDialog(context);
 
     // If user cancelled, don't proceed
     if (confirmed != true) {

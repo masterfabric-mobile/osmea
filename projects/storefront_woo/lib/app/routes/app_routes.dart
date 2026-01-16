@@ -2202,7 +2202,11 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
       },
       emptyStateBuilder: (context) {
         final searchCubit = context.read<SearchCubit>();
-        return SearchEmptyStateWidget(searchCubit: searchCubit);
+        // Show skeleton if coming from navbar (fromHome is false)
+        return SearchEmptyStateWidget(
+          searchCubit: searchCubit,
+          showSkeleton: !widget.fromHome,
+        );
       },
     );
   }
