@@ -227,7 +227,7 @@ class AuthWidget extends StatelessWidget {
         // Build variant-specific design
         switch (designVariant) {
           case AuthDesignVariant.startup:
-            return _buildSpaceDesign(
+            return _buildStartupDesign(
               context,
               formState,
               cubit,
@@ -242,7 +242,7 @@ class AuthWidget extends StatelessWidget {
               horizontalPadding,
             );
           case AuthDesignVariant.space:
-            return _buildStartupDesign(
+            return _buildSpaceDesign(
               context,
               formState,
               cubit,
@@ -507,6 +507,9 @@ class AuthWidget extends StatelessWidget {
 
   Widget _buildEmailField(
       BuildContext context, AuthFormState state, AuthCubit cubit) {
+    // Create controller with initial value if email is not empty
+    final controller = TextEditingController(text: state.signInEmail);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -519,6 +522,7 @@ class AuthWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
           key: const Key('sign_in_email_field'),
+          controller: controller,
           hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
@@ -948,6 +952,8 @@ class AuthWidget extends StatelessWidget {
         _buildSpaceEmailField(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing24),
         _buildSpacePasswordField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing20),
+        _buildSpaceRememberMe(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing32),
         _buildSpaceSignInButton(context, formState, cubit, buttonRadius),
         OsmeaComponents.sizedBox(height: context.spacing16),
@@ -996,6 +1002,9 @@ class AuthWidget extends StatelessWidget {
 
   Widget _buildSpaceEmailField(
       BuildContext context, AuthFormState state, AuthCubit cubit) {
+    // Create controller with initial value if email is not empty
+    final controller = TextEditingController(text: state.signInEmail);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1008,6 +1017,7 @@ class AuthWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
           key: const Key('sign_in_email_field'),
+          controller: controller,
           hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
@@ -1064,6 +1074,28 @@ class AuthWidget extends StatelessWidget {
             ),
             onPressed: cubit.toggleSignInPasswordVisibility,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpaceRememberMe(
+      BuildContext context, AuthFormState state, AuthCubit cubit) {
+    return OsmeaComponents.row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        OsmeaComponents.checkbox(
+          value: state.signInRememberMe,
+          onChanged: (value) => cubit.toggleRememberMe(),
+          activeColor: OsmeaColors.thunder,
+          size: CheckboxSize.small,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing8),
+        OsmeaComponents.text(
+          _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w400,
         ),
       ],
     );
@@ -1467,6 +1499,8 @@ class AuthWidget extends StatelessWidget {
         _buildStartupEmailField(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing24),
         _buildStartupPasswordField(context, formState, cubit),
+        OsmeaComponents.sizedBox(height: context.spacing20),
+        _buildStartupRememberMe(context, formState, cubit, primaryColor),
         OsmeaComponents.sizedBox(height: context.spacing32),
         _buildStartupSignInButton(
             context, formState, cubit, buttonRadius, primaryColor),
@@ -1547,6 +1581,9 @@ class AuthWidget extends StatelessWidget {
 
   Widget _buildStartupEmailField(
       BuildContext context, AuthFormState state, AuthCubit cubit) {
+    // Create controller with initial value if email is not empty
+    final controller = TextEditingController(text: state.signInEmail);
+    
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1559,6 +1596,7 @@ class AuthWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing8),
         OsmeaComponents.textField(
           key: const Key('sign_in_email_field'),
+          controller: controller,
           hint: _getConfigValue('sign_in', 'email_hint', 'Enter your email'),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
@@ -1605,6 +1643,28 @@ class AuthWidget extends StatelessWidget {
             ),
             onPressed: cubit.toggleSignInPasswordVisibility,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartupRememberMe(BuildContext context, AuthFormState state,
+      AuthCubit cubit, Color primaryColor) {
+    return OsmeaComponents.row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        OsmeaComponents.checkbox(
+          value: state.signInRememberMe,
+          onChanged: (value) => cubit.toggleRememberMe(),
+          activeColor: primaryColor,
+          size: CheckboxSize.small,
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing8),
+        OsmeaComponents.text(
+          _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.thunder,
+          fontWeight: FontWeight.w400,
         ),
       ],
     );

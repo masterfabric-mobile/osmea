@@ -251,14 +251,10 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       await _authStorage.clearToken();
       debugPrint('✅ AuthCubit: Token cleared from storage');
 
-      // Step 2: Clear remember me from storage
-      try {
-        await _localStorage.init();
-        await _localStorage.removeItem('remember_me');
-        debugPrint('✅ AuthCubit: Remember me cleared from storage');
-      } catch (e) {
-        debugPrint('❌ AuthCubit: Error clearing remember me from storage: $e');
-      }
+      // Step 2: Keep remember me and saved email in storage (don't clear)
+      // If user had remember me enabled, email should persist after logout
+      debugPrint('ℹ️ AuthCubit: Remember me and saved email kept in storage');
+
 
       // Step 3: Clear HydratedBloc persisted state manually
       try {
@@ -369,6 +365,7 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
       // Load remember me state from storage
       bool rememberMe = false;
+      String savedEmail = '';
       try {
         await _localStorage.init();
         final savedRememberMe = await _localStorage.getItem('remember_me');
@@ -377,16 +374,27 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
         } else if (savedRememberMe is String) {
           rememberMe = savedRememberMe.toLowerCase() == 'true';
         }
+        
+        // Load saved email if remember me is enabled
+        if (rememberMe) {
+          final emailFromStorage = await _localStorage.getItem('saved_email');
+          if (emailFromStorage is String && emailFromStorage.isNotEmpty) {
+            savedEmail = emailFromStorage;
+            debugPrint('✅ Saved email loaded from storage: $savedEmail');
+          }
+        }
+        
         debugPrint('✅ Remember me loaded from storage: $rememberMe');
       } catch (e) {
         debugPrint('❌ Error loading remember me from storage: $e');
       }
 
-      // Initialize form state with config, initial tab, and remember me state
+      // Initialize form state with config, initial tab, remember me state, and saved email
       emit(AuthFormState(
         currentTab: initialTab,
         config: config,
         signInRememberMe: rememberMe,
+        signInEmail: savedEmail,
       ));
 
       debugPrint('✅ AuthCubit: Authentication initialized');
@@ -484,6 +492,17 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
       try {
         await _localStorage.init();
         await _localStorage.setItem('remember_me', newValue);
+        
+        // If remember me is enabled and email is not empty, save email
+        if (newValue && formState.signInEmail.isNotEmpty) {
+          await _localStorage.setItem('saved_email', formState.signInEmail);
+          debugPrint('✅ Email saved to storage: ${formState.signInEmail}');
+        } else if (!newValue) {
+          // If remember me is disabled, remove saved email
+          await _localStorage.removeItem('saved_email');
+          debugPrint('🗑️ Saved email removed from storage');
+        }
+        
         debugPrint('✅ Remember me saved to storage: $newValue');
       } catch (e) {
         debugPrint('❌ Error saving remember me to storage: $e');
@@ -576,6 +595,17 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
 
         if (success) {
           debugPrint('✅ Sign in successful');
+
+          // Save email to local storage if remember me is enabled
+          if (formState.signInRememberMe) {
+            try {
+              await _localStorage.init();
+              await _localStorage.setItem('saved_email', formState.signInEmail);
+              debugPrint('✅ Email saved to storage after successful sign in: ${formState.signInEmail}');
+            } catch (e) {
+              debugPrint('❌ Error saving email after sign in: $e');
+            }
+          }
 
           // Call platform-specific onSignInSuccess callback if provided
           // This allows platforms (e.g., WooCommerce) to load tokens from their storage
