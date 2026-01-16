@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
 import 'package:core/src/models/empty_view_models.dart';
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart';
@@ -137,7 +138,9 @@ class EmptyView
       foregroundColor: foregroundColor,
       leading: showBackButton
           ? OsmeaComponents.iconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                context.go('/home');
+              },
               icon: Icon(
                 Icons.arrow_back,
                 color: iconColor,
