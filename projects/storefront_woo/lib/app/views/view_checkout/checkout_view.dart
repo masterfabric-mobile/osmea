@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_content_widget.dart';
@@ -74,7 +75,10 @@ class CheckoutView
       variant: AppBarVariant.standard,
       size: AppBarSize.standard,
       leading: OsmeaComponents.iconButton(
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () {
+          // Navigate back to cart
+          context.go('/cart');
+        },
         icon: Icon(
           Icons.arrow_back_ios_new_rounded,
           color: iconColor,
