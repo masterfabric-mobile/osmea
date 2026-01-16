@@ -504,8 +504,9 @@
           "disabledTextColor": "#FFFFFF"
         },
         "sign_out": {
-          "backgroundColor": "#666666",
-          "textColor": "#FFFFFF"
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000",
+          "borderColor": "#000000"
         }
       },
       "text_links": {

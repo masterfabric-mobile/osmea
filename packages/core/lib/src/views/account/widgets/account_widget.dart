@@ -461,11 +461,15 @@ mixin AccountWidget {
     // Get button colors from config
     final signOutBgColor = configHelper.getColor(
       'auth_configuration.buttons.sign_out.backgroundColor',
-      primaryColor,
+      OsmeaColors.white,
     );
     final signOutTextColor = configHelper.getColor(
       'auth_configuration.buttons.sign_out.textColor',
-      OsmeaColors.white,
+      OsmeaColors.black,
+    );
+    final signOutBorderColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.borderColor',
+      OsmeaColors.black,
     );
     final signInBgColor = configHelper.getColor(
       'auth_configuration.buttons.sign_in.backgroundColor',
@@ -482,10 +486,11 @@ mixin AccountWidget {
         if (isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _signOut(context, viewModel),
-            variant: ButtonVariant.secondary,
+            variant: ButtonVariant.outlined,
             size: ButtonSize.large,
             backgroundColor: signOutBgColor,
             textColor: signOutTextColor,
+            borderColor: signOutBorderColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
               color: signOutTextColor,
@@ -1191,11 +1196,15 @@ mixin AccountWidget {
     // Get button colors from config
     final signOutBgColor = configHelper.getColor(
       'auth_configuration.buttons.sign_out.backgroundColor',
-      OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+      OsmeaColors.white,
     );
     final signOutTextColor = configHelper.getColor(
       'auth_configuration.buttons.sign_out.textColor',
-      OsmeaColors.white,
+      OsmeaColors.black,
+    );
+    final signOutBorderColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.borderColor',
+      OsmeaColors.black,
     );
     final signInBgColor = configHelper.getColor(
       'auth_configuration.buttons.sign_in.backgroundColor',
@@ -1212,10 +1221,11 @@ mixin AccountWidget {
         if (isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _signOut(context, viewModel),
-            variant: ButtonVariant.secondary,
+            variant: ButtonVariant.outlined,
             size: ButtonSize.large,
             backgroundColor: signOutBgColor,
             textColor: signOutTextColor,
+            borderColor: signOutBorderColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
