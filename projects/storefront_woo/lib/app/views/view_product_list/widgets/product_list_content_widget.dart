@@ -17,6 +17,7 @@ import 'package:storefront_woo/app/views/view_product_list/models/product_list_v
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_filters_widget.dart';
 // Animation helpers are now imported from core
@@ -894,20 +895,43 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         final product = state.products[index];
         final productId = product.id ?? 0;
 
-        // Direct check without BlocBuilder to prevent blocking
-        final wishlistVm = GetIt.I<WishlistViewModel>();
-        final isSaved = wishlistVm.isSaved(productId);
-
         return StaggeredAnimation(
           index: index,
           child: ClipRect(
-            child: ProductCardWidget(
-              product: product,
-              isSaved: isSaved,
-              onWishlistTap: () {
-                GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+            child: BlocBuilder<WishlistViewModel, WishlistState>(
+              bloc: GetIt.I<WishlistViewModel>(),
+              builder: (context, wishlistState) {
+                final wishlistVm = GetIt.I<WishlistViewModel>();
+                final currentIsSaved = wishlistVm.isSaved(productId);
+                
+                return ProductCardWidget(
+                  product: product,
+                  isSaved: currentIsSaved,
+                  onWishlistTap: () async {
+                    final wasSaved = wishlistVm.isSaved(productId);
+                    await GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+                    final isNowSaved = wishlistVm.isSaved(productId);
+                    
+                    // Show snackbar based on action
+                    if (isNowSaved && !wasSaved) {
+                      if (context.mounted) {
+                        context.showSnackbar(
+                          message: 'Added to favorites',
+                          type: SnackbarType.success,
+                        );
+                      }
+                    } else if (!isNowSaved && wasSaved) {
+                      if (context.mounted) {
+                        context.showSnackbar(
+                          message: 'Removed from favorites',
+                          type: SnackbarType.info,
+                        );
+                      }
+                    }
+                  },
+                  onTap: () => context.push('/product-detail/$productId'),
+                );
               },
-              onTap: () => context.push('/product-detail/$productId'),
             ),
           ),
         );

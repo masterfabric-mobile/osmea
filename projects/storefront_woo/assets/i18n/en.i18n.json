@@ -242,6 +242,10 @@
             "message": "Try adjusting your filters or search terms",
             "clearAll": "Clear all filters"
         },
+        "wishlist": {
+            "added": "Added to favorites",
+            "removed": "Removed from favorites"
+        },
         "widgets": {
             "chips": {
                 "onSale": "On Sale",
