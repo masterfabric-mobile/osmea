@@ -35,9 +35,13 @@ class StockStatusFilterWidget extends StatelessWidget {
     final isSelected = selectedStatus == value;
     return OsmeaComponents.chips(
       text: label,
+      icon: isSelected ? Icons.check : null,
+      iconPosition: ChipsIconPosition.start,
       variant: isSelected ? ChipsVariant.primary : ChipsVariant.neutral,
       style: isSelected ? ChipsStyle.normal : ChipsStyle.outlined,
-      selected: isSelected,
+      backgroundColor: isSelected ? OsmeaColors.black : null,
+      textColor: isSelected ? OsmeaColors.white : null,
+      borderWidth: isSelected ? 2.0 : null,
       onTap: () {
         viewModel.updateTempFilter(stockStatus: isSelected ? null : value);
       },
