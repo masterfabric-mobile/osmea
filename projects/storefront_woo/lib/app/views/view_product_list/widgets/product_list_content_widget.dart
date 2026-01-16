@@ -15,7 +15,6 @@ import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
-import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
@@ -908,23 +907,50 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                   product: product,
                   isSaved: currentIsSaved,
                   onWishlistTap: () async {
-                    final wasSaved = wishlistVm.isSaved(productId);
-                    await GetIt.I<HomeViewModel>().addProductToWishlist(productId);
-                    final isNowSaved = wishlistVm.isSaved(productId);
-                    
-                    // Show snackbar based on action
-                    if (isNowSaved && !wasSaved) {
+                    try {
+                      final wasSaved = wishlistVm.isSaved(productId);
+                      
+                      // Create WishlistItem from current product
+                      final wishlistItem = WishlistItem(
+                        id: productId,
+                        name: product.name,
+                        imageUrl: (product.images?.isNotEmpty ?? false)
+                            ? product.images!.first.src
+                            : null,
+                        regularPrice: product.prices?.regularPrice,
+                        salePrice: product.prices?.salePrice,
+                        currencyCode: product.prices?.currencyCode,
+                        currencyDecimalSeparator: product.prices?.currencyDecimalSeparator,
+                        currencyThousandSeparator: product.prices?.currencyThousandSeparator,
+                        currencyMinorUnit: product.prices?.currencyMinorUnit,
+                        onSale: product.onSale == true,
+                      );
+                      
+                      // Toggle wishlist using WishlistViewModel
+                      await wishlistVm.toggle(wishlistItem);
+                      
+                      final isNowSaved = wishlistVm.isSaved(productId);
+                      
+                      // Show snackbar based on action
                       if (context.mounted) {
-                        context.showSnackbar(
-                          message: 'Added to favorites',
-                          type: SnackbarType.success,
-                        );
+                        if (isNowSaved && !wasSaved) {
+                          context.showSnackbar(
+                            message: 'Added to favorites',
+                            type: SnackbarType.success,
+                          );
+                        } else if (!isNowSaved && wasSaved) {
+                          context.showSnackbar(
+                            message: 'Removed from favorites',
+                            type: SnackbarType.info,
+                          );
+                        }
                       }
-                    } else if (!isNowSaved && wasSaved) {
+                    } catch (e) {
+                      debugPrint('❌ Failed to toggle wishlist: $e');
                       if (context.mounted) {
                         context.showSnackbar(
-                          message: 'Removed from favorites',
-                          type: SnackbarType.info,
+                          message: 'Failed to update favorites',
+                          type: SnackbarType.error,
                         );
                       }
                     }
