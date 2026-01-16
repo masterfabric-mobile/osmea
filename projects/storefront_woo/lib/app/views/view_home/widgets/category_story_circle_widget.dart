@@ -284,7 +284,7 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                       isFavorite ? Icons.favorite : Icons.favorite_border,
                       size: 14,
                       color: isFavorite
-                          ? OsmeaColors.nordicBlue
+                          ? OsmeaColors.black
                           : OsmeaColors.thunder,
                     ),
                   ),
