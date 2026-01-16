@@ -69,6 +69,8 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
     size: BottomSheetSize.large,
     title: context.t.productDetailView.addToCart.popup.title,
     backgroundColor: backgroundColor,
+    openDuration: const Duration(milliseconds: 600),
+    closeDuration: const Duration(milliseconds: 250),
     footer: BlocBuilder<CartViewModel, CartState>(
       bloc: cartViewModel,
       builder: (context, cartState) {
