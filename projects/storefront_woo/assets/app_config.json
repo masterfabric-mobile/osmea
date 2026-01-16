@@ -1160,6 +1160,9 @@
     },
     "campaign_view": {
       "backgroundColor": "#FFFFFF",
+      "splash_image_url": "",
+      "splash_title": "",
+      "splash_subtitle": "",
       "animation": {
         "duration_milliseconds": 800,
         "fade_begin": 0.0,
