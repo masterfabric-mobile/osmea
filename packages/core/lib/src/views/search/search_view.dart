@@ -327,6 +327,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 searchFocusNode: searchFocusNode,
                 searchBarVariant: searchBarVariant,
                 searchBarSize: searchBarSize,
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(OsmeaColors.black),
                 showClearButton: showClearButton,
                 showSearchIcon: showSearchIcon,
                 onSearch: (query) {
@@ -453,6 +454,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 searchFocusNode: searchFocusNode,
                 searchBarVariant: searchBarVariant,
                 searchBarSize: searchBarSize,
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(OsmeaColors.black),
                 showClearButton: showClearButton,
                 showSearchIcon: showSearchIcon,
                 onSearch: (query) {

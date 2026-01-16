@@ -81,7 +81,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         showClearButton: true,
         backgroundColor: OsmeaColors.white,
         borderColor: OsmeaColors.pewter,
-        focusColor: OsmeaColors.nordicBlue,
+        focusColor: widget.configHelper.getSearchViewFocusColor(OsmeaColors.black),
         textColor: OsmeaColors.thunder,
         hintColor: OsmeaColors.pewter,
         onTap: () {
