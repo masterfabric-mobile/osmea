@@ -177,6 +177,9 @@ class CartItemWidget extends StatelessWidget {
   }
 
   Widget _buildQuantitySelector(BuildContext context) {
+    // Check if this item is being updated
+    final isUpdating = state.updatingProductId == item.productId;
+    
     return OsmeaComponents.container(
       decoration: BoxDecoration(
         color: OsmeaColors.grayMaterial[50],
@@ -186,7 +189,7 @@ class CartItemWidget extends StatelessWidget {
         mainAxisSize: context.min,
         children: [
           OsmeaComponents.iconButton(
-            onPressed: item.quantity > 1
+            onPressed: (item.quantity > 1 && !isUpdating)
                 ? () => viewModel.updateItemQuantity(
                     item.productId,
                     item.quantity - 1,
@@ -194,7 +197,7 @@ class CartItemWidget extends StatelessWidget {
                 : null,
             icon: Icon(
               Icons.remove_rounded,
-              color: item.quantity > 1
+              color: (item.quantity > 1 && !isUpdating)
                   ? OsmeaColors.thunder
                   : OsmeaColors.pewter,
               size: context.iconSizeExtraSmall,
@@ -204,21 +207,31 @@ class CartItemWidget extends StatelessWidget {
           ),
           OsmeaComponents.padding(
             padding: context.horizontalPaddingLow,
-            child: OsmeaComponents.text(
-              '${item.quantity}',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w600,
-                color: OsmeaColors.thunder,
-                fontSize: context.fontSizeSmall * context.textScaleFactor,
-              ),
-            ),
+            child: isUpdating
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: OsmeaColors.thunder,
+                    ),
+                  )
+                : OsmeaComponents.text(
+                    '${item.quantity}',
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.thunder,
+                      fontSize: context.fontSizeSmall * context.textScaleFactor,
+                    ),
+                  ),
           ),
           OsmeaComponents.iconButton(
-            onPressed: () =>
-                viewModel.updateItemQuantity(item.productId, item.quantity + 1),
+            onPressed: !isUpdating
+                ? () => viewModel.updateItemQuantity(item.productId, item.quantity + 1)
+                : null,
             icon: Icon(
               Icons.add_rounded,
-              color: _getQuantityIconColor(context),
+              color: !isUpdating ? _getQuantityIconColor(context) : OsmeaColors.pewter,
               size: context.iconSizeExtraSmall,
             ),
             backgroundColor: Colors.transparent,

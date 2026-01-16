@@ -99,6 +99,7 @@ class CartLoadedState extends CartState {
   final String? currencyDecimalSeparator;
   final String? currencyThousandSeparator;
   final int? currencyMinorUnit;
+  final int? updatingProductId; // ID of product currently being updated
 
   CartLoadedState({
     required this.cartItems,
@@ -112,6 +113,7 @@ class CartLoadedState extends CartState {
     this.currencyDecimalSeparator,
     this.currencyThousandSeparator,
     this.currencyMinorUnit,
+    this.updatingProductId,
   });
 
   CartLoadedState copyWith({
@@ -126,6 +128,8 @@ class CartLoadedState extends CartState {
     String? currencyDecimalSeparator,
     String? currencyThousandSeparator,
     int? currencyMinorUnit,
+    int? updatingProductId,
+    bool clearUpdatingProductId = false,
   }) {
     return CartLoadedState(
       cartItems: cartItems ?? this.cartItems,
@@ -139,6 +143,7 @@ class CartLoadedState extends CartState {
       currencyDecimalSeparator: currencyDecimalSeparator ?? this.currencyDecimalSeparator,
       currencyThousandSeparator: currencyThousandSeparator ?? this.currencyThousandSeparator,
       currencyMinorUnit: currencyMinorUnit ?? this.currencyMinorUnit,
+      updatingProductId: clearUpdatingProductId ? null : (updatingProductId ?? this.updatingProductId),
     );
   }
 

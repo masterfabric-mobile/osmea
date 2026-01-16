@@ -32,10 +32,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   CartLoadedState? _lastLoadedState;
   CartLoadedState? get lastLoadedState => _lastLoadedState;
 
-  // Debouncing for cart reload to prevent bottom sheet from closing
-  Timer? _reloadDebounceTimer;
-  bool _hasPendingUpdate = false;
-
   // Arguments holder for route/widget inputs
   final Map<String, dynamic> _arguments = {};
   void setArguments(Map<String, dynamic> args) {
@@ -588,6 +584,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       debugPrint(
         '🛒 CartViewModel: _updateItemQuantity called - productId: $productId, quantity: $quantity',
       );
+      
+      // Save current loaded state before showing loading
+      if (state is CartLoadedState) {
+        _lastLoadedState = state as CartLoadedState;
+      }
+      
       debugPrint('🛒 CartViewModel: Updating quantity via API');
       await _updateItemQuantityFromAPI(productId, quantity);
     } catch (e) {
@@ -603,13 +605,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling updateItem API: productId=$productId, quantity=$quantity',
       );
 
-      // Get the current state BEFORE emitting loading state
+      // Get the current loaded state
       final currentState = state;
       CartLoadedState? loadedState;
       if (currentState is CartLoadedState) {
         loadedState = currentState;
       } else if (_lastLoadedState != null) {
-        // Use last loaded state if current state is not loaded
         loadedState = _lastLoadedState;
       }
 
@@ -618,10 +619,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         emit(CartErrorState(message: t.cartView.messages.noCartLoaded));
         return;
       }
-
-      // DON'T emit loading state - use optimistic update instead
-      // This prevents bottom sheet from showing "Failed to load cart" error
-      // emit(CartLoadingState());
 
       // Get tokens before API call
       final cartToken = await _getCartToken();
@@ -656,7 +653,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return;
       }
 
-      // Optimistic update: Update UI immediately before API call
+      // Show loading state with updatingProductId - this will show spinner on that item
+      // Also update the quantity optimistically
       final updatedItems = loadedState.cartItems.map((item) {
         if (item.productId == productId) {
           return item.copyWith(quantity: quantity);
@@ -664,27 +662,31 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         return item;
       }).toList();
 
-      // Calculate new total
+      // Calculate new total items count
+      int newTotalItems = 0;
       double newTotal = 0.0;
       for (final item in updatedItems) {
+        newTotalItems += item.quantity;
         newTotal += item.price * item.quantity;
       }
 
-      // Emit optimistic state
-      final optimisticState = loadedState.copyWith(
+      // Emit state with loading indicator and updated counts
+      final updatingState = loadedState.copyWith(
         cartItems: updatedItems,
         totalPrice: newTotal,
+        totalItems: newTotalItems,
+        updatingProductId: productId,
       );
-      _lastLoadedState = optimisticState;
-      emit(optimisticState);
+      _lastLoadedState = updatingState;
+      emit(updatingState);
 
-      // Now make API call in background
+      // Make API call in background
       final response = await _cartService.updateItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken,
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
+        jwtToken: jwtToken,
         key: itemKey,
         quantity: quantity,
       );
@@ -695,9 +697,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API update item error: ${response.errors!.first}');
-        // Revert to previous state on error
-        _lastLoadedState = loadedState;
-        emit(loadedState);
+        // Revert to previous state on error (without updatingProductId)
+        final revertedState = loadedState.copyWith(clearUpdatingProductId: true);
+        _lastLoadedState = revertedState;
+        emit(revertedState);
         emit(
           CartErrorState(
             message: ApiErrorUtils.getErrorMessage(response.errors!.first),
@@ -708,31 +711,19 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       debugPrint('✅ Successfully updated item in API cart');
       
-      // Mark that we have a pending update
-      _hasPendingUpdate = true;
-      
-      // Debounce cart reload to prevent bottom sheet from closing during rapid updates
-      _reloadDebounceTimer?.cancel();
-      _reloadDebounceTimer = Timer(const Duration(milliseconds: 800), () async {
-        if (_hasPendingUpdate) {
-          _hasPendingUpdate = false;
-          debugPrint('🔄 CartViewModel: Debounced reload - syncing with server');
-          await _loadCartFromAPI();
-        }
-      });
+      // Clear updating indicator
+      final finalState = updatingState.copyWith(clearUpdatingProductId: true);
+      _lastLoadedState = finalState;
+      emit(finalState);
     } catch (e) {
       debugPrint('❌ Failed to update item in API cart: $e');
-      // Cancel pending reload on error
-      _reloadDebounceTimer?.cancel();
-      _hasPendingUpdate = false;
       
-      // Try to reload cart to get correct state
-      try {
-        await _loadCartFromAPI();
-      } catch (reloadError) {
-        debugPrint('❌ Failed to reload cart after update error: $reloadError');
-        emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
+      // Restore last loaded state on error (without updatingProductId)
+      if (_lastLoadedState != null) {
+        final errorState = _lastLoadedState!.copyWith(clearUpdatingProductId: true);
+        emit(errorState);
       }
+      emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
 
@@ -910,7 +901,6 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   @override
   Future<void> close() {
-    _reloadDebounceTimer?.cancel();
     return super.close();
   }
 

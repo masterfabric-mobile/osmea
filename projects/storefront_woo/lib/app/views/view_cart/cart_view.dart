@@ -122,7 +122,9 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
     return BlocBuilder<CartViewModel, CartState>(
       bloc: viewModel,
       builder: (context, currentState) {
-        final isCurrentlyLoading = isLoading || currentState is CartLoadingState;
+        // Don't show global loading overlay for quantity updates
+        // We show item-level loading indicators instead
+        final showGlobalLoading = isLoading && currentState is CartLoadingState;
         
         return Stack(
           children: [
@@ -138,8 +140,8 @@ class CartView extends MasterViewHydratedCubit<CartViewModel, CartState> {
                 child: CartContentWidget(viewModel: viewModel, state: state),
               ),
             ),
-            // Loading overlay when refreshing
-            if (isCurrentlyLoading)
+            // Loading overlay only for full cart refresh (not quantity updates)
+            if (showGlobalLoading)
               Positioned.fill(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(
