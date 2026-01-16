@@ -134,13 +134,15 @@ final GoRouter appRouter = GoRouter(
             // Create focus node for auto-focusing search input
             final searchFocusNode = FocusNode();
 
-            // Extract query from URL if present
+            // Extract query and fromHome flag from URL if present
             final query = state.uri.queryParameters['query'];
+            final fromHome = state.uri.queryParameters['fromHome'] == 'true';
 
             return CustomTransitionPage(
               child: _AutoFocusSearchView(
                 searchFocusNode: searchFocusNode,
                 initialQuery: query,
+                fromHome: fromHome,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -173,21 +175,13 @@ final GoRouter appRouter = GoRouter(
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(0.0, 1.0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeInOutCubic,
-                            ),
-                          ),
+                    // Smooth fade transition that feels like no transition
+                    return FadeTransition(
+                      opacity: animation,
                       child: child,
                     );
                   },
-              transitionDuration: const Duration(milliseconds: 400),
+              transitionDuration: const Duration(milliseconds: 150),
             );
           },
         ),
@@ -2126,12 +2120,14 @@ void _navigateToPageFallback(
 class _AutoFocusSearchView extends StatefulWidget {
   final FocusNode searchFocusNode;
   final String? initialQuery;
+  final bool fromHome;
   final Function(String) goRoute;
   final Future<List<dynamic>> Function(String query) searchProvider;
 
   const _AutoFocusSearchView({
     required this.searchFocusNode,
     this.initialQuery,
+    this.fromHome = false,
     required this.goRoute,
     required this.searchProvider,
   });
@@ -2149,12 +2145,10 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
 
-    // Check if we came from navbar (no auto-focus) or from searchbar tap (auto-focus)
-    // We'll determine this based on whether there's an initial query or not
-    // If there's an initial query, it means user typed in home searchbar, so auto-focus
-    // If no initial query, it means user tapped navbar, so don't auto-focus
-    _shouldAutoFocus =
-        widget.initialQuery != null && widget.initialQuery!.isNotEmpty;
+    // Check if we came from navbar (no auto-focus) or from home searchbar (auto-focus)
+    // If fromHome is true, it means user tapped home searchbar, so auto-focus
+    // If fromHome is false, it means user tapped navbar, so don't auto-focus
+    _shouldAutoFocus = widget.fromHome;
 
     // Request focus after the frame is built only if should auto-focus
     if (_shouldAutoFocus) {
@@ -2182,7 +2176,7 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
       searchController: _searchController,
       searchFocusNode: widget.searchFocusNode,
       showBackButton: true,
-      showTitle: false,
+      showTitle: true,
       titleAlignment: AppBarTitleAlignment.center,
       showSearchIcon: true,
       onBackPressed: () => widget.goRoute('/home'),

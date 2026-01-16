@@ -548,28 +548,8 @@ class _CategoryCard extends StatelessWidget {
                         ),
                       )
                     : _buildImagePlaceholder(context),
-                // Gradient overlay from bottom - minimal
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.35),
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.05),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.4, 0.7, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
+                // Gradient overlay from bottom - config based
+                _buildGradientOverlay(context),
                 // Category name on gradient
                 Positioned(
                   left: 0,
@@ -601,6 +581,68 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build gradient overlay from config
+  Widget _buildGradientOverlay(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final gradientConfig = configHelper.getObject('search_view_configuration.category_card.gradient_overlay');
+    final enabled = gradientConfig?['enabled'] as bool? ?? true;
+    
+    if (!enabled) {
+      return const SizedBox.shrink();
+    }
+    
+    final height = (gradientConfig?['height'] as num?)?.toDouble() ?? 40.0;
+    final colorsList = gradientConfig?['colors'] as List<dynamic>?;
+    final stopsList = gradientConfig?['stops'] as List<dynamic>?;
+    
+    List<Color> gradientColors = [
+      Colors.black.withOpacity(0.55),
+      Colors.black.withOpacity(0.35),
+      Colors.black.withOpacity(0.15),
+      Colors.transparent,
+    ];
+    
+    List<double> gradientStops = const [0.0, 0.4, 0.7, 1.0];
+    
+    if (colorsList != null && colorsList.isNotEmpty) {
+      gradientColors = colorsList.map((colorMap) {
+        final colorString = colorMap['color'] as String? ?? '#000000';
+        final opacity = (colorMap['opacity'] as num?)?.toDouble() ?? 1.0;
+        Color baseColor = Colors.black;
+        if (colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            baseColor = Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            baseColor = Color(int.parse(hexString, radix: 16));
+          }
+        }
+        return baseColor.withOpacity(opacity);
+      }).toList();
+    }
+    
+    if (stopsList != null && stopsList.isNotEmpty) {
+      gradientStops = stopsList.map((stop) => (stop as num).toDouble()).toList();
+    }
+    
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: gradientColors,
+            stops: gradientStops,
           ),
         ),
       ),

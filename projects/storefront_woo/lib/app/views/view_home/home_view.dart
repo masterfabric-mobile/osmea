@@ -240,10 +240,10 @@ PreferredSizeWidget _buildHomeAppBar(
   // Listen for focus changes to navigate on tap (same as search view)
   searchFocusNode.addListener(() {
     if (searchFocusNode.hasFocus) {
-      // Navigate to search when searchbar is focused (tapped)
+      // Navigate to search when searchbar is focused (tapped) with fromHome flag
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
-          context.push('/search');
+          context.push('/search?fromHome=true');
         }
       });
     }
@@ -275,27 +275,27 @@ PreferredSizeWidget _buildHomeAppBar(
     showClearButton: true,
     showSearchIcon: true,
     onSearch: (query) {
-      // Navigate to search with query
+      // Navigate to search with query and fromHome flag
       if (query.trim().isNotEmpty) {
-        context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+        context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
       } else {
-        context.push('/search');
+        context.push('/search?fromHome=true');
       }
     },
     onSearchSubmitted: (query) {
-      // Navigate to search with query
+      // Navigate to search with query and fromHome flag
       if (query.trim().isNotEmpty) {
-        context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+        context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
       } else {
-        context.push('/search');
+        context.push('/search?fromHome=true');
       }
     },
     onSearchChanged: (query) {
-      // When user starts typing, navigate to search
+      // When user starts typing, navigate to search with fromHome flag
       if (query.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
-            context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+            context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
           }
         });
       }

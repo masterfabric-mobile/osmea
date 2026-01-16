@@ -305,45 +305,39 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 title: title,
                 titleAlignment: titleAlignment,
                 centerTitle: titleAlignment == AppBarTitleAlignment.center,
+                showBackButton: showBackButton,
                 leading: showBackButton
                     ? OsmeaComponents.iconButton(
                         icon: const Icon(Icons.arrow_back),
-                        onPressed:
-                            onBackPressed ?? () => Navigator.of(context).pop(),
+                        onPressed: onBackPressed ??
+                            () => Navigator.of(context).pop(),
                         variant: ButtonVariant.ghost,
                         size: ButtonSize.medium,
                         backgroundColor: Colors.transparent,
                       )
                     : null,
-                appBarBackgroundColor: appBarBackgroundColor ??
-                    configHelper.getSearchAppBarColor(),
-                searchBarBackgroundColor: searchBarBackgroundColor ??
-                    configHelper.getSearchInputBackgroundColor(),
-                searchBarBorderColor: searchBarBorderColor ??
-                    configHelper.getSearchBarBorderColor(),
-                searchBarTextColor: configHelper.getSearchViewTextColor(),
-                searchBarHintColor: configHelper.getSearchViewHintTextColor(),
-                searchBarFocusColor: configHelper.getSearchViewFocusColor(),
-                searchBarErrorColor: configHelper.getSearchViewErrorColor(),
-                searchBarActions: effectiveActions,
-                searchBarActionMargin: searchBarActionMargin,
-                searchBarActionAlignment: searchBarActionAlignment,
                 appBarVariant: appBarVariant,
                 appBarSize: appBarSize,
-                searchBarVariant: searchBarVariant,
+                appBarBackgroundColor: appBarBackgroundColor ??
+                    configHelper.getSearchAppBarColor(),
+                appBarForegroundColor: configHelper.getSearchViewTextColor(),
+                appBarElevation: elevation,
                 searchHint: searchHint ?? 'Search...',
                 searchController: searchController,
                 searchFocusNode: searchFocusNode,
+                searchBarVariant: searchBarVariant,
+                searchBarSize: searchBarSize,
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
                 onSearch: (query) {
                   viewModel.performSearch(query,
                       searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
                 },
-                onSearchTap: () {
-                  // Request focus when searchbar is tapped
-                  if (searchFocusNode != null) {
-                    searchFocusNode!.requestFocus();
-                  }
+                onSearchSubmitted: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
                 },
                 onSearchChanged: (query) {
                   viewModel.updateQuery(query);
@@ -362,18 +356,11 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                         suggestionProvider: searchSuggestionProvider);
                   }
                 },
-                onSearchClear: () {
-                  viewModel.clearSearch();
-                  onSearchClear?.call();
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped (for navbar navigation)
+                  searchFocusNode?.requestFocus();
                 },
-                onSearchSubmitted: (query) {
-                  viewModel.performSearch(query,
-                      searchProvider: searchProvider, immediate: true);
-                  onSearchSubmitted?.call(query);
-                },
-                showClearButton: showClearButton,
-                showSearchIcon: showSearchIcon,
-                searchSuggestionProvider: searchSuggestionProvider,
+                actions: const [],
               );
             } else {
               // showTitle is false - use appBarWithSearchBar but without showing title (same structure as home)
@@ -444,42 +431,36 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 title: null, // Don't show title when showTitle is false
                 titleAlignment: titleAlignment,
                 centerTitle: titleAlignment == AppBarTitleAlignment.center,
+                showBackButton: showBackButton,
                 leading: showBackButton
                     ? OsmeaComponents.iconButton(
                         icon: const Icon(Icons.arrow_back),
-                        onPressed:
-                            onBackPressed ?? () => Navigator.of(context).pop(),
+                        onPressed: onBackPressed ??
+                            () => Navigator.of(context).pop(),
                         variant: ButtonVariant.ghost,
                         size: ButtonSize.medium,
                         backgroundColor: Colors.transparent,
                       )
                     : null,
-                appBarBackgroundColor: appBarBackgroundColor ??
-                    configHelper.getSearchAppBarColor(),
-                searchBarBackgroundColor: searchBarBackgroundColor ??
-                    configHelper.getSearchInputBackgroundColor(),
-                searchBarBorderColor: searchBarBorderColor ??
-                    configHelper.getSearchBarBorderColor(),
-                searchBarTextColor: configHelper.getSearchViewTextColor(),
-                searchBarHintColor: configHelper.getSearchViewHintTextColor(),
-                searchBarFocusColor: configHelper.getSearchViewFocusColor(),
-                searchBarErrorColor: configHelper.getSearchViewErrorColor(),
-                searchBarActions: effectiveActions,
-                searchBarActionMargin: searchBarActionMargin,
-                searchBarActionAlignment: searchBarActionAlignment,
                 appBarVariant: appBarVariant,
                 appBarSize: appBarSize,
-                searchBarVariant: searchBarVariant,
+                appBarBackgroundColor: appBarBackgroundColor ??
+                    configHelper.getSearchAppBarColor(),
+                appBarForegroundColor: configHelper.getSearchViewTextColor(),
+                appBarElevation: elevation,
                 searchHint: searchHint ?? 'Search...',
                 searchController: searchController,
                 searchFocusNode: searchFocusNode,
-                onSearchTap: () {
-                  // Request focus when searchbar is tapped
-                  if (searchFocusNode != null) {
-                    searchFocusNode!.requestFocus();
-                  }
-                },
+                searchBarVariant: searchBarVariant,
+                searchBarSize: searchBarSize,
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
                 onSearch: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchSubmitted: (query) {
                   viewModel.performSearch(query,
                       searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
@@ -501,17 +482,11 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                         suggestionProvider: searchSuggestionProvider);
                   }
                 },
-                onSearchSubmitted: (query) {
-                  viewModel.performSearch(query,
-                      searchProvider: searchProvider, immediate: true);
-                  onSearchSubmitted?.call(query);
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped (for navbar navigation)
+                  searchFocusNode?.requestFocus();
                 },
-                onSearchClear: () {
-                  viewModel.clearSearch();
-                  onSearchClear?.call();
-                },
-                showClearButton: showClearButton,
-                showSearchIcon: showSearchIcon,
+                actions: const [],
               );
             }
           },
