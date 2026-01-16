@@ -167,27 +167,37 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
               left: 0,
               right: 0,
               child: OsmeaComponents.center(
-                child: OsmeaComponents.row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    widget.imageUrls.length,
-                    (index) => GestureDetector(
-                      onTap: () {
-                        _pageController.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: OsmeaComponents.container(
-                        margin: EdgeInsets.symmetric(horizontal: 3),
-                        width: _currentPage == index ? 20 : 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: _currentPage == index
-                              ? OsmeaColors.white
-                              : OsmeaColors.white.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(3),
+                child: OsmeaComponents.container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.spacing8,
+                    vertical: context.spacing6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.black.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: OsmeaComponents.row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      widget.imageUrls.length,
+                      (index) => GestureDetector(
+                        onTap: () {
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: OsmeaComponents.container(
+                          margin: EdgeInsets.symmetric(horizontal: 3),
+                          width: _currentPage == index ? 20 : 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: _currentPage == index
+                                ? _getIndicatorColor(context)
+                                : _getIndicatorColor(context).withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
                         ),
                       ),
                     ),
@@ -258,6 +268,30 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
         ],
       ),
     );
+  }
+
+  /// Gets indicator color from config
+  Color _getIndicatorColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'product_detail_view.images.indicatorColor',
+      '#FFFFFF',
+    );
+    
+    try {
+      if (colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to parse indicator color: $e');
+    }
+    
+    return OsmeaColors.white;
   }
 
   /// Shares product information
