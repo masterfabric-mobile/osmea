@@ -122,6 +122,45 @@ class _CampaignViewState extends State<CampaignView>
     });
   }
 
+  /// Get splash image URL from config if available
+  String? _getSplashImageUrl() {
+    try {
+      final splashImageUrl = _configHelper?.getString('campaign_view.splash_image_url');
+      if (splashImageUrl != null && splashImageUrl.isNotEmpty) {
+        return splashImageUrl;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load splash image URL: $e');
+    }
+    return null;
+  }
+
+  /// Get splash title from config if available
+  String? _getSplashTitle() {
+    try {
+      final splashTitle = _configHelper?.getString('campaign_view.splash_title');
+      if (splashTitle != null && splashTitle.isNotEmpty) {
+        return splashTitle;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load splash title: $e');
+    }
+    return null;
+  }
+
+  /// Get splash subtitle from config if available
+  String? _getSplashSubtitle() {
+    try {
+      final splashSubtitle = _configHelper?.getString('campaign_view.splash_subtitle');
+      if (splashSubtitle != null && splashSubtitle.isNotEmpty) {
+        return splashSubtitle;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load splash subtitle: $e');
+    }
+    return null;
+  }
+
   /// Get campaign images from config
   List<CampaignImageItem> _getCampaignImages() {
     try {
@@ -199,16 +238,81 @@ class _CampaignViewState extends State<CampaignView>
         width: double.infinity,
         height: double.infinity,
         color: _getBackgroundColor(),
-        child: _campaignImages.isEmpty
-            ? _buildLoadingState()
-            : _buildCampaignImage(),
+        child: _shouldUseSplashImage()
+            ? _buildSplashImage()
+            : (_campaignImages.isEmpty
+                ? _buildLoadingState()
+                : _buildCampaignImage()),
       ),
     );
+  }
+
+  /// Check if splash image should be used instead of campaign images
+  bool _shouldUseSplashImage() {
+    final splashImageUrl = _getSplashImageUrl();
+    return splashImageUrl != null && splashImageUrl.isNotEmpty;
   }
 
   /// Build loading state while config is loading
   Widget _buildLoadingState() {
     return UnifiedLoadingWidget(goRoute: widget.goRoute);
+  }
+
+  /// Build splash image from config
+  Widget _buildSplashImage() {
+    final splashImageUrl = _getSplashImageUrl();
+    final splashTitle = _getSplashTitle();
+    final splashSubtitle = _getSplashSubtitle();
+
+    if (splashImageUrl == null || splashImageUrl.isEmpty) {
+      // Fallback to campaign images if splash image URL is not available
+      if (_campaignImages.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            widget.goRoute('/home');
+          }
+        });
+        return UnifiedLoadingWidget(goRoute: widget.goRoute);
+      }
+      return _buildCampaignImage();
+    }
+
+    final splashCampaign = CampaignImageItem(
+      imageUrl: splashImageUrl,
+      title: splashTitle,
+      subtitle: splashSubtitle,
+    );
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Full-screen splash image with scale animation
+          ScaleTransition(
+            scale: _scaleAnimation,
+            alignment: Alignment.center,
+            child: OsmeaComponents.image(
+              imageUrl: splashCampaign.imageUrl,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+              variant: ImageVariant.normal,
+              borderRadius: BorderRadius.zero,
+              cacheWidth: null, // Full resolution for full-screen
+              showLoadingIndicator: true,
+              errorWidget: _buildErrorWidget(),
+            ),
+          ),
+          // Optional: Gradient overlay for text readability
+          if (_shouldShowGradientOverlay(splashCampaign))
+            _buildGradientOverlay(),
+          // Optional: Text overlay
+          if (splashCampaign.title != null || splashCampaign.subtitle != null)
+            _buildTextOverlay(context, splashCampaign),
+        ],
+      ),
+    );
   }
 
   /// Build full-screen campaign image
