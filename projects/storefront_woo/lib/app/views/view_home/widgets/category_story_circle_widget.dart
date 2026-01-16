@@ -60,50 +60,93 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
   }
 
   Future<void> _toggleFavorite(int categoryId, String categoryName) async {
+    debugPrint('🔵 CategoryStoryCircle: Toggle favorite clicked for category $categoryId ($categoryName)');
+    
     final wasFavorite = _favoriteStatus[categoryId] ?? false;
+    debugPrint('🔵 CategoryStoryCircle: Current favorite status: $wasFavorite');
 
     // Optimistically update UI first
     if (mounted) {
       setState(() {
         _favoriteStatus[categoryId] = !wasFavorite;
       });
+      debugPrint('🔵 CategoryStoryCircle: UI updated optimistically to ${!wasFavorite}');
     }
 
-    final success = await _favoriteHelper.toggleFavorite(categoryId);
+    try {
+      final success = await _favoriteHelper.toggleFavorite(categoryId);
+      debugPrint('🔵 CategoryStoryCircle: toggleFavorite result: $success');
 
-    if (!success) {
-      // Revert on failure
-      if (mounted) {
-        setState(() {
-          _favoriteStatus[categoryId] = wasFavorite;
-        });
-      }
-      return;
-    }
-
-    if (!context.mounted) return;
-
-    final isNowFavorite = !wasFavorite;
-    context.showSnackbar(
-      title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
-      message: isNowFavorite
-          ? '$categoryName was added to your favorites'
-          : '$categoryName was removed from your favorites',
-      type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
-      style: SnackbarStyle.minimal,
-      position: SnackbarPosition.bottom,
-      animation: SnackbarAnimation.slide,
-      duration: const Duration(seconds: 2),
-      actionLabel: 'Undo',
-      onAction: () async {
-        await _favoriteHelper.toggleFavorite(categoryId);
+      if (!success) {
+        debugPrint('⚠️ CategoryStoryCircle: Failed to toggle favorite, reverting UI');
+        // Revert on failure
         if (mounted) {
           setState(() {
             _favoriteStatus[categoryId] = wasFavorite;
           });
         }
-      },
-    );
+        
+        if (context.mounted) {
+          context.showSnackbar(
+            title: 'Error',
+            message: 'Failed to update favorites. Please try again.',
+            type: SnackbarType.error,
+            style: SnackbarStyle.minimal,
+            position: SnackbarPosition.bottom,
+            duration: const Duration(seconds: 2),
+          );
+        }
+        return;
+      }
+
+      if (!context.mounted) return;
+
+      final isNowFavorite = !wasFavorite;
+      debugPrint('🔵 CategoryStoryCircle: Showing success snackbar, isNowFavorite: $isNowFavorite');
+      
+      context.showSnackbar(
+        title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
+        message: isNowFavorite
+            ? '$categoryName was added to your favorites'
+            : '$categoryName was removed from your favorites',
+        type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
+        style: SnackbarStyle.minimal,
+        position: SnackbarPosition.bottom,
+        animation: SnackbarAnimation.slide,
+        duration: const Duration(seconds: 2),
+        actionLabel: 'Undo',
+        onAction: () async {
+          debugPrint('🔵 CategoryStoryCircle: Undo action triggered');
+          await _favoriteHelper.toggleFavorite(categoryId);
+          if (mounted) {
+            setState(() {
+              _favoriteStatus[categoryId] = wasFavorite;
+            });
+          }
+        },
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ CategoryStoryCircle: Exception in _toggleFavorite: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      
+      // Revert on error
+      if (mounted) {
+        setState(() {
+          _favoriteStatus[categoryId] = wasFavorite;
+        });
+      }
+      
+      if (context.mounted) {
+        context.showSnackbar(
+          title: 'Error',
+          message: 'An error occurred: ${e.toString()}',
+          type: SnackbarType.error,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 3),
+        );
+      }
+    }
   }
 
   /// Loads circle categories configuration
