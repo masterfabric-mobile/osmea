@@ -277,7 +277,9 @@ PreferredSizeWidget _buildHomeAppBar(
     onSearch: (query) {
       // Navigate to search with query and fromHome flag
       if (query.trim().isNotEmpty) {
-        context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
+        context.push(
+          '/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true',
+        );
       } else {
         context.push('/search?fromHome=true');
       }
@@ -285,7 +287,9 @@ PreferredSizeWidget _buildHomeAppBar(
     onSearchSubmitted: (query) {
       // Navigate to search with query and fromHome flag
       if (query.trim().isNotEmpty) {
-        context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
+        context.push(
+          '/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true',
+        );
       } else {
         context.push('/search?fromHome=true');
       }
@@ -295,7 +299,9 @@ PreferredSizeWidget _buildHomeAppBar(
       if (query.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
-            context.push('/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true');
+            context.push(
+              '/search?query=${Uri.encodeComponent(query.trim())}&fromHome=true',
+            );
           }
         });
       }

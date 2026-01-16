@@ -176,10 +176,7 @@ final GoRouter appRouter = GoRouter(
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     // Smooth fade transition that feels like no transition
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
+                    return FadeTransition(opacity: animation, child: child);
                   },
               transitionDuration: const Duration(milliseconds: 150),
             );
@@ -1138,7 +1135,8 @@ NavbarVariant _getNavbarVariant(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final variantString = navbarConfig?['variant'] as String?;
-    return NavbarVariantStringExtension.fromString(variantString) ?? NavbarVariant.retailMain;
+    return NavbarVariantStringExtension.fromString(variantString) ??
+        NavbarVariant.retailMain;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar variant: $e');
     return NavbarVariant.retailMain;
@@ -1150,7 +1148,8 @@ NavbarSize _getNavbarSize(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final sizeString = navbarConfig?['size'] as String?;
-    return NavbarSizeStringExtension.fromString(sizeString) ?? NavbarSize.medium;
+    return NavbarSizeStringExtension.fromString(sizeString) ??
+        NavbarSize.medium;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar size: $e');
     return NavbarSize.medium;
@@ -1162,7 +1161,8 @@ NavbarPosition _getNavbarPosition(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final positionString = navbarConfig?['position'] as String?;
-    return NavbarPositionStringExtension.fromString(positionString) ?? NavbarPosition.bottom;
+    return NavbarPositionStringExtension.fromString(positionString) ??
+        NavbarPosition.bottom;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar position: $e');
     return NavbarPosition.bottom;
@@ -1204,7 +1204,8 @@ NavbarIndicatorStyle _getNavbarIndicatorStyle(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final indicatorString = navbarConfig?['indicatorStyle'] as String?;
-    return NavbarIndicatorStyleStringExtension.fromString(indicatorString) ?? NavbarIndicatorStyle.none;
+    return NavbarIndicatorStyleStringExtension.fromString(indicatorString) ??
+        NavbarIndicatorStyle.none;
   } catch (e) {
     debugPrint('⚠️ Failed to load navbar indicator style: $e');
     return NavbarIndicatorStyle.none;
@@ -1212,10 +1213,7 @@ NavbarIndicatorStyle _getNavbarIndicatorStyle(AssetConfigHelper configHelper) {
 }
 
 /// Get navbar numeric property from config
-double? _getNavbarDouble(
-  AssetConfigHelper configHelper,
-  String key,
-) {
+double? _getNavbarDouble(AssetConfigHelper configHelper, String key) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final value = navbarConfig?[key];
@@ -1408,13 +1406,20 @@ Widget? _getNavbarForRoute(String location) {
                     'indicatorColor',
                     activeColor,
                   );
-                  final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+                  final borderWidth = _getNavbarDouble(
+                    configHelper,
+                    'borderWidth',
+                  );
                   final showBorder = _getNavbarBool(
                     configHelper,
                     'showBorder',
                     false,
                   );
-                  final borderStyleString = configHelper.getObject('navbar_configuration')?['borderStyle'] as String?;
+                  final borderStyleString =
+                      configHelper.getObject(
+                            'navbar_configuration',
+                          )?['borderStyle']
+                          as String?;
                   BorderStyle? borderStyle;
                   if (borderStyleString != null) {
                     switch (borderStyleString.toLowerCase()) {
@@ -1649,13 +1654,20 @@ Widget? _getNavbarForRouteFallback(String location) {
                     'indicatorColor',
                     activeColor,
                   );
-                  final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+                  final borderWidth = _getNavbarDouble(
+                    configHelper,
+                    'borderWidth',
+                  );
                   final showBorder = _getNavbarBool(
                     configHelper,
                     'showBorder',
                     false,
                   );
-                  final borderStyleString = configHelper.getObject('navbar_configuration')?['borderStyle'] as String?;
+                  final borderStyleString =
+                      configHelper.getObject(
+                            'navbar_configuration',
+                          )?['borderStyle']
+                          as String?;
                   BorderStyle? borderStyle;
                   if (borderStyleString != null) {
                     switch (borderStyleString.toLowerCase()) {
@@ -1767,7 +1779,11 @@ Widget? _getNavbarForRouteFallback(String location) {
                 'showBorder',
                 false,
               );
-              final borderStyleString = (configHelper.getObject('navbar_configuration'))?['borderStyle'] as String?;
+              final borderStyleString =
+                  (configHelper.getObject(
+                        'navbar_configuration',
+                      ))?['borderStyle']
+                      as String?;
               BorderStyle? borderStyle;
               if (borderStyleString != null) {
                 switch (borderStyleString.toLowerCase()) {
