@@ -139,18 +139,28 @@ class BrandsSectionWidget extends StatelessWidget {
             ),
           )
         else
-          OsmeaComponents.padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Wrap(
-              spacing: context.spacing16,
-              runSpacing: context.height16,
-              children: brands.map((brand) {
-                return SizedBox(
-                  width: (context.allWidth - (horizontalPadding * 2) - (context.spacing16 * 2)) / 3,
-                  child: _buildBrandCard(context, brand),
-                );
-              }).toList(),
-            ),
+          Builder(
+            builder: (context) {
+              // Determine columns based on brand count
+              final isEvenCount = brands.length % 2 == 0;
+              final columns = isEvenCount ? 2 : 3;
+              final totalSpacing = context.spacing16 * (columns - 1);
+              final itemWidth = (context.allWidth - (horizontalPadding * 2) - totalSpacing) / columns;
+              
+              return OsmeaComponents.padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Wrap(
+                  spacing: context.spacing16,
+                  runSpacing: context.height16,
+                  children: brands.map((brand) {
+                    return SizedBox(
+                      width: itemWidth,
+                      child: _buildBrandCard(context, brand),
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           ),
       ],
     );
