@@ -128,7 +128,7 @@ class WishlistView
                  surfaceTintColor: surfaceTintColor,
                  shadowColor: shadowColor,
                  leading: OsmeaComponents.iconButton(
-                   icon: Icon(Icons.arrow_back_ios_new, color: iconColor),
+                   icon: Icon(Icons.arrow_back, color: iconColor),
                    onPressed: () {
                      if (context.canPop()) {
                        context.pop();
