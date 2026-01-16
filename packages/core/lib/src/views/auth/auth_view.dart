@@ -296,6 +296,13 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             // Use postFrameCallback to ensure state is fully updated before navigation
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
+                // Show success snackbar
+                context.snackbarSuccess(
+                  'Redirecting to Home Page',
+                  title: 'Login Successful',
+                  duration: const Duration(seconds: 3),
+                );
+                
                 wrappedOnSignInSuccess?.call();
                 debugPrint(
                     '✅ AuthView: Navigation callback executed - navigating to home');
