@@ -475,7 +475,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
         backgroundColor: appBarBackgroundColor,
         foregroundColor: appBarForegroundColor,
         shadowColor: appBarShadowColor,
-        surfaceTintColor: appBarSurfaceTintColor,
+        surfaceTintColor: appBarSurfaceTintColor ?? Colors.transparent,
         elevation: appBarElevation,
         centerTitle: centerTitle,
         titleSpacing: titleSpacing,
@@ -485,7 +485,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
         automaticallyImplyLeading: automaticallyImplyLeading,
         excludeHeaderSemantics: excludeHeaderSemantics,
         primary: primary,
-        scrolledUnderElevation: scrolledUnderElevation,
+        scrolledUnderElevation: scrolledUnderElevation ?? (appBarElevation ?? 0),
         flexibleSpace: flexibleSpace,
         clipBehavior: Clip.none,
         bottom: PreferredSize(
