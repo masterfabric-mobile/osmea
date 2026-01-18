@@ -328,6 +328,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             if (onSignInError != null) {
               onSignInError?.call(state.signInErrorMessage!);
             }
+            return; // Prevent duplicate error handling below
           }
 
           // Handle Sign Up success/error
@@ -361,12 +362,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                 onSignUpError?.call(state.signUpErrorMessage!);
               }
             }
-            // Handle sign in error
-            if (state.signInErrorMessage != null && state.currentTab == 0) {
-              if (onSignInError != null) {
-                onSignInError?.call(state.signInErrorMessage!);
-              }
-            }
+            // Note: Sign in error is already handled above, so we don't check it again here
           }
         }
       },
