@@ -68,7 +68,11 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
         if (id != null && id > 0) byId[id] = p;
       }
 
-      return ids.map((id) => byId[id]).whereType<ListAllProductsResponseModel>().take(limit).toList();
+      return ids
+          .map((id) => byId[id])
+          .whereType<ListAllProductsResponseModel>()
+          .take(limit)
+          .toList();
     }
 
     // Fallback: current behavior (discounted on-sale products)
@@ -98,12 +102,18 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
       debugPrint('⚠️ Failed to load horizontal padding: $e');
     }
     // Default from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing() {
-    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   @override
@@ -124,8 +134,10 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
     final horizontalPadding = _getHorizontalPadding();
 
     // Keep carousel aligned with section padding (same left/right as header)
-    final double itemWidth =
-        (context.allWidth - (horizontalPadding * 2)).clamp(0.0, context.allWidth);
+    final double itemWidth = (context.allWidth - (horizontalPadding * 2)).clamp(
+      0.0,
+      context.allWidth,
+    );
     // Banner feel
     final double bannerHeight = context.height160;
     final bannerItems = dealsProducts
@@ -322,8 +334,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: OsmeaColors.black,
-                            borderRadius:
-                                BorderRadius.circular(context.spacing20),
+                            borderRadius: BorderRadius.circular(
+                              context.spacing20,
+                            ),
                             border: Border.all(
                               color: OsmeaColors.black,
                               width: context.borderWidth,
@@ -333,11 +346,12 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                             '$discount% OFF',
                             textStyle: OsmeaTextStyle.bodySmall(context)
                                 .copyWith(
-                              fontSize: context.fontSizeExtraSmall *
-                                  context.textScaleFactor,
-                              color: OsmeaColors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                                  fontSize:
+                                      context.fontSizeExtraSmall *
+                                      context.textScaleFactor,
+                                  color: OsmeaColors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
                           ),
                         ),
                       OsmeaComponents.sizedBox(height: context.spacing8),
@@ -367,9 +381,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                               ),
                               textStyle: OsmeaTextStyle.titleSmall(context)
                                   .copyWith(
-                                color: OsmeaColors.black,
-                                fontWeight: FontWeight.w700,
-                              ),
+                                    color: OsmeaColors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                             ),
                             if (prices.salePrice != null &&
                                 prices.salePrice!.isNotEmpty &&
@@ -388,9 +402,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                                 ),
                                 textStyle: OsmeaTextStyle.bodySmall(context)
                                     .copyWith(
-                                  color: OsmeaColors.pewter,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
+                                      color: OsmeaColors.pewter,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
                               ),
                             ],
                           ],
@@ -403,7 +417,6 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
           ),
 
           // Week Star intentionally disabled for Deals of Day.
-
         ],
       ),
     );
