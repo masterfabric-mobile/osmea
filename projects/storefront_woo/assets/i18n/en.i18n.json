@@ -216,6 +216,7 @@
             "failed": "Failed to share product",
             "error": "Error sharing product"
         },
+        "discount": "{percentage}% Sale",
         "unknownProduct": "Unknown Product"
     },
     "productListView": {

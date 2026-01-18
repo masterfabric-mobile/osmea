@@ -76,7 +76,7 @@ class ActionSection extends StatelessWidget {
                   OsmeaComponents.sizedBox(height: context.spacing2),
                   // Discount percentage
                   OsmeaComponents.text(
-                    _calculateDiscountPercentage(prices),
+                    _calculateDiscountPercentage(context, prices),
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                       color: OsmeaColors.black,
                       fontWeight: FontWeight.w600,
@@ -185,7 +185,10 @@ class ActionSection extends StatelessWidget {
   }
 
   /// Calculates discount percentage
-  String _calculateDiscountPercentage(product_models.Prices? prices) {
+  String _calculateDiscountPercentage(
+    BuildContext context,
+    product_models.Prices? prices,
+  ) {
     if (prices == null) return '';
     try {
       final regularPrice =
@@ -211,7 +214,10 @@ class ActionSection extends StatelessWidget {
       if (regularPrice > 0 && salePrice < regularPrice) {
         final discount = ((regularPrice - salePrice) / regularPrice * 100)
             .round();
-        return '%$discount İndirim';
+        return context.t.productDetailView.discount.replaceAll(
+          '{percentage}',
+          discount.toString(),
+        );
       }
     } catch (e) {
       debugPrint('⚠️ Error calculating discount: $e');

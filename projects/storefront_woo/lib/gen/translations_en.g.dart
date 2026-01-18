@@ -152,6 +152,9 @@ class TranslationsProductDetailViewEn {
 	late final TranslationsProductDetailViewDescriptionEn description = TranslationsProductDetailViewDescriptionEn._(_root);
 	late final TranslationsProductDetailViewShareEn share = TranslationsProductDetailViewShareEn._(_root);
 
+	/// en: '{percentage}% Sale'
+	String get discount => TranslationOverrides.string(_root.$meta, 'productDetailView.discount', {}) ?? '{percentage}% Sale';
+
 	/// en: 'Unknown Product'
 	String get unknownProduct => TranslationOverrides.string(_root.$meta, 'productDetailView.unknownProduct', {}) ?? 'Unknown Product';
 }
@@ -168,6 +171,7 @@ class TranslationsProductListViewEn {
 	late final TranslationsProductListViewSortEn sort = TranslationsProductListViewSortEn._(_root);
 	late final TranslationsProductListViewFiltersEn filters = TranslationsProductListViewFiltersEn._(_root);
 	late final TranslationsProductListViewEmptyEn empty = TranslationsProductListViewEmptyEn._(_root);
+	late final TranslationsProductListViewWishlistEn wishlist = TranslationsProductListViewWishlistEn._(_root);
 	late final TranslationsProductListViewWidgetsEn widgets = TranslationsProductListViewWidgetsEn._(_root);
 }
 
@@ -716,6 +720,21 @@ class TranslationsProductListViewEmptyEn {
 
 	/// en: 'Clear all filters'
 	String get clearAll => TranslationOverrides.string(_root.$meta, 'productListView.empty.clearAll', {}) ?? 'Clear all filters';
+}
+
+// Path: productListView.wishlist
+class TranslationsProductListViewWishlistEn {
+	TranslationsProductListViewWishlistEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Added to favorites'
+	String get added => TranslationOverrides.string(_root.$meta, 'productListView.wishlist.added', {}) ?? 'Added to favorites';
+
+	/// en: 'Removed from favorites'
+	String get removed => TranslationOverrides.string(_root.$meta, 'productListView.wishlist.removed', {}) ?? 'Removed from favorites';
 }
 
 // Path: productListView.widgets
@@ -1439,6 +1458,7 @@ extension on Translations {
 			'productDetailView.description.details' => TranslationOverrides.string(_root.$meta, 'productDetailView.description.details', {}) ?? 'Details',
 			'productDetailView.share.failed' => TranslationOverrides.string(_root.$meta, 'productDetailView.share.failed', {}) ?? 'Failed to share product',
 			'productDetailView.share.error' => TranslationOverrides.string(_root.$meta, 'productDetailView.share.error', {}) ?? 'Error sharing product',
+			'productDetailView.discount' => TranslationOverrides.string(_root.$meta, 'productDetailView.discount', {}) ?? '{percentage}% Sale',
 			'productDetailView.unknownProduct' => TranslationOverrides.string(_root.$meta, 'productDetailView.unknownProduct', {}) ?? 'Unknown Product',
 			'productListView.appBar.title' => TranslationOverrides.string(_root.$meta, 'productListView.appBar.title', {}) ?? 'Products',
 			'productListView.appBar.backTooltip' => TranslationOverrides.string(_root.$meta, 'productListView.appBar.backTooltip', {}) ?? 'Back',
@@ -1453,6 +1473,8 @@ extension on Translations {
 			'productListView.empty.title' => TranslationOverrides.string(_root.$meta, 'productListView.empty.title', {}) ?? 'No products found',
 			'productListView.empty.message' => TranslationOverrides.string(_root.$meta, 'productListView.empty.message', {}) ?? 'Try adjusting your filters or search terms',
 			'productListView.empty.clearAll' => TranslationOverrides.string(_root.$meta, 'productListView.empty.clearAll', {}) ?? 'Clear all filters',
+			'productListView.wishlist.added' => TranslationOverrides.string(_root.$meta, 'productListView.wishlist.added', {}) ?? 'Added to favorites',
+			'productListView.wishlist.removed' => TranslationOverrides.string(_root.$meta, 'productListView.wishlist.removed', {}) ?? 'Removed from favorites',
 			'productListView.widgets.chips.onSale' => TranslationOverrides.string(_root.$meta, 'productListView.widgets.chips.onSale', {}) ?? 'On Sale',
 			'productListView.widgets.chips.featured' => TranslationOverrides.string(_root.$meta, 'productListView.widgets.chips.featured', {}) ?? 'Featured',
 			'productListView.widgets.chips.clearAll' => TranslationOverrides.string(_root.$meta, 'productListView.widgets.chips.clearAll', {}) ?? 'Clear all',
