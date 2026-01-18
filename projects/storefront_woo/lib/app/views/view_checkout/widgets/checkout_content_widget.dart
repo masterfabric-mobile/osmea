@@ -29,6 +29,113 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   final _formKey = GlobalKey<FormState>();
   final _configHelper = AssetConfigHelper();
 
+  /// Storage scope for checkout form persistence.
+  ///
+  /// Without scoping, checkout form fields can leak between users after sign in/sign out
+  /// because the same local-storage keys are reused.
+  ///
+  /// Scope priority:
+  /// - authenticated email (preferred)
+  /// - authenticated user id (fallback if present)
+  /// - 'guest'
+  String _checkoutStorageScope() {
+    try {
+      final authCubit = GetIt.I<AuthCubit>();
+      final s = authCubit.state;
+      if (s is AuthAuthenticatedState && s.userData != null) {
+        final userData = s.userData!;
+
+        final email = (userData['email'] as String?)?.trim();
+        if (email != null && email.isNotEmpty) {
+          final normalized = email.toLowerCase();
+          final safe = normalized.replaceAll(RegExp(r'[^a-z0-9@._-]'), '_');
+          return 'email_$safe';
+        }
+
+        final id = userData['id'] ?? userData['user_id'] ?? userData['userId'];
+        if (id != null) {
+          final safe = id.toString().replaceAll(RegExp(r'[^a-z0-9._-]'), '_');
+          if (safe.isNotEmpty) return 'user_$safe';
+        }
+
+        // Authenticated, but no stable identifier found.
+        return 'auth';
+      }
+    } catch (_) {
+      // Ignore and fallback to guest
+    }
+    return 'guest';
+  }
+
+  /// Builds a scoped key for checkout persistence.
+  /// Example:
+  /// - legacy: checkout_billing_first_name
+  /// - scoped: checkout_email_xxx_billing_first_name
+  String _scopedCheckoutKey(String legacyKey) {
+    const prefix = 'checkout_';
+    if (!legacyKey.startsWith(prefix)) return legacyKey;
+    final scope = _checkoutStorageScope();
+    return legacyKey.replaceFirst(prefix, '${prefix}${scope}_');
+  }
+
+  Future<String?> _getLegacyCheckoutValue(
+    LocalStorageHelper storage,
+    String legacyKey,
+  ) async {
+    return await storage.getItem(legacyKey);
+  }
+
+  Future<String?> _getScopedCheckoutValue(
+    LocalStorageHelper storage,
+    String legacyKey,
+  ) async {
+    return await storage.getItem(_scopedCheckoutKey(legacyKey));
+  }
+
+  /// Reads checkout value with scope-first strategy.
+  ///
+  /// For authenticated scope, legacy keys are only used if legacy billing email matches
+  /// current user email (prevents cross-user leakage from older app versions).
+  Future<String?> _readCheckoutValueWithLegacyFallback(
+    LocalStorageHelper storage, {
+    required String legacyKey,
+    String? currentUserEmail,
+  }) async {
+    // 1) Scoped first
+    final scoped = await _getScopedCheckoutValue(storage, legacyKey);
+    if (scoped != null) return scoped;
+
+    // 2) Legacy (only if safe)
+    final scope = _checkoutStorageScope();
+    if (scope == 'guest') {
+      final legacy = await _getLegacyCheckoutValue(storage, legacyKey);
+      // Migrate legacy -> guest scoped for future reads, then optionally clean legacy.
+      if (legacy != null) {
+        await storage.setItem(_scopedCheckoutKey(legacyKey), legacy);
+        await storage.removeItem(legacyKey);
+      }
+      return legacy;
+    }
+
+    // Authenticated: only accept legacy values if they match the current user's email.
+    final email = currentUserEmail?.trim().toLowerCase();
+    if (email != null && email.isNotEmpty) {
+      final legacyBillingEmail =
+          (await _getLegacyCheckoutValue(storage, 'checkout_billing_email'))
+              ?.trim()
+              .toLowerCase();
+      if (legacyBillingEmail == email) {
+        final legacy = await _getLegacyCheckoutValue(storage, legacyKey);
+        if (legacy != null) {
+          await storage.setItem(_scopedCheckoutKey(legacyKey), legacy);
+        }
+        return legacy;
+      }
+    }
+
+    return null;
+  }
+
   /// Get color from config
   Color _getColorFromConfig(String key, Color fallback) {
     try {
@@ -115,53 +222,118 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
       final storage = LocalStorageHelper();
       await storage.init();
 
+      String? currentUserEmail;
+      try {
+        currentUserEmail = _billingEmailController.text.trim().isNotEmpty
+            ? _billingEmailController.text.trim()
+            : null;
+      } catch (_) {}
+
       // Load billing address
-      final billingFirstName = await storage.getItem(
-        'checkout_billing_first_name',
+      final billingFirstName = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_first_name',
+        currentUserEmail: currentUserEmail,
       );
-      final billingLastName = await storage.getItem(
-        'checkout_billing_last_name',
+      final billingLastName = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_last_name',
+        currentUserEmail: currentUserEmail,
       );
-      final billingEmail = await storage.getItem('checkout_billing_email');
-      final billingPhone = await storage.getItem('checkout_billing_phone');
-      final billingAddress1 = await storage.getItem(
-        'checkout_billing_address_1',
+      final billingEmail = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_email',
+        currentUserEmail: currentUserEmail,
       );
-      final billingAddress2 = await storage.getItem(
-        'checkout_billing_address_2',
+      final billingPhone = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_phone',
+        currentUserEmail: currentUserEmail,
       );
-      final billingCity = await storage.getItem('checkout_billing_city');
-      final billingState = await storage.getItem('checkout_billing_state');
-      final billingPostcode = await storage.getItem(
-        'checkout_billing_postcode',
+      final billingAddress1 = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_address_1',
+        currentUserEmail: currentUserEmail,
       );
-      final billingCountry = await storage.getItem('checkout_billing_country');
+      final billingAddress2 = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_address_2',
+        currentUserEmail: currentUserEmail,
+      );
+      final billingCity = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_city',
+        currentUserEmail: currentUserEmail,
+      );
+      final billingState = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_state',
+        currentUserEmail: currentUserEmail,
+      );
+      final billingPostcode = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_postcode',
+        currentUserEmail: currentUserEmail,
+      );
+      final billingCountry = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_billing_country',
+        currentUserEmail: currentUserEmail,
+      );
 
       // Load shipping address
-      final shippingFirstName = await storage.getItem(
-        'checkout_shipping_first_name',
+      final shippingFirstName = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_first_name',
+        currentUserEmail: currentUserEmail,
       );
-      final shippingLastName = await storage.getItem(
-        'checkout_shipping_last_name',
+      final shippingLastName = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_last_name',
+        currentUserEmail: currentUserEmail,
       );
-      final shippingPhone = await storage.getItem('checkout_shipping_phone');
-      final shippingAddress1 = await storage.getItem(
-        'checkout_shipping_address_1',
+      final shippingPhone = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_phone',
+        currentUserEmail: currentUserEmail,
       );
-      final shippingAddress2 = await storage.getItem(
-        'checkout_shipping_address_2',
+      final shippingAddress1 = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_address_1',
+        currentUserEmail: currentUserEmail,
       );
-      final shippingCity = await storage.getItem('checkout_shipping_city');
-      final shippingState = await storage.getItem('checkout_shipping_state');
-      final shippingPostcode = await storage.getItem(
-        'checkout_shipping_postcode',
+      final shippingAddress2 = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_address_2',
+        currentUserEmail: currentUserEmail,
       );
-      final shippingCountry = await storage.getItem(
-        'checkout_shipping_country',
+      final shippingCity = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_city',
+        currentUserEmail: currentUserEmail,
+      );
+      final shippingState = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_state',
+        currentUserEmail: currentUserEmail,
+      );
+      final shippingPostcode = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_postcode',
+        currentUserEmail: currentUserEmail,
+      );
+      final shippingCountry = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_shipping_country',
+        currentUserEmail: currentUserEmail,
       );
 
       // Load same as billing preference
-      final sameAsBilling = await storage.getItem('checkout_same_as_billing');
+      final sameAsBilling = await _readCheckoutValueWithLegacyFallback(
+        storage,
+        legacyKey: 'checkout_same_as_billing',
+        currentUserEmail: currentUserEmail,
+      );
 
       // Restore billing address
       if (billingFirstName != null)
@@ -224,87 +396,87 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
 
       // Save billing address
       await storage.setItem(
-        'checkout_billing_first_name',
+        _scopedCheckoutKey('checkout_billing_first_name'),
         _billingFirstNameController.text,
       );
       await storage.setItem(
-        'checkout_billing_last_name',
+        _scopedCheckoutKey('checkout_billing_last_name'),
         _billingLastNameController.text,
       );
       await storage.setItem(
-        'checkout_billing_email',
+        _scopedCheckoutKey('checkout_billing_email'),
         _billingEmailController.text,
       );
       await storage.setItem(
-        'checkout_billing_phone',
+        _scopedCheckoutKey('checkout_billing_phone'),
         _billingPhoneController.text,
       );
       await storage.setItem(
-        'checkout_billing_address_1',
+        _scopedCheckoutKey('checkout_billing_address_1'),
         _billingAddress1Controller.text,
       );
       await storage.setItem(
-        'checkout_billing_address_2',
+        _scopedCheckoutKey('checkout_billing_address_2'),
         _billingAddress2Controller.text,
       );
       await storage.setItem(
-        'checkout_billing_city',
+        _scopedCheckoutKey('checkout_billing_city'),
         _billingCityController.text,
       );
       await storage.setItem(
-        'checkout_billing_state',
+        _scopedCheckoutKey('checkout_billing_state'),
         _billingStateController.text,
       );
       await storage.setItem(
-        'checkout_billing_postcode',
+        _scopedCheckoutKey('checkout_billing_postcode'),
         _billingPostcodeController.text,
       );
       await storage.setItem(
-        'checkout_billing_country',
+        _scopedCheckoutKey('checkout_billing_country'),
         _billingCountryController.text,
       );
 
       // Save shipping address
       await storage.setItem(
-        'checkout_shipping_first_name',
+        _scopedCheckoutKey('checkout_shipping_first_name'),
         _shippingFirstNameController.text,
       );
       await storage.setItem(
-        'checkout_shipping_last_name',
+        _scopedCheckoutKey('checkout_shipping_last_name'),
         _shippingLastNameController.text,
       );
       await storage.setItem(
-        'checkout_shipping_phone',
+        _scopedCheckoutKey('checkout_shipping_phone'),
         _shippingPhoneController.text,
       );
       await storage.setItem(
-        'checkout_shipping_address_1',
+        _scopedCheckoutKey('checkout_shipping_address_1'),
         _shippingAddress1Controller.text,
       );
       await storage.setItem(
-        'checkout_shipping_address_2',
+        _scopedCheckoutKey('checkout_shipping_address_2'),
         _shippingAddress2Controller.text,
       );
       await storage.setItem(
-        'checkout_shipping_city',
+        _scopedCheckoutKey('checkout_shipping_city'),
         _shippingCityController.text,
       );
       await storage.setItem(
-        'checkout_shipping_state',
+        _scopedCheckoutKey('checkout_shipping_state'),
         _shippingStateController.text,
       );
       await storage.setItem(
-        'checkout_shipping_postcode',
+        _scopedCheckoutKey('checkout_shipping_postcode'),
         _shippingPostcodeController.text,
       );
       await storage.setItem(
-        'checkout_shipping_country',
+        _scopedCheckoutKey('checkout_shipping_country'),
         _shippingCountryController.text,
       );
 
       // Save same as billing preference
       await storage.setItem(
-        'checkout_same_as_billing',
+        _scopedCheckoutKey('checkout_same_as_billing'),
         _sameAsBilling.toString(),
       );
 
