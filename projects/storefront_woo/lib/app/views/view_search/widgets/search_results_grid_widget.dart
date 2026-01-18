@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 // Animation helpers are now imported from core
 
 class SearchResultsGridWidget extends StatefulWidget {
@@ -92,6 +93,12 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
                         onWishlistTap: () {
                           // Use shared HomeViewModel for wishlist to keep messages/state in sync
                           GetIt.I<HomeViewModel>().addProductToWishlist(productId);
+                        },
+                        onAddToCart: () async {
+                          await addToCartFromProductCard(
+                            context,
+                            productId: productId,
+                          );
                         },
                         onTap: () => context.push('/product-detail/${product.id ?? 0}'),
                       ),

@@ -192,6 +192,17 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
       );
     }
 
+    // Collections skeleton
+    if (_isEnabled(configHelper, 'collections')) {
+      components.add(
+        _SkeletonComponent(
+          orderId: _getOrderId(configHelper, 'collections'),
+          widget: _buildCollectionsSkeleton(context),
+          name: 'collections',
+        ),
+      );
+    }
+
     // Recommended section skeleton
     if (_isEnabled(configHelper, 'recommended')) {
       components.add(
@@ -685,6 +696,100 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
                 ),
               );
             },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCollectionsSkeleton(BuildContext context) {
+    final configHelper = _configHelper ?? AssetConfigHelper();
+    final horizontalPadding = _getHorizontalPadding(configHelper, 'collections');
+    final titleSpacing = _getTitleSpacing(configHelper);
+
+    final imageHeight = context.height160 + context.spacing10;
+    final tabViewHeight = imageHeight + context.height80 + context.spacing12;
+
+    return OsmeaComponents.column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header skeleton
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: _ShimmerContainer(
+            animation: _controller,
+            child: Container(
+              height: 20,
+              width: 110,
+              decoration: BoxDecoration(
+                color: OsmeaColors.grayMaterial[200],
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing6),
+        // Tab bar skeleton (underlined style)
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: OsmeaComponents.column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OsmeaComponents.row(
+                children: List.generate(3, (index) {
+                  return _ShimmerContainer(
+                    animation: _controller,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        right: index == 2 ? 0 : context.spacing16,
+                      ),
+                      height: 18,
+                      width: 90,
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.grayMaterial[200],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+              Container(
+                height: 1,
+                color: OsmeaColors.silver.withOpacity(0.35),
+              ),
+            ],
+          ),
+        ),
+        OsmeaComponents.sizedBox(height: titleSpacing),
+        // Products strip skeleton
+        SizedBox(
+          height: tabViewHeight,
+          child: OsmeaComponents.padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 2,
+              itemBuilder: (context, index) {
+                return _ShimmerContainer(
+                  animation: _controller,
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      right: index == 1 ? 0 : context.spacing16,
+                    ),
+                    width:
+                        (context.allWidth -
+                            (horizontalPadding * 2) -
+                            context.spacing16) /
+                        2,
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.grayMaterial[50],
+                      borderRadius: BorderRadius.circular(context.radiusMedium),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ],

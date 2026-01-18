@@ -7,14 +7,13 @@
  */
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
-import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
@@ -24,6 +23,7 @@ import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_
 // Animation helpers are now imported from core
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
+import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 
 /// Main content widget for product list view
 class ProductListContentWidget extends StatefulWidget {
@@ -48,9 +48,8 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   final AssetConfigHelper _configHelper = AssetConfigHelper();
   late final TextEditingController _searchController;
   late final FocusNode _searchFocusNode;
-  late final List<String> _initialSearchHistory;
-  late final ProductSearchHistoryCubit _historyCubit;
-  late final ProductService _productService;
+  Timer? _searchDebounceTimer;
+  String _lastAppliedSearch = '';
 
   @override
   void initState() {
@@ -58,9 +57,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     _scrollController.addListener(_onScroll);
     _searchController = TextEditingController(text: widget.viewModel.filters.search ?? '');
     _searchFocusNode = FocusNode();
-    _historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-    _productService = GetIt.I<ProductService>();
-    _initialSearchHistory = List<String>.from(_historyCubit.state);
   }
 
   @override
@@ -69,6 +65,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     _scrollController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _searchDebounceTimer?.cancel();
     super.dispose();
   }
 
@@ -297,16 +294,33 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         state: TextFieldState.enabled,
         showSearchIcon: true,
         showClearButton: true,
-        showSuggestions: true,
-        minQueryLength: 2,
-        maxHistoryItems: _historyCubit.maxItems,
-        initialHistory: _initialSearchHistory,
+        // User requested: don't show past searches.
+        showSuggestions: false,
         backgroundColor: OsmeaColors.white,
         borderColor: OsmeaColors.pewter,
         focusColor: _configHelper.getSearchViewFocusColor(OsmeaColors.black),
         textColor: OsmeaColors.thunder,
         hintColor: OsmeaColors.pewter,
-        suggestionProvider: _buildSuggestionProvider(),
+        suggestionProvider: null,
+        onChanged: (query) {
+          final q = query.trim();
+          // Match SearchView-like behavior: don't search for 1-char queries,
+          // and debounce live filtering to avoid too many refreshes.
+          if (q == _lastAppliedSearch) return;
+          _searchDebounceTimer?.cancel();
+          _searchDebounceTimer = Timer(
+            const Duration(milliseconds: 350),
+            () {
+              // If user cleared input, clear filter immediately.
+              if (q.isEmpty) {
+                _applySearch('');
+                return;
+              }
+              if (q.length < 2) return;
+              _applySearch(q);
+            },
+          );
+        },
         onSearch: (query) {
           _applySearch(query);
         },
@@ -321,66 +335,14 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     );
   }
 
-  Future<List<String>> Function(String query) _buildSuggestionProvider() {
-    return (query) async {
-      final q = query.trim();
-      if (q.isEmpty) return const <String>[];
-
-      final lc = q.toLowerCase();
-
-      final historyMatches = _historyCubit.history
-          .where((h) => h.toLowerCase().contains(lc))
-          .take(5)
-          .toList();
-
-      final localProductMatches = widget.state.products
-          .map((p) => (p.name ?? '').trim())
-          .where((name) => name.isNotEmpty && name.toLowerCase().contains(lc))
-          .take(5)
-          .toList();
-
-      final combined = <String>[...historyMatches, ...localProductMatches];
-
-      // Remote enrichment (keep it light)
-      if (combined.length < 8 && q.length >= 3) {
-        try {
-          final remote = await _productService.listAllProducts(
-            apiVersion: 'v1',
-            search: q,
-            page: 1,
-            perPage: 10,
-          );
-          for (final p in remote) {
-            final name = (p.name ?? '').trim();
-            if (name.isEmpty) continue;
-            combined.add(name);
-          }
-        } catch (e) {
-          // suggestions are best-effort
-          debugPrint('⚠️ SuggestionProvider remote failed: $e');
-        }
-      }
-
-      // Uniq + limit
-      final seen = <String>{};
-      final out = <String>[];
-      for (final item in combined) {
-        final key = item.toLowerCase();
-        if (seen.add(key)) out.add(item);
-        if (out.length >= 10) break;
-      }
-      return out;
-    };
-  }
-
   void _applySearch(String query) {
     final q = query.trim();
+    _lastAppliedSearch = q;
     if (q.isEmpty) {
       widget.viewModel.updateFilter(search: null);
       return;
     }
 
-    _historyCubit.addQuery(q);
     widget.viewModel.updateFilter(search: q);
   }
 
@@ -996,9 +958,19 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                     final wishlistVm = GetIt.I<WishlistViewModel>();
                     final currentIsSaved = wishlistVm.isSaved(productId);
 
+                    final Set<ProductCardBadge> badges = {};
+                    // Flash sale badge for products list (on sale items)
+                    if (product.onSale == true) {
+                      badges.add(ProductCardBadge.flashSale);
+                    }
+                    // Week star is handled inside ProductCardWidget via config
+                    // (product_card.badges.week_star.product_ids)
+
                     return ProductCardWidget(
                       product: product,
                       isSaved: currentIsSaved,
+                      badges: badges,
+                      allowWeekStarBadge: true,
                       onWishlistTap: () async {
                         try {
                           final wasSaved = wishlistVm.isSaved(productId);
@@ -1049,6 +1021,12 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                             );
                           }
                         }
+                      },
+                      onAddToCart: () async {
+                        await addToCartFromProductCard(
+                          context,
+                          productId: productId,
+                        );
                       },
                       onTap: () => context.push('/product-detail/$productId'),
                     );

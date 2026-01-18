@@ -14,6 +14,7 @@ import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/p
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 
 /// Related products widget
 class RelatedProductsWidget extends StatefulWidget {
@@ -162,6 +163,12 @@ class _RelatedProductsWidgetState extends State<RelatedProductsWidget> {
                           onSale: product.onSale == true,
                         );
                         await wishlistVm.toggle(item);
+                      },
+                      onAddToCart: () async {
+                        await addToCartFromProductCard(
+                          context,
+                          productId: productId,
+                        );
                       },
                       onTap: () {
                         // Navigate to product detail - use push to stay in navigation stack

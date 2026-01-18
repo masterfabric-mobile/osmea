@@ -13,7 +13,6 @@ import 'package:storefront_woo/app/views/view_campaign/campaign_view.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/favorite_categories_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
-import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -138,7 +137,6 @@ final GoRouter appRouter = GoRouter(
             // Extract query and fromHome flag from URL if present
             final query = state.uri.queryParameters['query'];
             final fromHome = state.uri.queryParameters['fromHome'] == 'true';
-            final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
 
             return CustomTransitionPage(
               child: _AutoFocusSearchView(
@@ -174,46 +172,10 @@ final GoRouter appRouter = GoRouter(
                     return [];
                   }
                 },
-                searchSuggestionProvider: (query) async {
-                  final q = query.trim();
-                  if (q.isEmpty) return const <String>[];
-
-                  final lc = q.toLowerCase();
-                  final out = <String>[];
-                  final seen = <String>{};
-
-                  // Recent searches first
-                  for (final item in historyCubit.history) {
-                    if (!item.toLowerCase().contains(lc)) continue;
-                    if (seen.add(item.toLowerCase())) out.add(item);
-                    if (out.length >= 6) break;
-                  }
-
-                  // Remote product name suggestions
-                  if (out.length < 10 && q.length >= 3) {
-                    try {
-                      final productService = GetIt.I<ProductService>();
-                      final products = await productService.listAllProducts(
-                        apiVersion: 'v1',
-                        search: q,
-                        page: 1,
-                        perPage: 10,
-                      );
-                      for (final p in products) {
-                        final name = (p.name ?? '').trim();
-                        if (name.isEmpty) continue;
-                        final key = name.toLowerCase();
-                        if (seen.add(key)) out.add(name);
-                        if (out.length >= 10) break;
-                      }
-                    } catch (_) {
-                      // best-effort
-                    }
-                  }
-
-                  return out;
-                },
-                initialHistory: historyCubit.history,
+                // No local search history suggestions.
+                // (User requested: don't show past searches.)
+                searchSuggestionProvider: null,
+                initialHistory: const [],
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -403,26 +365,25 @@ final GoRouter appRouter = GoRouter(
                     }
                   },
                   onSignOut: () async {
+                    // Capture router instance early so we can navigate even if the
+                    // original BuildContext becomes unmounted during async cleanup.
+                    final router = GoRouter.of(context);
+
                     // AccountCubit handles its own state clearing
                     // Platform-specific cleanup is provided via callback
                     await accountCubit.signOut(
                       onSignOut: () async {
-                        // Platform-specific cleanup: cookies, wishlist, cart tokens, AuthCubit
+                        // Platform-specific cleanup: cookies, wishlist, cart tokens, Woo JWT
+                        //
+                        // NOTE: Do NOT call AuthCubit.signOut() here.
+                        // Core AccountWidget already signs out AuthCubit as part of the
+                        // comprehensive sign-out flow. Calling it here can cause duplicate
+                        // state transitions and intermittent navigation issues.
                         debugPrint(
                           '🚪 Route: Starting platform-specific cleanup...',
                         );
 
-                        // Step 1: Sign out from AuthCubit
-                        try {
-                          await authCubit.signOut();
-                          debugPrint('✅ Route: AuthCubit signed out');
-                        } catch (e) {
-                          debugPrint(
-                            '⚠️ Route: Failed to sign out from AuthCubit: $e',
-                          );
-                        }
-
-                        // Step 2: Clear WooCommerce JWT token
+                        // Step 1: Clear WooCommerce JWT token
                         try {
                           await WooJwtTokenStorage.clearToken();
                           debugPrint('✅ Route: WooJWT token cleared');
@@ -432,7 +393,7 @@ final GoRouter appRouter = GoRouter(
                           );
                         }
 
-                        // Step 3: Clear cart token
+                        // Step 2: Clear cart token
                         try {
                           await WooCartTokenStorage.clearCartToken();
                           debugPrint('✅ Route: WooCartToken cleared');
@@ -442,7 +403,7 @@ final GoRouter appRouter = GoRouter(
                           );
                         }
 
-                        // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+                        // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
                         try {
                           await ApiDioClient.clearAllCookies();
                           debugPrint(
@@ -452,7 +413,7 @@ final GoRouter appRouter = GoRouter(
                           debugPrint('⚠️ Route: Failed to clear cookies: $e');
                         }
 
-                        // Step 5: Clear wishlist (user-specific data)
+                        // Step 4: Clear wishlist (user-specific data)
                         try {
                           final wishlistViewModel =
                               GetIt.I<WishlistViewModel>();
@@ -468,19 +429,12 @@ final GoRouter appRouter = GoRouter(
                       },
                     );
 
-                    // Step 5: Navigate to home after sign out
-                    await Future.delayed(const Duration(milliseconds: 300));
-                    if (context.mounted) {
-                      debugPrint(
-                        '🔀 Route: Navigating to /home after sign out...',
-                      );
-                      context.go('/home');
-                      debugPrint('✅ Route: Navigation to /home completed');
-                    } else {
-                      debugPrint(
-                        '⚠️ Route: Context not mounted, cannot navigate',
-                      );
-                    }
+                    // Navigate to home after sign out.
+                    debugPrint(
+                      '🔀 Route: Navigating to /home after sign out...',
+                    );
+                    router.go('/home');
+                    debugPrint('✅ Route: Navigation to /home completed');
                   },
                 ),
               ),
@@ -2247,7 +2201,6 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
 
   @override
   Widget build(BuildContext context) {
-    final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
     return SearchView(
       goRoute: widget.goRoute,
       title: const Text('Search Products'),
@@ -2258,12 +2211,11 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
       showTitle: true,
       titleAlignment: AppBarTitleAlignment.center,
       showSearchIcon: true,
+      // Don't show search history.
+      maxHistoryItems: 0,
       searchSuggestionProvider: widget.searchSuggestionProvider,
       initialHistory: widget.initialHistory,
-      onSearchSubmitted: (query) {
-        // Persist only committed searches (submit / search / suggestion select).
-        historyCubit.addQuery(query);
-      },
+      onSearchSubmitted: null,
       onBackPressed: () => widget.goRoute('/home'),
       searchProvider: widget.searchProvider,
       resultBuilder: (context, results) {

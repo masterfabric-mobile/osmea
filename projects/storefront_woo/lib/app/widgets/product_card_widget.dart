@@ -7,29 +7,82 @@
  */
 
 import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/material.dart' as FlutterMaterial show Image;
+import 'package:flutter/material.dart' as flutter_material show Image;
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
     hide Image;
 import 'package:core/core.dart';
 // Animation helpers are now imported from core
 
+enum ProductCardBadge { flashSale, weekStar }
+
 /// Product card widget - matches home recommended section design
-class ProductCardWidget extends StatelessWidget {
+class ProductCardWidget extends StatefulWidget {
   final ListAllProductsResponseModel product;
   final VoidCallback onWishlistTap;
   final VoidCallback onTap;
+  final Future<void> Function()? onAddToCart;
   final bool isSaved; // Wishlist status passed from parent
+  final Set<ProductCardBadge> badges;
+
+  /// Controls whether the "Week Star" badge is allowed to render in this context.
+  /// We intentionally keep this disabled for home sections (e.g. Deals of Day).
+  final bool allowWeekStarBadge;
 
   const ProductCardWidget({
     super.key,
     required this.product,
     required this.onWishlistTap,
     required this.onTap,
+    this.onAddToCart,
     this.isSaved = false,
+    this.badges = const {},
+    this.allowWeekStarBadge = false,
   });
 
   @override
+  State<ProductCardWidget> createState() => _ProductCardWidgetState();
+}
+
+class _ProductCardWidgetState extends State<ProductCardWidget> {
+  PageController? _pageController;
+  int _currentImageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final imageCount = widget.product.images?.length ?? 0;
+    if (imageCount > 1) {
+      _pageController = PageController();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldCount = oldWidget.product.images?.length ?? 0;
+    final newCount = widget.product.images?.length ?? 0;
+
+    if (oldCount <= 1 && newCount > 1) {
+      _pageController ??= PageController();
+    } else if (oldCount > 1 && newCount <= 1) {
+      _pageController?.dispose();
+      _pageController = null;
+      _currentImageIndex = 0;
+    } else if (_currentImageIndex >= newCount && newCount > 0) {
+      _currentImageIndex = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+    final configHelper = AssetConfigHelper();
     final prices = product.prices;
     final bool hasSale =
         product.onSale == true &&
@@ -60,15 +113,62 @@ class ProductCardWidget extends StatelessWidget {
       }
     }
 
+    // Week Star badge: ONLY products defined in app config.
+    final weekStarConfig =
+        configHelper.getObject('product_card.badges.week_star') ?? const {};
+    final weekStarIds =
+        (weekStarConfig['product_ids'] as List<dynamic>?) ?? const [];
+    final weekStarIdSet = weekStarIds
+        .map((e) => int.tryParse(e.toString()) ?? -1)
+        .where((id) => id > 0)
+        .toSet();
+    final shouldShowWeekStar =
+        widget.allowWeekStarBadge &&
+        weekStarIdSet.isNotEmpty &&
+        weekStarIdSet.contains(product.id);
+
+    final flashEnabled = configHelper.getBool(
+      'product_card.badges.flash_sale.enabled',
+      true,
+    );
+    final flashAuto = configHelper.getBool(
+      'product_card.badges.flash_sale.auto',
+      true,
+    );
+    final flashMinDiscount = configHelper.getInt(
+      'product_card.badges.flash_sale.min_discount_percent',
+      0,
+    );
+    final flashLabel = configHelper.getString(
+      'product_card.badges.flash_sale.label',
+      'FLASH',
+    );
+    // Flash sale badge logic: ONLY when discount percent >= configured threshold.
+    final meetsMinDiscount =
+        discountPct != null && (discountPct >= flashMinDiscount);
+    final flashFromAuto =
+        flashEnabled &&
+        flashAuto &&
+        (product.onSale == true) &&
+        meetsMinDiscount;
+    // If a product is both Week Star and Flash, only show Week Star.
+    final shouldShowFlashSale =
+        flashEnabled && flashFromAuto && !shouldShowWeekStar;
+
+    final colorCount = _getColorOptionsCount(product);
+    final showColorCountBadge = colorCount > 1;
+
+    final imageHeight = context.height160 + context.spacing10;
+
     return AnimatedCard(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           // Image container
           Container(
-            height: context.height160 + context.spacing10,
+            height: imageHeight,
             decoration: BoxDecoration(
               color: OsmeaColors.grayMaterial[50],
               borderRadius: context.borderRadiusNormal,
@@ -78,78 +178,139 @@ class ProductCardWidget extends StatelessWidget {
                 // Product image with Hero animation
                 ClipRRect(
                   borderRadius: context.borderRadiusNormal,
-                  child: product.images?.isNotEmpty == true
-                      ? Hero(
-                          tag: 'product-image-${product.id ?? 0}',
-                          child: FlutterMaterial.Image.network(
-                            product.images!.first.src ?? '',
-                            width: double.infinity,
-                            height: context.height160 + context.spacing10,
-                            fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: double.infinity,
-                              height: context.height160 + context.spacing10,
-                              color: OsmeaColors.grayMaterial[50],
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.image_outlined,
-                                color: OsmeaColors.grayMaterial[400],
-                                size: context.iconSizeExtraHigh,
-                              ),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              width: double.infinity,
-                              height: context.height160 + context.spacing10,
-                              color: OsmeaColors.grayMaterial[50],
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator(
-                                strokeWidth: context.width2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  _getLoadingIndicatorColor(context),
-                                ),
-                              ),
-                            );
-                          },
-                          ),
-                        )
-                      : Container(
-                          width: double.infinity,
-                          height: context.height160 + context.spacing10,
-                          color: OsmeaColors.grayMaterial[50],
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: OsmeaColors.grayMaterial[400],
-                            size: context.iconSizeExtraHigh,
-                          ),
-                        ),
+                  child: _buildImageArea(context, product),
                 ),
-                // Discount badge - top left (only when API marks onSale)
-                if (product.onSale == true && discountPct != null)
+                // Badges - top left (week star / flash sale / discount)
+                if (shouldShowWeekStar ||
+                    shouldShowFlashSale ||
+                    (product.onSale == true && discountPct != null))
                   Positioned(
                     top: context.spacing8,
                     left: context.spacing8,
-                    child: OsmeaComponents.container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.spacing6,
-                        vertical: context.spacing2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getDiscountBadgeBackgroundColor(context),
-                        borderRadius: BorderRadius.circular(context.spacing6),
-                      ),
-                      child: OsmeaComponents.text(
-                        '$discountPct% OFF',
-                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: _getDiscountBadgeTextColor(context),
-                          fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                    child: OsmeaComponents.column(
+                      crossAxisAlignment: context.crossStart,
+                      children: [
+                        if (shouldShowWeekStar)
+                          Container(
+                            width: context.width48,
+                            height: context.height48,
+                            decoration: BoxDecoration(
+                              color: OsmeaColors.black,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: OsmeaColors.white,
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: OsmeaColors.black.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  blurRadius: context.blurRadius8,
+                                  offset: context.offsetVerticalCustom(
+                                    context.spacing2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: OsmeaComponents.column(
+                              mainAxisAlignment: context.centerMain,
+                              children: [
+                                Icon(
+                                  Icons.star_rounded,
+                                  size: context.iconSizeSmall,
+                                  color: OsmeaColors.white,
+                                ),
+                                OsmeaComponents.text(
+                                  'WEEK',
+                                  textStyle: OsmeaTextStyle.bodySmall(context)
+                                      .copyWith(
+                                        color: OsmeaColors.white,
+                                        fontSize:
+                                            context.fontSizeExtraSmall * 0.8,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.0,
+                                        letterSpacing: 0.6,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (shouldShowWeekStar)
+                          OsmeaComponents.sizedBox(height: context.spacing6),
+                        if (shouldShowFlashSale)
+                          Container(
+                            width: context.width48,
+                            height: context.height48,
+                            decoration: BoxDecoration(
+                              color: OsmeaColors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: OsmeaColors.black,
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: OsmeaColors.black.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  blurRadius: context.blurRadius8,
+                                  offset: context.offsetVerticalCustom(
+                                    context.spacing2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: OsmeaComponents.column(
+                              mainAxisAlignment: context.centerMain,
+                              children: [
+                                Icon(
+                                  Icons.flash_on_rounded,
+                                  size: context.iconSizeSmall,
+                                  color: OsmeaColors.black,
+                                ),
+                                OsmeaComponents.text(
+                                  flashLabel,
+                                  textStyle: OsmeaTextStyle.bodySmall(context)
+                                      .copyWith(
+                                        color: OsmeaColors.black,
+                                        fontSize:
+                                            context.fontSizeExtraSmall * 0.72,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.0,
+                                        letterSpacing: 0.7,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (shouldShowFlashSale)
+                          OsmeaComponents.sizedBox(height: context.spacing6),
+                        if (product.onSale == true && discountPct != null)
+                          OsmeaComponents.container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.spacing6,
+                              vertical: context.spacing2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getDiscountBadgeBackgroundColor(context),
+                              borderRadius: BorderRadius.circular(
+                                context.spacing6,
+                              ),
+                            ),
+                            child: OsmeaComponents.text(
+                              '$discountPct% OFF',
+                              textStyle: OsmeaTextStyle.bodySmall(context)
+                                  .copyWith(
+                                    color: _getDiscountBadgeTextColor(context),
+                                    fontSize:
+                                        context.fontSizeExtraSmall *
+                                        context.textScaleFactor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 // Wishlist button - top right with animation
@@ -157,7 +318,7 @@ class ProductCardWidget extends StatelessWidget {
                   top: context.spacing8,
                   right: context.spacing8,
                   child: AnimatedButton(
-                    onPressed: onWishlistTap,
+                    onPressed: widget.onWishlistTap,
                     child: OsmeaComponents.container(
                       width: context.iconSizeNormal * 1.25,
                       height: context.iconSizeNormal * 1.25,
@@ -170,15 +331,119 @@ class ProductCardWidget extends StatelessWidget {
                         ),
                       ),
                       child: Icon(
-                        isSaved ? Icons.favorite : Icons.favorite_border,
+                        widget.isSaved ? Icons.favorite : Icons.favorite_border,
                         size: context.iconSizeExtraSmall,
-                        color: isSaved
+                        color: widget.isSaved
                             ? _getWishlistIconSavedColor(context)
                             : _getWishlistIconUnsavedColor(context),
                       ),
                     ),
                   ),
                 ),
+
+                // Multi-image indicator (small dots)
+                // Multi-image indicator (bottom-center)
+                if ((product.images?.length ?? 0) > 1)
+                  Positioned(
+                    bottom: context.spacing8,
+                    left: 0,
+                    right: 0,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: OsmeaComponents.container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing8,
+                          vertical: context.spacing4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.black.withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(
+                            context.spacing24,
+                          ),
+                        ),
+                        child: OsmeaComponents.row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(
+                            product.images?.length ?? 0,
+                            (index) => OsmeaComponents.container(
+                              width: context.spacing6,
+                              height: context.spacing6,
+                              margin: EdgeInsets.symmetric(
+                                horizontal: context.spacing2,
+                              ),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: index == _currentImageIndex
+                                    ? OsmeaColors.white
+                                    : OsmeaColors.white.withValues(alpha: 0.4),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Color options count badge (right, above 1/4 of image height)
+                if (showColorCountBadge)
+                  Positioned(
+                    bottom: (imageHeight * 0.25).clamp(
+                      context.spacing8,
+                      imageHeight,
+                    ),
+                    right: context.spacing8,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final badgeTextStyle = OsmeaTextStyle.bodySmall(context)
+                            .copyWith(
+                              color: OsmeaColors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize:
+                                  context.fontSizeExtraSmall *
+                                  context.textScaleFactor,
+                            );
+
+                        // Keep badge readable on narrow cards.
+                        final isNarrow =
+                            MediaQuery.of(context).size.width < 380;
+                        final label = isNarrow
+                            ? '$colorCount'
+                            : '$colorCount colors';
+
+                        return OsmeaComponents.container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.spacing8,
+                            vertical: context.spacing4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.white.withValues(alpha: 0.92),
+                            borderRadius: BorderRadius.circular(
+                              context.spacing24,
+                            ),
+                            border: Border.all(
+                              color: OsmeaColors.silver,
+                              width: context.borderWidth,
+                            ),
+                          ),
+                          child: OsmeaComponents.row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.palette_outlined,
+                                size: context.iconSizeExtraSmall,
+                                color: OsmeaColors.black,
+                              ),
+                              OsmeaComponents.sizedBox(width: context.spacing4),
+                              OsmeaComponents.text(
+                                label,
+                                textStyle: badgeTextStyle,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
@@ -189,78 +454,178 @@ class ProductCardWidget extends StatelessWidget {
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Price
+                // Price row (top) + add-to-cart
                 if (hasSale) ...[
                   OsmeaComponents.row(
+                    crossAxisAlignment: context.crossCenter,
                     children: [
-                      OsmeaComponents.text(
-                        _formatPrice(
-                          prices?.salePrice,
-                          currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
-                          currencyMinorUnit: prices?.currencyMinorUnit,
-                        ),
-                        textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
-                          fontWeight: FontWeight.w700,
-                          color: _getSalePriceColor(context),
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.row(
+                          children: [
+                            OsmeaComponents.text(
+                              _formatPrice(
+                                prices?.salePrice,
+                                currencyCode: prices?.currencyCode,
+                                currencyDecimalSeparator:
+                                    prices?.currencyDecimalSeparator,
+                                currencyThousandSeparator:
+                                    prices?.currencyThousandSeparator,
+                                currencyMinorUnit: prices?.currencyMinorUnit,
+                              ),
+                              textStyle: OsmeaTextStyle.titleSmall(context)
+                                  .copyWith(
+                                    fontSize:
+                                        context.fontSizeExtraSmallMedium *
+                                        context.textScaleFactor,
+                                    fontWeight: FontWeight.w800,
+                                    color: _getSalePriceColor(context),
+                                  ),
+                            ),
+                            OsmeaComponents.sizedBox(width: context.spacing6),
+                            OsmeaComponents.text(
+                              _formatPrice(
+                                prices?.regularPrice,
+                                currencyCode: prices?.currencyCode,
+                                currencyDecimalSeparator:
+                                    prices?.currencyDecimalSeparator,
+                                currencyThousandSeparator:
+                                    prices?.currencyThousandSeparator,
+                                currencyMinorUnit: prices?.currencyMinorUnit,
+                              ),
+                              textStyle: OsmeaTextStyle.bodySmall(context)
+                                  .copyWith(
+                                    fontSize:
+                                        context.fontSizeSmall *
+                                        context.textScaleFactor,
+                                    color: OsmeaColors.pewter,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
-                      OsmeaComponents.sizedBox(width: context.spacing6),
-                      OsmeaComponents.text(
-                        _formatPrice(
-                          prices?.regularPrice,
-                          currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
-                          currencyMinorUnit: prices?.currencyMinorUnit,
+                      if (widget.onAddToCart != null) ...[
+                        OsmeaComponents.sizedBox(width: context.spacing8),
+                        AnimatedButton(
+                          onPressed: () async {
+                            final needsOptions =
+                                product.hasOptions == true ||
+                                (product.variations?.isNotEmpty ?? false) ||
+                                (product.type?.toLowerCase() == 'variable');
+
+                            if (needsOptions) {
+                              widget.onTap();
+                              return;
+                            }
+
+                            await widget.onAddToCart?.call();
+                          },
+                          child: OsmeaComponents.container(
+                            width: context.iconSizeNormal * 1.25,
+                            height: context.iconSizeNormal * 1.25,
+                            decoration: BoxDecoration(
+                              color: OsmeaColors.black,
+                              borderRadius: BorderRadius.circular(
+                                context.spacing24,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.add_shopping_cart_outlined,
+                              size: context.iconSizeExtraSmall,
+                              color: OsmeaColors.white,
+                            ),
+                          ),
                         ),
-                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          fontSize: context.fontSizeSmall * context.textScaleFactor,
-                          color: OsmeaColors.pewter,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                 ] else ...[
-                  OsmeaComponents.text(
-                    _formatPrice(
-                      prices?.regularPrice,
-                      currencyCode: prices?.currencyCode,
-                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                      currencyThousandSeparator: prices?.currencyThousandSeparator,
-                      currencyMinorUnit: prices?.currencyMinorUnit,
-                    ),
-                    textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                      fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
-                      fontWeight: FontWeight.w700,
-                      color: _getRegularPriceColor(context),
-                    ),
+                  OsmeaComponents.row(
+                    crossAxisAlignment: context.crossCenter,
+                    children: [
+                      OsmeaComponents.expanded(
+                        child: OsmeaComponents.text(
+                          _formatPrice(
+                            prices?.regularPrice,
+                            currencyCode: prices?.currencyCode,
+                            currencyDecimalSeparator:
+                                prices?.currencyDecimalSeparator,
+                            currencyThousandSeparator:
+                                prices?.currencyThousandSeparator,
+                            currencyMinorUnit: prices?.currencyMinorUnit,
+                          ),
+                          textStyle: OsmeaTextStyle.titleSmall(context)
+                              .copyWith(
+                                fontSize:
+                                    context.fontSizeExtraSmallMedium *
+                                    context.textScaleFactor,
+                                fontWeight: FontWeight.w800,
+                                color: _getRegularPriceColor(context),
+                              ),
+                        ),
+                      ),
+                      if (widget.onAddToCart != null) ...[
+                        OsmeaComponents.sizedBox(width: context.spacing8),
+                        AnimatedButton(
+                          onPressed: () async {
+                            final needsOptions =
+                                product.hasOptions == true ||
+                                (product.variations?.isNotEmpty ?? false) ||
+                                (product.type?.toLowerCase() == 'variable');
+
+                            if (needsOptions) {
+                              widget.onTap();
+                              return;
+                            }
+
+                            await widget.onAddToCart?.call();
+                          },
+                          child: OsmeaComponents.container(
+                            width: context.iconSizeNormal * 1.25,
+                            height: context.iconSizeNormal * 1.25,
+                            decoration: BoxDecoration(
+                              color: OsmeaColors.black,
+                              borderRadius: BorderRadius.circular(
+                                context.spacing24,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.add_shopping_cart_outlined,
+                              size: context.iconSizeExtraSmall,
+                              color: OsmeaColors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
-                OsmeaComponents.sizedBox(height: context.spacing4),
-                // Product name
+
+                // Tight spacing between price and title
+                OsmeaComponents.sizedBox(height: context.spacing2),
+
+                // Product title (below price)
                 OsmeaComponents.text(
                   product.name ?? 'Product',
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
-                    fontWeight: FontWeight.w500,
+                    fontSize:
+                        context.fontSizeExtraSmallMedium *
+                        context.textScaleFactor,
+                    fontWeight: FontWeight.w600,
                     height: 1.14,
                     color: _getProductNameColor(context),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                OsmeaComponents.sizedBox(height: context.spacing2),
                 // Description
                 if (product.shortDescription != null &&
                     product.shortDescription!.isNotEmpty)
                   OsmeaComponents.text(
                     _stripHtml(product.shortDescription!),
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                      fontSize:
+                          context.fontSizeExtraSmall * context.textScaleFactor,
                       fontWeight: FontWeight.w400,
                       height: 1.2,
                       color: _getDescriptionColor(context),
@@ -290,13 +655,15 @@ class ProductCardWidget extends StatelessWidget {
 
     // Use PriceInfoCurrencyHelper.parsePriceToDouble to properly handle formatted strings
     // Use API-provided separators and minor_unit to correctly parse the price format
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: currencyDecimalSeparator,
-      currencyThousandSeparator: currencyThousandSeparator,
-      currencyMinorUnit: currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: currencyDecimalSeparator,
+          currencyThousandSeparator: currencyThousandSeparator,
+          currencyMinorUnit: currencyMinorUnit,
+        ) ??
+        0.0;
 
     // Use API-provided separators to correctly format the price
     return PriceInfoCurrencyHelper.formatPrice(
@@ -312,6 +679,116 @@ class ProductCardWidget extends StatelessWidget {
   /// Strips HTML tags from description
   String _stripHtml(String input) {
     return input.replaceAll(RegExp(r'<[^>]*>'), '');
+  }
+
+  Widget _buildImageArea(
+    BuildContext context,
+    ListAllProductsResponseModel product,
+  ) {
+    final images = product.images ?? const [];
+    final imageCount = images.length;
+
+    if (imageCount == 0) {
+      return Container(
+        width: double.infinity,
+        height: context.height160 + context.spacing10,
+        color: OsmeaColors.grayMaterial[50],
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.image_outlined,
+          color: OsmeaColors.grayMaterial[400],
+          size: context.iconSizeExtraHigh,
+        ),
+      );
+    }
+
+    Widget buildNetworkImage(String url) {
+      return flutter_material.Image.network(
+        url,
+        width: double.infinity,
+        height: context.height160 + context.spacing10,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: double.infinity,
+            height: context.height160 + context.spacing10,
+            color: OsmeaColors.grayMaterial[50],
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.image_outlined,
+              color: OsmeaColors.grayMaterial[400],
+              size: context.iconSizeExtraHigh,
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: double.infinity,
+            height: context.height160 + context.spacing10,
+            color: OsmeaColors.grayMaterial[50],
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              strokeWidth: context.width2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _getLoadingIndicatorColor(context),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    if (imageCount == 1 || _pageController == null) {
+      return Hero(
+        tag: 'product-image-${product.id ?? 0}',
+        child: buildNetworkImage(images.first.src ?? ''),
+      );
+    }
+
+    return Hero(
+      tag: 'product-image-${product.id ?? 0}',
+      child: PageView.builder(
+        controller: _pageController,
+        itemCount: imageCount,
+        onPageChanged: (index) {
+          if (!mounted) return;
+          setState(() => _currentImageIndex = index);
+        },
+        itemBuilder: (context, index) {
+          return buildNetworkImage(images[index].src ?? '');
+        },
+      ),
+    );
+  }
+
+  int _getColorOptionsCount(ListAllProductsResponseModel product) {
+    final attrs = product.attributes;
+    if (attrs == null || attrs.isEmpty) return 0;
+
+    for (final attr in attrs) {
+      final name = (attr.name ?? '').trim().toLowerCase();
+      final taxonomy = (attr.taxonomy ?? '').trim().toLowerCase();
+
+      final isColor =
+          name.contains('color') ||
+          name.contains('colour') ||
+          name.contains('renk') ||
+          taxonomy.contains('pa_color') ||
+          taxonomy.contains('pa_colour');
+
+      if (!isColor) continue;
+
+      final terms = attr.terms ?? const [];
+      final unique = <String>{};
+      for (final t in terms) {
+        final n = (t.name ?? '').trim();
+        if (n.isNotEmpty) unique.add(n);
+      }
+      return unique.length;
+    }
+
+    return 0;
   }
 
   /// Gets loading indicator color from config

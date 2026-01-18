@@ -20,6 +20,7 @@ import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button
 import 'package:storefront_woo/app/views/view_home/widgets/promotional_bar_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/bottom_foreground_banner_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/flash_sale_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/collections_section_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/brands_section_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_alert_widget.dart';
 import 'package:go_router/go_router.dart';
@@ -208,6 +209,21 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
                 .toList(),
           ),
           name: 'deals_of_day',
+        ),
+      );
+    }
+
+    // Collections (curated groups) - between Deals and Flash Sale
+    if (_isEnabled(configHelper, 'collections')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'collections'),
+          widget: CollectionsSectionWidget(
+            configHelper: configHelper,
+            allProducts: widget.state.products,
+            viewModel: widget.viewModel,
+          ),
+          name: 'collections',
         ),
       );
     }

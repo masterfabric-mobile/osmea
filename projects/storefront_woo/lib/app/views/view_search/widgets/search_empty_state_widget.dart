@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +8,6 @@ import 'package:apis/network/remote/woocommerce/store_api/product_categories_api
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart'
     as brand_models;
-import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget to load and display categories and brands in search empty state
@@ -36,24 +34,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   String? _error;
   int _columnCount = 2; // Default to 2 columns for category grid
   bool _isListView = false; // Default to grid view
-
-  Future<void> _searchFromHistory(String query) async {
-    final q = query.trim();
-    if (q.isEmpty) return;
-    if (widget.searchCubit == null || widget.searchProvider == null) {
-      debugPrint('⚠️ SearchEmptyStateWidget: searchCubit/provider missing');
-      return;
-    }
-
-    // Persist + bump to top
-    GetIt.I<ProductSearchHistoryCubit>().addQuery(q);
-
-    await widget.searchCubit!.performSearch(
-      q,
-      searchProvider: widget.searchProvider,
-      immediate: true,
-    );
-  }
 
   @override
   void initState() {
@@ -302,59 +282,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         vertical: context.spacing10,
       ),
       children: [
-        // Recent searches (persisted)
-        BlocBuilder<ProductSearchHistoryCubit, List<String>>(
-          bloc: GetIt.I<ProductSearchHistoryCubit>(),
-          builder: (context, history) {
-            if (history.isEmpty) return const SizedBox.shrink();
-
-            return OsmeaComponents.column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                OsmeaComponents.text(
-                  'Recent searches',
-                  textStyle: OsmeaTextStyle.titleMedium(context),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing8),
-                Wrap(
-                  spacing: context.spacing8,
-                  runSpacing: context.spacing8,
-                  children: [
-                    ...history.take(8).map((q) {
-                      return OsmeaComponents.chips(
-                        text: q,
-                        variant: ChipsVariant.neutral,
-                        style: ChipsStyle.outlined,
-                        selected: false,
-                        closable: true,
-                        onTap: () => _searchFromHistory(q),
-                        onClose: () {
-                          final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-                          historyCubit.removeQuery(q);
-                          widget.searchCubit?.removeFromHistory(q);
-                        },
-                      );
-                    }),
-                    OsmeaComponents.chips(
-                      text: 'Clear',
-                      variant: ChipsVariant.neutral,
-                      style: ChipsStyle.normal,
-                      icon: const Icon(Icons.close, size: 16),
-                      iconPosition: ChipsIconPosition.start,
-                      onTap: () {
-                        final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-                        historyCubit.clearAll();
-                        widget.searchCubit?.clearHistory();
-                      },
-                    ),
-                  ],
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-              ],
-            );
-          },
-        ),
-
         // Brands section with horizontal scroll
         if (_brands.isNotEmpty) ...[
           OsmeaComponents.text(

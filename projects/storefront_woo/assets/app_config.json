@@ -676,15 +676,52 @@
             "order_id": 8,
             "title": "Deals of the Day",
             "limit": 10,
+            "product_ids": [94,188,190],
             "padding": {
                 "top": 0,
                 "bottom": 16,
                 "horizontal": 20
             }
         },
+        "collections": {
+            "enabled": true,
+            "order_id": 9,
+            "title": "Collections",
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            },
+            "items": [
+                {
+                    "id": "winter_essentials",
+                    "title": "Winter essentials",
+                    "limit": 10,
+                    "product_ids": [94, 188, 190]
+                },
+                {
+                    "id": "developer_kits",
+                    "title": "Developer kits",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "focus_work",
+                    "title": "Focus work",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "daily_favorites",
+                    "title": "Daily favorites",
+                    "limit": 10,
+                    "product_ids": [186, 194, 293]
+                }
+            ]
+        },
         "recommended": {
             "enabled": true,
-            "order_id": 10,
+            "order_id": 11,
             "title": "Recommended for you",
             "limit": 4,
             "product_ids": [],
@@ -747,7 +784,7 @@
         },
         "flash_sale": {
             "enabled": true,
-            "order_id": 9,
+            "order_id": 10,
             "title": "Flash Sale",
             "limit": 10,
             "end_time": "2026-02-01T23:59:59Z",
@@ -843,6 +880,23 @@
             "titleColor": "#000000",
             "iconColor": "#000000",
             "elevation": 0
+        },
+        "delivery": {
+            "estimated_label": "Estimated delivery",
+            "estimated_min_days": 7,
+            "estimated_max_days": 7,
+            "estimated_display": "date",
+            "date_format": "medium",
+            "estimated_date_single_template": "{date}",
+            "estimated_date_range_template": "{startDate} - {endDate}",
+            "estimated_exact_template": "{days} days later",
+            "estimated_range_template": "{minDays}-{maxDays} days",
+            "cutoff_title": "Order within",
+            "cutoff_hour": 16,
+            "cutoff_minute": 0,
+            "show_cutoff_time": false,
+            "show_cutoff_countdown": true,
+            "cutoff_affects_estimate": true
         },
         "name_and_price": {
             "enabled": true,
@@ -1021,6 +1075,19 @@
             "regular_price_color": "#000000",
             "product_name_color": "#000000",
             "description_color": "#666666"
+        }
+    },
+    "product_card": {
+        "badges": {
+            "flash_sale": {
+                "enabled": true,
+                "auto": true,
+                "min_discount_percent": 10,
+                "label": "FLASH"
+            },
+            "week_star": {
+                "product_ids": [297, 305, 96]
+            }
         }
     },
     "navbar_configuration": {
