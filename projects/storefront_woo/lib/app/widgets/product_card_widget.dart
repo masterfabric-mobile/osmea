@@ -192,62 +192,18 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                       children: [
                         if (shouldShowWeekStar)
                           Container(
-                            width: context.width48,
-                            height: context.height48,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.spacing10,
+                              vertical: context.spacing4,
+                            ),
                             decoration: BoxDecoration(
                               color: OsmeaColors.black,
-                              shape: BoxShape.circle,
+                              borderRadius: BorderRadius.circular(
+                                context.spacing6,
+                              ),
                               border: Border.all(
                                 color: OsmeaColors.white,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: OsmeaColors.black.withValues(
-                                    alpha: 0.2,
-                                  ),
-                                  blurRadius: context.blurRadius8,
-                                  offset: context.offsetVerticalCustom(
-                                    context.spacing2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            child: OsmeaComponents.column(
-                              mainAxisAlignment: context.centerMain,
-                              children: [
-                                Icon(
-                                  Icons.star_rounded,
-                                  size: context.iconSizeSmall,
-                                  color: OsmeaColors.white,
-                                ),
-                                OsmeaComponents.text(
-                                  'WEEK',
-                                  textStyle: OsmeaTextStyle.bodySmall(context)
-                                      .copyWith(
-                                        color: OsmeaColors.white,
-                                        fontSize:
-                                            context.fontSizeExtraSmall * 0.8,
-                                        fontWeight: FontWeight.w800,
-                                        height: 1.0,
-                                        letterSpacing: 0.6,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (shouldShowWeekStar)
-                          OsmeaComponents.sizedBox(height: context.spacing6),
-                        if (shouldShowFlashSale)
-                          Container(
-                            width: context.width48,
-                            height: context.height48,
-                            decoration: BoxDecoration(
-                              color: OsmeaColors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: OsmeaColors.black,
-                                width: 2,
+                                width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
@@ -261,31 +217,85 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                 ),
                               ],
                             ),
-                            child: OsmeaComponents.column(
-                              mainAxisAlignment: context.centerMain,
+                            child: OsmeaComponents.row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.star_rounded,
+                                  size: context.iconSizeExtraSmall,
+                                  color: OsmeaColors.white,
+                                ),
+                                OsmeaComponents.sizedBox(width: context.spacing4),
+                                OsmeaComponents.text(
+                                  'WEEK STAR',
+                                  textStyle: OsmeaTextStyle.bodySmall(context)
+                                      .copyWith(
+                                        color: OsmeaColors.white,
+                                        fontSize:
+                                            context.fontSizeExtraSmall * 0.82,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.0,
+                                        letterSpacing: 0.5,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (shouldShowWeekStar)
+                          OsmeaComponents.sizedBox(height: context.spacing4),
+                        if (shouldShowFlashSale)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.spacing10,
+                              vertical: context.spacing4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: OsmeaColors.white,
+                              borderRadius: BorderRadius.circular(
+                                context.spacing6,
+                              ),
+                              border: Border.all(
+                                color: OsmeaColors.black,
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: OsmeaColors.black.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  blurRadius: context.blurRadius8,
+                                  offset: context.offsetVerticalCustom(
+                                    context.spacing2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: OsmeaComponents.row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.flash_on_rounded,
-                                  size: context.iconSizeSmall,
+                                  size: context.iconSizeExtraSmall,
                                   color: OsmeaColors.black,
                                 ),
+                                OsmeaComponents.sizedBox(width: context.spacing4),
                                 OsmeaComponents.text(
                                   flashLabel,
                                   textStyle: OsmeaTextStyle.bodySmall(context)
                                       .copyWith(
                                         color: OsmeaColors.black,
                                         fontSize:
-                                            context.fontSizeExtraSmall * 0.72,
+                                            context.fontSizeExtraSmall * 0.82,
                                         fontWeight: FontWeight.w900,
                                         height: 1.0,
-                                        letterSpacing: 0.7,
+                                        letterSpacing: 0.5,
                                       ),
                                 ),
                               ],
                             ),
                           ),
                         if (shouldShowFlashSale)
-                          OsmeaComponents.sizedBox(height: context.spacing6),
+                          OsmeaComponents.sizedBox(height: context.spacing4),
                         if (product.onSale == true && discountPct != null)
                           OsmeaComponents.container(
                             padding: EdgeInsets.symmetric(
@@ -403,12 +413,8 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                   context.textScaleFactor,
                             );
 
-                        // Keep badge readable on narrow cards.
-                        final isNarrow =
-                            MediaQuery.of(context).size.width < 380;
-                        final label = isNarrow
-                            ? '$colorCount'
-                            : '$colorCount colors';
+                        // Show only the count (no "colors" text).
+                        final label = '$colorCount';
 
                         return OsmeaComponents.container(
                           padding: EdgeInsets.symmetric(
