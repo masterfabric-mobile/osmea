@@ -846,6 +846,14 @@ final GoRouter appRouter = GoRouter(
             debugPrint('✅ Sign in successful! Navigating to /home');
             context.go('/home');
           },
+          onSignInError: (String error) {
+            debugPrint('❌ Sign in error: $error');
+            // Show error snackbar to user
+            context.snackbarError(
+              'Password or email is incorrect,please try again',
+              duration: const Duration(seconds: 3),
+            );
+          },
           arguments: {
             'auth': true,
             'onSignIn': (String email, String password, {bool? rememberMe}) async {
