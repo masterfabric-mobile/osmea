@@ -123,6 +123,16 @@ PreferredSizeWidget _buildProductListAppBar(
     size: AppBarSize.standard,
     backgroundColor: backgroundColor,
     foregroundColor: foregroundColor,
+    actions: [
+      AppBarAction(
+        type: AppBarActionType.search,
+        icon: Icon(Icons.search, color: iconColor),
+        onPressed: () {
+          context.push('/search?fromHome=true');
+        },
+        tooltip: 'Search',
+      ),
+    ],
     leading: OsmeaComponents.iconButton(
       icon: Icon(Icons.arrow_back, color: iconColor),
       onPressed: () {

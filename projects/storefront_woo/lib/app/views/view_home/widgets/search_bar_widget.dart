@@ -43,9 +43,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   /// Navigates to search view with query
   void _navigateToSearch(String? query) {
     if (query != null && query.trim().isNotEmpty) {
-      context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+      context.push(
+        '/search?fromHome=true&query=${Uri.encodeComponent(query.trim())}',
+      );
     } else {
-      context.push('/search');
+      context.push('/search?fromHome=true');
     }
   }
 

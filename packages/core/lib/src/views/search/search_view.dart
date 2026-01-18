@@ -347,7 +347,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   // Trigger search if query length meets minimum requirement
                   if (query.trim().length >= minQueryLength) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider);
+                        searchProvider: searchProvider, addToHistory: false);
                   } else if (query.trim().isEmpty) {
                     viewModel.clearSearch();
                   }
@@ -474,7 +474,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   // Trigger search if query length meets minimum requirement
                   if (query.trim().length >= minQueryLength) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider);
+                        searchProvider: searchProvider, addToHistory: false);
                   } else if (query.trim().isEmpty) {
                     viewModel.clearSearch();
                   }

@@ -485,7 +485,8 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
         automaticallyImplyLeading: automaticallyImplyLeading,
         excludeHeaderSemantics: excludeHeaderSemantics,
         primary: primary,
-        scrolledUnderElevation: scrolledUnderElevation ?? (appBarElevation ?? 0),
+        scrolledUnderElevation:
+            scrolledUnderElevation ?? (appBarElevation ?? 0),
         flexibleSpace: flexibleSpace,
         clipBehavior: Clip.none,
         bottom: PreferredSize(

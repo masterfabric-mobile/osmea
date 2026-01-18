@@ -6,13 +6,15 @@
  * Includes filter chips at the top for active filters.
  */
 
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
+import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
@@ -42,18 +44,31 @@ class ProductListContentWidget extends StatefulWidget {
 class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollToTop = false;
+  bool _showFiltersBar = false;
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+  late final TextEditingController _searchController;
+  late final FocusNode _searchFocusNode;
+  late final List<String> _initialSearchHistory;
+  late final ProductSearchHistoryCubit _historyCubit;
+  late final ProductService _productService;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchController = TextEditingController(text: widget.viewModel.filters.search ?? '');
+    _searchFocusNode = FocusNode();
+    _historyCubit = GetIt.I<ProductSearchHistoryCubit>();
+    _productService = GetIt.I<ProductService>();
+    _initialSearchHistory = List<String>.from(_historyCubit.state);
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -62,6 +77,18 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     if (shouldShow != _showScrollToTop) {
       setState(() {
         _showScrollToTop = shouldShow;
+      });
+    }
+
+    // Filter/sort bar: show after a small scroll up (content moves up).
+    // Hysteresis prevents flicker near the threshold.
+    final offset = _scrollController.offset;
+    final shouldShowFilters = offset > 60
+        ? true
+        : (offset < 20 ? false : _showFiltersBar);
+    if (shouldShowFilters != _showFiltersBar) {
+      setState(() {
+        _showFiltersBar = shouldShowFilters;
       });
     }
   }
@@ -113,47 +140,59 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
 
     return Stack(
       children: [
-        OsmeaComponents.column(
-          children: [
-            // Add top padding for AppBar when useSafeArea is false
-            SizedBox(height: context.highValue * 1.5),
-            // Icon buttons for Sort by / Filters
-            _buildActionButtons(context),
-
-            // Active filter chips
-            if (_hasChipWorthyFilters())
-              OsmeaComponents.padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: _configHelper.getDouble(
-                    'product_list_view.component_spacing.horizontal',
-                    context.spacing20,
-                  ),
-                  vertical: _configHelper.getDouble(
-                    'product_list_view.component_spacing.vertical',
-                    context.spacing12,
+        NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (scrollInfo.metrics.pixels ==
+                    scrollInfo.metrics.maxScrollExtent &&
+                widget.state.hasMore) {
+              widget.viewModel.loadMore();
+            }
+            return false;
+          },
+          child: RefreshIndicator(
+            onRefresh: () async => widget.viewModel.loadProducts(refresh: true),
+            child: CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                // Add top padding for AppBar when useSafeArea is false
+                SliverToBoxAdapter(
+                  child: SizedBox(height: context.highValue * 1.5),
+                ),
+                SliverToBoxAdapter(child: _buildSearchBar(context)),
+                // Icon buttons for Sort by / Filters (scrolls away with content)
+                SliverToBoxAdapter(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    child: _showFiltersBar
+                        ? _buildActionButtons(context)
+                        : const SizedBox.shrink(),
                   ),
                 ),
-                child: _buildActiveFilterChips(context),
-              ),
-            // Product grid
-            Expanded(
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  if (scrollInfo.metrics.pixels ==
-                          scrollInfo.metrics.maxScrollExtent &&
-                      widget.state.hasMore) {
-                    widget.viewModel.loadMore();
-                  }
-                  return false;
-                },
-                child: RefreshIndicator(
-                  onRefresh: () async =>
-                      widget.viewModel.loadProducts(refresh: true),
-                  child: _buildProductGrid(context),
-                ),
-              ),
+                // Active filter chips (scrolls away with content)
+                if (_hasChipWorthyFilters())
+                  SliverToBoxAdapter(
+                    child: OsmeaComponents.padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _configHelper.getDouble(
+                          'product_list_view.component_spacing.horizontal',
+                          context.spacing20,
+                        ),
+                        vertical: _configHelper.getDouble(
+                          'product_list_view.component_spacing.vertical',
+                          context.spacing12,
+                        ),
+                      ),
+                      child: _buildActiveFilterChips(context),
+                    ),
+                  ),
+                // Product grid
+                _buildProductGridSliver(context),
+              ],
             ),
-          ],
+          ),
         ),
         // Scroll to top button
         if (_showScrollToTop)
@@ -229,6 +268,120 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
           ),
       ],
     );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    // Match HomeView's SearchBarWidget styling/config.
+    final searchConfig = _configHelper.getObject('home_view.search');
+    final placeholder =
+        searchConfig?['placeholder'] as String? ??
+        context.t.homeView.widgets.search.placeholder;
+    final variant = searchConfig?['variant'] as String? ?? 'outlined';
+
+    return OsmeaComponents.padding(
+      padding: EdgeInsets.fromLTRB(
+        context.spacing20,
+        context.spacing16,
+        context.spacing20,
+        context.spacing16,
+      ),
+      child: OsmeaComponents.searchbar(
+        controller: _searchController,
+        focusNode: _searchFocusNode,
+        hint: placeholder,
+        size: TextFieldSize.medium,
+        searchbarStyle: SearchbarStyle.minimal,
+        searchbarVariant: variant == 'outlined'
+            ? SearchbarVariant.outlined
+            : SearchbarVariant.borderless,
+        state: TextFieldState.enabled,
+        showSearchIcon: true,
+        showClearButton: true,
+        showSuggestions: true,
+        minQueryLength: 2,
+        maxHistoryItems: _historyCubit.maxItems,
+        initialHistory: _initialSearchHistory,
+        backgroundColor: OsmeaColors.white,
+        borderColor: OsmeaColors.pewter,
+        focusColor: _configHelper.getSearchViewFocusColor(OsmeaColors.black),
+        textColor: OsmeaColors.thunder,
+        hintColor: OsmeaColors.pewter,
+        suggestionProvider: _buildSuggestionProvider(),
+        onSearch: (query) {
+          _applySearch(query);
+        },
+        onSubmitted: (query) {
+          _applySearch(query);
+        },
+        onClear: () {
+          _searchController.clear();
+          _applySearch('');
+        },
+      ),
+    );
+  }
+
+  Future<List<String>> Function(String query) _buildSuggestionProvider() {
+    return (query) async {
+      final q = query.trim();
+      if (q.isEmpty) return const <String>[];
+
+      final lc = q.toLowerCase();
+
+      final historyMatches = _historyCubit.history
+          .where((h) => h.toLowerCase().contains(lc))
+          .take(5)
+          .toList();
+
+      final localProductMatches = widget.state.products
+          .map((p) => (p.name ?? '').trim())
+          .where((name) => name.isNotEmpty && name.toLowerCase().contains(lc))
+          .take(5)
+          .toList();
+
+      final combined = <String>[...historyMatches, ...localProductMatches];
+
+      // Remote enrichment (keep it light)
+      if (combined.length < 8 && q.length >= 3) {
+        try {
+          final remote = await _productService.listAllProducts(
+            apiVersion: 'v1',
+            search: q,
+            page: 1,
+            perPage: 10,
+          );
+          for (final p in remote) {
+            final name = (p.name ?? '').trim();
+            if (name.isEmpty) continue;
+            combined.add(name);
+          }
+        } catch (e) {
+          // suggestions are best-effort
+          debugPrint('⚠️ SuggestionProvider remote failed: $e');
+        }
+      }
+
+      // Uniq + limit
+      final seen = <String>{};
+      final out = <String>[];
+      for (final item in combined) {
+        final key = item.toLowerCase();
+        if (seen.add(key)) out.add(item);
+        if (out.length >= 10) break;
+      }
+      return out;
+    };
+  }
+
+  void _applySearch(String query) {
+    final q = query.trim();
+    if (q.isEmpty) {
+      widget.viewModel.updateFilter(search: null);
+      return;
+    }
+
+    _historyCubit.addQuery(q);
+    widget.viewModel.updateFilter(search: q);
   }
 
   /// Builds icon buttons for Sort by / Filters
@@ -757,7 +910,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   }
 
   /// Builds product grid - same layout as home recommended section
-  Widget _buildProductGrid(BuildContext context) {
+  Widget _buildProductGridSliver(BuildContext context) {
     final state = widget.state;
     final bool isTablet = context.allWidth >= 768;
     final double crossAxisSpacing = _configHelper.getDouble(
@@ -791,8 +944,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         (isTablet ? columnsTablet : columnsMobile);
     final double childAspectRatio = cardWidth / estimatedCardHeight;
 
-    return GridView.builder(
-      controller: _scrollController,
+    return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: _configHelper.getDouble(
           'product_list_view.component_spacing.grid_padding',
@@ -803,105 +955,111 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
           context.spacing8,
         ),
       ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isTablet ? columnsTablet : columnsMobile,
-        childAspectRatio: childAspectRatio,
-        crossAxisSpacing: crossAxisSpacing,
-        mainAxisSpacing: mainAxisSpacing,
-      ),
-      itemCount: state.products.length + (state.hasMore ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index >= state.products.length) {
-          if (state.hasMore) {
-            // Load more trigger
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.viewModel.loadMore();
-            });
-            return OsmeaComponents.center(
-              child: OsmeaComponents.loading(
-                type: LoadingType.circularFade,
-                size: context.iconSizeExtraHigh,
-                color: _configHelper.getColor(
-                  'product_list_view.empty_view.iconBackgroundColor',
-                  OsmeaColors.black,
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isTablet ? columnsTablet : columnsMobile,
+          childAspectRatio: childAspectRatio,
+          crossAxisSpacing: crossAxisSpacing,
+          mainAxisSpacing: mainAxisSpacing,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            if (index >= state.products.length) {
+              if (state.hasMore) {
+                // Load more trigger
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  widget.viewModel.loadMore();
+                });
+                return OsmeaComponents.center(
+                  child: OsmeaComponents.loading(
+                    type: LoadingType.circularFade,
+                    size: context.iconSizeExtraHigh,
+                    color: _configHelper.getColor(
+                      'product_list_view.empty_view.iconBackgroundColor',
+                      OsmeaColors.black,
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }
+
+            final product = state.products[index];
+            final productId = product.id ?? 0;
+
+            return StaggeredAnimation(
+              index: index,
+              child: ClipRect(
+                child: BlocBuilder<WishlistViewModel, WishlistState>(
+                  bloc: GetIt.I<WishlistViewModel>(),
+                  builder: (context, wishlistState) {
+                    final wishlistVm = GetIt.I<WishlistViewModel>();
+                    final currentIsSaved = wishlistVm.isSaved(productId);
+
+                    return ProductCardWidget(
+                      product: product,
+                      isSaved: currentIsSaved,
+                      onWishlistTap: () async {
+                        try {
+                          final wasSaved = wishlistVm.isSaved(productId);
+
+                          // Create WishlistItem from current product
+                          final wishlistItem = WishlistItem(
+                            id: productId,
+                            name: product.name,
+                            imageUrl: (product.images?.isNotEmpty ?? false)
+                                ? product.images!.first.src
+                                : null,
+                            regularPrice: product.prices?.regularPrice,
+                            salePrice: product.prices?.salePrice,
+                            currencyCode: product.prices?.currencyCode,
+                            currencyDecimalSeparator:
+                                product.prices?.currencyDecimalSeparator,
+                            currencyThousandSeparator:
+                                product.prices?.currencyThousandSeparator,
+                            currencyMinorUnit: product.prices?.currencyMinorUnit,
+                            onSale: product.onSale == true,
+                          );
+
+                          // Toggle wishlist using WishlistViewModel
+                          await wishlistVm.toggle(wishlistItem);
+
+                          final isNowSaved = wishlistVm.isSaved(productId);
+
+                          // Show snackbar based on action
+                          if (context.mounted) {
+                            if (isNowSaved && !wasSaved) {
+                              context.showSnackbar(
+                                message: 'Added to favorites',
+                                type: SnackbarType.success,
+                              );
+                            } else if (!isNowSaved && wasSaved) {
+                              context.showSnackbar(
+                                message: 'Removed from favorites',
+                                type: SnackbarType.info,
+                              );
+                            }
+                          }
+                        } catch (e) {
+                          debugPrint('❌ Failed to toggle wishlist: $e');
+                          if (context.mounted) {
+                            context.showSnackbar(
+                              message: 'Failed to update favorites',
+                              type: SnackbarType.error,
+                            );
+                          }
+                        }
+                      },
+                      onTap: () => context.push('/product-detail/$productId'),
+                    );
+                  },
                 ),
               ),
             );
-          }
-          return const SizedBox.shrink();
-        }
-
-        final product = state.products[index];
-        final productId = product.id ?? 0;
-
-        return StaggeredAnimation(
-          index: index,
-          child: ClipRect(
-            child: BlocBuilder<WishlistViewModel, WishlistState>(
-              bloc: GetIt.I<WishlistViewModel>(),
-              builder: (context, wishlistState) {
-                final wishlistVm = GetIt.I<WishlistViewModel>();
-                final currentIsSaved = wishlistVm.isSaved(productId);
-                
-                return ProductCardWidget(
-                  product: product,
-                  isSaved: currentIsSaved,
-                  onWishlistTap: () async {
-                    try {
-                      final wasSaved = wishlistVm.isSaved(productId);
-                      
-                      // Create WishlistItem from current product
-                      final wishlistItem = WishlistItem(
-                        id: productId,
-                        name: product.name,
-                        imageUrl: (product.images?.isNotEmpty ?? false)
-                            ? product.images!.first.src
-                            : null,
-                        regularPrice: product.prices?.regularPrice,
-                        salePrice: product.prices?.salePrice,
-                        currencyCode: product.prices?.currencyCode,
-                        currencyDecimalSeparator: product.prices?.currencyDecimalSeparator,
-                        currencyThousandSeparator: product.prices?.currencyThousandSeparator,
-                        currencyMinorUnit: product.prices?.currencyMinorUnit,
-                        onSale: product.onSale == true,
-                      );
-                      
-                      // Toggle wishlist using WishlistViewModel
-                      await wishlistVm.toggle(wishlistItem);
-                      
-                      final isNowSaved = wishlistVm.isSaved(productId);
-                      
-                      // Show snackbar based on action
-                      if (context.mounted) {
-                        if (isNowSaved && !wasSaved) {
-                          context.showSnackbar(
-                            message: 'Added to favorites',
-                            type: SnackbarType.success,
-                          );
-                        } else if (!isNowSaved && wasSaved) {
-                          context.showSnackbar(
-                            message: 'Removed from favorites',
-                            type: SnackbarType.info,
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      debugPrint('❌ Failed to toggle wishlist: $e');
-                      if (context.mounted) {
-                        context.showSnackbar(
-                          message: 'Failed to update favorites',
-                          type: SnackbarType.error,
-                        );
-                      }
-                    }
-                  },
-                  onTap: () => context.push('/product-detail/$productId'),
-                );
-              },
-            ),
-          ),
-        );
-      },
+          },
+          childCount: state.products.length + (state.hasMore ? 1 : 0),
+        ),
+      ),
     );
   }
 }
