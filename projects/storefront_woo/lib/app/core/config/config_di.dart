@@ -3,6 +3,7 @@ import 'package:apis/apis.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/core/config/config_di.config.dart';
+import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:flutter/foundation.dart';
 
@@ -40,6 +41,18 @@ Future<GetIt> configureDependencies({String? environment}) async {
     } catch (e) {
       debugPrint('⚠️ Could not register WishlistViewModel as singleton: $e');
       // Continue - factory registration will be used
+    }
+
+    // Product search history should be shared & persisted across the app
+    try {
+      if (!getIt.isRegistered<ProductSearchHistoryCubit>()) {
+        getIt.registerLazySingleton<ProductSearchHistoryCubit>(
+          () => ProductSearchHistoryCubit(),
+        );
+        debugPrint('✅ ProductSearchHistoryCubit registered as singleton');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Could not register ProductSearchHistoryCubit: $e');
     }
 
     return result;
