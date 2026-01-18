@@ -20,6 +20,9 @@ class BannerItem {
   final int? categoryId;
   final int? productId;
   final VoidCallback? onTap;
+  final bool showTitle;
+  final bool showSubtitle;
+  final bool showText;
 
   BannerItem({
     this.imageUrl,
@@ -30,6 +33,9 @@ class BannerItem {
     this.categoryId,
     this.productId,
     this.onTap,
+    this.showTitle = true,
+    this.showSubtitle = true,
+    this.showText = true,
   });
 
   factory BannerItem.fromConfig(Map<String, dynamic> config) {
@@ -41,6 +47,9 @@ class BannerItem {
       route: config['route'] as String?,
       categoryId: config['category_id'] as int?,
       productId: config['product_id'] as int?,
+      showTitle: config['showTitle'] as bool? ?? true,
+      showSubtitle: config['showSubtitle'] as bool? ?? true,
+      showText: config['showText'] as bool? ?? true,
     );
   }
 }
@@ -125,7 +134,8 @@ class BannerCarouselWidget extends StatelessWidget {
                 ),
               ),
             // Text content overlay
-            if (banner.title != null || banner.text != null)
+            if ((banner.showTitle && banner.title != null) || 
+                (banner.showText && banner.text != null))
               Positioned.fill(
                 child: OsmeaComponents.padding(
                   padding: context.paddingNormal,
@@ -133,7 +143,7 @@ class BannerCarouselWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (banner.title != null)
+                      if (banner.showTitle && banner.title != null)
                         OsmeaComponents.text(
                           banner.title!,
                           textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
@@ -149,9 +159,10 @@ class BannerCarouselWidget extends StatelessWidget {
                           maxLines: context.maxLineTwo,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      if (banner.title != null && banner.text != null)
+                      if ((banner.showTitle && banner.title != null) && 
+                          (banner.showText && banner.text != null))
                         OsmeaComponents.sizedBox(height: context.spacing8),
-                      if (banner.text != null)
+                      if (banner.showText && banner.text != null)
                         OsmeaComponents.text(
                           banner.text!,
                           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
