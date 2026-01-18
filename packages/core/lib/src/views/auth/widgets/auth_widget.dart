@@ -844,8 +844,7 @@ class AuthWidget extends StatelessWidget {
   Widget _buildSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius, Color primaryColor) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled =
-        state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    final isEnabled = !isLoading && cubit.signUpCallback != null;
     
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
@@ -863,7 +862,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.large,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null || !state.isSignUpValid
+          : (cubit.signUpCallback == null
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
@@ -1350,7 +1349,7 @@ class AuthWidget extends StatelessWidget {
   Widget _buildSpaceSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    final isEnabled = !isLoading && cubit.signUpCallback != null;
 
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', OsmeaColors.thunder);
@@ -1368,7 +1367,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null || !state.isSignUpValid
+          : (cubit.signUpCallback == null
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
@@ -1897,8 +1896,7 @@ class AuthWidget extends StatelessWidget {
   Widget _buildStartupSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius, Color primaryColor) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled =
-        state.isSignUpValid && !isLoading && cubit.signUpCallback != null;
+    final isEnabled = !isLoading && cubit.signUpCallback != null;
     
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
@@ -1916,7 +1914,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null || !state.isSignUpValid
+          : (cubit.signUpCallback == null
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,

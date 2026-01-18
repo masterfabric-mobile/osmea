@@ -854,6 +854,14 @@ final GoRouter appRouter = GoRouter(
               duration: const Duration(seconds: 3),
             );
           },
+          onSignUpError: (String error) {
+            debugPrint('❌ Sign up error: $error');
+            // Show error snackbar to user
+            context.snackbarError(
+              error,
+              duration: const Duration(seconds: 3),
+            );
+          },
           arguments: {
             'auth': true,
             'onSignIn': (String email, String password, {bool? rememberMe}) async {

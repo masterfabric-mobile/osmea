@@ -953,14 +953,40 @@ class AuthCubit extends BaseViewModelHydratedCubit<AuthState> {
           lastNameError != null) {
         debugPrint('❌ Validation failed');
         emit(formState.copyWith(
-          operationStatus: AuthOperationStatus.idle,
+          operationStatus: AuthOperationStatus.error,
           signUpEmailError: emailError,
           signUpPasswordError: passwordError,
           signUpPasswordConfirmError: passwordConfirmError,
           signUpFirstNameError: firstNameError,
           signUpLastNameError: lastNameError,
+          signUpErrorMessage: 'All required fields must be filled',
         ));
         return;
+      }
+
+      // Check required checklists from config
+      final signUpConfig = formState.config?['sign_up'] as Map<String, dynamic>?;
+      final checklists = signUpConfig?['checklists'] as List<dynamic>?;
+      
+      if (checklists != null) {
+        for (final checklist in checklists) {
+          final checklistMap = checklist as Map<String, dynamic>;
+          final id = checklistMap['id'] as String?;
+          final required = checklistMap['required'] as bool? ?? false;
+          final enabled = checklistMap['enabled'] as bool? ?? true;
+
+          if (enabled && required && id != null) {
+            final isChecked = formState.signUpChecklists[id] ?? false;
+            if (!isChecked) {
+              debugPrint('❌ Required checklist not checked: $id');
+              emit(formState.copyWith(
+                operationStatus: AuthOperationStatus.error,
+                signUpErrorMessage: 'Bütün zorunlu alanlar doldurulmalıdır',
+              ));
+              return;
+            }
+          }
+        }
       }
 
       // Set loading state
