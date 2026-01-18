@@ -31,6 +31,32 @@ import 'package:storefront_supabase/app/views/view_profile/personal_info_view.da
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
+/// Get navbar colors from config
+Color _getNavbarColor(
+  AssetConfigHelper configHelper,
+  String key,
+  Color defaultValue,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final colorString = navbarConfig?[key] as String?;
+    if (colorString != null && colorString.isNotEmpty) {
+      // Handle hex color strings
+      if (colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar color $key: $e');
+  }
+  return defaultValue;
+}
+
 class MainScreen extends StatefulWidget {
   final Widget child;
 
@@ -44,6 +70,25 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
+    final configHelper = AssetConfigHelper();
+
+    // Get colors from config
+    final backgroundColor = _getNavbarColor(
+      configHelper,
+      'backgroundColor',
+      const Color(0xFFFFFFFF), // White
+    );
+    final activeColor = _getNavbarColor(
+      configHelper,
+      'selectedIconColor',
+      const Color(0xFF000000), // Black
+    );
+    final inactiveColor = _getNavbarColor(
+      configHelper,
+      'unselectedIconColor',
+      const Color(0xFF666666), // Gray
+    );
+
     final List<NavbarItem> navItems = [
       NavbarItem(
         text: resources.home,
@@ -76,11 +121,13 @@ class _MainScreenState extends State<MainScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: navItems,
-        variant: NavbarVariant.primary,
+        variant: NavbarVariant.retailMain,
         size: NavbarSize.medium,
         currentIndex: _calculateSelectedIndex(context),
         onItemTap: (int idx) => _onItemTapped(idx, context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: backgroundColor,
+        activeColor: activeColor,
+        inactiveColor: inactiveColor,
       ),
     );
   }
@@ -130,30 +177,74 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
+    final configHelper = AssetConfigHelper();
+
+    // Get colors from config
+    final backgroundColor = _getNavbarColor(
+      configHelper,
+      'backgroundColor',
+      const Color(0xFFFFFFFF), // White
+    );
+    final activeColor = _getNavbarColor(
+      configHelper,
+      'selectedIconColor',
+      const Color(0xFF000000), // Black
+    );
+    final inactiveColor = _getNavbarColor(
+      configHelper,
+      'unselectedIconColor',
+      const Color(0xFF666666), // Gray
+    );
+
     final List<NavbarItem> navItems = [
       NavbarItem(
         text: resources.adminDashboard,
-        icon: const Icon(Icons.dashboard),
+        icon: Icon(
+          Icons.dashboard,
+          color: _calculateSelectedIndex(context) == 0
+              ? activeColor
+              : inactiveColor,
+        ),
         onTap: () {},
       ),
       NavbarItem(
         text: resources.users,
-        icon: const Icon(Icons.people),
+        icon: Icon(
+          Icons.people,
+          color: _calculateSelectedIndex(context) == 1
+              ? activeColor
+              : inactiveColor,
+        ),
         onTap: () {},
       ),
       NavbarItem(
         text: resources.products,
-        icon: const Icon(Icons.shopping_bag),
+        icon: Icon(
+          Icons.shopping_bag,
+          color: _calculateSelectedIndex(context) == 2
+              ? activeColor
+              : inactiveColor,
+        ),
         onTap: () {},
       ),
       NavbarItem(
         text: resources.orders,
-        icon: const Icon(Icons.receipt),
+        icon: Icon(
+          Icons.receipt,
+          color: _calculateSelectedIndex(context) == 3
+              ? activeColor
+              : inactiveColor,
+        ),
         onTap: () {},
       ),
       NavbarItem(
         text: resources.settings,
-        icon: const Icon(Icons.settings),
+        icon: Icon(
+          Icons.settings,
+          color: _calculateSelectedIndex(context) == 4
+              ? activeColor
+              : inactiveColor,
+        ),
         onTap: () {},
       ),
     ];
@@ -162,11 +253,13 @@ class _AdminScreenState extends State<AdminScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: navItems,
-        variant: NavbarVariant.primary,
+        variant: NavbarVariant.retailMain,
         size: NavbarSize.medium,
         currentIndex: _calculateSelectedIndex(context),
         onItemTap: (int idx) => _onItemTapped(idx, context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: backgroundColor,
+        activeColor: activeColor,
+        inactiveColor: inactiveColor,
       ),
     );
   }

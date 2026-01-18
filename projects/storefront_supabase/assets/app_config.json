@@ -143,5 +143,803 @@
           "next_text": "Continue"
         }
       ]
+    },
+    "account_configuration": {
+      "style": "space",
+      "space_style_colors": {
+        "primary_color": "#000000",
+        "secondary_color": "#06060666",
+        "text_color": "#000000",
+        "icon_color": "#000000",
+        "separator_color": "#E5E5E5",
+        "background_color": "#FFFFFF"
+      },
+      "sections": [
+        {
+          "sectionTitle": "Account & Preferences",
+          "items": [
+            {
+              "id": "about",
+              "title": "About",
+              "iconName": "info_outline",
+              "iconColor": "#000000",
+              "route": "/about"
+            },
+            {
+              "id": "contact_us",
+              "title": "Contact Us",
+              "iconName": "email_outlined",
+              "iconColor": "#000000",
+              "route": "/contact-us"
+            },
+            {
+              "id": "faq",
+              "title": "FAQ",
+              "iconName": "help_outline",
+              "iconColor": "#000000",
+              "route": "/faq"
+            }
+          ]
+        }
+      ]
+    },
+    "search_view_configuration": {
+      "search_app_bar_color": "#FFFFFFFF",
+      "search_bar_border_color": "#E0E0E0FF",
+      "action_icon_color": "#6B7280FF",
+      "text_color": "#000000FF",
+      "hint_text_color": "#6B7280FF",
+      "focus_color": "#000000FF",
+      "error_color": "#000000FF",
+      "search_bar_show_clear_button": true,
+      "search_bar_show_search_icon": true,
+      "elevation": 4,
+      "search_bar_size": "medium",
+      "search_bar_variant": "borderless",
+      "search_bar_border_radius": 20,
+      "title": "Search",
+      "search_hint": "Search products, brands, categories...",
+      "show_barcode_scanner": true,
+      "show_voice_search": true,
+      "show_back_button": true,
+      "action_button_spacing": 2,
+      "action_button_min_width": 32,
+      "action_button_min_height": 32,
+      "action_button_padding_all": 4,
+      "loading": {
+        "color": "#000000",
+        "loadingSteps": [
+          "Searching products...",
+          "Fetching results...",
+          "Almost there..."
+        ],
+        "stepDuration": 500,
+        "showProgress": true,
+        "showCancelButton": false
+      }
+    },
+    "error_handling_configuration": {
+      "style": "space",
+      "errorTitle": "Something went wrong..",
+      "animation_duration": 500,
+      "primary_color": "#FAFAFAFF",
+      "secondary_color": "#000000FF",
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "icon_color": "#000000",
+      "icon_border_color": "#000000",
+      "retry_button_background": "#000000",
+      "retry_button_text_color": "#FFFFFF",
+      "go_back_button_text_color": "#000000"
+    },
+    "auth_configuration": {
+      "ui_style": {
+        "style": "startup",
+        "tab_container_radius": 12,
+        "tab_item_radius": 10,
+        "button_radius": 12,
+        "content_area_top_radius": 32,
+        "background_color": "#000000",
+        "horizontal_padding": 24,
+        "primary_color": "#000000"
+      },
+      "buttons": {
+        "sign_in": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "disabledBackgroundColor": "#999999",
+          "disabledTextColor": "#FFFFFF"
+        },
+        "sign_up": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "disabledBackgroundColor": "#999999",
+          "disabledTextColor": "#FFFFFF"
+        },
+        "sign_out": {
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000",
+          "borderColor": "#000000"
+        }
+      },
+      "text_links": {
+        "sign_in_link": {
+          "color": "#000000"
+        },
+        "sign_up_link": {
+          "color": "#000000"
+        }
+      },
+      "sign_in": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "remember_me_label": "Remember me",
+        "forgot_password_label": "Forgot Password?",
+        "sign_in_button": "Continue",
+        "sign_in_button_loading": "Signing in...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "sign_up": {
+        "app_name": "Storefront",
+        "tab_sign_in": "Sign In",
+        "tab_sign_up": "Sign Up",
+        "email_label": "Email",
+        "email_hint": "Enter your email",
+        "password_label": "Password",
+        "password_hint": "Enter your password",
+        "password_confirm_label": "Confirm Password",
+        "password_confirm_hint": "Confirm your password",
+        "privacy_policy_label": "I have read and accept the Privacy Policy",
+        "terms_label": "I have read and accept the Terms of Service",
+        "sign_up_button": "Create Account",
+        "sign_up_button_loading": "Creating account...",
+        "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+        "logo_width": 120,
+        "logo_height": 120
+      },
+      "forgot_password": {
+        "title": "Reset Password",
+        "subtitle": "Enter your email to reset"
+      }
+    },
+    "empty_view_configuration": {
+      "style": "enterprise",
+      "background_color": "#FFFFFF",
+      "text_color": "#000000",
+      "animation_duration": 400,
+      "primary_color": "#000000",
+      "secondary_color": "#FFFFFF",
+      "enable_haptic_feedback": true,
+      "default_empty_message": "No items found",
+      "show_action_button": true,
+      "empty_pages": [
+        {
+          "title": "Your cart is empty",
+          "description": "Add items to your cart to see them here.",
+          "empty_type": "cart",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Start Shopping"
+        },
+        {
+          "title": "No favorites yet",
+          "description": "Start adding items to your favorites to see them here.",
+          "empty_type": "wishlist",
+          "icon_path": null,
+          "image_path": null,
+          "background_color": "#FFFFFF",
+          "text_color": "#000000",
+          "action_button_text": "Explore Products"
+        }
+      ]
+    },
+    "home_view": {
+      "app_bar": {
+        "title_source": "app_settings.app_name",
+        "fallback_title": "Storefront Supabase",
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "elevation": 0,
+        "variant": "standard",
+        "size": "standard",
+        "titleFontWeight": 700
+      },
+      "component_spacing": {
+        "top": 0,
+        "bottom": 16,
+        "horizontal": 20,
+        "title_to_content": 16
+      },
+      "search": {
+        "enabled": true,
+        "order_id": 0,
+        "placeholder": "Search products, brands, categories...",
+        "style": "minimal",
+        "variant": "outlined"
+      },
+      "recommended": {
+        "enabled": true,
+        "order_id": 10,
+        "title": "Recommended for you",
+        "limit": 4,
+        "product_ids": [],
+        "padding": {
+          "top": 0,
+          "bottom": 16,
+          "horizontal": 20
+        },
+        "titleColor": "#000000",
+        "seeAllColor": "#000000",
+        "card": {
+          "backgroundColor": "#FFFFFF",
+          "imageBackgroundColor": "#FFFFFF",
+          "borderRadius": 12,
+          "showBorder": false,
+          "borderColor": "#E5E5E5",
+          "borderWidth": 0
+        },
+        "discountBadge": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderRadius": 6
+        },
+        "wishlistButton": {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "#E5E5E5",
+          "borderWidth": 0,
+          "iconColor": "#000000",
+          "iconColorSelected": "#000000",
+          "borderRadius": 24
+        },
+        "price": {
+          "salePriceColor": "#000000",
+          "regularPriceColor": "#000000",
+          "strikethroughPriceColor": "#666666"
+        },
+        "productName": {
+          "color": "#000000"
+        },
+        "description": {
+          "color": "#666666"
+        }
+      }
+    },
+    "product_detail_view": {
+      "appBar": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0
+      },
+      "name_and_price": {
+        "enabled": true,
+        "order_id": 1,
+        "nameColor": "#000000",
+        "priceColor": "#000000",
+        "padding": {
+          "horizontal": 16,
+          "vertical": 4
+        }
+      },
+      "attributes": {
+        "enabled": true,
+        "order_id": 3,
+        "selectedColor": "#000000",
+        "unselectedColor": "#666666",
+        "highlightedColor": "#000000",
+        "borderColor": "#E5E5E5",
+        "backgroundColor": "#FFFFFF"
+      },
+      "description": {
+        "enabled": true,
+        "order_id": 4,
+        "textColor": "#000000",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5"
+      },
+      "action_section": {
+        "wishlistIconColor": "#000000",
+        "wishlistUnselectedColor": "#666666",
+        "shareIconColor": "#000000",
+        "buttonBackgroundColor": "#000000",
+        "buttonTextColor": "#FFFFFF",
+        "buttonBorderColor": "#000000",
+        "buttonBorderWidth": 0,
+        "buttonBorderRadius": 8,
+        "addToCartButton": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderColor": "#000000",
+          "borderWidth": 0,
+          "borderRadius": 8
+        },
+        "counter": {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "#E5E5E5",
+          "iconColor": "#000000",
+          "textColor": "#000000"
+        }
+      },
+      "quantity_selector": {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "iconColor": "#000000",
+        "textColor": "#000000"
+      },
+      "counter": {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "buttonColor": "#000000",
+        "buttonIconColor": "#FFFFFF",
+        "valueTextColor": "#000000",
+        "valueBackgroundColor": "#FFFFFF",
+        "borderRadius": 8
+      },
+      "reviews": {
+        "enabled": true,
+        "order_id": 2,
+        "starColor": "#000000",
+        "textColor": "#000000",
+        "nameColor": "#000000",
+        "dateColor": "#666666",
+        "verifiedBadgeColor": "#000000",
+        "verifiedBadgeTextColor": "#FFFFFF",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5"
+      },
+      "images": {
+        "enabled": true,
+        "order_id": 0,
+        "indicatorColor": "#000000",
+        "wishlistIconColor": "#000000"
+      }
+    },
+    "product_list_view": {
+      "app_bar": {
+        "title": "Products",
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000"
+      },
+      "component_spacing": {
+        "top": 0,
+        "bottom": 16,
+        "horizontal": 20,
+        "vertical": 12,
+        "action_buttons_spacing": 12,
+        "filter_chips_spacing": 8,
+        "grid_spacing": 8,
+        "grid_padding": 12
+      },
+      "action_buttons": {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "textColor": "#000000",
+        "iconColor": "#000000",
+        "borderRadius": 12,
+        "borderWidth": 1,
+        "badgeColor": "#000000",
+        "badgeBorderColor": "#FFFFFF",
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.04,
+        "shadowBlur": 8,
+        "shadowOffset": 2
+      },
+      "filter_chips": {
+        "category": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF"
+        },
+        "on_sale": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF"
+        },
+        "featured": {
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000"
+        },
+        "stock_status": {
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000"
+        },
+        "clear_all": {
+          "iconColor": "#999999"
+        }
+      },
+      "empty_view": {
+        "iconBackgroundColor": "#000000",
+        "iconColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "descriptionColor": "#000000"
+      },
+      "scroll_to_top": {
+        "backgroundColor": "#000000",
+        "iconColor": "#FFFFFF",
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.3,
+        "shadowBlur": 12,
+        "shadowSpread": 1,
+        "shadowOffset": 4,
+        "elevation": 8
+      },
+      "bottom_sheet": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "apply_button_background": "#000000",
+        "apply_button_text_color": "#FFFFFF",
+        "cancel_button_text_color": "#000000"
+      },
+      "grid": {
+        "columns_tablet": 3,
+        "columns_mobile": 2,
+        "crossAxisSpacing": 8,
+        "mainAxisSpacing": 8,
+        "estimatedCardHeight": 280
+      },
+      "product_card": {
+        "loading_indicator_color": "#000000",
+        "discount_badge_background": "#000000",
+        "discount_badge_text_color": "#FFFFFF",
+        "wishlist_icon_saved_color": "#000000",
+        "wishlist_icon_unsaved_color": "#000000",
+        "sale_price_color": "#000000",
+        "regular_price_color": "#000000",
+        "product_name_color": "#000000",
+        "description_color": "#666666"
+      }
+    },
+    "navbar_configuration": {
+      "enabled": true,
+      "variant": "transparent",
+      "size": "medium",
+      "position": "bottom",
+      "backgroundColor": "#FFFFFF",
+      "borderColor": "#E5E5E5",
+      "elevation": 0.5,
+      "selectedIconColor": "#000000",
+      "unselectedIconColor": "#666666",
+      "selectedTextColor": "#000000",
+      "unselectedTextColor": "#666666",
+      "showLabels": true,
+      "showIcons": true,
+      "centerItems": true,
+      "items": [
+        {
+          "id": "home",
+          "order_id": 0,
+          "text": "Home",
+          "iconName": "home_outlined",
+          "route": "/home",
+          "tooltip": "Home"
+        },
+        {
+          "id": "search",
+          "order_id": 1,
+          "text": "Search",
+          "iconName": "search_outlined",
+          "route": "/search",
+          "tooltip": "Search"
+        },
+        {
+          "id": "saved",
+          "order_id": 3,
+          "text": "Saved",
+          "iconName": "favorite_outline",
+          "filledIconName": "favorite",
+          "route": "/favorites",
+          "tooltip": "Saved Items",
+          "isAnimated": true,
+          "animationType": "scale",
+          "animationTrigger": "wishlist_count"
+        },
+        {
+          "id": "cart",
+          "order_id": 2,
+          "text": "Cart",
+          "iconName": "shopping_cart_outlined",
+          "route": "/cart",
+          "tooltip": "Shopping Cart"
+        },
+        {
+          "id": "profile",
+          "order_id": 4,
+          "text": "Profile",
+          "iconName": "person_outline",
+          "authIconName": "person_outline",
+          "guestIconName": "login_outlined",
+          "authRoute": "/profile",
+          "guestRoute": "/auth",
+          "authText": "Profile",
+          "guestText": "Sign In",
+          "isConditional": true,
+          "tooltip": "Profile"
+        }
+      ]
+    },
+    "cart_view_configuration": {
+      "app_bar": {
+        "title": "Shopping Cart",
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0,
+        "variant": "standard",
+        "size": "standard",
+        "show_back_button": true,
+        "show_refresh_button": true,
+        "refresh_tooltip": "Refresh cart"
+      },
+      "refresh_indicator": {
+        "color": "#000000",
+        "backgroundColor": "#FFFFFF",
+        "strokeWidth": 2,
+        "displacement": 40
+      },
+      "loading_overlay": {
+        "blur_sigma": 4,
+        "background_color": "#FFFFFF",
+        "background_alpha": 0.7,
+        "container_background_color": "#FFFFFF",
+        "container_border_radius": 16,
+        "loading_color": "#000000",
+        "loading_size": "large"
+      },
+      "cart_items": {
+        "background_color": "#FFFFFF",
+        "border_color": "#E5E5E5",
+        "separator_color": "#E5E5E5",
+        "product_name_color": "#000000",
+        "price_color": "#000000",
+        "variation_text_color": "#666666",
+        "quantity_selector_background": "#F5F5F5",
+        "quantity_selector_text_color": "#000000",
+        "quantity_selector_icon_color": "#000000",
+        "quantity_selector_disabled_color": "#999999",
+        "remove_button_color": "#000000"
+      },
+      "order_summary": {
+        "background_color": "#FFFFFF",
+        "border_color": "#E5E5E5",
+        "total_label_color": "#666666",
+        "total_amount_color": "#000000",
+        "discount_color": "#000000",
+        "expand_icon_color": "#000000",
+        "checkout_button_background": "#000000",
+        "checkout_button_text_color": "#FFFFFF",
+        "checkout_button_icon_color": "#FFFFFF",
+        "checkout_button_border_radius": 16
+      },
+      "coupon_section": {
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "border_color": "#E5E5E5"
+      },
+      "empty_cart": {
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "icon_color": "#000000"
+      }
+    },
+    "checkout_view_configuration": {
+      "app_bar": {
+        "title": "Checkout",
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0,
+        "variant": "standard",
+        "size": "standard"
+      },
+      "order_success": {
+        "icon_background_gradient_start": "#000000",
+        "icon_background_gradient_end": "#000000",
+        "icon_color": "#000000",
+        "icon_size": 64,
+        "title_color": "#000000",
+        "description_color": "#666666",
+        "card_background_color": "#FFFFFF",
+        "card_border_color": "#E5E5E5",
+        "total_label_color": "#666666",
+        "total_amount_background_start": "#000000",
+        "total_amount_background_end": "#000000",
+        "total_amount_color": "#000000",
+        "detail_label_color": "#666666",
+        "detail_value_color": "#000000",
+        "status_background_color": "#000000",
+        "status_border_color": "#000000",
+        "status_text_color": "#000000",
+        "button_background_color": "#000000",
+        "button_text_color": "#FFFFFF",
+        "button_icon_color": "#FFFFFF",
+        "button_border_radius": 12
+      },
+      "form_fields": {
+        "label_color": "#000000",
+        "input_background_color": "#FFFFFF",
+        "input_border_color": "#E5E5E5",
+        "input_focused_border_color": "#000000",
+        "input_error_border_color": "#000000",
+        "input_text_color": "#000000",
+        "input_hint_color": "#666666",
+        "prefix_icon_color": "#000000",
+        "error_text_color": "#000000",
+        "helper_text_color": "#666666"
+      },
+      "section_header": {
+        "icon_background_color": "#000000",
+        "icon_color": "#FFFFFF",
+        "title_color": "#000000"
+      },
+      "order_summary": {
+        "background_color": "#FFFFFF",
+        "border_color": "#E5E5E5",
+        "label_color": "#666666",
+        "value_color": "#000000",
+        "total_background_start": "#000000",
+        "total_background_end": "#000000",
+        "total_label_color": "#666666",
+        "total_amount_color": "#000000",
+        "button_background_color": "#000000",
+        "button_disabled_background_color": "#999999",
+        "button_text_color": "#FFFFFF",
+        "button_border_radius": 12
+      }
+    },
+    "favorites_view_configuration": {
+      "app_bar": {
+        "title": "Favourites",
+        "titleWithCount": "Favourites ({count})",
+        "backgroundColor": "#FFFFFF",
+        "foregroundColor": "#000000",
+        "titleColor": "#000000",
+        "iconColor": "#000000",
+        "elevation": 0,
+        "surfaceTintColor": "#00000000",
+        "shadowColor": "#00000000"
+      },
+      "component_spacing": {
+        "horizontal": 12,
+        "vertical": 8,
+        "item_padding": 8,
+        "divider_height": 1
+      },
+      "list_item": {
+        "titleColor": "#000000",
+        "titleFontWeight": 600,
+        "imageSize": 64,
+        "imageBorderRadius": 8,
+        "placeholderBackgroundColor": "#F5F5F5",
+        "placeholderIconColor": "#999999",
+        "loadingIndicatorColor": "#000000"
+      },
+      "dismissible": {
+        "backgroundColor": "#000000",
+        "textColor": "#FFFFFF",
+        "iconColor": "#FFFFFF",
+        "textFontWeight": 600
+      },
+      "action_buttons": {
+        "cartButton": {
+          "iconColor": "#000000",
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "#E5E5E5",
+          "borderWidth": 1,
+          "borderRadius": 4,
+          "size": "extraSmall",
+          "variant": "outlined"
+        },
+        "favoriteButton": {
+          "iconColor": "#000000",
+          "size": "extraSmall",
+          "variant": "ghost"
+        },
+        "spacing": 4
+      },
+      "price": {
+        "salePriceColor": "#000000",
+        "regularPriceColor": "#000000",
+        "strikethroughPriceColor": "#666666",
+        "defaultPriceColor": "#666666",
+        "fontWeight": 600
+      },
+      "divider": {
+        "color": "#E5E5E5",
+        "height": 1
+      },
+      "dialog": {
+        "titleColor": "#000000",
+        "subtitleColor": "#666666",
+        "backgroundColor": "#FFFFFF"
+      },
+      "snackbar": {
+        "title": "Removed from favorites",
+        "message": "Item was removed from your favorites",
+        "type": "error",
+        "actionLabel": "Undo"
+      }
+    },
+    "dialog_popup_configuration": {
+      "dialog": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 12,
+        "elevation": 8
+      },
+      "bottom_sheet": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 16,
+        "elevation": 0
+      },
+      "popup": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "subtitleColor": "#000000",
+        "textColor": "#000000",
+        "borderRadius": 12,
+        "elevation": 8
+      },
+      "buttons": {
+        "primary": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderColor": "#000000"
+        },
+        "secondary": {
+          "backgroundColor": "#FFFFFF",
+          "textColor": "#000000",
+          "borderColor": "#000000"
+        },
+        "ghost": {
+          "backgroundColor": "transparent",
+          "textColor": "#000000",
+          "borderColor": "transparent"
+        },
+        "danger": {
+          "backgroundColor": "#000000",
+          "textColor": "#FFFFFF",
+          "borderColor": "#000000"
+        },
+        "cancel": {
+          "backgroundColor": "transparent",
+          "textColor": "#000000",
+          "borderColor": "transparent"
+        }
+      },
+      "icons": {
+        "primaryColor": "#000000",
+        "secondaryColor": "#000000",
+        "successColor": "#000000",
+        "errorColor": "#000000"
+      },
+      "add_to_cart_popup": {
+        "backgroundColor": "#FFFFFF",
+        "titleColor": "#000000",
+        "successBackgroundColor": "#FFFFFF",
+        "successBorderColor": "#000000",
+        "successIconColor": "#000000",
+        "successTextColor": "#000000",
+        "loadingColor": "#000000",
+        "footerBackgroundColor": "#FFFFFF",
+        "footerBorderColor": "#E0E0E0"
+      }
     }
   }
