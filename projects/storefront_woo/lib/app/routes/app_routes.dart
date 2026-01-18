@@ -13,6 +13,7 @@ import 'package:storefront_woo/app/views/view_campaign/campaign_view.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/favorite_categories_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
+import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -137,6 +138,7 @@ final GoRouter appRouter = GoRouter(
             // Extract query and fromHome flag from URL if present
             final query = state.uri.queryParameters['query'];
             final fromHome = state.uri.queryParameters['fromHome'] == 'true';
+            final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
 
             return CustomTransitionPage(
               child: _AutoFocusSearchView(
@@ -172,6 +174,46 @@ final GoRouter appRouter = GoRouter(
                     return [];
                   }
                 },
+                searchSuggestionProvider: (query) async {
+                  final q = query.trim();
+                  if (q.isEmpty) return const <String>[];
+
+                  final lc = q.toLowerCase();
+                  final out = <String>[];
+                  final seen = <String>{};
+
+                  // Recent searches first
+                  for (final item in historyCubit.history) {
+                    if (!item.toLowerCase().contains(lc)) continue;
+                    if (seen.add(item.toLowerCase())) out.add(item);
+                    if (out.length >= 6) break;
+                  }
+
+                  // Remote product name suggestions
+                  if (out.length < 10 && q.length >= 3) {
+                    try {
+                      final productService = GetIt.I<ProductService>();
+                      final products = await productService.listAllProducts(
+                        apiVersion: 'v1',
+                        search: q,
+                        page: 1,
+                        perPage: 10,
+                      );
+                      for (final p in products) {
+                        final name = (p.name ?? '').trim();
+                        if (name.isEmpty) continue;
+                        final key = name.toLowerCase();
+                        if (seen.add(key)) out.add(name);
+                        if (out.length >= 10) break;
+                      }
+                    } catch (_) {
+                      // best-effort
+                    }
+                  }
+
+                  return out;
+                },
+                initialHistory: historyCubit.history,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -2155,6 +2197,8 @@ class _AutoFocusSearchView extends StatefulWidget {
   final bool fromHome;
   final Function(String) goRoute;
   final Future<List<dynamic>> Function(String query) searchProvider;
+  final Future<List<String>> Function(String query)? searchSuggestionProvider;
+  final List<String> initialHistory;
 
   const _AutoFocusSearchView({
     required this.searchFocusNode,
@@ -2162,6 +2206,8 @@ class _AutoFocusSearchView extends StatefulWidget {
     this.fromHome = false,
     required this.goRoute,
     required this.searchProvider,
+    this.searchSuggestionProvider,
+    this.initialHistory = const [],
   });
 
   @override
@@ -2201,6 +2247,7 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
 
   @override
   Widget build(BuildContext context) {
+    final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
     return SearchView(
       goRoute: widget.goRoute,
       title: const Text('Search Products'),
@@ -2211,6 +2258,12 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
       showTitle: true,
       titleAlignment: AppBarTitleAlignment.center,
       showSearchIcon: true,
+      searchSuggestionProvider: widget.searchSuggestionProvider,
+      initialHistory: widget.initialHistory,
+      onSearchSubmitted: (query) {
+        // Persist only committed searches (submit / search / suggestion select).
+        historyCubit.addQuery(query);
+      },
       onBackPressed: () => widget.goRoute('/home'),
       searchProvider: widget.searchProvider,
       resultBuilder: (context, results) {
@@ -2221,6 +2274,7 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
         // Show skeleton if coming from navbar (fromHome is false)
         return SearchEmptyStateWidget(
           searchCubit: searchCubit,
+          searchProvider: widget.searchProvider,
           showSkeleton: !widget.fromHome,
         );
       },
