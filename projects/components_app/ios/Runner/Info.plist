@@ -12,80 +12,6 @@
 	<string>Components App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>components_app</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>This app requires access to the local network for debugging purposes.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to take photos and videos for testing camera components.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app needs microphone access to record audio for testing audio components.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs location access to test location-based components and features.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs location access to test location-based components and features.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs location access to test location-based components and features.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs photo library access to save and share images from camera components.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app needs photo library access to save images from camera components.</string>
-	<key>NSContactsUsageDescription</key>
-	<string>This app needs contacts access to test contact-related components and features.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>This app needs calendar access to test calendar-related components and features.</string>
-	<key>NSRemindersUsageDescription</key>
-	<string>This app needs reminders access to test reminder-related components and features.</string>
-	<key>NSNotificationsUsageDescription</key>
-	<string>This app needs notification access to test notification components and features.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This app needs tracking access to provide personalized experiences.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>This app needs Face ID access for biometric authentication features.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>This app needs motion access to test motion-based components and features.</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSAllowsArbitraryLoadsInWebContent</key>
-		<true/>
-	</dict>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>io.flutter.embedded_views_preview</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
@@ -110,5 +36,79 @@
 			<string>AppIcon</string>
 		</dict>
 	</dict>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>components_app</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app needs calendar access to test calendar-related components and features.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take photos and videos for testing camera components.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs contacts access to test contact-related components and features.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app needs Face ID access for biometric authentication features.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app requires access to the local network for debugging purposes.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to test location-based components and features.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs location access to test location-based components and features.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to test location-based components and features.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access to record audio for testing audio components.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app needs motion access to test motion-based components and features.</string>
+	<key>NSNotificationsUsageDescription</key>
+	<string>This app needs notification access to test notification components and features.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs photo library access to save images from camera components.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to save and share images from camera components.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>This app needs reminders access to test reminder-related components and features.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app needs tracking access to provide personalized experiences.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
