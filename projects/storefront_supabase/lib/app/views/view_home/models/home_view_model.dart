@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
@@ -19,8 +20,26 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   ];
   final List<String> shoeSizes = List.generate(14, (index) => (34 + index).toString());
 
+  final TextEditingController searchController = TextEditingController(); // Added this back
+
   SupabaseHomeViewModel(this._supabaseClient)
       : super(SupabaseHomeInitialState());
+
+  /* -------------------- SEARCH -------------------- */
+
+  void setSearchQuery(String query) {
+    if (state is! SupabaseHomeLoadedState) return;
+    fetchProducts(searchQuery: query);
+  }
+  /* -------------------- VIEW TOGGLE -------------------- */
+
+  void toggleViewMode(bool isList) {
+    if (state is! SupabaseHomeLoadedState) return;
+    final currentState = state as SupabaseHomeLoadedState;
+    if (currentState.isListView != isList) {
+      stateChanger(currentState.copyWith(isListView: isList));
+    }
+  }
 
   /* -------------------- SORTS -------------------- */
 
@@ -116,7 +135,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
             ? state as SupabaseHomeLoadedState
             : SupabaseHomeLoadedState(products: []);
 
-    stateChanger(SupabaseHomeLoadingState());
+    stateChanger(currentState.copyWith(isLoading: true)); // Use copyWith to set loading
 
     try {
       /* -------- Initial lookup data -------- */
@@ -256,10 +275,17 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           selectedLeafCategory: activeLeaf,
           selectedBrandIds: finalBrandIds,
           selectedSizesOrAges: finalSizes,
+          isLoading: false,
         ),
       );
     } catch (e) {
       stateChanger(SupabaseHomeErrorState('Failed to load products: $e'));
     }
+  }
+
+  @override
+  Future<void> close() {
+    searchController.dispose();
+    return super.close();
   }
 }

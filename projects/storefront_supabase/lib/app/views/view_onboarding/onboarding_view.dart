@@ -9,7 +9,15 @@ class OnboardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.resources.onboarding)),
+      appBar: AppBar(
+        title: Text(
+          context.resources.onboarding,
+          style: const TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

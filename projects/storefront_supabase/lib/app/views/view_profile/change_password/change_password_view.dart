@@ -15,10 +15,13 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(context.resources.changePassword),
+            title: OsmeaComponents.text(
+              context.resources.changePassword,
+              color: Colors.black,
+            ),
             variant: AppBarVariant.primary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back),

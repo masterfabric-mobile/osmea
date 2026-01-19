@@ -21,7 +21,11 @@ class AddProductView
             final productId = arguments['productId'] as String?;
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
-                  productId == null ? resources.addNewProduct : resources.editProduct),
+                productId == null ? resources.addNewProduct : resources.editProduct,
+                color: Colors.black,
+              ),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
               variant: AppBarVariant.primary,
             );
           },

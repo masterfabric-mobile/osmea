@@ -2676,10 +2676,10 @@ class OsmeaNavbar extends CoreContainer {
     switch (variant) {
       case NavbarVariant.retailMain:
         return _NavbarColors(
-          background: OsmeaColors.nordicBlue,
-          active: OsmeaColors.crystalBay,
-          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
-          border: OsmeaColors.deepSea,
+          background: backgroundColor ?? OsmeaColors.nordicBlue,
+          active: activeColor ?? OsmeaColors.crystalBay,
+          inactive: inactiveColor ?? OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: borderColor ?? OsmeaColors.deepSea,
         );
 
       case NavbarVariant.retailSidebar:

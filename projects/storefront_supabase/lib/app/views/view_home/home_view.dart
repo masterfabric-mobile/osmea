@@ -26,35 +26,64 @@ class SupabaseHomeView
     required super.goRoute,
   }) : super(
           horizontalPadding: const PaddingVisibility.disabled(),
+          verticalPadding: const PaddingVisibility.disabled(),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.appTitle,
-              color: const Color(0xFFFFFFFF), // White text
+              color: const Color(0xFF000000), // Black text
             ),
-            backgroundColor: const Color(0xFF000000), // Black background
-            foregroundColor: const Color(0xFFFFFFFF), // White foreground
+            backgroundColor: const Color(0xFFFFFFFF), // White background
+            foregroundColor: const Color(0xFF000000), // Black foreground
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
             actions: [
               AppBarAction(
-                type: AppBarActionType.search,
-                icon: const Icon(
-                  Icons.search,
-                  color: Color(0xFFFFFFFF), // White
-                ),
-                onPressed: () => goRoute('/search'),
-              ),
-              AppBarAction(
                 type: AppBarActionType.more,
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
-                  color: Color(0xFFFFFFFF), // White
+                  color: Color(0xFF000000), // Black
                 ),
                 onPressed: () => goRoute('/cart'),
               ),
             ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(70), // Reduced height
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    // Search Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        key: const ValueKey('homeSearchBar'),
+                        controller: viewModel.searchController,
+                        decoration: InputDecoration(
+                          hintText: context.resources.searchProductsHint,
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.zero, // Compact content
+                          isDense: true,
+                        ),
+                        onChanged: viewModel.setSearchQuery,
+                      ),
+                    ),
+                    const SizedBox(height: 16), // Bottom padding
+                  ],
+                ),
+              ),
+            ),
           ),
         );
 
@@ -156,6 +185,8 @@ class _ProductsViewWithScrollToTopState
       children: [
         Column(
           children: [
+            if (widget.state.isLoading)
+              const LinearProgressIndicator(minHeight: 2),
             _buildFilterBarWithViewToggle(
               context,
               widget.viewModel,
@@ -218,22 +249,34 @@ class _ProductsViewWithScrollToTopState
     SupabaseHomeLoadedState state,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Theme.of(context).cardColor,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1),
+        ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               TextButton.icon(
-                icon: const Icon(Icons.sort),
-                label: Text(context.resources.sort),
+                icon: const Icon(Icons.sort, color: Colors.black),
+                label: Text(
+                  context.resources.sort,
+                  style: const TextStyle(color: Colors.black),
+                ),
                 onPressed: () => _showSortSheet(context, viewModel, state),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
-                icon: const Icon(Icons.filter_list),
-                label: Text(context.resources.filter),
+                icon: const Icon(Icons.filter_list, color: Colors.black),
+                label: Text(
+                  context.resources.filter,
+                  style: const TextStyle(color: Colors.black),
+                ),
                 onPressed: () => _showFilterSheet(context, viewModel, state),
               ),
             ],
@@ -682,23 +725,23 @@ class _ProductsViewWithScrollToTopState
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            final rootCats = widget.viewModel.getRootCategories(
+            final rootCats = viewModel.getRootCategories(
               currentState.allCategories,
             );
-            final subCats = widget.viewModel.getSubCategories(
+            final subCats = viewModel.getSubCategories(
               currentState.allCategories,
               tempRoot?.id,
             );
-            final leafCats = widget.viewModel.getSubCategories(
+            final leafCats = viewModel.getSubCategories(
               currentState.allCategories,
               tempSub?.id,
             );
-            final isShoe = widget.viewModel.isShoeCategory(
+            final isShoe = viewModel.isShoeCategory(
               tempLeaf,
               tempSub,
               tempRoot,
             );
-            final isFashion = widget.viewModel.isFashionCategory(tempRoot);
+            final isFashion = viewModel.isFashionCategory(tempRoot);
 
             return DraggableScrollableSheet(
               expand: false,

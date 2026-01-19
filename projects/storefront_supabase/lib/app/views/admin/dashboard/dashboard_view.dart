@@ -16,10 +16,13 @@ class AdminDashboardView
       required super.goRoute})
       : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(context.resources.adminDashboard),
+            title: OsmeaComponents.text(
+              context.resources.adminDashboard,
+              color: Colors.black,
+            ),
             variant: AppBarVariant.primary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => goRoute('/profile'),
               icon: const Icon(Icons.arrow_back),
@@ -95,6 +98,7 @@ class AdminDashboardView
 
   Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Card(
+      color: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -138,6 +142,7 @@ class AdminDashboardView
       return Center(child: Text(resources.noRecentOrders));
     }
     return Card(
+      color: Colors.white,
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: orders.map((order) {
@@ -164,6 +169,7 @@ class AdminDashboardView
       return Center(child: Text(resources.noNewUsers));
     }
     return Card(
+      color: Colors.white,
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: users.map((user) {

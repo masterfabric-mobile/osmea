@@ -32,11 +32,15 @@ class _AdminUsersViewState extends State<AdminUsersView> {
   Widget build(BuildContext context) {
     final resources = context.resources;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text(resources.users),
+        title: OsmeaComponents.text(
+          resources.users,
+          color: Colors.black,
+        ),
         variant: AppBarVariant.primary,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         leading: OsmeaComponents.iconButton(
           onPressed: () => context.go('/profile'),
           icon: const Icon(Icons.arrow_back),

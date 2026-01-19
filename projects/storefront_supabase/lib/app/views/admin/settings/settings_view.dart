@@ -13,10 +13,13 @@ class AdminSettingsView
     super.arguments = const {'init': true},
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(context.resources.adminSettings),
+            title: OsmeaComponents.text(
+              context.resources.adminSettings,
+              color: Colors.black,
+            ),
             variant: AppBarVariant.primary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => goRoute('/profile'),
               icon: const Icon(Icons.arrow_back),

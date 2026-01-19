@@ -19,10 +19,10 @@ class SettingsView
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.settings,
-              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+              color: Colors.black,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,

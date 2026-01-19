@@ -15,10 +15,13 @@ class AdminProductsView
     super.arguments = const {'init': true},
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(context.resources.products),
+            title: OsmeaComponents.text(
+              context.resources.products,
+              color: Colors.black,
+            ),
             variant: AppBarVariant.primary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.go('/profile'),
               icon: const Icon(Icons.arrow_back),
@@ -59,31 +62,34 @@ class AdminProductsView
     final resources = context.resources;
     if (state is! AdminProductsLoaded) return const SizedBox.shrink();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: viewModel.searchController,
-              decoration: InputDecoration(
-                hintText: resources.searchProductsHint,
-                prefixIcon: const Icon(Icons.search),
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: viewModel.searchController,
+                decoration: InputDecoration(
+                  hintText: resources.searchProductsHint,
+                  prefixIcon: const Icon(Icons.search),
+                ),
+                onChanged: viewModel.setSearchQuery,
               ),
-              onChanged: viewModel.setSearchQuery,
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: resources.sort,
-            onPressed: () => _showSortSheet(context, viewModel, state),
-          ),
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            tooltip: resources.filter,
-            onPressed: () => _showFilterSheet(context, viewModel, state),
-          ),
-        ],
+            IconButton(
+              icon: const Icon(Icons.sort, color: Colors.black),
+              tooltip: resources.sort,
+              onPressed: () => _showSortSheet(context, viewModel, state),
+            ),
+            IconButton(
+              icon: const Icon(Icons.filter_list, color: Colors.black),
+              tooltip: resources.filter,
+              onPressed: () => _showFilterSheet(context, viewModel, state),
+            ),
+          ],
+        ),
       ),
     );
   }

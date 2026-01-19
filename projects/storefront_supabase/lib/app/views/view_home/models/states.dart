@@ -26,6 +26,8 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final Category? selectedLeafCategory;
   final Set<int> selectedBrandIds;
   final List<String> selectedSizesOrAges;
+  final bool isLoading;
+  final bool isListView;
 
   SupabaseHomeLoadedState({
     required this.products,
@@ -40,6 +42,8 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
     this.selectedSizesOrAges = const [],
+    this.isLoading = false,
+    this.isListView = false,
   });
 
   SupabaseHomeLoadedState copyWith({
@@ -55,6 +59,8 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
     List<String>? selectedSizesOrAges,
+    bool? isLoading,
+    bool? isListView,
   }) {
     return SupabaseHomeLoadedState(
       products: products ?? this.products,
@@ -69,6 +75,8 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
       selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
       selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
+      isLoading: isLoading ?? this.isLoading,
+      isListView: isListView ?? this.isListView,
     );
   }
 }

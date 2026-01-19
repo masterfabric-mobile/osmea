@@ -15,12 +15,18 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     required super.goRoute,
   }) : super(
           horizontalPadding: const PaddingVisibility.disabled(),
+          verticalPadding: const PaddingVisibility.disabled(),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) {
             final state = viewModel.state;
             if (state is ProfileAuthenticated) {
               return OsmeaComponents.appBar(
-                title: OsmeaComponents.text(context.resources.profile),
+                title: OsmeaComponents.text(
+                  context.resources.profile,
+                  color: Colors.black,
+                ),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
                 variant: AppBarVariant.primary,
                 size: AppBarSize.large,
                 elevation: 0,
@@ -56,7 +62,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
     if (state is ProfileAuthenticated) {
       return ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.zero,
         children: [
           _buildSectionHeader(context, resources.account),
           OsmeaComponents.listItem(
@@ -167,7 +173,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(

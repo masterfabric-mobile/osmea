@@ -18,9 +18,12 @@ class ProductsByCategoryView
             final resources = context.resources;
             final categoryName = arguments['categoryName'] as String? ?? resources.products;
             return OsmeaComponents.appBar(
-              title: OsmeaComponents.text(categoryName),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              title: OsmeaComponents.text(
+                categoryName,
+                color: Colors.black,
+              ),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
               leading: OsmeaComponents.iconButton(
                 onPressed: () {
                   if (context.canPop()) {
@@ -65,68 +68,60 @@ class ProductsByCategoryView
     }
 
     if (state is ProductsByCategoryLoaded) {
+      // 1. If there are subcategories, show them as a vertical list (Navigation Style)
+      if (state.subCategories.isNotEmpty) {
+        return ListView.builder(
+          itemCount: state.subCategories.length,
+          itemBuilder: (context, index) {
+            final subCat = state.subCategories[index];
+            return OsmeaComponents.listItem(
+              title: OsmeaComponents.text(subCat.name),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                // Navigate deeper into the hierarchy
+                goRoute(
+                    '/categories/products/${subCat.id}?name=${Uri.encodeComponent(subCat.name)}');
+              },
+            );
+          },
+        );
+      }
+
+      // 2. If no subcategories (Leaf Node), show Products Grid
       return Column(
         children: [
-          // Filters Section
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            color: Theme.of(context).cardColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Subcategories
-                if (state.subCategories.isNotEmpty)
-                  SizedBox(
-                    height: 50,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: state.subCategories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final subCat = state.subCategories[index];
-                        // In drill-down mode, chips aren't 'selected' in the traditional sense,
-                        // clicking one enters that category.
-                        return ActionChip(
-                          label: Text(subCat.name),
-                          avatar: const Icon(Icons.arrow_forward_ios, size: 12),
-                          onPressed: () => viewModel.navigateToSubcategory(subCat.id),
-                        );
-                      },
-                    ),
-                  ),
-                if (state.subCategories.isNotEmpty) const SizedBox(height: 8),
-                
-                // Age/Size Groups - ONLY if showSizeFilter is true
-                if (state.showSizeFilter)
-                  SizedBox(
-                    height: 50,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: viewModel.ageGroups.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final age = viewModel.ageGroups[index];
-                        final isSelected = state.selectedSizes.contains(age);
-                        return FilterChip(
-                          label: Text(age),
-                          selected: isSelected,
-                          onSelected: (_) => viewModel.toggleSizeFilter(age),
-                        );
-                      },
-                    ),
-                  ),
-              ],
+          // Size/Age Filters (Only for Fashion/Leaf categories if applicable)
+          if (state.showSizeFilter)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: Theme.of(context).cardColor,
+              child: SizedBox(
+                height: 50,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: viewModel.ageGroups.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final age = viewModel.ageGroups[index];
+                    final isSelected = state.selectedSizes.contains(age);
+                    return FilterChip(
+                      label: Text(age),
+                      selected: isSelected,
+                      onSelected: (_) => viewModel.toggleSizeFilter(age),
+                    );
+                  },
+                ),
+              ),
             ),
-          ),
-          
+
           Expanded(
             child: state.products.isEmpty
                 ? Center(child: Text(resources.noProductsForSelection))
                 : GridView.builder(
                     padding: const EdgeInsets.all(16.0),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16.0,
                       mainAxisSpacing: 16.0,
@@ -143,15 +138,19 @@ class ProductsByCategoryView
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: (product.imageUrl.contains('placehold.co'))
+                                child: (product.imageUrl
+                                        .contains('placehold.co'))
                                     ? const Center(
-                                        child: Icon(Icons.image, color: Colors.grey))
+                                        child: Icon(Icons.image,
+                                            color: Colors.grey))
                                     : Image.network(
                                         product.imageUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return const Center(
-                                              child: Icon(Icons.error, color: Colors.red));
+                                              child: Icon(Icons.error,
+                                                  color: Colors.red));
                                         },
                                       ),
                               ),
@@ -164,15 +163,22 @@ class ProductsByCategoryView
                                       product.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       '\$${product.price.toStringAsFixed(2)}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.primary,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: const Color(0xFF000000),
+                                            fontWeight: FontWeight.bold,
                                           ),
                                     ),
                                   ],

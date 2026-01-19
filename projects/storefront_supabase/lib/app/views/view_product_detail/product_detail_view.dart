@@ -28,9 +28,15 @@ class ProductDetailView
              title: (viewModel.state is ProductDetailLoadedState)
                  ? Text(
                      (viewModel.state as ProductDetailLoadedState).product.name,
+                     style: const TextStyle(color: Colors.black),
                    )
-                 : Text(context.resources.productDetail),
+                 : Text(
+                     context.resources.productDetail,
+                     style: const TextStyle(color: Colors.black),
+                   ),
              variant: AppBarVariant.primary,
+             backgroundColor: Colors.white,
+             foregroundColor: Colors.black,
              leading: OsmeaComponents.iconButton(
                onPressed: () {
                  if (context.canPop()) {
@@ -146,6 +152,8 @@ class ProductDetailView
                       }
                     },
                     variant: ButtonVariant.primary,
+                    backgroundColor: Colors.black, // Explicitly set background
+                    textColor: Colors.white, // Explicitly set text color
                     fullWidth: true,
                   ),
                   const SizedBox(height: 24),
@@ -221,7 +229,7 @@ class ProductDetailView
             Text(
               '\$${product.effectivePrice.toStringAsFixed(2)}',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -259,7 +267,7 @@ class ProductDetailView
       children: [
         OsmeaComponents.iconButton(
           onPressed: viewModel.decreaseQuantity,
-          icon: const Icon(Icons.remove),
+          icon: const Icon(Icons.remove, color: Colors.black),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -270,7 +278,7 @@ class ProductDetailView
         ),
         OsmeaComponents.iconButton(
           onPressed: viewModel.increaseQuantity,
-          icon: const Icon(Icons.add),
+          icon: const Icon(Icons.add, color: Colors.black),
         ),
       ],
     );

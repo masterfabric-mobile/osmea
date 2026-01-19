@@ -86,7 +86,7 @@ class _MainScreenState extends State<MainScreen> {
     final inactiveColor = _getNavbarColor(
       configHelper,
       'unselectedIconColor',
-      const Color(0xFF666666), // Gray
+      const Color(0xFF000000), // Black
     );
 
     final List<NavbarItem> navItems = [
@@ -193,7 +193,7 @@ class _AdminScreenState extends State<AdminScreen> {
     final inactiveColor = _getNavbarColor(
       configHelper,
       'unselectedIconColor',
-      const Color(0xFF666666), // Gray
+      const Color(0xFF000000), // Black
     );
 
     final List<NavbarItem> navItems = [
