@@ -5,6 +5,7 @@ class Category {
   final String? description;
   final String? imageUrl;
   final String? parentId;
+  final int? count;
 
   Category({
     required this.id,
@@ -13,9 +14,18 @@ class Category {
     this.description,
     this.imageUrl,
     this.parentId,
+    this.count,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    int? parsedCount;
+    if (json['products'] != null && json['products'] is List && (json['products'] as List).isNotEmpty) {
+       final firstItem = (json['products'] as List).first;
+       if (firstItem is Map && firstItem.containsKey('count')) {
+         parsedCount = firstItem['count'] as int?;
+       }
+    }
+
     return Category(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -23,6 +33,7 @@ class Category {
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
       parentId: json['parent_id'] as String?,
+      count: parsedCount,
     );
   }
 

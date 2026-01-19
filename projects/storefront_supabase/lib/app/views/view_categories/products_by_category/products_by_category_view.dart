@@ -79,8 +79,15 @@ class ProductsByCategoryView
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // Navigate deeper into the hierarchy
-                goRoute(
-                    '/categories/products/${subCat.id}?name=${Uri.encodeComponent(subCat.name)}');
+                if (subCat.count != null && subCat.count! > 0) {
+                  goRoute(
+                      '/categories/products/${subCat.id}?name=${Uri.encodeComponent(subCat.name)}');
+                } else {
+                  context.showSnackbar(
+                    message: resources.noProductsForSelection,
+                    type: SnackbarType.info,
+                  );
+                }
               },
             );
           },

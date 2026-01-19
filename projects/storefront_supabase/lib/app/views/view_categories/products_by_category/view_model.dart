@@ -39,7 +39,7 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
       // 2. Fetch direct subcategories (Children of the current category)
       final subCategoriesResponse = await _supabaseClient
           .from('categories')
-          .select()
+          .select('*, products(count)')
           .eq('parent_id', categoryId)
           .order('name');
       
