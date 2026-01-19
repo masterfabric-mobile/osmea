@@ -5,6 +5,8 @@ import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the new enum
+
 import 'states.dart';
 
 @injectable
@@ -79,15 +81,15 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     }
   }
 
-  Future<void> toggleFavorite(String productId) async {
+  Future<FavoriteActionStatus> toggleFavorite(String productId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) {
-      // Maybe show a message to log in
-      debugPrint("User not logged in, can't add to favorites.");
-      return;
+      return FavoriteActionStatus.errorLogin;
     }
 
-    if (state is! ProductDetailLoadedState) return;
+    if (state is! ProductDetailLoadedState) {
+      return FavoriteActionStatus.unknownError;
+    }
 
     final currentLoadedState = state as ProductDetailLoadedState;
     final bool isCurrentlyInWishlist = currentLoadedState.isInWishlist;
@@ -112,9 +114,12 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       stateChanger(
         currentLoadedState.copyWith(isInWishlist: !isCurrentlyInWishlist),
       );
+      return isCurrentlyInWishlist
+          ? FavoriteActionStatus.removed
+          : FavoriteActionStatus.added;
     } catch (e) {
       debugPrint("Error updating favorite status: $e");
-      // Optionally, show an error message to the user
+      return FavoriteActionStatus.errorFailed;
     }
   }
 
@@ -212,3 +217,4 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     reviewCommentController.dispose();
   }
 }
+

@@ -34,8 +34,16 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                 actions: [
                   AppBarAction(
                     type: AppBarActionType.profile,
-                    icon: const Icon(Icons.logout),
-                    onPressed: () => viewModel.logout(),
+                    icon: const Icon(Icons.logout, color: Colors.black),
+                    onPressed: () async {
+                      await viewModel.logout();
+                      if (context.mounted) {
+                        context.showSnackbar(
+                          message: context.resources.logoutSuccess,
+                          type: SnackbarType.success,
+                        );
+                      }
+                    },
                   ),
                 ],
               );

@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/core/config/register_module.dart'
+    as _i1006;
 import 'package:storefront_supabase/app/views/admin/dashboard/models/view_model.dart'
     as _i821;
 import 'package:storefront_supabase/app/views/admin/products/add_product/view_model.dart'
@@ -48,7 +50,9 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final registerModule = _$RegisterModule();
     gh.factory<_i76.SettingsViewModel>(() => _i76.SettingsViewModel());
+    gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.factory<_i826.CartViewModel>(
       () => _i826.CartViewModel(gh<_i454.SupabaseClient>()),
     );
@@ -91,3 +95,5 @@ extension GetItInjectableX on _i174.GetIt {
     return this;
   }
 }
+
+class _$RegisterModule extends _i1006.RegisterModule {}

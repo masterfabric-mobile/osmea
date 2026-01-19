@@ -208,6 +208,10 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get goToHome => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Aller à l\'accueil';
 	@override String get password => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Mot de passe';
 	@override String get confirmPassword => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Confirmer le mot de passe';
+	@override String get logoutSuccess => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Déconnexion réussie !';
+	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Ajouté aux favoris !';
+	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Retiré des favoris.';
+	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -388,6 +392,10 @@ extension on TranslationsFr {
 			'goToHome' => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Aller à l\'accueil',
 			'password' => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Mot de passe',
 			'confirmPassword' => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Confirmer le mot de passe',
+			'logoutSuccess' => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Déconnexion réussie !',
+			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Ajouté aux favoris !',
+			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Retiré des favoris.',
+			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.',
 			_ => null,
 		};
 	}

@@ -1,10 +1,11 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 import 'package:flutter/foundation.dart';
 import 'package:storefront_supabase/app/core/config/config_di.config.dart';
+
 
 
 GetIt getIt = GetIt.instance;
@@ -19,11 +20,8 @@ Future<GetIt> configureDependencies({String? environment}) async {
     debugPrint('✅ Core dependencies initialized');
 
 
-    // Register Supabase client
-    if (!getIt.isRegistered<SupabaseClient>()) {
-      getIt.registerSingleton<SupabaseClient>(Supabase.instance.client);
-      debugPrint('✅ SupabaseClient registered manually in GetIt');
-    }
+    // Manual Supabase client registration removed.
+    // Injectable will now provide SupabaseClient via RegisterModule.
 
 
     // Initialize app-specific dependencies

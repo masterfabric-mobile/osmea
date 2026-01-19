@@ -175,6 +175,10 @@
   "onboardingScreen": "Onboarding-Bildschirm",
   "goToHome": "Zur Startseite",
   "password": "Passwort",
-  "confirmPassword": "Passwort bestätigen"
+  "confirmPassword": "Passwort bestätigen",
+  "logoutSuccess": "Erfolgreich abgemeldet!",
+  "addedToFavorites": "Zu Favoriten hinzugefügt!",
+  "removedFromFavorites": "Aus Favoriten entfernt.",
+  "wishlistUpdateFailed": "Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
 }
 

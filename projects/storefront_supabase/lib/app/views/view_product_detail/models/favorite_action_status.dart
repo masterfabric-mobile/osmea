@@ -1,0 +1,1 @@
+enum FavoriteActionStatus { added, removed, errorLogin, errorFailed, unknownError }

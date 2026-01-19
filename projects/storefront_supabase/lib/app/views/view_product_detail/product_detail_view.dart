@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the enum
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -59,12 +60,42 @@ class ProductDetailView
                      }
                      return Icon(
                        isInWishlist ? Icons.favorite : Icons.favorite_border,
+                       color: Colors.black, // Explicitly set to black
                      );
                    },
                  ),
-                 onPressed: () {
+                 onPressed: () async {
                    if (productId != null) {
-                     viewModel.toggleFavorite(productId);
+                     final status = await viewModel.toggleFavorite(productId);
+                     if (!context.mounted) return;
+                     String message;
+                     SnackbarType type;
+                     switch (status) {
+                       case FavoriteActionStatus.added:
+                         message = context.resources.addedToFavorites;
+                         type = SnackbarType.success;
+                         break;
+                       case FavoriteActionStatus.removed:
+                         message = context.resources.removedFromFavorites;
+                         type = SnackbarType.info;
+                         break;
+                       case FavoriteActionStatus.errorLogin:
+                         message = context.resources.loginToViewInfo;
+                         type = SnackbarType.error;
+                         break;
+                       case FavoriteActionStatus.errorFailed:
+                         message = context.resources.wishlistUpdateFailed;
+                         type = SnackbarType.error;
+                         break;
+                       case FavoriteActionStatus.unknownError:
+                         message = context.resources.unexpectedError;
+                         type = SnackbarType.error;
+                         break;
+                     }
+                     context.showSnackbar(
+                       message: message,
+                       type: type,
+                     );
                    }
                  },
                ),
@@ -136,18 +167,14 @@ class ProductDetailView
                       );
                       if (!context.mounted) return;
                       if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(resources.productAddedToCart),
-                            backgroundColor: Colors.green,
-                          ),
+                        context.showSnackbar(
+                          message: resources.productAddedToCart,
+                          type: SnackbarType.success,
                         );
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(resources.failedToAddCart),
-                            backgroundColor: Colors.red,
-                          ),
+                        context.showSnackbar(
+                          message: resources.failedToAddCart,
+                          type: SnackbarType.error,
                         );
                       }
                     },
@@ -558,7 +585,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Color.fromARGB((255 * 0.4).round(), 0, 0, 0),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -580,7 +607,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                           decoration: BoxDecoration(
                             color: _currentPage == index
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.5),
+                                : Color.fromARGB((255 * 0.5).round(), 255, 255, 255),
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),

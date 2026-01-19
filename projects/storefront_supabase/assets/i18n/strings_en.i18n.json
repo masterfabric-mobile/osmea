@@ -176,6 +176,10 @@
   "onboardingScreen": "Onboarding Screen",
   "goToHome": "Go to Home",
   "password": "Password",
-  "confirmPassword": "Confirm Password"
+  "confirmPassword": "Confirm Password",
+  "logoutSuccess": "Logged out successfully!",
+  "addedToFavorites": "Added to favorites!",
+  "removedFromFavorites": "Removed from favorites.",
+  "wishlistUpdateFailed": "Failed to update wishlist. Please try again."
 }
 

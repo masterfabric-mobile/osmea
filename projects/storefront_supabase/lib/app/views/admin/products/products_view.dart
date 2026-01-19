@@ -455,16 +455,15 @@ class AdminProductsView
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium),
         ...allSorts.map(
-          (sort) => ListTile(
+          (sort) => RadioListTile<T>(
             title: Text((sort as Enum).name),
-            leading: Radio<T>(
-              value: sort,
-              // ignore: deprecated_member_use
-              groupValue: currentSort,
-              // ignore: deprecated_member_use
-              onChanged: null,
-            ),
-            onTap: () => onChanged(sort),
+            // ignore: deprecated_member_use
+            value: sort,
+            // ignore: deprecated_member_use
+            groupValue: currentSort,
+            // ignore: deprecated_member_use
+            onChanged: onChanged,
+            // selected: sort == currentSort, // Optional: highlight selected
           ),
         ),
         const Divider(),

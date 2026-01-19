@@ -212,7 +212,7 @@ class _ProductsViewWithScrollToTopState
               color: const Color(0xFF000000),
               shape: const CircleBorder(),
               elevation: 8,
-              shadowColor: Colors.black.withOpacity(0.3),
+              shadowColor: Color.fromARGB((255 * 0.3).round(), 0, 0, 0),
               child: InkWell(
                 onTap: _scrollToTop,
                 borderRadius: BorderRadius.circular(24),
@@ -223,7 +223,7 @@ class _ProductsViewWithScrollToTopState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Color.fromARGB((255 * 0.3).round(), 0, 0, 0),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                         spreadRadius: 1,
@@ -924,6 +924,7 @@ class _ProductsViewWithScrollToTopState
     }
 
     return DropdownButtonFormField<T>(
+      // ignore: deprecated_member_use
       value: effectiveValue,
       decoration: InputDecoration(
         labelText: label,
@@ -978,14 +979,15 @@ class _ProductsViewWithScrollToTopState
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium),
         ...allSorts.map(
-          (sort) => ListTile(
+          (sort) => RadioListTile<T>(
             title: Text((sort as Enum).name),
-            leading: Radio<T>(
-              value: sort,
-              groupValue: currentSort,
-              onChanged: null,
-            ),
-            onTap: () => onChanged(sort),
+            // ignore: deprecated_member_use
+            value: sort,
+            // ignore: deprecated_member_use
+            groupValue: currentSort,
+            // ignore: deprecated_member_use
+            onChanged: onChanged,
+            // selected: sort == currentSort, // Optional: highlight selected
           ),
         ),
         const Divider(),
