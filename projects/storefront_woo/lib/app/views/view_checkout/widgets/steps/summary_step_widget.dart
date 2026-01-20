@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
+import 'package:storefront_woo/app/utils/estimated_delivery_helper.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
 class SummaryStepWidget extends StatelessWidget {
@@ -27,6 +28,9 @@ class SummaryStepWidget extends StatelessWidget {
   final double subtotal;
   final double shippingCost;
   final String? currencyCode;
+
+  // Cart items for per-product estimated delivery
+  final List<CheckoutLineItem> lineItems;
   
   // Actions
   final bool isProcessing;
@@ -47,6 +51,7 @@ class SummaryStepWidget extends StatelessWidget {
     required this.subtotal,
     required this.shippingCost,
     this.currencyCode,
+    this.lineItems = const [],
     this.isProcessing = false,
     required this.onCompleteOrder,
     required this.onBack,
@@ -108,6 +113,19 @@ class SummaryStepWidget extends StatelessWidget {
                   onEdit: onEditPayment,
                   content: _buildPaymentContent(context),
                 ),
+
+                if (lineItems.isNotEmpty) ...[
+                  SizedBox(height: context.spacing12),
+                  _buildStaticCard(
+                    context,
+                    configHelper,
+                    title: EstimatedDeliveryHelper.estimatedDeliveryLabel(
+                      configHelper: configHelper,
+                    ),
+                    icon: Icons.inventory_2_outlined,
+                    content: _buildItemsDeliveryContent(context, configHelper),
+                  ),
+                ],
                 
                 SizedBox(height: context.spacing20),
                 
@@ -230,6 +248,165 @@ class SummaryStepWidget extends StatelessWidget {
           content,
         ],
       ),
+    );
+  }
+
+  Widget _buildStaticCard(
+    BuildContext context,
+    AssetConfigHelper configHelper, {
+    required String title,
+    required IconData icon,
+    required Widget content,
+  }) {
+    final activeColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_focused_border_color',
+      OsmeaColors.black,
+    );
+
+    return Container(
+      padding: EdgeInsets.all(context.spacing16),
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.grayMaterial[200]!,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: activeColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: activeColor, size: 18),
+              ),
+              SizedBox(width: context.spacing10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.spacing12),
+          content,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemsDeliveryContent(
+    BuildContext context,
+    AssetConfigHelper configHelper,
+  ) {
+    final baseDeliveryTime = selectedShippingMethod?.deliveryTime;
+
+    final groups = <String, _DeliveryGroup>{};
+    for (final item in lineItems) {
+      final range = EstimatedDeliveryHelper.estimatedDeliveryDates(
+        context,
+        deliveryTime: baseDeliveryTime,
+        minAdditionalDays: item.deliveryProfile.minAdditionalDays,
+        maxAdditionalDays: item.deliveryProfile.maxAdditionalDays,
+        configHelper: configHelper,
+      );
+      if (range == null) continue;
+
+      final startDay = DateUtils.dateOnly(range.startDate);
+      final endDay = DateUtils.dateOnly(range.endDate);
+      final key = '${startDay.millisecondsSinceEpoch}-${endDay.millisecondsSinceEpoch}';
+
+      final existing = groups[key];
+      if (existing == null) {
+        groups[key] = _DeliveryGroup(startDay, endDay, [item]);
+      } else {
+        existing.items.add(item);
+      }
+    }
+
+    final sorted = groups.values.toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+
+    if (sorted.isEmpty) {
+      return Text(
+        '-',
+        style: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.grayMaterial[500],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var gi = 0; gi < sorted.length; gi++) ...[
+          Text(
+            EstimatedDeliveryHelper.formatDateRange(
+              context,
+              startDate: sorted[gi].start,
+              endDate: sorted[gi].end,
+              configHelper: configHelper,
+            ),
+            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+              fontWeight: FontWeight.w700,
+              color: OsmeaColors.black,
+            ),
+          ),
+          SizedBox(height: context.spacing10),
+          ...sorted[gi].items.map((item) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: context.spacing8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${item.name ?? '-'} ×${item.quantity}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (item.deliveryProfile.reason != null &&
+                            item.deliveryProfile.reason!.isNotEmpty) ...[
+                          SizedBox(height: context.spacing2),
+                          Text(
+                            item.deliveryProfile.reason!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: OsmeaTextStyle.bodySmall(context).copyWith(
+                              color: OsmeaColors.grayMaterial[500],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          if (gi != sorted.length - 1)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: context.spacing6),
+              child: Divider(color: OsmeaColors.grayMaterial[200], height: 1),
+            ),
+        ],
+      ],
     );
   }
 
@@ -524,26 +701,35 @@ class SummaryStepWidget extends StatelessWidget {
     bool isLarge = false,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: (isLarge
-                  ? OsmeaTextStyle.bodyLarge(context)
-                  : OsmeaTextStyle.bodyMedium(context))
-              .copyWith(
-            color: isBold ? OsmeaColors.black : OsmeaColors.grayMaterial[600],
-            fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: (isLarge
+                    ? OsmeaTextStyle.bodyLarge(context)
+                    : OsmeaTextStyle.bodyMedium(context))
+                .copyWith(
+              color: isBold ? OsmeaColors.black : OsmeaColors.grayMaterial[600],
+              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ),
-        Text(
-          value,
-          style: (isLarge
-                  ? OsmeaTextStyle.titleLarge(context)
-                  : OsmeaTextStyle.bodyMedium(context))
-              .copyWith(
-            color: valueColor ?? OsmeaColors.black,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+        SizedBox(width: context.spacing12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: (isLarge
+                    ? OsmeaTextStyle.titleLarge(context)
+                    : OsmeaTextStyle.bodyMedium(context))
+                .copyWith(
+              color: valueColor ?? OsmeaColors.black,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -677,4 +863,12 @@ class SummaryStepWidget extends StatelessWidget {
     }
     return fallback;
   }
+}
+
+class _DeliveryGroup {
+  final DateTime start;
+  final DateTime end;
+  final List<CheckoutLineItem> items;
+
+  _DeliveryGroup(this.start, this.end, this.items);
 }

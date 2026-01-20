@@ -85,7 +85,7 @@ class PaymentStepWidget extends StatelessWidget {
                 
                 // Delivery info card
                 _buildDeliveryInfoCard(context, configHelper),
-                
+
                 SizedBox(height: context.spacing16),
                 
                 // Final order summary
@@ -450,24 +450,35 @@ class PaymentStepWidget extends StatelessWidget {
     bool isLarge = false,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: (isLarge 
-              ? OsmeaTextStyle.bodyLarge(context) 
-              : OsmeaTextStyle.bodyMedium(context)).copyWith(
-            color: isBold ? OsmeaColors.black : OsmeaColors.grayMaterial[600],
-            fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: (isLarge
+                    ? OsmeaTextStyle.bodyLarge(context)
+                    : OsmeaTextStyle.bodyMedium(context))
+                .copyWith(
+              color: isBold ? OsmeaColors.black : OsmeaColors.grayMaterial[600],
+              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ),
-        Text(
-          value,
-          style: (isLarge 
-              ? OsmeaTextStyle.titleLarge(context) 
-              : OsmeaTextStyle.bodyMedium(context)).copyWith(
-            color: valueColor ?? OsmeaColors.black,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+        SizedBox(width: context.spacing12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: (isLarge
+                    ? OsmeaTextStyle.titleLarge(context)
+                    : OsmeaTextStyle.bodyMedium(context))
+                .copyWith(
+              color: valueColor ?? OsmeaColors.black,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ),
       ],

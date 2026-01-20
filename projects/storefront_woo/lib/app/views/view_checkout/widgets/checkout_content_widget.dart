@@ -68,7 +68,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
     const prefix = 'checkout_';
     if (!legacyKey.startsWith(prefix)) return legacyKey;
     final scope = _checkoutStorageScope();
-    return legacyKey.replaceFirst(prefix, '${prefix}${scope}_');
+    return legacyKey.replaceFirst(prefix, '$prefix${scope}_');
   }
 
   Future<String?> _readCheckoutValueWithLegacyFallback(
@@ -614,6 +614,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           subtotal: widget.state.subtotalAmount,
           shippingCost: widget.state.shippingCost,
           currencyCode: widget.state.currencyCode,
+          lineItems: widget.state.lineItems,
           isProcessing: _isProcessing,
           onCompleteOrder: _handleCompleteOrder,
           onBack: _handleBack,

@@ -355,20 +355,29 @@ class ShippingStepWidget extends StatelessWidget {
     bool isBold = false,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: OsmeaTextStyle.bodyMedium(context).copyWith(
-            color: OsmeaColors.grayMaterial[600],
-            fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+              color: OsmeaColors.grayMaterial[600],
+              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ),
-        Text(
-          value,
-          style: OsmeaTextStyle.bodyMedium(context).copyWith(
-            color: valueColor ?? OsmeaColors.black,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+        SizedBox(width: context.spacing12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+              color: valueColor ?? OsmeaColors.black,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ),
       ],

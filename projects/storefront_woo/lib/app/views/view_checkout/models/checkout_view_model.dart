@@ -11,6 +11,7 @@ import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/abst
 import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/freezed_model/request/process_payment_and_order_request_model.dart' as request_model;
 import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/freezed_model/response/process_order_and_payment_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
+import 'package:apis/network/remote/woocommerce/store_api/cart_api/freezed_model/response/get_cart_response.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
@@ -81,6 +82,15 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
 
       debugPrint('🛒 CheckoutViewModel: Loading checkout data...');
 
+      // Get API version from config (needed for cart fetch)
+      final apiVersion = _configHelper.getString(
+        'woocommerce_configuration.version',
+        'v1',
+      );
+
+      // Ensure cart token exists so we can fetch items.
+      await _ensureCartToken(apiVersion);
+
       // Get cart total from arguments
       final totalAmount = _arguments['totalAmount'] as double? ?? 0.0;
       final currencySymbol = _arguments['currencySymbol'] as String?;
@@ -106,6 +116,15 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       // Default payment methods (can be fetched from API in future)
       final paymentMethods = _getDefaultPaymentMethods();
 
+      // Fetch cart items for per-product estimated delivery in checkout.
+      List<CheckoutLineItem> lineItems = const [];
+      try {
+        final cart = await _cartService.getCart(apiVersion: apiVersion);
+        lineItems = _mapCartToCheckoutLineItems(cart);
+      } catch (e) {
+        debugPrint('⚠️ CheckoutViewModel: Could not fetch cart items: $e');
+      }
+
       emit(CheckoutLoadedState(
         currentStep: CheckoutStep.address,
         subtotalAmount: totalAmount,
@@ -113,6 +132,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         totalAmount: totalAmount,
         currencySymbol: currencySymbol,
         currencyCode: currencyCode,
+        lineItems: lineItems,
         savedBillingAddress: savedBillingAddress,
         savedShippingAddress: savedShippingAddress,
         shippingMethods: shippingMethods,
@@ -126,6 +146,71 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         message: 'Failed to load checkout. Please try again.',
       ));
     }
+  }
+
+  List<CheckoutLineItem> _mapCartToCheckoutLineItems(GetCartResponse cart) {
+    final items = cart.items ?? const <GetCartResponseItem>[];
+    return items.map((it) {
+      final img = (it.images?.isNotEmpty ?? false)
+          ? (it.images!.first.thumbnail ?? it.images!.first.src)
+          : null;
+      return CheckoutLineItem(
+        key: it.key,
+        id: it.id,
+        name: it.name,
+        quantity: it.quantity ?? 1,
+        imageUrl: img,
+        lowStockRemaining: it.lowStockRemaining,
+        backordersAllowed: it.backordersAllowed ?? false,
+        showBackorderBadge: it.showBackorderBadge ?? false,
+        // Store API cart item "extensions" is currently an empty model here.
+        extensions: null,
+        deliveryProfile: _buildDeliveryProfile(it),
+      );
+    }).toList();
+  }
+
+  CheckoutDeliveryProfile _buildDeliveryProfile(GetCartResponseItem it) {
+    // Otherwise, derive a per-product modifier from stock/backorder signals.
+    final qty = it.quantity ?? 1;
+    final showBackorder = it.showBackorderBadge ?? false;
+    final backordersAllowed = it.backordersAllowed ?? false;
+
+    int? lowStock;
+    final lsr = it.lowStockRemaining;
+    if (lsr is int) {
+      lowStock = lsr;
+    } else if (lsr is String) {
+      lowStock = int.tryParse(lsr);
+    }
+
+    // Defaults: no extra days
+    var minAdd = 0;
+    var maxAdd = 0;
+    String? reason;
+
+    if (showBackorder || backordersAllowed) {
+      minAdd = 2;
+      maxAdd = 5;
+      reason = 'Backorder';
+    } else if (lowStock != null && lowStock <= 0) {
+      minAdd = 1;
+      maxAdd = 3;
+      reason = 'Low stock';
+    }
+
+    // Bigger quantities can take slightly longer to consolidate.
+    if (qty >= 3) {
+      minAdd += 1;
+      maxAdd += 1;
+      reason = reason ?? 'Quantity';
+    }
+
+    return CheckoutDeliveryProfile(
+      minAdditionalDays: minAdd,
+      maxAdditionalDays: maxAdd,
+      reason: reason,
+    );
   }
 
   /// Get default shipping methods

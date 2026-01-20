@@ -5,6 +5,46 @@
  * Supports 4-step wizard: Address -> Shipping -> Payment -> Summary
  */
 
+/// Simple line-item model for checkout UI.
+class CheckoutLineItem {
+  final String? key;
+  final int? id;
+  final String? name;
+  final int quantity;
+  final String? imageUrl;
+  final dynamic lowStockRemaining;
+  final bool backordersAllowed;
+  final bool showBackorderBadge;
+  final Map<String, dynamic>? extensions;
+  final CheckoutDeliveryProfile deliveryProfile;
+
+  const CheckoutLineItem({
+    this.key,
+    this.id,
+    this.name,
+    this.quantity = 1,
+    this.imageUrl,
+    this.lowStockRemaining,
+    this.backordersAllowed = false,
+    this.showBackorderBadge = false,
+    this.extensions,
+    this.deliveryProfile = const CheckoutDeliveryProfile(),
+  });
+}
+
+/// Per-item delivery modifiers to make estimates product-specific.
+class CheckoutDeliveryProfile {
+  final int minAdditionalDays;
+  final int maxAdditionalDays;
+  final String? reason;
+
+  const CheckoutDeliveryProfile({
+    this.minAdditionalDays = 0,
+    this.maxAdditionalDays = 0,
+    this.reason,
+  });
+}
+
 /// Checkout step enum
 enum CheckoutStep {
   address,   // Step 1: Billing & Shipping Address
@@ -107,6 +147,9 @@ class CheckoutLoadedState extends CheckoutState {
   final double totalAmount;
   final String? currencySymbol;
   final String? currencyCode;
+
+  // Cart items (for per-product estimated delivery)
+  final List<CheckoutLineItem> lineItems;
   
   // Saved addresses
   final Map<String, dynamic>? savedBillingAddress;
@@ -138,6 +181,7 @@ class CheckoutLoadedState extends CheckoutState {
     required this.totalAmount,
     this.currencySymbol,
     this.currencyCode,
+    this.lineItems = const [],
     this.savedBillingAddress,
     this.savedShippingAddress,
     this.billingAddress,
@@ -189,6 +233,7 @@ class CheckoutLoadedState extends CheckoutState {
     double? totalAmount,
     String? currencySymbol,
     String? currencyCode,
+    List<CheckoutLineItem>? lineItems,
     Map<String, dynamic>? savedBillingAddress,
     Map<String, dynamic>? savedShippingAddress,
     Map<String, dynamic>? billingAddress,
@@ -212,6 +257,7 @@ class CheckoutLoadedState extends CheckoutState {
       totalAmount: totalAmount ?? this.totalAmount,
       currencySymbol: currencySymbol ?? this.currencySymbol,
       currencyCode: currencyCode ?? this.currencyCode,
+      lineItems: lineItems ?? this.lineItems,
       savedBillingAddress: savedBillingAddress ?? this.savedBillingAddress,
       savedShippingAddress: savedShippingAddress ?? this.savedShippingAddress,
       billingAddress: billingAddress ?? this.billingAddress,
