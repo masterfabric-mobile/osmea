@@ -2,6 +2,7 @@
  * CheckoutViewModel
  * -----------------
  * ViewModel for the checkout view following OSMEA architecture.
+ * Supports 3-step wizard: Address -> Shipping -> Payment
  */
 
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,31 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
   // Public trigger functions
   void loadCheckout() => _loadCheckout();
   
+  /// Update address data and proceed to shipping step
+  void updateAddressAndProceed({
+    required String billingEmail,
+    required Map<String, dynamic> billingAddress,
+    required Map<String, dynamic> shippingAddress,
+    required bool sameAsBilling,
+  }) => _updateAddressAndProceed(
+        billingEmail: billingEmail,
+        billingAddress: billingAddress,
+        shippingAddress: shippingAddress,
+        sameAsBilling: sameAsBilling,
+      );
+
+  /// Select a shipping method
+  void selectShippingMethod(String methodId) => _selectShippingMethod(methodId);
+
+  /// Proceed to payment step
+  void proceedToPayment() => _proceedToPayment();
+
+  /// Select a payment method
+  void selectPaymentMethod(String methodId) => _selectPaymentMethod(methodId);
+
+  /// Navigate to a specific step
+  void goToStep(CheckoutStep step) => _goToStep(step);
+
   void processOrder({
     required String billingEmail,
     required Map<String, dynamic> billingAddress,
@@ -67,19 +93,31 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         final authCubit = GetIt.I<AuthCubit>();
         final authState = authCubit.state;
         if (authState is AuthAuthenticatedState && authState.userData != null) {
-          // Could load saved addresses from user profile here
           debugPrint('✅ CheckoutViewModel: User authenticated, could load saved addresses');
         }
       } catch (e) {
         debugPrint('⚠️ CheckoutViewModel: Could not load saved addresses: $e');
       }
 
+      // Default shipping methods (can be fetched from API in future)
+      final shippingMethods = _getDefaultShippingMethods();
+
+      // Default payment methods (can be fetched from API in future)
+      final paymentMethods = _getDefaultPaymentMethods();
+
       emit(CheckoutLoadedState(
+        currentStep: CheckoutStep.address,
+        subtotalAmount: totalAmount,
+        shippingCost: 0.0,
         totalAmount: totalAmount,
         currencySymbol: currencySymbol,
         currencyCode: currencyCode,
         savedBillingAddress: savedBillingAddress,
         savedShippingAddress: savedShippingAddress,
+        shippingMethods: shippingMethods,
+        paymentMethods: paymentMethods,
+        isAddressStepValid: false,
+        isShippingStepValid: false,
       ));
     } catch (e) {
       debugPrint('❌ CheckoutViewModel: Error loading checkout: $e');
@@ -89,17 +127,195 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
     }
   }
 
+  /// Get default shipping methods
+  List<ShippingMethod> _getDefaultShippingMethods() {
+    return [
+      const ShippingMethod(
+        id: 'flat_rate',
+        title: 'Standard Shipping',
+        description: 'Delivery to your address',
+        cost: 29.90,
+        deliveryTime: '3-5 business days',
+      ),
+      const ShippingMethod(
+        id: 'express',
+        title: 'Express Shipping',
+        description: 'Fast delivery',
+        cost: 59.90,
+        deliveryTime: '1-2 business days',
+      ),
+      const ShippingMethod(
+        id: 'free_shipping',
+        title: 'Free Shipping',
+        description: 'Free delivery on orders over ₺500',
+        cost: 0.0,
+        deliveryTime: '5-7 business days',
+      ),
+    ];
+  }
+
+  /// Get default payment methods
+  List<PaymentMethod> _getDefaultPaymentMethods() {
+    return [
+      const PaymentMethod(
+        id: 'bacs',
+        title: 'Bank Transfer',
+        description: 'Direct bank transfer (EFT/Havale)',
+        icon: 'account_balance',
+        enabled: true,
+      ),
+      const PaymentMethod(
+        id: 'cod',
+        title: 'Cash on Delivery',
+        description: 'Pay when you receive your order',
+        icon: 'payments',
+        enabled: true,
+      ),
+      // Credit card can be enabled when Stripe/iyzico is integrated
+      const PaymentMethod(
+        id: 'credit_card',
+        title: 'Credit Card',
+        description: 'Pay securely with your card',
+        icon: 'credit_card',
+        enabled: false, // Disabled until payment gateway is integrated
+      ),
+    ];
+  }
+
+  /// Update address and proceed to shipping step
+  void _updateAddressAndProceed({
+    required String billingEmail,
+    required Map<String, dynamic> billingAddress,
+    required Map<String, dynamic> shippingAddress,
+    required bool sameAsBilling,
+  }) {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    debugPrint('🛒 CheckoutViewModel: Address validated, proceeding to shipping');
+
+    emit(currentState.copyWith(
+      currentStep: CheckoutStep.shipping,
+      billingEmail: billingEmail,
+      billingAddress: billingAddress,
+      shippingAddress: shippingAddress,
+      sameAsBilling: sameAsBilling,
+      isAddressStepValid: true,
+    ));
+  }
+
+  /// Select shipping method
+  void _selectShippingMethod(String methodId) {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    final selectedMethod = currentState.shippingMethods
+        .where((m) => m.id == methodId)
+        .firstOrNull;
+
+    if (selectedMethod == null) return;
+
+    debugPrint('🛒 CheckoutViewModel: Selected shipping method: ${selectedMethod.title}');
+
+    emit(currentState.copyWith(
+      selectedShippingMethodId: methodId,
+      shippingCost: selectedMethod.cost,
+      totalAmount: currentState.subtotalAmount + selectedMethod.cost,
+    ));
+  }
+
+  /// Proceed to payment step
+  void _proceedToPayment() {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    if (currentState.selectedShippingMethodId == null) {
+      debugPrint('⚠️ CheckoutViewModel: No shipping method selected');
+      return;
+    }
+
+    debugPrint('🛒 CheckoutViewModel: Proceeding to payment step');
+
+    emit(currentState.copyWith(
+      currentStep: CheckoutStep.payment,
+      isShippingStepValid: true,
+    ));
+  }
+
+  /// Select payment method
+  void _selectPaymentMethod(String methodId) {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    final selectedMethod = currentState.paymentMethods
+        .where((m) => m.id == methodId && m.enabled)
+        .firstOrNull;
+
+    if (selectedMethod == null) return;
+
+    debugPrint('🛒 CheckoutViewModel: Selected payment method: ${selectedMethod.title}');
+
+    emit(currentState.copyWith(
+      selectedPaymentMethodId: methodId,
+    ));
+  }
+
+  /// Proceed to summary step
+  void proceedToSummary() => _proceedToSummary();
+
+  void _proceedToSummary() {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    if (currentState.selectedPaymentMethodId == null) {
+      debugPrint('⚠️ CheckoutViewModel: No payment method selected');
+      return;
+    }
+
+    debugPrint('🛒 CheckoutViewModel: Proceeding to summary step');
+
+    emit(currentState.copyWith(
+      currentStep: CheckoutStep.summary,
+      isPaymentStepValid: true,
+    ));
+  }
+
+  /// Navigate to a specific step
+  void _goToStep(CheckoutStep step) {
+    final currentState = state;
+    if (currentState is! CheckoutLoadedState) return;
+
+    // Validate step navigation
+    if (step == CheckoutStep.shipping && !currentState.isAddressStepValid) {
+      debugPrint('⚠️ CheckoutViewModel: Cannot go to shipping, address not valid');
+      return;
+    }
+    if (step == CheckoutStep.payment && !currentState.isShippingStepValid) {
+      debugPrint('⚠️ CheckoutViewModel: Cannot go to payment, shipping not valid');
+      return;
+    }
+
+    debugPrint('🛒 CheckoutViewModel: Navigating to step: ${step.name}');
+
+    emit(currentState.copyWith(currentStep: step));
+  }
+
   @override
   CheckoutState? fromJson(Map<String, dynamic> json) {
     return null;
   }
 
-  /// Process order with bank transfer payment
+  /// Process order with selected payment method
   Future<void> _processOrder({
     required String billingEmail,
     required Map<String, dynamic> billingAddress,
     required Map<String, dynamic> shippingAddress,
   }) async {
+    final currentState = state;
+    final selectedPaymentMethodId = currentState is CheckoutLoadedState 
+        ? currentState.selectedPaymentMethodId 
+        : 'bacs';
+
     try {
       emit(CheckoutProcessingOrderState());
 
@@ -161,7 +377,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         phone: effectiveShippingAddress['phone'] as String? ?? billingAddress['phone'] as String?,
       );
 
-      // Create request model
+      // Create request model with selected payment method
       final request = request_model.ProcessPaymentAndOrderRequestModel(
         orderId: null,
         status: null,
@@ -170,7 +386,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         customerId: null,
         billingAddress: billingIngAddress,
         shippingAddress: shippingIngAddress,
-        paymentMethod: 'bacs',
+        paymentMethod: selectedPaymentMethodId ?? 'bacs',
         customerNote: null,
         shippingLines: null,
         paymentResult: null,
@@ -179,7 +395,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         extensions: null,
       );
 
-      debugPrint('🛒 CheckoutViewModel: Sending order request...');
+      debugPrint('🛒 CheckoutViewModel: Sending order request with payment method: $selectedPaymentMethodId');
 
       // Process payment and create order
       final response = await _checkoutDataService.processPaymentAndOrder(
@@ -193,6 +409,9 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       debugPrint('🛒 Status: ${response.status}');
 
       final totalAmount = _arguments['totalAmount'] as double? ?? 0.0;
+      final shippingCost = currentState is CheckoutLoadedState 
+          ? currentState.shippingCost 
+          : 0.0;
       final currencySymbol = _arguments['currencySymbol'] as String?;
       final currencyCode = _arguments['currencyCode'] as String?;
 
@@ -200,7 +419,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         orderId: response.orderId ?? 0,
         orderKey: response.orderKey ?? '',
         status: response.status ?? 'pending',
-        totalAmount: totalAmount,
+        totalAmount: totalAmount + shippingCost,
         currencySymbol: currencySymbol,
         currencyCode: currencyCode,
       ));
@@ -223,7 +442,10 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         }
       }
 
-      emit(CheckoutErrorState(message: errorMessage));
+      emit(CheckoutErrorState(
+        message: errorMessage,
+        failedAtStep: CheckoutStep.payment,
+      ));
     }
   }
 
@@ -272,7 +494,7 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
     if (cityLower.contains('istanbul') || cityLower.contains('i̇stanbul')) return 'TR34';
     if (cityLower.contains('ankara')) return 'TR06';
     if (cityLower.contains('izmir') || cityLower.contains('i̇zmir')) return 'TR35';
-    if (cityLower.contains('esenler')) return 'TR34'; // Esenler is in Istanbul
+    if (cityLower.contains('esenler')) return 'TR34';
     return null;
   }
 
@@ -291,7 +513,6 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       'izmir': 'TR35',
       'i̇zmir': 'TR35',
       'esenler': 'TR34',
-      // Add more as needed
     };
 
     if (stateMap.containsKey(stateLower)) {

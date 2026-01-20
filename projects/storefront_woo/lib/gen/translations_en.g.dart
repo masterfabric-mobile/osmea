@@ -108,8 +108,14 @@ class TranslationsCheckoutViewEn {
 	late final TranslationsCheckoutViewAppBarEn appBar = TranslationsCheckoutViewAppBarEn._(_root);
 	late final TranslationsCheckoutViewLoadingEn loading = TranslationsCheckoutViewLoadingEn._(_root);
 	late final TranslationsCheckoutViewOrderSuccessEn orderSuccess = TranslationsCheckoutViewOrderSuccessEn._(_root);
+	late final TranslationsCheckoutViewStepsEn steps = TranslationsCheckoutViewStepsEn._(_root);
+	late final TranslationsCheckoutViewSummaryEn summary = TranslationsCheckoutViewSummaryEn._(_root);
 	late final TranslationsCheckoutViewSectionsEn sections = TranslationsCheckoutViewSectionsEn._(_root);
+	late final TranslationsCheckoutViewAddressEn address = TranslationsCheckoutViewAddressEn._(_root);
+	late final TranslationsCheckoutViewFieldsEn fields = TranslationsCheckoutViewFieldsEn._(_root);
 	late final TranslationsCheckoutViewFormFieldsEn formFields = TranslationsCheckoutViewFormFieldsEn._(_root);
+	late final TranslationsCheckoutViewShippingEn shipping = TranslationsCheckoutViewShippingEn._(_root);
+	late final TranslationsCheckoutViewOrderSummaryEn orderSummary = TranslationsCheckoutViewOrderSummaryEn._(_root);
 	late final TranslationsCheckoutViewPaymentEn payment = TranslationsCheckoutViewPaymentEn._(_root);
 	late final TranslationsCheckoutViewButtonsEn buttons = TranslationsCheckoutViewButtonsEn._(_root);
 	late final TranslationsCheckoutViewMessagesEn messages = TranslationsCheckoutViewMessagesEn._(_root);
@@ -360,6 +366,72 @@ class TranslationsCheckoutViewOrderSuccessEn {
 	String get backToHome => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSuccess.backToHome', {}) ?? 'Back to Home';
 }
 
+// Path: checkoutView.steps
+class TranslationsCheckoutViewStepsEn {
+	TranslationsCheckoutViewStepsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Address'
+	String get address => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.address', {}) ?? 'Address';
+
+	/// en: 'Shipping'
+	String get shipping => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.shipping', {}) ?? 'Shipping';
+
+	/// en: 'Payment'
+	String get payment => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.payment', {}) ?? 'Payment';
+
+	/// en: 'Summary'
+	String get summary => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.summary', {}) ?? 'Summary';
+
+	/// en: 'Select Shipping Method'
+	String get selectShipping => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.selectShipping', {}) ?? 'Select Shipping Method';
+
+	/// en: 'Choose how you would like your order delivered'
+	String get shippingDescription => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.shippingDescription', {}) ?? 'Choose how you would like your order delivered';
+
+	/// en: 'Select Payment Method'
+	String get selectPayment => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.selectPayment', {}) ?? 'Select Payment Method';
+
+	/// en: 'Order Review'
+	String get orderReview => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.orderReview', {}) ?? 'Order Review';
+}
+
+// Path: checkoutView.summary
+class TranslationsCheckoutViewSummaryEn {
+	TranslationsCheckoutViewSummaryEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Order Summary'
+	String get title => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.title', {}) ?? 'Order Summary';
+
+	/// en: 'Please review your order details before placing'
+	String get subtitle => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.subtitle', {}) ?? 'Please review your order details before placing';
+
+	/// en: 'Delivery Address'
+	String get deliveryAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.deliveryAddress', {}) ?? 'Delivery Address';
+
+	/// en: 'Shipping Method'
+	String get shippingMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.shippingMethod', {}) ?? 'Shipping Method';
+
+	/// en: 'Payment Method'
+	String get paymentMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.paymentMethod', {}) ?? 'Payment Method';
+
+	/// en: 'Edit'
+	String get edit => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.edit', {}) ?? 'Edit';
+
+	/// en: 'No shipping method selected'
+	String get noShippingSelected => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.noShippingSelected', {}) ?? 'No shipping method selected';
+
+	/// en: 'No payment method selected'
+	String get noPaymentSelected => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.noPaymentSelected', {}) ?? 'No payment method selected';
+}
+
 // Path: checkoutView.sections
 class TranslationsCheckoutViewSectionsEn {
 	TranslationsCheckoutViewSectionsEn._(this._root);
@@ -379,6 +451,54 @@ class TranslationsCheckoutViewSectionsEn {
 
 	/// en: 'Order Total'
 	String get orderTotal => TranslationOverrides.string(_root.$meta, 'checkoutView.sections.orderTotal', {}) ?? 'Order Total';
+}
+
+// Path: checkoutView.address
+class TranslationsCheckoutViewAddressEn {
+	TranslationsCheckoutViewAddressEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Default'
+	String get defaultLabel => TranslationOverrides.string(_root.$meta, 'checkoutView.address.defaultLabel', {}) ?? 'Default';
+
+	/// en: 'You don't have any saved addresses yet'
+	String get noSavedAddresses => TranslationOverrides.string(_root.$meta, 'checkoutView.address.noSavedAddresses', {}) ?? 'You don\'t have any saved addresses yet';
+
+	/// en: 'Add New Address'
+	String get addNewAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.address.addNewAddress', {}) ?? 'Add New Address';
+
+	/// en: 'Edit Address'
+	String get editAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.address.editAddress', {}) ?? 'Edit Address';
+
+	/// en: 'Home'
+	String get home => TranslationOverrides.string(_root.$meta, 'checkoutView.address.home', {}) ?? 'Home';
+
+	/// en: 'Work'
+	String get work => TranslationOverrides.string(_root.$meta, 'checkoutView.address.work', {}) ?? 'Work';
+
+	/// en: 'Other'
+	String get other => TranslationOverrides.string(_root.$meta, 'checkoutView.address.other', {}) ?? 'Other';
+}
+
+// Path: checkoutView.fields
+class TranslationsCheckoutViewFieldsEn {
+	TranslationsCheckoutViewFieldsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Email Address'
+	String get email => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.email', {}) ?? 'Email Address';
+
+	/// en: 'Enter your email address'
+	String get emailHint => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.emailHint', {}) ?? 'Enter your email address';
+
+	/// en: 'Same as billing address'
+	String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.sameAsBilling', {}) ?? 'Same as billing address';
 }
 
 // Path: checkoutView.formFields
@@ -426,6 +546,45 @@ class TranslationsCheckoutViewFormFieldsEn {
 	String get invalidEmail => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.invalidEmail', {}) ?? 'Invalid email';
 }
 
+// Path: checkoutView.shipping
+class TranslationsCheckoutViewShippingEn {
+	TranslationsCheckoutViewShippingEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No shipping methods available'
+	String get noMethodsAvailable => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.noMethodsAvailable', {}) ?? 'No shipping methods available';
+
+	/// en: 'Please contact support for assistance'
+	String get contactSupport => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.contactSupport', {}) ?? 'Please contact support for assistance';
+
+	/// en: 'Free'
+	String get free => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.free', {}) ?? 'Free';
+}
+
+// Path: checkoutView.orderSummary
+class TranslationsCheckoutViewOrderSummaryEn {
+	TranslationsCheckoutViewOrderSummaryEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Subtotal'
+	String get subtotal => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.subtotal', {}) ?? 'Subtotal';
+
+	/// en: 'Shipping'
+	String get shipping => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.shipping', {}) ?? 'Shipping';
+
+	/// en: 'Tax'
+	String get tax => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.tax', {}) ?? 'Tax';
+
+	/// en: 'Total'
+	String get total => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.total', {}) ?? 'Total';
+}
+
 // Path: checkoutView.payment
 class TranslationsCheckoutViewPaymentEn {
 	TranslationsCheckoutViewPaymentEn._(this._root);
@@ -437,8 +596,32 @@ class TranslationsCheckoutViewPaymentEn {
 	/// en: 'Bank Transfer'
 	String get bankTransfer => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransfer', {}) ?? 'Bank Transfer';
 
-	/// en: 'Havale/EFT'
-	String get bankTransferSubtitle => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransferSubtitle', {}) ?? 'Havale/EFT';
+	/// en: 'Direct bank transfer'
+	String get bankTransferSubtitle => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransferSubtitle', {}) ?? 'Direct bank transfer';
+
+	/// en: 'Cash on Delivery'
+	String get cashOnDelivery => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.cashOnDelivery', {}) ?? 'Cash on Delivery';
+
+	/// en: 'Pay when you receive'
+	String get cashOnDeliverySubtitle => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.cashOnDeliverySubtitle', {}) ?? 'Pay when you receive';
+
+	/// en: 'Credit Card'
+	String get creditCard => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.creditCard', {}) ?? 'Credit Card';
+
+	/// en: 'Pay securely with your card'
+	String get creditCardSubtitle => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.creditCardSubtitle', {}) ?? 'Pay securely with your card';
+
+	/// en: 'Delivery Address'
+	String get deliveryAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.deliveryAddress', {}) ?? 'Delivery Address';
+
+	/// en: 'Shipping Method'
+	String get shippingMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.shippingMethod', {}) ?? 'Shipping Method';
+
+	/// en: 'Standard Shipping'
+	String get standardShipping => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.standardShipping', {}) ?? 'Standard Shipping';
+
+	/// en: 'No address set'
+	String get noAddressSet => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.noAddressSet', {}) ?? 'No address set';
 }
 
 // Path: checkoutView.buttons
@@ -449,8 +632,23 @@ class TranslationsCheckoutViewButtonsEn {
 
 	// Translations
 
+	/// en: 'Back'
+	String get back => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.back', {}) ?? 'Back';
+
+	/// en: 'Continue to Shipping'
+	String get continueToShipping => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToShipping', {}) ?? 'Continue to Shipping';
+
+	/// en: 'Continue to Payment'
+	String get continueToPayment => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToPayment', {}) ?? 'Continue to Payment';
+
+	/// en: 'Continue to Summary'
+	String get continueToSummary => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToSummary', {}) ?? 'Continue to Summary';
+
 	/// en: 'Complete Order'
 	String get completeOrder => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.completeOrder', {}) ?? 'Complete Order';
+
+	/// en: 'Place Order'
+	String get placeOrder => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.placeOrder', {}) ?? 'Place Order';
 }
 
 // Path: checkoutView.messages
@@ -463,6 +661,15 @@ class TranslationsCheckoutViewMessagesEn {
 
 	/// en: 'Please fill in all required fields'
 	String get fillRequiredFields => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.fillRequiredFields', {}) ?? 'Please fill in all required fields';
+
+	/// en: 'Please select an address'
+	String get selectAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectAddress', {}) ?? 'Please select an address';
+
+	/// en: 'Please select a shipping method'
+	String get selectShippingMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectShippingMethod', {}) ?? 'Please select a shipping method';
+
+	/// en: 'Please select a payment method'
+	String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectPaymentMethod', {}) ?? 'Please select a payment method';
 }
 
 // Path: favoriteCategoriesView.appBar
@@ -1391,10 +1598,36 @@ extension on Translations {
 			'checkoutView.orderSuccess.orderId' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSuccess.orderId', {}) ?? 'Order ID',
 			'checkoutView.orderSuccess.status' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSuccess.status', {}) ?? 'Status',
 			'checkoutView.orderSuccess.backToHome' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSuccess.backToHome', {}) ?? 'Back to Home',
+			'checkoutView.steps.address' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.address', {}) ?? 'Address',
+			'checkoutView.steps.shipping' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.shipping', {}) ?? 'Shipping',
+			'checkoutView.steps.payment' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.payment', {}) ?? 'Payment',
+			'checkoutView.steps.summary' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.summary', {}) ?? 'Summary',
+			'checkoutView.steps.selectShipping' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.selectShipping', {}) ?? 'Select Shipping Method',
+			'checkoutView.steps.shippingDescription' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.shippingDescription', {}) ?? 'Choose how you would like your order delivered',
+			'checkoutView.steps.selectPayment' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.selectPayment', {}) ?? 'Select Payment Method',
+			'checkoutView.steps.orderReview' => TranslationOverrides.string(_root.$meta, 'checkoutView.steps.orderReview', {}) ?? 'Order Review',
+			'checkoutView.summary.title' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.title', {}) ?? 'Order Summary',
+			'checkoutView.summary.subtitle' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.subtitle', {}) ?? 'Please review your order details before placing',
+			'checkoutView.summary.deliveryAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.deliveryAddress', {}) ?? 'Delivery Address',
+			'checkoutView.summary.shippingMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.shippingMethod', {}) ?? 'Shipping Method',
+			'checkoutView.summary.paymentMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.paymentMethod', {}) ?? 'Payment Method',
+			'checkoutView.summary.edit' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.edit', {}) ?? 'Edit',
+			'checkoutView.summary.noShippingSelected' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.noShippingSelected', {}) ?? 'No shipping method selected',
+			'checkoutView.summary.noPaymentSelected' => TranslationOverrides.string(_root.$meta, 'checkoutView.summary.noPaymentSelected', {}) ?? 'No payment method selected',
 			'checkoutView.sections.billingAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.sections.billingAddress', {}) ?? 'Billing Address',
 			'checkoutView.sections.shippingAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.sections.shippingAddress', {}) ?? 'Shipping Address',
 			'checkoutView.sections.sameAsBilling' => TranslationOverrides.string(_root.$meta, 'checkoutView.sections.sameAsBilling', {}) ?? 'Same as billing address',
 			'checkoutView.sections.orderTotal' => TranslationOverrides.string(_root.$meta, 'checkoutView.sections.orderTotal', {}) ?? 'Order Total',
+			'checkoutView.address.defaultLabel' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.defaultLabel', {}) ?? 'Default',
+			'checkoutView.address.noSavedAddresses' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.noSavedAddresses', {}) ?? 'You don\'t have any saved addresses yet',
+			'checkoutView.address.addNewAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.addNewAddress', {}) ?? 'Add New Address',
+			'checkoutView.address.editAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.editAddress', {}) ?? 'Edit Address',
+			'checkoutView.address.home' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.home', {}) ?? 'Home',
+			'checkoutView.address.work' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.work', {}) ?? 'Work',
+			'checkoutView.address.other' => TranslationOverrides.string(_root.$meta, 'checkoutView.address.other', {}) ?? 'Other',
+			'checkoutView.fields.email' => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.email', {}) ?? 'Email Address',
+			'checkoutView.fields.emailHint' => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.emailHint', {}) ?? 'Enter your email address',
+			'checkoutView.fields.sameAsBilling' => TranslationOverrides.string(_root.$meta, 'checkoutView.fields.sameAsBilling', {}) ?? 'Same as billing address',
 			'checkoutView.formFields.firstName' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.firstName', {}) ?? 'First name',
 			'checkoutView.formFields.lastName' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.lastName', {}) ?? 'Last name',
 			'checkoutView.formFields.email' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.email', {}) ?? 'Email',
@@ -1407,10 +1640,33 @@ extension on Translations {
 			'checkoutView.formFields.country' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.country', {}) ?? 'Country',
 			'checkoutView.formFields.required' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.required', {}) ?? 'Required',
 			'checkoutView.formFields.invalidEmail' => TranslationOverrides.string(_root.$meta, 'checkoutView.formFields.invalidEmail', {}) ?? 'Invalid email',
+			'checkoutView.shipping.noMethodsAvailable' => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.noMethodsAvailable', {}) ?? 'No shipping methods available',
+			'checkoutView.shipping.contactSupport' => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.contactSupport', {}) ?? 'Please contact support for assistance',
+			'checkoutView.shipping.free' => TranslationOverrides.string(_root.$meta, 'checkoutView.shipping.free', {}) ?? 'Free',
+			'checkoutView.orderSummary.subtotal' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.subtotal', {}) ?? 'Subtotal',
+			'checkoutView.orderSummary.shipping' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.shipping', {}) ?? 'Shipping',
+			'checkoutView.orderSummary.tax' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.tax', {}) ?? 'Tax',
+			'checkoutView.orderSummary.total' => TranslationOverrides.string(_root.$meta, 'checkoutView.orderSummary.total', {}) ?? 'Total',
 			'checkoutView.payment.bankTransfer' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransfer', {}) ?? 'Bank Transfer',
-			'checkoutView.payment.bankTransferSubtitle' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransferSubtitle', {}) ?? 'Havale/EFT',
+			'checkoutView.payment.bankTransferSubtitle' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.bankTransferSubtitle', {}) ?? 'Direct bank transfer',
+			'checkoutView.payment.cashOnDelivery' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.cashOnDelivery', {}) ?? 'Cash on Delivery',
+			'checkoutView.payment.cashOnDeliverySubtitle' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.cashOnDeliverySubtitle', {}) ?? 'Pay when you receive',
+			'checkoutView.payment.creditCard' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.creditCard', {}) ?? 'Credit Card',
+			'checkoutView.payment.creditCardSubtitle' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.creditCardSubtitle', {}) ?? 'Pay securely with your card',
+			'checkoutView.payment.deliveryAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.deliveryAddress', {}) ?? 'Delivery Address',
+			'checkoutView.payment.shippingMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.shippingMethod', {}) ?? 'Shipping Method',
+			'checkoutView.payment.standardShipping' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.standardShipping', {}) ?? 'Standard Shipping',
+			'checkoutView.payment.noAddressSet' => TranslationOverrides.string(_root.$meta, 'checkoutView.payment.noAddressSet', {}) ?? 'No address set',
+			'checkoutView.buttons.back' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.back', {}) ?? 'Back',
+			'checkoutView.buttons.continueToShipping' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToShipping', {}) ?? 'Continue to Shipping',
+			'checkoutView.buttons.continueToPayment' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToPayment', {}) ?? 'Continue to Payment',
+			'checkoutView.buttons.continueToSummary' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.continueToSummary', {}) ?? 'Continue to Summary',
 			'checkoutView.buttons.completeOrder' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.completeOrder', {}) ?? 'Complete Order',
+			'checkoutView.buttons.placeOrder' => TranslationOverrides.string(_root.$meta, 'checkoutView.buttons.placeOrder', {}) ?? 'Place Order',
 			'checkoutView.messages.fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.fillRequiredFields', {}) ?? 'Please fill in all required fields',
+			'checkoutView.messages.selectAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectAddress', {}) ?? 'Please select an address',
+			'checkoutView.messages.selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectShippingMethod', {}) ?? 'Please select a shipping method',
+			'checkoutView.messages.selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectPaymentMethod', {}) ?? 'Please select a payment method',
 			'favoriteCategoriesView.appBar.title' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.appBar.title', {}) ?? 'Favorite Categories',
 			'favoriteCategoriesView.remove.title' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.remove.title', {}) ?? 'Removed from favorites',
 			'favoriteCategoriesView.remove.message' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.remove.message', {}) ?? 'Category was removed from your favorites',

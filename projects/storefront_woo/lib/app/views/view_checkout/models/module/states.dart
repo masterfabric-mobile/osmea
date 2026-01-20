@@ -2,7 +2,90 @@
  * CheckoutState
  * -------------
  * States for the checkout view model.
+ * Supports 4-step wizard: Address -> Shipping -> Payment -> Summary
  */
+
+/// Checkout step enum
+enum CheckoutStep {
+  address,   // Step 1: Billing & Shipping Address
+  shipping,  // Step 2: Shipping Method Selection
+  payment,   // Step 3: Payment Method Selection
+  summary,   // Step 4: Order Summary & Confirmation
+}
+
+/// Shipping method model
+class ShippingMethod {
+  final String id;
+  final String title;
+  final String? description;
+  final double cost;
+  final String? deliveryTime; // e.g., "2-3 business days"
+  final bool isSelected;
+
+  const ShippingMethod({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.cost,
+    this.deliveryTime,
+    this.isSelected = false,
+  });
+
+  ShippingMethod copyWith({
+    String? id,
+    String? title,
+    String? description,
+    double? cost,
+    String? deliveryTime,
+    bool? isSelected,
+  }) {
+    return ShippingMethod(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      cost: cost ?? this.cost,
+      deliveryTime: deliveryTime ?? this.deliveryTime,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
+}
+
+/// Payment method model
+class PaymentMethod {
+  final String id;
+  final String title;
+  final String? description;
+  final String? icon; // Icon name or asset path
+  final bool isSelected;
+  final bool enabled;
+
+  const PaymentMethod({
+    required this.id,
+    required this.title,
+    this.description,
+    this.icon,
+    this.isSelected = false,
+    this.enabled = true,
+  });
+
+  PaymentMethod copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? icon,
+    bool? isSelected,
+    bool? enabled,
+  }) {
+    return PaymentMethod(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      isSelected: isSelected ?? this.isSelected,
+      enabled: enabled ?? this.enabled,
+    );
+  }
+}
 
 /// Base class for all checkout states
 abstract class CheckoutState {}
@@ -15,26 +98,146 @@ class CheckoutLoadingState extends CheckoutState {}
 
 /// Loaded state when checkout form is ready
 class CheckoutLoadedState extends CheckoutState {
+  // Current step in the wizard
+  final CheckoutStep currentStep;
+  
+  // Price & currency info
+  final double subtotalAmount;
+  final double shippingCost;
   final double totalAmount;
   final String? currencySymbol;
   final String? currencyCode;
+  
+  // Saved addresses
   final Map<String, dynamic>? savedBillingAddress;
   final Map<String, dynamic>? savedShippingAddress;
+  
+  // Address data (filled in step 1)
+  final Map<String, dynamic>? billingAddress;
+  final Map<String, dynamic>? shippingAddress;
+  final String? billingEmail;
+  final bool sameAsBilling;
+  
+  // Shipping methods (shown in step 2)
+  final List<ShippingMethod> shippingMethods;
+  final String? selectedShippingMethodId;
+  
+  // Payment methods (shown in step 3)
+  final List<PaymentMethod> paymentMethods;
+  final String? selectedPaymentMethodId;
+  
+  // Step validation flags
+  final bool isAddressStepValid;
+  final bool isShippingStepValid;
+  final bool isPaymentStepValid;
 
   CheckoutLoadedState({
+    this.currentStep = CheckoutStep.address,
+    required this.subtotalAmount,
+    this.shippingCost = 0.0,
     required this.totalAmount,
     this.currencySymbol,
     this.currencyCode,
     this.savedBillingAddress,
     this.savedShippingAddress,
+    this.billingAddress,
+    this.shippingAddress,
+    this.billingEmail,
+    this.sameAsBilling = true,
+    this.shippingMethods = const [],
+    this.selectedShippingMethodId,
+    this.paymentMethods = const [],
+    this.selectedPaymentMethodId,
+    this.isAddressStepValid = false,
+    this.isShippingStepValid = false,
+    this.isPaymentStepValid = false,
   });
+
+  /// Calculate total including shipping
+  double get calculatedTotal => subtotalAmount + shippingCost;
+
+  /// Get selected shipping method
+  ShippingMethod? get selectedShippingMethod {
+    if (selectedShippingMethodId == null) return null;
+    try {
+      return shippingMethods.firstWhere((m) => m.id == selectedShippingMethodId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Get selected payment method
+  PaymentMethod? get selectedPaymentMethod {
+    if (selectedPaymentMethodId == null) return null;
+    try {
+      return paymentMethods.firstWhere((m) => m.id == selectedPaymentMethodId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Check if can proceed to next step
+  bool get canProceedToShipping => isAddressStepValid;
+  bool get canProceedToPayment => isAddressStepValid && isShippingStepValid;
+  bool get canProceedToSummary => canProceedToPayment && isPaymentStepValid;
+  bool get canCompleteOrder => canProceedToSummary;
+
+  CheckoutLoadedState copyWith({
+    CheckoutStep? currentStep,
+    double? subtotalAmount,
+    double? shippingCost,
+    double? totalAmount,
+    String? currencySymbol,
+    String? currencyCode,
+    Map<String, dynamic>? savedBillingAddress,
+    Map<String, dynamic>? savedShippingAddress,
+    Map<String, dynamic>? billingAddress,
+    Map<String, dynamic>? shippingAddress,
+    String? billingEmail,
+    bool? sameAsBilling,
+    List<ShippingMethod>? shippingMethods,
+    String? selectedShippingMethodId,
+    List<PaymentMethod>? paymentMethods,
+    String? selectedPaymentMethodId,
+    bool? isAddressStepValid,
+    bool? isShippingStepValid,
+    bool? isPaymentStepValid,
+    bool clearSelectedShippingMethod = false,
+    bool clearSelectedPaymentMethod = false,
+  }) {
+    return CheckoutLoadedState(
+      currentStep: currentStep ?? this.currentStep,
+      subtotalAmount: subtotalAmount ?? this.subtotalAmount,
+      shippingCost: shippingCost ?? this.shippingCost,
+      totalAmount: totalAmount ?? this.totalAmount,
+      currencySymbol: currencySymbol ?? this.currencySymbol,
+      currencyCode: currencyCode ?? this.currencyCode,
+      savedBillingAddress: savedBillingAddress ?? this.savedBillingAddress,
+      savedShippingAddress: savedShippingAddress ?? this.savedShippingAddress,
+      billingAddress: billingAddress ?? this.billingAddress,
+      shippingAddress: shippingAddress ?? this.shippingAddress,
+      billingEmail: billingEmail ?? this.billingEmail,
+      sameAsBilling: sameAsBilling ?? this.sameAsBilling,
+      shippingMethods: shippingMethods ?? this.shippingMethods,
+      selectedShippingMethodId: clearSelectedShippingMethod ? null : (selectedShippingMethodId ?? this.selectedShippingMethodId),
+      paymentMethods: paymentMethods ?? this.paymentMethods,
+      selectedPaymentMethodId: clearSelectedPaymentMethod ? null : (selectedPaymentMethodId ?? this.selectedPaymentMethodId),
+      isAddressStepValid: isAddressStepValid ?? this.isAddressStepValid,
+      isShippingStepValid: isShippingStepValid ?? this.isShippingStepValid,
+      isPaymentStepValid: isPaymentStepValid ?? this.isPaymentStepValid,
+    );
+  }
 }
 
 /// Error state when checkout fails
 class CheckoutErrorState extends CheckoutState {
   final String message;
+  final CheckoutStep? failedAtStep;
 
-  CheckoutErrorState({required this.message});
+  CheckoutErrorState({
+    required this.message,
+    this.failedAtStep,
+  });
 }
 
 /// Processing order state
