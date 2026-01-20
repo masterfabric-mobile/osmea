@@ -253,7 +253,8 @@ class CartItemWidget extends StatelessWidget {
     );
     
     return OsmeaComponents.iconButton(
-      onPressed: () => viewModel.removeItemFromCart(item.productId),
+      onPressed: () =>
+          viewModel.removeItemFromCart(item.productId, context: context),
       icon: Icon(
         Icons.delete_outline_rounded,
         color: removeButtonColor,

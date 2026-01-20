@@ -7,11 +7,13 @@
  */
 
 import 'dart:async';
+import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/abstract/cart_coupons_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/freezed_model/response/list_cart_coupons_response_model.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -26,7 +28,23 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   // Dependencies
   final CartService _cartService = GetIt.I<CartService>();
   final CartCouponsService _cartCouponsService = GetIt.I<CartCouponsService>();
+  final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+  
+  // Wishlist API configuration - get from config like WishlistViewModel
+  String get _wishlistNamespace {
+    return _configHelper.getString(
+      'woocommerce_configuration.wishlist_namespace',
+      'masterfabric',
+    );
+  }
+
+  String get _wishlistApiVersion {
+    return _configHelper.getString(
+      'woocommerce_configuration.version',
+      'v1',
+    );
+  }
 
   // Track last loaded state to show overlay during updates
   CartLoadedState? _lastLoadedState;
@@ -76,11 +94,34 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     return fallback;
   }
 
-  /// Show confirmation dialog before removing item
-  void _showRemoveConfirmationDialog(BuildContext context, int productId) {
+  /// Get popup button color from config (same as wishlist)
+  Color _getPopupButtonColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = _configHelper.getString(
+        'dialog_popup_configuration.buttons.$key',
+      );
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load popup button color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Show confirmation dialog before removing item (wishlist-style popup)
+  Future<void> _showRemoveConfirmationDialog(
+    BuildContext context,
+    int productId,
+  ) async {
     // Get product name for the dialog
     final currentState = state;
-    String productName = context.t.cartView.widgets.item.defaultName;
+    String productName = 'this item';
     if (currentState is CartLoadedState) {
       try {
         final item = currentState.cartItems.firstWhere(
@@ -88,100 +129,142 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         );
         productName = item.productName;
       } catch (e) {
-        // Item not found, use default name
-        productName = t.cartView.widgets.item.defaultName;
+        debugPrint('⚠️ Item not found in cart: $e');
       }
     }
 
-    // Get colors from config
-    final dialogBgColor = _getDialogColorFromConfig(
-      'dialog.backgroundColor',
+    // Get popup colors from config
+    final popupBgColor = _getDialogColorFromConfig(
+      'popup.backgroundColor',
       OsmeaColors.white,
     );
-    final dialogTitleColor = _getDialogColorFromConfig(
-      'dialog.titleColor',
+    final popupTitleColor = _getDialogColorFromConfig(
+      'popup.titleColor',
       const Color(0xFF1976D2),
     );
-    final dialogSubtitleColor = _getDialogColorFromConfig(
-      'dialog.subtitleColor',
+    final popupSubtitleColor = _getDialogColorFromConfig(
+      'popup.subtitleColor',
       OsmeaColors.grayMaterial[400]!,
     );
-    final cancelButtonColor = _getDialogColorFromConfig(
-      'buttons.cancel.textColor',
-      OsmeaColors.grayMaterial[500]!,
-    );
-    final dangerButtonColor = _getDialogColorFromConfig(
-      'buttons.danger.textColor',
-      OsmeaColors.white,
-    );
-    final dialogBorderRadius = _configHelper.getDouble(
-      'dialog_popup_configuration.dialog.borderRadius',
-      12.0,
+    final popupElevation = _configHelper.getDouble(
+      'dialog_popup_configuration.popup.elevation',
+      8.0,
     );
 
-    showDialog(
+    // Show popup and wait for result
+    final result = await OsmeaComponents.showPopup<String>(
       context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: dialogBgColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(dialogBorderRadius),
-          ),
-          title: OsmeaComponents.text(
-            context.t.cartView.widgets.item.remove.title,
-            textStyle: OsmeaTextStyle.titleLarge(context),
-            color: dialogTitleColor,
-          ),
-          content: OsmeaComponents.column(
-            mainAxisSize: MainAxisSize.min,
+      variant: PopupVariant.dialog,
+      title: 'Remove from cart?',
+      subtitle:
+          'Would you like to save "$productName" for later or remove it from your cart?',
+      backgroundColor: popupBgColor,
+      titleStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+        color: popupTitleColor,
+        fontWeight: FontWeight.w600,
+      ),
+      subtitleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        color: popupSubtitleColor,
+      ),
+      elevation: popupElevation,
+      padding: EdgeInsets.all(context.spacing16),
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Primary button: Remove & save for later
+          OsmeaComponents.row(
             children: [
-              OsmeaComponents.text(
-                context.t.cartView.widgets.item.remove.message.replaceAll(
-                  '{productName}',
-                  productName,
+              OsmeaComponents.expanded(
+                child: Builder(
+                  builder: (context) {
+                    final primaryBgColor = _getPopupButtonColorFromConfig(
+                      'primary.backgroundColor',
+                      OsmeaColors.black,
+                    );
+                    final primaryTextColor = _getPopupButtonColorFromConfig(
+                      'primary.textColor',
+                      OsmeaColors.white,
+                    );
+
+                    return OsmeaComponents.button(
+                      text: 'Remove & save for later',
+                      variant: ButtonVariant.primary,
+                      backgroundColor: primaryBgColor,
+                      textColor: primaryTextColor,
+                      onPressed: () {
+                        Navigator.of(context).pop('save_later');
+                      },
+                    );
+                  },
                 ),
-                textStyle: OsmeaTextStyle.bodyMedium(context),
-                color: dialogSubtitleColor,
-                textAlign: TextAlign.center,
               ),
             ],
           ),
-          actions: [
-            // Cancel button
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: OsmeaComponents.text(
-                context.t.cartView.widgets.item.remove.cancel,
-                textStyle: OsmeaTextStyle.bodyMedium(
-                  context,
-                ).copyWith(color: cancelButtonColor),
-              ),
-            ),
-            // Remove button
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _removeItemFromCart(productId);
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: _getDialogColorFromConfig(
-                  'buttons.danger.backgroundColor',
-                  const Color(0xFFD32F2F),
+
+          OsmeaComponents.sizedBox(height: context.spacing8),
+
+          // Secondary button: Just remove (outlined)
+          OsmeaComponents.row(
+            children: [
+              OsmeaComponents.expanded(
+                child: Builder(
+                  builder: (context) {
+                    final secondaryBgColor = _getPopupButtonColorFromConfig(
+                      'secondary.backgroundColor',
+                      OsmeaColors.white,
+                    );
+                    final secondaryTextColor = _getPopupButtonColorFromConfig(
+                      'secondary.textColor',
+                      OsmeaColors.black,
+                    );
+                    final secondaryBorderColor = _getPopupButtonColorFromConfig(
+                      'secondary.borderColor',
+                      OsmeaColors.black,
+                    );
+
+                    return OsmeaComponents.button(
+                      text: 'Just remove',
+                      variant: ButtonVariant.outlined,
+                      backgroundColor: secondaryBgColor,
+                      textColor: secondaryTextColor,
+                      borderColor: secondaryBorderColor,
+                      onPressed: () {
+                        Navigator.of(context).pop('remove_only');
+                      },
+                    );
+                  },
                 ),
-                foregroundColor: dangerButtonColor,
               ),
-              child: OsmeaComponents.text(
-                context.t.cartView.widgets.item.remove.confirm,
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: dangerButtonColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing8),
+
+          // Ghost button: Cancel
+          Builder(
+            builder: (context) {
+              final ghostTextColor = _getPopupButtonColorFromConfig(
+                'ghost.textColor',
+                OsmeaColors.black,
+              );
+
+              return OsmeaComponents.button(
+                text: 'Cancel',
+                variant: ButtonVariant.ghost,
+                textColor: ghostTextColor,
+                onPressed: () => Navigator.of(context).pop('cancel'),
+              );
+            },
+          ),
+        ],
+      ),
     );
+
+    // Handle result after popup is closed
+    if (result == 'save_later') {
+      await _addToWishlistAndRemove(context, productId);
+    } else if (result == 'remove_only') {
+      await _removeItemFromCart(productId);
+    }
   }
 
   void updateItemQuantity(int productId, int quantity) =>
@@ -987,6 +1070,143 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     } catch (e) {
       debugPrint('❌ Failed to get JWT token: $e');
       return null;
+    }
+  }
+
+  /// Add item to wishlist and then remove from cart
+  Future<void> _addToWishlistAndRemove(BuildContext context, int productId) async {
+    try {
+      // Get product name for the success message
+      final currentState = state;
+      String productName = 'Item';
+      if (currentState is CartLoadedState) {
+        try {
+          final item = currentState.cartItems.firstWhere(
+            (item) => item.productId == productId,
+          );
+          productName = item.productName;
+        } catch (e) {
+          debugPrint('⚠️ Could not find product name for productId: $productId');
+        }
+      }
+
+      debugPrint('💖 Adding product $productId to wishlist from cart');
+      
+      // Add to wishlist
+      final response = await _wishlistService.addItemToWishlist(
+        namespace: _wishlistNamespace,
+        apiVersion: _wishlistApiVersion,
+        request: AddWishlistItemRequest(
+          productId: productId,
+          groupId: 0, // Default group
+          quantity: 1,
+        ),
+      );
+
+      debugPrint('💖 Wishlist API response: success=${response.success}, message=${response.message}');
+
+      // Check if operation was successful or item already in wishlist
+      final message = response.message?.toLowerCase() ?? '';
+      final isAlreadyInWishlist = message.contains('already in wishlist') ||
+          message.contains('already exists') ||
+          message.contains('already added');
+
+      if (response.success == true || isAlreadyInWishlist) {
+        // Successfully added or already in wishlist - now remove from cart
+        await _removeItemFromCart(productId);
+        
+        // Show success message
+        if (context.mounted) {
+          context.snackbarSuccess(
+            '$productName moved to your favorites',
+            duration: context.durationNormal,
+          );
+        }
+      } else {
+        // Failed to add to wishlist
+        debugPrint('❌ Failed to add to wishlist: ${response.message}');
+        if (context.mounted) {
+          context.snackbarError(
+            'Failed to save to favorites',
+            duration: context.durationNormal,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding to wishlist: $e');
+      if (context.mounted) {
+        context.snackbarError(
+          'Failed to save to favorites',
+          duration: context.durationNormal,
+        );
+      }
+    }
+  }
+
+  /// Add item to wishlist only (without removing from cart)
+  Future<void> _addToWishlistOnly(BuildContext context, int productId) async {
+    try {
+      // Get product name for the success message
+      final currentState = state;
+      String productName = 'Item';
+      if (currentState is CartLoadedState) {
+        try {
+          final item = currentState.cartItems.firstWhere(
+            (item) => item.productId == productId,
+          );
+          productName = item.productName;
+        } catch (e) {
+          debugPrint('⚠️ Could not find product name for productId: $productId');
+        }
+      }
+
+      debugPrint('💖 Adding product $productId to wishlist only (keeping in cart)');
+      
+      // Add to wishlist
+      final response = await _wishlistService.addItemToWishlist(
+        namespace: _wishlistNamespace,
+        apiVersion: _wishlistApiVersion,
+        request: AddWishlistItemRequest(
+          productId: productId,
+          groupId: 0, // Default group
+          quantity: 1,
+        ),
+      );
+
+      debugPrint('💖 Wishlist API response: success=${response.success}, message=${response.message}');
+
+      // Check if operation was successful or item already in wishlist
+      final message = response.message?.toLowerCase() ?? '';
+      final isAlreadyInWishlist = message.contains('already in wishlist') ||
+          message.contains('already exists') ||
+          message.contains('already added');
+
+      if (response.success == true || isAlreadyInWishlist) {
+        // Successfully added or already in wishlist
+        if (context.mounted) {
+          context.snackbarSuccess(
+            '$productName added to your favorites',
+            duration: context.durationNormal,
+          );
+        }
+      } else {
+        // Failed to add to wishlist
+        debugPrint('❌ Failed to add to wishlist: ${response.message}');
+        if (context.mounted) {
+          context.snackbarError(
+            'Failed to add to favorites',
+            duration: context.durationNormal,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding to wishlist: $e');
+      if (context.mounted) {
+        context.snackbarError(
+          'Failed to add to favorites',
+          duration: context.durationNormal,
+        );
+      }
     }
   }
 }
