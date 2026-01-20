@@ -30,10 +30,33 @@ class CartItemSwipeWidget extends StatelessWidget {
       key: Key('cart_item_${item.key}'),
       direction: DismissDirection.endToStart,
       background: _buildSwipeBackground(context),
-      confirmDismiss: (direction) => _showConfirmDialog(context),
-      onDismissed: (direction) => _handleDismiss(context),
+      confirmDismiss: (direction) => _confirmAndRemove(context),
       child: CartItemWidget(item: item, viewModel: viewModel, state: state),
     );
+  }
+
+  /// Confirm dialog and remove item - returns false to prevent Dismissible animation
+  /// The actual removal is handled by viewModel and state update will remove the item from list
+  Future<bool> _confirmAndRemove(BuildContext context) async {
+    final confirmed = await _showConfirmDialog(context);
+    if (confirmed) {
+      // Remove item via viewModel - this will update state and rebuild list without this item
+      viewModel.removeItemFromCart(item.productId);
+      
+      // Show undo snackbar
+      if (context.mounted) {
+        context.snackbarInfo(
+          context.t.cartView.widgets.item.remove.removedMessage,
+          duration: context.durationVeryLong,
+          actionLabel: context.t.cartView.widgets.item.remove.undo,
+          onAction: () {
+            viewModel.addItemToCart(item.productId, quantity: item.quantity);
+          },
+        );
+      }
+    }
+    // Always return false - we handle removal through state update, not through Dismissible
+    return false;
   }
 
   Widget _buildSwipeBackground(BuildContext context) {
@@ -145,15 +168,4 @@ class CartItemSwipeWidget extends StatelessWidget {
         false;
   }
 
-  void _handleDismiss(BuildContext context) {
-    viewModel.removeItemFromCart(item.productId);
-    context.snackbarInfo(
-      context.t.cartView.widgets.item.remove.removedMessage,
-      duration: context.durationVeryLong,
-      actionLabel: context.t.cartView.widgets.item.remove.undo,
-      onAction: () {
-        viewModel.addItemToCart(item.productId, quantity: item.quantity);
-      },
-    );
-  }
 }
