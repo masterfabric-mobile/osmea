@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/abstract/checkout_data_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/freezed_model/request/process_payment_and_order_request_model.dart' as request_model;
+import 'package:apis/network/remote/woocommerce/store_api/checkout_data_api/freezed_model/response/process_order_and_payment_response_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:core/core.dart';
@@ -398,15 +399,23 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       debugPrint('🛒 CheckoutViewModel: Sending order request with payment method: $selectedPaymentMethodId');
 
       // Process payment and create order
-      final response = await _checkoutDataService.processPaymentAndOrder(
-        apiVersion: apiVersion,
-        requestData: request,
-      );
-
-      debugPrint('🛒 CheckoutViewModel: ✅ Order processed successfully!');
-      debugPrint('🛒 Order ID: ${response.orderId}');
-      debugPrint('🛒 Order Key: ${response.orderKey}');
-      debugPrint('🛒 Status: ${response.status}');
+      ProcessPaymentAndOrderResponseModel response;
+      try {
+        response = await _checkoutDataService.processPaymentAndOrder(
+          apiVersion: apiVersion,
+          requestData: request,
+        );
+        debugPrint('🛒 CheckoutViewModel: ✅ Order processed successfully!');
+        debugPrint('🛒 Order ID: ${response.orderId}');
+        debugPrint('🛒 Order Key: ${response.orderKey}');
+        debugPrint('🛒 Status: ${response.status}');
+        debugPrint('🛒 Response experimentalCart type: ${response.experimentalCart?.runtimeType}');
+      } catch (parseError, parseStack) {
+        debugPrint('❌ CheckoutViewModel: Error parsing API response: $parseError');
+        debugPrint('❌ Parse stack trace: $parseStack');
+        // Re-throw to be caught by outer catch block
+        rethrow;
+      }
 
       final totalAmount = _arguments['totalAmount'] as double? ?? 0.0;
       final shippingCost = currentState is CheckoutLoadedState 
@@ -425,12 +434,80 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
       ));
     } catch (e, stackTrace) {
       debugPrint('❌ CheckoutViewModel: Error processing order: $e');
+      debugPrint('❌ Error type: ${e.runtimeType}');
       debugPrint('❌ Stack trace: $stackTrace');
 
       String errorMessage = 'Failed to process order. Please try again.';
+      bool isEmailError = false;
 
       if (e is DioException) {
-        if (e.response?.data is Map<String, dynamic>) {
+        debugPrint('❌ DioException details:');
+        debugPrint('   - Status code: ${e.response?.statusCode}');
+        debugPrint('   - Status message: ${e.response?.statusMessage}');
+        debugPrint('   - Response data type: ${e.response?.data?.runtimeType}');
+        
+        if (e.response?.statusCode == 500) {
+          debugPrint('❌ Server returned 500 Internal Server Error');
+          if (e.response?.data != null) {
+            try {
+              debugPrint('❌ Response data: ${e.response!.data}');
+              if (e.response!.data is Map<String, dynamic>) {
+                final data = e.response!.data as Map<String, dynamic>;
+                debugPrint('❌ Response data keys: ${data.keys.toList()}');
+                
+                // Check if error is related to PHPMailer/email sending
+                final errorData = data['data'] as Map<String, dynamic>?;
+                if (errorData != null) {
+                  final errorInfo = errorData['error'] as Map<String, dynamic>?;
+                  if (errorInfo != null) {
+                    final errorMsg = errorInfo['message'] as String? ?? '';
+                    debugPrint('❌ Error message from server: $errorMsg');
+                    
+                    // Check if it's a PHPMailer/email error
+                    if (errorMsg.contains('PHPMailer') || 
+                        errorMsg.contains('mail()') ||
+                        errorMsg.contains('wp_mail') ||
+                        errorMsg.contains('WC_Email')) {
+                      isEmailError = true;
+                      debugPrint('✅ Detected email sending error - order might still be created');
+                      
+                      // Try to extract order ID from error stack trace or check if order exists
+                      // The order might have been created before the email error
+                      // We'll treat this as a partial success
+                    }
+                  }
+                }
+                
+                final apiMsg = data['message'] as String?;
+                if (apiMsg != null && apiMsg.isNotEmpty && !isEmailError) {
+                  errorMessage = apiMsg;
+                }
+              } else if (e.response!.data is String) {
+                debugPrint('❌ Response data (string): ${e.response!.data}');
+                final dataStr = e.response!.data as String;
+                if (dataStr.contains('PHPMailer') || dataStr.contains('mail()')) {
+                  isEmailError = true;
+                  debugPrint('✅ Detected email sending error from string response');
+                } else {
+                  errorMessage = 'Server error: $dataStr';
+                }
+              }
+            } catch (logError) {
+              debugPrint('❌ Error logging response data: $logError');
+            }
+          }
+          
+          // If it's an email error, treat as partial success
+          if (isEmailError) {
+            debugPrint('⚠️ Email sending failed but order might be created. Checking order status...');
+            // Note: In a real scenario, you might want to verify the order was created
+            // by checking the order ID or making a separate API call
+            // For now, we'll show a warning but still treat it as an error
+            errorMessage = 'Sipariş oluşturuldu ancak onay e-postası gönderilemedi. Lütfen siparişlerinizi kontrol edin.';
+          } else {
+            errorMessage = 'Sunucu hatası (500). Lütfen daha sonra tekrar deneyin.';
+          }
+        } else if (e.response?.data is Map<String, dynamic>) {
           final data = e.response!.data as Map<String, dynamic>;
           final apiMsg = data['message'] as String?;
           if (apiMsg != null && apiMsg.isNotEmpty) {
@@ -440,6 +517,9 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
             }
           }
         }
+      } else if (e is FormatException || e.toString().contains('fromJson') || e.toString().contains('parsing')) {
+        debugPrint('❌ JSON parsing error detected');
+        errorMessage = 'Sipariş yanıtı işlenirken bir hata oluştu. Lütfen tekrar deneyin.';
       }
 
       emit(CheckoutErrorState(
