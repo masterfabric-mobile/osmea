@@ -133,6 +133,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       }
     }
 
+    // Check if user is logged in (has valid JWT token)
+    final jwtToken = await _getJwtToken();
+    final isLoggedIn = jwtToken != null && jwtToken.isNotEmpty;
+
     // Get popup colors from config
     final popupBgColor = _getDialogColorFromConfig(
       'popup.backgroundColor',
@@ -151,13 +155,132 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       8.0,
     );
 
+    // Build popup buttons based on login status
+    List<Widget> popupButtons = [];
+    
+    // Only show "Remove & save for later" button if user is logged in
+    if (isLoggedIn) {
+      popupButtons.add(
+        OsmeaComponents.row(
+          children: [
+            OsmeaComponents.expanded(
+              child: Builder(
+                builder: (context) {
+                  final primaryBgColor = _getPopupButtonColorFromConfig(
+                    'primary.backgroundColor',
+                    OsmeaColors.black,
+                  );
+                  final primaryTextColor = _getPopupButtonColorFromConfig(
+                    'primary.textColor',
+                    OsmeaColors.white,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Remove & save for later',
+                    variant: ButtonVariant.primary,
+                    backgroundColor: primaryBgColor,
+                    textColor: primaryTextColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('save_later');
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+      popupButtons.add(OsmeaComponents.sizedBox(height: context.spacing8));
+    }
+
+    // "Just remove" button (or "Remove" if not logged in - make it primary)
+    popupButtons.add(
+      OsmeaComponents.row(
+        children: [
+          OsmeaComponents.expanded(
+            child: Builder(
+              builder: (context) {
+                if (isLoggedIn) {
+                  // Secondary button style when logged in
+                  final secondaryBgColor = _getPopupButtonColorFromConfig(
+                    'secondary.backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final secondaryTextColor = _getPopupButtonColorFromConfig(
+                    'secondary.textColor',
+                    OsmeaColors.black,
+                  );
+                  final secondaryBorderColor = _getPopupButtonColorFromConfig(
+                    'secondary.borderColor',
+                    OsmeaColors.black,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Just remove',
+                    variant: ButtonVariant.outlined,
+                    backgroundColor: secondaryBgColor,
+                    textColor: secondaryTextColor,
+                    borderColor: secondaryBorderColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('remove_only');
+                    },
+                  );
+                } else {
+                  // Primary button style when not logged in
+                  final primaryBgColor = _getPopupButtonColorFromConfig(
+                    'primary.backgroundColor',
+                    OsmeaColors.black,
+                  );
+                  final primaryTextColor = _getPopupButtonColorFromConfig(
+                    'primary.textColor',
+                    OsmeaColors.white,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Remove',
+                    variant: ButtonVariant.primary,
+                    backgroundColor: primaryBgColor,
+                    textColor: primaryTextColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('remove_only');
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+    popupButtons.add(OsmeaComponents.sizedBox(height: context.spacing8));
+
+    // Cancel button
+    popupButtons.add(
+      Builder(
+        builder: (context) {
+          final ghostTextColor = _getPopupButtonColorFromConfig(
+            'ghost.textColor',
+            OsmeaColors.black,
+          );
+
+          return OsmeaComponents.button(
+            text: 'Cancel',
+            variant: ButtonVariant.ghost,
+            textColor: ghostTextColor,
+            onPressed: () => Navigator.of(context).pop('cancel'),
+          );
+        },
+      ),
+    );
+
     // Show popup and wait for result
     final result = await OsmeaComponents.showPopup<String>(
       context: context,
       variant: PopupVariant.dialog,
       title: 'Remove from cart?',
-      subtitle:
-          'Would you like to save "$productName" for later or remove it from your cart?',
+      subtitle: isLoggedIn
+          ? 'Would you like to save "$productName" for later or remove it from your cart?'
+          : 'Are you sure you want to remove "$productName" from your cart?',
       backgroundColor: popupBgColor,
       titleStyle: OsmeaTextStyle.titleMedium(context).copyWith(
         color: popupTitleColor,
@@ -170,92 +293,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       padding: EdgeInsets.all(context.spacing16),
       child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          // Primary button: Remove & save for later
-          OsmeaComponents.row(
-            children: [
-              OsmeaComponents.expanded(
-                child: Builder(
-                  builder: (context) {
-                    final primaryBgColor = _getPopupButtonColorFromConfig(
-                      'primary.backgroundColor',
-                      OsmeaColors.black,
-                    );
-                    final primaryTextColor = _getPopupButtonColorFromConfig(
-                      'primary.textColor',
-                      OsmeaColors.white,
-                    );
-
-                    return OsmeaComponents.button(
-                      text: 'Remove & save for later',
-                      variant: ButtonVariant.primary,
-                      backgroundColor: primaryBgColor,
-                      textColor: primaryTextColor,
-                      onPressed: () {
-                        Navigator.of(context).pop('save_later');
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          OsmeaComponents.sizedBox(height: context.spacing8),
-
-          // Secondary button: Just remove (outlined)
-          OsmeaComponents.row(
-            children: [
-              OsmeaComponents.expanded(
-                child: Builder(
-                  builder: (context) {
-                    final secondaryBgColor = _getPopupButtonColorFromConfig(
-                      'secondary.backgroundColor',
-                      OsmeaColors.white,
-                    );
-                    final secondaryTextColor = _getPopupButtonColorFromConfig(
-                      'secondary.textColor',
-                      OsmeaColors.black,
-                    );
-                    final secondaryBorderColor = _getPopupButtonColorFromConfig(
-                      'secondary.borderColor',
-                      OsmeaColors.black,
-                    );
-
-                    return OsmeaComponents.button(
-                      text: 'Just remove',
-                      variant: ButtonVariant.outlined,
-                      backgroundColor: secondaryBgColor,
-                      textColor: secondaryTextColor,
-                      borderColor: secondaryBorderColor,
-                      onPressed: () {
-                        Navigator.of(context).pop('remove_only');
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-
-          // Ghost button: Cancel
-          Builder(
-            builder: (context) {
-              final ghostTextColor = _getPopupButtonColorFromConfig(
-                'ghost.textColor',
-                OsmeaColors.black,
-              );
-
-              return OsmeaComponents.button(
-                text: 'Cancel',
-                variant: ButtonVariant.ghost,
-                textColor: ghostTextColor,
-                onPressed: () => Navigator.of(context).pop('cancel'),
-              );
-            },
-          ),
-        ],
+        children: popupButtons,
       ),
     );
 
