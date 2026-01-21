@@ -26,30 +26,43 @@ _$ListProductCollectionDataResponseModelImpl
         );
 
 Map<String, dynamic> _$$ListProductCollectionDataResponseModelImplToJson(
-        _$ListProductCollectionDataResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.priceRange?.toJson() case final value?) 'price_range': value,
-      if (instance.attributeCounts?.map((e) => e.toJson()).toList()
-          case final value?)
-        'attribute_counts': value,
-      if (instance.ratingCounts?.map((e) => e.toJson()).toList()
-          case final value?)
-        'rating_counts': value,
-      if (instance.taxonomyCounts?.map((e) => e.toJson()).toList()
-          case final value?)
-        'taxonomy_counts': value,
-    };
+    _$ListProductCollectionDataResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('price_range', instance.priceRange?.toJson());
+  writeNotNull('attribute_counts',
+      instance.attributeCounts?.map((e) => e.toJson()).toList());
+  writeNotNull(
+      'rating_counts', instance.ratingCounts?.map((e) => e.toJson()).toList());
+  writeNotNull('taxonomy_counts',
+      instance.taxonomyCounts?.map((e) => e.toJson()).toList());
+  return val;
+}
 
 _$CountImpl _$$CountImplFromJson(Map<String, dynamic> json) => _$CountImpl(
       term: (json['term'] as num?)?.toInt(),
       count: (json['count'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$CountImplToJson(_$CountImpl instance) =>
-    <String, dynamic>{
-      if (instance.term case final value?) 'term': value,
-      if (instance.count case final value?) 'count': value,
-    };
+Map<String, dynamic> _$$CountImplToJson(_$CountImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('term', instance.term);
+  writeNotNull('count', instance.count);
+  return val;
+}
 
 _$PriceRangeImpl _$$PriceRangeImplFromJson(Map<String, dynamic> json) =>
     _$PriceRangeImpl(
@@ -64,21 +77,27 @@ _$PriceRangeImpl _$$PriceRangeImplFromJson(Map<String, dynamic> json) =>
       currencyThousandSeparator: json['currency_thousand_separator'] as String?,
     );
 
-Map<String, dynamic> _$$PriceRangeImplToJson(_$PriceRangeImpl instance) =>
-    <String, dynamic>{
-      if (instance.currencyMinorUnit case final value?)
-        'currency_minor_unit': value,
-      if (instance.minPrice case final value?) 'min_price': value,
-      if (instance.maxPrice case final value?) 'max_price': value,
-      if (instance.currencyCode case final value?) 'currency_code': value,
-      if (instance.currencyDecimalSeparator case final value?)
-        'currency_decimal_separator': value,
-      if (instance.currencyPrefix case final value?) 'currency_prefix': value,
-      if (instance.currencySuffix case final value?) 'currency_suffix': value,
-      if (instance.currencySymbol case final value?) 'currency_symbol': value,
-      if (instance.currencyThousandSeparator case final value?)
-        'currency_thousand_separator': value,
-    };
+Map<String, dynamic> _$$PriceRangeImplToJson(_$PriceRangeImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('currency_minor_unit', instance.currencyMinorUnit);
+  writeNotNull('min_price', instance.minPrice);
+  writeNotNull('max_price', instance.maxPrice);
+  writeNotNull('currency_code', instance.currencyCode);
+  writeNotNull('currency_decimal_separator', instance.currencyDecimalSeparator);
+  writeNotNull('currency_prefix', instance.currencyPrefix);
+  writeNotNull('currency_suffix', instance.currencySuffix);
+  writeNotNull('currency_symbol', instance.currencySymbol);
+  writeNotNull(
+      'currency_thousand_separator', instance.currencyThousandSeparator);
+  return val;
+}
 
 _$RatingCountImpl _$$RatingCountImplFromJson(Map<String, dynamic> json) =>
     _$RatingCountImpl(
@@ -86,8 +105,16 @@ _$RatingCountImpl _$$RatingCountImplFromJson(Map<String, dynamic> json) =>
       count: (json['count'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$RatingCountImplToJson(_$RatingCountImpl instance) =>
-    <String, dynamic>{
-      if (instance.rating case final value?) 'rating': value,
-      if (instance.count case final value?) 'count': value,
-    };
+Map<String, dynamic> _$$RatingCountImplToJson(_$RatingCountImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('rating', instance.rating);
+  writeNotNull('count', instance.count);
+  return val;
+}

@@ -12,6 +12,18 @@ export 'services/auth/woo_jwt_signin_manager.dart';
 export 'services/auth/woo_jwt_auth_service.dart';
 export 'models/auth/woo_jwt_token.dart';
 
+// 👥 OSMEA Users Manager Services
+export 'network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+export 'network/remote/woocommerce/users_manager/api/api_osmea_users_manager_service.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/request/update_user_metadata_request.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/delete_user_metadata_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_all_users_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_by_id_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_metadata_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_profile_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/update_user_metadata_response.dart';
+
 // 🛒 Cart Token Services
 export 'models/cart/woo_cart_token.dart';
 export 'dio_config/interceptors/woo_cart_token_interceptor.dart';

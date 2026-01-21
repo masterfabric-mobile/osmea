@@ -25,17 +25,23 @@ _$ProcessPaymentAndOrderRequestModelImpl
         );
 
 Map<String, dynamic> _$$ProcessPaymentAndOrderRequestModelImplToJson(
-        _$ProcessPaymentAndOrderRequestModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.key case final value?) 'key': value,
-      if (instance.billingEmail case final value?) 'billing_email': value,
-      if (instance.billingAddress?.toJson() case final value?)
-        'billing_address': value,
-      if (instance.shippingAddress?.toJson() case final value?)
-        'shipping_address': value,
-      if (instance.paymentMethod case final value?) 'payment_method': value,
-      if (instance.paymentData case final value?) 'payment_data': value,
-    };
+    _$ProcessPaymentAndOrderRequestModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('key', instance.key);
+  writeNotNull('billing_email', instance.billingEmail);
+  writeNotNull('billing_address', instance.billingAddress?.toJson());
+  writeNotNull('shipping_address', instance.shippingAddress?.toJson());
+  writeNotNull('payment_method', instance.paymentMethod);
+  writeNotNull('payment_data', instance.paymentData);
+  return val;
+}
 
 _$IngAddressImpl _$$IngAddressImplFromJson(Map<String, dynamic> json) =>
     _$IngAddressImpl(
@@ -52,17 +58,25 @@ _$IngAddressImpl _$$IngAddressImplFromJson(Map<String, dynamic> json) =>
       phone: json['phone'] as String?,
     );
 
-Map<String, dynamic> _$$IngAddressImplToJson(_$IngAddressImpl instance) =>
-    <String, dynamic>{
-      if (instance.firstName case final value?) 'first_name': value,
-      if (instance.lastName case final value?) 'last_name': value,
-      if (instance.company case final value?) 'company': value,
-      if (instance.address1 case final value?) 'address_1': value,
-      if (instance.address2 case final value?) 'address_2': value,
-      if (instance.city case final value?) 'city': value,
-      if (instance.state case final value?) 'state': value,
-      if (instance.postcode case final value?) 'postcode': value,
-      if (instance.country case final value?) 'country': value,
-      if (instance.email case final value?) 'email': value,
-      if (instance.phone case final value?) 'phone': value,
-    };
+Map<String, dynamic> _$$IngAddressImplToJson(_$IngAddressImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('first_name', instance.firstName);
+  writeNotNull('last_name', instance.lastName);
+  writeNotNull('company', instance.company);
+  writeNotNull('address_1', instance.address1);
+  writeNotNull('address_2', instance.address2);
+  writeNotNull('city', instance.city);
+  writeNotNull('state', instance.state);
+  writeNotNull('postcode', instance.postcode);
+  writeNotNull('country', instance.country);
+  writeNotNull('email', instance.email);
+  writeNotNull('phone', instance.phone);
+  return val;
+}

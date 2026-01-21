@@ -20,13 +20,21 @@ _$RetrieveProductAttributeResponseModelImpl
         );
 
 Map<String, dynamic> _$$RetrieveProductAttributeResponseModelImplToJson(
-        _$RetrieveProductAttributeResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.taxonomy case final value?) 'taxonomy': value,
-      if (instance.type case final value?) 'type': value,
-      if (instance.order case final value?) 'order': value,
-      if (instance.hasArchives case final value?) 'has_archives': value,
-      if (instance.count case final value?) 'count': value,
-    };
+    _$RetrieveProductAttributeResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('taxonomy', instance.taxonomy);
+  writeNotNull('type', instance.type);
+  writeNotNull('order', instance.order);
+  writeNotNull('has_archives', instance.hasArchives);
+  writeNotNull('count', instance.count);
+  return val;
+}
