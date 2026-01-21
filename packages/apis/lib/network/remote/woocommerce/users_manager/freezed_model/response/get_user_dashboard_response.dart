@@ -24,7 +24,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
       // Handle case where metadata/preferences come as empty arrays instead of objects
       final metadataJson = json['metadata'];
       final preferencesJson = json['preferences'];
-      
+
       // Convert empty arrays to empty maps
       Map<String, dynamic> metadataMap;
       if (metadataJson is List) {
@@ -34,7 +34,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
       } else {
         metadataMap = {};
       }
-      
+
       Map<String, dynamic> preferencesMap;
       if (preferencesJson is List) {
         preferencesMap = {};
@@ -43,7 +43,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
       } else {
         preferencesMap = {};
       }
-      
+
       // Parse metadata
       final metadata = metadataMap.map(
         (k, e) => MapEntry(
@@ -51,7 +51,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
           UserMetadataItem.fromJson(e as Map<String, dynamic>),
         ),
       );
-      
+
       // Parse preferences
       final preferences = preferencesMap.map(
         (k, e) => MapEntry(
@@ -59,7 +59,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
           UserPreference.fromJson(e as Map<String, dynamic>),
         ),
       );
-      
+
       // Parse addresses - handle empty array
       final addressesJson = json['addresses'];
       final addresses = addressesJson is List
@@ -67,7 +67,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
               .map((e) => UserAddress.fromJson(e as Map<String, dynamic>))
               .toList()
           : <UserAddress>[];
-      
+
       // Parse contracts - handle empty array
       final contractsJson = json['contracts'];
       final contracts = contractsJson is List
@@ -75,7 +75,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
               .map((e) => UserContract.fromJson(e as Map<String, dynamic>))
               .toList()
           : <UserContract>[];
-      
+
       // Parse orders - handle empty array
       final ordersJson = json['orders'];
       final orders = ordersJson is List
@@ -83,7 +83,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
               .map((e) => UserOrder.fromJson(e as Map<String, dynamic>))
               .toList()
           : <UserOrder>[];
-      
+
       // Parse activities - handle empty array
       final activitiesJson = json['activities'];
       final activities = activitiesJson is List
@@ -91,7 +91,7 @@ class GetUserDashboardResponse with _$GetUserDashboardResponse {
               .map((e) => UserActivity.fromJson(e as Map<String, dynamic>))
               .toList()
           : <UserActivity>[];
-      
+
       return GetUserDashboardResponse(
         profile: UserProfile.fromJson(json['profile'] as Map<String, dynamic>),
         metadata: metadata,
