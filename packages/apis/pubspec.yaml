@@ -40,7 +40,10 @@ dependencies:
   # NOTE: Keep `core` source consistent across the workspace (path vs git).
   # Using `path` avoids version solving conflicts in local development.
   core:
-    path: ../core
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
 
   # Code generation and annotations
   json_annotation: ^4.9.0
