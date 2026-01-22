@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 import 'get_user_metadata_response.dart';
+import 'get_user_orders_response.dart';
 
 part 'get_user_dashboard_response.freezed.dart';
 part 'get_user_dashboard_response.g.dart';
@@ -200,6 +201,7 @@ class UserOrder with _$UserOrder {
     required double total,
     @JsonKey(name: 'currency') required String currency,
     @JsonKey(name: 'payment_method') String? paymentMethod,
+    @JsonKey(name: 'line_items') List<OrderLineItem>? lineItems,
   }) = _UserOrder;
 
   factory UserOrder.fromJson(Map<String, dynamic> json) =>

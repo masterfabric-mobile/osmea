@@ -737,6 +737,48 @@ class OSMEA_Users_Manager {
             'payment_method' => $order->get_payment_method_title(),
         );
         
+        // Include line items - first 3 for list view, all for detailed view
+        $data['line_items'] = array();
+        $items = $order->get_items();
+        $item_count = 0;
+        $max_items = $detailed ? PHP_INT_MAX : 3; // Limit to 3 for list, all for detailed
+        
+        // Debug: Log items count
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('OSMEA format_order_data: Order #' . $order->get_order_number() . ' - Items count: ' . count($items));
+        }
+        
+        foreach ($items as $item_id => $item) {
+            if ($item_count >= $max_items) break;
+            $product = $item->get_product();
+            $product_image = '';
+            if ($product) {
+                $image_id = $product->get_image_id();
+                if ($image_id) {
+                    $product_image = wp_get_attachment_image_url($image_id, 'thumbnail');
+                    // Fallback to medium size if thumbnail not available
+                    if (!$product_image) {
+                        $product_image = wp_get_attachment_image_url($image_id, 'medium');
+                    }
+                    // Fallback to full size if medium not available
+                    if (!$product_image) {
+                        $product_image = wp_get_attachment_image_url($image_id, 'full');
+                    }
+                }
+            }
+            
+            $data['line_items'][] = array(
+                'id' => $item_id,
+                'name' => $item->get_name(),
+                'quantity' => $item->get_quantity(),
+                'subtotal' => $item->get_subtotal(),
+                'total' => $item->get_total(),
+                'product_id' => $item->get_product_id(),
+                'product_image' => $product_image ? $product_image : '',
+            );
+            $item_count++;
+        }
+        
         if ($detailed) {
             $data['billing'] = array(
                 'first_name' => $order->get_billing_first_name(),
@@ -763,20 +805,6 @@ class OSMEA_Users_Manager {
                 'postcode' => $order->get_shipping_postcode(),
                 'country' => $order->get_shipping_country(),
             );
-            
-            $data['line_items'] = array();
-            foreach ($order->get_items() as $item_id => $item) {
-                $product = $item->get_product();
-                $data['line_items'][] = array(
-                    'id' => $item_id,
-                    'name' => $item->get_name(),
-                    'quantity' => $item->get_quantity(),
-                    'subtotal' => $item->get_subtotal(),
-                    'total' => $item->get_total(),
-                    'product_id' => $item->get_product_id(),
-                    'product_image' => $product ? wp_get_attachment_image_url($product->get_image_id(), 'thumbnail') : '',
-                );
-            }
             
             $data['totals'] = array(
                 'subtotal' => $order->get_subtotal(),

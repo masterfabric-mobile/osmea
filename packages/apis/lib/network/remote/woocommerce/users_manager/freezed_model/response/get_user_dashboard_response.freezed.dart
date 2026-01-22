@@ -1741,6 +1741,8 @@ mixin _$UserOrder {
   String get currency => throw _privateConstructorUsedError;
   @JsonKey(name: 'payment_method')
   String? get paymentMethod => throw _privateConstructorUsedError;
+  @JsonKey(name: 'line_items')
+  List<OrderLineItem>? get lineItems => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1760,7 +1762,8 @@ abstract class $UserOrderCopyWith<$Res> {
       @JsonKey(name: 'date_created') String dateCreated,
       @JsonKey(name: 'total', fromJson: _totalFromJson) double total,
       @JsonKey(name: 'currency') String currency,
-      @JsonKey(name: 'payment_method') String? paymentMethod});
+      @JsonKey(name: 'payment_method') String? paymentMethod,
+      @JsonKey(name: 'line_items') List<OrderLineItem>? lineItems});
 }
 
 /// @nodoc
@@ -1783,6 +1786,7 @@ class _$UserOrderCopyWithImpl<$Res, $Val extends UserOrder>
     Object? total = null,
     Object? currency = null,
     Object? paymentMethod = freezed,
+    Object? lineItems = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -1813,6 +1817,10 @@ class _$UserOrderCopyWithImpl<$Res, $Val extends UserOrder>
           ? _value.paymentMethod
           : paymentMethod // ignore: cast_nullable_to_non_nullable
               as String?,
+      lineItems: freezed == lineItems
+          ? _value.lineItems
+          : lineItems // ignore: cast_nullable_to_non_nullable
+              as List<OrderLineItem>?,
     ) as $Val);
   }
 }
@@ -1832,7 +1840,8 @@ abstract class _$$UserOrderImplCopyWith<$Res>
       @JsonKey(name: 'date_created') String dateCreated,
       @JsonKey(name: 'total', fromJson: _totalFromJson) double total,
       @JsonKey(name: 'currency') String currency,
-      @JsonKey(name: 'payment_method') String? paymentMethod});
+      @JsonKey(name: 'payment_method') String? paymentMethod,
+      @JsonKey(name: 'line_items') List<OrderLineItem>? lineItems});
 }
 
 /// @nodoc
@@ -1853,6 +1862,7 @@ class __$$UserOrderImplCopyWithImpl<$Res>
     Object? total = null,
     Object? currency = null,
     Object? paymentMethod = freezed,
+    Object? lineItems = freezed,
   }) {
     return _then(_$UserOrderImpl(
       id: null == id
@@ -1883,6 +1893,10 @@ class __$$UserOrderImplCopyWithImpl<$Res>
           ? _value.paymentMethod
           : paymentMethod // ignore: cast_nullable_to_non_nullable
               as String?,
+      lineItems: freezed == lineItems
+          ? _value._lineItems
+          : lineItems // ignore: cast_nullable_to_non_nullable
+              as List<OrderLineItem>?,
     ));
   }
 }
@@ -1897,7 +1911,9 @@ class _$UserOrderImpl with DiagnosticableTreeMixin implements _UserOrder {
       @JsonKey(name: 'date_created') required this.dateCreated,
       @JsonKey(name: 'total', fromJson: _totalFromJson) required this.total,
       @JsonKey(name: 'currency') required this.currency,
-      @JsonKey(name: 'payment_method') this.paymentMethod});
+      @JsonKey(name: 'payment_method') this.paymentMethod,
+      @JsonKey(name: 'line_items') final List<OrderLineItem>? lineItems})
+      : _lineItems = lineItems;
 
   factory _$UserOrderImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserOrderImplFromJson(json);
@@ -1923,10 +1939,20 @@ class _$UserOrderImpl with DiagnosticableTreeMixin implements _UserOrder {
   @override
   @JsonKey(name: 'payment_method')
   final String? paymentMethod;
+  final List<OrderLineItem>? _lineItems;
+  @override
+  @JsonKey(name: 'line_items')
+  List<OrderLineItem>? get lineItems {
+    final value = _lineItems;
+    if (value == null) return null;
+    if (_lineItems is EqualUnmodifiableListView) return _lineItems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'UserOrder(id: $id, orderNumber: $orderNumber, status: $status, dateCreated: $dateCreated, total: $total, currency: $currency, paymentMethod: $paymentMethod)';
+    return 'UserOrder(id: $id, orderNumber: $orderNumber, status: $status, dateCreated: $dateCreated, total: $total, currency: $currency, paymentMethod: $paymentMethod, lineItems: $lineItems)';
   }
 
   @override
@@ -1940,7 +1966,8 @@ class _$UserOrderImpl with DiagnosticableTreeMixin implements _UserOrder {
       ..add(DiagnosticsProperty('dateCreated', dateCreated))
       ..add(DiagnosticsProperty('total', total))
       ..add(DiagnosticsProperty('currency', currency))
-      ..add(DiagnosticsProperty('paymentMethod', paymentMethod));
+      ..add(DiagnosticsProperty('paymentMethod', paymentMethod))
+      ..add(DiagnosticsProperty('lineItems', lineItems));
   }
 
   @override
@@ -1958,13 +1985,23 @@ class _$UserOrderImpl with DiagnosticableTreeMixin implements _UserOrder {
             (identical(other.currency, currency) ||
                 other.currency == currency) &&
             (identical(other.paymentMethod, paymentMethod) ||
-                other.paymentMethod == paymentMethod));
+                other.paymentMethod == paymentMethod) &&
+            const DeepCollectionEquality()
+                .equals(other._lineItems, _lineItems));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, orderNumber, status,
-      dateCreated, total, currency, paymentMethod);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      orderNumber,
+      status,
+      dateCreated,
+      total,
+      currency,
+      paymentMethod,
+      const DeepCollectionEquality().hash(_lineItems));
 
   @JsonKey(ignore: true)
   @override
@@ -1989,7 +2026,8 @@ abstract class _UserOrder implements UserOrder {
           @JsonKey(name: 'total', fromJson: _totalFromJson)
           required final double total,
           @JsonKey(name: 'currency') required final String currency,
-          @JsonKey(name: 'payment_method') final String? paymentMethod}) =
+          @JsonKey(name: 'payment_method') final String? paymentMethod,
+          @JsonKey(name: 'line_items') final List<OrderLineItem>? lineItems}) =
       _$UserOrderImpl;
 
   factory _UserOrder.fromJson(Map<String, dynamic> json) =
@@ -2016,6 +2054,9 @@ abstract class _UserOrder implements UserOrder {
   @override
   @JsonKey(name: 'payment_method')
   String? get paymentMethod;
+  @override
+  @JsonKey(name: 'line_items')
+  List<OrderLineItem>? get lineItems;
   @override
   @JsonKey(ignore: true)
   _$$UserOrderImplCopyWith<_$UserOrderImpl> get copyWith =>

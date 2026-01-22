@@ -139,6 +139,9 @@ _$UserOrderImpl _$$UserOrderImplFromJson(Map<String, dynamic> json) =>
       total: _totalFromJson(json['total']),
       currency: json['currency'] as String,
       paymentMethod: json['payment_method'] as String?,
+      lineItems: (json['line_items'] as List<dynamic>?)
+          ?.map((e) => OrderLineItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$UserOrderImplToJson(_$UserOrderImpl instance) {
@@ -158,6 +161,8 @@ Map<String, dynamic> _$$UserOrderImplToJson(_$UserOrderImpl instance) {
   }
 
   writeNotNull('payment_method', instance.paymentMethod);
+  writeNotNull(
+      'line_items', instance.lineItems?.map((e) => e.toJson()).toList());
   return val;
 }
 
