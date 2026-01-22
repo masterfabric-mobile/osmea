@@ -409,7 +409,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('❌ Wishlist: Service call failed: $e');
         emit(
           WishlistErrorState(
-            message: 'Failed to load saved items: ${e.toString()}',
+            message: 'Failed to load saved items: ${ApiErrorUtils.getErrorMessage(e)}',
           ),
         );
         return;

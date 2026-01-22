@@ -48,7 +48,7 @@ class _CartContentWidgetState extends State<CartContentWidget> {
         _bottomWidgetKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null && mounted) {
       setState(() {
-        _bottomWidgetHeight = renderBox.size.height + MediaQuery.of(context).padding.bottom;
+        _bottomWidgetHeight = renderBox.size.height;
       });
     }
   }
@@ -59,67 +59,80 @@ class _CartContentWidgetState extends State<CartContentWidget> {
       return const CartEmptyWidget();
     }
 
+    // Get navbar height from config (for padding calculation)
+    final navbarHeight = _getNavbarHeight(context);
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    
     // Calculate responsive bottom padding
     final screenHeight = MediaQuery.of(context).size.height;
-    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
     // Use a percentage of screen height or measured height, whichever is larger
-    final responsiveBottomPadding = (_bottomWidgetHeight + safeAreaBottom + context.spacing16)
+    // Account for navbar height and safe area in padding
+    final responsiveBottomPadding = (_bottomWidgetHeight + navbarHeight + safeAreaBottom + context.spacing16)
         .clamp(200.0, screenHeight * 0.3);
 
-    return Stack(
-      children: [
-        // Scrollable content
-        OsmeaComponents.singleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: OsmeaComponents.column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: Stack(
             children: [
-              OsmeaComponents.sizedBox(height: context.spacing12),
-              ..._buildCartItems(context),
-              OsmeaComponents.sizedBox(height: context.spacing12),
-              // Product count widget before coupon section
-              ProductCountWidget(state: widget.state),
-              OsmeaComponents.sizedBox(height: context.spacing12),
-              CouponSectionWidget(
-                viewModel: widget.viewModel,
-                state: widget.state,
-              ),
-              // Responsive bottom padding to account for fixed bottom summary
-              OsmeaComponents.sizedBox(height: responsiveBottomPadding),
-            ],
-          ),
-        ),
-        // Blur overlay when summary is expanded
-        if (_isSummaryExpanded)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                child: Container(
-                  color: _getBlurOverlayColor(context),
+              // Scrollable content
+              OsmeaComponents.singleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: OsmeaComponents.column(
+                  children: [
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    ..._buildCartItems(context),
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    // Product count widget before coupon section
+                    ProductCountWidget(state: widget.state),
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    CouponSectionWidget(
+                      viewModel: widget.viewModel,
+                      state: widget.state,
+                    ),
+                    // Responsive bottom padding to account for fixed bottom summary
+                    OsmeaComponents.sizedBox(height: responsiveBottomPadding),
+                  ],
                 ),
               ),
-            ),
+              // Blur overlay when summary is expanded
+              if (_isSummaryExpanded)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      child: Container(
+                        color: _getBlurOverlayColor(context),
+                      ),
+                    ),
+                  ),
+                ),
+              // Fixed bottom collapsible summary - positioned at bottom (above navbar)
+              // Note: Scaffold's body already accounts for navbar, so bottom: 0 is correct
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0, // Position at bottom of body (which is above navbar)
+                child: _BottomWidgetMeasurer(
+                  key: _bottomWidgetKey,
+                  onHeightChanged: _measureBottomWidget,
+                  child: CollapsibleOrderSummaryWidget(
+                    viewModel: widget.viewModel,
+                    state: widget.state,
+                    onExpandedChanged: (isExpanded) {
+                      setState(() {
+                        _isSummaryExpanded = isExpanded;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
-        // Fixed bottom collapsible summary
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: _BottomWidgetMeasurer(
-            key: _bottomWidgetKey,
-            onHeightChanged: _measureBottomWidget,
-            child: CollapsibleOrderSummaryWidget(
-              viewModel: widget.viewModel,
-              state: widget.state,
-              onExpandedChanged: (isExpanded) {
-                setState(() {
-                  _isSummaryExpanded = isExpanded;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -186,6 +199,30 @@ class _BottomWidgetMeasurerState extends State<_BottomWidgetMeasurer> {
 
 /// Helper methods for cart content widget
 extension _CartContentWidgetHelpers on _CartContentWidgetState {
+  /// Gets navbar height from config
+  double _getNavbarHeight(BuildContext context) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final navbarConfig = configHelper.getObject('navbar_configuration');
+      final sizeString = navbarConfig?['size'] as String? ?? 'medium';
+      
+      // Map size string to NavbarSize and get height
+      switch (sizeString.toLowerCase()) {
+        case 'small':
+          return 56.0;
+        case 'medium':
+          return 64.0;
+        case 'large':
+          return 72.0;
+        default:
+          return 64.0; // Default to medium
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error getting navbar height: $e');
+      return 64.0; // Default to medium size
+    }
+  }
+
   /// Gets blur overlay color from config
   Color _getBlurOverlayColor(BuildContext context) {
     final configHelper = AssetConfigHelper();
