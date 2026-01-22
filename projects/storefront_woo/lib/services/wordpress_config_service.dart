@@ -1,4 +1,3 @@
-import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -14,23 +13,27 @@ class WordPressConfigService {
     this.dio,
   });
   
-  /// Get Dio instance using ApiDioClient helper
-  /// Uses wooPublicDio() for public WordPress REST API endpoints
+  /// Get Dio instance for WordPress config fetch
+  /// Creates a simple Dio instance without cookie jar to avoid file system issues
   Dio get _dio {
     if (dio != null) return dio!;
     
-    // Use ApiDioClient helper for public WordPress endpoints
-    // wooPublicDio() is appropriate for public REST API calls without authentication
-    final publicDio = ApiDioClient.wooPublicDio();
+    // Create a simple Dio instance without cookie jar for WordPress config fetch
+    // This avoids file system errors when cookie jar tries to create .cookies directory
+    final simpleDio = Dio()
+      ..options = BaseOptions(
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        connectTimeout: timeout,
+        receiveTimeout: timeout,
+        sendTimeout: timeout,
+        responseType: ResponseType.json,
+      );
     
-    // Override timeout if custom timeout is provided
-    if (timeout != const Duration(seconds: 60)) {
-      publicDio.options.connectTimeout = timeout;
-      publicDio.options.receiveTimeout = timeout;
-      publicDio.options.sendTimeout = timeout;
-    }
-    
-    return publicDio;
+    debugPrint('📡 WordPress config Dio client configured (no cookies)');
+    return simpleDio;
   }
   
   /// Fetch app configuration from WordPress REST API
@@ -59,15 +62,42 @@ class WordPressConfigService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('❌ Dio error fetching config: ${e.message}');
+      debugPrint('❌ Dio error fetching config:');
+      debugPrint('  - Type: ${e.type}');
+      debugPrint('  - Message: ${e.message ?? 'null'}');
+      debugPrint('  - Error: ${e.error}');
+      debugPrint('  - Response status: ${e.response?.statusCode}');
+      debugPrint('  - Response data: ${e.response?.data}');
+      debugPrint('  - Request path: ${e.requestOptions.path}');
+      
       if (e.response != null) {
+        final statusCode = e.response?.statusCode;
+        final responseData = e.response?.data;
         throw Exception(
-          'Failed to load config: ${e.response?.statusCode} - ${e.response?.data}',
+          'Failed to load config: HTTP $statusCode - $responseData',
         );
       }
-      throw Exception('Network error: ${e.message}');
-    } catch (e) {
+      
+      // Provide more detailed error message
+      String errorMsg = 'Network error';
+      if (e.type == DioExceptionType.connectionTimeout) {
+        errorMsg = 'Connection timeout - server did not respond in time';
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        errorMsg = 'Receive timeout - server took too long to respond';
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        errorMsg = 'Send timeout - request took too long to send';
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMsg = 'Connection error - could not connect to server';
+      } else if (e.message != null && e.message!.isNotEmpty) {
+        errorMsg = e.message!;
+      } else if (e.error != null) {
+        errorMsg = 'Error: ${e.error}';
+      }
+      
+      throw Exception('Network error: $errorMsg');
+    } catch (e, stackTrace) {
       debugPrint('❌ Error fetching config: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
       rethrow;
     }
   }

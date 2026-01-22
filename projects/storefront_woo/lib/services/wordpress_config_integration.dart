@@ -62,6 +62,20 @@ class WordPressConfigIntegration {
           retryDelay: const Duration(seconds: 1),
         );
         debugPrint('✅ WordPress config fetched successfully');
+        
+        // Debug: Check WordPress config structure
+        if (wordPressConfig != null) {
+          debugPrint('📊 WordPress config keys: ${wordPressConfig.keys.toList()}');
+          if (wordPressConfig.containsKey('woocommerce_configuration')) {
+            final wooConfig = wordPressConfig['woocommerce_configuration'];
+            if (wooConfig is Map) {
+              debugPrint('📊 WooCommerce config from WordPress:');
+              debugPrint('  - Store URL: ${wooConfig['store_url']}');
+              debugPrint('  - Brand Name: ${wooConfig['brand_name']}');
+              debugPrint('  - Version: ${wooConfig['version']}');
+            }
+          }
+        }
       } catch (e) {
         debugPrint('⚠️ WordPress config fetch failed: $e');
         debugPrint('📦 Using local config only');
@@ -70,14 +84,37 @@ class WordPressConfigIntegration {
       }
       
       // Step 3: Merge configurations
+      // Priority: WordPress Config (plugin) > Local Config (app_config.json)
       debugPrint('🔄 Step 3: Merging configurations...');
+      debugPrint('  - Priority: ${useWordPressAsPrimary ? 'WordPress (plugin) > Local' : 'Local > WordPress'}');
+      
       mergedConfig = useWordPressAsPrimary
-          ? _mergeConfigs(localConfig, wordPressConfig)
-          : _mergeConfigs(wordPressConfig, localConfig);
+          ? _mergeConfigs(
+              localConfig,      // base: lower priority (fallback)
+              wordPressConfig!, // override: higher priority (plugin config wins)
+            )
+          : _mergeConfigs(
+              wordPressConfig!, // base: lower priority
+              localConfig,      // override: higher priority (local config wins)
+            );
       
       debugPrint('✅ Configuration merged successfully');
       debugPrint('📊 Config source: WordPress + Local (merged)');
       debugPrint('📊 Merged config keys: ${mergedConfig!.keys.toList()}');
+      
+      // Debug: Check merged config structure and verify WordPress values are used
+      if (mergedConfig!.containsKey('woocommerce_configuration')) {
+        final wooConfig = mergedConfig!['woocommerce_configuration'];
+        final wordPressWooConfig = wordPressConfig?['woocommerce_configuration'];
+        final localWooConfig = localConfig['woocommerce_configuration'];
+        
+        if (wooConfig is Map) {
+          debugPrint('📊 Merged WooCommerce config (final values):');
+          debugPrint('  - Store URL: ${wooConfig['store_url']} ${_getSourceInfo(wooConfig['store_url'], wordPressWooConfig?['store_url'], localWooConfig?['store_url'], useWordPressAsPrimary)}');
+          debugPrint('  - Brand Name: ${wooConfig['brand_name']} ${_getSourceInfo(wooConfig['brand_name'], wordPressWooConfig?['brand_name'], localWooConfig?['brand_name'], useWordPressAsPrimary)}');
+          debugPrint('  - Version: ${wooConfig['version']} ${_getSourceInfo(wooConfig['version'], wordPressWooConfig?['version'], localWooConfig?['version'], useWordPressAsPrimary)}');
+        }
+      }
       
       return mergedConfig;
     } catch (e, stackTrace) {
@@ -89,23 +126,28 @@ class WordPressConfigIntegration {
   
   /// Merge two configuration maps
   /// 
-  /// [base] - Base configuration (lower priority)
-  /// [override] - Override configuration (higher priority)
+  /// [base] - Base configuration (lower priority, used as fallback)
+  /// [override] - Override configuration (higher priority, overwrites base values)
+  /// 
+  /// Returns: Merged config where override values take precedence over base values
   Map<String, dynamic> _mergeConfigs(
     Map<String, dynamic> base,
     Map<String, dynamic> override,
   ) {
+    // Start with base config (fallback values)
     final merged = Map<String, dynamic>.from(base);
     
+    // Override with higher priority config values
     override.forEach((key, value) {
       if (value is Map && merged[key] is Map) {
-        // Recursively merge nested maps
+        // Recursively merge nested maps (e.g., woocommerce_configuration)
         merged[key] = _mergeConfigs(
-          merged[key] as Map<String, dynamic>,
-          value as Map<String, dynamic>,
+          merged[key] as Map<String, dynamic>, // base nested map
+          value as Map<String, dynamic>,        // override nested map
         );
       } else {
-        // Override with WordPress value
+        // Override base value with higher priority value
+        // If override is null or empty, it still overwrites (allows clearing values)
         merged[key] = value;
       }
     });
@@ -184,6 +226,31 @@ class WordPressConfigIntegration {
     }
     
     return value ?? defaultValue;
+  }
+  
+  /// Helper to show which source provided the final value
+  String _getSourceInfo(
+    dynamic finalValue,
+    dynamic wordPressValue,
+    dynamic localValue,
+    bool wordPressIsPrimary,
+  ) {
+    if (wordPressIsPrimary) {
+      // WordPress is primary, check if it matches WordPress value
+      if (wordPressValue != null && wordPressValue.toString() == finalValue.toString()) {
+        return '(from WordPress plugin ✅)';
+      } else if (localValue != null && localValue.toString() == finalValue.toString()) {
+        return '(from local config, WordPress missing)';
+      }
+    } else {
+      // Local is primary
+      if (localValue != null && localValue.toString() == finalValue.toString()) {
+        return '(from local config ✅)';
+      } else if (wordPressValue != null && wordPressValue.toString() == finalValue.toString()) {
+        return '(from WordPress plugin, local missing)';
+      }
+    }
+    return '(merged/fallback)';
   }
 }
 

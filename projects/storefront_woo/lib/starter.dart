@@ -65,7 +65,7 @@ launchApp({String environment = 'dev'}) async {
     debugPrint('📡 Attempting to load configuration from WordPress...');
 
     final wordPressService = WordPressConfigService(
-      baseUrl: 'http://example.com', // WordPress site URL
+      baseUrl: 'https://example.com', // WordPress site URL
     );
 
     wordPressConfigIntegration = WordPressConfigIntegration(
@@ -82,6 +82,42 @@ launchApp({String environment = 'dev'}) async {
     if (mergedConfig != null) {
       configLoaded = true;
       debugPrint('✅ Configuration loaded: WordPress + Local (merged)');
+
+      // Ensure woocommerce_configuration.store_url is set
+      // If WordPress config doesn't provide it, use the WordPress baseUrl as fallback
+      if (!mergedConfig.containsKey('woocommerce_configuration') ||
+          mergedConfig['woocommerce_configuration'] == null) {
+        mergedConfig['woocommerce_configuration'] = <String, dynamic>{};
+      }
+      
+      final wooConfig = mergedConfig['woocommerce_configuration'] as Map<String, dynamic>;
+      
+      // Set store_url if missing or invalid
+      final currentStoreUrl = wooConfig['store_url'] as String?;
+      if (currentStoreUrl == null || currentStoreUrl.isEmpty || currentStoreUrl == 'http://example.com') {
+        // Use WordPress baseUrl as fallback, converting http to https
+        final fallbackUrl = wordPressService.baseUrl.replaceFirst('http://', 'https://');
+        wooConfig['store_url'] = fallbackUrl;
+        debugPrint('⚠️ store_url not found in WordPress config, using baseUrl as fallback: $fallbackUrl');
+      } else {
+        debugPrint('✅ store_url found in WordPress config: $currentStoreUrl');
+      }
+      
+      // Ensure brand_name is set (required for JWT auth)
+      final currentBrandName = wooConfig['brand_name'] as String?;
+      if (currentBrandName == null || currentBrandName.isEmpty || currentBrandName == 'example') {
+        // Use a default brand name if not provided
+        wooConfig['brand_name'] = 'simple-jwt-login';
+        debugPrint('⚠️ brand_name not found in WordPress config, using default: simple-jwt-login');
+      } else {
+        debugPrint('✅ brand_name found in WordPress config: $currentBrandName');
+      }
+      
+      // Ensure version is set
+      if (wooConfig['version'] == null || wooConfig['version'] == '') {
+        wooConfig['version'] = 'v1';
+        debugPrint('⚠️ version not found in WordPress config, using default: v1');
+      }
 
       // Set merged config to AssetConfigHelper so all parts of the app use it
       assetConfigHelper.setConfig(mergedConfig, 'wordpress_merged_config');
