@@ -13,6 +13,15 @@ import 'package:storefront_woo/app/views/view_campaign/campaign_view.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/favorite_categories_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
+import 'package:storefront_woo/app/views/view_orders_history/orders_history_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/user_profile_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/addresses/user_addresses_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/settings/user_settings_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/metadata/user_metadata_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/preferences/user_preferences_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/contracts/user_contracts_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/edit/user_edit_profile_sub_view.dart';
+import 'package:storefront_woo/app/views/view_order_detail/order_detail_view.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -32,9 +41,9 @@ final GoRouter appRouter = GoRouter(
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return Scaffold(
-          body: child,
-          bottomNavigationBar: _getNavbarForRoute(state.uri.path),
+        return _AppShellWithMiniCart(
+          child: child,
+          navbar: _getNavbarForRoute(state.uri.path),
         );
       },
       routes: [
@@ -512,6 +521,206 @@ final GoRouter appRouter = GoRouter(
           },
         ),
 
+        // Orders History Route
+        GoRoute(
+          path: '/orders-history',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: OrdersHistoryView(
+                arguments: const {'orders_history': true},
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 OrdersHistoryView: goRoute called with path: $path',
+                  );
+                  if (path.contains('profile') || path == '/profile') {
+                    context.go('/profile');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // User Profile Route
+        GoRoute(
+          path: '/user-profile',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: UserProfileView(
+                arguments: const {'user_profile': true},
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 UserProfileView: goRoute called with path: $path',
+                  );
+                  if (path.contains('profile') || path == '/profile') {
+                    context.go('/profile');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+          routes: [
+            // User Edit Profile Route
+            GoRoute(
+              path: 'edit',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserEditProfileView(
+                    arguments: const {'edit_profile': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Addresses Route
+            GoRoute(
+              path: 'addresses',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserAddressesView(
+                    arguments: const {'addresses': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Settings Route
+            GoRoute(
+              path: 'settings',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserSettingsView(
+                    arguments: const {'settings': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Metadata Route
+            GoRoute(
+              path: 'metadata',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserMetadataView(
+                    arguments: const {'metadata': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Preferences Route
+            GoRoute(
+              path: 'preferences',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserPreferencesView(
+                    arguments: const {'preferences': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Contracts Route
+            GoRoute(
+              path: 'contracts',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return CustomTransitionPage(
+                  child: UserContractsView(
+                    arguments: const {'contracts': true},
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+          ],
+        ),
+
+        // Order Detail Route
+        GoRoute(
+          path: '/order-detail/:orderId',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final orderId =
+                int.tryParse(state.pathParameters['orderId'] ?? '0') ?? 0;
+            return CustomTransitionPage(
+              child: OrderDetailView(
+                arguments: {'order_detail': true, 'orderId': orderId},
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 OrderDetailView: goRoute called with path: $path',
+                  );
+                  if (path.contains('orders-history') ||
+                      path == '/orders-history') {
+                    context.go('/orders-history');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
         // Product Detail Route
         GoRoute(
           path: '/product-detail/:productId',
@@ -853,10 +1062,7 @@ final GoRouter appRouter = GoRouter(
           onSignUpError: (String error) {
             debugPrint('❌ Sign up error: $error');
             // Show error snackbar to user
-            context.snackbarError(
-              error,
-              duration: const Duration(seconds: 3),
-            );
+            context.snackbarError(error, duration: const Duration(seconds: 3));
           },
           arguments: {
             'auth': true,
@@ -2230,6 +2436,30 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
           showSkeleton: !widget.fromHome,
         );
       },
+    );
+  }
+}
+
+/// App shell with mini cart drawer and floating button
+class _AppShellWithMiniCart extends StatefulWidget {
+  final Widget child;
+  final Widget? navbar;
+
+  const _AppShellWithMiniCart({
+    required this.child,
+    this.navbar,
+  });
+
+  @override
+  State<_AppShellWithMiniCart> createState() => _AppShellWithMiniCartState();
+}
+
+class _AppShellWithMiniCartState extends State<_AppShellWithMiniCart> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: widget.navbar,
     );
   }
 }
