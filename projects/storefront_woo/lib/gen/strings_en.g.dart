@@ -108,8 +108,12 @@ class TranslationsCheckoutViewEn {
 	late final TranslationsCheckoutViewAppBarEn appBar = TranslationsCheckoutViewAppBarEn._(_root);
 	late final TranslationsCheckoutViewLoadingEn loading = TranslationsCheckoutViewLoadingEn._(_root);
 	late final TranslationsCheckoutViewOrderSuccessEn orderSuccess = TranslationsCheckoutViewOrderSuccessEn._(_root);
+	late final TranslationsCheckoutViewStepsEn steps = TranslationsCheckoutViewStepsEn._(_root);
+	late final TranslationsCheckoutViewSummaryEn summary = TranslationsCheckoutViewSummaryEn._(_root);
 	late final TranslationsCheckoutViewSectionsEn sections = TranslationsCheckoutViewSectionsEn._(_root);
 	late final TranslationsCheckoutViewFormFieldsEn formFields = TranslationsCheckoutViewFormFieldsEn._(_root);
+	late final TranslationsCheckoutViewShippingEn shipping = TranslationsCheckoutViewShippingEn._(_root);
+	late final TranslationsCheckoutViewOrderSummaryEn orderSummary = TranslationsCheckoutViewOrderSummaryEn._(_root);
 	late final TranslationsCheckoutViewPaymentEn payment = TranslationsCheckoutViewPaymentEn._(_root);
 	late final TranslationsCheckoutViewButtonsEn buttons = TranslationsCheckoutViewButtonsEn._(_root);
 	late final TranslationsCheckoutViewMessagesEn messages = TranslationsCheckoutViewMessagesEn._(_root);
@@ -152,6 +156,9 @@ class TranslationsProductDetailViewEn {
 	late final TranslationsProductDetailViewDescriptionEn description = TranslationsProductDetailViewDescriptionEn._(_root);
 	late final TranslationsProductDetailViewShareEn share = TranslationsProductDetailViewShareEn._(_root);
 
+	/// en: '{percentage}% Sale'
+	String get discount => '{percentage}% Sale';
+
 	/// en: 'Unknown Product'
 	String get unknownProduct => 'Unknown Product';
 }
@@ -168,6 +175,7 @@ class TranslationsProductListViewEn {
 	late final TranslationsProductListViewSortEn sort = TranslationsProductListViewSortEn._(_root);
 	late final TranslationsProductListViewFiltersEn filters = TranslationsProductListViewFiltersEn._(_root);
 	late final TranslationsProductListViewEmptyEn empty = TranslationsProductListViewEmptyEn._(_root);
+	late final TranslationsProductListViewWishlistEn wishlist = TranslationsProductListViewWishlistEn._(_root);
 	late final TranslationsProductListViewWidgetsEn widgets = TranslationsProductListViewWidgetsEn._(_root);
 }
 
@@ -356,6 +364,72 @@ class TranslationsCheckoutViewOrderSuccessEn {
 	String get backToHome => 'Back to Home';
 }
 
+// Path: checkoutView.steps
+class TranslationsCheckoutViewStepsEn {
+	TranslationsCheckoutViewStepsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Address'
+	String get address => 'Address';
+
+	/// en: 'Shipping'
+	String get shipping => 'Shipping';
+
+	/// en: 'Payment'
+	String get payment => 'Payment';
+
+	/// en: 'Summary'
+	String get summary => 'Summary';
+
+	/// en: 'Select Shipping Method'
+	String get selectShipping => 'Select Shipping Method';
+
+	/// en: 'Choose how you would like your order delivered'
+	String get shippingDescription => 'Choose how you would like your order delivered';
+
+	/// en: 'Select Payment Method'
+	String get selectPayment => 'Select Payment Method';
+
+	/// en: 'Order Review'
+	String get orderReview => 'Order Review';
+}
+
+// Path: checkoutView.summary
+class TranslationsCheckoutViewSummaryEn {
+	TranslationsCheckoutViewSummaryEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Order Summary'
+	String get title => 'Order Summary';
+
+	/// en: 'Please review your order details before placing'
+	String get subtitle => 'Please review your order details before placing';
+
+	/// en: 'Delivery Address'
+	String get deliveryAddress => 'Delivery Address';
+
+	/// en: 'Shipping Method'
+	String get shippingMethod => 'Shipping Method';
+
+	/// en: 'Payment Method'
+	String get paymentMethod => 'Payment Method';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'No shipping method selected'
+	String get noShippingSelected => 'No shipping method selected';
+
+	/// en: 'No payment method selected'
+	String get noPaymentSelected => 'No payment method selected';
+}
+
 // Path: checkoutView.sections
 class TranslationsCheckoutViewSectionsEn {
 	TranslationsCheckoutViewSectionsEn._(this._root);
@@ -422,6 +496,45 @@ class TranslationsCheckoutViewFormFieldsEn {
 	String get invalidEmail => 'Invalid email';
 }
 
+// Path: checkoutView.shipping
+class TranslationsCheckoutViewShippingEn {
+	TranslationsCheckoutViewShippingEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No shipping methods available'
+	String get noMethodsAvailable => 'No shipping methods available';
+
+	/// en: 'Please contact support for assistance'
+	String get contactSupport => 'Please contact support for assistance';
+
+	/// en: 'Free'
+	String get free => 'Free';
+}
+
+// Path: checkoutView.orderSummary
+class TranslationsCheckoutViewOrderSummaryEn {
+	TranslationsCheckoutViewOrderSummaryEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Subtotal'
+	String get subtotal => 'Subtotal';
+
+	/// en: 'Shipping'
+	String get shipping => 'Shipping';
+
+	/// en: 'Tax'
+	String get tax => 'Tax';
+
+	/// en: 'Total'
+	String get total => 'Total';
+}
+
 // Path: checkoutView.payment
 class TranslationsCheckoutViewPaymentEn {
 	TranslationsCheckoutViewPaymentEn._(this._root);
@@ -433,8 +546,32 @@ class TranslationsCheckoutViewPaymentEn {
 	/// en: 'Bank Transfer'
 	String get bankTransfer => 'Bank Transfer';
 
-	/// en: 'Havale/EFT'
-	String get bankTransferSubtitle => 'Havale/EFT';
+	/// en: 'Direct bank transfer'
+	String get bankTransferSubtitle => 'Direct bank transfer';
+
+	/// en: 'Cash on Delivery'
+	String get cashOnDelivery => 'Cash on Delivery';
+
+	/// en: 'Pay when you receive'
+	String get cashOnDeliverySubtitle => 'Pay when you receive';
+
+	/// en: 'Credit Card'
+	String get creditCard => 'Credit Card';
+
+	/// en: 'Pay securely with your card'
+	String get creditCardSubtitle => 'Pay securely with your card';
+
+	/// en: 'Delivery Address'
+	String get deliveryAddress => 'Delivery Address';
+
+	/// en: 'Shipping Method'
+	String get shippingMethod => 'Shipping Method';
+
+	/// en: 'Standard Shipping'
+	String get standardShipping => 'Standard Shipping';
+
+	/// en: 'No address set'
+	String get noAddressSet => 'No address set';
 }
 
 // Path: checkoutView.buttons
@@ -445,8 +582,23 @@ class TranslationsCheckoutViewButtonsEn {
 
 	// Translations
 
+	/// en: 'Back'
+	String get back => 'Back';
+
+	/// en: 'Continue to Shipping'
+	String get continueToShipping => 'Continue to Shipping';
+
+	/// en: 'Continue to Payment'
+	String get continueToPayment => 'Continue to Payment';
+
+	/// en: 'Continue to Summary'
+	String get continueToSummary => 'Continue to Summary';
+
 	/// en: 'Complete Order'
 	String get completeOrder => 'Complete Order';
+
+	/// en: 'Place Order'
+	String get placeOrder => 'Place Order';
 }
 
 // Path: checkoutView.messages
@@ -459,6 +611,12 @@ class TranslationsCheckoutViewMessagesEn {
 
 	/// en: 'Please fill in all required fields'
 	String get fillRequiredFields => 'Please fill in all required fields';
+
+	/// en: 'Please select a shipping method'
+	String get selectShippingMethod => 'Please select a shipping method';
+
+	/// en: 'Please select a payment method'
+	String get selectPaymentMethod => 'Please select a payment method';
 }
 
 // Path: favoriteCategoriesView.appBar
@@ -716,6 +874,21 @@ class TranslationsProductListViewEmptyEn {
 
 	/// en: 'Clear all filters'
 	String get clearAll => 'Clear all filters';
+}
+
+// Path: productListView.wishlist
+class TranslationsProductListViewWishlistEn {
+	TranslationsProductListViewWishlistEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Added to favorites'
+	String get added => 'Added to favorites';
+
+	/// en: 'Removed from favorites'
+	String get removed => 'Removed from favorites';
 }
 
 // Path: productListView.widgets
@@ -1372,6 +1545,22 @@ extension on Translations {
 			'checkoutView.orderSuccess.orderId' => 'Order ID',
 			'checkoutView.orderSuccess.status' => 'Status',
 			'checkoutView.orderSuccess.backToHome' => 'Back to Home',
+			'checkoutView.steps.address' => 'Address',
+			'checkoutView.steps.shipping' => 'Shipping',
+			'checkoutView.steps.payment' => 'Payment',
+			'checkoutView.steps.summary' => 'Summary',
+			'checkoutView.steps.selectShipping' => 'Select Shipping Method',
+			'checkoutView.steps.shippingDescription' => 'Choose how you would like your order delivered',
+			'checkoutView.steps.selectPayment' => 'Select Payment Method',
+			'checkoutView.steps.orderReview' => 'Order Review',
+			'checkoutView.summary.title' => 'Order Summary',
+			'checkoutView.summary.subtitle' => 'Please review your order details before placing',
+			'checkoutView.summary.deliveryAddress' => 'Delivery Address',
+			'checkoutView.summary.shippingMethod' => 'Shipping Method',
+			'checkoutView.summary.paymentMethod' => 'Payment Method',
+			'checkoutView.summary.edit' => 'Edit',
+			'checkoutView.summary.noShippingSelected' => 'No shipping method selected',
+			'checkoutView.summary.noPaymentSelected' => 'No payment method selected',
 			'checkoutView.sections.billingAddress' => 'Billing Address',
 			'checkoutView.sections.shippingAddress' => 'Shipping Address',
 			'checkoutView.sections.sameAsBilling' => 'Same as billing address',
@@ -1388,10 +1577,32 @@ extension on Translations {
 			'checkoutView.formFields.country' => 'Country',
 			'checkoutView.formFields.required' => 'Required',
 			'checkoutView.formFields.invalidEmail' => 'Invalid email',
+			'checkoutView.shipping.noMethodsAvailable' => 'No shipping methods available',
+			'checkoutView.shipping.contactSupport' => 'Please contact support for assistance',
+			'checkoutView.shipping.free' => 'Free',
+			'checkoutView.orderSummary.subtotal' => 'Subtotal',
+			'checkoutView.orderSummary.shipping' => 'Shipping',
+			'checkoutView.orderSummary.tax' => 'Tax',
+			'checkoutView.orderSummary.total' => 'Total',
 			'checkoutView.payment.bankTransfer' => 'Bank Transfer',
-			'checkoutView.payment.bankTransferSubtitle' => 'Havale/EFT',
+			'checkoutView.payment.bankTransferSubtitle' => 'Direct bank transfer',
+			'checkoutView.payment.cashOnDelivery' => 'Cash on Delivery',
+			'checkoutView.payment.cashOnDeliverySubtitle' => 'Pay when you receive',
+			'checkoutView.payment.creditCard' => 'Credit Card',
+			'checkoutView.payment.creditCardSubtitle' => 'Pay securely with your card',
+			'checkoutView.payment.deliveryAddress' => 'Delivery Address',
+			'checkoutView.payment.shippingMethod' => 'Shipping Method',
+			'checkoutView.payment.standardShipping' => 'Standard Shipping',
+			'checkoutView.payment.noAddressSet' => 'No address set',
+			'checkoutView.buttons.back' => 'Back',
+			'checkoutView.buttons.continueToShipping' => 'Continue to Shipping',
+			'checkoutView.buttons.continueToPayment' => 'Continue to Payment',
+			'checkoutView.buttons.continueToSummary' => 'Continue to Summary',
 			'checkoutView.buttons.completeOrder' => 'Complete Order',
+			'checkoutView.buttons.placeOrder' => 'Place Order',
 			'checkoutView.messages.fillRequiredFields' => 'Please fill in all required fields',
+			'checkoutView.messages.selectShippingMethod' => 'Please select a shipping method',
+			'checkoutView.messages.selectPaymentMethod' => 'Please select a payment method',
 			'favoriteCategoriesView.appBar.title' => 'Favorite Categories',
 			'favoriteCategoriesView.remove.title' => 'Removed from favorites',
 			'favoriteCategoriesView.remove.message' => 'Category was removed from your favorites',
@@ -1439,6 +1650,7 @@ extension on Translations {
 			'productDetailView.description.details' => 'Details',
 			'productDetailView.share.failed' => 'Failed to share product',
 			'productDetailView.share.error' => 'Error sharing product',
+			'productDetailView.discount' => '{percentage}% Sale',
 			'productDetailView.unknownProduct' => 'Unknown Product',
 			'productListView.appBar.title' => 'Products',
 			'productListView.appBar.backTooltip' => 'Back',
@@ -1453,6 +1665,8 @@ extension on Translations {
 			'productListView.empty.title' => 'No products found',
 			'productListView.empty.message' => 'Try adjusting your filters or search terms',
 			'productListView.empty.clearAll' => 'Clear all filters',
+			'productListView.wishlist.added' => 'Added to favorites',
+			'productListView.wishlist.removed' => 'Removed from favorites',
 			'productListView.widgets.chips.onSale' => 'On Sale',
 			'productListView.widgets.chips.featured' => 'Featured',
 			'productListView.widgets.chips.clearAll' => 'Clear all',
