@@ -6,11 +6,20 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
-class PaymentStepWidget extends StatelessWidget {
+class _MatchInfo {
+  final int start;
+  final int end;
+  final String type;
+
+  _MatchInfo(this.start, this.end, this.type);
+}
+
+class PaymentStepWidget extends StatefulWidget {
   final List<PaymentMethod> paymentMethods;
   final String? selectedMethodId;
   final double subtotal;
@@ -41,6 +50,15 @@ class PaymentStepWidget extends StatelessWidget {
   });
 
   @override
+  State<PaymentStepWidget> createState() => _PaymentStepWidgetState();
+}
+
+class _PaymentStepWidgetState extends State<PaymentStepWidget> {
+  bool _isAgreementAccepted = false;
+  bool _isPreliminaryFormExpanded = true;
+  bool _isDistanceSalesExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
     final configHelper = AssetConfigHelper();
     
@@ -66,7 +84,7 @@ class PaymentStepWidget extends StatelessWidget {
                 SizedBox(height: context.spacing12),
                 
                 // Payment methods list
-                ...paymentMethods.map((method) => Padding(
+                ...widget.paymentMethods.map((method) => Padding(
                   padding: EdgeInsets.only(bottom: context.spacing10),
                   child: _buildPaymentMethodCard(context, configHelper, method),
                 )),
@@ -90,6 +108,11 @@ class PaymentStepWidget extends StatelessWidget {
                 
                 // Final order summary
                 _buildFinalSummary(context, configHelper),
+                
+                SizedBox(height: context.spacing20),
+                
+                // Payment Agreements Section
+                _buildAgreementsSection(context, configHelper),
                 
                 SizedBox(height: context.spacing24),
               ],
@@ -152,7 +175,7 @@ class PaymentStepWidget extends StatelessWidget {
     AssetConfigHelper configHelper,
     PaymentMethod method,
   ) {
-    final isSelected = method.id == selectedMethodId;
+    final isSelected = method.id == widget.selectedMethodId;
     final activeColor = _getColorFromConfig(
       configHelper,
       'form_fields.input_focused_border_color',
@@ -185,7 +208,7 @@ class PaymentStepWidget extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: method.enabled ? () => onMethodSelected(method.id) : null,
+      onTap: method.enabled ? () => widget.onMethodSelected(method.id) : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.all(context.spacing12),
@@ -289,7 +312,7 @@ class PaymentStepWidget extends StatelessWidget {
   }
 
   Widget _buildDeliveryInfoCard(BuildContext context, AssetConfigHelper configHelper) {
-    final address = shippingAddress ?? billingAddress;
+    final address = widget.shippingAddress ?? widget.billingAddress;
     final addressLine = address != null
         ? '${address['address_1'] ?? ''}, ${address['city'] ?? ''}'
         : context.t.checkoutView.payment.noAddressSet;
@@ -368,7 +391,7 @@ class PaymentStepWidget extends StatelessWidget {
                     ),
                     SizedBox(height: context.spacing2),
                     Text(
-                      shippingMethodName ?? context.t.checkoutView.payment.standardShipping,
+                      widget.shippingMethodName ?? context.t.checkoutView.payment.standardShipping,
                       style: OsmeaTextStyle.bodyMedium(context).copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -384,18 +407,18 @@ class PaymentStepWidget extends StatelessWidget {
   }
 
   Widget _buildFinalSummary(BuildContext context, AssetConfigHelper configHelper) {
-    final total = subtotal + shippingCost;
+    final total = widget.subtotal + widget.shippingCost;
     
     final formattedSubtotal = PriceInfoCurrencyHelper.formatPrice(
-      subtotal,
-      currencyCode: currencyCode,
+      widget.subtotal,
+      currencyCode: widget.currencyCode,
     );
-    final formattedShipping = shippingCost == 0
+    final formattedShipping = widget.shippingCost == 0
         ? context.t.checkoutView.shipping.free
-        : PriceInfoCurrencyHelper.formatPrice(shippingCost, currencyCode: currencyCode);
+        : PriceInfoCurrencyHelper.formatPrice(widget.shippingCost, currencyCode: widget.currencyCode);
     final formattedTotal = PriceInfoCurrencyHelper.formatPrice(
       total,
-      currencyCode: currencyCode,
+      currencyCode: widget.currencyCode,
     );
 
     return Container(
@@ -423,7 +446,7 @@ class PaymentStepWidget extends StatelessWidget {
             context,
             label: context.t.checkoutView.orderSummary.shipping,
             value: formattedShipping,
-            valueColor: shippingCost == 0 ? OsmeaColors.greenMaterial[600] : null,
+            valueColor: widget.shippingCost == 0 ? OsmeaColors.greenMaterial[600] : null,
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: context.spacing10),
@@ -485,6 +508,333 @@ class PaymentStepWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildAgreementsSection(BuildContext context, AssetConfigHelper configHelper) {
+    final agreementBgColor = _getColorFromConfig(
+      configHelper,
+      'payment_agreements.agreement_section_background_color',
+      OsmeaColors.white,
+    );
+    final agreementBorderColor = _getColorFromConfig(
+      configHelper,
+      'payment_agreements.agreement_section_border_color',
+      OsmeaColors.grayMaterial[200]!,
+    );
+    final agreementTextColor = _getColorFromConfig(
+      configHelper,
+      'payment_agreements.agreement_text_color',
+      OsmeaColors.grayMaterial[600]!,
+    );
+    final agreementTitleColor = _getColorFromConfig(
+      configHelper,
+      'payment_agreements.agreement_title_color',
+      OsmeaColors.black,
+    );
+    final linkColor = _getColorFromConfig(
+      configHelper,
+      'payment_agreements.checkbox_link_color',
+      const Color(0xFFFF6B00),
+    );
+
+    // Get agreement content from config
+    final preliminaryTitle = configHelper.getString(
+      'checkout_view_configuration.payment_agreements.preliminary_information_form.title',
+      'Preliminary Information Form',
+    );
+    final preliminaryContent = configHelper.getString(
+      'checkout_view_configuration.payment_agreements.preliminary_information_form.content',
+      '',
+    );
+    final distanceSalesTitle = configHelper.getString(
+      'checkout_view_configuration.payment_agreements.distance_sales_agreement.title',
+      'Distance Sales Agreement',
+    );
+    final distanceSalesContent = configHelper.getString(
+      'checkout_view_configuration.payment_agreements.distance_sales_agreement.content',
+      '',
+    );
+    final checkboxText = configHelper.getString(
+      'checkout_view_configuration.payment_agreements.checkbox_text',
+      'I approve the Preliminary Information Form and the Distance Sales Agreement.',
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Preliminary Information Form
+        _buildAgreementExpansionTile(
+          context,
+          configHelper,
+          title: preliminaryTitle,
+          content: preliminaryContent,
+          isExpanded: _isPreliminaryFormExpanded,
+          onExpansionChanged: (expanded) {
+            setState(() {
+              _isPreliminaryFormExpanded = expanded;
+            });
+          },
+          agreementBgColor: agreementBgColor,
+          agreementBorderColor: agreementBorderColor,
+          agreementTextColor: agreementTextColor,
+          agreementTitleColor: agreementTitleColor,
+        ),
+        
+        SizedBox(height: context.spacing12),
+        
+        // Distance Sales Agreement
+        _buildAgreementExpansionTile(
+          context,
+          configHelper,
+          title: distanceSalesTitle,
+          content: distanceSalesContent,
+          isExpanded: _isDistanceSalesExpanded,
+          onExpansionChanged: (expanded) {
+            setState(() {
+              _isDistanceSalesExpanded = expanded;
+            });
+          },
+          agreementBgColor: agreementBgColor,
+          agreementBorderColor: agreementBorderColor,
+          agreementTextColor: agreementTextColor,
+          agreementTitleColor: agreementTitleColor,
+        ),
+        
+        SizedBox(height: context.spacing16),
+        
+        // Agreement Checkbox
+        _buildAgreementCheckbox(
+          context,
+          configHelper,
+          checkboxText: checkboxText,
+          linkColor: linkColor,
+          preliminaryTitle: preliminaryTitle,
+          distanceSalesTitle: distanceSalesTitle,
+          preliminaryContent: preliminaryContent,
+          distanceSalesContent: distanceSalesContent,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgreementExpansionTile(
+    BuildContext context,
+    AssetConfigHelper configHelper, {
+    required String title,
+    required String content,
+    required bool isExpanded,
+    required ValueChanged<bool> onExpansionChanged,
+    required Color agreementBgColor,
+    required Color agreementBorderColor,
+    required Color agreementTextColor,
+    required Color agreementTitleColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: agreementBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: agreementBorderColor,
+          width: 1,
+        ),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+        ),
+        child: ExpansionTile(
+          title: Text(
+            title,
+            style: OsmeaTextStyle.titleMedium(context).copyWith(
+              fontWeight: FontWeight.w600,
+              color: agreementTitleColor,
+            ),
+          ),
+          initiallyExpanded: isExpanded,
+          onExpansionChanged: onExpansionChanged,
+          trailing: Icon(
+            isExpanded ? Icons.expand_less : Icons.expand_more,
+            color: agreementTitleColor,
+          ),
+          children: [
+            if (content.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.all(context.spacing16),
+                child: Text(
+                  content,
+                  style: OsmeaTextStyle.bodySmall(context).copyWith(
+                    color: agreementTextColor,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAgreementCheckbox(
+    BuildContext context,
+    AssetConfigHelper configHelper, {
+    required String checkboxText,
+    required Color linkColor,
+    required String preliminaryTitle,
+    required String distanceSalesTitle,
+    required String preliminaryContent,
+    required String distanceSalesContent,
+  }) {
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isAgreementAccepted = !_isAgreementAccepted;
+        });
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Transform.scale(
+            scale: 0.85,
+            child: Checkbox(
+              value: _isAgreementAccepted,
+              onChanged: (value) {
+                setState(() {
+                  _isAgreementAccepted = value ?? false;
+                });
+              },
+              activeColor: linkColor,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+          SizedBox(width: context.spacing4),
+          Expanded(
+            child: _buildCheckboxTextWithLinks(
+              context,
+              checkboxText,
+              linkColor,
+              preliminaryTitle,
+              distanceSalesTitle,
+              preliminaryContent,
+              distanceSalesContent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckboxTextWithLinks(
+    BuildContext context,
+    String text,
+    Color linkColor,
+    String preliminaryTitle,
+    String distanceSalesTitle,
+    String preliminaryContent,
+    String distanceSalesContent,
+  ) {
+    final spans = <TextSpan>[];
+    // Match "Preliminary Information Form" with optional "the" before it
+    final preliminaryPattern = RegExp(r'(?:the\s+)?Preliminary Information Form', caseSensitive: false);
+    // Match "Distance Sales Agreement" with optional "the" before it
+    final distanceSalesPattern = RegExp(r'(?:the\s+)?Distance Sales Agreement', caseSensitive: false);
+    
+    int lastIndex = 0;
+    
+    // Find all matches
+    final allMatches = <_MatchInfo>[];
+    for (final match in preliminaryPattern.allMatches(text)) {
+      allMatches.add(_MatchInfo(match.start, match.end, 'preliminary'));
+    }
+    for (final match in distanceSalesPattern.allMatches(text)) {
+      allMatches.add(_MatchInfo(match.start, match.end, 'distance'));
+    }
+    
+    // Sort by position
+    allMatches.sort((a, b) => a.start.compareTo(b.start));
+    
+    for (final match in allMatches) {
+      // Add text before match
+      if (match.start > lastIndex) {
+        spans.add(TextSpan(
+          text: text.substring(lastIndex, match.start),
+          style: OsmeaTextStyle.bodySmall(context).copyWith(
+            color: OsmeaColors.black,
+          ),
+        ));
+      }
+      
+      // Add link
+      spans.add(TextSpan(
+        text: text.substring(match.start, match.end),
+        style: OsmeaTextStyle.bodySmall(context).copyWith(
+          color: linkColor,
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            _showAgreementDialog(
+              context,
+              match.type == 'preliminary' ? preliminaryTitle : distanceSalesTitle,
+              match.type == 'preliminary' ? preliminaryContent : distanceSalesContent,
+            );
+          },
+      ));
+      
+      lastIndex = match.end;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastIndex),
+        style: OsmeaTextStyle.bodySmall(context).copyWith(
+          color: OsmeaColors.black,
+        ),
+      ));
+    }
+    
+    return RichText(
+      text: TextSpan(children: spans),
+      textHeightBehavior: const TextHeightBehavior(
+        applyHeightToFirstAscent: false,
+        applyHeightToLastDescent: false,
+      ),
+    );
+  }
+
+  void _showAgreementDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: OsmeaTextStyle.titleLarge(context).copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            content,
+            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+              height: 1.5,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              context.t.checkoutView.buttons.back,
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomButtons(BuildContext context, AssetConfigHelper configHelper) {
     final buttonBgColor = _getColorFromConfig(
       configHelper,
@@ -497,8 +847,8 @@ class PaymentStepWidget extends StatelessWidget {
       OsmeaColors.white,
     );
 
-    final hasSelection = selectedMethodId != null;
-    final canComplete = hasSelection && !isProcessing;
+    final hasSelection = widget.selectedMethodId != null;
+    final canComplete = hasSelection && _isAgreementAccepted && !widget.isProcessing;
 
     return Container(
       padding: EdgeInsets.all(context.spacing16),
@@ -520,11 +870,11 @@ class PaymentStepWidget extends StatelessWidget {
             Expanded(
               flex: 1,
               child: OutlinedButton(
-                onPressed: isProcessing ? null : onBack,
+                onPressed: widget.isProcessing ? null : widget.onBack,
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: context.spacing12),
                   side: BorderSide(
-                    color: isProcessing 
+                    color: widget.isProcessing 
                         ? buttonBgColor.withOpacity(0.3) 
                         : buttonBgColor,
                   ),
@@ -535,7 +885,7 @@ class PaymentStepWidget extends StatelessWidget {
                 child: Text(
                   context.t.checkoutView.buttons.back,
                   style: OsmeaTextStyle.titleMedium(context).copyWith(
-                    color: isProcessing 
+                    color: widget.isProcessing 
                         ? buttonBgColor.withOpacity(0.3) 
                         : buttonBgColor,
                     fontWeight: FontWeight.w600,
@@ -550,7 +900,7 @@ class PaymentStepWidget extends StatelessWidget {
             Expanded(
               flex: 2,
               child: ElevatedButton(
-                onPressed: canComplete ? onCompleteOrder : null,
+                onPressed: canComplete ? widget.onCompleteOrder : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: buttonBgColor,
                   disabledBackgroundColor: buttonBgColor.withOpacity(0.3),
@@ -560,7 +910,7 @@ class PaymentStepWidget extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: isProcessing
+                child: widget.isProcessing
                     ? SizedBox(
                         height: 22,
                         width: 22,
