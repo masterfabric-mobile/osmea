@@ -18,6 +18,9 @@
         "brand_name": "example",
         "auth_key": "exampleAUthCodE123",
         "version": "v1",
+        "store_api_version": "v1",
+        "admin_api_version": "v3",
+        "wishlist_api_version": "v1",
         "wishlist_namespace": "masterfabric-wishlist",
         "verify_ssl": true,
         "query_string_auth": false,
@@ -40,6 +43,22 @@
             {
                 "sectionTitle": "Account & Preferences",
                 "items": [
+                    {
+                        "id": "orders_history",
+                        "title": "Order History",
+                        "iconName": "shopping_bag_outlined",
+                        "iconColor": "#000000",
+                        "route": "/orders-history"
+                    },
+
+
+                    {
+                        "id": "user_profile",
+                        "title": "My Profile",
+                        "iconName": "person_outline",
+                        "iconColor": "#000000",
+                        "route": "/user-profile"
+                    },
                     {
                         "id": "about",
                         "title": "About",
@@ -176,10 +195,10 @@
         "dev_mode_tap_count": 7
     },
     "localization_configuration": {
-        "default_language": "tr",
+        "default_language": "en",
         "supported_languages": [
-            "tr",
             "en",
+            "tr",
             "de",
             "fr"
         ],
@@ -839,14 +858,14 @@
         },
         "campaign_popup_button": {
             "enabled": true,
-            "text": "KUPON",
-            "amount": "100 TL",
+            "text": "COUPON",
+            "amount": "100",
             "imageUrl": null,
             "backgroundColor": "#000000",
             "borderColor": "#FFFFFF",
             "textColor": "#FFFFFF",
             "position": "right",
-            "size": 100,
+            "size": 80,
             "showCloseButton": true,
             "route": "/products",
             "category_id": null,
@@ -1554,6 +1573,373 @@
             "loadingColor": "#000000",
             "footerBackgroundColor": "#FFFFFF",
             "footerBorderColor": "#E0E0E0"
+        }
+    },
+    "orders_history_view": {
+        "app_bar": {
+            "title": "Order History",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 4,
+            "card_margin_bottom": 6
+        },
+        "order_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "transparent",
+            "borderWidth": 0,
+            "borderRadius": 8,
+            "elevation": 0,
+            "padding": 14,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "total": {
+            "label_color": "#8A8A8A",
+            "amount_color": "#000000",
+            "amount_fontWeight": 600,
+            "fontSize": 15
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 12
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
+        }
+    },
+    "user_profile_view": {
+        "app_bar": {
+            "title": "My Profile",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "component_spacing": {
+            "horizontal": 12,
+            "vertical": 8,
+            "section_spacing": 12,
+            "item_spacing": 8
+        },
+        "profile_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "avatar": {
+            "size": 64,
+            "backgroundColor": "#000000",
+            "textColor": "#FFFFFF",
+            "fontWeight": 700
+        },
+        "profile_name": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 20
+        },
+        "profile_email": {
+            "color": "#666666",
+            "fontSize": 14
+        },
+        "profile_username": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "member_since": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "statistics_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "statistics_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "stat_value": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 24
+        },
+        "stat_label": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "address_label": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "address_text": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "default_badge": {
+            "backgroundColor": "#E3F2FD",
+            "textColor": "#1976D2",
+            "borderRadius": 8,
+            "padding_horizontal": 8,
+            "padding_vertical": 4,
+            "fontWeight": 600,
+            "fontSize": 10
+        },
+        "contract_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "contract_info": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "metadata_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "metadata_value": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "preference_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "preference_value": {
+            "color": "#666666",
+            "fontSize": 12
+        }
+    },
+    "order_detail_view": {
+        "app_bar": {
+            "title": "Order Details",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 12,
+            "section_spacing": 16
+        },
+        "order_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 20
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "order_item": {
+            "name_color": "#000000",
+            "name_fontWeight": 500,
+            "name_fontSize": 15,
+            "price_color": "#000000",
+            "price_fontWeight": 600,
+            "price_fontSize": 15,
+            "quantity_color": "#8A8A8A",
+            "quantity_fontSize": 13,
+            "image_size": 64,
+            "image_borderRadius": 12
+        },
+        "order_totals": {
+            "label_color": "#8A8A8A",
+            "label_fontSize": 14,
+            "value_color": "#000000",
+            "value_fontWeight": 500,
+            "value_fontSize": 14,
+            "total_label_color": "#000000",
+            "total_label_fontWeight": 600,
+            "total_label_fontSize": 16,
+            "total_value_color": "#000000",
+            "total_value_fontWeight": 600,
+            "total_value_fontSize": 17
+        },
+        "address_text": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
         }
     }
 }
