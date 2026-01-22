@@ -50,7 +50,7 @@ final GoRouter appRouter = GoRouter(
     // User Shell Route with Dynamic Navbar
     ShellRoute(
       builder: (context, state, child) {
-        return Scaffold(
+        return OsmeaComponents.scaffold(
           body: child,
           bottomNavigationBar: _getNavbarForRoute(context, state.uri.path),
         );
@@ -305,7 +305,7 @@ class _AdminScreenState extends State<AdminScreen> {
       ),
     ];
 
-    return Scaffold(
+    return OsmeaComponents.scaffold(
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: navItems,

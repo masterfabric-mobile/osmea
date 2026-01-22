@@ -13,6 +13,8 @@ import 'package:storefront_supabase/app/views/view_home/widgets/home_error_widge
 import 'package:storefront_supabase/app/views/view_home/widgets/home_skeleton_widget.dart';
 
 
+import 'package:storefront_supabase/app/views/view_home/widgets/home_category_list_widget.dart';
+
 class SupabaseHomeView
     extends MasterViewCubit<SupabaseHomeViewModel, SupabaseHomeState> {
   SupabaseHomeView({
@@ -44,37 +46,32 @@ class SupabaseHomeView
               ),
             ],
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(70), 
-              child: Container(
+              preferredSize: const Size.fromHeight(196), 
+              child: OsmeaComponents.container(
                 color: Colors.white,
-                child: Column(
+                child: OsmeaComponents.column(
                   children: [
                     // Search Bar
-                    Padding(
+                    OsmeaComponents.padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
+                      child: OsmeaComponents.textField(
                         key: const ValueKey('homeSearchBar'),
                         controller: viewModel.searchController,
-                        decoration: InputDecoration(
-                          hintText: context.resources.searchProductsHint,
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.zero, 
-                          isDense: true,
-                        ),
+                        label: context.resources.searchProductsHint,
+                        prefixIcon: const Icon(Icons.search),
+                        variant: TextFieldVariant.outlined,
+                        focusColor: Colors.black,
                         onChanged: viewModel.setSearchQuery,
                       ),
                     ),
-                    const SizedBox(height: 16), 
+                    OsmeaComponents.sizedBox(height: 16), 
+                    // Category Bubbles (moved here)
+                    HomeCategoryListWidget(
+                      allCategories: (viewModel.state is SupabaseHomeLoadedState)
+                          ? (viewModel.state as SupabaseHomeLoadedState).allCategories
+                          : [],
+                      goRoute: goRoute,
+                    ),
                   ],
                 ),
               ),

@@ -41,18 +41,18 @@ class AdminSettingsView
     }
 
     if (state is AdminSettingsError) {
-      return Center(child: Text(state.message));
+      return OsmeaComponents.center(child: OsmeaComponents.text(state.message));
     }
 
     if (state is AdminSettingsLoaded) {
       final AppUser adminUser = state.adminUser;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(resources.adminInformation, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
+            OsmeaComponents.text(resources.adminInformation, textStyle: Theme.of(context).textTheme.titleLarge),
+            OsmeaComponents.sizedBox(height: 16),
             _buildInfoRow(resources.emailLabel, adminUser.email ?? 'N/A'),
             _buildInfoRow(resources.fullNameLabel, adminUser.fullName ?? 'N/A'),
             _buildInfoRow(resources.roleLabel, adminUser.role ?? 'N/A'),
@@ -62,21 +62,21 @@ class AdminSettingsView
         ),
       );
     }
-    return Center(child: Text(resources.unexpectedError));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.unexpectedError));
   }
 
   Widget _buildInfoRow(String label, String value) {
-    return Padding(
+    return OsmeaComponents.padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+      child: OsmeaComponents.row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          OsmeaComponents.text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
+          OsmeaComponents.sizedBox(width: 8),
+          OsmeaComponents.expanded(child: OsmeaComponents.text(value)),
         ],
       ),
     );

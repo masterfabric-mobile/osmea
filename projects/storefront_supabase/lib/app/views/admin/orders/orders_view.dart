@@ -32,7 +32,7 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
-    return Scaffold(
+    return OsmeaComponents.scaffold(
       backgroundColor: Colors.white,
       appBar: OsmeaComponents.appBar(
         title: OsmeaComponents.text(
@@ -54,21 +54,21 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('${resources.errorPrefix}${snapshot.error}'));
+            return OsmeaComponents.center(child: OsmeaComponents.text('${resources.errorPrefix}${snapshot.error}'));
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return Center(child: Text(resources.noOrdersFound));
+            return OsmeaComponents.center(child: OsmeaComponents.text(resources.noOrdersFound));
           }
           final orders = snapshot.data!;
           return ListView.builder(
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              return ListTile(
-                title: Text('${resources.orderNumber}${order.orderNumber}'),
-                subtitle: Text(
+              return OsmeaComponents.listItem(
+                title: OsmeaComponents.text('${resources.orderNumber}${order.orderNumber}'),
+                subtitle: OsmeaComponents.text(
                     '${resources.userPrefix}${order.user?.username != null ? '@${order.user!.username}' : (order.user?.fullName ?? 'N/A')} - ${resources.totalPrefix}\$${order.total.toStringAsFixed(2)}'),
-                trailing: Text(order.status),
+                trailing: OsmeaComponents.text(order.status),
               );
             },
           );

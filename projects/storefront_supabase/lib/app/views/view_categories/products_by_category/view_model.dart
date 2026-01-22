@@ -28,83 +28,95 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
   ProductsByCategoryViewModel(this._supabaseClient) : super(ProductsByCategoryInitial());
 
   String? _currentCategoryId;
+  
+  // Cache for categories to avoid refetching on every sub-navigation if possible,
+  // but for now we'll fetch fresh to ensure consistency.
+  List<Category> _allCachedCategories = [];
 
   Future<void> fetchProductsByCategory(String categoryId) async {
     _currentCategoryId = categoryId;
     stateChanger(ProductsByCategoryLoading());
     try {
-      // 1. Check if we are in the "Fashion" tree (to enable size filters)
-      final isFashionTree = await _isCategoryInHierarchy(categoryId, 'fashion');
-
-      // 2. Fetch direct subcategories (Children of the current category)
-      final subCategoriesResponse = await _supabaseClient
+      // 1. Fetch ALL categories at once to build hierarchy in memory.
+      // This is much faster than recursive DB calls.
+      final categoriesResponse = await _supabaseClient
           .from('categories')
-          .select('*, products(count)')
-          .eq('parent_id', categoryId)
+          .select('*, products(count)') // Select everything needed
           .order('name');
       
-      final subCategories = (subCategoriesResponse as List)
+      _allCachedCategories = (categoriesResponse as List)
           .map((data) => Category.fromJson(data as Map<String, dynamic>))
           .toList();
 
-      // 3. Fetch products
-      await _fetchProductsInternal(
-        activeCategoryId: categoryId,
+      // 2. Process hierarchy in memory
+      
+      // Check Fashion Tree
+      final isFashionTree = _isCategoryInHierarchyInMemory(categoryId, 'fashion');
+
+      // Get Direct Subcategories
+      final subCategories = _allCachedCategories
+          .where((c) => c.parentId == categoryId)
+          .toList();
+
+      // Get All Descendant IDs for Product Query
+      final allCategoryIds = _getAllDescendantIdsInMemory(categoryId);
+      allCategoryIds.add(categoryId); // Include current
+
+      // 3. Fetch Products
+      await _fetchProductsWithIds(
+        categoryIds: allCategoryIds,
         subCategories: subCategories,
         showSizeFilter: isFashionTree,
       );
+
     } catch (e) {
       stateChanger(ProductsByCategoryError('Failed to load data: $e'));
     }
   }
 
-  /// Recursively checks if a category or its parents have the given slug
-  Future<bool> _isCategoryInHierarchy(String categoryId, String targetSlug) async {
-    try {
-      // Get the current category
-      final response = await _supabaseClient
-          .from('categories')
-          .select('id, slug, parent_id')
-          .eq('id', categoryId)
-          .single();
+  /// Checks if category is in hierarchy of targetSlug using in-memory list
+  bool _isCategoryInHierarchyInMemory(String categoryId, String targetSlug) {
+    String? currentId = categoryId;
+    while (currentId != null) {
+      final category = _allCachedCategories.firstWhere(
+        (c) => c.id == currentId,
+        orElse: () => Category(id: 'notFound', name: '', slug: ''),
+      );
       
-      final slug = response['slug'] as String;
-      final parentId = response['parent_id'] as String?;
-
-      // Check current
-      if (slug.toLowerCase().contains(targetSlug.toLowerCase())) return true;
-
-      // Check parent if exists
-      if (parentId != null) {
-        return _isCategoryInHierarchy(parentId, targetSlug);
+      if (category.id == 'notFound') break;
+      
+      if (category.slug.toLowerCase().contains(targetSlug.toLowerCase())) {
+        return true;
       }
-      
-      return false;
-    } catch (e) {
-      return false;
+      currentId = category.parentId;
     }
+    return false;
   }
 
-  Future<void> _fetchProductsInternal({
-    required String activeCategoryId,
+  /// Gets all descendant IDs recursively from memory
+  List<String> _getAllDescendantIdsInMemory(String parentId) {
+    final directChildren = _allCachedCategories.where((c) => c.parentId == parentId).toList();
+    final List<String> ids = [];
+    
+    for (var child in directChildren) {
+      ids.add(child.id);
+      ids.addAll(_getAllDescendantIdsInMemory(child.id));
+    }
+    return ids;
+  }
+
+  Future<void> _fetchProductsWithIds({
+    required List<String> categoryIds,
     required List<Category> subCategories,
     required bool showSizeFilter,
     List<String> selectedSizes = const [],
   }) async {
     try {
-      final List<String> allCategoryIds = await _getAllDescendantIds(activeCategoryId);
-      allCategoryIds.add(activeCategoryId); 
-
       var query = _supabaseClient
           .from('products')
           .select('*, product_images(image_url, is_primary, sort_order)')
           .eq('is_active', true)
-          .inFilter('category_id', allCategoryIds); 
-
-      // Note: Supabase doesn't have an easy "array contains any of array" filter for comma-separated strings directly via Postgrest yet without complex RPC or splitting.
-      // So we fetch products first and filter in memory if size filter is active.
-      // Or, we can use ILIKE/OR logic but that's hard dynamically.
-      // For this prototype, we filter in memory after fetch.
+          .inFilter('category_id', categoryIds); 
 
       final response = await query.order('created_at', ascending: false);
       var products = (response as List).map((data) => Product.fromJson(data as Map<String, dynamic>)).toList();
@@ -113,7 +125,6 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
         products = products.where((p) {
           if (p.targetAgeGroup == null) return false;
           final productSizes = p.targetAgeGroup!.split(',').map((e) => e.trim()).toList();
-          // Intersection check
           return productSizes.any((s) => selectedSizes.contains(s));
         }).toList();
       }
@@ -129,34 +140,6 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
     }
   }
 
-  // Helper for hierarchy
-  Future<List<String>> _getAllDescendantIds(String parentId) async {
-    final List<String> ids = [];
-    final response = await _supabaseClient.from('categories').select('id').eq('parent_id', parentId);
-    for (var item in response as List) {
-      final id = item['id'] as String;
-      ids.add(id);
-      ids.addAll(await _getAllDescendantIds(id));
-    }
-    return ids;
-  }
-
-  void navigateToSubcategory(String? subcategoryId) {
-    if (state is ProductsByCategoryLoaded && _currentCategoryId != null) {
-      final currentState = state as ProductsByCategoryLoaded;
-      final newId = currentState.selectedSubcategoryId == subcategoryId ? null : subcategoryId;
-
-      // When category changes, we might want to clear size filters or keep them. 
-      // Keeping them usually feels better.
-      _fetchProductsInternal(
-        activeCategoryId: newId ?? _currentCategoryId!,
-        subCategories: currentState.subCategories,
-        showSizeFilter: currentState.showSizeFilter, // Ideally re-check hierarchy if subcat changes
-        selectedSizes: currentState.selectedSizes,
-      );
-    }
-  }
-
   void toggleSizeFilter(String size) {
     if (state is ProductsByCategoryLoaded && _currentCategoryId != null) {
       final currentState = state as ProductsByCategoryLoaded;
@@ -168,8 +151,25 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
         currentList.add(size);
       }
 
-      _fetchProductsInternal(
-        activeCategoryId: currentState.selectedSubcategoryId ?? _currentCategoryId!,
+      // We need to re-fetch or re-filter?
+      // Since we filter in memory at the end of _fetchProductsWithIds, 
+      // we need to call it again. But to avoid re-fetching products from DB 
+      // just for client-side filter, we should ideally cache products too.
+      // However, to keep it simple and safe with the current structure:
+      
+      // Optimization: We already have the full product list if we didn't filter in DB.
+      // But _fetchProductsWithIds does the DB fetch. 
+      // For responsiveness, let's just re-run the whole flow or optimize?
+      // Re-running flow is safe. optimizing is better. 
+      
+      // Let's re-run the fetch for now to ensure consistency, 
+      // but ideally we'd store `allFetchedProducts` in state and filter locally.
+      
+      final allCategoryIds = _getAllDescendantIdsInMemory(_currentCategoryId!);
+      allCategoryIds.add(_currentCategoryId!);
+
+      _fetchProductsWithIds(
+        categoryIds: allCategoryIds,
         subCategories: currentState.subCategories,
         showSizeFilter: currentState.showSizeFilter,
         selectedSizes: currentList,

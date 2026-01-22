@@ -49,12 +49,12 @@ class AddProductView
     }
 
     if (state is AddProductError) {
-      return Center(
-        child: Column(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(state.message),
-            const SizedBox(height: 16),
+            OsmeaComponents.text(state.message),
+            OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.button(
               text: resources.retry,
               onPressed: () => initialContent(viewModel, context),
@@ -64,29 +64,29 @@ class AddProductView
       );
     }
     if (state is AddProductSubmitting) {
-      return Center(
-        child: Column(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text(isEditMode ? resources.savingChanges : resources.addingProduct),
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.text(isEditMode ? resources.savingChanges : resources.addingProduct),
           ],
         ),
       );
     }
 
     if (state is AddProductSuccess) {
-      return Center(
-        child: Column(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 50),
-            const SizedBox(height: 16),
-            Text(isEditMode
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.text(isEditMode
                 ? resources.productUpdatedSuccess
                 : resources.productAddedSuccess),
-            const SizedBox(height: 16),
+            OsmeaComponents.sizedBox(height: 16),
             if (!isEditMode)
               OsmeaComponents.button(
                 text: resources.addAnotherProduct,
@@ -117,37 +117,37 @@ class AddProductView
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: viewModel.formKey,
-            child: Column(
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildImagePicker(context, viewModel, state.image, state.existingImageUrl),
-                const SizedBox(height: 24),
+                OsmeaComponents.sizedBox(height: 24),
                 _buildTextField(context, viewModel.nameController, resources.productName),
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 _buildTextField(context, viewModel.descriptionController, resources.description,
                     maxLines: 5),
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 _buildTextField(context, viewModel.priceController, resources.price,
                     keyboardType: TextInputType.number),
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 _buildTextField(context, viewModel.skuController, resources.sku),
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 _buildTextField(context, viewModel.stockController, resources.stockQuantity,
                     keyboardType: TextInputType.number),
-                const SizedBox(height: 24),
+                OsmeaComponents.sizedBox(height: 24),
                 
                 // --- CATEGORY HIERARCHY ---
                 _buildCategoryHierarchy(context, viewModel, state),
                 
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 
                 // --- DYNAMIC SIZE/AGE SELECTOR ---
                 _buildDynamicSizeSelector(context, viewModel, state),
 
-                const SizedBox(height: 16),
-                Row(
+                OsmeaComponents.sizedBox(height: 16),
+                OsmeaComponents.row(
                   children: [
-                    Expanded(
+                    OsmeaComponents.expanded(
                       child: _buildSafeDropdown<Brand>(
                         context,
                         resources.brand,
@@ -157,13 +157,13 @@ class AddProductView
                         viewModel.onBrandChanged,
                       ),
                     ),
-                    IconButton(
+                    OsmeaComponents.iconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () => _showAddBrandDialog(context, viewModel),
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                OsmeaComponents.sizedBox(height: 32),
                 OsmeaComponents.button(
                   text: isEditMode ? resources.saveChanges : resources.addProduct,
                   onPressed: () => viewModel.submitProduct(productId: productId),
@@ -176,7 +176,7 @@ class AddProductView
       );
     }
 
-    return Center(child: Text(resources.unexpectedError));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.unexpectedError));
   }
 
   Widget _buildCategoryHierarchy(BuildContext context, AddProductViewModel viewModel, AddProductLoaded state) {
@@ -185,7 +185,7 @@ class AddProductView
     final subCats = viewModel.getSubCategories(state.allCategories, state.selectedRootCategory?.id);
     final leafCats = viewModel.getSubCategories(state.allCategories, state.selectedSubCategory?.id);
 
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSafeDropdown<Category>(
@@ -197,7 +197,7 @@ class AddProductView
           viewModel.onRootCategoryChanged,
         ),
         if (state.selectedRootCategory != null && subCats.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          OsmeaComponents.sizedBox(height: 16),
           _buildSafeDropdown<Category>(
             context,
             resources.subCategory,
@@ -208,7 +208,7 @@ class AddProductView
           ),
         ],
         if (state.selectedSubCategory != null && leafCats.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          OsmeaComponents.sizedBox(height: 16),
           _buildSafeDropdown<Category>(
             context,
             resources.specificCategory,
@@ -237,11 +237,11 @@ class AddProductView
       return const SizedBox.shrink();
     }
 
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
+        OsmeaComponents.text(label, textStyle: Theme.of(context).textTheme.titleSmall),
+        OsmeaComponents.sizedBox(height: 8),
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,

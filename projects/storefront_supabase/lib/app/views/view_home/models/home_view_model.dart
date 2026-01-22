@@ -9,7 +9,7 @@ import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'states.dart';
 
-@injectable
+@lazySingleton
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final SupabaseClient _supabaseClient;
 
@@ -114,6 +114,9 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   }
 
   Future<void> initial() async {
+    // If data is already loaded, don't reload
+    if (state is SupabaseHomeLoadedState) return;
+    
     // Initial fetch with default sort/filter
     await fetchProducts();
   }
@@ -138,33 +141,11 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     stateChanger(currentState.copyWith(isLoading: true)); // Use copyWith to set loading
 
     try {
-      /* -------- Initial lookup data -------- */
-      if (currentState.allCategories.isEmpty ||
-          currentState.allBrands.isEmpty) {
-        final results = await Future.wait([
-          _supabaseClient.from('categories').select(),
-          _supabaseClient.from('brand').select(),
-        ]);
-
-        currentState = currentState.copyWith(
-          allCategories: (results[0] as List)
-              .map((e) => Category.fromJson(e))
-              .toList(),
-          allBrands: (results[1] as List)
-              .map((e) => Brand.fromJson(e))
-              .toList(),
-        );
-      }
-
       final finalQuery = searchQuery ?? currentState.searchQuery;
       final finalPriceSort = priceSort ?? currentState.priceSort;
       final finalDateSort = dateSort ?? currentState.dateSort;
       final finalPopularitySort =
           popularitySort ?? currentState.popularitySort;
-      
-      // Handle Filters
-      // If applyFilter is true, use the passed values (even if null/empty) to override.
-      // Otherwise, fallback to current state.
       
       final activeRoot = applyFilter ? selectedRoot : (selectedRoot ?? currentState.selectedRootCategory);
       final activeSub = applyFilter ? selectedSub : (selectedSub ?? currentState.selectedSubCategory);
@@ -178,9 +159,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           ? (selectedSizesOrAges ?? const []) 
           : (selectedSizesOrAges ?? currentState.selectedSizesOrAges);
 
-      /* -------- Base query -------- */
-      
-      // Use products table by default to ensure we have all latest columns (like target_age_group).
+      // --- Prepare Product Query ---
       var baseQuery = _supabaseClient
           .from('products')
           .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
@@ -191,7 +170,6 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       /* -------- Text Search -------- */
       if (finalQuery.isNotEmpty) {
         final sanitizedQuery = finalQuery.replaceAll(',', ' ');
-        
         // 1. Find brands that match the query
         final brandResponse = await _supabaseClient
             .from('brand')
@@ -214,7 +192,9 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       /* -------- Hierarchy Filter (Deep Search) -------- */
       final targetCategory = activeLeaf ?? activeSub ?? activeRoot;
       if (targetCategory != null) {
-        // Get all descendant IDs
+        // This part is inherently sequential/dependent if filtering by hierarchy
+        // because we need the IDs first.
+        // Optimization: If initial load (targetCategory == null), we skip this.
         final descendantIds = await _getAllDescendantIds(targetCategory.id);
         descendantIds.add(targetCategory.id);
         
@@ -235,7 +215,6 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           ascending: finalPriceSort == PriceSort.lowToHigh,
         );
       } else if (finalPopularitySort != PopularitySort.none) {
-        // Fallback to price if wishlist_count column missing on raw table
         finalOrderedQuery = currentFilteredQuery.order('price'); 
       } else {
         finalOrderedQuery = currentFilteredQuery.order(
@@ -244,19 +223,43 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         );
       }
 
-      /* -------- Execute & Client-side Size Filter -------- */
-      final response = await finalOrderedQuery;
-      var products = (response as List)
-          .map((e) => Product.fromJson(e))
-          .toList();
+      // --- EXECUTION ---
+      
+      List<Product> products = [];
+      List<Category> allCategories = currentState.allCategories;
+      List<Brand> allBrands = currentState.allBrands;
 
-      // Client-side filtering for sizes (comma-separated string in DB)
+      if (currentState.allCategories.isEmpty || currentState.allBrands.isEmpty) {
+        // Initial Fetch: Parallelize Categories, Brands, and Products
+        final results = await Future.wait([
+          _supabaseClient.from('categories').select(),
+          _supabaseClient.from('brand').select(),
+          finalOrderedQuery,
+        ]);
+
+        allCategories = (results[0] as List)
+            .map((e) => Category.fromJson(e))
+            .toList();
+        allBrands = (results[1] as List)
+            .map((e) => Brand.fromJson(e))
+            .toList();
+        
+        products = (results[2] as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
+      } else {
+        // Subsequent Fetch: Only Products
+        final response = await finalOrderedQuery;
+        products = (response as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
+      }
+
+      // Client-side filtering for sizes
       if (finalSizes.isNotEmpty) {
         products = products.where((p) {
           if (p.targetAgeGroup == null) return false;
-          // DB: "S, M, L" -> List: ["S", "M", "L"]
           final productSizes = p.targetAgeGroup!.split(',').map((e) => e.trim()).toList();
-          // Check intersection: Does product have *any* of the selected filters?
           return productSizes.any((s) => finalSizes.contains(s));
         }).toList();
       }
@@ -268,8 +271,8 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           priceSort: finalPriceSort,
           dateSort: finalDateSort,
           popularitySort: finalPopularitySort,
-          allCategories: currentState.allCategories,
-          allBrands: currentState.allBrands,
+          allCategories: allCategories,
+          allBrands: allBrands,
           selectedRootCategory: activeRoot,
           selectedSubCategory: activeSub,
           selectedLeafCategory: activeLeaf,

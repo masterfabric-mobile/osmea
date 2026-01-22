@@ -40,11 +40,11 @@ class AdminProductsView
     AdminProductsViewModel viewModel,
     AdminProductsState state,
   ) {
-    return Scaffold(
-      body: Column(
+    return OsmeaComponents.scaffold(
+      body: OsmeaComponents.column(
         children: [
           _buildFilterControls(context, viewModel, state),
-          Expanded(child: _buildBody(context, viewModel, state)),
+          OsmeaComponents.expanded(child: _buildBody(context, viewModel, state)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -62,28 +62,27 @@ class AdminProductsView
     final resources = context.resources;
     if (state is! AdminProductsLoaded) return const SizedBox.shrink();
 
-    return Container(
+    return OsmeaComponents.container(
       color: Colors.white,
-      child: Padding(
+      child: OsmeaComponents.padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
+        child: OsmeaComponents.row(
           children: [
-            Expanded(
-              child: TextField(
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.textField(
                 controller: viewModel.searchController,
-                decoration: InputDecoration(
-                  hintText: resources.searchProductsHint,
-                  prefixIcon: const Icon(Icons.search),
-                ),
+                label: resources.searchProductsHint, // Using label as hint proxy or label
+                prefixIcon: const Icon(Icons.search),
                 onChanged: viewModel.setSearchQuery,
+                variant: TextFieldVariant.outlined,
               ),
             ),
-            IconButton(
+            OsmeaComponents.iconButton(
               icon: const Icon(Icons.sort, color: Colors.black),
               tooltip: resources.sort,
               onPressed: () => _showSortSheet(context, viewModel, state),
             ),
-            IconButton(
+            OsmeaComponents.iconButton(
               icon: const Icon(Icons.filter_list, color: Colors.black),
               tooltip: resources.filter,
               onPressed: () => _showFilterSheet(context, viewModel, state),
@@ -115,25 +114,25 @@ class AdminProductsView
               initialChildSize: 0.4,
               maxChildSize: 0.6,
               builder: (context, scrollController) {
-                return Column(
+                return OsmeaComponents.column(
                   children: [
-                    Padding(
+                    OsmeaComponents.padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: OsmeaComponents.row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          OsmeaComponents.text(
                             resources.sort,
-                            style: Theme.of(context).textTheme.titleLarge,
+                            textStyle: Theme.of(context).textTheme.titleLarge,
                           ),
-                          IconButton(
+                          OsmeaComponents.iconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ],
                       ),
                     ),
-                    Expanded(
+                    OsmeaComponents.expanded(
                       child: ListView(
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -180,11 +179,11 @@ class AdminProductsView
                         ],
                       ),
                     ),
-                    Padding(
+                    OsmeaComponents.padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: OsmeaComponents.row(
                         children: [
-                          Expanded(
+                          OsmeaComponents.expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
@@ -193,11 +192,11 @@ class AdminProductsView
                                   tempPopularitySort = PopularitySort.none;
                                 });
                               },
-                              child: Text(resources.clear),
+                              child: OsmeaComponents.text(resources.clear),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
+                          OsmeaComponents.sizedBox(width: 16),
+                          OsmeaComponents.expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
@@ -207,7 +206,7 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: Text(resources.apply),
+                              child: OsmeaComponents.text(resources.apply),
                             ),
                           ),
                         ],
@@ -256,23 +255,23 @@ class AdminProductsView
               initialChildSize: 0.85,
               maxChildSize: 0.95,
               builder: (context, scrollController) {
-                return Column(
+                return OsmeaComponents.column(
                   children: [
                     // Header
-                    Padding(
+                    OsmeaComponents.padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: OsmeaComponents.row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(resources.filters, style: Theme.of(context).textTheme.titleLarge),
-                          IconButton(
+                          OsmeaComponents.text(resources.filters, textStyle: Theme.of(context).textTheme.titleLarge),
+                          OsmeaComponents.iconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ],
                       ),
                     ),
-                    Expanded(
+                    OsmeaComponents.expanded(
                       child: ListView(
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -291,7 +290,7 @@ class AdminProductsView
                             }),
                           ),
                           if (tempRoot != null && subCats.isNotEmpty) ...[
-                            const SizedBox(height: 16),
+                            OsmeaComponents.sizedBox(height: 16),
                             _buildSafeDropdown<Category>(
                               resources.subCategory,
                               subCats,
@@ -305,7 +304,7 @@ class AdminProductsView
                             ),
                           ],
                           if (tempSub != null && leafCats.isNotEmpty) ...[
-                            const SizedBox(height: 16),
+                            OsmeaComponents.sizedBox(height: 16),
                             _buildSafeDropdown<Category>(
                               resources.specificCategory,
                               leafCats,
@@ -322,11 +321,11 @@ class AdminProductsView
 
                           // --- Size / Age Filter ---
                           if (isShoe || isFashion) ...[
-                            Text(
+                            OsmeaComponents.text(
                               isShoe ? resources.shoeSizes : resources.sizeAgeGroups,
-                              style: Theme.of(context).textTheme.titleMedium,
+                              textStyle: Theme.of(context).textTheme.titleMedium,
                             ),
-                            const SizedBox(height: 8),
+                            OsmeaComponents.sizedBox(height: 8),
                             Wrap(
                               spacing: 8,
                               children: (isShoe ? viewModel.shoeSizes : viewModel.clothingSizesAndAges).map((opt) {
@@ -346,7 +345,7 @@ class AdminProductsView
                           ],
 
                           // --- Brand Filter ---
-                          Text(resources.brands, style: Theme.of(context).textTheme.titleMedium),
+                          OsmeaComponents.text(resources.brands, textStyle: Theme.of(context).textTheme.titleMedium),
                           ...currentState.allBrands.map((brand) {
                             final isSelected = tempBrandIds.contains(brand.id);
                             return CheckboxListTile(
@@ -364,11 +363,11 @@ class AdminProductsView
                     ),
                     
                     // Buttons
-                    Padding(
+                    OsmeaComponents.padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: OsmeaComponents.row(
                         children: [
-                          Expanded(
+                          OsmeaComponents.expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
@@ -379,11 +378,11 @@ class AdminProductsView
                                   tempSizes.clear();
                                 });
                               },
-                              child: Text(resources.clear),
+                              child: OsmeaComponents.text(resources.clear),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
+                          OsmeaComponents.sizedBox(width: 16),
+                          OsmeaComponents.expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
@@ -395,7 +394,7 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: Text(resources.apply),
+                              child: OsmeaComponents.text(resources.apply),
                             ),
                           ),
                         ],
@@ -450,10 +449,10 @@ class AdminProductsView
     List<T> allSorts,
     ValueChanged<T?> onChanged,
   ) {
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
+        OsmeaComponents.text(title, textStyle: Theme.of(context).textTheme.titleMedium),
         ...allSorts.map(
           (sort) => RadioListTile<T>(
             title: Text((sort as Enum).name),
@@ -484,37 +483,36 @@ class AdminProductsView
     }
 
     if (state is AdminProductsError) {
-      return Center(child: Text(state.message));
+      return OsmeaComponents.center(child: OsmeaComponents.text(state.message));
     }
 
     if (state is AdminProductsLoaded) {
       if (state.products.isEmpty && !state.isLoading) {
-        return Center(child: Text(resources.noProducts));
+        return OsmeaComponents.center(child: OsmeaComponents.text(resources.noProducts));
       }
 
-      return Column(
+      return OsmeaComponents.column(
         children: [
           if (state.isLoading) const LinearProgressIndicator(),
-          Expanded(
+          OsmeaComponents.expanded(
             child: RefreshIndicator(
               onRefresh: viewModel.fetchProducts,
               child: ListView.builder(
                 itemCount: state.products.length,
                 itemBuilder: (context, index) {
                   final product = state.products[index];
-                  return ListTile(
-                    leading: Image.network(
-                      product.imageUrl,
+                  return OsmeaComponents.listItem(
+                    leading: OsmeaComponents.image(
+                      imageUrl: product.imageUrl,
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.error, size: 40),
+                      errorWidget: const Icon(Icons.error, size: 40),
                     ),
-                    title: Text(product.name),
+                    title: OsmeaComponents.text(product.name),
                     subtitle:
-                        Text('\$${product.price.toStringAsFixed(2)}'),
-                    trailing: IconButton(
+                        OsmeaComponents.text('\$${product.price.toStringAsFixed(2)}'),
+                    trailing: OsmeaComponents.iconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () =>
                           context.go('/admin/products/edit/${product.id}'),

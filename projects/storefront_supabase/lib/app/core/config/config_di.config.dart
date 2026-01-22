@@ -83,14 +83,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i793.ProductsByCategoryViewModel>(
       () => _i793.ProductsByCategoryViewModel(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i482.SupabaseHomeViewModel>(
-      () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
-    );
     gh.factory<_i844.SearchViewModel>(
       () => _i844.SearchViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i721.FavoritesViewModel>(
       () => _i721.FavoritesViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i482.SupabaseHomeViewModel>(
+      () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
     );
     return this;
   }
