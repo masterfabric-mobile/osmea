@@ -1,3 +1,4 @@
+import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,16 +14,24 @@ class WordPressConfigService {
     this.dio,
   });
   
-  Dio get _dio => dio ?? Dio(
-    BaseOptions(
-      connectTimeout: timeout,
-      receiveTimeout: timeout,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ),
-  );
+  /// Get Dio instance using ApiDioClient helper
+  /// Uses wooPublicDio() for public WordPress REST API endpoints
+  Dio get _dio {
+    if (dio != null) return dio!;
+    
+    // Use ApiDioClient helper for public WordPress endpoints
+    // wooPublicDio() is appropriate for public REST API calls without authentication
+    final publicDio = ApiDioClient.wooPublicDio();
+    
+    // Override timeout if custom timeout is provided
+    if (timeout != const Duration(seconds: 60)) {
+      publicDio.options.connectTimeout = timeout;
+      publicDio.options.receiveTimeout = timeout;
+      publicDio.options.sendTimeout = timeout;
+    }
+    
+    return publicDio;
+  }
   
   /// Fetch app configuration from WordPress REST API
   /// 

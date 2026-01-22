@@ -587,8 +587,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -606,8 +606,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -625,8 +625,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -644,8 +644,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -663,8 +663,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -682,8 +682,8 @@ final GoRouter appRouter = GoRouter(
                   ),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   transitionDuration: const Duration(milliseconds: 300),
                 );
               },
@@ -2445,10 +2445,7 @@ class _AppShellWithMiniCart extends StatefulWidget {
   final Widget child;
   final Widget? navbar;
 
-  const _AppShellWithMiniCart({
-    required this.child,
-    this.navbar,
-  });
+  const _AppShellWithMiniCart({required this.child, this.navbar});
 
   @override
   State<_AppShellWithMiniCart> createState() => _AppShellWithMiniCartState();
@@ -2457,9 +2454,6 @@ class _AppShellWithMiniCart extends StatefulWidget {
 class _AppShellWithMiniCartState extends State<_AppShellWithMiniCart> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: widget.navbar,
-    );
+    return Scaffold(body: widget.child, bottomNavigationBar: widget.navbar);
   }
 }
