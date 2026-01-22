@@ -71,10 +71,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   // Helper: Get API version from config
   String get _apiVersion {
-    return _config.getString(
-      'woocommerce_configuration.version',
-      'v1',
-    );
+    return _config.getString('woocommerce_configuration.version', 'v1');
   }
 
   // Public triggers (OSMEA style)
@@ -409,7 +406,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint('❌ Wishlist: Service call failed: $e');
         emit(
           WishlistErrorState(
-            message: 'Failed to load saved items: ${ApiErrorUtils.getErrorMessage(e)}',
+            message:
+                'Failed to load saved items: ${ApiErrorUtils.getErrorMessage(e)}',
           ),
         );
         return;

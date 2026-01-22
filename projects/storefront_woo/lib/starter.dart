@@ -56,33 +56,33 @@ launchApp({String environment = 'dev'}) async {
 
   // 🗂️ Initialize configuration helpers for app-level usage
   final AssetConfigHelper assetConfigHelper = AssetConfigHelper();
-  
+
   // 📡 Try to load WordPress config and merge with local config
   WordPressConfigIntegration? wordPressConfigIntegration;
   bool configLoaded = false;
-  
+
   try {
     debugPrint('📡 Attempting to load configuration from WordPress...');
-    
+
     final wordPressService = WordPressConfigService(
       baseUrl: 'http://example.com', // WordPress site URL
     );
-    
+
     wordPressConfigIntegration = WordPressConfigIntegration(
       configService: wordPressService,
       assetConfigHelper: assetConfigHelper,
     );
-    
+
     // Load and merge WordPress config with local config
     final mergedConfig = await wordPressConfigIntegration!.loadAndMergeConfig(
       localConfigPath: 'assets/app_config.json',
       useWordPressAsPrimary: true, // WordPress config overrides local
     );
-    
+
     if (mergedConfig != null) {
       configLoaded = true;
       debugPrint('✅ Configuration loaded: WordPress + Local (merged)');
-      
+
       // Set merged config to AssetConfigHelper so all parts of the app use it
       assetConfigHelper.setConfig(mergedConfig, 'wordpress_merged_config');
       debugPrint('✅ Merged config set to AssetConfigHelper');
@@ -96,11 +96,9 @@ launchApp({String environment = 'dev'}) async {
   } catch (e) {
     debugPrint('⚠️ WordPress config integration error: $e');
     debugPrint('📦 Falling back to local config only');
-    configLoaded = await assetConfigHelper.loadConfig(
-      'assets/app_config.json',
-    );
+    configLoaded = await assetConfigHelper.loadConfig('assets/app_config.json');
   }
-  
+
   // Simple config source info
   final configStats = assetConfigHelper.getConfigStats();
   final configSource = configStats['config_source'] ?? 'unknown';
@@ -129,22 +127,31 @@ launchApp({String environment = 'dev'}) async {
         final existing = GetIt.I<AuthCubit>();
         debugPrint('✅ AuthCubit already registered in GetIt (singleton)');
         debugPrint('🔍 AuthCubit current state: ${existing.state.runtimeType}');
-        
+
         // Only load tokens if state is initial or unauthenticated
         // HydratedCubit may have already restored authenticated state
-        if (existing.state is AuthInitialState || existing.state is AuthUnauthenticatedState) {
+        if (existing.state is AuthInitialState ||
+            existing.state is AuthUnauthenticatedState) {
           debugPrint('🔄 AuthCubit: Loading tokens from storage...');
           await existing.loadTokens();
           debugPrint('✅ AuthCubit tokens loaded');
         } else if (existing.state is AuthAuthenticatedState) {
           final authState = existing.state as AuthAuthenticatedState;
-          debugPrint('✅ AuthCubit: Already authenticated (restored from storage)');
-          debugPrint('🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}');
+          debugPrint(
+            '✅ AuthCubit: Already authenticated (restored from storage)',
+          );
+          debugPrint(
+            '🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}',
+          );
           // Verify token is still valid in storage
           final authStorage = AuthStorageHelper();
           final storageToken = await authStorage.getToken();
-          if (storageToken == null || storageToken.isEmpty || storageToken != authState.jwtToken) {
-            debugPrint('⚠️ AuthCubit: Token mismatch, reloading from storage...');
+          if (storageToken == null ||
+              storageToken.isEmpty ||
+              storageToken != authState.jwtToken) {
+            debugPrint(
+              '⚠️ AuthCubit: Token mismatch, reloading from storage...',
+            );
             await existing.loadTokens();
           }
         }
@@ -157,7 +164,8 @@ launchApp({String environment = 'dev'}) async {
         final authCubit = AuthCubit();
         GetIt.instance.registerSingleton<AuthCubit>(authCubit);
         // HydratedCubit may have already restored state, check before loading
-        if (authCubit.state is AuthInitialState || authCubit.state is AuthUnauthenticatedState) {
+        if (authCubit.state is AuthInitialState ||
+            authCubit.state is AuthUnauthenticatedState) {
           await authCubit.loadTokens();
         }
         debugPrint('✅ AuthCubit re-registered as singleton');
@@ -168,21 +176,28 @@ launchApp({String environment = 'dev'}) async {
       final authCubit = AuthCubit();
       GetIt.instance.registerSingleton<AuthCubit>(authCubit);
       debugPrint('🔍 AuthCubit initial state: ${authCubit.state.runtimeType}');
-      
+
       // HydratedCubit automatically restores state from storage on construction
       // Only load tokens if state is not already authenticated
-      if (authCubit.state is AuthInitialState || authCubit.state is AuthUnauthenticatedState) {
+      if (authCubit.state is AuthInitialState ||
+          authCubit.state is AuthUnauthenticatedState) {
         debugPrint('🔄 AuthCubit: Loading tokens from storage...');
         await authCubit.loadTokens();
         debugPrint('✅ AuthCubit tokens loaded');
       } else if (authCubit.state is AuthAuthenticatedState) {
         final authState = authCubit.state as AuthAuthenticatedState;
-        debugPrint('✅ AuthCubit: Already authenticated (restored from HydratedCubit storage)');
-        debugPrint('🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}');
+        debugPrint(
+          '✅ AuthCubit: Already authenticated (restored from HydratedCubit storage)',
+        );
+        debugPrint(
+          '🔍 AuthCubit: JWT token present: ${authState.jwtToken != null && authState.jwtToken!.isNotEmpty}',
+        );
         // Verify token is still valid in storage
         final authStorage = AuthStorageHelper();
         final storageToken = await authStorage.getToken();
-        if (storageToken == null || storageToken.isEmpty || storageToken != authState.jwtToken) {
+        if (storageToken == null ||
+            storageToken.isEmpty ||
+            storageToken != authState.jwtToken) {
           debugPrint('⚠️ AuthCubit: Token mismatch, reloading from storage...');
           await authCubit.loadTokens();
         } else {
@@ -200,8 +215,9 @@ launchApp({String environment = 'dev'}) async {
   bool debugMode;
   double fontScale;
   String themeMode;
-  
-  if (wordPressConfigIntegration != null && wordPressConfigIntegration!.mergedConfig != null) {
+
+  if (wordPressConfigIntegration != null &&
+      wordPressConfigIntegration!.mergedConfig != null) {
     // Use WordPress merged config
     debugMode = configLoaded
         ? wordPressConfigIntegration!.getBool(
@@ -209,13 +225,19 @@ launchApp({String environment = 'dev'}) async {
             environment == 'dev',
           )
         : (environment == 'dev');
-    
+
     fontScale = configLoaded
-        ? wordPressConfigIntegration!.getDouble('ui_configuration.font_scale', 1.0)
+        ? wordPressConfigIntegration!.getDouble(
+            'ui_configuration.font_scale',
+            1.0,
+          )
         : 1.0;
-    
+
     themeMode = configLoaded
-        ? wordPressConfigIntegration!.getString('ui_configuration.theme_mode', 'light')
+        ? wordPressConfigIntegration!.getString(
+            'ui_configuration.theme_mode',
+            'light',
+          )
         : 'light';
   } else {
     // Use local AssetConfigHelper
@@ -225,11 +247,11 @@ launchApp({String environment = 'dev'}) async {
             environment == 'dev',
           )
         : (environment == 'dev');
-    
+
     fontScale = configLoaded
         ? assetConfigHelper.getDouble('ui_configuration.font_scale', 1.0)
         : 1.0;
-    
+
     themeMode = configLoaded
         ? assetConfigHelper.getString('ui_configuration.theme_mode', 'light')
         : 'light';
@@ -255,7 +277,12 @@ launchApp({String environment = 'dev'}) async {
   debugPrint('  - Debug Mode: $debugMode');
 
   // Initialize locale settings
-  app_translations.LocaleSettings.useDeviceLocaleSync();
+  // Force English so no Turkish strings are shown anywhere
+  // (ignores device locale and any remote/local default language).
+  app_translations.LocaleSettings.setLocaleSync(
+    app_translations.AppLocale.en,
+    listenToDeviceLocale: false,
+  );
 
   // Run the main application with the specified router and configuration
   runApp(
