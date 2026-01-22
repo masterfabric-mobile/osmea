@@ -214,7 +214,9 @@ class __$$GetUserDashboardResponseImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$GetUserDashboardResponseImpl implements _GetUserDashboardResponse {
+class _$GetUserDashboardResponseImpl
+    with DiagnosticableTreeMixin
+    implements _GetUserDashboardResponse {
   const _$GetUserDashboardResponseImpl(
       {required this.profile,
       required final Map<String, UserMetadataItem> metadata,
@@ -285,8 +287,23 @@ class _$GetUserDashboardResponseImpl implements _GetUserDashboardResponse {
   final UserStatistics statistics;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'GetUserDashboardResponse(profile: $profile, metadata: $metadata, addresses: $addresses, preferences: $preferences, contracts: $contracts, orders: $orders, activities: $activities, statistics: $statistics)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'GetUserDashboardResponse'))
+      ..add(DiagnosticsProperty('profile', profile))
+      ..add(DiagnosticsProperty('metadata', metadata))
+      ..add(DiagnosticsProperty('addresses', addresses))
+      ..add(DiagnosticsProperty('preferences', preferences))
+      ..add(DiagnosticsProperty('contracts', contracts))
+      ..add(DiagnosticsProperty('orders', orders))
+      ..add(DiagnosticsProperty('activities', activities))
+      ..add(DiagnosticsProperty('statistics', statistics));
   }
 
   @override
@@ -560,7 +577,7 @@ class __$$UserProfileImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserProfileImpl implements _UserProfile {
+class _$UserProfileImpl with DiagnosticableTreeMixin implements _UserProfile {
   const _$UserProfileImpl(
       {@JsonKey(name: 'user_id') required this.userId,
       @JsonKey(name: 'username') required this.username,
@@ -613,8 +630,24 @@ class _$UserProfileImpl implements _UserProfile {
   final String registeredAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserProfile(userId: $userId, username: $username, email: $email, displayName: $displayName, firstName: $firstName, lastName: $lastName, nickname: $nickname, roles: $roles, registeredAt: $registeredAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserProfile'))
+      ..add(DiagnosticsProperty('userId', userId))
+      ..add(DiagnosticsProperty('username', username))
+      ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('displayName', displayName))
+      ..add(DiagnosticsProperty('firstName', firstName))
+      ..add(DiagnosticsProperty('lastName', lastName))
+      ..add(DiagnosticsProperty('nickname', nickname))
+      ..add(DiagnosticsProperty('roles', roles))
+      ..add(DiagnosticsProperty('registeredAt', registeredAt));
   }
 
   @override
@@ -1025,7 +1058,7 @@ class __$$UserAddressImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserAddressImpl implements _UserAddress {
+class _$UserAddressImpl with DiagnosticableTreeMixin implements _UserAddress {
   const _$UserAddressImpl(
       {@JsonKey(name: 'id') required this.id,
       @JsonKey(name: 'address_type') required this.addressType,
@@ -1101,8 +1134,32 @@ class _$UserAddressImpl implements _UserAddress {
   final String? updatedAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserAddress(id: $id, addressType: $addressType, label: $label, firstName: $firstName, lastName: $lastName, company: $company, address1: $address1, address2: $address2, city: $city, state: $state, postcode: $postcode, country: $country, email: $email, phone: $phone, isDefault: $isDefault, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserAddress'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('addressType', addressType))
+      ..add(DiagnosticsProperty('label', label))
+      ..add(DiagnosticsProperty('firstName', firstName))
+      ..add(DiagnosticsProperty('lastName', lastName))
+      ..add(DiagnosticsProperty('company', company))
+      ..add(DiagnosticsProperty('address1', address1))
+      ..add(DiagnosticsProperty('address2', address2))
+      ..add(DiagnosticsProperty('city', city))
+      ..add(DiagnosticsProperty('state', state))
+      ..add(DiagnosticsProperty('postcode', postcode))
+      ..add(DiagnosticsProperty('country', country))
+      ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('phone', phone))
+      ..add(DiagnosticsProperty('isDefault', isDefault))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt));
   }
 
   @override
@@ -1354,7 +1411,9 @@ class __$$UserPreferenceImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserPreferenceImpl implements _UserPreference {
+class _$UserPreferenceImpl
+    with DiagnosticableTreeMixin
+    implements _UserPreference {
   const _$UserPreferenceImpl(
       {@JsonKey(name: 'value') required this.value,
       @JsonKey(name: 'updated_at') this.updatedAt});
@@ -1370,8 +1429,17 @@ class _$UserPreferenceImpl implements _UserPreference {
   final String? updatedAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserPreference(value: $value, updatedAt: $updatedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserPreference'))
+      ..add(DiagnosticsProperty('value', value))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt));
   }
 
   @override
@@ -1552,7 +1620,7 @@ class __$$UserContractImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserContractImpl implements _UserContract {
+class _$UserContractImpl with DiagnosticableTreeMixin implements _UserContract {
   const _$UserContractImpl(
       {@JsonKey(name: 'id') required this.id,
       @JsonKey(name: 'contract_type') required this.contractType,
@@ -1576,8 +1644,19 @@ class _$UserContractImpl implements _UserContract {
   final String signedAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserContract(id: $id, contractType: $contractType, contractTitle: $contractTitle, signedAt: $signedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserContract'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('contractType', contractType))
+      ..add(DiagnosticsProperty('contractTitle', contractTitle))
+      ..add(DiagnosticsProperty('signedAt', signedAt));
   }
 
   @override
@@ -1810,7 +1889,7 @@ class __$$UserOrderImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserOrderImpl implements _UserOrder {
+class _$UserOrderImpl with DiagnosticableTreeMixin implements _UserOrder {
   const _$UserOrderImpl(
       {@JsonKey(name: 'id') required this.id,
       @JsonKey(name: 'order_number') required this.orderNumber,
@@ -1846,8 +1925,22 @@ class _$UserOrderImpl implements _UserOrder {
   final String? paymentMethod;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserOrder(id: $id, orderNumber: $orderNumber, status: $status, dateCreated: $dateCreated, total: $total, currency: $currency, paymentMethod: $paymentMethod)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserOrder'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('orderNumber', orderNumber))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('dateCreated', dateCreated))
+      ..add(DiagnosticsProperty('total', total))
+      ..add(DiagnosticsProperty('currency', currency))
+      ..add(DiagnosticsProperty('paymentMethod', paymentMethod));
   }
 
   @override
@@ -2084,7 +2177,7 @@ class __$$UserActivityImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserActivityImpl implements _UserActivity {
+class _$UserActivityImpl with DiagnosticableTreeMixin implements _UserActivity {
   const _$UserActivityImpl(
       {@JsonKey(name: 'id') required this.id,
       @JsonKey(name: 'activity_type') required this.activityType,
@@ -2125,8 +2218,21 @@ class _$UserActivityImpl implements _UserActivity {
   final String createdAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserActivity(id: $id, activityType: $activityType, activityDescription: $activityDescription, ipAddress: $ipAddress, metadata: $metadata, createdAt: $createdAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserActivity'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('activityType', activityType))
+      ..add(DiagnosticsProperty('activityDescription', activityDescription))
+      ..add(DiagnosticsProperty('ipAddress', ipAddress))
+      ..add(DiagnosticsProperty('metadata', metadata))
+      ..add(DiagnosticsProperty('createdAt', createdAt));
   }
 
   @override
@@ -2391,7 +2497,9 @@ class __$$UserStatisticsImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserStatisticsImpl implements _UserStatistics {
+class _$UserStatisticsImpl
+    with DiagnosticableTreeMixin
+    implements _UserStatistics {
   const _$UserStatisticsImpl(
       {@JsonKey(name: 'metadata_count') required this.metadataCount,
       @JsonKey(name: 'contracts_count') required this.contractsCount,
@@ -2440,8 +2548,23 @@ class _$UserStatisticsImpl implements _UserStatistics {
   }
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserStatistics(metadataCount: $metadataCount, contractsCount: $contractsCount, addressesCount: $addressesCount, preferencesCount: $preferencesCount, activityCount: $activityCount, ordersCount: $ordersCount, ordersTotal: $ordersTotal, ordersByStatus: $ordersByStatus)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserStatistics'))
+      ..add(DiagnosticsProperty('metadataCount', metadataCount))
+      ..add(DiagnosticsProperty('contractsCount', contractsCount))
+      ..add(DiagnosticsProperty('addressesCount', addressesCount))
+      ..add(DiagnosticsProperty('preferencesCount', preferencesCount))
+      ..add(DiagnosticsProperty('activityCount', activityCount))
+      ..add(DiagnosticsProperty('ordersCount', ordersCount))
+      ..add(DiagnosticsProperty('ordersTotal', ordersTotal))
+      ..add(DiagnosticsProperty('ordersByStatus', ordersByStatus));
   }
 
   @override

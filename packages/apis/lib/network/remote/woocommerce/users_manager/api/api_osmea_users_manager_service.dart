@@ -1,14 +1,26 @@
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/create_contract_signature_request.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/create_user_address_request.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/log_user_activity_request.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_address_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_metadata_request.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_profile_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/delete_user_metadata_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_all_users_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_activity_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_by_id_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_contracts_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_metadata_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_preferences_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_profile_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_statistics_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/update_user_metadata_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/update_user_profile_response.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
@@ -65,6 +77,145 @@ abstract class ApiOsmeaUsersManagerService implements OsmeaUsersManagerService {
   @override
   @GET('/wp-json/osmea-users/v1/profile')
   Future<GetUserProfileResponse> getUserProfile();
+
+  /// ✏️ Update current user's profile
+  @override
+  @PUT('/wp-json/osmea-users/v1/profile')
+  Future<UpdateUserProfileResponse> updateUserProfile(
+    @Body() UpdateUserProfileRequest request,
+  );
+
+  // ==========================================
+  // Orders (Authenticated User)
+  // ==========================================
+
+  /// 🛒 Get current user's orders
+  @override
+  @GET('/wp-json/osmea-users/v1/orders')
+  Future<GetUserOrdersResponse> getUserOrders({
+    @Query('page') int page = 1,
+    @Query('per_page') int perPage = 10,
+    @Query('status') String? status,
+  });
+
+  /// 🛒 Get single order by ID
+  @override
+  @GET('/wp-json/osmea-users/v1/orders/{id}')
+  Future<DetailedUserOrder> getUserOrder(
+    @Path('id') int orderId,
+  );
+
+  // ==========================================
+  // Contracts (Authenticated User)
+  // ==========================================
+
+  /// 📝 Get current user's contracts
+  @override
+  @GET('/wp-json/osmea-users/v1/contracts')
+  Future<GetUserContractsResponse> getUserContracts({
+    @Query('page') int page = 1,
+    @Query('per_page') int perPage = 10,
+    @Query('contract_type') String? contractType,
+  });
+
+  /// 📝 Get single contract by ID
+  @override
+  @GET('/wp-json/osmea-users/v1/contracts/{id}')
+  Future<UserContractDetail> getUserContract(
+    @Path('id') int contractId,
+  );
+
+  /// 📝 Create contract signature
+  @override
+  @POST('/wp-json/osmea-users/v1/contracts')
+  Future<CreateContractSignatureResponse> createContractSignature(
+    @Body() CreateContractSignatureRequest request,
+  );
+
+  // ==========================================
+  // Addresses (Authenticated User)
+  // ==========================================
+
+  /// 📍 Get current user's addresses
+  @override
+  @GET('/wp-json/osmea-users/v1/addresses')
+  Future<GetUserAddressesResponse> getUserAddresses({
+    @Query('type') String? type,
+  });
+
+  /// 📍 Create new address
+  @override
+  @POST('/wp-json/osmea-users/v1/addresses')
+  Future<AddressOperationResponse> createUserAddress(
+    @Body() CreateUserAddressRequest request,
+  );
+
+  /// 📍 Update address
+  @override
+  @PUT('/wp-json/osmea-users/v1/addresses/{id}')
+  Future<AddressOperationResponse> updateUserAddress(
+    @Path('id') int addressId,
+    @Body() UpdateUserAddressRequest request,
+  );
+
+  /// 📍 Delete address
+  @override
+  @DELETE('/wp-json/osmea-users/v1/addresses/{id}')
+  Future<AddressOperationResponse> deleteUserAddress(
+    @Path('id') int addressId,
+  );
+
+  /// 📍 Set default address
+  @override
+  @POST('/wp-json/osmea-users/v1/addresses/{id}/set-default')
+  Future<AddressOperationResponse> setDefaultAddress(
+    @Path('id') int addressId,
+  );
+
+  // ==========================================
+  // Preferences (Authenticated User)
+  // ==========================================
+
+  /// ⚙️ Get current user's preferences
+  @override
+  @GET('/wp-json/osmea-users/v1/preferences')
+  Future<GetUserPreferencesResponse> getUserPreferences();
+
+  /// ⚙️ Update current user's preferences
+  @override
+  @POST('/wp-json/osmea-users/v1/preferences')
+  Future<UpdatePreferencesResponse> updateUserPreferences(
+    @Body() Map<String, dynamic> preferences,
+  );
+
+  // ==========================================
+  // Activity (Authenticated User)
+  // ==========================================
+
+  /// 📊 Get current user's activity logs
+  @override
+  @GET('/wp-json/osmea-users/v1/activity')
+  Future<GetUserActivityResponse> getUserActivity({
+    @Query('page') int page = 1,
+    @Query('per_page') int perPage = 20,
+    @Query('type') String? type,
+  });
+
+  /// 📊 Log user activity
+  @override
+  @POST('/wp-json/osmea-users/v1/activity')
+  Future<LogActivityResponse> logUserActivity(
+    @Body() LogUserActivityRequest request,
+  );
+
+  // ==========================================
+  // Statistics (Authenticated User)
+  // ==========================================
+
+  /// 📈 Get current user's statistics
+  @override
+  @GET('/wp-json/osmea-users/v1/statistics')
+  Future<GetUserStatisticsResponse> getUserStatistics();
 
   // ==========================================
   // Admin Endpoints (Manage All Users)
