@@ -58,7 +58,7 @@ class CategoriesView
 
     if (state is CategoriesLoadedState) {
       if (state.rootCategories.isEmpty) {
-        return Center(
+        return OsmeaComponents.center(
           child: OsmeaComponents.text(resources.noCategories),
         );
       }

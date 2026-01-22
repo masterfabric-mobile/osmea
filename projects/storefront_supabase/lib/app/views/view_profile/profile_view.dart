@@ -138,10 +138,10 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     }
 
     if (state is ProfileUnauthenticated) {
-      return Center(
-        child: SingleChildScrollView(
+      return OsmeaComponents.center(
+        child: SingleChildScrollView( // OsmeaComponents.singleChildScrollView might not be available or tricky, keeping standard for now or check import.
           padding: const EdgeInsets.all(24),
-          child: Column(
+          child: OsmeaComponents.column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const LogoHeaderWidget(),
@@ -176,15 +176,15 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     }
 
     // Fallback for any other state
-    return Center(child: Text(resources.unexpectedError));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.unexpectedError));
   }
 
   Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
+    return OsmeaComponents.padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: Text(
+      child: OsmeaComponents.text(
         title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Colors.grey,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,

@@ -47,14 +47,14 @@ class FavoritesView
     }
 
     if (state is FavoritesErrorState) {
-      return Center(
-        child: Padding(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
+          child: OsmeaComponents.column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(state.message, textAlign: TextAlign.center),
-              const SizedBox(height: 20),
+              OsmeaComponents.text(state.message, textAlign: TextAlign.center),
+              OsmeaComponents.sizedBox(height: 20),
               OsmeaComponents.button(
                 text: context.resources.loginSignup, // Changed to English
                 onPressed: () => goRoute('/profile'),
@@ -68,7 +68,7 @@ class FavoritesView
 
     if (state is FavoritesLoadedState) {
       if (state.favoriteProducts.isEmpty) {
-        return Center(
+        return OsmeaComponents.center(
           child: OsmeaComponents.text(context.resources.noFavorites), // Changed to English
         );
       }
@@ -87,40 +87,38 @@ class FavoritesView
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () => goRoute('/product-detail/${product.id}'),
-              child: Column(
+              child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
+                  OsmeaComponents.expanded(
                     child: (product.imageUrl.contains('placehold.co'))
                         ? const Center(
                             child: Icon(Icons.image, color: Colors.grey))
-                        : Image.network(
-                            product.imageUrl,
+                        : OsmeaComponents.image(
+                            imageUrl: product.imageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                  child: Icon(Icons.error, color: Colors.red));
-                            },
+                            errorWidget: const Center(
+                                child: Icon(Icons.error, color: Colors.red)),
                           ),
                   ),
-                  Padding(
+                  OsmeaComponents.padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
+                    child: OsmeaComponents.column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        OsmeaComponents.text(
                           product.name,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style:
+                          textStyle:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
+                        OsmeaComponents.sizedBox(height: 4),
+                        OsmeaComponents.text(
                           '\$${product.price.toStringAsFixed(2)}',
-                          style:
+                          textStyle:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context).colorScheme.primary,
                                   ),

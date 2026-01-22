@@ -41,12 +41,12 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
     }
 
     if (state is CartErrorState) {
-      return Center(
-        child: Column(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(state.message, textAlign: TextAlign.center),
-            const SizedBox(height: 20),
+            OsmeaComponents.text(state.message, textAlign: TextAlign.center),
+            OsmeaComponents.sizedBox(height: 20),
             OsmeaComponents.button(
               text: resources.loginSignup,
               onPressed: () => goRoute('/profile'),
@@ -59,14 +59,14 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
 
     if (state is CartLoadedState) {
       if (state.cartItems.isEmpty) {
-        return Center(
+        return OsmeaComponents.center(
           child: OsmeaComponents.text(resources.emptyCart),
         );
       }
 
-      return Column(
+      return OsmeaComponents.column(
         children: [
-          Expanded(
+          OsmeaComponents.expanded(
             child: ListView.builder(
               itemCount: state.cartItems.length,
               itemBuilder: (context, index) {
@@ -80,40 +80,39 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
       );
     }
 
-    return Center(child: Text(resources.somethingWentWrong));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.somethingWentWrong));
   }
 
   Widget _buildCartItemCard(
       BuildContext context, CartItem item, CartViewModel viewModel) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
+      child: OsmeaComponents.padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
+        child: OsmeaComponents.row(
           children: [
-            Image.network(
-              item.product.imageUrl,
+            OsmeaComponents.image(
+              imageUrl: item.product.imageUrl,
               width: 60,
               height: 60,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.error, size: 40),
+              errorWidget: const Icon(Icons.error, size: 40),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
+            OsmeaComponents.sizedBox(width: 12),
+            OsmeaComponents.expanded(
+              child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  OsmeaComponents.text(
                     item.product.name,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    textStyle: Theme.of(context).textTheme.titleMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.row(
                     children: [
-                      SizedBox(
+                      OsmeaComponents.sizedBox(
                         height: 30,
                         width: 30,
                         child: OsmeaComponents.iconButton(
@@ -122,12 +121,12 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
                           icon: const Icon(Icons.remove, size: 16),
                         ),
                       ),
-                      Padding(
+                      OsmeaComponents.padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('${item.quantity}',
-                            style: Theme.of(context).textTheme.titleMedium),
+                        child: OsmeaComponents.text('${item.quantity}',
+                            textStyle: Theme.of(context).textTheme.titleMedium),
                       ),
-                      SizedBox(
+                      OsmeaComponents.sizedBox(
                         height: 30,
                         width: 30,
                         child: OsmeaComponents.iconButton(
@@ -141,18 +140,20 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            Column(
+            OsmeaComponents.sizedBox(width: 12),
+            OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                OsmeaComponents.text(
                   '\$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  textStyle: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 4),
-                TextButton(
+                OsmeaComponents.sizedBox(height: 4),
+                OsmeaComponents.textButton(
                   onPressed: () => viewModel.removeItem(item.id),
-                  child: Text(context.resources.remove, style: const TextStyle(color: Colors.red)),
+                  text: context.resources.remove, 
+                  // variant: ButtonVariant.ghost, // TextButton default variant usually
+                  // style: const TextStyle(color: Colors.red), // Need to check if textButton supports style
                 ),
               ],
             ),
@@ -163,7 +164,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
   }
 
   Widget _buildSummary(BuildContext context, double totalPrice) {
-    return Container(
+    return OsmeaComponents.container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -175,18 +176,18 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
           ),
         ],
       ),
-      child: Column(
+      child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          OsmeaComponents.row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${context.resources.total}:', style: Theme.of(context).textTheme.headlineSmall),
-              Text('\$${totalPrice.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              OsmeaComponents.text('${context.resources.total}:', textStyle: Theme.of(context).textTheme.headlineSmall),
+              OsmeaComponents.text('\$${totalPrice.toStringAsFixed(2)}',
+                  textStyle: Theme.of(context).textTheme.headlineSmall),
             ],
           ),
-          const SizedBox(height: 16),
+          OsmeaComponents.sizedBox(height: 16),
           OsmeaComponents.button(
             text: context.resources.proceedToCheckout,
             onPressed: () {

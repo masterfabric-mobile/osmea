@@ -73,71 +73,68 @@ class SettingsView
   }
 
   void _showLanguageSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Text('🇺🇸'),
-              title: const Text('English'),
-              onTap: () {
-                final locale = const Locale('en');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇹🇷'),
-              title: const Text('Türkçe'),
-              onTap: () {
-                final locale = const Locale('tr');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇩🇪'),
-              title: const Text('Deutsch'),
-              onTap: () {
-                final locale = const Locale('de');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇫🇷'),
-              title: const Text('Français'),
-              onTap: () {
-                final locale = const Locale('fr');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+    OsmeaComponents.bottomSheet(
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OsmeaComponents.listItem(
+            leading: const Text('🇺🇸'),
+            title: const Text('English'),
+            onTap: () {
+              final locale = const Locale('en');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇹🇷'),
+            title: const Text('Türkçe'),
+            onTap: () {
+              final locale = const Locale('tr');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇩🇪'),
+            title: const Text('Deutsch'),
+            onTap: () {
+              final locale = const Locale('de');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇫🇷'),
+            title: const Text('Français'),
+            onTap: () {
+              final locale = const Locale('fr');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

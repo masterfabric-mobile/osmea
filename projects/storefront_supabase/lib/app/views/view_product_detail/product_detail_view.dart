@@ -27,13 +27,13 @@ class ProductDetailView
            final productId = arguments['productId'] as String?;
            return OsmeaComponents.appBar(
              title: (viewModel.state is ProductDetailLoadedState)
-                 ? Text(
+                 ? OsmeaComponents.text(
                      (viewModel.state as ProductDetailLoadedState).product.name,
-                     style: const TextStyle(color: Colors.black),
+                     textStyle: const TextStyle(color: Colors.black),
                    )
-                 : Text(
+                 : OsmeaComponents.text(
                      context.resources.productDetail,
-                     style: const TextStyle(color: Colors.black),
+                     textStyle: const TextStyle(color: Colors.black),
                    ),
              variant: AppBarVariant.primary,
              backgroundColor: Colors.white,
@@ -135,29 +135,29 @@ class ProductDetailView
       final reviews = state.reviews;
 
       return SingleChildScrollView(
-        child: Column(
+        child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildProductImagesCarousel(context, product),
-            Padding(
+            OsmeaComponents.padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
+              child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  OsmeaComponents.text(
                     product.name,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    textStyle: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const SizedBox(height: 8),
+                  OsmeaComponents.sizedBox(height: 8),
                   _buildPriceDisplay(context, product),
-                  const SizedBox(height: 16),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 16),
+                  OsmeaComponents.text(
                     product.description,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 24),
+                  OsmeaComponents.sizedBox(height: 24),
                   _buildQuantitySelector(context, viewModel, state),
-                  const SizedBox(height: 16),
+                  OsmeaComponents.sizedBox(height: 16),
                   OsmeaComponents.button(
                     text: resources.addToCart,
                     onPressed: () async {
@@ -183,19 +183,19 @@ class ProductDetailView
                     textColor: Colors.white, // Explicitly set text color
                     fullWidth: true,
                   ),
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 24),
+                  const Divider(), // OsmeaComponents.divider() might need context/theme, keeping const Divider() is simpler if equivalent
+                  OsmeaComponents.sizedBox(height: 16),
+                  OsmeaComponents.text(
                     resources.reviewsCount.replaceAll(
                       '{count}',
                       reviews.length.toString(),
                     ),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    textStyle: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 16),
+                  OsmeaComponents.sizedBox(height: 16),
                   _buildReviewsList(context, reviews),
-                  const SizedBox(height: 24),
+                  OsmeaComponents.sizedBox(height: 24),
                   _buildAddReviewForm(context, viewModel, product.id),
                 ],
               ),
@@ -204,7 +204,7 @@ class ProductDetailView
         ),
       );
     }
-    return Center(child: Text(resources.somethingWentWrong));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.somethingWentWrong));
   }
 
   Widget _buildProductImagesCarousel(BuildContext context, Product product) {
@@ -214,7 +214,7 @@ class ProductDetailView
 
     if (imageUrls.isEmpty ||
         (imageUrls.length == 1 && imageUrls.first.contains('placehold.co'))) {
-      return Container(
+      return OsmeaComponents.container(
         height: 300,
         width: double.infinity,
         color: Colors.grey[200],
@@ -238,24 +238,24 @@ class ProductDetailView
   Widget _buildPriceDisplay(BuildContext context, Product product) {
     final hasDiscount = product.hasDiscount;
 
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        OsmeaComponents.row(
           children: [
             if (hasDiscount) ...[
-              Text(
+              OsmeaComponents.text(
                 '\$${product.price.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                   decoration: TextDecoration.lineThrough,
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(width: 8),
+              OsmeaComponents.sizedBox(width: 8),
             ],
-            Text(
+            OsmeaComponents.text(
               '\$${product.effectivePrice.toStringAsFixed(2)}',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -263,16 +263,16 @@ class ProductDetailView
           ],
         ),
         if (hasDiscount && product.discountPercentage != null) ...[
-          const SizedBox(height: 4),
-          Container(
+          OsmeaComponents.sizedBox(height: 4),
+          OsmeaComponents.container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFF000000),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Text(
+            child: OsmeaComponents.text(
               'SALE -${product.discountPercentage!.toStringAsFixed(0)}%',
-              style: const TextStyle(
+              textStyle: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -289,18 +289,18 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailLoadedState state,
   ) {
-    return Row(
+    return OsmeaComponents.row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         OsmeaComponents.iconButton(
           onPressed: viewModel.decreaseQuantity,
           icon: const Icon(Icons.remove, color: Colors.black),
         ),
-        Padding(
+        OsmeaComponents.padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
+          child: OsmeaComponents.text(
             '${state.detailPageQuantity}',
-            style: Theme.of(context).textTheme.headlineMedium,
+            textStyle: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         OsmeaComponents.iconButton(
@@ -314,7 +314,7 @@ class ProductDetailView
   Widget _buildReviewsList(BuildContext context, List<ProductReview> reviews) {
     final resources = context.resources;
     if (reviews.isEmpty) {
-      return Center(child: Text(resources.noReviewsYet));
+      return OsmeaComponents.center(child: OsmeaComponents.text(resources.noReviewsYet));
     }
     return ListView.builder(
       shrinkWrap: true,
@@ -324,29 +324,29 @@ class ProductDetailView
         final review = reviews[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
-          child: Padding(
+          child: OsmeaComponents.padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                OsmeaComponents.row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    OsmeaComponents.text(
                       review.authorName,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
+                    OsmeaComponents.text(
                       DateFormat.yMMMd().format(review.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      textStyle: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                // Simple star rating display
-                Row(
+                OsmeaComponents.sizedBox(height: 4),
+                
+                OsmeaComponents.row(
                   children: List.generate(
                     5,
                     (i) => Icon(
@@ -357,15 +357,15 @@ class ProductDetailView
                   ),
                 ),
                 if (review.title != null && review.title!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.text(
                     review.title!,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    textStyle: Theme.of(context).textTheme.titleMedium,
                   ),
                 ],
                 if (review.comment != null && review.comment!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(review.comment!),
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.text(review.comment!),
                 ],
               ],
             ),
@@ -383,17 +383,17 @@ class ProductDetailView
     final resources = context.resources;
     return StatefulBuilder(
       builder: (context, setState) {
-        return Column(
+        return OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            OsmeaComponents.text(
               resources.writeReview,
-              style: Theme.of(context).textTheme.titleLarge,
+              textStyle: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
-            Row(
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.row(
               children: [
-                Text('${resources.rating}: '),
+                OsmeaComponents.text('${resources.rating}: '),
                 ...List.generate(
                   5,
                   (index) => IconButton(
@@ -412,24 +412,20 @@ class ProductDetailView
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            TextField(
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.textField(
               controller: viewModel.reviewTitleController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: resources.reviewTitle,
-              ),
+              label: resources.reviewTitle,
+              variant: TextFieldVariant.outlined,
             ),
-            const SizedBox(height: 16),
-            TextField(
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.textField(
               controller: viewModel.reviewCommentController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: resources.yourReview,
-              ),
+              label: resources.yourReview,
               maxLines: 4,
+              variant: TextFieldVariant.outlined,
             ),
-            const SizedBox(height: 16),
+            OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.button(
               text: resources.submitReview,
               onPressed: () async {
@@ -495,9 +491,9 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
   Widget build(BuildContext context) {
     final height = 300.0;
 
-    return SizedBox(
+    return OsmeaComponents.sizedBox(
       height: height,
-      child: Stack(
+      child: OsmeaComponents.stack(
         children: [
           // Image carousel
           PageView.builder(
@@ -515,7 +511,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
+                  return OsmeaComponents.container(
                     height: height,
                     width: double.infinity,
                     color: Colors.grey[200],
@@ -526,7 +522,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return Container(
+                  return OsmeaComponents.container(
                     height: height,
                     width: double.infinity,
                     color: Colors.grey[100],
@@ -547,10 +543,10 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
 
           // SALE badge (only on first image)
           if (widget.hasDiscount && _currentPage == 0)
-            Positioned(
+            OsmeaComponents.positioned(
               top: 16,
               right: 16,
-              child: Container(
+              child: OsmeaComponents.container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
@@ -559,11 +555,11 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                   color: const Color(0xFF000000),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(
+                child: OsmeaComponents.text(
                   widget.discountPercentage != null
                       ? 'SALE -${widget.discountPercentage!.toStringAsFixed(0)}%'
                       : 'SALE',
-                  style: const TextStyle(
+                  textStyle: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -574,12 +570,12 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
 
           // Page indicator (if multiple images)
           if (widget.imageUrls.length > 1)
-            Positioned(
+            OsmeaComponents.positioned(
               bottom: 16,
               left: 0,
               right: 0,
               child: Center(
-                child: Container(
+                child: OsmeaComponents.container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 6,
@@ -588,7 +584,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                     color: Color.fromARGB((255 * 0.4).round(), 0, 0, 0),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
+                  child: OsmeaComponents.row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(
                       widget.imageUrls.length,
@@ -600,7 +596,7 @@ class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
                             curve: Curves.easeInOut,
                           );
                         },
-                        child: Container(
+                        child: OsmeaComponents.container(
                           margin: const EdgeInsets.symmetric(horizontal: 3),
                           width: _currentPage == index ? 20 : 6,
                           height: 6,

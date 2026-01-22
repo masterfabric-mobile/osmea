@@ -95,11 +95,11 @@ class ProductsByCategoryView
       }
 
       // 2. If no subcategories (Leaf Node), show Products Grid
-      return Column(
+      return OsmeaComponents.column(
         children: [
           // Size/Age Filters (Only for Fashion/Leaf categories if applicable)
           if (state.showSizeFilter)
-            Container(
+            OsmeaComponents.container(
               padding: const EdgeInsets.symmetric(vertical: 8),
               color: Theme.of(context).cardColor,
               child: SizedBox(
@@ -108,7 +108,7 @@ class ProductsByCategoryView
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   scrollDirection: Axis.horizontal,
                   itemCount: viewModel.ageGroups.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  separatorBuilder: (_, __) => OsmeaComponents.sizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final age = viewModel.ageGroups[index];
                     final isSelected = state.selectedSizes.contains(age);
@@ -122,9 +122,9 @@ class ProductsByCategoryView
               ),
             ),
 
-          Expanded(
+          OsmeaComponents.expanded(
             child: state.products.isEmpty
-                ? Center(child: Text(resources.noProductsForSelection))
+                ? OsmeaComponents.center(child: OsmeaComponents.text(resources.noProductsForSelection))
                 : GridView.builder(
                     padding: const EdgeInsets.all(16.0),
                     gridDelegate:
@@ -141,46 +141,43 @@ class ProductsByCategoryView
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           onTap: () => goRoute('/product-detail/${product.id}'),
-                          child: Column(
+                          child: OsmeaComponents.column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
+                              OsmeaComponents.expanded(
                                 child: (product.imageUrl
                                         .contains('placehold.co'))
                                     ? const Center(
                                         child: Icon(Icons.image,
                                             color: Colors.grey))
-                                    : Image.network(
-                                        product.imageUrl,
+                                    : OsmeaComponents.image(
+                                        imageUrl: product.imageUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Center(
+                                        errorWidget: const Center(
                                               child: Icon(Icons.error,
-                                                  color: Colors.red));
-                                        },
+                                                  color: Colors.red)),
                                       ),
                               ),
-                              Padding(
+                              OsmeaComponents.padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Column(
+                                child: OsmeaComponents.column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    OsmeaComponents.text(
                                       product.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
+                                      textStyle: Theme.of(context)
                                           .textTheme
                                           .bodyMedium
                                           ?.copyWith(
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
+                                    OsmeaComponents.sizedBox(height: 4),
+                                    OsmeaComponents.text(
                                       '\$${product.price.toStringAsFixed(2)}',
-                                      style: Theme.of(context)
+                                      textStyle: Theme.of(context)
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(

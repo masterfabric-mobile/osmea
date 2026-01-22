@@ -10,7 +10,7 @@ class LogoHeaderWidget extends StatelessWidget {
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.sizedBox(height: 60),
-        Center(
+        OsmeaComponents.center(
           child: OsmeaComponents.container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

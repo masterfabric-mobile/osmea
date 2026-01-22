@@ -40,9 +40,9 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
     SearchState state,
   ) {
     final resources = context.resources;
-    return Column(
+    return OsmeaComponents.column(
       children: [
-        Padding(
+        OsmeaComponents.padding(
           padding: const EdgeInsets.all(16.0),
           child: OsmeaComponents.textField(
             controller: viewModel.searchController,
@@ -55,7 +55,7 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
             focusColor: Theme.of(context).colorScheme.primary,
           ),
         ),
-        Expanded(
+        OsmeaComponents.expanded(
           child: _buildBody(context, viewModel, state),
         ),
       ],
@@ -91,17 +91,16 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
           final product = state.searchResults[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: Image.network(
-                product.imageUrl,
+            child: OsmeaComponents.listItem(
+              leading: OsmeaComponents.image(
+                imageUrl: product.imageUrl,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.error),
+                errorWidget: const Icon(Icons.error),
               ),
-              title: Text(product.name),
-              subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+              title: OsmeaComponents.text(product.name),
+              subtitle: OsmeaComponents.text('\$${product.price.toStringAsFixed(2)}'),
               onTap: () {
                 goRoute('/product-detail/${product.id}');
               },
@@ -115,4 +114,3 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
             CircularProgressIndicator()); // Should not happen in normal flow
   }
 }
-
