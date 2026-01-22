@@ -85,15 +85,8 @@ class OrderDetailView
     DetailedUserOrder order,
     OrderDetailViewModel viewModel,
   ) {
-    final configHelper = AssetConfigHelper();
-    final horizontalPadding = configHelper.getDouble(
-      'order_detail_view.component_spacing.horizontal',
-      context.spacing16,
-    );
-    final verticalPadding = configHelper.getDouble(
-      'order_detail_view.component_spacing.vertical',
-      context.spacing12,
-    );
+    final horizontalPadding = context.spacing16;
+    final verticalPadding = context.spacing12;
     
     return RefreshIndicator(
       onRefresh: () {
@@ -103,40 +96,53 @@ class OrderDetailView
         }
         return Future.value();
       },
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding,
-          vertical: verticalPadding,
-        ),
-        child: OsmeaComponents.column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Order Header
-            _buildOrderHeader(context, order),
-            
-            // Order Items
-            if (order.lineItems != null && order.lineItems!.isNotEmpty) ...[
-              Divider(color: OsmeaColors.silver, height: 1),
-              OsmeaComponents.sizedBox(height: context.spacing16),
-              _buildOrderItemsSection(context, order.lineItems!, order.currency),
-            ],
-            
-            // Order Totals
-            if (order.totals != null) ...[
-              Divider(color: OsmeaColors.silver, height: 1),
-              OsmeaComponents.sizedBox(height: context.spacing16),
-              _buildOrderTotalsSection(context, order.totals!, order.currency),
-            ],
-            
-            // Addresses - Collapsible
-            if (order.billing != null || order.shipping != null) ...[
-              Divider(color: OsmeaColors.silver, height: 1),
-              OsmeaComponents.sizedBox(height: context.spacing16),
-              _buildCollapsibleAddresses(context, order),
-            ],
-          ],
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final mediaQuery = MediaQuery.of(context);
+          final safeAreaPadding = mediaQuery.padding;
+          
+          return SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            padding: EdgeInsets.only(
+              left: horizontalPadding,
+              right: horizontalPadding,
+              top: verticalPadding,
+              bottom: verticalPadding + safeAreaPadding.bottom,
+            ),
+            child: OsmeaComponents.column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Order Header
+                _buildOrderHeader(context, order),
+                
+                // Order Items
+                if (order.lineItems != null && order.lineItems!.isNotEmpty) ...[
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  Divider(color: OsmeaColors.silver, height: 1),
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  _buildOrderItemsSection(context, order.lineItems!, order.currency),
+                ],
+                
+                // Order Totals
+                if (order.totals != null) ...[
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  Divider(color: OsmeaColors.silver, height: 1),
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  _buildOrderTotalsSection(context, order.totals!, order.currency),
+                ],
+                
+                // Addresses - Collapsible
+                if (order.billing != null || order.shipping != null) ...[
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  Divider(color: OsmeaColors.silver, height: 1),
+                  OsmeaComponents.sizedBox(height: context.spacing24),
+                  _buildCollapsibleAddresses(context, order),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -152,7 +158,7 @@ class OrderDetailView
       children: [
         OsmeaComponents.row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: OsmeaComponents.column(
@@ -165,7 +171,7 @@ class OrderDetailView
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing4),
+                  OsmeaComponents.sizedBox(height: context.spacing8),
                   OsmeaComponents.row(
                     children: [
                       Icon(
@@ -173,7 +179,7 @@ class OrderDetailView
                         size: 14,
                         color: OsmeaColors.pewter,
                       ),
-                      OsmeaComponents.sizedBox(width: context.spacing4),
+                      OsmeaComponents.sizedBox(width: context.spacing6),
                       OsmeaComponents.text(
                         date,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
@@ -197,20 +203,20 @@ class OrderDetailView
           ],
         ),
         if (order.paymentMethod != null) ...[
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          OsmeaComponents.listItem(
-            leading: Icon(
-              Icons.payment_outlined,
-              size: 16,
-              color: OsmeaColors.pewter,
-            ),
-            title: OsmeaComponents.text(
-              order.paymentMethod!,
-              textStyle: OsmeaTextStyle.bodySmall(context),
-            ),
-            variant: ListItemVariant.dense,
-            padding: EdgeInsets.zero,
-            margin: EdgeInsets.zero,
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          OsmeaComponents.row(
+            children: [
+              Icon(
+                Icons.payment_outlined,
+                size: 16,
+                color: OsmeaColors.pewter,
+              ),
+              OsmeaComponents.sizedBox(width: context.spacing8),
+              OsmeaComponents.text(
+                order.paymentMethod!,
+                textStyle: OsmeaTextStyle.bodySmall(context),
+              ),
+            ],
           ),
         ],
       ],
@@ -227,22 +233,24 @@ class OrderDetailView
       mainAxisSize: MainAxisSize.min,
       children: [
         OsmeaComponents.text(
-          'Items (${lineItems.length})',
+          'Items',
           textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing10),
+        OsmeaComponents.sizedBox(height: context.spacing16),
         ...lineItems.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
           return Column(
+            key: ValueKey('order_item_${item.id}_$index'),
+            mainAxisSize: MainAxisSize.min,
             children: [
               _buildOrderItem(context, item, currency),
               if (index < lineItems.length - 1) ...[
-                OsmeaComponents.sizedBox(height: context.spacing10),
+                OsmeaComponents.sizedBox(height: context.spacing12),
                 Divider(color: OsmeaColors.silver, height: 1),
-                OsmeaComponents.sizedBox(height: context.spacing10),
+                OsmeaComponents.sizedBox(height: context.spacing12),
               ],
             ],
           );
@@ -256,61 +264,73 @@ class OrderDetailView
     OrderLineItem item,
     String currency,
   ) {
-    return OsmeaComponents.listItem(
-      leading: OsmeaComponents.container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: OsmeaColors.grayMaterial[50],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: item.productImage != null && item.productImage!.isNotEmpty
-              ? OsmeaComponents.image(
-                  imageUrl: item.productImage!,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  borderRadius: BorderRadius.circular(8),
-                  variant: ImageVariant.normal,
-                  cacheWidth: 150,
-                  showLoadingIndicator: true,
-                  errorWidget: OsmeaComponents.center(
+    return OsmeaComponents.row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OsmeaComponents.container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: OsmeaColors.silver,
+              width: 1,
+            ),
+            color: OsmeaColors.grayMaterial[50],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: item.productImage != null && item.productImage!.isNotEmpty
+                ? OsmeaComponents.image(
+                    imageUrl: item.productImage!,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    variant: ImageVariant.normal,
+                    cacheWidth: 200,
+                    showLoadingIndicator: true,
+                    errorWidget: OsmeaComponents.center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: OsmeaColors.grayMaterial[400],
+                        size: 20,
+                      ),
+                    ),
+                  )
+                : OsmeaComponents.center(
                     child: Icon(
                       Icons.image_outlined,
                       color: OsmeaColors.grayMaterial[400],
-                      size: 18,
+                      size: 20,
                     ),
                   ),
-                )
-              : OsmeaComponents.center(
-                  child: Icon(
-                    Icons.image_outlined,
-                    color: OsmeaColors.grayMaterial[400],
-                    size: 18,
-                  ),
+          ),
+        ),
+        OsmeaComponents.sizedBox(width: context.spacing12),
+        Expanded(
+          child: OsmeaComponents.column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OsmeaComponents.text(
+                item.name,
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  fontWeight: FontWeight.w500,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing4),
+              OsmeaComponents.text(
+                '${item.quantity}x • $currency ${item.total.toStringAsFixed(2)}',
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                  color: OsmeaColors.pewter,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      title: OsmeaComponents.text(
-        item.name,
-        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-          fontWeight: FontWeight.w500,
-        ),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: OsmeaComponents.text(
-        '${item.quantity}x • $currency ${item.total.toStringAsFixed(2)}',
-        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-          color: OsmeaColors.pewter,
-          fontSize: 12,
-        ),
-      ),
-      variant: ListItemVariant.dense,
-      padding: EdgeInsets.zero,
-      margin: EdgeInsets.zero,
+      ],
     );
   }
 
@@ -329,15 +349,15 @@ class OrderDetailView
             fontWeight: FontWeight.w600,
           ),
         ),
-        OsmeaComponents.sizedBox(height: context.spacing10),
+        OsmeaComponents.sizedBox(height: context.spacing16),
         _buildTotalRow(context, 'Subtotal', totals.subtotal, currency),
-        OsmeaComponents.sizedBox(height: context.spacing6),
+        OsmeaComponents.sizedBox(height: context.spacing12),
         _buildTotalRow(context, 'Shipping', totals.shipping, currency),
-        OsmeaComponents.sizedBox(height: context.spacing6),
+        OsmeaComponents.sizedBox(height: context.spacing12),
         _buildTotalRow(context, 'Tax', totals.tax, currency),
-        OsmeaComponents.sizedBox(height: context.spacing10),
+        OsmeaComponents.sizedBox(height: context.spacing16),
         Divider(color: OsmeaColors.silver, height: 1),
-        OsmeaComponents.sizedBox(height: context.spacing10),
+        OsmeaComponents.sizedBox(height: context.spacing16),
         _buildTotalRow(
           context,
           'Total',
@@ -358,7 +378,8 @@ class OrderDetailView
   }) {
     return OsmeaComponents.row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       children: [
         OsmeaComponents.text(
           label,
@@ -388,64 +409,75 @@ class OrderDetailView
     BuildContext context,
     DetailedUserOrder order,
   ) {
-    return OsmeaComponents.collapse(
-      size: CollapseSize.medium,
-      variant: CollapseVariant.ghost,
-      mode: CollapseBehaviorMode.multiple,
-      children: [
-        if (order.billing != null)
-          OsmeaCollapsePanel(
-            header: OsmeaComponents.row(
-              children: [
-                Icon(
-                  Icons.payment_outlined,
-                  size: 18,
-                  color: OsmeaColors.thunder,
-                ),
-                OsmeaComponents.sizedBox(width: context.spacing8),
-                OsmeaComponents.text(
-                  'Billing Address',
-                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    fontWeight: FontWeight.w600,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        iconTheme: IconThemeData(
+          color: OsmeaColors.transparent,
+          size: 0,
+        ),
+        expansionTileTheme: ExpansionTileThemeData(
+          iconColor: OsmeaColors.transparent,
+          collapsedIconColor: OsmeaColors.transparent,
+        ),
+      ),
+      child: OsmeaComponents.collapse(
+        size: CollapseSize.small,
+        variant: CollapseVariant.ghost,
+        mode: CollapseBehaviorMode.multiple,
+        padding: EdgeInsets.zero,
+        children: [
+          if (order.billing != null)
+            OsmeaCollapsePanel(
+              header: OsmeaComponents.row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.payment_outlined,
+                    size: 18,
+                    color: OsmeaColors.thunder,
                   ),
-                ),
-              ],
-            ),
-            value: 'billing',
-            body: OsmeaComponents.padding(
-              padding: EdgeInsets.only(
-                top: context.spacing10,
-              ),
-              child: _buildBillingAddressContent(context, order.billing!),
-            ),
-          ),
-        if (order.shipping != null)
-          OsmeaCollapsePanel(
-            header: OsmeaComponents.row(
-              children: [
-                Icon(
-                  Icons.local_shipping_outlined,
-                  size: 18,
-                  color: OsmeaColors.thunder,
-                ),
-                OsmeaComponents.sizedBox(width: context.spacing8),
-                OsmeaComponents.text(
-                  'Shipping Address',
-                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    fontWeight: FontWeight.w600,
+                  OsmeaComponents.sizedBox(width: context.spacing8),
+                  Expanded(
+                    child: OsmeaComponents.text(
+                      'Billing Address',
+                      textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            value: 'shipping',
-            body: OsmeaComponents.padding(
-              padding: EdgeInsets.only(
-                top: context.spacing10,
+                ],
               ),
-              child: _buildShippingAddressContent(context, order.shipping!),
+              trailing: const SizedBox.shrink(),
+              value: 'billing',
+              body: _buildBillingAddressContent(context, order.billing!),
             ),
-          ),
-      ],
+          if (order.shipping != null)
+            OsmeaCollapsePanel(
+              header: OsmeaComponents.row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.local_shipping_outlined,
+                    size: 18,
+                    color: OsmeaColors.thunder,
+                  ),
+                  OsmeaComponents.sizedBox(width: context.spacing8),
+                  Expanded(
+                    child: OsmeaComponents.text(
+                      'Shipping Address',
+                      textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              trailing: const SizedBox.shrink(),
+              value: 'shipping',
+              body: _buildShippingAddressContent(context, order.shipping!),
+            ),
+        ],
+      ),
     );
   }
 
@@ -478,43 +510,46 @@ class OrderDetailView
       addressLines.add(address.country!);
     }
     
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ...addressLines.map((line) => OsmeaComponents.text(
-          line,
-          textStyle: OsmeaTextStyle.bodySmall(context),
-        )).toList(),
-        if (address.email != null && address.email!.isNotEmpty) ...[
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          Divider(color: OsmeaColors.silver, height: 1),
-          OsmeaComponents.sizedBox(height: context.spacing8),
-          OsmeaComponents.listItem(
-            leading: Icon(Icons.email_outlined, size: 16, color: OsmeaColors.pewter),
-            title: OsmeaComponents.text(
-              address.email!,
-              textStyle: OsmeaTextStyle.bodySmall(context),
+    return Padding(
+      padding: EdgeInsets.only(top: context.spacing8),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...addressLines.map((line) => OsmeaComponents.text(
+            line,
+            textStyle: OsmeaTextStyle.bodySmall(context),
+          )).toList(),
+          if (address.email != null && address.email!.isNotEmpty) ...[
+            OsmeaComponents.sizedBox(height: context.spacing8),
+            Divider(color: OsmeaColors.silver, height: 1),
+            OsmeaComponents.sizedBox(height: context.spacing8),
+            OsmeaComponents.listItem(
+              leading: Icon(Icons.email_outlined, size: 16, color: OsmeaColors.pewter),
+              title: OsmeaComponents.text(
+                address.email!,
+                textStyle: OsmeaTextStyle.bodySmall(context),
+              ),
+              variant: ListItemVariant.dense,
+              padding: EdgeInsets.zero,
+              margin: EdgeInsets.zero,
             ),
-            variant: ListItemVariant.dense,
-            padding: EdgeInsets.zero,
-            margin: EdgeInsets.zero,
-          ),
-        ],
-        if (address.phone != null && address.phone!.isNotEmpty) ...[
-          OsmeaComponents.sizedBox(height: context.spacing4),
-          OsmeaComponents.listItem(
-            leading: Icon(Icons.phone_outlined, size: 16, color: OsmeaColors.pewter),
-            title: OsmeaComponents.text(
-              address.phone!,
-              textStyle: OsmeaTextStyle.bodySmall(context),
+          ],
+          if (address.phone != null && address.phone!.isNotEmpty) ...[
+            OsmeaComponents.sizedBox(height: context.spacing4),
+            OsmeaComponents.listItem(
+              leading: Icon(Icons.phone_outlined, size: 16, color: OsmeaColors.pewter),
+              title: OsmeaComponents.text(
+                address.phone!,
+                textStyle: OsmeaTextStyle.bodySmall(context),
+              ),
+              variant: ListItemVariant.dense,
+              padding: EdgeInsets.zero,
+              margin: EdgeInsets.zero,
             ),
-            variant: ListItemVariant.dense,
-            padding: EdgeInsets.zero,
-            margin: EdgeInsets.zero,
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -547,13 +582,16 @@ class OrderDetailView
       addressLines.add(address.country!);
     }
     
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: addressLines.map<Widget>((line) => OsmeaComponents.text(
-        line,
-        textStyle: OsmeaTextStyle.bodySmall(context),
-      )).toList(),
+    return Padding(
+      padding: EdgeInsets.only(top: context.spacing8),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: addressLines.map<Widget>((line) => OsmeaComponents.text(
+          line,
+          textStyle: OsmeaTextStyle.bodySmall(context),
+        )).toList(),
+      ),
     );
   }
 
