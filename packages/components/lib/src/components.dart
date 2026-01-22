@@ -2715,6 +2715,7 @@ class OsmeaComponents {
     BorderRadius? borderRadius,
     Color? backgroundColor,
     Color? borderColor,
+    double? borderWidth,
     Color? shadowColor,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding, // 🔧 Added missing padding parameter
