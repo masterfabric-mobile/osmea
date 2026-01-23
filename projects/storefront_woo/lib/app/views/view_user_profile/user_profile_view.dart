@@ -105,12 +105,12 @@ class UserProfileView
                 ? '${state.addresses.length} saved'
                 : null,
           ),
-          _buildMenuItem(
-            context,
-            'Settings',
-            Icons.settings_outlined,
-            () => context.go('/user-profile/settings'),
-          ),
+          // _buildMenuItem(
+          //   context,
+          //   'Settings',
+          //   Icons.settings_outlined,
+          //   () => context.go('/user-profile/settings'),
+          // ),
 
           _buildSectionHeader(context, 'Orders'),
           _buildMenuItem(
