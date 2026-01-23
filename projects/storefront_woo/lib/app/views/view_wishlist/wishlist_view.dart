@@ -65,7 +65,7 @@ class WishlistView
     Map<String, dynamic>? arguments,
   }) : super(
          arguments: arguments ?? const {'saved': true},
-         coreAppBar: (context, cubit) => PreferredSize(
+         coreAppBar: (BuildContext context, WishlistViewModel cubit) => PreferredSize(
            preferredSize: Size.fromHeight(kToolbarHeight),
            child: BlocBuilder<WishlistViewModel, WishlistState>(
              bloc: cubit,
@@ -139,7 +139,12 @@ class WishlistView
                    backgroundColor: OsmeaColors.transparent,
                  ),
                  actions: [
-                  
+                   // Add collection button
+                   AppBarAction(
+                     icon: Icon(Icons.add, color: iconColor),
+                     onPressed: () => _showCreateCollectionDialog(context, cubit),
+                     tooltip: 'Create new collection',
+                   ),
                    if (hasItems)
                      AppBarAction(
                        icon: Icon(Icons.delete_outline, color: iconColor),
@@ -410,6 +415,103 @@ class WishlistView
     return WishlistListWidget(
       items: const <WishlistItem>[],
       viewModel: viewModel,
+    );
+  }
+
+  /// Show dialog for creating a new wishlist collection
+  static void _showCreateCollectionDialog(
+    BuildContext context,
+    WishlistViewModel viewModel,
+  ) {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Create New Collection',
+          style: OsmeaTextStyle.titleLarge(context).copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Collection Name',
+                    hintText: 'Enter collection name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Collection name is required';
+                    }
+                    return null;
+                  },
+                  autofocus: true,
+                ),
+                SizedBox(height: context.spacing16),
+                TextFormField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description (Optional)',
+                    hintText: 'Enter collection description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancel',
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.black,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState?.validate() ?? false) {
+                Navigator.of(context).pop();
+                await viewModel.createGroup(
+                  nameController.text.trim(),
+                  description: descriptionController.text.trim().isEmpty
+                      ? null
+                      : descriptionController.text.trim(),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: OsmeaColors.black,
+              foregroundColor: OsmeaColors.white,
+            ),
+            child: Text(
+              'Create',
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -233,6 +233,21 @@ class WishlistItemWidget extends StatelessWidget {
             return OsmeaComponents.row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Add to collection button
+                OsmeaComponents.iconButton(
+                  icon: Icon(
+                    Icons.folder_outlined,
+                    size: context.iconSizeSmall,
+                    color: cartIconColor,
+                  ),
+                  variant: ButtonVariant.outlined,
+                  size: ButtonSize.extraSmall,
+                  backgroundColor: cartBgColor,
+                  borderColor: cartBorderColor,
+                  borderRadius: cartBorderRadius,
+                  onPressed: () => _showAddToCollectionDialog(context, item, viewModel),
+                ),
+                OsmeaComponents.sizedBox(width: buttonSpacing),
                 // Cart button
                 OsmeaComponents.iconButton(
                   icon: Icon(
@@ -277,6 +292,121 @@ class WishlistItemWidget extends StatelessWidget {
         ),
         padding: context.paddingLow,
         margin: context.paddingZero,
+      ),
+    );
+  }
+
+  void _showAddToCollectionDialog(
+    BuildContext context,
+    WishlistItem item,
+    WishlistViewModel viewModel,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StreamBuilder<WishlistState>(
+        stream: viewModel.stream,
+        initialData: viewModel.state,
+        builder: (context, snapshot) {
+          final state = snapshot.data;
+          List<WishlistGroup> groups = [];
+
+          if (state is WishlistLoadedState) {
+            groups = state.groups;
+          }
+
+          return AlertDialog(
+            title: Text(
+              'Add to Collection',
+              style: OsmeaTextStyle.titleLarge(context).copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: groups.isEmpty
+                  ? Padding(
+                      padding: EdgeInsets.all(context.spacing16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.folder_outlined,
+                            size: 48,
+                            color: OsmeaColors.grayMaterial[400],
+                          ),
+                          SizedBox(height: context.spacing12),
+                          Text(
+                            'No collections available',
+                            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                              color: OsmeaColors.grayMaterial[600],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: context.spacing8),
+                          Text(
+                            'Create a collection first to add products',
+                            style: OsmeaTextStyle.bodySmall(context).copyWith(
+                              color: OsmeaColors.grayMaterial[500],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: groups.map((group) {
+                          return ListTile(
+                            leading: Icon(Icons.folder_outlined),
+                            title: Text(
+                              group.name,
+                              style: OsmeaTextStyle.bodyMedium(context),
+                            ),
+                            subtitle: group.itemCount != null
+                                ? Text(
+                                    '${group.itemCount} items',
+                                    style: OsmeaTextStyle.bodySmall(context).copyWith(
+                                      color: OsmeaColors.grayMaterial[500],
+                                    ),
+                                  )
+                                : null,
+                            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: () async {
+                              final groupId = int.tryParse(group.id);
+                              if (groupId != null) {
+                                await viewModel.add(item, groupId: groupId);
+                                if (dialogContext.mounted) {
+                                  Navigator.of(dialogContext).pop();
+                                  context.showSnackbar(
+                                    title: 'Added',
+                                    message: '${item.name} added to ${group.name}',
+                                    type: SnackbarType.success,
+                                    style: SnackbarStyle.minimal,
+                                    position: SnackbarPosition.bottom,
+                                    duration: const Duration(seconds: 2),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                  style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: OsmeaColors.black,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

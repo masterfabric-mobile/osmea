@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/create_wishlist_group_request.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/delete_wishlist_item_request.dart';
 import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/response/wishlist_item_response.dart';
@@ -75,17 +76,29 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   }
 
   // Public triggers (OSMEA style)
-  Future<void> initial() => _syncFromServer();
+  Future<void> initial() async {
+    await _syncFromServer();
+    await _loadGroups();
+  }
   Future<void> syncFromServer({int? groupId}) =>
       _syncFromServer(groupId: groupId);
+  Future<List<WishlistItem>> getCollectionItems(int groupId) =>
+      _getCollectionItems(groupId);
   Future<void> toggle(WishlistItem item, {int? groupId}) =>
       _toggle(item, groupId: groupId);
   Future<void> add(WishlistItem item, {int? groupId}) =>
       _add(item, groupId: groupId);
   Future<void> remove(int productId, {int? groupId}) =>
       _remove(productId, groupId: groupId);
+  Future<void> removeByItemId(int itemId) =>
+      _removeByItemId(itemId);
   Future<void> addItemToCartFromWishlist(int productId) =>
       _addItemToCartFromWishlist(productId);
+  
+  // Group management methods
+  Future<void> loadGroups() => _loadGroups();
+  Future<void> createGroup(String name, {String? description}) =>
+      _createGroup(name, description: description);
 
   /// Adds item to cart and then removes it from wishlist
   Future<void> addItemToCartAndRemoveFromWishlist(int productId) async {
@@ -169,7 +182,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       );
 
       // Emit the updated state immediately
-      emit(WishlistLoadedState(items: updatedItems));
+      final currentGroups = loadedState.groups;
+      emit(WishlistLoadedState(items: updatedItems, groups: currentGroups));
 
       // Optionally try to remove from server in background (don't await)
       _removeFromServerInBackground(productId);
@@ -290,7 +304,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   /// Clear all wishlist items (used when user signs out)
   void clearAll() {
     debugPrint('💖 Wishlist: Clearing all items (sign out)');
-    emit(WishlistLoadedState(items: const []));
+    emit(WishlistLoadedState(items: const [], groups: const []));
   }
 
   /// Sync local wishlist items to server after successful login
@@ -349,6 +363,132 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   }
 
   // Private implementations
+  Future<List<WishlistItem>> _getCollectionItems(int groupId) async {
+    try {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, returning empty list');
+        return [];
+      }
+
+      debugPrint('💖 Wishlist: Fetching items for collection $groupId...');
+
+      List<WishlistItemResponse> items = [];
+
+      try {
+        final paged = await _wishlistService.getWishlistItems(
+          namespace: _namespace,
+          apiVersion: _apiVersion,
+          groupId: groupId,
+          page: 1,
+          perPage: 100,
+        );
+
+        if (paged.items != null && paged.items!.isNotEmpty) {
+          items = paged.items!;
+        } else if (paged.data != null && paged.data!.isNotEmpty) {
+          items = paged.data!;
+        }
+      } catch (e) {
+        debugPrint('❌ Wishlist: Failed to fetch collection items: $e');
+        return [];
+      }
+
+      if (items.isEmpty) {
+        return [];
+      }
+
+      // Map WishlistItemResponse to WishlistItem
+      final mapped = <WishlistItem>[];
+
+      for (final itemResponse in items) {
+        try {
+          final itemId = itemResponse.id;
+          final productId = itemResponse.productId;
+
+          if (productId == null || productId == 0) {
+            continue;
+          }
+
+          String? safeStringFromResponse(dynamic value) {
+            if (value == null) return null;
+            if (value is String) return value;
+            if (value is bool) return value.toString();
+            if (value is num) return value.toString();
+            return value.toString();
+          }
+
+          final name =
+              safeStringFromResponse(itemResponse.name) ??
+              safeStringFromResponse(itemResponse.productName);
+          final price =
+              safeStringFromResponse(itemResponse.price) ??
+              safeStringFromResponse(itemResponse.productPrice);
+          final image =
+              safeStringFromResponse(itemResponse.image) ??
+              safeStringFromResponse(itemResponse.productImage);
+
+          try {
+            final product = await _productService.retrieveProduct(
+              apiVersion: _apiVersion,
+              productId: productId,
+            );
+
+            final prices = product.prices;
+            final imageUrl = product.images?.isNotEmpty == true
+                ? product.images!.first.src
+                : image;
+
+            final productName = product.name ?? name ?? 'Product';
+            final productPrice =
+                prices?.regularPrice ?? prices?.price ?? price ?? '0.00';
+
+            mapped.add(
+              WishlistItem(
+                id: productId,
+                itemId: itemId,
+                name: productName,
+                imageUrl: imageUrl,
+                regularPrice: productPrice,
+                salePrice: product.onSale == true ? prices?.salePrice : null,
+                currencyCode: prices?.currencyCode,
+                currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                currencyThousandSeparator: prices?.currencyThousandSeparator,
+                currencyMinorUnit: prices?.currencyMinorUnit,
+                onSale: product.onSale ?? false,
+              ),
+            );
+          } catch (e) {
+            final fallbackName = name ?? 'Product';
+            final fallbackPrice = price ?? '0.00';
+
+            mapped.add(
+              WishlistItem(
+                id: productId,
+                itemId: itemId,
+                name: fallbackName,
+                imageUrl: image,
+                regularPrice: fallbackPrice,
+                salePrice: null,
+                currencyCode: null,
+                onSale: false,
+              ),
+            );
+          }
+        } catch (e) {
+          debugPrint('❌ Wishlist: Error parsing collection item: $e');
+          continue;
+        }
+      }
+
+      debugPrint('✅ Wishlist: Loaded ${mapped.length} items for collection $groupId');
+      return mapped;
+    } catch (e) {
+      debugPrint('❌ Wishlist: Error getting collection items: $e');
+      return [];
+    }
+  }
+
   Future<void> _syncFromServer({int? groupId}) async {
     try {
       // If not authenticated, keep local (hydrated) state without erroring
@@ -358,14 +498,14 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         final s = state;
         if (s is WishlistLoadedState) {
           // Keep existing state
-          emit(WishlistLoadedState(items: s.items));
+          emit(WishlistLoadedState(items: s.items, groups: s.groups));
         } else if (s is WishlistInitialState) {
           // If initial state, try to restore from persisted state
           // HydratedCubit should handle this, but ensure we have loaded state
-          emit(WishlistLoadedState(items: const []));
+          emit(WishlistLoadedState(items: const [], groups: const []));
         } else {
           // For any other state (error, etc.), ensure we have loaded state
-          emit(WishlistLoadedState(items: const []));
+          emit(WishlistLoadedState(items: const [], groups: const []));
         }
         return;
       }
@@ -415,7 +555,14 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       if (items.isEmpty) {
         debugPrint('💡 Wishlist: No items found');
-        emit(WishlistLoadedState(items: const []));
+        // Load groups even if no items
+        final groups = await _loadGroupsAndGetList();
+        final currentState = state;
+        if (currentState is WishlistLoadedState) {
+          emit(currentState.copyWith(groups: groups));
+        } else {
+          emit(WishlistLoadedState(items: const [], groups: groups));
+        }
         return;
       }
 
@@ -538,7 +685,10 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         }
       }
 
-      emit(WishlistLoadedState(items: mapped));
+      // Load groups after loading items
+      final groups = await _loadGroupsAndGetList();
+      
+      emit(WishlistLoadedState(items: mapped, groups: groups));
       debugPrint('✅ Wishlist: Loaded ${mapped.length} items from API');
     } catch (e, stackTrace) {
       debugPrint('❌ Wishlist sync error: $e');
@@ -551,13 +701,16 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint(
           '💡 Wishlist: Sync failed, keeping existing state with ${currentState.items.length} items',
         );
-        emit(WishlistLoadedState(items: currentState.items));
+        emit(WishlistLoadedState(items: currentState.items, groups: currentState.groups));
       } else if (currentState is WishlistActionPromptState) {
         // If popup is open, restore previous state
         debugPrint(
           '💡 Wishlist: Sync failed, restoring previous state from popup',
         );
-        emit(WishlistLoadedState(items: currentState.previousState.items));
+        emit(WishlistLoadedState(
+          items: currentState.previousState.items,
+          groups: currentState.previousState.groups,
+        ));
       } else {
         // If no existing state, try to restore from persisted state
         // HydratedCubit should handle this, but ensure we have loaded state
@@ -573,7 +726,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           emit(persistedState);
         } else {
           debugPrint('💡 Wishlist: No persisted state, using empty state');
-          emit(WishlistLoadedState(items: const []));
+          emit(WishlistLoadedState(items: const [], groups: const []));
         }
       }
     }
@@ -612,7 +765,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         }
 
         final items = [...currentItems, item];
-        final newState = WishlistLoadedState(items: items);
+        final currentGroups = s is WishlistLoadedState ? s.groups : const <WishlistGroup>[];
+        final newState = WishlistLoadedState(items: items, groups: currentGroups);
         emit(newState);
         debugPrint('✅ Wishlist: Item added to local state (unauthenticated)');
         return;
@@ -705,7 +859,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             // Add item to preserved state optimistically
             if (!preservedState.items.any((w) => w.id == item.id)) {
               final items = [...preservedState.items, item];
-              emit(WishlistLoadedState(items: items));
+              emit(WishlistLoadedState(items: items, groups: preservedState.groups));
             } else {
               emit(preservedState);
             }
@@ -742,13 +896,13 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           if (cur is WishlistLoadedState) {
             if (!cur.items.any((w) => w.id == item.id)) {
               final items = [...cur.items, item];
-              optimisticState = WishlistLoadedState(items: items);
+              optimisticState = WishlistLoadedState(items: items, groups: cur.groups);
               emit(optimisticState);
             }
           } else if (preservedState != null) {
             if (!preservedState.items.any((w) => w.id == item.id)) {
               final items = [...preservedState.items, item];
-              optimisticState = WishlistLoadedState(items: items);
+              optimisticState = WishlistLoadedState(items: items, groups: preservedState.groups);
               emit(optimisticState);
             } else {
               emit(preservedState);
@@ -810,19 +964,20 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           if (!cur.items.any((w) => w.id == item.id)) {
             debugPrint('💡 Wishlist: Adding item to local state as fallback');
             final items = [...cur.items, item];
-            emit(WishlistLoadedState(items: items));
+            emit(WishlistLoadedState(items: items, groups: cur.groups));
           }
         } else if (preservedState != null) {
           // Use preserved state and add item if not already there
           if (!preservedState.items.any((w) => w.id == item.id)) {
             final items = [...preservedState.items, item];
-            emit(WishlistLoadedState(items: items));
+            emit(WishlistLoadedState(items: items, groups: preservedState.groups));
           } else {
             emit(preservedState);
           }
         } else {
           // If state is not loaded, create new state with item
-          emit(WishlistLoadedState(items: [item]));
+          final currentGroups = cur is WishlistLoadedState ? cur.groups : const <WishlistGroup>[];
+          emit(WishlistLoadedState(items: [item], groups: currentGroups));
         }
       }
     }
@@ -842,7 +997,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             ? s.previousState.items
             : <WishlistItem>[];
         final items = currentItems.where((e) => e.id != productId).toList();
-        emit(WishlistLoadedState(items: items));
+        final currentGroups = s is WishlistLoadedState ? s.groups : const <WishlistGroup>[];
+        emit(WishlistLoadedState(items: items, groups: currentGroups));
         debugPrint(
           '✅ Wishlist: Item removed from local state (unauthenticated)',
         );
@@ -868,7 +1024,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       // Update local state optimistically (UI updates immediately)
       final items = currentItems.where((e) => e.id != productId).toList();
-      emit(WishlistLoadedState(items: items));
+      final currentGroups = s is WishlistLoadedState ? s.groups : const <WishlistGroup>[];
+      emit(WishlistLoadedState(items: items, groups: currentGroups));
 
       // Try DELETE by itemId first (preferred method as per API explorer)
       bool deleteSuccess = false;
@@ -957,6 +1114,39 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         '💡 Wishlist: Remove error occurred, but keeping optimistic removal',
       );
       // Don't sync from server as it might clear the entire list
+    }
+  }
+
+  Future<void> _removeByItemId(int itemId) async {
+    try {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, cannot remove by itemId');
+        return;
+      }
+
+      debugPrint('💖 Wishlist: Deleting by itemId: $itemId');
+      final response = await _wishlistService.deleteItemById(
+        namespace: _namespace,
+        apiVersion: _apiVersion,
+        itemId: itemId,
+      );
+
+      debugPrint(
+        '💖 Wishlist remove API response (by ID): success=${response.success}, message=${response.message}',
+      );
+
+      if (response.success == true) {
+        debugPrint('✅ Wishlist: Item removed successfully by ID');
+        // Reload groups to update item counts
+        await _loadGroups();
+      } else {
+        debugPrint('⚠️ Wishlist: Delete by itemId failed: ${response.message}');
+        throw Exception(response.message ?? 'Failed to remove item');
+      }
+    } catch (e) {
+      debugPrint('❌ Wishlist removeByItemId error: $e');
+      rethrow;
     }
   }
 
@@ -1165,41 +1355,40 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   @override
   WishlistState? fromJson(Map<String, dynamic> json) {
     try {
-      // Try to restore wishlist state from persisted data
+      // Helper functions
+      String? safeString(dynamic value) {
+        if (value == null) return null;
+        if (value is String) return value;
+        if (value is bool) return value.toString();
+        if (value is num) return value.toString();
+        return value.toString();
+      }
+
+      int? safeInt(dynamic value) {
+        if (value == null) return null;
+        if (value is int) return value;
+        if (value is String) return int.tryParse(value);
+        if (value is num) return value.toInt();
+        return null;
+      }
+
+      bool safeBool(dynamic value, {bool defaultValue = false}) {
+        if (value == null) return defaultValue;
+        if (value is bool) return value;
+        if (value is String) {
+          return value.toLowerCase() == 'true' || value == '1';
+        }
+        if (value is num) return value != 0;
+        return defaultValue;
+      }
+
+      // Restore items
+      List<WishlistItem> items = const [];
       if (json.containsKey('items') && json['items'] is List) {
         final itemsJson = json['items'] as List;
-        final items = itemsJson
+        items = itemsJson
             .map((item) {
               try {
-                // Helper function to safely convert dynamic to String?
-                String? safeString(dynamic value) {
-                  if (value == null) return null;
-                  if (value is String) return value;
-                  if (value is bool) return value.toString();
-                  if (value is num) return value.toString();
-                  return value.toString();
-                }
-
-                // Helper function to safely convert dynamic to int?
-                int? safeInt(dynamic value) {
-                  if (value == null) return null;
-                  if (value is int) return value;
-                  if (value is String) return int.tryParse(value);
-                  if (value is num) return value.toInt();
-                  return null;
-                }
-
-                // Helper function to safely convert dynamic to bool?
-                bool safeBool(dynamic value, {bool defaultValue = false}) {
-                  if (value == null) return defaultValue;
-                  if (value is bool) return value;
-                  if (value is String) {
-                    return value.toLowerCase() == 'true' || value == '1';
-                  }
-                  if (value is num) return value != 0;
-                  return defaultValue;
-                }
-
                 return WishlistItem(
                   id: safeInt(item['id']) ?? 0,
                   itemId: safeInt(item['itemId']),
@@ -1224,18 +1413,42 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
             })
             .whereType<WishlistItem>()
             .toList();
-
-        debugPrint(
-          '✅ Wishlist: Restored ${items.length} items from persisted state',
-        );
-        return WishlistLoadedState(items: items);
       }
-      // If no items, return empty loaded state
-      return WishlistLoadedState(items: const []);
+
+      // Restore groups
+      List<WishlistGroup> groups = const [];
+      if (json.containsKey('groups') && json['groups'] is List) {
+        final groupsJson = json['groups'] as List;
+        groups = groupsJson
+            .map((group) {
+              try {
+                return WishlistGroup(
+                  id: safeString(group['id']) ?? '',
+                  name: safeString(group['name']) ?? 'Unnamed Group',
+                  description: safeString(group['description']),
+                  isDefault: safeBool(group['isDefault'], defaultValue: false),
+                  itemCount: safeInt(group['itemCount']),
+                  createdAt: safeString(group['createdAt']),
+                  updatedAt: safeString(group['updatedAt']),
+                  userId: safeInt(group['userId']),
+                );
+              } catch (e) {
+                debugPrint('⚠️ Wishlist: Error parsing group from JSON: $e');
+                return null;
+              }
+            })
+            .whereType<WishlistGroup>()
+            .toList();
+      }
+
+      debugPrint(
+        '✅ Wishlist: Restored ${items.length} items and ${groups.length} groups from persisted state',
+      );
+      return WishlistLoadedState(items: items, groups: groups);
     } catch (e) {
       debugPrint('⚠️ Wishlist: Error restoring state from JSON: $e');
       // Return empty loaded state on error
-      return WishlistLoadedState(items: const []);
+      return WishlistLoadedState(items: const [], groups: const []);
     }
   }
 
@@ -1257,16 +1470,240 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
           };
         }).toList();
 
+        final groupsJson = state.groups.map((group) {
+          return {
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'isDefault': group.isDefault,
+            'itemCount': group.itemCount,
+            'createdAt': group.createdAt,
+            'updatedAt': group.updatedAt,
+            'userId': group.userId,
+          };
+        }).toList();
+
         debugPrint(
-          '✅ Wishlist: Persisting ${state.items.length} items to storage',
+          '✅ Wishlist: Persisting ${state.items.length} items and ${state.groups.length} groups to storage',
         );
-        return {'items': itemsJson};
+        return {
+          'items': itemsJson,
+          'groups': groupsJson,
+        };
       }
       // Don't persist other states (loading, error, etc.)
       return null;
     } catch (e) {
       debugPrint('⚠️ Wishlist: Error persisting state to JSON: $e');
       return null;
+    }
+  }
+
+  // Private group management implementations
+  Future<void> _loadGroups() async {
+    await _loadGroupsAndGetList();
+  }
+
+  Future<List<WishlistGroup>> _loadGroupsAndGetList() async {
+    try {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, skipping group load');
+        return const <WishlistGroup>[];
+      }
+
+      debugPrint('💖 Wishlist: Loading groups from server...');
+      final response = await _wishlistService.getAllGroups(
+        namespace: _namespace,
+        apiVersion: _apiVersion,
+      );
+
+      final groups = response.groups ?? [];
+      final mappedGroups = groups.map((group) {
+        return WishlistGroup(
+          id: group.id ?? '',
+          name: group.name ?? 'Unnamed Group',
+          description: group.description,
+          isDefault: group.isDefault ?? false,
+          itemCount: group.itemCount,
+          createdAt: group.createdAt,
+          updatedAt: group.updatedAt,
+          userId: group.userId,
+        );
+      }).toList();
+
+      // Update current state with groups (preserve items)
+      final currentState = state;
+      if (currentState is WishlistLoadedState) {
+        emit(currentState.copyWith(groups: mappedGroups));
+      } else if (currentState is! WishlistLoadingState) {
+        // Only emit if not loading (to avoid overriding loading state)
+        emit(WishlistLoadedState(
+          items: const [],
+          groups: mappedGroups,
+        ));
+      }
+
+      debugPrint('✅ Wishlist: Loaded ${mappedGroups.length} groups');
+      return mappedGroups;
+    } catch (e) {
+      debugPrint('❌ Wishlist: Error loading groups: $e');
+      // Return empty list on error, don't emit error state
+      return const <WishlistGroup>[];
+    }
+  }
+
+  Future<void> _createGroup(String name, {String? description}) async {
+    try {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, cannot create group');
+        emit(WishlistErrorState(
+          message: 'Please sign in to create a collection',
+        ));
+        return;
+      }
+
+      if (name.trim().isEmpty) {
+        emit(WishlistErrorState(message: 'Collection name cannot be empty'));
+        return;
+      }
+
+      emit(WishlistLoadingState());
+      debugPrint('💖 Wishlist: Creating group: $name');
+
+      final response = await _wishlistService.createGroup(
+        namespace: _namespace,
+        apiVersion: _apiVersion,
+        request: CreateWishlistGroupRequest(
+          name: name.trim(),
+          description: description?.trim(),
+        ),
+      );
+
+      debugPrint('💖 Wishlist: Create group response: success=${response.success}, data=${response.data}');
+
+      if (response.success == true) {
+        WishlistGroup newGroup;
+        
+        if (response.data != null) {
+          // Standard format with data object
+          newGroup = WishlistGroup(
+            id: response.data!.id?.toString() ?? '',
+            name: response.data!.name ?? name.trim(),
+            description: response.data!.description,
+            isDefault: response.data!.isDefault ?? false,
+            itemCount: 0,
+            createdAt: response.data!.createdAt,
+            userId: response.data!.userId,
+          );
+          debugPrint('✅ Wishlist: Group created with data object: ${newGroup.name}');
+        } else {
+          // API returns {success: true, group_id: X} format
+          // Reload groups to get the newly created group with full details
+          debugPrint('💡 Wishlist: Response has no data object, reloading groups to get full info');
+          
+          // Wait a bit for server to process
+          await Future.delayed(const Duration(milliseconds: 500));
+          
+          // Reload groups to get the newly created group
+          await _loadGroups();
+          
+          // Find the newly created group by name
+          final currentState = state;
+          WishlistGroup? foundGroup;
+          if (currentState is WishlistLoadedState) {
+            final allGroups = currentState.groups;
+            // Find groups with matching name, prefer the one with most recent created_at
+            final matchingGroups = allGroups.where((g) => g.name == name.trim()).toList();
+            if (matchingGroups.isNotEmpty) {
+              // Sort by created_at if available, otherwise take first
+              matchingGroups.sort((a, b) {
+                if (a.createdAt == null && b.createdAt == null) return 0;
+                if (a.createdAt == null) return 1;
+                if (b.createdAt == null) return -1;
+                return b.createdAt!.compareTo(a.createdAt!);
+              });
+              foundGroup = matchingGroups.first;
+              debugPrint('✅ Wishlist: Found newly created group: ${foundGroup.name} (id: ${foundGroup.id})');
+            }
+          }
+          
+          // If still not found, create a basic group object with the name
+          newGroup = foundGroup ?? WishlistGroup(
+            id: '', // Will be updated when groups are reloaded next time
+            name: name.trim(),
+            description: description?.trim(),
+            isDefault: false,
+            itemCount: 0,
+          );
+          
+          if (foundGroup == null) {
+            debugPrint('⚠️ Wishlist: Could not find newly created group, created basic object');
+          }
+        }
+
+        // Update current state with new group
+        final currentState = state;
+        if (currentState is WishlistLoadedState) {
+          // Check if group already exists (avoid duplicates)
+          final groupExists = currentState.groups.any((g) => g.id == newGroup.id && g.id.isNotEmpty);
+          if (!groupExists && newGroup.id.isNotEmpty) {
+            final updatedGroups = [...currentState.groups, newGroup];
+            emit(currentState.copyWith(groups: updatedGroups));
+            emit(WishlistSuccessState(
+              message: 'Collection created successfully',
+              previousState: currentState.copyWith(groups: updatedGroups),
+            ));
+          } else {
+            // Group already exists or ID is empty, reload to ensure we have latest data
+            await _loadGroups();
+            final updatedState = state;
+            if (updatedState is WishlistLoadedState) {
+              emit(WishlistSuccessState(
+                message: 'Collection created successfully',
+                previousState: updatedState,
+              ));
+            }
+          }
+        } else {
+          // If state is not loaded, ensure we have loaded state with the new group
+          if (newGroup.id.isNotEmpty) {
+            emit(WishlistLoadedState(
+              items: const [],
+              groups: [newGroup],
+            ));
+            final loadedState = state as WishlistLoadedState;
+            emit(WishlistSuccessState(
+              message: 'Collection created successfully',
+              previousState: loadedState,
+            ));
+          } else {
+            // If group ID is empty, reload groups to get proper state
+            await _loadGroups();
+            final updatedState = state;
+            if (updatedState is WishlistLoadedState) {
+              emit(WishlistSuccessState(
+                message: 'Collection created successfully',
+                previousState: updatedState,
+              ));
+            }
+          }
+        }
+
+        debugPrint('✅ Wishlist: Group created successfully: ${newGroup.name}');
+      } else {
+        emit(WishlistErrorState(
+          message: response.message ?? 'Failed to create collection',
+        ));
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ Wishlist: Error creating group: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      final errorMessage = ApiErrorUtils.getErrorMessage(e);
+      emit(WishlistErrorState(
+        message: 'Failed to create collection: $errorMessage',
+      ));
     }
   }
 }

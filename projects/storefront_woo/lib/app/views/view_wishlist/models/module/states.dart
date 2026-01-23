@@ -27,6 +27,29 @@ class WishlistItem {
   });
 }
 
+/// Simple wishlist group model for states
+class WishlistGroup {
+  final String id;
+  final String name;
+  final String? description;
+  final bool isDefault;
+  final int? itemCount;
+  final String? createdAt;
+  final String? updatedAt;
+  final int? userId;
+
+  WishlistGroup({
+    required this.id,
+    required this.name,
+    this.description,
+    this.isDefault = false,
+    this.itemCount,
+    this.createdAt,
+    this.updatedAt,
+    this.userId,
+  });
+}
+
 /// Saved/Wishlist states - mirrors Home states structure
 abstract class WishlistState {}
 
@@ -36,11 +59,21 @@ class WishlistLoadingState extends WishlistState {}
 
 class WishlistLoadedState extends WishlistState {
   final List<WishlistItem> items;
+  final List<WishlistGroup> groups;
 
-  WishlistLoadedState({required this.items});
+  WishlistLoadedState({
+    required this.items,
+    this.groups = const [],
+  });
 
-  WishlistLoadedState copyWith({List<WishlistItem>? items}) =>
-      WishlistLoadedState(items: items ?? this.items);
+  WishlistLoadedState copyWith({
+    List<WishlistItem>? items,
+    List<WishlistGroup>? groups,
+  }) =>
+      WishlistLoadedState(
+        items: items ?? this.items,
+        groups: groups ?? this.groups,
+      );
 }
 
 class WishlistErrorState extends WishlistState {
