@@ -508,6 +508,14 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
           : 0.0;
       final currencySymbol = _arguments['currencySymbol'] as String?;
       final currencyCode = _arguments['currencyCode'] as String?;
+      
+      // Get line items and shipping address from current state for order success screen
+      final List<CheckoutLineItem> lineItems = currentState is CheckoutLoadedState
+          ? currentState.lineItems
+          : const [];
+      final Map<String, dynamic>? orderSuccessShippingAddress = currentState is CheckoutLoadedState
+          ? (currentState.sameAsBilling ? currentState.billingAddress : currentState.shippingAddress)
+          : null;
 
       emit(CheckoutOrderCompletedState(
         orderId: response.orderId ?? 0,
@@ -516,6 +524,8 @@ class CheckoutViewModel extends BaseViewModelHydratedCubit<CheckoutState> {
         totalAmount: totalAmount + shippingCost,
         currencySymbol: currencySymbol,
         currencyCode: currencyCode,
+        lineItems: lineItems,
+        shippingAddress: orderSuccessShippingAddress,
       ));
     } catch (e, stackTrace) {
       debugPrint('❌ CheckoutViewModel: Error processing order: $e');

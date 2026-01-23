@@ -297,6 +297,8 @@ class CheckoutOrderCompletedState extends CheckoutState {
   final double totalAmount;
   final String? currencySymbol;
   final String? currencyCode;
+  final List<CheckoutLineItem> lineItems;
+  final Map<String, dynamic>? shippingAddress;
 
   CheckoutOrderCompletedState({
     required this.orderId,
@@ -305,6 +307,8 @@ class CheckoutOrderCompletedState extends CheckoutState {
     required this.totalAmount,
     this.currencySymbol,
     this.currencyCode,
+    this.lineItems = const [],
+    this.shippingAddress,
   });
 }
 

@@ -197,43 +197,48 @@ class CheckoutView
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OsmeaComponents.sizedBox(height: 48),
-          // Success Icon
-          OsmeaComponents.container(
-            alignment: Alignment.center,
-            child: OsmeaComponents.container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    iconBgStart.withOpacity(0.1),
-                    iconBgEnd.withOpacity(0.05),
-                  ],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_circle_rounded,
-                color: iconColor,
-                size: iconSize,
-              ),
-            ),
-          ),
-          OsmeaComponents.sizedBox(height: 28),
-          // Success Message
+          OsmeaComponents.sizedBox(height: 32),
+          // Success Icon and Title - Side by Side
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing24),
-            child: OsmeaComponents.text(
-              context.t.checkoutView.orderSuccess.title,
-              textStyle: OsmeaTextStyle.headlineSmall(
-                context,
-              ).copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
-              textAlign: TextAlign.center,
-              color: titleColor,
+            child: OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Success Icon - Smaller
+                OsmeaComponents.container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        iconBgStart.withValues(alpha: 0.1),
+                        iconBgEnd.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: iconColor,
+                    size: 32,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(width: 12),
+                // Success Message
+                Expanded(
+                  child: OsmeaComponents.text(
+                    context.t.checkoutView.orderSuccess.title,
+                    textStyle: OsmeaTextStyle.headlineSmall(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                    color: titleColor,
+                  ),
+                ),
+              ],
             ),
           ),
-          OsmeaComponents.sizedBox(height: 12),
+          OsmeaComponents.sizedBox(height: 8),
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing24),
             child: OsmeaComponents.text(
@@ -243,71 +248,77 @@ class CheckoutView
               color: descriptionColor,
             ),
           ),
-          OsmeaComponents.sizedBox(height: 40),
+          OsmeaComponents.sizedBox(height: 24),
           // Order Details Card
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-            padding: EdgeInsets.all(24),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: cardBgColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: cardBorderColor.withOpacity(0.3),
+                color: cardBorderColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Total Amount - Highlighted
-                Center(
-                  child: OsmeaComponents.container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          totalAmountBgStart.withOpacity(0.08),
-                          totalAmountBgEnd.withOpacity(0.03),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: OsmeaComponents.column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        OsmeaComponents.text(
-                          context.t.checkoutView.orderSuccess.totalAmount,
-                          textStyle: OsmeaTextStyle.bodySmall(context),
-                          color: totalLabelColor,
-                        ),
-                        OsmeaComponents.sizedBox(height: 8),
-                        OsmeaComponents.text(
-                          formattedTotal,
-                          textStyle: OsmeaTextStyle.headlineMedium(context)
-                              .copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                          color: totalAmountColor,
-                        ),
-                      ],
-                    ),
+                // Products Section
+                if (state.lineItems.isNotEmpty) ...[
+                  OsmeaComponents.text(
+                    'Products',
+                    textStyle: OsmeaTextStyle.bodySmall(context),
+                    color: _getColorFromConfig('order_success.detail_label_color', OsmeaColors.grayMaterial[400]!),
                   ),
+                  OsmeaComponents.sizedBox(height: 12),
+                  ...state.lineItems.map((item) => _buildProductItem(context, item)),
+                ],
+                
+                // Shipping Address Section
+                if (state.shippingAddress != null) ...[
+                  OsmeaComponents.sizedBox(height: 20),
+                  _buildShippingAddress(context, state.shippingAddress!),
+                ],
+              ],
+            ),
+          ),
+          OsmeaComponents.sizedBox(height: 20),
+          // Total Amount - Small at bottom
+          OsmeaComponents.container(
+            margin: EdgeInsets.symmetric(horizontal: context.spacing16),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  totalAmountBgStart.withValues(alpha: 0.08),
+                  totalAmountBgEnd.withValues(alpha: 0.03),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OsmeaComponents.text(
+                  context.t.checkoutView.orderSuccess.totalAmount,
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  color: totalLabelColor,
                 ),
-                OsmeaComponents.sizedBox(height: 20),
-                _buildOrderDetailRow(context, context.t.checkoutView.orderSuccess.orderId, '#${state.orderId}'),
-                // _buildOrderDetailRow(context, 'Order Key', state.orderKey),
-                _buildOrderDetailRow(
-                  context,
-                  context.t.checkoutView.orderSuccess.status,
-                  state.status.toUpperCase(),
-                  isStatus: true,
+                OsmeaComponents.text(
+                  formattedTotal,
+                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                  color: totalAmountColor,
                 ),
               ],
             ),
           ),
-          OsmeaComponents.sizedBox(height: 32),
+          OsmeaComponents.sizedBox(height: 24),
           // Action Button
           OsmeaComponents.container(
             margin: EdgeInsets.symmetric(horizontal: context.spacing16),
@@ -371,10 +382,10 @@ class CheckoutView
               ? OsmeaComponents.container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusBgColor.withOpacity(0.1),
+                    color: statusBgColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: statusBorderColor.withOpacity(0.3),
+                      color: statusBorderColor.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -395,6 +406,137 @@ class CheckoutView
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductItem(BuildContext context, CheckoutLineItem item) {
+    final productBgColor = _getColorFromConfig('order_success.product_background_color', OsmeaColors.grayMaterial[50]!);
+    final productTextColor = _getColorFromConfig('order_success.product_text_color', OsmeaColors.black);
+    final productLabelColor = _getColorFromConfig('order_success.product_label_color', OsmeaColors.grayMaterial[400]!);
+    
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: productBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: OsmeaColors.silver.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: OsmeaComponents.row(
+        children: [
+          // Product Image
+          OsmeaComponents.container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: OsmeaColors.grayMaterial[100],
+            ),
+            child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                ? OsmeaComponents.image(
+                    imageUrl: item.imageUrl!,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    borderRadius: BorderRadius.circular(8),
+                    variant: ImageVariant.normal,
+                    cacheWidth: 120,
+                    showLoadingIndicator: true,
+                    errorWidget: OsmeaComponents.center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: OsmeaColors.grayMaterial[400],
+                        size: 24,
+                      ),
+                    ),
+                  )
+                : OsmeaComponents.center(
+                    child: Icon(
+                      Icons.image_outlined,
+                      color: OsmeaColors.grayMaterial[400],
+                      size: 24,
+                    ),
+                  ),
+          ),
+          OsmeaComponents.sizedBox(width: 12),
+          // Product Info
+          OsmeaComponents.expanded(
+            child: OsmeaComponents.column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OsmeaComponents.text(
+                  item.name ?? 'Product',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: productTextColor,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                OsmeaComponents.sizedBox(height: 4),
+                OsmeaComponents.text(
+                  'Quantity: ${item.quantity}',
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    color: productLabelColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShippingAddress(BuildContext context, Map<String, dynamic> address) {
+    final addressLabelColor = _getColorFromConfig('order_success.detail_label_color', OsmeaColors.grayMaterial[400]!);
+    final addressValueColor = _getColorFromConfig('order_success.detail_value_color', OsmeaColors.black);
+    
+    final firstName = address['first_name'] as String? ?? '';
+    final lastName = address['last_name'] as String? ?? '';
+    final address1 = address['address_1'] as String? ?? '';
+    final address2 = address['address_2'] as String? ?? '';
+    final city = address['city'] as String? ?? '';
+    final state = address['state'] as String? ?? '';
+    final postcode = address['postcode'] as String? ?? '';
+    final country = address['country'] as String? ?? '';
+    
+    final fullAddress = [
+      if (firstName.isNotEmpty || lastName.isNotEmpty) '$firstName $lastName'.trim(),
+      if (address1.isNotEmpty) address1,
+      if (address2.isNotEmpty) address2,
+      if (city.isNotEmpty || state.isNotEmpty) [city, state].where((e) => e.isNotEmpty).join(', '),
+      if (postcode.isNotEmpty) postcode,
+      if (country.isNotEmpty) country,
+    ].where((e) => e.isNotEmpty).join('\n');
+    
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(bottom: 14),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OsmeaComponents.text(
+            'Shipping Address',
+            textStyle: OsmeaTextStyle.bodySmall(context),
+            color: addressLabelColor,
+          ),
+          OsmeaComponents.sizedBox(height: 6),
+          OsmeaComponents.text(
+            fullAddress,
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+              fontWeight: FontWeight.w500,
+              color: addressValueColor,
+              height: 1.4,
+            ),
+            maxLines: 6,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
