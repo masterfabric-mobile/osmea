@@ -478,6 +478,7 @@ class _UserAddressesViewState extends State<UserAddressesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: OsmeaColors.white,
       appBar: _buildAppBar(context),
       body: _isLoading
           ? UnifiedLoadingWidget(goRoute: widget.goRoute)
@@ -493,7 +494,7 @@ class _UserAddressesViewState extends State<UserAddressesView> {
         'Addresses',
         textStyle: OsmeaTextStyle.titleLarge(context),
       ),
-      backgroundColor: OsmeaColors.paperWhite,
+      backgroundColor: OsmeaColors.white,
       foregroundColor: OsmeaColors.thunder,
       elevation: 0,
       leading: OsmeaComponents.iconButton(
@@ -628,7 +629,7 @@ class _UserAddressesViewState extends State<UserAddressesView> {
       margin: EdgeInsets.only(bottom: context.spacing8),
       padding: EdgeInsets.all(context.spacing12),
       decoration: BoxDecoration(
-        color: OsmeaColors.paperWhite,
+        color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: OsmeaColors.silver,
