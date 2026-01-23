@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
@@ -32,6 +34,9 @@ import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -1233,6 +1238,77 @@ final GoRouter appRouter = GoRouter(
                   debugPrint('⚠️ Error syncing wishlist after login: $e');
                   // Don't block login if wishlist sync fails
                 }
+
+                // Load and cache user addresses after successful login
+                // This prevents slow API calls every time addresses are needed
+                // Note: We wait a bit after login to ensure backend has processed the user data
+                try {
+                  // Wait a short time for backend to process user data after login
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  
+                  debugPrint('📍 [ADDRESS CACHE] Loading user addresses for caching...');
+                  final usersManagerService = GetIt.I<OsmeaUsersManagerService>();
+                  
+                  // Try to fetch addresses with retry mechanism
+                  GetUserAddressesResponse? addressesResponse;
+                  int retryCount = 0;
+                  const maxRetries = 2;
+                  
+                  while (retryCount <= maxRetries) {
+                    try {
+                      addressesResponse = await usersManagerService.getUserAddresses();
+                      debugPrint('📍 [ADDRESS CACHE] API Response: ${addressesResponse.addresses.length} addresses received');
+                      
+                      // If we got addresses (even if 0), cache them
+                      // But if we got 0 and it's the first try, wait and retry once
+                      if (addressesResponse.addresses.isNotEmpty || retryCount > 0) {
+                        break; // Success or already retried
+                      }
+                      
+                      // If 0 addresses on first try, wait and retry
+                      if (retryCount == 0 && addressesResponse.addresses.isEmpty) {
+                        debugPrint('⚠️ [ADDRESS CACHE] Got 0 addresses on first try, waiting 1 second and retrying...');
+                        await Future.delayed(const Duration(seconds: 1));
+                        retryCount++;
+                        continue;
+                      }
+                    } catch (e) {
+                      debugPrint('⚠️ [ADDRESS CACHE] Error fetching addresses (attempt ${retryCount + 1}): $e');
+                      if (retryCount < maxRetries) {
+                        await Future.delayed(Duration(milliseconds: 500 * (retryCount + 1)));
+                        retryCount++;
+                        continue;
+                      }
+                      rethrow;
+                    }
+                    break;
+                  }
+                  
+                  if (addressesResponse != null) {
+                    // Cache addresses in local storage
+                    final storage = LocalStorageHelper();
+                    final addressesJson = jsonEncode(
+                      addressesResponse.addresses.map((addr) => addr.toJson()).toList(),
+                    );
+                    await storage.setItem('user_addresses_cache', addressesJson);
+                    final timestamp = DateTime.now().toIso8601String();
+                    await storage.setItem('user_addresses_cache_timestamp', timestamp);
+                    
+                    debugPrint('✅ [ADDRESS CACHE] User addresses cached successfully');
+                    debugPrint('   📦 Cached ${addressesResponse.addresses.length} addresses');
+                    debugPrint('   🕐 Cache timestamp: $timestamp');
+                    debugPrint('   💾 Cache key: user_addresses_cache');
+                  }
+                  
+                  // Cache order addresses in background (this is slow, so don't block login)
+                  // Order addresses will be loaded from cache when user visits addresses page
+                  _cacheOrdersInBackground(usersManagerService);
+                } catch (e, stackTrace) {
+                  debugPrint('❌ [ADDRESS CACHE] Error caching user addresses after login: $e');
+                  debugPrint('   Stack trace: $stackTrace');
+                  // Don't block login if address caching fails
+                  // Addresses will be loaded when user visits the addresses page
+                }
               } else {
                 debugPrint('⚠️ No JWT token found in storage');
               }
@@ -1307,6 +1383,69 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
+/// Cache user orders in background after login
+/// This caches orders which can be used to extract addresses and for other purposes
+/// Note: This is a slow operation (many API calls), so it runs in background
+Future<void> _cacheOrdersInBackground(OsmeaUsersManagerService usersManagerService) async {
+  // Run in background without blocking
+  Future.microtask(() async {
+    try {
+      debugPrint('📍 [ORDER CACHE] Starting to cache user orders in background...');
+      
+      // Get order IDs from getUserDashboard
+      List<int> orderIds = [];
+      try {
+        final dashboard = await usersManagerService.getUserDashboard(
+          includeOrders: true,
+          ordersLimit: 100,
+        );
+        orderIds = dashboard.orders.map((o) => o.id).toList();
+        debugPrint('✅ [ORDER CACHE] Got ${orderIds.length} order IDs');
+      } catch (e) {
+        debugPrint('⚠️ [ORDER CACHE] Failed to get orders: $e');
+        return;
+      }
+
+      if (orderIds.isEmpty) {
+        debugPrint('⚠️ [ORDER CACHE] No orders found, caching empty list');
+        final storage = LocalStorageHelper();
+        await storage.setItem('user_orders_cache', jsonEncode([]));
+        await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
+        return;
+      }
+
+      // Fetch detailed order information (limit to 50 to avoid too many calls)
+      final List<Map<String, dynamic>> detailedOrders = [];
+      final limitedOrderIds = orderIds.take(50).toList();
+      
+      debugPrint('📦 [ORDER CACHE] Fetching ${limitedOrderIds.length} order details...');
+      
+      for (final orderId in limitedOrderIds) {
+        try {
+          final detailedOrder = await usersManagerService.getUserOrder(orderId);
+          // Convert to JSON for caching
+          detailedOrders.add(detailedOrder.toJson());
+        } catch (e) {
+          debugPrint('⚠️ [ORDER CACHE] Failed to retrieve order $orderId: $e');
+        }
+      }
+
+      // Cache the orders
+      final storage = LocalStorageHelper();
+      final ordersJson = jsonEncode(detailedOrders);
+      await storage.setItem('user_orders_cache', ordersJson);
+      await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
+      
+      debugPrint('✅ [ORDER CACHE] Cached ${detailedOrders.length} orders');
+      debugPrint('   💾 Cache key: user_orders_cache');
+    } catch (e, stackTrace) {
+      debugPrint('❌ [ORDER CACHE] Error caching orders: $e');
+      debugPrint('   Stack trace: $stackTrace');
+      // Don't throw - this is background operation
+    }
+  });
+}
 
 /// Get navbar colors from config
 Color _getNavbarColor(
