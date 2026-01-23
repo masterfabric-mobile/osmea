@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/checkout_view_model.dart';
 import 'package:storefront_woo/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_content_widget.dart';
+import 'package:storefront_woo/app/views/view_checkout/widgets/checkout_processing_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -122,13 +123,14 @@ class CheckoutView
       );
     }
 
-    if (state is CheckoutLoadingState ||
-        state is CheckoutProcessingOrderState) {
+    if (state is CheckoutProcessingOrderState) {
+      return const CheckoutProcessingWidget();
+    }
+
+    if (state is CheckoutLoadingState) {
       return UnifiedLoadingWidget(
         goRoute: goRoute,
-        loadingSteps: state is CheckoutProcessingOrderState
-            ? [context.t.checkoutView.loading.processingOrder, context.t.checkoutView.loading.creatingOrder]
-            : [context.t.checkoutView.loading.loadingCheckout],
+        loadingSteps: [context.t.checkoutView.loading.loadingCheckout],
       );
     }
 
