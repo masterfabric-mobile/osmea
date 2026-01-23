@@ -18,47 +18,19 @@ class SearchResultsGridWidget extends StatefulWidget {
 }
 
 class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
-  int _columnCount = 2; // Default to 2 columns
+  static const int _columnCount = 2; // Fixed to 2 columns
 
   @override
   Widget build(BuildContext context) {
     // Calculate item width based on column count
     final screenWidth = MediaQuery.of(context).size.width;
     final horizontalPadding = context.spacing20 * 2;
-    final spacing = _columnCount == 2 ? 15.0 : 12.0;
+    final spacing = 15.0;
     final totalSpacing = spacing * (_columnCount - 1);
     final itemWidth = (screenWidth - horizontalPadding - totalSpacing) / _columnCount;
 
     return Column(
       children: [
-        // Grid toggle button - aligned right
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.spacing20,
-            vertical: context.spacing8,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildIconButton(
-                    icon: Icons.grid_view,
-                    isActive: _columnCount == 2,
-                    onTap: () => setState(() => _columnCount = 2),
-                  ),
-                  SizedBox(width: context.spacing8),
-                  _buildIconButton(
-                    icon: Icons.apps,
-                    isActive: _columnCount == 3,
-                    onTap: () => setState(() => _columnCount = 3),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
         // Product grid with Wrap for proper alignment
         Expanded(
           child: SingleChildScrollView(
@@ -110,36 +82,6 @@ class _SearchResultsGridWidgetState extends State<SearchResultsGridWidget> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isActive ? OsmeaColors.black : OsmeaColors.snow,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive ? OsmeaColors.black : Colors.grey.shade300,
-              width: 1,
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
-          ),
-        ),
-      ),
     );
   }
 }

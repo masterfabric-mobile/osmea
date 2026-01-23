@@ -306,47 +306,14 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           ),
           OsmeaComponents.sizedBox(height: context.spacing16),
         ],
-        // Categories section with toggle button
+        // Categories section
         Padding(
           padding: EdgeInsets.only(right: context.spacing8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              OsmeaComponents.text(
-                context.t.searchView.sections.categories,
-                textStyle: OsmeaTextStyle.titleMedium(
-                  context,
-                ).copyWith(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildIconButton(
-                    icon: Icons.grid_view,
-                    isActive: !_isListView && _columnCount == 2,
-                    onTap: () => setState(() {
-                      _isListView = false;
-                      _columnCount = 2;
-                    }),
-                  ),
-                  SizedBox(width: context.spacing8),
-                  _buildIconButton(
-                    icon: Icons.apps,
-                    isActive: !_isListView && _columnCount == 3,
-                    onTap: () => setState(() {
-                      _isListView = false;
-                      _columnCount = 3;
-                    }),
-                  ),
-                  SizedBox(width: context.spacing8),
-                  _buildIconButton(
-                    icon: Icons.list,
-                    isActive: _isListView,
-                    onTap: () => setState(() => _isListView = true),
-                  ),
-                ],
-              ),
-            ],
+          child: OsmeaComponents.text(
+            context.t.searchView.sections.categories,
+            textStyle: OsmeaTextStyle.titleMedium(
+              context,
+            ).copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
@@ -396,35 +363,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
     );
   }
 
-  Widget _buildIconButton({
-    required IconData icon,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isActive ? OsmeaColors.black : OsmeaColors.snow,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive ? OsmeaColors.black : Colors.grey.shade300,
-              width: 1,
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _BrandCard extends StatelessWidget {
