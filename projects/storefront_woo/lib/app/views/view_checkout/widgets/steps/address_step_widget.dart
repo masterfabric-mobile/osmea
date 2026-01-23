@@ -813,10 +813,6 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: widget.sameAsBilling ? activeColor : inactiveColor.withOpacity(0.3),
-            width: 1.5,
-          ),
         ),
         child: Row(
           children: [

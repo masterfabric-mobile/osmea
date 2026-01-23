@@ -827,7 +827,7 @@ class SummaryStepWidget extends StatelessWidget {
                           ),
                           SizedBox(width: context.spacing8),
                           Text(
-                            context.t.checkoutView.buttons.placeOrder,
+                            context.t.checkoutView.buttons.completeOrder,
                             style: OsmeaTextStyle.titleMedium(context).copyWith(
                               color: buttonTextColor,
                               fontWeight: FontWeight.w600,
