@@ -617,6 +617,9 @@ class TranslationsCheckoutViewMessagesEn {
 
 	/// en: 'Please select a payment method'
 	String get selectPaymentMethod => 'Please select a payment method';
+
+	/// en: 'Please select an address or add a new one'
+	String get selectAddress => 'Please select an address or add a new one';
 }
 
 // Path: favoriteCategoriesView.appBar
@@ -1603,6 +1606,7 @@ extension on Translations {
 			'checkoutView.messages.fillRequiredFields' => 'Please fill in all required fields',
 			'checkoutView.messages.selectShippingMethod' => 'Please select a shipping method',
 			'checkoutView.messages.selectPaymentMethod' => 'Please select a payment method',
+			'checkoutView.messages.selectAddress' => 'Please select an address or add a new one',
 			'favoriteCategoriesView.appBar.title' => 'Favorite Categories',
 			'favoriteCategoriesView.remove.title' => 'Removed from favorites',
 			'favoriteCategoriesView.remove.message' => 'Category was removed from your favorites',

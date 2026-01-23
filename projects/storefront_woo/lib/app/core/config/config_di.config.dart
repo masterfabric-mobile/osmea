@@ -49,12 +49,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i819.ProductDetailViewModel>(
       () => _i819.ProductDetailViewModel(),
     );
+    gh.factory<_i245.OrderDetailViewModel>(() => _i245.OrderDetailViewModel());
     gh.factory<_i867.HomeViewModel>(() => _i867.HomeViewModel());
     gh.factory<_i845.OrdersHistoryViewModel>(
       () => _i845.OrdersHistoryViewModel(),
     );
     gh.factory<_i439.CheckoutViewModel>(() => _i439.CheckoutViewModel());
-    gh.factory<_i245.OrderDetailViewModel>(() => _i245.OrderDetailViewModel());
     return this;
   }
 }

@@ -617,6 +617,9 @@ class TranslationsCheckoutViewMessagesEn {
 
 	/// en: 'Please select a payment method'
 	String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectPaymentMethod', {}) ?? 'Please select a payment method';
+
+	/// en: 'Please select an address or add a new one'
+	String get selectAddress => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectAddress', {}) ?? 'Please select an address or add a new one';
 }
 
 // Path: favoriteCategoriesView.appBar
@@ -1075,9 +1078,6 @@ class TranslationsCartViewWidgetsOrderSummaryEn {
 
 	/// en: 'Error starting checkout: {error}'
 	String get checkoutError => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.checkoutError', {}) ?? 'Error starting checkout: {error}';
-
-	/// en: 'I accept the terms and conditions'
-	String get acceptAgreements => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.acceptAgreements', {}) ?? 'I accept the terms and conditions';
 }
 
 // Path: cartView.widgets.coupon
@@ -1534,7 +1534,6 @@ extension on Translations {
 			'cartView.widgets.orderSummary.total' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.total', {}) ?? 'Total',
 			'cartView.widgets.orderSummary.checkout' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.checkout', {}) ?? 'Checkout',
 			'cartView.widgets.orderSummary.checkoutError' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.checkoutError', {}) ?? 'Error starting checkout: {error}',
-			'cartView.widgets.orderSummary.acceptAgreements' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.orderSummary.acceptAgreements', {}) ?? 'I accept the terms and conditions',
 			'cartView.widgets.coupon.inputHint' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.coupon.inputHint', {}) ?? 'Discount code',
 			'cartView.widgets.coupon.apply' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.coupon.apply', {}) ?? 'Apply',
 			'cartView.widgets.coupon.removeTooltip' => TranslationOverrides.string(_root.$meta, 'cartView.widgets.coupon.removeTooltip', {}) ?? 'Remove coupon',
@@ -1607,6 +1606,7 @@ extension on Translations {
 			'checkoutView.messages.fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.fillRequiredFields', {}) ?? 'Please fill in all required fields',
 			'checkoutView.messages.selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectShippingMethod', {}) ?? 'Please select a shipping method',
 			'checkoutView.messages.selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectPaymentMethod', {}) ?? 'Please select a payment method',
+			'checkoutView.messages.selectAddress' => TranslationOverrides.string(_root.$meta, 'checkoutView.messages.selectAddress', {}) ?? 'Please select an address or add a new one',
 			'favoriteCategoriesView.appBar.title' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.appBar.title', {}) ?? 'Favorite Categories',
 			'favoriteCategoriesView.remove.title' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.remove.title', {}) ?? 'Removed from favorites',
 			'favoriteCategoriesView.remove.message' => TranslationOverrides.string(_root.$meta, 'favoriteCategoriesView.remove.message', {}) ?? 'Category was removed from your favorites',

@@ -165,7 +165,8 @@
         "messages": {
             "fillRequiredFields": "Please fill in all required fields",
             "selectShippingMethod": "Please select a shipping method",
-            "selectPaymentMethod": "Please select a payment method"
+            "selectPaymentMethod": "Please select a payment method",
+            "selectAddress": "Please select an address or add a new one"
         }
     },
     "favoriteCategoriesView": {
