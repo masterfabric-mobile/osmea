@@ -192,13 +192,24 @@ class OrderDetailView
               ),
             ),
             OsmeaComponents.sizedBox(width: context.spacing12),
-            OsmeaComponents.chips(
-              text: status,
-              variant: ChipsVariant.custom,
-              style: ChipsStyle.normal,
-              size: ChipsSize.small,
-              backgroundColor: statusConfig['background_color'] as Color,
-              textColor: statusConfig['text_color'] as Color,
+            // Status Badge with color - same styling as order history
+            OsmeaComponents.container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.spacing10,
+                vertical: context.spacing6,
+              ),
+              decoration: BoxDecoration(
+                color: statusConfig['background_color'] as Color,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: OsmeaComponents.text(
+                status,
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                  color: statusConfig['text_color'] as Color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10,
+                ),
+              ),
             ),
           ],
         ),
@@ -597,84 +608,66 @@ class OrderDetailView
 
 
   Map<String, dynamic> _getStatusBadgeConfig(BuildContext context, String status) {
-    final configHelper = AssetConfigHelper();
-    final statusLower = status.toLowerCase();
-    
-    final statusKey = statusLower.replaceAll('-', '_');
-    final bgColorKey = 'orders_history_view.status_badge.colors.$statusKey.background';
-    final textColorKey = 'orders_history_view.status_badge.colors.$statusKey.text';
-    
-    Color bgColor = _getColorFromConfig(bgColorKey, _getDefaultStatusColor(statusLower).withOpacity(0.1));
-    Color textColor = _getColorFromConfig(textColorKey, _getDefaultStatusColor(statusLower));
-    
-    if (bgColor == _getDefaultStatusColor(statusLower).withOpacity(0.1)) {
-      bgColor = _getColorFromConfig(
-        'orders_history_view.status_badge.colors.default.background',
-        bgColor,
-      );
-    }
-    if (textColor == _getDefaultStatusColor(statusLower)) {
-      textColor = _getColorFromConfig(
-        'orders_history_view.status_badge.colors.default.text',
-        textColor,
-      );
-    }
+    // Use the same color logic as order history view
+    final statusColors = _getStatusColors(status);
     
     return {
-      'background_color': bgColor,
-      'text_color': textColor,
-      'border_radius': configHelper.getDouble(
-        'orders_history_view.status_badge.borderRadius',
-        8.0,
-      ),
-      'padding_horizontal': configHelper.getDouble(
-        'orders_history_view.status_badge.padding_horizontal',
-        8.0,
-      ),
-      'padding_vertical': configHelper.getDouble(
-        'orders_history_view.status_badge.padding_vertical',
-        4.0,
-      ),
-      'font_size': configHelper.getDouble(
-        'orders_history_view.status_badge.fontSize',
-        12.0,
-      ),
+      'background_color': statusColors['background'] as Color,
+      'text_color': statusColors['text'] as Color,
     };
   }
 
-  Color _getDefaultStatusColor(String status) {
+  /// Get status colors based on order status - same as order history view
+  Map<String, Color> _getStatusColors(String status) {
+    // Normalize status - handle both 'on-hold' and 'on_hold' formats
+    final statusLower = status.toLowerCase().replaceAll('_', '-');
+
+    // Get default colors directly - same as order history view
+    Color bgColor = _getDefaultStatusBackgroundColor(statusLower);
+    Color textColor = _getDefaultStatusTextColor(statusLower);
+
+    return {'background': bgColor, 'text': textColor};
+  }
+
+  /// Get default background color for status - same as order history view
+  Color _getDefaultStatusBackgroundColor(String status) {
     switch (status) {
       case 'completed':
+        return OsmeaColors.forestHeart.withValues(alpha: 0.15);
       case 'processing':
-        return OsmeaColors.forestHeart;
+        return OsmeaColors.blue.withValues(alpha: 0.15);
       case 'pending':
+        return OsmeaColors.sunsetGlow.withValues(alpha: 0.15);
       case 'on-hold':
-        return OsmeaColors.sunsetGlow;
+        return OsmeaColors.amberFlame.withValues(alpha: 0.15);
       case 'cancelled':
       case 'refunded':
       case 'failed':
-        return OsmeaColors.amberFlame;
+        return OsmeaColors.red.withValues(alpha: 0.15);
       default:
-        return OsmeaColors.pewter;
+        return OsmeaColors.grayMaterial[100] ??
+            OsmeaColors.pewter.withValues(alpha: 0.1);
     }
   }
 
-  Color _getColorFromConfig(String key, Color fallback) {
-    try {
-      final configHelper = AssetConfigHelper();
-      final colorString = configHelper.getString(key);
-      if (colorString.isNotEmpty && colorString.startsWith('#')) {
-        final hexString = colorString.substring(1);
-        if (hexString.length == 6) {
-          return Color(int.parse('FF$hexString', radix: 16));
-        } else if (hexString.length == 8) {
-          return Color(int.parse(hexString, radix: 16));
-        }
-      }
-    } catch (e) {
-      debugPrint('⚠️ Failed to load color $key: $e');
+  /// Get default text color for status - same as order history view
+  Color _getDefaultStatusTextColor(String status) {
+    switch (status) {
+      case 'completed':
+        return OsmeaColors.forestHeart;
+      case 'processing':
+        return OsmeaColors.blue;
+      case 'pending':
+        return OsmeaColors.sunsetGlow;
+      case 'on-hold':
+        return OsmeaColors.amberFlame;
+      case 'cancelled':
+      case 'refunded':
+      case 'failed':
+        return OsmeaColors.red;
+      default:
+        return OsmeaColors.pewter;
     }
-    return fallback;
   }
 
   String _formatDate(String dateString) {
@@ -694,9 +687,14 @@ class OrderDetailView
   }
 
   String _formatStatus(String status) {
-    return status.split('_').map((word) {
-      return word[0].toUpperCase() + word.substring(1).toLowerCase();
-    }).join(' ');
+    // Convert status to readable format - same as order history view
+    // Handle both underscore and hyphen separators
+    final parts = status.contains('_') ? status.split('_') : status.split('-');
+    return parts
+        .map((word) {
+          return word[0].toUpperCase() + word.substring(1).toLowerCase();
+        })
+        .join(' ');
   }
 
 }
