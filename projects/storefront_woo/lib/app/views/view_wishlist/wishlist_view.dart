@@ -148,42 +148,63 @@ class WishlistView
                    if (hasItems)
                      AppBarAction(
                        icon: Icon(Icons.delete_outline, color: iconColor),
-                       onPressed: () async {
-                         final confirmed = await OsmeaComponents.showPopup<bool>(
-                           context: context,
-                           variant: PopupVariant.dialog,
-                           title: context.t.wishlistView.removeAll.dialog.title,
-                           subtitle: context.t.wishlistView.removeAll.dialog.subtitle,
-                           padding: context.paddingNormal,
-                           child: OsmeaComponents.column(
-                             mainAxisSize: MainAxisSize.min,
-                             children: [
-                               OsmeaComponents.row(
-                                 children: [
-                                   OsmeaComponents.expanded(
-                                     child: OsmeaComponents.button(
-                                       text: context.t.wishlistView.removeAll.dialog.cancel,
-                                       variant: ButtonVariant.outlined,
-                                       onPressed: () =>
-                                           Navigator.of(context).pop(false),
-                                     ),
-                                   ),
-                                   OsmeaComponents.sizedBox(
-                                     width: context.spacing8,
-                                   ),
-                                   OsmeaComponents.expanded(
-                                     child: OsmeaComponents.button(
-                                       text: context.t.wishlistView.removeAll.dialog.confirm,
-                                       variant: ButtonVariant.primary,
-                                       onPressed: () =>
-                                           Navigator.of(context).pop(true),
-                                     ),
-                                   ),
-                                 ],
-                               ),
-                             ],
-                           ),
-                         );
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (dialogContext) => OsmeaComponents.popup(
+                            variant: PopupVariant.dialog,
+                            title: context.t.wishlistView.removeAll.dialog.title,
+                            subtitle: context.t.wishlistView.removeAll.dialog.subtitle,
+                            padding: context.paddingNormal,
+                            backgroundColor: OsmeaColors.white,
+                            titleStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                              color: OsmeaColors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            subtitleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                              color: OsmeaColors.black,
+                            ),
+                            showCloseButton: true,
+                            closeButtonIcon: Icon(
+                              Icons.close,
+                              color: OsmeaColors.black,
+                              size: 20,
+                            ),
+                            child: OsmeaComponents.column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                OsmeaComponents.row(
+                                  children: [
+                                    OsmeaComponents.expanded(
+                                      child: OsmeaComponents.button(
+                                        text: context.t.wishlistView.removeAll.dialog.cancel,
+                                        variant: ButtonVariant.outlined,
+                                        borderColor: OsmeaColors.black,
+                                        textColor: OsmeaColors.black,
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(false),
+                                      ),
+                                    ),
+                                    OsmeaComponents.sizedBox(
+                                      width: context.spacing8,
+                                    ),
+                                    OsmeaComponents.expanded(
+                                      child: OsmeaComponents.button(
+                                        text: context.t.wishlistView.removeAll.dialog.confirm,
+                                        variant: ButtonVariant.primary,
+                                        backgroundColor: OsmeaColors.black,
+                                        textColor: OsmeaColors.white,
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(true),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
 
                          if (confirmed == true) {
                            final previousState = state is WishlistLoadedState
