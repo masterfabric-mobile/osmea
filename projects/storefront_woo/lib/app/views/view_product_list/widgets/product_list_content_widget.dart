@@ -6,8 +6,6 @@
  * Includes filter chips at the top for active filters.
  */
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,28 +42,18 @@ class ProductListContentWidget extends StatefulWidget {
 class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollToTop = false;
-  bool _showFiltersBar = false;
   final AssetConfigHelper _configHelper = AssetConfigHelper();
-  late final TextEditingController _searchController;
-  late final FocusNode _searchFocusNode;
-  Timer? _searchDebounceTimer;
-  String _lastAppliedSearch = '';
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _searchController = TextEditingController(text: widget.viewModel.filters.search ?? '');
-    _searchFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    _searchDebounceTimer?.cancel();
     super.dispose();
   }
 
@@ -76,18 +64,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         _showScrollToTop = shouldShow;
       });
     }
-
-    // Filter/sort bar: show after a small scroll up (content moves up).
-    // Hysteresis prevents flicker near the threshold.
-    final offset = _scrollController.offset;
-    final shouldShowFilters = offset > 60
-        ? true
-        : (offset < 20 ? false : _showFiltersBar);
-    if (shouldShowFilters != _showFiltersBar) {
-      setState(() {
-        _showFiltersBar = shouldShowFilters;
-      });
-    }
   }
 
   void _scrollToTop() {
@@ -96,6 +72,26 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
+  }
+
+  /// Calculates the height of action buttons (sort/filter)
+  double _getActionButtonsHeight(BuildContext context) {
+    final verticalPadding = _configHelper.getDouble(
+      'product_list_view.component_spacing.vertical',
+      context.spacing12,
+    ) * 2; // top + bottom padding
+    final buttonHeight = context.spacing10 * 2 + context.iconSizeNormal; // vertical padding + icon size
+    return verticalPadding + buttonHeight;
+  }
+
+  /// Calculates the approximate height of filter chips
+  double _getFilterChipsHeight(BuildContext context) {
+    final verticalPadding = _configHelper.getDouble(
+      'product_list_view.component_spacing.vertical',
+      context.spacing12,
+    ) * 2; // top + bottom padding
+    final chipHeight = context.spacing32; // approximate chip height
+    return verticalPadding + chipHeight;
   }
 
   @override
@@ -156,37 +152,49 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                 SliverToBoxAdapter(
                   child: SizedBox(height: context.highValue * 1.5),
                 ),
-                SliverToBoxAdapter(child: _buildSearchBar(context)),
-                // Icon buttons for Sort by / Filters (scrolls away with content)
+                // Add padding for fixed sort/filter buttons and chips
                 SliverToBoxAdapter(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    switchInCurve: Curves.easeOut,
-                    switchOutCurve: Curves.easeIn,
-                    child: _showFiltersBar
-                        ? _buildActionButtons(context)
-                        : const SizedBox.shrink(),
+                  child: SizedBox(
+                    height: _getActionButtonsHeight(context) + 
+                        (_hasChipWorthyFilters() 
+                          ? _getFilterChipsHeight(context) 
+                          : 0) +
+                        context.spacing16,
                   ),
                 ),
-                // Active filter chips (scrolls away with content)
-                if (_hasChipWorthyFilters())
-                  SliverToBoxAdapter(
-                    child: OsmeaComponents.padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: _configHelper.getDouble(
-                          'product_list_view.component_spacing.horizontal',
-                          context.spacing20,
-                        ),
-                        vertical: _configHelper.getDouble(
-                          'product_list_view.component_spacing.vertical',
-                          context.spacing12,
-                        ),
-                      ),
-                      child: _buildActiveFilterChips(context),
-                    ),
-                  ),
                 // Product grid
                 _buildProductGridSliver(context),
+              ],
+            ),
+          ),
+        ),
+        // Fixed sort and filter buttons at the top
+        Positioned(
+          top: context.highValue * 1.5 - 15, // 10 pixels higher
+          left: 0,
+          right: 0,
+          child: Material(
+            color: OsmeaColors.white,
+            elevation: 2,
+            shadowColor: OsmeaColors.black.withValues(alpha: 0.1),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildActionButtons(context),
+                if (_hasChipWorthyFilters())
+                  OsmeaComponents.padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: _configHelper.getDouble(
+                        'product_list_view.component_spacing.horizontal',
+                        context.spacing20,
+                      ),
+                      vertical: _configHelper.getDouble(
+                        'product_list_view.component_spacing.vertical',
+                        context.spacing12,
+                      ),
+                    ),
+                    child: _buildActiveFilterChips(context),
+                  ),
               ],
             ),
           ),
@@ -267,84 +275,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    // Match HomeView's SearchBarWidget styling/config.
-    final searchConfig = _configHelper.getObject('home_view.search');
-    final placeholder =
-        searchConfig?['placeholder'] as String? ??
-        context.t.homeView.widgets.search.placeholder;
-    final variant = searchConfig?['variant'] as String? ?? 'outlined';
-
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        context.spacing16,
-        context.spacing20,
-        context.spacing16,
-      ),
-      child: OsmeaComponents.searchbar(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        hint: placeholder,
-        size: TextFieldSize.medium,
-        searchbarStyle: SearchbarStyle.minimal,
-        searchbarVariant: variant == 'outlined'
-            ? SearchbarVariant.outlined
-            : SearchbarVariant.borderless,
-        state: TextFieldState.enabled,
-        showSearchIcon: true,
-        showClearButton: true,
-        // User requested: don't show past searches.
-        showSuggestions: false,
-        backgroundColor: OsmeaColors.white,
-        borderColor: OsmeaColors.pewter,
-        focusColor: _configHelper.getSearchViewFocusColor(OsmeaColors.black),
-        textColor: OsmeaColors.thunder,
-        hintColor: OsmeaColors.pewter,
-        suggestionProvider: null,
-        onChanged: (query) {
-          final q = query.trim();
-          // Match SearchView-like behavior: don't search for 1-char queries,
-          // and debounce live filtering to avoid too many refreshes.
-          if (q == _lastAppliedSearch) return;
-          _searchDebounceTimer?.cancel();
-          _searchDebounceTimer = Timer(
-            const Duration(milliseconds: 350),
-            () {
-              // If user cleared input, clear filter immediately.
-              if (q.isEmpty) {
-                _applySearch('');
-                return;
-              }
-              if (q.length < 2) return;
-              _applySearch(q);
-            },
-          );
-        },
-        onSearch: (query) {
-          _applySearch(query);
-        },
-        onSubmitted: (query) {
-          _applySearch(query);
-        },
-        onClear: () {
-          _searchController.clear();
-          _applySearch('');
-        },
-      ),
-    );
-  }
-
-  void _applySearch(String query) {
-    final q = query.trim();
-    _lastAppliedSearch = q;
-    if (q.isEmpty) {
-      widget.viewModel.updateFilter(search: null);
-      return;
-    }
-
-    widget.viewModel.updateFilter(search: q);
-  }
 
   /// Builds icon buttons for Sort by / Filters
   Widget _buildActionButtons(BuildContext context) {
@@ -467,7 +397,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             border: Border.all(color: borderColor, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: shadowColor.withOpacity(shadowOpacity),
+                color: shadowColor.withValues(alpha: shadowOpacity),
                 blurRadius: shadowBlur,
                 offset: context.offsetVerticalCustom(shadowOffset),
                 spreadRadius: 0,
