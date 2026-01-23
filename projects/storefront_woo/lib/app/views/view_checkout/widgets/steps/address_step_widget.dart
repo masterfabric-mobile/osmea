@@ -73,6 +73,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   UserAddress? _selectedBillingAddress;
   bool _showManualForm = false;
   bool _isLoadingAddresses = true;
+  bool _showAllAddresses = false;
 
   @override
   void initState() {
@@ -281,6 +282,9 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                     configHelper,
                     title: context.t.checkoutView.sections.billingAddress,
                     icon: Icons.receipt_outlined,
+                    showMoreCount: !_showManualForm && _cachedAddresses.isNotEmpty && !_showAllAddresses && _cachedAddresses.length > 2
+                        ? _cachedAddresses.length - 2
+                        : null,
                   ),
                   
                   SizedBox(height: context.spacing12),
@@ -337,11 +341,15 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   }
 
   Widget _buildAddressList(BuildContext context, AssetConfigHelper configHelper) {
+    final displayedAddresses = _showAllAddresses 
+        ? _cachedAddresses 
+        : _cachedAddresses.take(2).toList();
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Address cards
-        ..._cachedAddresses.map((address) => Padding(
+        // Address cards (show first 2 or all)
+        ...displayedAddresses.map((address) => Padding(
           padding: EdgeInsets.only(bottom: context.spacing8),
           child: _buildAddressCard(context, configHelper, address),
         )),
@@ -513,6 +521,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
     AssetConfigHelper configHelper, {
     required String title,
     required IconData icon,
+    int? showMoreCount,
   }) {
     final iconBgColor = _getColorFromConfig(
       configHelper,
@@ -529,6 +538,11 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
       'section_header.title_color',
       OsmeaColors.black,
     );
+    final showMoreColor = _getColorFromConfig(
+      configHelper,
+      'section_header.show_more_color',
+      OsmeaColors.grayMaterial[600]!,
+    );
 
     return Row(
       children: [
@@ -541,13 +555,31 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
           child: Icon(icon, color: iconColor, size: 20),
         ),
         SizedBox(width: context.spacing12),
-        Text(
-          title,
-          style: OsmeaTextStyle.titleMedium(context).copyWith(
-            fontWeight: FontWeight.w600,
-            color: titleColor,
+        Expanded(
+          child: Text(
+            title,
+            style: OsmeaTextStyle.titleMedium(context).copyWith(
+              fontWeight: FontWeight.w600,
+              color: titleColor,
+            ),
           ),
         ),
+        if (showMoreCount != null && showMoreCount > 0)
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _showAllAddresses = true;
+              });
+            },
+            child: Text(
+              'Show more ($showMoreCount)',
+              style: OsmeaTextStyle.bodySmall(context).copyWith(
+                color: showMoreColor,
+                fontWeight: FontWeight.w500,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
       ],
     );
   }
