@@ -38,17 +38,93 @@ import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_use
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
 
+/// Custom ErrorHandlingView for route errors
+/// Shows route-specific error messages using app_config.json configuration
+class _RouteErrorHandlingView extends ErrorHandlingView {
+  final String errorPath;
+  final Exception? error;
+
+  _RouteErrorHandlingView({
+    required this.errorPath,
+    this.error,
+    required super.goRoute,
+    super.onGoHome,
+    super.onGoBack,
+  }) : super(
+          arguments: const {'routeError': true},
+        );
+
+  @override
+  Future<void> initialContent(viewModel, BuildContext context) async {
+    debugPrint('🎯 Route Error Handling View Start!');
+    debugPrint('📍 Error path: $errorPath');
+    debugPrint('❌ Error: $error');
+    
+    // Load error handling config from app_config.json
+    await viewModel.loadErrorHandlingConfig();
+
+    // Show route error with custom message
+    // Error message will be styled according to app_config.json configuration
+    final errorMessage = 'The route "$errorPath" could not be found. '
+        'Please check the URL and try again.';
+    
+    await viewModel.showError(
+      errorType: ErrorType.general,
+      errorMessage: errorMessage,
+      errorCode: 'ROUTE_NOT_FOUND',
+    );
+  }
+}
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: false, // Disable debug route bar to prevent freezing
+  // Deep linking support - redirect configuration
+  redirect: (BuildContext context, GoRouterState state) {
+    // Handle deep links and redirects here if needed
+    // For now, return null to allow normal navigation
+    return null;
+  },
+  // Error handling for deep links - uses ErrorHandlingView from core package
+  errorBuilder: (BuildContext context, GoRouterState state) {
+    debugPrint('⚠️ Route error: ${state.error} for path: ${state.uri.path}');
+    
+    // Use ErrorHandlingView from core package with app_config.json configuration
+    return ErrorHandlingProvider(
+      child: _RouteErrorHandlingView(
+        errorPath: state.uri.path,
+        error: state.error,
+        goRoute: (String path) {
+          if (path.contains('home') || path == '/home') {
+            context.go('/home');
+          } else {
+            context.go(path);
+          }
+        },
+        onGoHome: () => context.go('/home'),
+        onGoBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        },
+      ),
+    );
+  },
   // Global route configuration
   routes: <RouteBase>[
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
+        // Get navbar widget - always returns navbar if route should show it (config'de olsa da olmasa da)
+        final navbar = _getNavbarForRoute(state.uri.path, null);
+        
         return _AppShellWithMiniCart(
           child: child,
-          navbar: _getNavbarForRoute(state.uri.path),
+          navbar: navbar,
+          currentPath: state.uri.path,
+          routeExtra: null,
         );
       },
       routes: [
@@ -56,9 +132,17 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/home',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'home': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: HomeView(
-                arguments: const {'home': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('products')) {
                     context.go('/products');
@@ -80,35 +164,19 @@ final GoRouter appRouter = GoRouter(
           },
         ),
 
-        // Search Page
-        // GoRoute(
-        //   path: '/search',
-        //   pageBuilder: (BuildContext context, GoRouterState state) {
-        //     return CustomTransitionPage(
-        //       child: store_search.SearchView(
-        //         goRoute: (String path) {
-        //           if (path.contains('home')) {
-        //             context.go('/home');
-        //           } else if (path.contains('product-detail')) {
-        //             context.go('/product-detail');
-        //           } else {
-        //             context.go('/search');
-        //           }
-        //         },
-        //       ),
-        //       transitionsBuilder:
-        //           (context, animation, secondaryAnimation, child) {
-        //             return FadeTransition(opacity: animation, child: child);
-        //           },
-        //       transitionDuration: const Duration(milliseconds: 300),
-        //     );
-        //   },
-        // ),
 
         // Saved Page
         GoRoute(
           path: '/saved',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'saved': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: WishlistView(
                 goRoute: (String path) {
@@ -118,7 +186,7 @@ final GoRouter appRouter = GoRouter(
                     context.go('/saved');
                   }
                 },
-                arguments: const {'saved': true},
+                arguments: arguments,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -151,6 +219,8 @@ final GoRouter appRouter = GoRouter(
             // Extract query and fromHome flag from URL if present
             final query = state.uri.queryParameters['query'];
             final fromHome = state.uri.queryParameters['fromHome'] == 'true';
+            // Note: Search route shows navbar by default (it's a main navigation item)
+            // Navbar visibility is controlled by _getNavbarForRoute based on route path
 
             return CustomTransitionPage(
               child: _AutoFocusSearchView(
@@ -209,6 +279,7 @@ final GoRouter appRouter = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'cart': true,
+              'showNavbar': extra?['showNavbar'] ?? true,
               if (extra != null && extra.containsKey('cartToken'))
                 'cartToken': extra['cartToken'] as String?,
             };
@@ -252,7 +323,11 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (BuildContext context, GoRouterState state) {
             // Parse query parameters
             final queryParams = state.uri.queryParameters;
-            final arguments = <String, dynamic>{'products': true};
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = <String, dynamic>{
+              'products': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+            };
 
             // Add category_id from query parameters if present
             if (queryParams.containsKey('category_id')) {
@@ -305,9 +380,17 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/favorite-categories',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'favorite_categories': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: FavoriteCategoriesView(
-                arguments: const {'favorite_categories': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -339,6 +422,14 @@ final GoRouter appRouter = GoRouter(
             // This ensures profile data is always fresh (user can update their info)
             _loadUserApiData(accountCubit);
 
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'account': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+
             return CustomTransitionPage(
               child: BlocListener<AuthCubit, AuthState>(
                 bloc: authCubit,
@@ -356,7 +447,7 @@ final GoRouter appRouter = GoRouter(
                   }
                 },
                 child: AccountView(
-                  arguments: const {'account': true},
+                  arguments: arguments,
                   goRoute: (String path) {
                     debugPrint(
                       '🔀 AccountView: goRoute called with path: $path',
@@ -557,9 +648,16 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/user-profile',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'user_profile': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: UserProfileView(
-                arguments: const {'user_profile': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   debugPrint(
                     '🔀 UserProfileView: goRoute called with path: $path',
@@ -583,9 +681,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'edit',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'edit_profile': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserEditProfileView(
-                    arguments: const {'edit_profile': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -602,9 +707,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'addresses',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'addresses': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserAddressesView(
-                    arguments: const {'addresses': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -621,9 +733,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'settings',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'settings': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserSettingsView(
-                    arguments: const {'settings': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -640,9 +759,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'metadata',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'metadata': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserMetadataView(
-                    arguments: const {'metadata': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -659,9 +785,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'preferences',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'preferences': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserPreferencesView(
-                    arguments: const {'preferences': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -678,9 +811,16 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'contracts',
               pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'contracts': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
                 return CustomTransitionPage(
                   child: UserContractsView(
-                    arguments: const {'contracts': true},
+                    arguments: arguments,
                     goRoute: (String path) {
                       context.go(path);
                     },
@@ -702,9 +842,17 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (BuildContext context, GoRouterState state) {
             final orderId =
                 int.tryParse(state.pathParameters['orderId'] ?? '0') ?? 0;
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'order_detail': true,
+              'orderId': orderId,
+              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: OrderDetailView(
-                arguments: {'order_detail': true, 'orderId': orderId},
+                arguments: arguments,
                 goRoute: (String path) {
                   debugPrint(
                     '🔀 OrderDetailView: goRoute called with path: $path',
@@ -737,6 +885,7 @@ final GoRouter appRouter = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'productDetail': true,
+              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
               if (extra != null && extra.containsKey('cartToken'))
                 'cartToken': extra['cartToken'] as String?,
             };
@@ -774,7 +923,11 @@ final GoRouter appRouter = GoRouter(
           path: '/checkout',
           pageBuilder: (BuildContext context, GoRouterState state) {
             final extra = state.extra as Map<String, dynamic>?;
-            final arguments = {'checkout': true, if (extra != null) ...extra};
+            final arguments = {
+              'checkout': true,
+              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
+              if (extra != null) ...extra,
+            };
             return CustomTransitionPage(
               child: CheckoutView(
                 arguments: arguments,
@@ -1583,10 +1736,42 @@ double? _getNavbarDouble(AssetConfigHelper configHelper, String key) {
   return null;
 }
 
+/// Determines if navbar should be shown for a given route path
+/// Navbar is shown on all pages except auth, onboarding, campaign, and special pages
+bool _shouldShowNavbarForPath(String path) {
+  // Routes that should NOT show navbar (only special pages like auth, onboarding, etc.)
+  final hideNavbarRoutes = [
+    '/auth',            // Authentication pages
+    '/onboarding',      // Onboarding flow
+    '/campaign',        // Campaign splash
+    '/',                // Root/splash route
+    '/empty',           // Empty state pages
+    '/loading',         // Loading pages
+  ];
+  
+  // Check if path matches exactly or starts with any hide navbar route
+  for (final route in hideNavbarRoutes) {
+    if (path == route || path.startsWith('$route/')) {
+      debugPrint('🚫 Navbar hidden for route: $path (matches: $route)');
+      return false;
+    }
+  }
+  
+  // Default: show navbar for all other routes (including product-detail, checkout, order-detail, etc.)
+  debugPrint('✅ Navbar shown for route: $path');
+  return true;
+}
+
 /// Get navbar for specific route
-/// Calculates currentIndex from navbar configuration
-Widget? _getNavbarForRoute(String location) {
-  // Load navbar config to determine if route should show navbar
+/// Always returns navbar widget if route should show navbar (config'de olsa da olmasa da)
+/// Calculates currentIndex from navbar configuration or uses fallback
+Widget? _getNavbarForRoute(String location, Map<String, dynamic>? routeExtra) {
+  // First check if route should show navbar
+  if (!_shouldShowNavbarForPath(location)) {
+    return null;
+  }
+
+  // Load navbar config
   try {
     final configHelper = AssetConfigHelper();
     final navbarConfig = configHelper.getObject('navbar_configuration');
@@ -1596,66 +1781,37 @@ Widget? _getNavbarForRoute(String location) {
     }
 
     final itemsList = navbarConfig?['items'] as List<dynamic>?;
-    if (itemsList == null || itemsList.isEmpty) {
-      // Fallback to hardcoded check
-      return _getNavbarForRouteFallback(location);
-    }
+    final List<NavbarItemModel> itemModels = itemsList != null && itemsList.isNotEmpty
+        ? itemsList
+            .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
+            .toList()
+        : [];
 
-    // Parse items and find matching route
-    final List<NavbarItemModel> itemModels = itemsList
-        .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
-        .toList();
-
-    // Check if location matches any navbar route
-    bool shouldShowNavbar = false;
+    // Try to find currentIndex from config
     int? currentIndex;
-
-    for (final model in itemModels) {
-      // Check standard route
-      if (location == model.route) {
-        shouldShowNavbar = true;
-        currentIndex = model.orderId;
-        break;
-      }
-      // Check conditional routes
-      if (model.isConditional) {
-        if (location == model.authRoute || location == model.guestRoute) {
-          shouldShowNavbar = true;
+    
+    if (itemModels.isNotEmpty) {
+      for (final model in itemModels) {
+        // Check standard route
+        if (location == model.route) {
           currentIndex = model.orderId;
           break;
         }
-      }
-    }
-
-    // Also check common routes for backward compatibility
-    if (!shouldShowNavbar) {
-      if (location == '/home' ||
-          location == '/search' ||
-          location == '/cart' ||
-          location == '/saved' ||
-          location == '/profile' ||
-          location == '/auth') {
-        shouldShowNavbar = true;
-        // Find index from config or use fallback
-        for (final model in itemModels) {
-          if (location == model.route ||
-              location == model.authRoute ||
-              location == model.guestRoute) {
+        // Check conditional routes
+        if (model.isConditional) {
+          if (location == model.authRoute || location == model.guestRoute) {
             currentIndex = model.orderId;
             break;
           }
         }
-        // Fallback to hardcoded if not found in config
-        currentIndex ??= _getFallbackIndex(location);
       }
     }
 
-    if (!shouldShowNavbar || currentIndex == null) {
-      return null;
-    }
-
-    // currentIndex is guaranteed to be non-null after the check above
-    final finalCurrentIndex = currentIndex;
+    // If not found in config, try fallback index or use default
+    // _getFallbackIndex always returns a value (defaults to 0), so currentIndex will never be null
+    final finalCurrentIndex = currentIndex != null 
+        ? currentIndex 
+        : _getFallbackIndex(location);
 
     // Return a Builder widget to access context
     // Use BlocBuilder with optimized buildWhen to prevent rebuild loops
@@ -1905,12 +2061,28 @@ Widget? _getNavbarForRoute(String location) {
 
 /// Fallback navbar route check if config fails
 Widget? _getNavbarForRouteFallback(String location) {
-  // Show navbar only for main app sections
+  // Check if route should show navbar
+  final shouldShow = _shouldShowNavbarForPath(location);
+  if (!shouldShow) {
+    return null;
+  }
+  
+  // Show navbar for main app sections and other routes that should show navbar
   if (location == '/home' ||
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/profile') {
+      location == '/profile' ||
+      location.startsWith('/products') ||
+      location.startsWith('/product-detail') ||
+      location.startsWith('/checkout') ||
+      location.startsWith('/order-detail') ||
+      location.startsWith('/user-profile') ||
+      location.startsWith('/favorite-categories') ||
+      location.startsWith('/orders-history') ||
+      location == '/about' ||
+      location == '/contact-us' ||
+      location == '/faq') {
     final currentIndex = _getFallbackIndex(location);
 
     // Return a Builder widget to access context
@@ -2579,12 +2751,19 @@ class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
   }
 }
 
-/// App shell with mini cart drawer and floating button
+/// App shell wrapper with navbar visibility control and deep linking support
 class _AppShellWithMiniCart extends StatefulWidget {
   final Widget child;
   final Widget? navbar;
+  final String currentPath;
+  final Map<String, dynamic>? routeExtra;
 
-  const _AppShellWithMiniCart({required this.child, this.navbar});
+  const _AppShellWithMiniCart({
+    required this.child,
+    this.navbar,
+    required this.currentPath,
+    this.routeExtra,
+  });
 
   @override
   State<_AppShellWithMiniCart> createState() => _AppShellWithMiniCartState();
@@ -2593,6 +2772,11 @@ class _AppShellWithMiniCart extends StatefulWidget {
 class _AppShellWithMiniCartState extends State<_AppShellWithMiniCart> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: widget.child, bottomNavigationBar: widget.navbar);
+    // Navbar visibility is already determined in ShellRoute builder
+    // If navbar is null, it means the route shouldn't show navbar
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: widget.navbar,
+    );
   }
 }
