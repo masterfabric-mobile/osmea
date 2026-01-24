@@ -46,6 +46,7 @@ class ProductCardWidget extends StatefulWidget {
 class _ProductCardWidgetState extends State<ProductCardWidget> {
   PageController? _pageController;
   int _currentImageIndex = 0;
+  bool _isAddingToCart = false;
 
   @override
   void initState() {
@@ -225,7 +226,9 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                   size: context.iconSizeExtraSmall,
                                   color: OsmeaColors.white,
                                 ),
-                                OsmeaComponents.sizedBox(width: context.spacing4),
+                                OsmeaComponents.sizedBox(
+                                  width: context.spacing4,
+                                ),
                                 OsmeaComponents.text(
                                   'WEEK STAR',
                                   textStyle: OsmeaTextStyle.bodySmall(context)
@@ -278,7 +281,9 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                   size: context.iconSizeExtraSmall,
                                   color: OsmeaColors.black,
                                 ),
-                                OsmeaComponents.sizedBox(width: context.spacing4),
+                                OsmeaComponents.sizedBox(
+                                  width: context.spacing4,
+                                ),
                                 OsmeaComponents.text(
                                   flashLabel,
                                   textStyle: OsmeaTextStyle.bodySmall(context)
@@ -513,19 +518,30 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                       if (widget.onAddToCart != null) ...[
                         OsmeaComponents.sizedBox(width: context.spacing8),
                         AnimatedButton(
-                          onPressed: () async {
-                            final needsOptions =
-                                product.hasOptions == true ||
-                                (product.variations?.isNotEmpty ?? false) ||
-                                (product.type?.toLowerCase() == 'variable');
+                          onPressed: _isAddingToCart
+                              ? null
+                              : () async {
+                                  final needsOptions =
+                                      product.hasOptions == true ||
+                                      (product.variations?.isNotEmpty ??
+                                          false) ||
+                                      (product.type?.toLowerCase() ==
+                                          'variable');
 
-                            if (needsOptions) {
-                              widget.onTap();
-                              return;
-                            }
+                                  if (needsOptions) {
+                                    widget.onTap();
+                                    return;
+                                  }
 
-                            await widget.onAddToCart?.call();
-                          },
+                                  setState(() => _isAddingToCart = true);
+                                  try {
+                                    await widget.onAddToCart?.call();
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _isAddingToCart = false);
+                                    }
+                                  }
+                                },
                           child: OsmeaComponents.container(
                             width: context.iconSizeNormal * 1.25,
                             height: context.iconSizeNormal * 1.25,
@@ -535,11 +551,25 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                 context.spacing24,
                               ),
                             ),
-                            child: Icon(
-                              Icons.add_shopping_cart_outlined,
-                              size: context.iconSizeExtraSmall,
-                              color: OsmeaColors.white,
-                            ),
+                            child: _isAddingToCart
+                                ? OsmeaComponents.center(
+                                    child: SizedBox(
+                                      width: context.iconSizeExtraSmall,
+                                      height: context.iconSizeExtraSmall,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              OsmeaColors.white,
+                                            ),
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.add_shopping_cart_outlined,
+                                    size: context.iconSizeExtraSmall,
+                                    color: OsmeaColors.white,
+                                  ),
                           ),
                         ),
                       ],
@@ -573,19 +603,30 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                       if (widget.onAddToCart != null) ...[
                         OsmeaComponents.sizedBox(width: context.spacing8),
                         AnimatedButton(
-                          onPressed: () async {
-                            final needsOptions =
-                                product.hasOptions == true ||
-                                (product.variations?.isNotEmpty ?? false) ||
-                                (product.type?.toLowerCase() == 'variable');
+                          onPressed: _isAddingToCart
+                              ? null
+                              : () async {
+                                  final needsOptions =
+                                      product.hasOptions == true ||
+                                      (product.variations?.isNotEmpty ??
+                                          false) ||
+                                      (product.type?.toLowerCase() ==
+                                          'variable');
 
-                            if (needsOptions) {
-                              widget.onTap();
-                              return;
-                            }
+                                  if (needsOptions) {
+                                    widget.onTap();
+                                    return;
+                                  }
 
-                            await widget.onAddToCart?.call();
-                          },
+                                  setState(() => _isAddingToCart = true);
+                                  try {
+                                    await widget.onAddToCart?.call();
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _isAddingToCart = false);
+                                    }
+                                  }
+                                },
                           child: OsmeaComponents.container(
                             width: context.iconSizeNormal * 1.25,
                             height: context.iconSizeNormal * 1.25,
@@ -595,11 +636,25 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                 context.spacing24,
                               ),
                             ),
-                            child: Icon(
-                              Icons.add_shopping_cart_outlined,
-                              size: context.iconSizeExtraSmall,
-                              color: OsmeaColors.white,
-                            ),
+                            child: _isAddingToCart
+                                ? OsmeaComponents.center(
+                                    child: SizedBox(
+                                      width: context.iconSizeExtraSmall,
+                                      height: context.iconSizeExtraSmall,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              OsmeaColors.white,
+                                            ),
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.add_shopping_cart_outlined,
+                                    size: context.iconSizeExtraSmall,
+                                    color: OsmeaColors.white,
+                                  ),
                           ),
                         ),
                       ],
