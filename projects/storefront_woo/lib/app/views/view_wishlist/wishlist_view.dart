@@ -333,6 +333,7 @@ class WishlistView
           ).copyWith(color: popupSubtitleColor),
           elevation: popupElevation,
           padding: context.paddingNormal,
+          showCloseButton: true,
           child: OsmeaComponents.column(
             mainAxisSize: MainAxisSize.min,
             children: [

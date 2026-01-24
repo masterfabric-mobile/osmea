@@ -616,54 +616,64 @@ class _PopupContentState extends State<_PopupContent>
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: context.popupHeaderPadding,
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (widget.popup.title != null)
-                  Text(
-                    widget.popup.title!,
-                    style: widget.popup.titleStyle ??
-                        Theme.of(context).textTheme.titleLarge,
-                  ),
-                if (widget.popup.subtitle != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.popup.subtitle!,
-                    style: widget.popup.subtitleStyle ??
-                        Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color:
-                                  Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                  ),
-                ],
-              ],
+    return Stack(
+      children: [
+        Container(
+          padding: context.popupHeaderPadding,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                width: 1,
+              ),
             ),
           ),
-          if (widget.popup.headerActions != null)
-            ...widget.popup.headerActions!,
-          if (widget.popup.showCloseButton)
-            IconButton(
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.popup.title != null)
+                      Text(
+                        widget.popup.title!,
+                        style: widget.popup.titleStyle ??
+                            Theme.of(context).textTheme.titleLarge,
+                      ),
+                    if (widget.popup.subtitle != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.popup.subtitle!,
+                        style: widget.popup.subtitleStyle ??
+                            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color:
+                                      Theme.of(context).textTheme.bodySmall?.color,
+                                ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (widget.popup.headerActions != null)
+                ...widget.popup.headerActions!,
+            ],
+          ),
+        ),
+        // Close button positioned at top-right corner
+        if (widget.popup.showCloseButton)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IconButton(
               onPressed: _dismiss,
               icon: widget.popup.closeButtonIcon ?? const Icon(Icons.close),
               iconSize: 20,
+              padding: EdgeInsets.all(8),
               visualDensity: VisualDensity.compact,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
