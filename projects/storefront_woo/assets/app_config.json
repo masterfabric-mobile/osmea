@@ -836,29 +836,29 @@
                 {
                     "id": 1,
                     "name": "MF Accessories",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
                     "route": "/products?brand=1"
                 },
                 {
                     "id": 2,
                     "name": "MF Apparel",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Apparel.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Apparel.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
                     "route": "/products?brand=2"
                 },
                 {
                     "id": 3,
                     "name": "MF Lifestyle",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Lifestyle.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Lifestyle.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
                     "route": "/products?brand=3"
                 },
                 {
                     "id": 4,
                     "name": "MF Stationery",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Stationery.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Stationery.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
                     "route": "/products?brand=4"
                 }
             ],
