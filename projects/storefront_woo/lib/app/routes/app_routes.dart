@@ -522,7 +522,7 @@ final GoRouter appRouter = GoRouter(
                         try {
                           final wishlistViewModel =
                               GetIt.I<WishlistViewModel>();
-                          wishlistViewModel.clearAll();
+                          await wishlistViewModel.clearAll();
                           debugPrint('✅ Route: Wishlist cleared');
                         } catch (e) {
                           debugPrint('⚠️ Route: Failed to clear wishlist: $e');

@@ -302,10 +302,70 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
     emit(prev);
   }
 
-  /// Clear all wishlist items (used when user signs out)
-  void clearAll() {
-    debugPrint('💖 Wishlist: Clearing all items (sign out)');
+  /// Clear all wishlist items (used when user signs out or remove all)
+  Future<void> clearAll() async {
+    debugPrint('💖 Wishlist: Clearing all items');
+    
+    // Get current items before clearing
+    final currentState = state;
+    final currentItems = currentState is WishlistLoadedState
+        ? currentState.items
+        : <WishlistItem>[];
+    
+    // Optimistically clear UI immediately
     emit(WishlistLoadedState(items: const [], groups: const []));
+    
+    // Delete all items from server in background
+    if (currentItems.isNotEmpty) {
+      final jwt = await _getJwtToken();
+      if (jwt != null && jwt.isNotEmpty) {
+        debugPrint('💖 Wishlist: Deleting ${currentItems.length} items from server');
+        
+        // Delete all items from server
+        for (final item in currentItems) {
+          try {
+            // Try to delete by itemId first (preferred method)
+            if (item.itemId != null) {
+              try {
+                await _wishlistService.deleteItemById(
+                  namespace: _namespace,
+                  apiVersion: _apiVersion,
+                  itemId: item.itemId!,
+                );
+                debugPrint('✅ Wishlist: Deleted item ${item.id} by itemId');
+                continue;
+              } catch (e) {
+                debugPrint('⚠️ Wishlist: Failed to delete item ${item.id} by itemId: $e');
+                // Fall through to try by productId
+              }
+            }
+            
+            // Fallback: delete by productId
+            try {
+              await _wishlistService.deleteItemByProduct(
+                namespace: _namespace,
+                apiVersion: _apiVersion,
+                request: DeleteWishlistItemRequest(
+                  productId: item.id,
+                  groupId: 0,
+                ),
+              );
+              debugPrint('✅ Wishlist: Deleted item ${item.id} by productId');
+            } catch (e) {
+              debugPrint('⚠️ Wishlist: Failed to delete item ${item.id} by productId: $e');
+              // Continue with other items even if one fails
+            }
+          } catch (e) {
+            debugPrint('❌ Wishlist: Error deleting item ${item.id}: $e');
+            // Continue with other items even if one fails
+          }
+        }
+        
+        debugPrint('✅ Wishlist: Finished deleting all items from server');
+      } else {
+        debugPrint('💡 Wishlist: Not authenticated, only cleared local state');
+      }
+    }
   }
 
   /// Sync local wishlist items to server after successful login

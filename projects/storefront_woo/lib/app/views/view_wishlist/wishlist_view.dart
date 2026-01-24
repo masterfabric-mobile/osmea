@@ -212,7 +212,7 @@ class WishlistView
                                : null;
                            final previousItems = previousState?.items ?? [];
 
-                           cubit.clearAll();
+                           await cubit.clearAll();
 
                            if (previousItems.isNotEmpty) {
                              context.showSnackbar(
