@@ -134,6 +134,14 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
     final hasProducts = widget.items.isNotEmpty;
     final hasGroups = _wishlistGroups.isNotEmpty;
     
+    // Default en başta olacak şekilde sıralama
+    final sortedGroups = List<WishlistGroup>.from(_wishlistGroups);
+    sortedGroups.sort((a, b) {
+      if (a.name == 'Default') return -1;
+      if (b.name == 'Default') return 1;
+      return 0;
+    });
+
     // Don't navigate to empty view if still loading categories
     if (!_isLoadingCategories && !hasCategories && !hasProducts) {
       // Navigate to empty view route
@@ -187,9 +195,9 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
                     height: 100,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _wishlistGroups.length,
+                      itemCount: sortedGroups.length,
                       itemBuilder: (context, index) {
-                        final group = _wishlistGroups[index];
+                        final group = sortedGroups[index];
                         return _buildCollectionCard(context, group);
                       },
                     ),
@@ -446,29 +454,105 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (bottomSheetContext) => OsmeaBottomSheet(
-        size: BottomSheetSize.large,
-        variant: BottomSheetVariant.modal,
-        title: group.name == 'Default' ? 'My Collection' : group.name,
-        headerActions: [
-          Icon(
-            Icons.folder_outlined,
-            color: OsmeaColors.black,
-            size: 24,
-          ),
-        ],
-        footer: OsmeaComponents.button(
-          text: 'Close',
-          variant: ButtonVariant.outlined,
-          onPressed: () => Navigator.of(bottomSheetContext).pop(),
-        ),
-        backgroundColor: OsmeaColors.white,
-        child: _CollectionDetailContent(
-          group: group,
-          groupId: groupId,
-          viewModel: widget.viewModel,
-          allItems: widget.items,
-        ),
+      builder: (bottomSheetContext) => StatefulBuilder(
+        builder: (context, setBottomSheetState) {
+          bool isDeleting = false;
+          
+          return OsmeaBottomSheet(
+            size: BottomSheetSize.large,
+            variant: BottomSheetVariant.modal,
+            title: group.name == 'Default' ? 'My Collection' : group.name,
+            headerActions: [
+              if (group.name != 'Default')
+                isDeleting 
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.delete_outline, color: OsmeaColors.red),
+                      onPressed: () async {
+                        final confirmed = await OsmeaComponents.showPopup<bool>(
+                          context: context,
+                          variant: PopupVariant.dialog,
+                          title: 'Delete Collection',
+                          subtitle: 'Are you sure you want to delete this collection?',
+                          padding: context.paddingNormal,
+                          child: OsmeaComponents.row(
+                            children: [
+                              OsmeaComponents.expanded(
+                                child: OsmeaComponents.button(
+                                  text: 'Cancel',
+                                  variant: ButtonVariant.outlined,
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                ),
+                              ),
+                              OsmeaComponents.sizedBox(width: context.spacing8),
+                              OsmeaComponents.expanded(
+                                child: OsmeaComponents.button(
+                                  text: 'Delete',
+                                  variant: ButtonVariant.primary,
+                                  backgroundColor: OsmeaColors.red,
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirmed == true) {
+                          setBottomSheetState(() => isDeleting = true);
+                          try {
+                            await widget.viewModel.deleteGroup(groupId);
+                            if (bottomSheetContext.mounted) {
+                              Navigator.of(bottomSheetContext).pop();
+                              context.showSnackbar(
+                                title: 'Deleted',
+                                message: 'Collection deleted successfully',
+                                type: SnackbarType.success,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                                duration: const Duration(seconds: 2),
+                              );
+                            }
+                          } catch (e) {
+                            setBottomSheetState(() => isDeleting = false);
+                            if (context.mounted) {
+                              context.showSnackbar(
+                                title: 'Error',
+                                message: 'Failed to delete collection',
+                                type: SnackbarType.error,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                                duration: const Duration(seconds: 2),
+                              );
+                            }
+                          }
+                        }
+                      },
+                    )
+              else
+                Icon(
+                  Icons.folder_outlined,
+                  color: OsmeaColors.black,
+                  size: 24,
+                ),
+            ],
+            footer: OsmeaComponents.button(
+              text: 'Close',
+              variant: ButtonVariant.outlined,
+              onPressed: () => Navigator.of(bottomSheetContext).pop(),
+            ),
+            backgroundColor: OsmeaColors.white,
+            child: _CollectionDetailContent(
+              group: group,
+              groupId: groupId,
+              viewModel: widget.viewModel,
+              allItems: widget.items,
+            ),
+          );
+        },
       ),
     );
   }

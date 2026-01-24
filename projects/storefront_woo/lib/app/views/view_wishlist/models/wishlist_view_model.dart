@@ -99,6 +99,7 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
   Future<void> loadGroups() => _loadGroups();
   Future<void> createGroup(String name, {String? description}) =>
       _createGroup(name, description: description);
+  Future<void> deleteGroup(int groupId) => _deleteGroup(groupId);
 
   /// Adds item to cart and then removes it from wishlist
   Future<void> addItemToCartAndRemoveFromWishlist(int productId) async {
@@ -1704,6 +1705,34 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       emit(WishlistErrorState(
         message: 'Failed to create collection: $errorMessage',
       ));
+    }
+  }
+
+  Future<void> _deleteGroup(int groupId) async {
+    try {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        debugPrint('💡 Wishlist: Not authenticated, cannot delete group');
+        throw Exception('Please sign in to delete a collection');
+      }
+
+      debugPrint('🗑️ Wishlist: Deleting group: $groupId');
+      final response = await _wishlistService.deleteGroup(
+        namespace: _namespace,
+        apiVersion: _apiVersion,
+        groupId: groupId,
+      );
+
+      if (response.success == true) {
+        debugPrint('✅ Wishlist: Group deleted successfully');
+        await _loadGroups();
+        return;
+      }
+
+      throw Exception(response.message ?? 'Failed to delete collection');
+    } catch (e) {
+      debugPrint('❌ Wishlist: Error deleting group ($groupId): $e');
+      rethrow;
     }
   }
 }
