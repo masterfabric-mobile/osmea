@@ -66,9 +66,69 @@ class ProductDetailView
   ) {
     // Success state (e.g., wishlist added)
     if (state is ProductDetailSuccessState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.toastSuccess(state.message);
-      });
+      // Don't show toast/snackbar if coming from favorites/saved page
+      final currentRoute = GoRouterState.of(context).uri.path;
+      final isOnSavedPage = currentRoute.contains('/saved') || 
+                           currentRoute.contains('/wishlist') || 
+                           currentRoute.contains('/favorites');
+      
+      // Also check arguments for 'saved' flag (when navigating from wishlist)
+      final isFromWishlist = arguments['saved'] == true || 
+                            arguments['fromWishlist'] == true;
+      
+      // Check GoRouter location history to see if we came from favorites
+      bool isFromSavedRoute = false;
+      try {
+        final router = GoRouter.of(context);
+        final location = router.routerDelegate.currentConfiguration.uri.path;
+        isFromSavedRoute = location.contains('/saved') || 
+                          location.contains('/wishlist') || 
+                          location.contains('/favorites');
+      } catch (e) {
+        // If we can't check router, try ModalRoute
+        final modalRoute = ModalRoute.of(context);
+        if (modalRoute != null) {
+          final previousRoute = modalRoute.settings.arguments;
+          if (previousRoute is Map) {
+            isFromSavedRoute = (previousRoute['saved'] == true) || 
+                             (previousRoute['fromWishlist'] == true);
+          }
+          // Also check route name if available
+          final routeName = modalRoute.settings.name;
+          if (routeName != null && (routeName.contains('/saved') || 
+                                    routeName.contains('/wishlist') || 
+                                    routeName.contains('/favorites'))) {
+            isFromSavedRoute = true;
+          }
+        }
+      }
+      
+      // Check if Navigator can pop and previous route was favorites
+      bool cameFromFavorites = false;
+      if (Navigator.of(context).canPop()) {
+        try {
+          final previousRoute = ModalRoute.of(context)?.settings.name ?? '';
+          cameFromFavorites = previousRoute.contains('/saved') || 
+                             previousRoute.contains('/wishlist') || 
+                             previousRoute.contains('/favorites');
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+      
+      // Only show toast if we're not on the saved page and not coming from wishlist
+      // Also check if we're currently viewing favorites page (even if route doesn't show it)
+      final shouldShowSnackbar = !isOnSavedPage && 
+                                 !isFromWishlist && 
+                                 !isFromSavedRoute && 
+                                 !cameFromFavorites;
+      
+      if (shouldShowSnackbar) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.toastSuccess(state.message);
+        });
+      }
+      
       return ProductDetailContentWidget(
         viewModel: viewModel,
         state: state.previousState,

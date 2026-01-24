@@ -37,11 +37,22 @@ class ProductImagesWidget extends StatefulWidget {
 class _ProductImagesWidgetState extends State<ProductImagesWidget> {
   late PageController _pageController;
   int _currentPage = 0;
+  late bool _localIsInWishlist; // Local state for immediate UI feedback
 
   @override
   void initState() {
     super.initState();
+    _localIsInWishlist = widget.isInWishlist; // Initialize from prop
     _pageController = PageController();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductImagesWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sync local state with prop when it changes from parent
+    if (oldWidget.isInWishlist != widget.isInWishlist) {
+      _localIsInWishlist = widget.isInWishlist;
+    }
   }
 
   @override
@@ -217,7 +228,15 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () => widget.viewModel.addProductToWishlistFire(widget.productId),
+                      onTap: () {
+                        // Immediately update local state for instant UI feedback
+                        setState(() {
+                          _localIsInWishlist = !_localIsInWishlist;
+                        });
+                        
+                        // Call the viewModel callback - it will show the success snackbar
+                        widget.viewModel.addProductToWishlistFire(widget.productId);
+                      },
                       borderRadius: BorderRadius.circular(20),
                       child: OsmeaComponents.container(
                         width: 40,
@@ -228,7 +247,7 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                         ),
                         child: OsmeaComponents.center(
                           child: Icon(
-                            widget.isInWishlist
+                            _localIsInWishlist
                                 ? Icons.favorite
                                 : Icons.favorite_outline,
                             color: OsmeaColors.black,

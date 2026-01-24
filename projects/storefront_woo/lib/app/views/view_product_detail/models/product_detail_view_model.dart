@@ -1198,15 +1198,26 @@ class ProductDetailViewModel
         '✅ ProductDetailViewModel: Wishlist toggled locally - now: $isNowInWishlistLocal (API sync in background)',
       );
 
-      // Show success message
-      emit(
-        ProductDetailSuccessState(
-          message: wasInWishlist
-              ? 'Product removed from wishlist'
-              : 'Product added to wishlist successfully!',
-          previousState: currentState.copyWith(isInWishlist: isNowInWishlistLocal),
-        ),
-      );
+      // Only emit success state if not coming from favorites/saved page
+      // Check arguments to see if we're navigating from wishlist
+      final isFromWishlist = _arguments['saved'] == true || 
+                            _arguments['fromWishlist'] == true;
+      
+      // Only show success message if not from wishlist page
+      if (!isFromWishlist) {
+        // Show success message
+        emit(
+          ProductDetailSuccessState(
+            message: wasInWishlist
+                ? 'Product removed from wishlist'
+                : 'Product added to wishlist successfully!',
+            previousState: currentState.copyWith(isInWishlist: isNowInWishlistLocal),
+          ),
+        );
+      } else {
+        // Just update state without showing success message
+        emit(currentState.copyWith(isInWishlist: isNowInWishlistLocal));
+      }
     } catch (e) {
       debugPrint('❌ ProductDetailViewModel: Failed to toggle wishlist: $e');
       final errorMessage = ApiErrorUtils.getErrorMessage(e);
