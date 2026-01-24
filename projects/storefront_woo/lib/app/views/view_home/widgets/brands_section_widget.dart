@@ -203,29 +203,32 @@ class BrandsSectionWidget extends StatelessWidget {
             width: context.borderWidth,
           ),
         ),
-        padding: EdgeInsets.all(context.spacing12),
+        padding: EdgeInsets.all(context.spacing20),
         child: displayImageUrl != null && displayImageUrl.isNotEmpty
-            ? OsmeaComponents.image(
-                imageUrl: displayImageUrl,
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.contain,
-                variant: ImageVariant.normal,
-                cacheWidth: 200,
-                showLoadingIndicator: true,
-                errorWidget: OsmeaComponents.container(
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(context.spacing8),
+                child: OsmeaComponents.image(
+                  imageUrl: displayImageUrl,
                   width: double.infinity,
                   height: double.infinity,
-                  color: OsmeaColors.grayMaterial[50],
-                  alignment: context.center,
-                  child: OsmeaComponents.text(
-                    brandName,
-                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
-                      fontWeight: FontWeight.w600,
-                      color: OsmeaColors.thunder,
+                  fit: BoxFit.cover,
+                  variant: ImageVariant.normal,
+                  cacheWidth: 400,
+                  showLoadingIndicator: true,
+                  errorWidget: OsmeaComponents.container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: OsmeaColors.grayMaterial[50],
+                    alignment: context.center,
+                    child: OsmeaComponents.text(
+                      brandName,
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.thunder,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               )
