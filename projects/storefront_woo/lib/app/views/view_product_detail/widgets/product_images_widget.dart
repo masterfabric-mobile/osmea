@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
-import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Modern widget for displaying product images with carousel and overlay actions
 class ProductImagesWidget extends StatefulWidget {
@@ -239,30 +238,6 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                       ),
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing6),
-                  // Share button - elegant
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _shareProduct(context),
-                      borderRadius: BorderRadius.circular(20),
-                      child: OsmeaComponents.container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.white.withValues(alpha: 0.9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: OsmeaComponents.center(
-                          child: Icon(
-                            Icons.share_outlined,
-                            color: OsmeaColors.black,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -485,33 +460,6 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
     }
     
     return OsmeaColors.white;
-  }
-
-  /// Shares product information
-  Future<void> _shareProduct(BuildContext context) async {
-    try {
-      final name = widget.productName ?? 'Product';
-      final shareText = '$name\n\n/product-detail/${widget.productId}';
-      
-      final success = await ApplicationShareHelper.shareText(
-        shareText,
-        subject: name,
-      );
-      
-      if (success) {
-        debugPrint('✅ Product shared successfully: $name');
-      } else {
-        debugPrint('⚠️ Failed to share product');
-        if (context.mounted) {
-          context.snackbarError(context.t.productDetailView.share.failed);
-        }
-      }
-    } catch (e) {
-      debugPrint('❌ Error sharing product: $e');
-      if (context.mounted) {
-        context.snackbarError(context.t.productDetailView.share.error);
-      }
-    }
   }
 }
 

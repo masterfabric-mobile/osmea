@@ -28,6 +28,7 @@ import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
+import 'package:storefront_woo/app/utils/wishlist_local_helper.dart';
 import 'package:get_it/get_it.dart';
 
 @injectable
@@ -1124,14 +1125,31 @@ class ProductDetailViewModel
 
       // Get WishlistViewModel from GetIt
       final wishlistViewModel = GetIt.I<WishlistViewModel>();
+      
+      // Import WishlistLocalHelper
+      final localHelper = WishlistLocalHelper();
 
-      // Check if product is already in wishlist
-      final isCurrentlyInWishlist = wishlistViewModel.isSaved(productId);
+      // Check if product is already in wishlist (check local first, then viewmodel)
+      final isInLocalWishlist = await localHelper.isInWishlist(productId);
+      final isCurrentlyInWishlist = isInLocalWishlist || wishlistViewModel.isSaved(productId);
       final wasInWishlist = isCurrentlyInWishlist;
 
       debugPrint(
         '💖 ProductDetailViewModel: Toggling wishlist for product $productId (currently: $isCurrentlyInWishlist)',
       );
+
+      // STEP 1: Update local storage immediately (optimistic update)
+      if (wasInWishlist) {
+        // Remove from local
+        await localHelper.removeFromLocalWishlist(productId);
+      } else {
+        // Add to local
+        await localHelper.addToLocalWishlist(productId);
+      }
+
+      // Update UI immediately based on local state
+      final isNowInWishlistLocal = !wasInWishlist;
+      emit(currentState.copyWith(isInWishlist: isNowInWishlistLocal));
 
       // Get product details from current state
       final product = currentState.product;
@@ -1162,18 +1180,23 @@ class ProductDetailViewModel
         onSale: product.onSale == true,
       );
 
-      // Toggle wishlist using WishlistViewModel (add or remove)
-      await wishlistViewModel.toggle(wishlistItem);
-
-      // Get updated wishlist status
-      final isNowInWishlist = wishlistViewModel.isSaved(productId);
+      // STEP 2: Sync with API in background (non-blocking)
+      // Toggle wishlist using WishlistViewModel (add or remove) - this will sync with API
+      wishlistViewModel.toggle(wishlistItem).then((_) {
+        // Mark as synced in local storage after successful API call
+        if (wasInWishlist) {
+          localHelper.markRemoveAsSynced(productId);
+        } else {
+          localHelper.markAddAsSynced(productId);
+        }
+      }).catchError((e) {
+        debugPrint('⚠️ ProductDetailViewModel: API sync failed, but local state updated: $e');
+        // Local state is already updated, so UI remains consistent
+      });
 
       debugPrint(
-        '✅ ProductDetailViewModel: Wishlist toggled - now: $isNowInWishlist',
+        '✅ ProductDetailViewModel: Wishlist toggled locally - now: $isNowInWishlistLocal (API sync in background)',
       );
-
-      // Update local state to reflect wishlist status
-      emit(currentState.copyWith(isInWishlist: isNowInWishlist));
 
       // Show success message
       emit(
@@ -1181,7 +1204,7 @@ class ProductDetailViewModel
           message: wasInWishlist
               ? 'Product removed from wishlist'
               : 'Product added to wishlist successfully!',
-          previousState: currentState.copyWith(isInWishlist: isNowInWishlist),
+          previousState: currentState.copyWith(isInWishlist: isNowInWishlistLocal),
         ),
       );
     } catch (e) {
