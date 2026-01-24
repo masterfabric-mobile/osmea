@@ -2,6 +2,26 @@
 
 Complete REST API documentation for OSMEA Users Manager plugin.
 
+## ⚠️ Legal Notice / Yasal Uyarı
+
+**IMPORTANT:** This plugin and its API endpoints are utility tools designed to facilitate user management processes. The plugin developers and contributors are **NOT responsible** for:
+
+- User data access, storage, or privacy compliance
+- Tax calculation, tax compliance, or any tax-related processes
+- Legal compliance with data protection regulations (GDPR, KVKK, etc.)
+- Any legal consequences arising from the use of this plugin or its API
+
+**Users of this plugin are solely responsible for ensuring compliance with all applicable laws and regulations.**
+
+**ÖNEMLİ:** Bu plugin ve API endpoint'leri, kullanıcı yönetimi süreçlerini kolaylaştırmak için tasarlanmış yardımcı araçlardır. Plugin geliştiricileri ve katkıda bulunanlar şunlardan **SORUMLU DEĞİLDİR:**
+
+- Kullanıcı verilerine erişim, depolama veya gizlilik uyumluluğu
+- Vergi hesaplaması, vergi uyumluluğu veya vergi ile ilgili herhangi bir süreç
+- Veri koruma düzenlemelerine (GDPR, KVKK, vb.) yasal uyumluluk
+- Bu plugin veya API'sinin kullanımından kaynaklanan yasal sonuçlar
+
+**Bu pluginin kullanıcıları, tüm geçerli yasa ve düzenlemelere uyum sağlamaktan tamamen sorumludur.**
+
 ## Base URL
 
 All endpoints are prefixed with:

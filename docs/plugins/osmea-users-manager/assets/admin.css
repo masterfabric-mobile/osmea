@@ -87,3 +87,57 @@
     font-size: 14px;
     margin-bottom: 15px;
 }
+
+/* Legal Notice Styles */
+.osmea-legal-notice {
+    position: relative;
+}
+
+.osmea-legal-notice details summary {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.osmea-legal-notice details summary:hover {
+    text-decoration: underline;
+}
+
+.osmea-legal-notice details[open] summary {
+    margin-bottom: 10px;
+}
+
+/* Tooltip style for legal notice icon */
+.osmea-legal-notice .legal-icon {
+    position: relative;
+    cursor: help;
+}
+
+.osmea-legal-notice .legal-icon:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1d2327;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.osmea-legal-notice .legal-icon:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 95%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1d2327;
+    z-index: 1000;
+}

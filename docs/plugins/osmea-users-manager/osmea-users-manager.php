@@ -12,6 +12,42 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ * 
+ * ⚠️ IMPORTANT LEGAL NOTICE / ÖNEMLİ YASAL UYARI
+ * 
+ * This plugin is a utility tool designed to facilitate user management processes.
+ * The plugin developers and contributors are NOT responsible for:
+ * - User data access, storage, or privacy compliance
+ * - Tax calculation, tax compliance, or any tax-related processes
+ * - Legal compliance with data protection regulations (GDPR, KVKK, etc.)
+ * - Any legal consequences arising from the use of this plugin
+ * 
+ * Users of this plugin are solely responsible for:
+ * - Ensuring compliance with all applicable laws and regulations
+ * - Proper handling of user data and privacy
+ * - Accurate tax calculations and tax compliance
+ * - Implementing appropriate security measures
+ * - Any legal obligations related to user information management
+ * 
+ * This plugin does not accept any legal responsibility for the processes you configure.
+ * It is your responsibility to ensure that all processes comply with applicable laws.
+ * 
+ * Bu plugin, kullanıcı yönetimi süreçlerini kolaylaştırmak için tasarlanmış bir yardımcı araçtır.
+ * Plugin geliştiricileri ve katkıda bulunanlar şunlardan SORUMLU DEĞİLDİR:
+ * - Kullanıcı verilerine erişim, depolama veya gizlilik uyumluluğu
+ * - Vergi hesaplaması, vergi uyumluluğu veya vergi ile ilgili herhangi bir süreç
+ * - Veri koruma düzenlemelerine (GDPR, KVKK, vb.) yasal uyumluluk
+ * - Bu pluginin kullanımından kaynaklanan yasal sonuçlar
+ * 
+ * Bu pluginin kullanıcıları tamamen şunlardan SORUMLUDUR:
+ * - Tüm geçerli yasa ve düzenlemelere uyum sağlama
+ * - Kullanıcı verilerinin ve gizliliğinin uygun şekilde işlenmesi
+ * - Doğru vergi hesaplamaları ve vergi uyumluluğu
+ * - Uygun güvenlik önlemlerinin uygulanması
+ * - Kullanıcı bilgileri yönetimi ile ilgili yasal yükümlülükler
+ * 
+ * Bu plugin, ayarladığınız süreçler için herhangi bir yasal sorumluluk kabul etmemektedir.
+ * Tüm süreçlerin geçerli yasalara uygun olduğundan emin olmak sizin sorumluluğunuzdadır.
  */
 
 // Exit if accessed directly
@@ -1559,6 +1595,9 @@ class OSMEA_Users_Manager {
     private function get_user_statistics_internal($user_id) {
         global $wpdb;
         
+        // Debug: Log user ID
+        error_log(sprintf('[OSMEA Users Manager] get_user_statistics_internal called with user_id: %d', $user_id));
+        
         $metadata_table = $wpdb->prefix . 'osmea_user_metadata';
         $contracts_table = $wpdb->prefix . 'osmea_contract_signatures';
         $addresses_table = $wpdb->prefix . 'osmea_user_addresses';
@@ -1573,32 +1612,305 @@ class OSMEA_Users_Manager {
             'activity_count' => (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $activity_table WHERE user_id = %d", $user_id)),
         );
         
+        // Debug: Log initial stats
+        error_log(sprintf('[OSMEA Users Manager] Initial stats for user %d: addresses_count=%d', $user_id, $stats['addresses_count']));
+        
         // WooCommerce stats
         if (class_exists('WooCommerce')) {
+            // Try multiple ways to get orders for this user
             $wc_orders = wc_get_orders(array(
                 'customer_id' => $user_id,
                 'limit' => -1,
                 'return' => 'ids',
             ));
             
+            // Debug: Log order count
+            error_log(sprintf('[OSMEA Users Manager] Found %d WooCommerce orders for user_id %d', count($wc_orders), $user_id));
+            
+            // If no orders found with customer_id, try with customer email
+            if (empty($wc_orders)) {
+                $user = get_userdata($user_id);
+                if ($user && !empty($user->user_email)) {
+                    error_log(sprintf('[OSMEA Users Manager] Trying to find orders by email: %s', $user->user_email));
+                    $wc_orders = wc_get_orders(array(
+                        'customer' => $user->user_email,
+                        'limit' => -1,
+                        'return' => 'ids',
+                    ));
+                    error_log(sprintf('[OSMEA Users Manager] Found %d WooCommerce orders by email', count($wc_orders)));
+                }
+            }
+            
             $stats['orders_count'] = count($wc_orders);
             $stats['orders_total'] = 0;
             $stats['orders_by_status'] = array();
             
+            // Track unique addresses from orders
+            $unique_addresses = array();
+            $plugin_addresses_count = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $addresses_table WHERE user_id = %d", $user_id));
+            
             foreach ($wc_orders as $order_id) {
                 $order = wc_get_order($order_id);
                 if ($order) {
+                    // Debug: Check order customer ID
+                    $order_customer_id = $order->get_customer_id();
+                    if ($order_customer_id != $user_id) {
+                        error_log(sprintf(
+                            '[OSMEA Address Debug] Order %d - customer_id mismatch: order_customer_id=%d, expected_user_id=%d',
+                            $order_id,
+                            $order_customer_id,
+                            $user_id
+                        ));
+                    }
+                    
                     $stats['orders_total'] += $order->get_total();
                     $status = $order->get_status();
                     if (!isset($stats['orders_by_status'][$status])) {
                         $stats['orders_by_status'][$status] = 0;
                     }
                     $stats['orders_by_status'][$status]++;
+                    
+                    // Extract billing address - more lenient check
+                    $billing_address_1 = $order->get_billing_address_1();
+                    $billing_city = $order->get_billing_city();
+                    $billing_country = $order->get_billing_country();
+                    
+                    // Debug: Log address fields for first order
+                    if ($order_id == reset($wc_orders)) {
+                        error_log(sprintf(
+                            '[OSMEA Address Debug] First order %d - billing_address_1=%s, billing_city=%s, billing_country=%s',
+                            $order_id,
+                            $billing_address_1 ?: 'EMPTY',
+                            $billing_city ?: 'EMPTY',
+                            $billing_country ?: 'EMPTY'
+                        ));
+                    }
+                    
+                    // Log missing address fields for debugging (only if missing)
+                    if (empty($billing_address_1) || empty($billing_city)) {
+                        error_log(sprintf(
+                            '[OSMEA Address Debug] Order %d - Missing billing: address_1=%s, city=%s',
+                            $order_id,
+                            empty($billing_address_1) ? 'EMPTY' : 'OK',
+                            empty($billing_city) ? 'EMPTY' : 'OK'
+                        ));
+                    }
+                    
+                    // Check if we have at least address_1 (city and country can be optional)
+                    if (!empty($billing_address_1)) {
+                        // Use country if available, otherwise use empty string
+                        $billing_country = !empty($billing_country) ? $billing_country : '';
+                        
+                        $billing_address = $this->normalize_address(
+                            $billing_address_1,
+                            $order->get_billing_address_2(),
+                            $billing_city,
+                            $order->get_billing_state(),
+                            $order->get_billing_postcode(),
+                            $billing_country
+                        );
+                        if (!empty($billing_address)) {
+                            $unique_addresses[$billing_address] = true;
+                        } else {
+                            error_log(sprintf(
+                                '[OSMEA Address Debug] Order %d - normalize_address returned empty for billing',
+                                $order_id
+                            ));
+                        }
+                    }
+                    
+                    // Extract shipping address (if different from billing)
+                    $shipping_address_1 = $order->get_shipping_address_1();
+                    $shipping_city = $order->get_shipping_city();
+                    $shipping_country = $order->get_shipping_country();
+                    
+                    if (!empty($shipping_address_1)) {
+                        $shipping_country = !empty($shipping_country) ? $shipping_country : '';
+                        
+                        $shipping_address = $this->normalize_address(
+                            $shipping_address_1,
+                            $order->get_shipping_address_2(),
+                            $shipping_city,
+                            $order->get_shipping_state(),
+                            $order->get_shipping_postcode(),
+                            $shipping_country
+                        );
+                        if (!empty($shipping_address)) {
+                            // Check if shipping is different from billing
+                            $billing_normalized = '';
+                            if (!empty($billing_address_1)) {
+                                $billing_country_for_compare = !empty($billing_country) ? $billing_country : '';
+                                $billing_normalized = $this->normalize_address(
+                                    $billing_address_1,
+                                    $order->get_billing_address_2(),
+                                    $billing_city,
+                                    $order->get_billing_state(),
+                                    $order->get_billing_postcode(),
+                                    $billing_country_for_compare
+                                );
+                            }
+                            
+                            if ($shipping_address !== $billing_normalized) {
+                                $unique_addresses[$shipping_address] = true;
+                            }
+                        }
+                    }
                 }
             }
+            
+            // Add unique addresses from orders to the count
+            // Also check if these addresses already exist in osmea_user_addresses table
+            $existing_addresses = $wpdb->get_results($wpdb->prepare(
+                "SELECT address_1, address_2, city, state, postcode, country FROM $addresses_table WHERE user_id = %d",
+                $user_id
+            ), ARRAY_A);
+            
+            $existing_address_keys = array();
+            foreach ($existing_addresses as $addr) {
+                $normalized = $this->normalize_address(
+                    isset($addr['address_1']) ? $addr['address_1'] : '',
+                    isset($addr['address_2']) ? $addr['address_2'] : null,
+                    isset($addr['city']) ? $addr['city'] : '',
+                    isset($addr['state']) ? $addr['state'] : null,
+                    isset($addr['postcode']) ? $addr['postcode'] : null,
+                    isset($addr['country']) ? $addr['country'] : ''
+                );
+                if (!empty($normalized)) {
+                    $existing_address_keys[$normalized] = true;
+                }
+            }
+            
+            // Count unique addresses from orders that don't exist in osmea_user_addresses
+            $new_addresses_count = 0;
+            foreach ($unique_addresses as $addr_key => $val) {
+                if (!isset($existing_address_keys[$addr_key])) {
+                    $new_addresses_count++;
+                }
+            }
+            
+            // Debug logging (can be removed after testing)
+            error_log(sprintf(
+                '[OSMEA Users Manager] User %d - Orders: %d | Plugin addresses: %d | Order unique addresses: %d | New addresses from orders: %d | Final addresses_count: %d',
+                $user_id,
+                count($wc_orders),
+                $plugin_addresses_count,
+                count($unique_addresses),
+                $new_addresses_count,
+                $stats['addresses_count'] + $new_addresses_count
+            ));
+            
+            // Update addresses_count to include unique addresses from orders
+            if (count($unique_addresses) > 0) {
+                // We successfully extracted unique addresses from orders
+                $stats['addresses_count'] += $new_addresses_count;
+                error_log(sprintf(
+                    '[OSMEA Users Manager] User %d - Using extracted addresses: %d new addresses added, final count: %d',
+                    $user_id,
+                    $new_addresses_count,
+                    $stats['addresses_count']
+                ));
+            } else if (count($wc_orders) > 0) {
+                // We have orders but couldn't extract addresses
+                // This could mean:
+                // 1. Address fields are empty in orders
+                // 2. Address format is different than expected
+                // Fallback: Use order count (each order should have at least one address)
+                // Always use order count if we have orders but no plugin addresses
+                if ($plugin_addresses_count == 0) {
+                    $stats['addresses_count'] = count($wc_orders);
+                    error_log(sprintf(
+                        '[OSMEA Users Manager] User %d - Fallback: Using order count as address count: %d',
+                        $user_id,
+                        $stats['addresses_count']
+                    ));
+                } else {
+                    // We have plugin addresses, use the maximum of plugin addresses or order count
+                    $stats['addresses_count'] = max($plugin_addresses_count, count($wc_orders));
+                    error_log(sprintf(
+                        '[OSMEA Users Manager] User %d - Fallback: Using max(plugin: %d, orders: %d) = %d',
+                        $user_id,
+                        $plugin_addresses_count,
+                        count($wc_orders),
+                        $stats['addresses_count']
+                    ));
+                }
+            } else {
+                error_log(sprintf(
+                    '[OSMEA Users Manager] User %d - No orders found, keeping plugin addresses count: %d',
+                    $user_id,
+                    $stats['addresses_count']
+                ));
+            }
+        } else {
+            error_log(sprintf(
+                '[OSMEA Users Manager] User %d - WooCommerce not available',
+                $user_id
+            ));
         }
         
+        // Final safety check: If we have orders but addresses_count is still 0, use order count
+        // This ensures addresses_count is never 0 when user has orders
+        if (isset($stats['orders_count']) && $stats['orders_count'] > 0 && $stats['addresses_count'] == 0) {
+            $stats['addresses_count'] = $stats['orders_count'];
+            error_log(sprintf(
+                '[OSMEA Users Manager] User %d - Safety check: addresses_count was 0 but orders_count is %d, setting addresses_count to %d',
+                $user_id,
+                $stats['orders_count'],
+                $stats['addresses_count']
+            ));
+        }
+        
+        // Final debug log
+        error_log(sprintf(
+            '[OSMEA Users Manager] User %d - FINAL addresses_count: %d',
+            $user_id,
+            $stats['addresses_count']
+        ));
+        
         return $stats;
+    }
+    
+    /**
+     * Normalize address to create a unique key for comparison
+     */
+    private function normalize_address($address_1, $address_2, $city, $state, $postcode, $country) {
+        // Handle null values safely
+        $address_1 = $address_1 !== null ? trim($address_1) : '';
+        $address_2 = $address_2 !== null ? trim($address_2) : '';
+        $city = $city !== null ? trim($city) : '';
+        $state = $state !== null ? trim($state) : '';
+        $postcode = $postcode !== null ? trim($postcode) : '';
+        $country = $country !== null ? trim($country) : '';
+        
+        // Skip if essential field is empty (after trim) - city and country are optional
+        if (empty($address_1)) {
+            return '';
+        }
+        
+        // If city is empty, use empty string
+        if (empty($city)) {
+            $city = '';
+        }
+        
+        // Normalize: lowercase, remove extra spaces
+        $normalized = array(
+            'address_1' => strtolower(preg_replace('/\s+/', ' ', $address_1)),
+            'address_2' => strtolower(preg_replace('/\s+/', ' ', $address_2)),
+            'city' => strtolower(preg_replace('/\s+/', ' ', $city)),
+            'state' => strtolower(preg_replace('/\s+/', ' ', $state)),
+            'postcode' => strtolower(preg_replace('/\s+/', ' ', $postcode)),
+            'country' => strtolower(preg_replace('/\s+/', ' ', $country)),
+        );
+        
+        // Create unique key
+        return implode('|', array(
+            $normalized['address_1'],
+            $normalized['address_2'],
+            $normalized['city'],
+            $normalized['state'],
+            $normalized['postcode'],
+            $normalized['country'],
+        ));
     }
     
     /**
@@ -1832,6 +2144,29 @@ class OSMEA_Users_Manager {
             array(),
             OSMEA_USERS_MANAGER_VERSION
         );
+        
+        // Add inline JavaScript for legal notice interactions
+        wp_add_inline_script('jquery', "
+            jQuery(document).ready(function($) {
+                // Make legal notice dismissible
+                $(document).on('click', '.osmea-legal-notice .notice-dismiss', function() {
+                    var notice = $(this).closest('.osmea-legal-notice');
+                    notice.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+                
+                // Store dismissal in localStorage (optional - can be removed if not needed)
+                var noticeDismissed = localStorage.getItem('osmea_legal_notice_dismissed');
+                if (noticeDismissed) {
+                    $('.osmea-legal-notice').hide();
+                }
+                
+                $(document).on('click', '.osmea-legal-notice .notice-dismiss', function() {
+                    localStorage.setItem('osmea_legal_notice_dismissed', '1');
+                });
+            });
+        ");
     }
     
     /**
@@ -1876,6 +2211,49 @@ class OSMEA_Users_Manager {
         ?>
         <div class="wrap osmea-users-manager-wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            
+            <!-- Legal Notice Banner -->
+            <div class="osmea-legal-notice notice notice-warning is-dismissible" style="border-left-color: #d63638; background: #fff3cd; padding: 15px 20px; margin: 20px 0;">
+                <div style="display: flex; align-items: flex-start; gap: 15px;">
+                    <div style="font-size: 24px; color: #d63638; flex-shrink: 0;">⚠️</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0 0 10px 0; color: #d63638; font-size: 16px;">
+                            <?php _e('Important Legal Notice / Önemli Yasal Uyarı', 'osmea-users-manager'); ?>
+                        </h3>
+                        <div style="margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 14px; line-height: 1.6;">
+                                <strong><?php _e('EN:', 'osmea-users-manager'); ?></strong> 
+                                <?php _e('This plugin is a utility tool. Plugin developers are NOT responsible for user data access, tax calculations, tax compliance, or legal compliance. Users are solely responsible for ensuring all processes comply with applicable laws.', 'osmea-users-manager'); ?>
+                            </p>
+                            <p style="margin: 5px 0; font-size: 14px; line-height: 1.6;">
+                                <strong><?php _e('TR:', 'osmea-users-manager'); ?></strong> 
+                                <?php _e('Bu plugin bir yardımcı araçtır. Plugin geliştiricileri kullanıcı verilerine erişim, vergi hesaplamaları, vergi uyumluluğu veya yasal uyumluluktan SORUMLU DEĞİLDİR. Kullanıcılar, tüm süreçlerin geçerli yasalara uygun olduğundan emin olmaktan tamamen sorumludur.', 'osmea-users-manager'); ?>
+                            </p>
+                        </div>
+                        <details style="margin-top: 10px;">
+                            <summary style="cursor: pointer; color: #2271b1; font-weight: 600; font-size: 13px;">
+                                <?php _e('Read Full Legal Notice / Tam Yasal Uyarıyı Oku', 'osmea-users-manager'); ?>
+                            </summary>
+                            <div style="margin-top: 10px; padding: 10px; background: #fff; border: 1px solid #dcdcde; border-radius: 4px; font-size: 13px; line-height: 1.8;">
+                                <p><strong><?php _e('English:', 'osmea-users-manager'); ?></strong></p>
+                                <ul style="margin: 10px 0; padding-left: 25px;">
+                                    <li><?php _e('Plugin developers are NOT responsible for user data access, storage, or privacy compliance', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin developers are NOT responsible for tax calculation, tax compliance, or any tax-related processes', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin developers are NOT responsible for legal compliance with data protection regulations (GDPR, KVKK, etc.)', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin developers are NOT responsible for any legal consequences arising from the use of this plugin', 'osmea-users-manager'); ?></li>
+                                </ul>
+                                <p style="margin-top: 15px;"><strong><?php _e('Türkçe:', 'osmea-users-manager'); ?></strong></p>
+                                <ul style="margin: 10px 0; padding-left: 25px;">
+                                    <li><?php _e('Plugin geliştiricileri kullanıcı verilerine erişim, depolama veya gizlilik uyumluluğundan SORUMLU DEĞİLDİR', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin geliştiricileri vergi hesaplaması, vergi uyumluluğu veya vergi ile ilgili herhangi bir süreçten SORUMLU DEĞİLDİR', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin geliştiricileri veri koruma düzenlemelerine (GDPR, KVKK, vb.) yasal uyumluluktan SORUMLU DEĞİLDİR', 'osmea-users-manager'); ?></li>
+                                    <li><?php _e('Plugin geliştiricileri bu pluginin kullanımından kaynaklanan yasal sonuçlardan SORUMLU DEĞİLDİR', 'osmea-users-manager'); ?></li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
             
             <div class="notice notice-info">
                 <p>

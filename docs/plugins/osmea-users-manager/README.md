@@ -444,6 +444,44 @@ osmea-users-manager/
 - **MySQL**: 5.6 or higher
 - **WooCommerce**: 5.0 or higher (optional, for order features)
 
+## ⚠️ Legal Notice / Yasal Uyarı
+
+**IMPORTANT:** This plugin is a utility tool designed to facilitate user management processes. The plugin developers and contributors are **NOT responsible** for:
+
+- User data access, storage, or privacy compliance
+- Tax calculation, tax compliance, or any tax-related processes
+- Legal compliance with data protection regulations (GDPR, KVKK, etc.)
+- Any legal consequences arising from the use of this plugin
+
+**Users of this plugin are solely responsible for:**
+
+- Ensuring compliance with all applicable laws and regulations
+- Proper handling of user data and privacy
+- Accurate tax calculations and tax compliance
+- Implementing appropriate security measures
+- Any legal obligations related to user information management
+
+**This plugin does not accept any legal responsibility for the processes you configure. It is your responsibility to ensure that all processes comply with applicable laws.**
+
+---
+
+**ÖNEMLİ:** Bu plugin, kullanıcı yönetimi süreçlerini kolaylaştırmak için tasarlanmış bir yardımcı araçtır. Plugin geliştiricileri ve katkıda bulunanlar şunlardan **SORUMLU DEĞİLDİR:**
+
+- Kullanıcı verilerine erişim, depolama veya gizlilik uyumluluğu
+- Vergi hesaplaması, vergi uyumluluğu veya vergi ile ilgili herhangi bir süreç
+- Veri koruma düzenlemelerine (GDPR, KVKK, vb.) yasal uyumluluk
+- Bu pluginin kullanımından kaynaklanan yasal sonuçlar
+
+**Bu pluginin kullanıcıları tamamen şunlardan SORUMLUDUR:**
+
+- Tüm geçerli yasa ve düzenlemelere uyum sağlama
+- Kullanıcı verilerinin ve gizliliğinin uygun şekilde işlenmesi
+- Doğru vergi hesaplamaları ve vergi uyumluluğu
+- Uygun güvenlik önlemlerinin uygulanması
+- Kullanıcı bilgileri yönetimi ile ilgili yasal yükümlülükler
+
+**Bu plugin, ayarladığınız süreçler için herhangi bir yasal sorumluluk kabul etmemektedir. Tüm süreçlerin geçerli yasalara uygun olduğundan emin olmak sizin sorumluluğunuzdadır.**
+
 ## 📝 License & Support
 
 - **License**: GPL v2 or later
