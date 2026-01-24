@@ -10,10 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
-import 'package:storefront_woo/app/views/view_wishlist/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:osmea_components/src/enums/carousel_enums.dart';
 
@@ -37,11 +35,23 @@ class FlashSaleSectionWidget extends StatefulWidget {
 class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
   Timer? _timer;
   Duration _timeRemaining = Duration.zero;
+  // Track wishlist state for each product for immediate UI feedback
+  final Map<int, bool> _productWishlistStates = {};
 
   @override
   void initState() {
     super.initState();
     _initializeTimer();
+    _initializeWishlistStates();
+  }
+
+  void _initializeWishlistStates() {
+    final flashSaleProducts = _getFlashSaleProducts();
+    final wishlistVm = GetIt.I<WishlistViewModel>();
+    for (final product in flashSaleProducts) {
+      final productId = product.id ?? 0;
+      _productWishlistStates[productId] = wishlistVm.isSaved(productId);
+    }
   }
 
   @override
@@ -198,6 +208,15 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
 
     final flashSaleProducts = _getFlashSaleProducts();
     if (flashSaleProducts.isEmpty) return const SizedBox.shrink();
+
+    // Update wishlist states from WishlistViewModel
+    final wishlistVm = GetIt.I<WishlistViewModel>();
+    for (final product in flashSaleProducts) {
+      final productId = product.id ?? 0;
+      if (!_productWishlistStates.containsKey(productId)) {
+        _productWishlistStates[productId] = wishlistVm.isSaved(productId);
+      }
+    }
 
     final horizontalPadding = _getHorizontalPadding();
     final backgroundColor = _getBackgroundColor();
@@ -432,34 +451,50 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                 Positioned(
                   top: context.spacing8,
                   right: context.spacing8,
-                  child: BlocBuilder<WishlistViewModel, WishlistState>(
-                    bloc: GetIt.I<WishlistViewModel>(),
-                    buildWhen: (previous, current) {
-                      final prevItems = previous is WishlistLoadedState
-                          ? previous.items.map((e) => e.id).toSet()
-                          : <int>{};
-                      final currItems = current is WishlistLoadedState
-                          ? current.items.map((e) => e.id).toSet()
-                          : current is WishlistSuccessState
-                              ? current.previousState.items.map((e) => e.id).toSet()
-                              : <int>{};
-                      return prevItems != currItems;
-                    },
-                    builder: (context, wishlistState) {
+                  child: Builder(
+                    builder: (context) {
                       final productId = product.id ?? 0;
-                      final wishlistVm = GetIt.I<WishlistViewModel>();
-                      final loadedState = wishlistState is WishlistSuccessState
-                          ? wishlistState.previousState
-                          : wishlistState is WishlistLoadedState
-                              ? wishlistState
-                              : null;
-                      final isSaved = loadedState != null
-                          ? loadedState.items.any((e) => e.id == productId)
-                          : wishlistVm.isSaved(productId);
-
+                      final localIsSaved = _productWishlistStates[productId] ?? false;
+                      
                       return GestureDetector(
-                        onTap: () async {
-                          await widget.viewModel.addProductToWishlist(productId);
+                        onTap: () {
+                          // Store previous state to determine action
+                          final wasSaved = localIsSaved;
+                          
+                          // Immediately update local state for instant UI feedback
+                          setState(() {
+                            _productWishlistStates[productId] = !wasSaved;
+                          });
+                          
+                          // Check if we're on wishlist/favorites/saved page - don't show snackbar there
+                          final currentRoute = GoRouterState.of(context).uri.path;
+                          final isOnWishlistPage = currentRoute.contains('/wishlist') || 
+                                                 currentRoute.contains('/favorites') ||
+                                                 currentRoute.contains('/saved');
+                          
+                          // Show snackbar immediately when button is pressed (but not on wishlist page)
+                          if (!isOnWishlistPage) {
+                            if (!wasSaved) {
+                              // Product was added to favorites
+                              context.showSnackbar(
+                                message: 'Added to favorites',
+                                type: SnackbarType.success,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                            } else {
+                              // Product was removed from favorites
+                              context.showSnackbar(
+                                message: 'Removed from favorites',
+                                type: SnackbarType.info,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                            }
+                          }
+                          
+                          // Then call the viewModel callback
+                          widget.viewModel.addProductToWishlist(productId);
                         },
                         child: Container(
                           width: context.width32,
@@ -473,9 +508,9 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                             ),
                           ),
                           child: Icon(
-                            isSaved ? Icons.favorite : Icons.favorite_border,
+                            localIsSaved ? Icons.favorite : Icons.favorite_border,
                             size: context.iconSizeExtraSmall,
-                            color: isSaved
+                            color: localIsSaved
                                 ? OsmeaColors.black
                                 : OsmeaColors.thunder,
                           ),
