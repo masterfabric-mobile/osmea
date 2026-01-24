@@ -278,9 +278,20 @@ class WishlistView
     }
 
     if (state is WishlistSuccessState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.snackbarSuccess(state.message);
-      });
+      // Don't show snackbar on favorites/saved page - it's already shown in ProductCardWidget
+      // Only show snackbar if it's not the initial page load
+      final currentRoute = GoRouterState.of(context).uri.path;
+      final isOnSavedPage = currentRoute.contains('/saved') || 
+                           currentRoute.contains('/wishlist') || 
+                           currentRoute.contains('/favorites');
+      
+      // Only show snackbar if we're not on the saved page (to avoid duplicate snackbars)
+      if (!isOnSavedPage) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.snackbarSuccess(state.message);
+        });
+      }
+      
       return WishlistListWidget(
         items: state.previousState.items,
         viewModel: viewModel,

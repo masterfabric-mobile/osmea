@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as flutter_material show Image;
+import 'package:go_router/go_router.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart'
     hide Image;
 import 'package:core/core.dart';
@@ -47,10 +48,12 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
   PageController? _pageController;
   int _currentImageIndex = 0;
   bool _isAddingToCart = false;
+  late bool _localIsSaved; // Local state for immediate UI feedback
 
   @override
   void initState() {
     super.initState();
+    _localIsSaved = widget.isSaved; // Initialize from prop
     final imageCount = widget.product.images?.length ?? 0;
     if (imageCount > 1) {
       _pageController = PageController();
@@ -60,6 +63,11 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
   @override
   void didUpdateWidget(covariant ProductCardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Sync local state with prop when it changes from parent
+    if (oldWidget.isSaved != widget.isSaved) {
+      _localIsSaved = widget.isSaved;
+    }
+    
     final oldCount = oldWidget.product.images?.length ?? 0;
     final newCount = widget.product.images?.length ?? 0;
 
@@ -333,7 +341,45 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                   top: context.spacing8,
                   right: context.spacing8,
                   child: AnimatedButton(
-                    onPressed: widget.onWishlistTap,
+                    onPressed: () {
+                      // Store previous state to determine action
+                      final wasSaved = _localIsSaved;
+                      
+                      // Immediately update local state for instant UI feedback
+                      setState(() {
+                        _localIsSaved = !_localIsSaved;
+                      });
+                      
+                      // Check if we're on wishlist/favorites/saved page - don't show snackbar there
+                      final currentRoute = GoRouterState.of(context).uri.path;
+                      final isOnWishlistPage = currentRoute.contains('/wishlist') || 
+                                             currentRoute.contains('/favorites') ||
+                                             currentRoute.contains('/saved');
+                      
+                      // Show snackbar immediately when button is pressed (but not on wishlist page)
+                      if (!isOnWishlistPage) {
+                        if (!wasSaved) {
+                          // Product was added to favorites
+                          context.showSnackbar(
+                            message: 'Added to favorites',
+                            type: SnackbarType.success,
+                            style: SnackbarStyle.minimal,
+                            position: SnackbarPosition.bottom,
+                          );
+                        } else {
+                          // Product was removed from favorites
+                          context.showSnackbar(
+                            message: 'Removed from favorites',
+                            type: SnackbarType.info,
+                            style: SnackbarStyle.minimal,
+                            position: SnackbarPosition.bottom,
+                          );
+                        }
+                      }
+                      
+                      // Then call the parent callback
+                      widget.onWishlistTap();
+                    },
                     child: OsmeaComponents.container(
                       width: context.iconSizeNormal * 1.25,
                       height: context.iconSizeNormal * 1.25,
@@ -346,9 +392,9 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                         ),
                       ),
                       child: Icon(
-                        widget.isSaved ? Icons.favorite : Icons.favorite_border,
+                        _localIsSaved ? Icons.favorite : Icons.favorite_border,
                         size: context.iconSizeExtraSmall,
-                        color: widget.isSaved
+                        color: _localIsSaved
                             ? _getWishlistIconSavedColor(context)
                             : _getWishlistIconUnsavedColor(context),
                       ),
