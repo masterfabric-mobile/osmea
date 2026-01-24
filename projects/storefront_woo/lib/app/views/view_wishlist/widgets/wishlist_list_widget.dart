@@ -454,11 +454,13 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (bottomSheetContext) => StatefulBuilder(
-        builder: (context, setBottomSheetState) {
-          bool isDeleting = false;
-          
-          return OsmeaBottomSheet(
+      builder: (bottomSheetContext) {
+        // Move isDeleting outside the builder to persist across rebuilds
+        bool isDeleting = false;
+        
+        return StatefulBuilder(
+          builder: (context, setBottomSheetState) {
+            return OsmeaBottomSheet(
             size: BottomSheetSize.large,
             variant: BottomSheetVariant.modal,
             title: group.name == 'Default' ? 'My Collection' : group.name,
@@ -539,11 +541,6 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
                   size: 24,
                 ),
             ],
-            footer: OsmeaComponents.button(
-              text: 'Close',
-              variant: ButtonVariant.outlined,
-              onPressed: () => Navigator.of(bottomSheetContext).pop(),
-            ),
             backgroundColor: OsmeaColors.white,
             child: _CollectionDetailContent(
               group: group,
@@ -551,9 +548,10 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
               viewModel: widget.viewModel,
               allItems: widget.items,
             ),
-          );
-        },
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
