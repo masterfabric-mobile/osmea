@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/views/auth/cubit/auth_cubit.dart';
 import 'package:core/src/views/auth/cubit/auth_state.dart';
 import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:osmea_components/osmea_components.dart';
+
+/// Helper class for match info
+class _MatchInfo {
+  final int start;
+  final int end;
+  final String type;
+
+  _MatchInfo(this.start, this.end, this.type);
+}
 
 /// 🎨 **OSMEA Auth Widget**
 ///
@@ -492,6 +502,8 @@ class AuthWidget extends StatelessWidget {
           OsmeaComponents.sizedBox(height: context.spacing24),
           // Dynamic checklists from config
           ..._buildDynamicChecklists(context, formState, cubit, primaryColor),
+          // Payment agreements checkbox
+          _buildPaymentAgreementCheckbox(context, formState, cubit, primaryColor),
           OsmeaComponents.sizedBox(height: context.spacing32),
           _buildSignUpButton(
               context, formState, cubit, buttonRadius, primaryColor),
@@ -841,10 +853,216 @@ class AuthWidget extends StatelessWidget {
     return checklistWidgets;
   }
 
+  /// 📋 Build payment agreement checkbox (similar to checkout)
+  Widget _buildPaymentAgreementCheckbox(
+    BuildContext context,
+    AuthFormState state,
+    AuthCubit cubit,
+    Color primaryColor,
+  ) {
+    try {
+      final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
+      final paymentAgreements = signUpConfig?['payment_agreements'] as Map<String, dynamic>?;
+      
+      if (paymentAgreements == null) {
+        return const SizedBox.shrink();
+      }
+
+      final checkboxText = paymentAgreements['checkbox_text'] as String?;
+      if (checkboxText == null || checkboxText.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      final linkColorString = paymentAgreements['checkbox_link_color'] as String? ?? '#FF6B00';
+      Color linkColor;
+      try {
+        String hex = linkColorString.startsWith('#') ? linkColorString.substring(1) : linkColorString;
+        if (hex.length == 6) {
+          linkColor = Color(int.parse('FF$hex', radix: 16));
+        } else if (hex.length == 8) {
+          linkColor = Color(int.parse(hex, radix: 16));
+        } else {
+          linkColor = const Color(0xFFFF6B00);
+        }
+      } catch (e) {
+        linkColor = const Color(0xFFFF6B00);
+      }
+
+      final preliminaryTitle = paymentAgreements['preliminary_information_form']?['title'] as String? ?? 'Preliminary Information Form';
+      final preliminaryContent = paymentAgreements['preliminary_information_form']?['content'] as String? ?? '';
+      final distanceSalesTitle = paymentAgreements['distance_sales_agreement']?['title'] as String? ?? 'Distance Sales Agreement';
+      final distanceSalesContent = paymentAgreements['distance_sales_agreement']?['content'] as String? ?? '';
+
+      // Use checklist system with id "payment_agreement"
+      final isChecked = state.signUpChecklists['payment_agreement'] ?? false;
+
+      return OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OsmeaComponents.sizedBox(height: context.spacing16),
+          GestureDetector(
+            onTap: () {
+              cubit.toggleChecklist('payment_agreement');
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Transform.scale(
+                  scale: 0.85,
+                  child: Checkbox(
+                    value: isChecked,
+                    onChanged: (value) {
+                      cubit.toggleChecklist('payment_agreement');
+                    },
+                    activeColor: linkColor,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                SizedBox(width: context.spacing4),
+                Expanded(
+                  child: _buildCheckboxTextWithLinks(
+                    context,
+                    checkboxText,
+                    linkColor,
+                    preliminaryTitle,
+                    distanceSalesTitle,
+                    preliminaryContent,
+                    distanceSalesContent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    } catch (e) {
+      debugPrint('⚠️ Error building payment agreement checkbox: $e');
+      return const SizedBox.shrink();
+    }
+  }
+
+  /// 📝 Build checkbox text with clickable links
+  Widget _buildCheckboxTextWithLinks(
+    BuildContext context,
+    String text,
+    Color linkColor,
+    String preliminaryTitle,
+    String distanceSalesTitle,
+    String preliminaryContent,
+    String distanceSalesContent,
+  ) {
+    final spans = <TextSpan>[];
+    // Match "Preliminary Information Form" with optional "the" before it
+    final preliminaryPattern = RegExp(r'(?:the\s+)?Preliminary Information Form', caseSensitive: false);
+    // Match "Distance Sales Agreement" with optional "the" before it
+    final distanceSalesPattern = RegExp(r'(?:the\s+)?Distance Sales Agreement', caseSensitive: false);
+    
+    int lastIndex = 0;
+    
+    // Find all matches
+    final allMatches = <_MatchInfo>[];
+    for (final match in preliminaryPattern.allMatches(text)) {
+      allMatches.add(_MatchInfo(match.start, match.end, 'preliminary'));
+    }
+    for (final match in distanceSalesPattern.allMatches(text)) {
+      allMatches.add(_MatchInfo(match.start, match.end, 'distance'));
+    }
+    
+    // Sort by position
+    allMatches.sort((a, b) => a.start.compareTo(b.start));
+    
+    for (final match in allMatches) {
+      // Add text before match
+      if (match.start > lastIndex) {
+        spans.add(TextSpan(
+          text: text.substring(lastIndex, match.start),
+          style: OsmeaTextStyle.bodySmall(context).copyWith(
+            color: OsmeaColors.black,
+          ),
+        ));
+      }
+      
+      // Add link
+      spans.add(TextSpan(
+        text: text.substring(match.start, match.end),
+        style: OsmeaTextStyle.bodySmall(context).copyWith(
+          color: linkColor,
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            _showAgreementDialog(
+              context,
+              match.type == 'preliminary' ? preliminaryTitle : distanceSalesTitle,
+              match.type == 'preliminary' ? preliminaryContent : distanceSalesContent,
+            );
+          },
+      ));
+      
+      lastIndex = match.end;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastIndex),
+        style: OsmeaTextStyle.bodySmall(context).copyWith(
+          color: OsmeaColors.black,
+        ),
+      ));
+    }
+    
+    return RichText(
+      text: TextSpan(children: spans),
+      textHeightBehavior: const TextHeightBehavior(
+        applyHeightToFirstAscent: false,
+        applyHeightToLastDescent: false,
+      ),
+    );
+  }
+
+  /// 📄 Show agreement dialog
+  void _showAgreementDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: OsmeaTextStyle.titleLarge(context).copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            content,
+            style: OsmeaTextStyle.bodyMedium(context).copyWith(
+              height: 1.5,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Close',
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius, Color primaryColor) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = !isLoading && cubit.signUpCallback != null;
+    final isPaymentAgreementChecked = _isPaymentAgreementChecked(state);
+    final isEnabled = !isLoading && 
+        cubit.signUpCallback != null && 
+        isPaymentAgreementChecked;
     
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
@@ -862,7 +1080,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.large,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !isPaymentAgreementChecked
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
@@ -872,6 +1090,28 @@ class AuthWidget extends StatelessWidget {
       disabledTextColor: disabledTextColor,
       borderRadius: buttonRadius,
     );
+  }
+
+  /// Check if payment agreement checkbox is checked
+  bool _isPaymentAgreementChecked(AuthFormState state) {
+    try {
+      final signUpConfig = config?['sign_up'] as Map<String, dynamic>?;
+      final paymentAgreements = signUpConfig?['payment_agreements'] as Map<String, dynamic>?;
+      
+      // If payment agreements config exists, check if checkbox is checked
+      if (paymentAgreements != null) {
+        final checkboxText = paymentAgreements['checkbox_text'] as String?;
+        if (checkboxText != null && checkboxText.isNotEmpty) {
+          // Check if payment_agreement checklist is checked
+          return state.signUpChecklists['payment_agreement'] ?? false;
+        }
+      }
+      // If no payment agreements config, return true (no requirement)
+      return true;
+    } catch (e) {
+      debugPrint('⚠️ Error checking payment agreement: $e');
+      return false;
+    }
   }
 
   // ============================================================================
@@ -987,6 +1227,8 @@ class AuthWidget extends StatelessWidget {
         _buildSpaceSignUpLastNameField(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing32),
         ..._buildDynamicChecklists(context, formState, cubit, OsmeaColors.thunder),
+        // Payment agreements checkbox
+        _buildPaymentAgreementCheckbox(context, formState, cubit, OsmeaColors.thunder),
         OsmeaComponents.sizedBox(height: context.spacing32),
         _buildSpaceSignUpButton(context, formState, cubit, buttonRadius),
         OsmeaComponents.sizedBox(height: context.spacing24),
@@ -1349,7 +1591,10 @@ class AuthWidget extends StatelessWidget {
   Widget _buildSpaceSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = !isLoading && cubit.signUpCallback != null;
+    final isPaymentAgreementChecked = _isPaymentAgreementChecked(state);
+    final isEnabled = !isLoading && 
+        cubit.signUpCallback != null && 
+        isPaymentAgreementChecked;
 
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', OsmeaColors.thunder);
@@ -1367,7 +1612,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !isPaymentAgreementChecked
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
@@ -1538,6 +1783,8 @@ class AuthWidget extends StatelessWidget {
         _buildStartupSignUpLastNameField(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing32),
         ..._buildDynamicChecklists(context, formState, cubit, primaryColor),
+        // Payment agreements checkbox
+        _buildPaymentAgreementCheckbox(context, formState, cubit, primaryColor),
         OsmeaComponents.sizedBox(height: context.spacing32),
         _buildStartupSignUpButton(
             context, formState, cubit, buttonRadius, primaryColor),
@@ -1896,7 +2143,10 @@ class AuthWidget extends StatelessWidget {
   Widget _buildStartupSignUpButton(BuildContext context, AuthFormState state,
       AuthCubit cubit, double buttonRadius, Color primaryColor) {
     final isLoading = state.operationStatus == AuthOperationStatus.loading;
-    final isEnabled = !isLoading && cubit.signUpCallback != null;
+    final isPaymentAgreementChecked = _isPaymentAgreementChecked(state);
+    final isEnabled = !isLoading && 
+        cubit.signUpCallback != null && 
+        isPaymentAgreementChecked;
     
     // Get button colors from config
     final buttonBgColor = _getButtonColor('sign_up', 'backgroundColor', primaryColor);
@@ -1914,7 +2164,7 @@ class AuthWidget extends StatelessWidget {
       size: ButtonSize.medium,
       state: isLoading
           ? ButtonState.loading
-          : (cubit.signUpCallback == null
+          : (cubit.signUpCallback == null || !isPaymentAgreementChecked
               ? ButtonState.disabled
               : ButtonState.enabled),
       fullWidth: true,
