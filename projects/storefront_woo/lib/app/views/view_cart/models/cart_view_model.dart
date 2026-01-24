@@ -18,6 +18,7 @@ import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:apis/apis.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
@@ -29,6 +30,7 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   final CartService _cartService = GetIt.I<CartService>();
   final CartCouponsService _cartCouponsService = GetIt.I<CartCouponsService>();
   final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
+  final WishlistViewModel _wishlistViewModel = GetIt.I<WishlistViewModel>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
   
   // Wishlist API configuration - get from config like WishlistViewModel
@@ -137,6 +139,20 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     final jwtToken = await _getJwtToken();
     final isLoggedIn = jwtToken != null && jwtToken.isNotEmpty;
 
+    // Check if item is already in wishlist (BEFORE showing popup)
+    bool isInWishlist = false;
+    if (isLoggedIn) {
+      try {
+        // Ensure wishlist is synced before checking
+        await _wishlistViewModel.syncFromServer();
+        isInWishlist = _wishlistViewModel.isSaved(productId);
+        debugPrint('💖 Cart: Product $productId is ${isInWishlist ? "already" : "not"} in wishlist');
+      } catch (e) {
+        debugPrint('⚠️ Cart: Failed to check wishlist status: $e');
+        // Continue with popup even if check fails
+      }
+    }
+
     // Get popup colors from config
     final popupBgColor = _getDialogColorFromConfig(
       'popup.backgroundColor',
@@ -155,11 +171,11 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       8.0,
     );
 
-    // Build popup buttons based on login status
+    // Build popup buttons based on login status and wishlist status
     List<Widget> popupButtons = [];
     
-    // Only show "Remove & save for later" button if user is logged in
-    if (isLoggedIn) {
+    // Only show "Remove & save for later" button if user is logged in AND item is NOT already in wishlist
+    if (isLoggedIn && !isInWishlist) {
       popupButtons.add(
         OsmeaComponents.row(
           children: [
@@ -273,14 +289,24 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       ),
     );
 
+    // Build subtitle based on wishlist status
+    String subtitle;
+    if (isLoggedIn) {
+      if (isInWishlist) {
+        subtitle = '"$productName" is already saved in your favorites. Would you like to remove it from your cart?';
+      } else {
+        subtitle = 'Would you like to save "$productName" for later or remove it from your cart?';
+      }
+    } else {
+      subtitle = 'Are you sure you want to remove "$productName" from your cart?';
+    }
+
     // Show popup and wait for result
     final result = await OsmeaComponents.showPopup<String>(
       context: context,
       variant: PopupVariant.dialog,
       title: 'Remove from cart?',
-      subtitle: isLoggedIn
-          ? 'Would you like to save "$productName" for later or remove it from your cart?'
-          : 'Are you sure you want to remove "$productName" from your cart?',
+      subtitle: subtitle,
       backgroundColor: popupBgColor,
       titleStyle: OsmeaTextStyle.titleMedium(context).copyWith(
         color: popupTitleColor,
@@ -297,10 +323,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       ),
     );
 
-    // Handle result after popup is closed
+    // Handle result after popup is closed - execute query based on selection
     if (result == 'save_later') {
+      // Add to wishlist and remove from cart (query will be executed in _addToWishlistAndRemove)
       await _addToWishlistAndRemove(context, productId);
     } else if (result == 'remove_only') {
+      // Just remove from cart (query will be executed in _removeItemFromCart)
       await _removeItemFromCart(productId);
     }
   }
