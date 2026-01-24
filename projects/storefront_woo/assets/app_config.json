@@ -513,7 +513,19 @@
             "sign_up_button_loading": "Creating account...",
             "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
             "logo_width": 120,
-            "logo_height": 120
+            "logo_height": 120,
+            "payment_agreements": {
+                "preliminary_information_form": {
+                    "title": "Preliminary Information Form",
+                    "content": "SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nINTERMEDIARY SERVICE PROVIDER:\nCompany Name: D-MARKET ELECTRONIC SERVICES AND TRADE INC\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12 Trump Towers Tower 2 Floor 2 Şişli/Istanbul\nTax ID: 2650179910 - Boğaziçi Corporate Tax Office\nPhone: 0850 252 40 00\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nPRELIMINARY INFORMATION FORM"
+                },
+                "distance_sales_agreement": {
+                    "title": "Distance Sales Agreement",
+                    "content": "DISTANCE SALES AGREEMENT\n\nARTICLE 1- PARTIES\n\n1.1. SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\n1.2. BUYER (\"CONSUMER\"):\nThe person placing the order is identified by the following information.\n\nARTICLE 2- SUBJECT OF THE AGREEMENT\n\nThis agreement is drawn up in accordance with the provisions of Law No. 6502 on the Protection of Consumers and the Distance Contracts Regulation regarding the sale and delivery of products ordered by the BUYER in the electronic environment and included in the SELLER's catalog.\n\nARTICLE 3- RIGHTS AND OBLIGATIONS\n\n3.1. The SELLER is responsible for delivering the product, which is the subject of the contract, sound, complete, in accordance with the specifications stated in the order, and with any warranty documents and user manuals.\n\n3.2. The BUYER is obliged to accept the delivery of the product ordered. The SELLER is not responsible for damages and expenses arising from the BUYER's late receipt or non-receipt of the product."
+                },
+                "checkbox_text": "I approve the Preliminary Information Form and the Distance Sales Agreement.",
+                "checkbox_link_color": "#FF6B00"
+            }
         },
         "forgot_password": {
             "title": "Reset Password",
