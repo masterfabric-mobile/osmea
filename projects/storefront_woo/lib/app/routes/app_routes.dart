@@ -38,6 +38,70 @@ import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_use
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
 
+/// Handle campaign navigation - checks onboarding status and navigates accordingly
+Future<void> _handleCampaignNavigation(BuildContext context) async {
+  // Check user authentication status from AuthCubit (HydratedCubit state)
+  // This ensures we use the persisted state, not just storage
+  try {
+    final authCubit = GetIt.I<AuthCubit>();
+    final isAuthenticated =
+        authCubit.state is AuthAuthenticatedState &&
+        authCubit.isAuthenticated;
+
+    if (!context.mounted) return;
+
+    if (isAuthenticated) {
+      debugPrint(
+        '👤 User already authenticated (from AuthCubit), navigating to home',
+      );
+      context.go('/home');
+    } else {
+      // User not authenticated, check onboarding status
+      final onboardingHelper = OnboardingStorageHelper();
+      final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
+      
+      // Check if onboarding is enabled in config
+      final configHelper = AssetConfigHelper();
+      final onboardingEnabled = configHelper.getBool('feature_flags.onboarding_enabled', true);
+      
+      if (!context.mounted) return;
+      
+      if (onboardingEnabled && !hasSeenOnboarding) {
+        // First-time user, show onboarding
+        debugPrint('📚 First-time user, navigating to onboarding');
+        context.go('/onboarding');
+      } else {
+        // User has seen onboarding or onboarding is disabled, go to home
+        debugPrint('🏠 User has seen onboarding or onboarding disabled, navigating to home');
+        context.go('/home');
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Error checking AuthCubit/Onboarding state: $e');
+    // Fallback: check onboarding status
+    try {
+      final onboardingHelper = OnboardingStorageHelper();
+      final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
+      final configHelper = AssetConfigHelper();
+      final onboardingEnabled = configHelper.getBool('feature_flags.onboarding_enabled', true);
+      
+      if (!context.mounted) return;
+      
+      if (onboardingEnabled && !hasSeenOnboarding) {
+        context.go('/onboarding');
+      } else {
+        context.go('/home');
+      }
+    } catch (e2) {
+      debugPrint('⚠️ Error in fallback onboarding check: $e2');
+      // Final fallback: go to home
+      if (context.mounted) {
+        context.go('/home');
+      }
+    }
+  }
+}
+
 /// Custom ErrorHandlingView for route errors
 /// Shows route-specific error messages using app_config.json configuration
 class _RouteErrorHandlingView extends ErrorHandlingView {
@@ -1079,7 +1143,7 @@ final GoRouter appRouter = GoRouter(
         return SplashView(
           goRoute: (String path) {
             // After splash, navigate to campaign screen first
-            // Campaign screen will then navigate to home after 1.5 seconds
+            // Campaign screen will then check onboarding and navigate accordingly
             debugPrint('🎯 Splash completed, navigating to campaign screen');
             context.go('/campaign');
           },
@@ -1087,57 +1151,15 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Campaign Screen Route - Shows campaign images for 1.5 seconds then navigates to home
+    // Campaign Screen Route - Shows campaign images for 1.5 seconds then navigates to onboarding or home
     GoRoute(
       path: '/campaign',
       pageBuilder: (BuildContext context, GoRouterState state) {
         return CustomTransitionPage(
           child: CampaignView(
             goRoute: (String path) {
-              // Check user authentication status from AuthCubit (HydratedCubit state)
-              // This ensures we use the persisted state, not just storage
-              try {
-                final authCubit = GetIt.I<AuthCubit>();
-                final isAuthenticated =
-                    authCubit.state is AuthAuthenticatedState &&
-                    authCubit.isAuthenticated;
-
-                if (!context.mounted) return;
-
-                if (isAuthenticated) {
-                  debugPrint(
-                    '👤 User already authenticated (from AuthCubit), navigating to home',
-                  );
-                  context.go('/home');
-                } else {
-                  // User not authenticated, go to guest mode (onboarding → home)
-                  if (path.contains(Routes.home.name)) {
-                    context.go('/home'); // Allow guest mode
-                  } else if (path.contains(Routes.onboarding.name)) {
-                    context.go('/onboarding');
-                  } else if (path.contains(Routes.signIn.name)) {
-                    context.go('/auth');
-                  } else {
-                    // Default: home (guest mode enabled)
-                    context.go('/home');
-                  }
-                }
-              } catch (e) {
-                debugPrint('⚠️ Error checking AuthCubit state: $e');
-                // Fallback to storage check
-                final authStorage = AuthStorageHelper();
-                authStorage.isAuthenticated().then((isAuthenticated) {
-                  if (!context.mounted) return;
-                  if (isAuthenticated) {
-                    debugPrint(
-                      '👤 User already authenticated (from storage), navigating to home',
-                    );
-                    context.go('/home');
-                  } else {
-                    context.go('/home');
-                  }
-                });
-              }
+              // Async navigation logic - check onboarding status and navigate accordingly
+              _handleCampaignNavigation(context);
             },
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
