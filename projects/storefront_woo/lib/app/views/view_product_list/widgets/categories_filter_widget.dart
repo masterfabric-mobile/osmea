@@ -40,7 +40,7 @@ class _CategoriesFilterWidgetState extends State<CategoriesFilterWidget> {
             child: OsmeaComponents.loading(
               type: LoadingType.circularFade,
               size: 32,
-              color: OsmeaColors.nordicBlue,
+              color: OsmeaColors.black,
             ),
           );
         }
@@ -78,13 +78,12 @@ class _CategoriesFilterWidgetState extends State<CategoriesFilterWidget> {
 
             return OsmeaComponents.chips(
               text: categoryName,
-              icon: isSelected ? Icons.check_circle : null,
+              icon: isSelected ? Icons.check : null,
               iconPosition: ChipsIconPosition.start,
               variant: isSelected ? ChipsVariant.primary : ChipsVariant.neutral,
               style: isSelected ? ChipsStyle.normal : ChipsStyle.outlined,
-              selected: isSelected,
               borderWidth: isSelected ? 2.0 : null,
-              backgroundColor: isSelected ? OsmeaColors.nordicBlue : null,
+              backgroundColor: isSelected ? OsmeaColors.black : null,
               textColor: isSelected ? OsmeaColors.white : null,
               onTap: () {
                 final newSelectedCategories = List<int>.from(

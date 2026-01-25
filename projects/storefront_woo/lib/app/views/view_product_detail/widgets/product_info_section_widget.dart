@@ -13,6 +13,7 @@ import 'package:storefront_woo/app/views/view_product_detail/models/module/state
 import 'package:storefront_woo/app/views/view_product_detail/widgets/description_section.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_attributes_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_section_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product information section
 class ProductInfoSectionWidget extends StatelessWidget {
@@ -27,73 +28,76 @@ class ProductInfoSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing16,
-        vertical: context.spacing8,
-      ),
-      child: OsmeaComponents.column(
-        crossAxisAlignment: context.crossStart,
-        children: [
-          // Product name
-          OsmeaComponents.text(
-            state.product.name ?? 'Unknown Product',
-            textStyle: OsmeaTextStyle.headlineLarge(context).copyWith(
-              fontWeight: FontWeight.w300,
-              letterSpacing: -0.8,
-              height: 1.0,
-              color: OsmeaColors.thunder,
-            ),
+    return OsmeaComponents.column(
+      crossAxisAlignment: context.crossStart,
+      children: [
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing16,
+            vertical: context.spacing4,
           ),
-
-          OsmeaComponents.sizedBox(height: context.spacing6),
-
-          // Price
-          OsmeaComponents.text(
-            _formatPrice(state.product.prices),
-            textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-              color: OsmeaColors.nordicBlue,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.5,
-              height: 1.1,
-            ),
-          ),
-
-          OsmeaComponents.sizedBox(height: context.spacing12),
-
-          // Attributes
-          if (state.product.attributes != null &&
-              state.product.attributes!.isNotEmpty)
-            ProductAttributesWidget(
-              viewModel: viewModel,
-              state: state,
-            ),
-
-          OsmeaComponents.sizedBox(height: context.spacing16),
-
-          // Description
-          if (state.product.description?.isNotEmpty == true) ...[
-            OsmeaComponents.text(
-              'Details',
-              textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.0,
-                color: OsmeaColors.thunder.withValues(alpha: 0.8),
+          child: OsmeaComponents.column(
+            crossAxisAlignment: context.crossStart,
+            children: [
+              // Product name only - price is shown in footer
+              OsmeaComponents.text(
+                state.product.name ?? context.t.productDetailView.unknownProduct,
+                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                  height: 1.2,
+                  color: OsmeaColors.black,
+                ),
               ),
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing6),
-            DescriptionSection(
-              description: state.product.description!,
-              viewModel: viewModel,
-              state: state,
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing12),
-          ],
 
-          // Reviews Section
-          ProductReviewsSectionWidget(state: state),
-        ],
-      ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+            ],
+          ),
+        ),
+
+        // Attributes - collapse extends edge to edge
+        if (state.product.attributes != null &&
+            state.product.attributes!.isNotEmpty)
+          ProductAttributesWidget(
+            viewModel: viewModel,
+            state: state,
+          ),
+
+        OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing16,
+            vertical: context.spacing4,
+          ),
+          child: OsmeaComponents.column(
+            crossAxisAlignment: context.crossStart,
+            children: [
+              OsmeaComponents.sizedBox(height: context.spacing8),
+
+              // Description
+              if (state.product.description?.isNotEmpty == true) ...[
+                OsmeaComponents.text(
+                  context.t.productDetailView.description.details,
+                  textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.0,
+                    color: OsmeaColors.black,
+                  ),
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing4),
+                DescriptionSection(
+                  description: state.product.description!,
+                  viewModel: viewModel,
+                  state: state,
+                ),
+                OsmeaComponents.sizedBox(height: context.spacing12),
+              ],
+
+              // Reviews Section
+              ProductReviewsSectionWidget(state: state),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

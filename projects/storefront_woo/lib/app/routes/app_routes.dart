@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
@@ -13,6 +15,15 @@ import 'package:storefront_woo/app/views/view_campaign/campaign_view.dart';
 import 'package:storefront_woo/app/views/view_favorite_categories/favorite_categories_view.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_results_grid_widget.dart';
 import 'package:storefront_woo/app/views/view_search/widgets/search_empty_state_widget.dart';
+import 'package:storefront_woo/app/views/view_orders_history/orders_history_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/user_profile_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/addresses/user_addresses_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/settings/user_settings_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/metadata/user_metadata_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/preferences/user_preferences_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/contracts/user_contracts_sub_view.dart';
+import 'package:storefront_woo/app/views/view_user_profile/edit/user_edit_profile_sub_view.dart';
+import 'package:storefront_woo/app/views/view_order_detail/order_detail_view.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -23,18 +34,97 @@ import 'package:get_it/get_it.dart';
 import 'package:apis/apis.dart';
 import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
+
+/// Custom ErrorHandlingView for route errors
+/// Shows route-specific error messages using app_config.json configuration
+class _RouteErrorHandlingView extends ErrorHandlingView {
+  final String errorPath;
+  final Exception? error;
+
+  _RouteErrorHandlingView({
+    required this.errorPath,
+    this.error,
+    required super.goRoute,
+    super.onGoHome,
+    super.onGoBack,
+  }) : super(
+          arguments: const {'routeError': true},
+        );
+
+  @override
+  Future<void> initialContent(viewModel, BuildContext context) async {
+    debugPrint('🎯 Route Error Handling View Start!');
+    debugPrint('📍 Error path: $errorPath');
+    debugPrint('❌ Error: $error');
+    
+    // Load error handling config from app_config.json
+    await viewModel.loadErrorHandlingConfig();
+
+    // Show route error with custom message
+    // Error message will be styled according to app_config.json configuration
+    final errorMessage = 'The route "$errorPath" could not be found. '
+        'Please check the URL and try again.';
+    
+    await viewModel.showError(
+      errorType: ErrorType.general,
+      errorMessage: errorMessage,
+      errorCode: 'ROUTE_NOT_FOUND',
+    );
+  }
+}
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: false, // Disable debug route bar to prevent freezing
+  // Deep linking support - redirect configuration
+  redirect: (BuildContext context, GoRouterState state) {
+    // Handle deep links and redirects here if needed
+    // For now, return null to allow normal navigation
+    return null;
+  },
+  // Error handling for deep links - uses ErrorHandlingView from core package
+  errorBuilder: (BuildContext context, GoRouterState state) {
+    debugPrint('⚠️ Route error: ${state.error} for path: ${state.uri.path}');
+    
+    // Use ErrorHandlingView from core package with app_config.json configuration
+    return ErrorHandlingProvider(
+      child: _RouteErrorHandlingView(
+        errorPath: state.uri.path,
+        error: state.error,
+        goRoute: (String path) {
+          if (path.contains('home') || path == '/home') {
+            context.go('/home');
+          } else {
+            context.go(path);
+          }
+        },
+        onGoHome: () => context.go('/home'),
+        onGoBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        },
+      ),
+    );
+  },
   // Global route configuration
   routes: <RouteBase>[
     // Shell Route with Navbar for main app sections
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return Scaffold(
-          body: child,
-          bottomNavigationBar: _getNavbarForRoute(state.uri.path),
+        // Get navbar widget - always returns navbar if route should show it (config'de olsa da olmasa da)
+        final navbar = _getNavbarForRoute(state.uri.path, null);
+        
+        return _AppShellWithMiniCart(
+          child: child,
+          navbar: navbar,
+          currentPath: state.uri.path,
+          routeExtra: null,
         );
       },
       routes: [
@@ -42,9 +132,17 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/home',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'home': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: HomeView(
-                arguments: const {'home': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('products')) {
                     context.go('/products');
@@ -66,35 +164,19 @@ final GoRouter appRouter = GoRouter(
           },
         ),
 
-        // Search Page
-        // GoRoute(
-        //   path: '/search',
-        //   pageBuilder: (BuildContext context, GoRouterState state) {
-        //     return CustomTransitionPage(
-        //       child: store_search.SearchView(
-        //         goRoute: (String path) {
-        //           if (path.contains('home')) {
-        //             context.go('/home');
-        //           } else if (path.contains('product-detail')) {
-        //             context.go('/product-detail');
-        //           } else {
-        //             context.go('/search');
-        //           }
-        //         },
-        //       ),
-        //       transitionsBuilder:
-        //           (context, animation, secondaryAnimation, child) {
-        //             return FadeTransition(opacity: animation, child: child);
-        //           },
-        //       transitionDuration: const Duration(milliseconds: 300),
-        //     );
-        //   },
-        // ),
 
         // Saved Page
         GoRoute(
           path: '/saved',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'saved': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
             return CustomTransitionPage(
               child: WishlistView(
                 goRoute: (String path) {
@@ -104,13 +186,25 @@ final GoRouter appRouter = GoRouter(
                     context.go('/saved');
                   }
                 },
-                arguments: const {'saved': true},
+                arguments: arguments,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.0, 1.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
                   },
-              transitionDuration: const Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: 400),
             );
           },
         ),
@@ -119,8 +213,20 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/search',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Create focus node for auto-focusing search input
+            final searchFocusNode = FocusNode();
+
+            // Extract query and fromHome flag from URL if present
+            final query = state.uri.queryParameters['query'];
+            final fromHome = state.uri.queryParameters['fromHome'] == 'true';
+            // Note: Search route shows navbar by default (it's a main navigation item)
+            // Navbar visibility is controlled by _getNavbarForRoute based on route path
+
             return CustomTransitionPage(
-              child: SearchView(
+              child: _AutoFocusSearchView(
+                searchFocusNode: searchFocusNode,
+                initialQuery: query,
+                fromHome: fromHome,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -132,13 +238,6 @@ final GoRouter appRouter = GoRouter(
                     context.go('/home');
                   }
                 },
-                title: const Text('Search Products'),
-                searchHint: 'Search for products...',
-                showBackButton: true,
-                showTitle: false,
-                onBackPressed: () => context.go('/home'),
-
-                // WooCommerce search provider
                 searchProvider: (query) async {
                   try {
                     final productService = GetIt.I<ProductService>();
@@ -157,24 +256,17 @@ final GoRouter appRouter = GoRouter(
                     return [];
                   }
                 },
-
-                // Custom result builder for product grid
-                resultBuilder: (context, results) {
-                  return SearchResultsGridWidget(products: results);
-                },
-
-                // Empty state with categories and brands
-                emptyStateBuilder: (context) {
-                  // Get SearchCubit from context to enable category/brand search
-                  final searchCubit = context.read<SearchCubit>();
-                  return SearchEmptyStateWidget(searchCubit: searchCubit);
-                },
+                // No local search history suggestions.
+                // (User requested: don't show past searches.)
+                searchSuggestionProvider: null,
+                initialHistory: const [],
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
+                    // Smooth fade transition that feels like no transition
                     return FadeTransition(opacity: animation, child: child);
                   },
-              transitionDuration: const Duration(milliseconds: 300),
+              transitionDuration: const Duration(milliseconds: 150),
             );
           },
         ),
@@ -187,6 +279,7 @@ final GoRouter appRouter = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'cart': true,
+              'showNavbar': extra?['showNavbar'] ?? true,
               if (extra != null && extra.containsKey('cartToken'))
                 'cartToken': extra['cartToken'] as String?,
             };
@@ -228,9 +321,28 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/products',
           pageBuilder: (BuildContext context, GoRouterState state) {
+            // Parse query parameters
+            final queryParams = state.uri.queryParameters;
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = <String, dynamic>{
+              'products': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+            };
+
+            // Add category_id from query parameters if present
+            if (queryParams.containsKey('category_id')) {
+              final categoryIdStr = queryParams['category_id'];
+              if (categoryIdStr != null) {
+                final categoryId = int.tryParse(categoryIdStr);
+                if (categoryId != null) {
+                  arguments['category_id'] = categoryId;
+                }
+              }
+            }
+
             return CustomTransitionPage(
               child: ProductListView(
-                arguments: const {'products': true},
+                arguments: arguments,
                 goRoute: (String path) {
                   if (path.contains('home')) {
                     context.go('/home');
@@ -242,6 +354,712 @@ final GoRouter appRouter = GoRouter(
                     context.go('/home');
                   }
                 },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+              transitionDuration: const Duration(milliseconds: 400),
+            );
+          },
+        ),
+
+        // Favorite Categories Route
+        GoRoute(
+          path: '/favorite-categories',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'favorite_categories': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+            
+            return CustomTransitionPage(
+              child: FavoriteCategoriesView(
+                arguments: arguments,
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('products')) {
+                    context.go(path);
+                  } else {
+                    context.go('/favorite-categories');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Profile Route (using AccountView from core package)
+        GoRoute(
+          path: '/profile',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            // Get AccountCubit and AuthCubit for platform-specific auth state listening
+            final accountCubit = GetIt.I<AccountCubit>();
+            final authCubit = GetIt.I<AuthCubit>();
+
+            // Load user API data and set it to AccountCubit
+            // This ensures profile data is always fresh (user can update their info)
+            _loadUserApiData(accountCubit);
+
+            // Extract route extra for navbar control
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'account': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true,
+              ...?routeExtra,
+            };
+
+            return CustomTransitionPage(
+              child: BlocListener<AuthCubit, AuthState>(
+                bloc: authCubit,
+                listener: (context, authState) {
+                  // If AuthCubit becomes authenticated, refresh profile data
+                  if (authState is AuthAuthenticatedState) {
+                    debugPrint(
+                      '👤 Route: AuthCubit authenticated, refreshing profile...',
+                    );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      // Reload user API data and refresh profile
+                      _loadUserApiData(accountCubit);
+                      accountCubit.refreshProfile();
+                    });
+                  }
+                },
+                child: AccountView(
+                  arguments: arguments,
+                  goRoute: (String path) {
+                    debugPrint(
+                      '🔀 AccountView: goRoute called with path: $path',
+                    );
+                    if (path.contains('home') || path == '/home') {
+                      debugPrint('🔀 AccountView: Navigating to /home');
+                      context.go('/home');
+                    } else if (path.contains('cart') || path == '/cart') {
+                      debugPrint('🔀 AccountView: Navigating to /cart');
+                      context.go('/cart');
+                    } else if (path.contains('saved') || path == '/saved') {
+                      debugPrint('🔀 AccountView: Navigating to /saved');
+                      context.go('/saved');
+                    } else if (path.contains('auth') || path == '/auth') {
+                      debugPrint('🔀 AccountView: Navigating to /auth');
+                      context.go('/auth');
+                    } else {
+                      debugPrint('🔀 AccountView: Navigating to path: $path');
+                      context.go(path);
+                    }
+                  },
+                  onSignOut: () async {
+                    // Capture router instance early so we can navigate even if the
+                    // original BuildContext becomes unmounted during async cleanup.
+                    final router = GoRouter.of(context);
+
+                    // AccountCubit handles its own state clearing
+                    // Platform-specific cleanup is provided via callback
+                    await accountCubit.signOut(
+                      onSignOut: () async {
+                        // Platform-specific cleanup: cookies, wishlist, cart tokens, Woo JWT
+                        //
+                        // NOTE: Do NOT call AuthCubit.signOut() here.
+                        // Core AccountWidget already signs out AuthCubit as part of the
+                        // comprehensive sign-out flow. Calling it here can cause duplicate
+                        // state transitions and intermittent navigation issues.
+                        debugPrint(
+                          '🚪 Route: Starting platform-specific cleanup...',
+                        );
+
+                        // Step 1: Clear WooCommerce JWT token
+                        try {
+                          await WooJwtTokenStorage.clearToken();
+                          debugPrint('✅ Route: WooJWT token cleared');
+                        } catch (e) {
+                          debugPrint(
+                            '⚠️ Route: Failed to clear WooJWT token: $e',
+                          );
+                        }
+
+                        // Step 2: Clear cart token
+                        try {
+                          await WooCartTokenStorage.clearCartToken();
+                          debugPrint('✅ Route: WooCartToken cleared');
+                        } catch (e) {
+                          debugPrint(
+                            '⚠️ Route: Failed to clear WooCartToken: $e',
+                          );
+                        }
+
+                        // Step 3: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
+                        try {
+                          await ApiDioClient.clearAllCookies();
+                          debugPrint(
+                            '✅ Route: All cookies cleared (including WP cookies)',
+                          );
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear cookies: $e');
+                        }
+
+                        // Step 4: Clear wishlist (user-specific data)
+                        try {
+                          final wishlistViewModel =
+                              GetIt.I<WishlistViewModel>();
+                          await wishlistViewModel.clearAll();
+                          debugPrint('✅ Route: Wishlist cleared');
+                        } catch (e) {
+                          debugPrint('⚠️ Route: Failed to clear wishlist: $e');
+                        }
+
+                        debugPrint(
+                          '✅ Route: Platform-specific cleanup completed',
+                        );
+                      },
+                    );
+
+                    // Navigate to home after sign out.
+                    debugPrint(
+                      '🔀 Route: Navigating to /home after sign out...',
+                    );
+                    router.go('/home');
+                    debugPrint('✅ Route: Navigation to /home completed');
+                  },
+                ),
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // About Route
+        GoRoute(
+          path: '/about',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: AboutView(
+                goRoute: (String path) {
+                  debugPrint('🔀 AboutView: goRoute called with path: $path');
+                  context.go(path);
+                },
+                // AboutView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Contact Us Route
+        GoRoute(
+          path: '/contact-us',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: ContactUsView(
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 ContactUsView: goRoute called with path: $path',
+                  );
+                  context.go(path);
+                },
+                // ContactUsView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // FAQ Route
+        GoRoute(
+          path: '/faq',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: FAQView(
+                goRoute: (String path) {
+                  debugPrint('🔀 FAQView: goRoute called with path: $path');
+                  context.go(path);
+                },
+                // FAQView will load configuration from app_config.json internally
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Orders History Route
+        GoRoute(
+          path: '/orders-history',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              child: OrdersHistoryView(
+                arguments: const {'orders_history': true},
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 OrdersHistoryView: goRoute called with path: $path',
+                  );
+                  if (path.contains('profile') || path == '/profile') {
+                    context.go('/profile');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // User Profile Route
+        GoRoute(
+          path: '/user-profile',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'user_profile': true,
+              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              ...?routeExtra,
+            };
+            
+            return CustomTransitionPage(
+              child: UserProfileView(
+                arguments: arguments,
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 UserProfileView: goRoute called with path: $path',
+                  );
+                  if (path.contains('profile') || path == '/profile') {
+                    context.go('/profile');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+          routes: [
+            // User Edit Profile Route
+            GoRoute(
+              path: 'edit',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'edit_profile': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserEditProfileView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Addresses Route
+            GoRoute(
+              path: 'addresses',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'addresses': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserAddressesView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Settings Route
+            GoRoute(
+              path: 'settings',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'settings': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserSettingsView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Metadata Route
+            GoRoute(
+              path: 'metadata',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'metadata': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserMetadataView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Preferences Route
+            GoRoute(
+              path: 'preferences',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'preferences': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserPreferencesView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+            // User Contracts Route
+            GoRoute(
+              path: 'contracts',
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                final routeExtra = state.extra as Map<String, dynamic>?;
+                final arguments = {
+                  'contracts': true,
+                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  ...?routeExtra,
+                };
+                
+                return CustomTransitionPage(
+                  child: UserContractsView(
+                    arguments: arguments,
+                    goRoute: (String path) {
+                      context.go(path);
+                    },
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                );
+              },
+            ),
+          ],
+        ),
+
+        // Order Detail Route
+        GoRoute(
+          path: '/order-detail/:orderId',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final orderId =
+                int.tryParse(state.pathParameters['orderId'] ?? '0') ?? 0;
+            final routeExtra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'order_detail': true,
+              'orderId': orderId,
+              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              ...?routeExtra,
+            };
+            
+            return CustomTransitionPage(
+              child: OrderDetailView(
+                arguments: arguments,
+                goRoute: (String path) {
+                  debugPrint(
+                    '🔀 OrderDetailView: goRoute called with path: $path',
+                  );
+                  if (path.contains('orders-history') ||
+                      path == '/orders-history') {
+                    context.go('/orders-history');
+                  } else {
+                    context.go(path);
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Product Detail Route
+        GoRoute(
+          path: '/product-detail/:productId',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final productId = int.tryParse(
+              state.pathParameters['productId'] ?? '0',
+            );
+            // Get cart token from extra (route params) or use default
+            final extra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'productDetail': true,
+              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
+              if (extra != null && extra.containsKey('cartToken'))
+                'cartToken': extra['cartToken'] as String?,
+            };
+            return CustomTransitionPage(
+              child: ProductDetailView(
+                productId: productId ?? 0,
+                arguments: arguments,
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return ScaleTransition(
+                      scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOutBack,
+                        ),
+                      ),
+                      child: FadeTransition(opacity: animation, child: child),
+                    );
+                  },
+              transitionDuration: const Duration(milliseconds: 500),
+            );
+          },
+        ),
+
+        // Checkout Route
+        GoRoute(
+          path: '/checkout',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final arguments = {
+              'checkout': true,
+              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
+              if (extra != null) ...extra,
+            };
+            return CustomTransitionPage(
+              child: CheckoutView(
+                arguments: arguments,
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0.0, 1.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOutCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+              transitionDuration: const Duration(milliseconds: 400),
+            );
+          },
+        ),
+
+        // Empty View Route
+        GoRoute(
+          path: '/empty/:emptyType',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
+            final emptyType = EmptyType.values.firstWhere(
+              (type) => type.name == emptyTypeStr,
+              orElse: () => EmptyType.general,
+            );
+
+            // Get custom parameters from query
+            final queryParams = state.uri.queryParameters;
+            final customTitle = queryParams['title'];
+            final customDescription = queryParams['description'];
+            final customImagePath = queryParams['imagePath'];
+            final customIconPath = queryParams['iconPath'];
+            final actionPath = queryParams['actionPath'] ?? '/home';
+
+            return CustomTransitionPage(
+              child: EmptyView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('saved')) {
+                    context.go('/saved');
+                  } else {
+                    context.go(path);
+                  }
+                },
+                emptyType: emptyType,
+                customTitle: customTitle,
+                customDescription: customDescription,
+                customImagePath: customImagePath,
+                customIconPath: customIconPath,
+                onActionPressed: () {
+                  context.go(actionPath);
+                },
+                arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
+
+        // Loading View Route
+        GoRoute(
+          path: '/loading/:loadingType',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final loadingTypeStr =
+                state.pathParameters['loadingType'] ?? 'general';
+            final loadingType = LoadingModelType.values.firstWhere(
+              (type) => type.name == loadingTypeStr,
+              orElse: () => LoadingModelType.general,
+            );
+
+            // Get custom parameters from query
+            final queryParams = state.uri.queryParameters;
+            final customTitle = queryParams['title'];
+            final customDescription = queryParams['description'];
+            final targetRoute = queryParams['targetRoute'];
+
+            return CustomTransitionPage(
+              child: LoadingView(
+                goRoute: (String path) {
+                  if (path.contains('home')) {
+                    context.go('/home');
+                  } else if (path.contains('cart')) {
+                    context.go('/cart');
+                  } else if (path.contains('saved')) {
+                    context.go('/saved');
+                  } else {
+                    context.go(path);
+                  }
+                },
+                loadingType: loadingType,
+                loadingPageModel:
+                    customTitle != null || customDescription != null
+                    ? LoadingPageModel(
+                        title: customTitle ?? 'Loading...',
+                        description: customDescription ?? 'Please wait',
+                        loadingType: loadingType,
+                        autoNavigateOnComplete: targetRoute != null,
+                        targetRoute: targetRoute,
+                      )
+                    : null,
+                onCompleted: targetRoute != null
+                    ? () {
+                        // Navigate to target route when loading completes
+                        context.go(targetRoute);
+                      }
+                    : null,
+                arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -323,37 +1141,9 @@ final GoRouter appRouter = GoRouter(
             },
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 600),
-        );
-      },
-    ),
-
-    // Favorite Categories Route
-    GoRoute(
-      path: '/favorite-categories',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          child: FavoriteCategoriesView(
-            arguments: const {'favorite_categories': true},
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('products')) {
-                context.go(path);
-              } else {
-                context.go('/favorite-categories');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
-          transitionDuration: const Duration(milliseconds: 300),
+          transitionDuration: const Duration(milliseconds: 600),
         );
       },
     ),
@@ -418,6 +1208,19 @@ final GoRouter appRouter = GoRouter(
           onSignInSuccess: () {
             debugPrint('✅ Sign in successful! Navigating to /home');
             context.go('/home');
+          },
+          onSignInError: (String error) {
+            debugPrint('❌ Sign in error: $error');
+            // Show error snackbar to user
+            context.snackbarError(
+              'Password or email is incorrect,please try again',
+              duration: const Duration(seconds: 3),
+            );
+          },
+          onSignUpError: (String error) {
+            debugPrint('❌ Sign up error: $error');
+            // Show error snackbar to user
+            context.snackbarError(error, duration: const Duration(seconds: 3));
           },
           arguments: {
             'auth': true,
@@ -588,6 +1391,77 @@ final GoRouter appRouter = GoRouter(
                   debugPrint('⚠️ Error syncing wishlist after login: $e');
                   // Don't block login if wishlist sync fails
                 }
+
+                // Load and cache user addresses after successful login
+                // This prevents slow API calls every time addresses are needed
+                // Note: We wait a bit after login to ensure backend has processed the user data
+                try {
+                  // Wait a short time for backend to process user data after login
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  
+                  debugPrint('📍 [ADDRESS CACHE] Loading user addresses for caching...');
+                  final usersManagerService = GetIt.I<OsmeaUsersManagerService>();
+                  
+                  // Try to fetch addresses with retry mechanism
+                  GetUserAddressesResponse? addressesResponse;
+                  int retryCount = 0;
+                  const maxRetries = 2;
+                  
+                  while (retryCount <= maxRetries) {
+                    try {
+                      addressesResponse = await usersManagerService.getUserAddresses();
+                      debugPrint('📍 [ADDRESS CACHE] API Response: ${addressesResponse.addresses.length} addresses received');
+                      
+                      // If we got addresses (even if 0), cache them
+                      // But if we got 0 and it's the first try, wait and retry once
+                      if (addressesResponse.addresses.isNotEmpty || retryCount > 0) {
+                        break; // Success or already retried
+                      }
+                      
+                      // If 0 addresses on first try, wait and retry
+                      if (retryCount == 0 && addressesResponse.addresses.isEmpty) {
+                        debugPrint('⚠️ [ADDRESS CACHE] Got 0 addresses on first try, waiting 1 second and retrying...');
+                        await Future.delayed(const Duration(seconds: 1));
+                        retryCount++;
+                        continue;
+                      }
+                    } catch (e) {
+                      debugPrint('⚠️ [ADDRESS CACHE] Error fetching addresses (attempt ${retryCount + 1}): $e');
+                      if (retryCount < maxRetries) {
+                        await Future.delayed(Duration(milliseconds: 500 * (retryCount + 1)));
+                        retryCount++;
+                        continue;
+                      }
+                      rethrow;
+                    }
+                    break;
+                  }
+                  
+                  if (addressesResponse != null) {
+                    // Cache addresses in local storage
+                    final storage = LocalStorageHelper();
+                    final addressesJson = jsonEncode(
+                      addressesResponse.addresses.map((addr) => addr.toJson()).toList(),
+                    );
+                    await storage.setItem('user_addresses_cache', addressesJson);
+                    final timestamp = DateTime.now().toIso8601String();
+                    await storage.setItem('user_addresses_cache_timestamp', timestamp);
+                    
+                    debugPrint('✅ [ADDRESS CACHE] User addresses cached successfully');
+                    debugPrint('   📦 Cached ${addressesResponse.addresses.length} addresses');
+                    debugPrint('   🕐 Cache timestamp: $timestamp');
+                    debugPrint('   💾 Cache key: user_addresses_cache');
+                  }
+                  
+                  // Cache order addresses in background (this is slow, so don't block login)
+                  // Order addresses will be loaded from cache when user visits addresses page
+                  _cacheOrdersInBackground(usersManagerService);
+                } catch (e, stackTrace) {
+                  debugPrint('❌ [ADDRESS CACHE] Error caching user addresses after login: $e');
+                  debugPrint('   Stack trace: $stackTrace');
+                  // Don't block login if address caching fails
+                  // Addresses will be loaded when user visits the addresses page
+                }
               } else {
                 debugPrint('⚠️ No JWT token found in storage');
               }
@@ -660,326 +1534,244 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
-
-    // Profile Route (using AccountView from core package)
-    GoRoute(
-      path: '/profile',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        // Get AccountCubit and AuthCubit for platform-specific auth state listening
-        final accountCubit = GetIt.I<AccountCubit>();
-        final authCubit = GetIt.I<AuthCubit>();
-
-        // Load user API data and set it to AccountCubit
-        // This ensures profile data is always fresh (user can update their info)
-        _loadUserApiData(accountCubit);
-
-        return CustomTransitionPage(
-          child: BlocListener<AuthCubit, AuthState>(
-            bloc: authCubit,
-            listener: (context, authState) {
-              // If AuthCubit becomes authenticated, refresh profile data
-              if (authState is AuthAuthenticatedState) {
-                debugPrint(
-                  '👤 Route: AuthCubit authenticated, refreshing profile...',
-                );
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // Reload user API data and refresh profile
-                  _loadUserApiData(accountCubit);
-                  accountCubit.refreshProfile();
-                });
-              }
-            },
-            child: AccountView(
-              arguments: const {'account': true},
-              goRoute: (String path) {
-                debugPrint('🔀 AccountView: goRoute called with path: $path');
-                if (path.contains('home') || path == '/home') {
-                  debugPrint('🔀 AccountView: Navigating to /home');
-                  context.go('/home');
-                } else if (path.contains('cart') || path == '/cart') {
-                  debugPrint('🔀 AccountView: Navigating to /cart');
-                  context.go('/cart');
-                } else if (path.contains('saved') || path == '/saved') {
-                  debugPrint('🔀 AccountView: Navigating to /saved');
-                  context.go('/saved');
-                } else if (path.contains('auth') || path == '/auth') {
-                  debugPrint('🔀 AccountView: Navigating to /auth');
-                  context.go('/auth');
-                } else {
-                  debugPrint('🔀 AccountView: Navigating to path: $path');
-                  context.go(path);
-                }
-              },
-              onSignOut: () async {
-                // AccountCubit handles its own state clearing
-                // Platform-specific cleanup is provided via callback
-                await accountCubit.signOut(
-                  onSignOut: () async {
-                    // Platform-specific cleanup: cookies, wishlist, cart tokens, AuthCubit
-                    debugPrint(
-                      '🚪 Route: Starting platform-specific cleanup...',
-                    );
-
-                    // Step 1: Sign out from AuthCubit
-                    try {
-                      await authCubit.signOut();
-                      debugPrint('✅ Route: AuthCubit signed out');
-                    } catch (e) {
-                      debugPrint(
-                        '⚠️ Route: Failed to sign out from AuthCubit: $e',
-                      );
-                    }
-
-                    // Step 2: Clear WooCommerce JWT token
-                    try {
-                      await WooJwtTokenStorage.clearToken();
-                      debugPrint('✅ Route: WooJWT token cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear WooJWT token: $e');
-                    }
-
-                    // Step 3: Clear cart token
-                    try {
-                      await WooCartTokenStorage.clearCartToken();
-                      debugPrint('✅ Route: WooCartToken cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear WooCartToken: $e');
-                    }
-
-                    // Step 4: Clear all cookies (WP cookies: wordpress_logged_in_, woocommerce_items_in_cart, wp_woocommerce_session_)
-                    try {
-                      await ApiDioClient.clearAllCookies();
-                      debugPrint(
-                        '✅ Route: All cookies cleared (including WP cookies)',
-                      );
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear cookies: $e');
-                    }
-
-                    // Step 5: Clear wishlist (user-specific data)
-                    try {
-                      final wishlistViewModel = GetIt.I<WishlistViewModel>();
-                      wishlistViewModel.clearAll();
-                      debugPrint('✅ Route: Wishlist cleared');
-                    } catch (e) {
-                      debugPrint('⚠️ Route: Failed to clear wishlist: $e');
-                    }
-
-                    debugPrint('✅ Route: Platform-specific cleanup completed');
-                  },
-                );
-
-                // Step 5: Navigate to home after sign out
-                await Future.delayed(const Duration(milliseconds: 300));
-                if (context.mounted) {
-                  debugPrint('🔀 Route: Navigating to /home after sign out...');
-                  context.go('/home');
-                  debugPrint('✅ Route: Navigation to /home completed');
-                } else {
-                  debugPrint('⚠️ Route: Context not mounted, cannot navigate');
-                }
-              },
-              bottomNavigationBar: _getNavbarForRoute(state.uri.path),
-            ),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Product Detail Route
-    GoRoute(
-      path: '/product-detail/:productId',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final productId = int.tryParse(
-          state.pathParameters['productId'] ?? '0',
-        );
-        // Get cart token from extra (route params) or use default
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = {
-          'productDetail': true,
-          if (extra != null && extra.containsKey('cartToken'))
-            'cartToken': extra['cartToken'] as String?,
-        };
-        return CustomTransitionPage(
-          child: ProductDetailView(
-            productId: productId ?? 0,
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return ScaleTransition(
-              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
-              ),
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 500),
-        );
-      },
-    ),
-
-    // Checkout Route
-    GoRoute(
-      path: '/checkout',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        final arguments = {
-          'checkout': true,
-          if (extra != null) ...extra,
-        };
-        return CustomTransitionPage(
-          child: CheckoutView(
-            arguments: arguments,
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else {
-                context.go('/home');
-              }
-            },
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.0, 1.0),
-                end: Offset.zero,
-              ).animate(
-                CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeInOutCubic,
-                ),
-              ),
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        );
-      },
-    ),
-
-    // Empty View Route
-    GoRoute(
-      path: '/empty/:emptyType',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final emptyTypeStr = state.pathParameters['emptyType'] ?? 'general';
-        final emptyType = EmptyType.values.firstWhere(
-          (type) => type.name == emptyTypeStr,
-          orElse: () => EmptyType.general,
-        );
-
-        // Get custom parameters from query
-        final queryParams = state.uri.queryParameters;
-        final customTitle = queryParams['title'];
-        final customDescription = queryParams['description'];
-        final customImagePath = queryParams['imagePath'];
-        final customIconPath = queryParams['iconPath'];
-        final actionPath = queryParams['actionPath'] ?? '/home';
-
-        return CustomTransitionPage(
-          child: EmptyView(
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else if (path.contains('saved')) {
-                context.go('/saved');
-              } else {
-                context.go(path);
-              }
-            },
-            emptyType: emptyType,
-            customTitle: customTitle,
-            customDescription: customDescription,
-            customImagePath: customImagePath,
-            customIconPath: customIconPath,
-            onActionPressed: () {
-              context.go(actionPath);
-            },
-            arguments: {'emptyView': true, 'emptyType': emptyTypeStr},
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
-
-    // Loading View Route
-    GoRoute(
-      path: '/loading/:loadingType',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final loadingTypeStr = state.pathParameters['loadingType'] ?? 'general';
-        final loadingType = LoadingModelType.values.firstWhere(
-          (type) => type.name == loadingTypeStr,
-          orElse: () => LoadingModelType.general,
-        );
-
-        // Get custom parameters from query
-        final queryParams = state.uri.queryParameters;
-        final customTitle = queryParams['title'];
-        final customDescription = queryParams['description'];
-        final targetRoute = queryParams['targetRoute'];
-
-        return CustomTransitionPage(
-          child: LoadingView(
-            goRoute: (String path) {
-              if (path.contains('home')) {
-                context.go('/home');
-              } else if (path.contains('cart')) {
-                context.go('/cart');
-              } else if (path.contains('saved')) {
-                context.go('/saved');
-              } else {
-                context.go(path);
-              }
-            },
-            loadingType: loadingType,
-            loadingPageModel: customTitle != null || customDescription != null
-                ? LoadingPageModel(
-                    title: customTitle ?? 'Loading...',
-                    description: customDescription ?? 'Please wait',
-                    loadingType: loadingType,
-                    autoNavigateOnComplete: targetRoute != null,
-                    targetRoute: targetRoute,
-                  )
-                : null,
-            onCompleted: targetRoute != null
-                ? () {
-                    // Navigate to target route when loading completes
-                    context.go(targetRoute);
-                  }
-                : null,
-            arguments: {'loadingView': true, 'loadingType': loadingTypeStr},
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-      },
-    ),
   ],
 );
 
+/// Cache user orders in background after login
+/// This caches orders which can be used to extract addresses and for other purposes
+/// Note: This is a slow operation (many API calls), so it runs in background
+Future<void> _cacheOrdersInBackground(OsmeaUsersManagerService usersManagerService) async {
+  // Run in background without blocking
+  Future.microtask(() async {
+    try {
+      debugPrint('📍 [ORDER CACHE] Starting to cache user orders in background...');
+      
+      // Get order IDs from getUserDashboard
+      List<int> orderIds = [];
+      try {
+        final dashboard = await usersManagerService.getUserDashboard(
+          includeOrders: true,
+          ordersLimit: 100,
+        );
+        orderIds = dashboard.orders.map((o) => o.id).toList();
+        debugPrint('✅ [ORDER CACHE] Got ${orderIds.length} order IDs');
+      } catch (e) {
+        debugPrint('⚠️ [ORDER CACHE] Failed to get orders: $e');
+        return;
+      }
+
+      if (orderIds.isEmpty) {
+        debugPrint('⚠️ [ORDER CACHE] No orders found, caching empty list');
+        final storage = LocalStorageHelper();
+        await storage.setItem('user_orders_cache', jsonEncode([]));
+        await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
+        return;
+      }
+
+      // Fetch detailed order information (limit to 50 to avoid too many calls)
+      final List<Map<String, dynamic>> detailedOrders = [];
+      final limitedOrderIds = orderIds.take(50).toList();
+      
+      debugPrint('📦 [ORDER CACHE] Fetching ${limitedOrderIds.length} order details...');
+      
+      for (final orderId in limitedOrderIds) {
+        try {
+          final detailedOrder = await usersManagerService.getUserOrder(orderId);
+          // Convert to JSON for caching
+          detailedOrders.add(detailedOrder.toJson());
+        } catch (e) {
+          debugPrint('⚠️ [ORDER CACHE] Failed to retrieve order $orderId: $e');
+        }
+      }
+
+      // Cache the orders
+      final storage = LocalStorageHelper();
+      final ordersJson = jsonEncode(detailedOrders);
+      await storage.setItem('user_orders_cache', ordersJson);
+      await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
+      
+      debugPrint('✅ [ORDER CACHE] Cached ${detailedOrders.length} orders');
+      debugPrint('   💾 Cache key: user_orders_cache');
+    } catch (e, stackTrace) {
+      debugPrint('❌ [ORDER CACHE] Error caching orders: $e');
+      debugPrint('   Stack trace: $stackTrace');
+      // Don't throw - this is background operation
+    }
+  });
+}
+
+/// Get navbar colors from config
+Color _getNavbarColor(
+  AssetConfigHelper configHelper,
+  String key,
+  Color defaultValue,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final colorString = navbarConfig?[key] as String?;
+    if (colorString != null && colorString.isNotEmpty) {
+      // Handle hex color strings
+      if (colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar color $key: $e');
+  }
+  return defaultValue;
+}
+
+/// Get navbar elevation from config
+double _getNavbarElevation(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final elevation = navbarConfig?['elevation'] as num?;
+    if (elevation != null) {
+      return elevation.toDouble();
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar elevation: $e');
+  }
+  return 0.5;
+}
+
+/// Get navbar variant from config
+NavbarVariant _getNavbarVariant(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final variantString = navbarConfig?['variant'] as String?;
+    return NavbarVariantStringExtension.fromString(variantString) ??
+        NavbarVariant.retailMain;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar variant: $e');
+    return NavbarVariant.retailMain;
+  }
+}
+
+/// Get navbar size from config
+NavbarSize _getNavbarSize(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final sizeString = navbarConfig?['size'] as String?;
+    return NavbarSizeStringExtension.fromString(sizeString) ??
+        NavbarSize.medium;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar size: $e');
+    return NavbarSize.medium;
+  }
+}
+
+/// Get navbar position from config
+NavbarPosition _getNavbarPosition(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final positionString = navbarConfig?['position'] as String?;
+    return NavbarPositionStringExtension.fromString(positionString) ??
+        NavbarPosition.bottom;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar position: $e');
+    return NavbarPosition.bottom;
+  }
+}
+
+/// Get navbar boolean property from config
+bool _getNavbarBool(
+  AssetConfigHelper configHelper,
+  String key,
+  bool defaultValue,
+) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key] as bool?;
+    if (value != null) {
+      return value;
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return defaultValue;
+}
+
+/// Get navbar style from config
+NavbarStyle? _getNavbarStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final styleString = navbarConfig?['style'] as String?;
+    return NavbarStyleStringExtension.fromString(styleString);
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar style: $e');
+    return null; // Auto-detect if not specified
+  }
+}
+
+/// Get navbar indicator style from config
+NavbarIndicatorStyle _getNavbarIndicatorStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final indicatorString = navbarConfig?['indicatorStyle'] as String?;
+    return NavbarIndicatorStyleStringExtension.fromString(indicatorString) ??
+        NavbarIndicatorStyle.none;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar indicator style: $e');
+    return NavbarIndicatorStyle.none;
+  }
+}
+
+/// Get navbar numeric property from config
+double? _getNavbarDouble(AssetConfigHelper configHelper, String key) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key];
+    if (value is num) {
+      return value.toDouble();
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return null;
+}
+
+/// Determines if navbar should be shown for a given route path
+/// Navbar is shown on all pages except auth, onboarding, campaign, and special pages
+bool _shouldShowNavbarForPath(String path) {
+  // Routes that should NOT show navbar (only special pages like auth, onboarding, etc.)
+  final hideNavbarRoutes = [
+    '/auth',            // Authentication pages
+    '/onboarding',      // Onboarding flow
+    '/campaign',        // Campaign splash
+    '/',                // Root/splash route
+    '/empty',           // Empty state pages
+    '/loading',         // Loading pages
+  ];
+  
+  // Check if path matches exactly or starts with any hide navbar route
+  for (final route in hideNavbarRoutes) {
+    if (path == route || path.startsWith('$route/')) {
+      debugPrint('🚫 Navbar hidden for route: $path (matches: $route)');
+      return false;
+    }
+  }
+  
+  // Default: show navbar for all other routes (including product-detail, checkout, order-detail, etc.)
+  debugPrint('✅ Navbar shown for route: $path');
+  return true;
+}
+
 /// Get navbar for specific route
-/// Calculates currentIndex from navbar configuration
-Widget? _getNavbarForRoute(String location) {
-  // Load navbar config to determine if route should show navbar
+/// Always returns navbar widget if route should show navbar (config'de olsa da olmasa da)
+/// Calculates currentIndex from navbar configuration or uses fallback
+Widget? _getNavbarForRoute(String location, Map<String, dynamic>? routeExtra) {
+  // First check if route should show navbar
+  if (!_shouldShowNavbarForPath(location)) {
+    return null;
+  }
+
+  // Load navbar config
   try {
     final configHelper = AssetConfigHelper();
     final navbarConfig = configHelper.getObject('navbar_configuration');
@@ -989,66 +1781,37 @@ Widget? _getNavbarForRoute(String location) {
     }
 
     final itemsList = navbarConfig?['items'] as List<dynamic>?;
-    if (itemsList == null || itemsList.isEmpty) {
-      // Fallback to hardcoded check
-      return _getNavbarForRouteFallback(location);
-    }
+    final List<NavbarItemModel> itemModels = itemsList != null && itemsList.isNotEmpty
+        ? itemsList
+            .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
+            .toList()
+        : [];
 
-    // Parse items and find matching route
-    final List<NavbarItemModel> itemModels = itemsList
-        .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
-        .toList();
-
-    // Check if location matches any navbar route
-    bool shouldShowNavbar = false;
+    // Try to find currentIndex from config
     int? currentIndex;
-
-    for (final model in itemModels) {
-      // Check standard route
-      if (location == model.route) {
-        shouldShowNavbar = true;
-        currentIndex = model.orderId;
-        break;
-      }
-      // Check conditional routes
-      if (model.isConditional) {
-        if (location == model.authRoute || location == model.guestRoute) {
-          shouldShowNavbar = true;
+    
+    if (itemModels.isNotEmpty) {
+      for (final model in itemModels) {
+        // Check standard route
+        if (location == model.route) {
           currentIndex = model.orderId;
           break;
         }
-      }
-    }
-
-    // Also check common routes for backward compatibility
-    if (!shouldShowNavbar) {
-      if (location == '/home' ||
-          location == '/search' ||
-          location == '/cart' ||
-          location == '/saved' ||
-          location == '/profile' ||
-          location == '/auth') {
-        shouldShowNavbar = true;
-        // Find index from config or use fallback
-        for (final model in itemModels) {
-          if (location == model.route ||
-              location == model.authRoute ||
-              location == model.guestRoute) {
+        // Check conditional routes
+        if (model.isConditional) {
+          if (location == model.authRoute || location == model.guestRoute) {
             currentIndex = model.orderId;
             break;
           }
         }
-        // Fallback to hardcoded if not found in config
-        currentIndex ??= _getFallbackIndex(location);
       }
     }
 
-    if (!shouldShowNavbar || currentIndex == null) {
-      return null;
-    }
-
-    // currentIndex is guaranteed to be non-null after the check above
-    final finalCurrentIndex = currentIndex;
+    // If not found in config, try fallback index or use default
+    // _getFallbackIndex always returns a value (defaults to 0), so currentIndex will never be null
+    final finalCurrentIndex = currentIndex != null 
+        ? currentIndex 
+        : _getFallbackIndex(location);
 
     // Return a Builder widget to access context
     // Use BlocBuilder with optimized buildWhen to prevent rebuild loops
@@ -1108,14 +1871,99 @@ Widget? _getNavbarForRoute(String location) {
                     wishlistCount,
                   );
 
+                  // Get all properties from config
+                  final configHelper = AssetConfigHelper();
+                  final variant = _getNavbarVariant(configHelper);
+                  final size = _getNavbarSize(configHelper);
+                  final position = _getNavbarPosition(configHelper);
+                  final backgroundColor = _getNavbarColor(
+                    configHelper,
+                    'backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final borderColor = _getNavbarColor(
+                    configHelper,
+                    'borderColor',
+                    OsmeaColors.silver,
+                  );
+                  final activeColor = _getNavbarColor(
+                    configHelper,
+                    'selectedIconColor',
+                    OsmeaColors.black,
+                  );
+                  final inactiveColor = _getNavbarColor(
+                    configHelper,
+                    'unselectedIconColor',
+                    OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+                  );
+                  final elevation = _getNavbarElevation(configHelper);
+                  final showLabels = _getNavbarBool(
+                    configHelper,
+                    'showLabels',
+                    true,
+                  );
+                  final showIcons = _getNavbarBool(
+                    configHelper,
+                    'showIcons',
+                    true,
+                  );
+                  final centerItems = _getNavbarBool(
+                    configHelper,
+                    'centerItems',
+                    true,
+                  );
+                  final style = _getNavbarStyle(configHelper);
+                  final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+                  final indicatorColor = _getNavbarColor(
+                    configHelper,
+                    'indicatorColor',
+                    activeColor,
+                  );
+                  final borderWidth = _getNavbarDouble(
+                    configHelper,
+                    'borderWidth',
+                  );
+                  final showBorder = _getNavbarBool(
+                    configHelper,
+                    'showBorder',
+                    false,
+                  );
+                  final borderStyleString =
+                      configHelper.getObject(
+                            'navbar_configuration',
+                          )?['borderStyle']
+                          as String?;
+                  BorderStyle? borderStyle;
+                  if (borderStyleString != null) {
+                    switch (borderStyleString.toLowerCase()) {
+                      case 'solid':
+                        borderStyle = BorderStyle.solid;
+                        break;
+                      case 'none':
+                        borderStyle = BorderStyle.none;
+                        break;
+                    }
+                  }
+
                   return OsmeaComponents.navbar(
-                    variant: NavbarVariant.transparent,
-                    size: NavbarSize.medium,
-                    position: NavbarPosition.bottom,
+                    variant: variant,
+                    size: size,
+                    position: position,
+                    style: style,
+                    indicatorStyle: indicatorStyle,
+                    indicatorColor: indicatorColor,
                     currentIndex: finalCurrentIndex,
-                    borderColor: OsmeaColors.silver,
-                    elevation: .5,
-                    backgroundColor: OsmeaColors.white,
+                    borderColor: borderColor,
+                    borderWidth: borderWidth,
+                    borderStyle: borderStyle,
+                    showBorder: showBorder,
+                    elevation: elevation,
+                    backgroundColor: backgroundColor,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                    showLabels: showLabels,
+                    showIcons: showIcons,
+                    centerItems: centerItems,
                     items: items,
                     onItemTap: (index) =>
                         _navigateToPage(context, index, isAuthenticated),
@@ -1145,14 +1993,57 @@ Widget? _getNavbarForRoute(String location) {
                 wishlistCount,
               );
 
+              // Get all properties from config
+              final configHelper = AssetConfigHelper();
+              final variant = _getNavbarVariant(configHelper);
+              final size = _getNavbarSize(configHelper);
+              final position = _getNavbarPosition(configHelper);
+              final backgroundColor = _getNavbarColor(
+                configHelper,
+                'backgroundColor',
+                OsmeaColors.white,
+              );
+              final borderColor = _getNavbarColor(
+                configHelper,
+                'borderColor',
+                OsmeaColors.silver,
+              );
+              final activeColor = _getNavbarColor(
+                configHelper,
+                'selectedIconColor',
+                OsmeaColors.black,
+              );
+              final inactiveColor = _getNavbarColor(
+                configHelper,
+                'unselectedIconColor',
+                OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+              );
+              final elevation = _getNavbarElevation(configHelper);
+              final showLabels = _getNavbarBool(
+                configHelper,
+                'showLabels',
+                true,
+              );
+              final showIcons = _getNavbarBool(configHelper, 'showIcons', true);
+              final centerItems = _getNavbarBool(
+                configHelper,
+                'centerItems',
+                true,
+              );
+
               return OsmeaComponents.navbar(
-                variant: NavbarVariant.transparent,
-                size: NavbarSize.medium,
-                position: NavbarPosition.bottom,
+                variant: variant,
+                size: size,
+                position: position,
                 currentIndex: finalCurrentIndex,
-                borderColor: OsmeaColors.silver,
-                elevation: .5,
-                backgroundColor: OsmeaColors.white,
+                borderColor: borderColor,
+                elevation: elevation,
+                backgroundColor: backgroundColor,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
+                showLabels: showLabels,
+                showIcons: showIcons,
+                centerItems: centerItems,
                 items: items,
                 onItemTap: (index) =>
                     _navigateToPage(context, index, isAuthenticated),
@@ -1170,12 +2061,28 @@ Widget? _getNavbarForRoute(String location) {
 
 /// Fallback navbar route check if config fails
 Widget? _getNavbarForRouteFallback(String location) {
-  // Show navbar only for main app sections
+  // Check if route should show navbar
+  final shouldShow = _shouldShowNavbarForPath(location);
+  if (!shouldShow) {
+    return null;
+  }
+  
+  // Show navbar for main app sections and other routes that should show navbar
   if (location == '/home' ||
       location == '/search' ||
       location == '/cart' ||
       location == '/saved' ||
-      location == '/profile') {
+      location == '/profile' ||
+      location.startsWith('/products') ||
+      location.startsWith('/product-detail') ||
+      location.startsWith('/checkout') ||
+      location.startsWith('/order-detail') ||
+      location.startsWith('/user-profile') ||
+      location.startsWith('/favorite-categories') ||
+      location.startsWith('/orders-history') ||
+      location == '/about' ||
+      location == '/contact-us' ||
+      location == '/faq') {
     final currentIndex = _getFallbackIndex(location);
 
     // Return a Builder widget to access context
@@ -1228,17 +2135,105 @@ Widget? _getNavbarForRouteFallback(String location) {
                     wishlistCount,
                   );
 
+                  // Get all properties from config
+                  final configHelper = AssetConfigHelper();
+                  final variant = _getNavbarVariant(configHelper);
+                  final size = _getNavbarSize(configHelper);
+                  final position = _getNavbarPosition(configHelper);
+                  final backgroundColor = _getNavbarColor(
+                    configHelper,
+                    'backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final borderColor = _getNavbarColor(
+                    configHelper,
+                    'borderColor',
+                    OsmeaColors.silver,
+                  );
+                  final activeColor = _getNavbarColor(
+                    configHelper,
+                    'selectedIconColor',
+                    OsmeaColors.black,
+                  );
+                  final inactiveColor = _getNavbarColor(
+                    configHelper,
+                    'unselectedIconColor',
+                    OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+                  );
+                  final elevation = _getNavbarElevation(configHelper);
+                  final showLabels = _getNavbarBool(
+                    configHelper,
+                    'showLabels',
+                    true,
+                  );
+                  final showIcons = _getNavbarBool(
+                    configHelper,
+                    'showIcons',
+                    true,
+                  );
+                  final centerItems = _getNavbarBool(
+                    configHelper,
+                    'centerItems',
+                    true,
+                  );
+                  final style = _getNavbarStyle(configHelper);
+                  final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+                  final indicatorColor = _getNavbarColor(
+                    configHelper,
+                    'indicatorColor',
+                    activeColor,
+                  );
+                  final borderWidth = _getNavbarDouble(
+                    configHelper,
+                    'borderWidth',
+                  );
+                  final showBorder = _getNavbarBool(
+                    configHelper,
+                    'showBorder',
+                    false,
+                  );
+                  final borderStyleString =
+                      configHelper.getObject(
+                            'navbar_configuration',
+                          )?['borderStyle']
+                          as String?;
+                  BorderStyle? borderStyle;
+                  if (borderStyleString != null) {
+                    switch (borderStyleString.toLowerCase()) {
+                      case 'solid':
+                        borderStyle = BorderStyle.solid;
+                        break;
+                      case 'none':
+                        borderStyle = BorderStyle.none;
+                        break;
+                    }
+                  }
+
                   return OsmeaComponents.navbar(
-                    variant: NavbarVariant.transparent,
-                    size: NavbarSize.medium,
-                    position: NavbarPosition.bottom,
+                    variant: variant,
+                    size: size,
+                    position: position,
+                    style: style,
+                    indicatorStyle: indicatorStyle,
+                    indicatorColor: indicatorColor,
                     currentIndex: currentIndex,
-                    borderColor: OsmeaColors.silver,
-                    elevation: .5,
-                    backgroundColor: OsmeaColors.white,
+                    borderColor: borderColor,
+                    borderWidth: borderWidth,
+                    borderStyle: borderStyle,
+                    showBorder: showBorder,
+                    elevation: elevation,
+                    backgroundColor: backgroundColor,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                    showLabels: showLabels,
+                    showIcons: showIcons,
+                    centerItems: centerItems,
                     items: items,
-                    onItemTap: (index) =>
-                        _navigateToPageFallback(context, index, isAuthenticated),
+                    onItemTap: (index) => _navigateToPageFallback(
+                      context,
+                      index,
+                      isAuthenticated,
+                    ),
                   );
                 },
               );
@@ -1263,14 +2258,92 @@ Widget? _getNavbarForRouteFallback(String location) {
                 wishlistCount,
               );
 
+              // Get all properties from config
+              final configHelper = AssetConfigHelper();
+              final variant = _getNavbarVariant(configHelper);
+              final size = _getNavbarSize(configHelper);
+              final position = _getNavbarPosition(configHelper);
+              final backgroundColor = _getNavbarColor(
+                configHelper,
+                'backgroundColor',
+                OsmeaColors.white,
+              );
+              final borderColor = _getNavbarColor(
+                configHelper,
+                'borderColor',
+                OsmeaColors.silver,
+              );
+              final activeColor = _getNavbarColor(
+                configHelper,
+                'selectedIconColor',
+                OsmeaColors.black,
+              );
+              final inactiveColor = _getNavbarColor(
+                configHelper,
+                'unselectedIconColor',
+                OsmeaColors.grayMaterial[600] ?? OsmeaColors.pewter,
+              );
+              final elevation = _getNavbarElevation(configHelper);
+              final showLabels = _getNavbarBool(
+                configHelper,
+                'showLabels',
+                true,
+              );
+              final showIcons = _getNavbarBool(configHelper, 'showIcons', true);
+              final centerItems = _getNavbarBool(
+                configHelper,
+                'centerItems',
+                true,
+              );
+              final style = _getNavbarStyle(configHelper);
+              final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+              final indicatorColor = _getNavbarColor(
+                configHelper,
+                'indicatorColor',
+                activeColor,
+              );
+              final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+              final showBorder = _getNavbarBool(
+                configHelper,
+                'showBorder',
+                false,
+              );
+              final borderStyleString =
+                  (configHelper.getObject(
+                        'navbar_configuration',
+                      ))?['borderStyle']
+                      as String?;
+              BorderStyle? borderStyle;
+              if (borderStyleString != null) {
+                switch (borderStyleString.toLowerCase()) {
+                  case 'solid':
+                    borderStyle = BorderStyle.solid;
+                    break;
+                  case 'none':
+                    borderStyle = BorderStyle.none;
+                    break;
+                }
+              }
+
               return OsmeaComponents.navbar(
-                variant: NavbarVariant.transparent,
-                size: NavbarSize.medium,
-                position: NavbarPosition.bottom,
+                variant: variant,
+                size: size,
+                position: position,
+                style: style,
+                indicatorStyle: indicatorStyle,
+                indicatorColor: indicatorColor,
                 currentIndex: currentIndex,
-                borderColor: OsmeaColors.silver,
-                elevation: .5,
-                backgroundColor: OsmeaColors.white,
+                borderColor: borderColor,
+                borderWidth: borderWidth,
+                borderStyle: borderStyle,
+                showBorder: showBorder,
+                elevation: elevation,
+                backgroundColor: backgroundColor,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
+                showLabels: showLabels,
+                showIcons: showIcons,
+                centerItems: centerItems,
                 items: items,
                 onItemTap: (index) =>
                     _navigateToPageFallback(context, index, isAuthenticated),
@@ -1370,7 +2443,7 @@ NavbarItem _buildNavbarItemFromModel(
       value: wishlistCount,
       filledIcon: filledIcon,
       emptyIcon: emptyIcon,
-      filledColor: OsmeaColors.nordicBlue,
+      filledColor: OsmeaColors.black,
     );
   } else {
     // Standard icon
@@ -1445,7 +2518,7 @@ List<NavbarItem> _buildFallbackNavbarItems(
         value: wishlistCount,
         filledIcon: Icons.favorite,
         emptyIcon: Icons.favorite_outline,
-        filledColor: OsmeaColors.nordicBlue,
+        filledColor: OsmeaColors.black,
       ),
       onTap: () => context.go('/saved'),
       tooltip: 'Saved Items',
@@ -1558,7 +2631,11 @@ void _navigateToPage(BuildContext context, int index, bool isAuthenticated) {
 }
 
 /// Fallback navigation if config fails
-void _navigateToPageFallback(BuildContext context, int index, bool isAuthenticated) {
+void _navigateToPageFallback(
+  BuildContext context,
+  int index,
+  bool isAuthenticated,
+) {
   switch (index) {
     case 0: // Home
       context.go('/home');
@@ -1581,5 +2658,125 @@ void _navigateToPageFallback(BuildContext context, int index, bool isAuthenticat
       break;
     default:
       context.go('/home');
+  }
+}
+
+/// Wrapper widget that auto-focuses the search input when navigated to
+class _AutoFocusSearchView extends StatefulWidget {
+  final FocusNode searchFocusNode;
+  final String? initialQuery;
+  final bool fromHome;
+  final Function(String) goRoute;
+  final Future<List<dynamic>> Function(String query) searchProvider;
+  final Future<List<String>> Function(String query)? searchSuggestionProvider;
+  final List<String> initialHistory;
+
+  const _AutoFocusSearchView({
+    required this.searchFocusNode,
+    this.initialQuery,
+    this.fromHome = false,
+    required this.goRoute,
+    required this.searchProvider,
+    this.searchSuggestionProvider,
+    this.initialHistory = const [],
+  });
+
+  @override
+  State<_AutoFocusSearchView> createState() => _AutoFocusSearchViewState();
+}
+
+class _AutoFocusSearchViewState extends State<_AutoFocusSearchView> {
+  late TextEditingController _searchController;
+  bool _shouldAutoFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(text: widget.initialQuery);
+
+    // Check if we came from navbar (no auto-focus) or from home searchbar (auto-focus)
+    // If fromHome is true, it means user tapped home searchbar, so auto-focus
+    // If fromHome is false, it means user tapped navbar, so don't auto-focus
+    _shouldAutoFocus = widget.fromHome;
+
+    // Request focus after the frame is built only if should auto-focus
+    if (_shouldAutoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.searchFocusNode.canRequestFocus) {
+          widget.searchFocusNode.requestFocus();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    widget.searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SearchView(
+      goRoute: widget.goRoute,
+      title: const Text('Search Products'),
+      searchHint: 'Search for products...',
+      searchController: _searchController,
+      searchFocusNode: widget.searchFocusNode,
+      showBackButton: true,
+      showTitle: true,
+      titleAlignment: AppBarTitleAlignment.center,
+      showSearchIcon: true,
+      // Don't show search history.
+      maxHistoryItems: 0,
+      searchSuggestionProvider: widget.searchSuggestionProvider,
+      initialHistory: widget.initialHistory,
+      onSearchSubmitted: null,
+      onBackPressed: () => widget.goRoute('/home'),
+      searchProvider: widget.searchProvider,
+      resultBuilder: (context, results) {
+        return SearchResultsGridWidget(products: results);
+      },
+      emptyStateBuilder: (context) {
+        final searchCubit = context.read<SearchCubit>();
+        // Show skeleton if coming from navbar (fromHome is false)
+        return SearchEmptyStateWidget(
+          searchCubit: searchCubit,
+          searchProvider: widget.searchProvider,
+          showSkeleton: !widget.fromHome,
+        );
+      },
+    );
+  }
+}
+
+/// App shell wrapper with navbar visibility control and deep linking support
+class _AppShellWithMiniCart extends StatefulWidget {
+  final Widget child;
+  final Widget? navbar;
+  final String currentPath;
+  final Map<String, dynamic>? routeExtra;
+
+  const _AppShellWithMiniCart({
+    required this.child,
+    this.navbar,
+    required this.currentPath,
+    this.routeExtra,
+  });
+
+  @override
+  State<_AppShellWithMiniCart> createState() => _AppShellWithMiniCartState();
+}
+
+class _AppShellWithMiniCartState extends State<_AppShellWithMiniCart> {
+  @override
+  Widget build(BuildContext context) {
+    // Navbar visibility is already determined in ShellRoute builder
+    // If navbar is null, it means the route shouldn't show navbar
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: widget.navbar,
+    );
   }
 }

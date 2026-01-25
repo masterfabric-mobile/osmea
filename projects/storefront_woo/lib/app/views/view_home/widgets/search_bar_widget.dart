@@ -9,15 +9,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Search bar widget for home view
 class SearchBarWidget extends StatefulWidget {
   final AssetConfigHelper configHelper;
 
-  const SearchBarWidget({
-    super.key,
-    required this.configHelper,
-  });
+  const SearchBarWidget({super.key, required this.configHelper});
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -45,9 +43,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   /// Navigates to search view with query
   void _navigateToSearch(String? query) {
     if (query != null && query.trim().isNotEmpty) {
-      context.push('/search?query=${Uri.encodeComponent(query.trim())}');
+      context.push(
+        '/search?fromHome=true&query=${Uri.encodeComponent(query.trim())}',
+      );
     } else {
-      context.push('/search');
+      context.push('/search?fromHome=true');
     }
   }
 
@@ -58,8 +58,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
     if (!showSearch) return const SizedBox.shrink();
 
-    final placeholder = config?['placeholder'] as String? ??
-        'Search products, brands, categories...';
+    final placeholder =
+        config?['placeholder'] as String? ??
+        context.t.homeView.widgets.search.placeholder;
     final variant = config?['variant'] as String? ?? 'outlined';
 
     return OsmeaComponents.padding(
@@ -72,6 +73,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       child: OsmeaComponents.searchbar(
         controller: _controller,
         hint: placeholder,
+        size: TextFieldSize.medium,
         searchbarStyle: SearchbarStyle.minimal,
         searchbarVariant: variant == 'outlined'
             ? SearchbarVariant.outlined
@@ -81,7 +83,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         showClearButton: true,
         backgroundColor: OsmeaColors.white,
         borderColor: OsmeaColors.pewter,
-        focusColor: OsmeaColors.nordicBlue,
+        focusColor: widget.configHelper.getSearchViewFocusColor(OsmeaColors.black),
         textColor: OsmeaColors.thunder,
         hintColor: OsmeaColors.pewter,
         onTap: () {
@@ -100,4 +102,3 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     );
   }
 }
-

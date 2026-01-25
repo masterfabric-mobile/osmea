@@ -4,19 +4,19 @@
  * Main content widget for cart view displaying cart items, coupons, and summary.
  */
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:go_router/go_router.dart';
-import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_empty_widget.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/cart_item_swipe_widget.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/coupon_section_widget.dart';
-import 'package:storefront_woo/app/views/view_cart/widgets/order_summary_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/product_count_widget.dart';
+import 'package:storefront_woo/app/views/view_cart/widgets/collapsible_order_summary_widget.dart';
 
 /// Main content widget for cart view
-class CartContentWidget extends StatelessWidget {
+class CartContentWidget extends StatefulWidget {
   final CartViewModel viewModel;
   final CartLoadedState state;
 
@@ -27,158 +27,131 @@ class CartContentWidget extends StatelessWidget {
   });
 
   @override
+  State<CartContentWidget> createState() => _CartContentWidgetState();
+}
+
+class _CartContentWidgetState extends State<CartContentWidget> {
+  final GlobalKey _bottomWidgetKey = GlobalKey();
+  double _bottomWidgetHeight = 200; // Default fallback height
+  bool _isSummaryExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measureBottomWidget();
+    });
+  }
+
+  void _measureBottomWidget() {
+    final RenderBox? renderBox =
+        _bottomWidgetKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && mounted) {
+      setState(() {
+        _bottomWidgetHeight = renderBox.size.height;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (state.cartItems.isEmpty) {
+    if (widget.state.cartItems.isEmpty) {
       return const CartEmptyWidget();
     }
 
-    return OsmeaComponents.singleChildScrollView(
-      child: OsmeaComponents.column(
-        children: [
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          ..._buildCartItems(context),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          CouponSectionWidget(
-            viewModel: viewModel,
-            state: state,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing12),
-          OrderSummaryWidget(state: state),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          
-          // Complete Purchase Button
-          _buildCheckoutButton(context),
-          
-          OsmeaComponents.sizedBox(height: context.spacing16),
-        ],
-      ),
-    );
-  }
+    // Get navbar height from config (for padding calculation)
+    final navbarHeight = _getNavbarHeight(context);
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    
+    // Calculate responsive bottom padding
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Use a percentage of screen height or measured height, whichever is larger
+    // Account for navbar height and safe area in padding
+    final responsiveBottomPadding = (_bottomWidgetHeight + navbarHeight + safeAreaBottom + context.spacing16)
+        .clamp(200.0, screenHeight * 0.3);
 
-  Widget _buildCheckoutButton(BuildContext context) {
-    return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(horizontal: context.spacing16),
-      decoration: BoxDecoration(
-        color: OsmeaColors.nordicBlue,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: OsmeaColors.nordicBlue.withValues(alpha: 0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            _handleCheckout(context);
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: OsmeaComponents.row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OsmeaComponents.text(
-                  'Complete Purchase',
-                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                    color: OsmeaColors.white,
-                    fontWeight: FontWeight.w600,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: Stack(
+            children: [
+              // Scrollable content
+              OsmeaComponents.singleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: OsmeaComponents.column(
+                  children: [
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    ..._buildCartItems(context),
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    // Product count widget before coupon section
+                    ProductCountWidget(state: widget.state),
+                    OsmeaComponents.sizedBox(height: context.spacing12),
+                    CouponSectionWidget(
+                      viewModel: widget.viewModel,
+                      state: widget.state,
+                    ),
+                    // Responsive bottom padding to account for fixed bottom summary
+                    OsmeaComponents.sizedBox(height: responsiveBottomPadding),
+                  ],
+                ),
+              ),
+              // Blur overlay when summary is expanded
+              if (_isSummaryExpanded)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      child: Container(
+                        color: _getBlurOverlayColor(context),
+                      ),
+                    ),
                   ),
                 ),
-                OsmeaComponents.sizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: OsmeaColors.white,
-                  size: 20,
+              // Fixed bottom collapsible summary - positioned at bottom (above navbar)
+              // Note: Scaffold's body already accounts for navbar, so bottom: 0 is correct
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0, // Position at bottom of body (which is above navbar)
+                child: _BottomWidgetMeasurer(
+                  key: _bottomWidgetKey,
+                  onHeightChanged: _measureBottomWidget,
+                  child: CollapsibleOrderSummaryWidget(
+                    viewModel: widget.viewModel,
+                    state: widget.state,
+                    onExpandedChanged: (isExpanded) {
+                      setState(() {
+                        _isSummaryExpanded = isExpanded;
+                      });
+                    },
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _handleCheckout(BuildContext context) async {
-    try {
-      // Check if user is authenticated using AuthCubit (more reliable)
-      bool isAuthenticated = false;
-      try {
-        final authCubit = GetIt.I<AuthCubit>();
-        final authState = authCubit.state;
-        isAuthenticated = authState is AuthAuthenticatedState &&
-            authState.isAuthenticated &&
-            authState.jwtToken != null &&
-            authState.jwtToken!.isNotEmpty;
-      } catch (e) {
-        debugPrint('⚠️ Could not get AuthCubit, trying AuthStorageHelper: $e');
-        // Fallback to AuthStorageHelper
-        final authStorage = AuthStorageHelper();
-        isAuthenticated = await authStorage.isAuthenticated();
-      }
-
-      if (!isAuthenticated) {
-        // User not authenticated, show message and redirect to auth
-        if (context.mounted) {
-          context.snackbarWarning(
-            'Please sign in to complete your purchase',
-            duration: const Duration(seconds: 3),
-          );
-          await Future.delayed(const Duration(milliseconds: 500));
-          if (context.mounted) {
-            context.go('/auth');
-          }
-        }
-        return;
-      }
-
-      // User is authenticated, proceed with checkout
-      // Navigate to checkout page where user will fill address forms
-      if (context.mounted) {
-        final currentState = viewModel.state;
-        if (currentState is CartLoadedState) {
-          // Navigate to checkout page (not directly to payment)
-          // User will fill address forms in checkout page
-          context.go(
-            '/checkout',
-            extra: {
-              'totalAmount': currentState.totalPrice,
-              'currencySymbol': currentState.currencySymbol,
-              'currencyCode': currentState.currencyCode,
-            },
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        context.snackbarError(
-          'Error starting checkout: ${e.toString()}',
-          duration: const Duration(seconds: 3),
         );
-      }
-    }
+      },
+    );
   }
 
   List<Widget> _buildCartItems(BuildContext context) {
-    return state.cartItems.asMap().entries.map((entry) {
+    return widget.state.cartItems.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
       return OsmeaComponents.column(
         children: [
           CartItemSwipeWidget(
             item: item,
-            viewModel: viewModel,
-            state: state,
+            viewModel: widget.viewModel,
+            state: widget.state,
           ),
-          if (index < state.cartItems.length - 1)
+          if (index < widget.state.cartItems.length - 1)
             OsmeaComponents.container(
               margin: EdgeInsets.symmetric(horizontal: context.spacing16),
               height: context.height1,
-              color: OsmeaColors.grayMaterial[200],
+              color: _getSeparatorColor(context),
             ),
         ],
       );
@@ -186,3 +159,119 @@ class CartContentWidget extends StatelessWidget {
   }
 }
 
+/// Widget that measures its child's height and reports it
+class _BottomWidgetMeasurer extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onHeightChanged;
+
+  const _BottomWidgetMeasurer({
+    super.key,
+    required this.child,
+    required this.onHeightChanged,
+  });
+
+  @override
+  State<_BottomWidgetMeasurer> createState() => _BottomWidgetMeasurerState();
+}
+
+class _BottomWidgetMeasurerState extends State<_BottomWidgetMeasurer> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onHeightChanged();
+    });
+  }
+
+  @override
+  void didUpdateWidget(_BottomWidgetMeasurer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onHeightChanged();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}
+
+/// Helper methods for cart content widget
+extension _CartContentWidgetHelpers on _CartContentWidgetState {
+  /// Gets navbar height from config
+  double _getNavbarHeight(BuildContext context) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final navbarConfig = configHelper.getObject('navbar_configuration');
+      final sizeString = navbarConfig?['size'] as String? ?? 'medium';
+      
+      // Map size string to NavbarSize and get height
+      switch (sizeString.toLowerCase()) {
+        case 'small':
+          return 56.0;
+        case 'medium':
+          return 64.0;
+        case 'large':
+          return 72.0;
+        default:
+          return 64.0; // Default to medium
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error getting navbar height: $e');
+      return 64.0; // Default to medium size
+    }
+  }
+
+  /// Gets blur overlay color from config
+  Color _getBlurOverlayColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'cart_view_configuration.loading_overlay.background_color',
+      '#FFFFFF',
+    );
+    return _parseColor(colorString).withValues(alpha: 0.3);
+  }
+
+  /// Gets separator color from config
+  Color _getSeparatorColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.separator_color',
+        '#E5E5E5',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      // Remove # if present
+      String hex = colorString.replaceAll('#', '');
+      
+      // Handle ARGB format (8 characters)
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      
+      // Handle RGB format (6 characters)
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      
+      // Fallback to gray
+      return OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.grayMaterial[200] ?? OsmeaColors.pewter;
+    }
+  }
+}

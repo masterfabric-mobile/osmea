@@ -328,9 +328,14 @@ class OsmeaBottomSheet extends CoreContainer {
   }
 
   Widget _buildActionBar(BuildContext context, _BottomSheetColors colors) {
+    // Use the same background color as the main bottom sheet if not explicitly provided
+    final effectiveActionBarBgColor = actionBarBackgroundColor ?? 
+        backgroundColor ?? 
+        colors.background;
+    
     return Container(
       decoration: BoxDecoration(
-        color: actionBarBackgroundColor ?? colors.background,
+        color: effectiveActionBarBgColor,
         border: showActionBorder
             ? Border(
                 bottom: BorderSide(
@@ -492,6 +497,9 @@ class OsmeaBottomSheetHelpers {
     bool showActionBorder = true,
     Color? actionBarBackgroundColor,
     Color? actionBarBorderColor,
+    // Animation parameters
+    Duration? openDuration,
+    Duration? closeDuration,
   }) {
     return showModalBottomSheet<T>(
       context: context,
@@ -516,9 +524,16 @@ class OsmeaBottomSheetHelpers {
       ),
       isDismissible: isDismissible,
       enableDrag: enableDrag,
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       barrierColor: barrierColor,
       isScrollControlled: true,
+      transitionAnimationController: (openDuration != null || closeDuration != null)
+          ? (AnimationController(
+              vsync: Navigator.of(context),
+              duration: openDuration ?? const Duration(milliseconds: 250),
+              reverseDuration: closeDuration ?? const Duration(milliseconds: 250),
+            )..forward())
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: size.config(context).borderRadius,
       ),

@@ -10,18 +10,21 @@ import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_cart/widgets/variations_text_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Individual cart item widget
 class CartItemWidget extends StatelessWidget {
   final CartItem item;
   final CartViewModel viewModel;
   final CartLoadedState state;
+  final bool isInBottomSheet;
 
   const CartItemWidget({
     super.key,
     required this.item,
     required this.viewModel,
     required this.state,
+    this.isInBottomSheet = false,
   });
 
   @override
@@ -158,7 +161,7 @@ class CartItemWidget extends StatelessWidget {
         removeTrailingZeros: true,
       ),
       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-        color: OsmeaColors.nordicBlue,
+        color: _getPriceColor(context),
         fontWeight: FontWeight.w600,
         fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
       ),
@@ -174,6 +177,9 @@ class CartItemWidget extends StatelessWidget {
   }
 
   Widget _buildQuantitySelector(BuildContext context) {
+    // Check if this item is being updated
+    final isUpdating = state.updatingProductId == item.productId;
+    
     return OsmeaComponents.container(
       decoration: BoxDecoration(
         color: OsmeaColors.grayMaterial[50],
@@ -183,7 +189,7 @@ class CartItemWidget extends StatelessWidget {
         mainAxisSize: context.min,
         children: [
           OsmeaComponents.iconButton(
-            onPressed: item.quantity > 1
+            onPressed: (item.quantity > 1 && !isUpdating)
                 ? () => viewModel.updateItemQuantity(
                     item.productId,
                     item.quantity - 1,
@@ -191,7 +197,7 @@ class CartItemWidget extends StatelessWidget {
                 : null,
             icon: Icon(
               Icons.remove_rounded,
-              color: item.quantity > 1
+              color: (item.quantity > 1 && !isUpdating)
                   ? OsmeaColors.thunder
                   : OsmeaColors.pewter,
               size: context.iconSizeExtraSmall,
@@ -201,21 +207,31 @@ class CartItemWidget extends StatelessWidget {
           ),
           OsmeaComponents.padding(
             padding: context.horizontalPaddingLow,
-            child: OsmeaComponents.text(
-              '${item.quantity}',
-              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w600,
-                color: OsmeaColors.thunder,
-                fontSize: context.fontSizeSmall * context.textScaleFactor,
-              ),
-            ),
+            child: isUpdating
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: OsmeaColors.thunder,
+                    ),
+                  )
+                : OsmeaComponents.text(
+                    '${item.quantity}',
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.thunder,
+                      fontSize: context.fontSizeSmall * context.textScaleFactor,
+                    ),
+                  ),
           ),
           OsmeaComponents.iconButton(
-            onPressed: () =>
-                viewModel.updateItemQuantity(item.productId, item.quantity + 1),
+            onPressed: !isUpdating
+                ? () => viewModel.updateItemQuantity(item.productId, item.quantity + 1)
+                : null,
             icon: Icon(
               Icons.add_rounded,
-              color: OsmeaColors.nordicBlue,
+              color: !isUpdating ? _getQuantityIconColor(context) : OsmeaColors.pewter,
               size: context.iconSizeExtraSmall,
             ),
             backgroundColor: Colors.transparent,
@@ -227,16 +243,72 @@ class CartItemWidget extends StatelessWidget {
   }
 
   Widget _buildRemoveButton(BuildContext context) {
+    // Get remove button color from config
+    final configHelper = AssetConfigHelper();
+    final removeButtonColor = _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.remove_button_color',
+        '#000000',
+      ),
+    );
+    
     return OsmeaComponents.iconButton(
-      onPressed: () => viewModel.removeItemFromCart(item.productId),
+      onPressed: () =>
+          viewModel.removeItemFromCart(item.productId, context: context),
       icon: Icon(
         Icons.delete_outline_rounded,
-        color: OsmeaColors.amberFlame,
+        color: removeButtonColor,
         size: context.iconSizeSmall,
       ),
       backgroundColor: Colors.transparent,
       size: ButtonSize.extraSmall,
-      tooltip: 'Remove item',
+      tooltip: context.t.cartView.widgets.item.remove.tooltip,
     );
+  }
+
+  /// Gets price color from config
+  Color _getPriceColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.price_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Gets quantity icon color from config
+  Color _getQuantityIconColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'cart_view_configuration.cart_items.quantity_selector_icon_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
   }
 }

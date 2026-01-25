@@ -11,7 +11,10 @@
  * {@subCategory AccountWidget}
  */
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
@@ -74,11 +77,12 @@ mixin AccountWidget {
                 )),
 
             // Account Details Section (only if authenticated)
-            if (_isAuthenticated(context)) ...[
-              OsmeaComponents.sizedBox(height: context.spacing8),
-              _buildStartupAccountSection(context),
-              OsmeaComponents.sizedBox(height: context.spacing24),
-            ],
+            // Hidden: JWT token and cart token sections should not be visible
+            // if (_isAuthenticated(context)) ...[
+            //   OsmeaComponents.sizedBox(height: context.spacing8),
+            //   _buildStartupAccountSection(context),
+            //   OsmeaComponents.sizedBox(height: context.spacing24),
+            // ],
 
             // Actions
             _buildStartupActions(context, viewModel),
@@ -133,7 +137,7 @@ mixin AccountWidget {
             children: [
               // User Account Header (space style - minimalist)
               _buildSpaceAccountHeader(context, state, textColor, iconColor),
-              OsmeaComponents.sizedBox(height: context.spacing32),
+              OsmeaComponents.sizedBox(height: context.spacing6),
 
               // Dynamic Sections with separators
               ...sections.expand((section) => [
@@ -161,21 +165,22 @@ mixin AccountWidget {
                         ],
                       );
                     }),
-                    OsmeaComponents.sizedBox(height: context.spacing24),
+                    OsmeaComponents.sizedBox(height: context.spacing4),
                   ]),
 
               // Account Details Section (only if authenticated)
-              if (_isAuthenticated(context)) ...[
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: separatorColor,
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-                _buildSpaceAccountSection(
-                    context, textColor, iconColor, separatorColor),
-                OsmeaComponents.sizedBox(height: context.spacing24),
-              ],
+              // Hidden: JWT token and cart token sections should not be visible
+              // if (_isAuthenticated(context)) ...[
+              //   Divider(
+              //     height: 1,
+              //     thickness: 1,
+              //     color: separatorColor,
+              //   ),
+              //   OsmeaComponents.sizedBox(height: context.spacing24),
+              //   _buildSpaceAccountSection(
+              //       context, textColor, iconColor, separatorColor),
+              //   OsmeaComponents.sizedBox(height: context.spacing24),
+              // ],
 
               // Actions
               _buildSpaceActions(context, viewModel, primaryColor, textColor),
@@ -259,7 +264,7 @@ mixin AccountWidget {
           ],
         ),
         if (isAuthenticated) ...[
-          OsmeaComponents.sizedBox(height: context.spacing12),
+          OsmeaComponents.sizedBox(height: context.spacing8),
           OsmeaComponents.row(
             children: [
               Icon(
@@ -298,35 +303,38 @@ mixin AccountWidget {
             _navigate(context, item.route);
           }
         },
+        splashColor: iconColor.withOpacity(0.08),
+        highlightColor: iconColor.withOpacity(0.04),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: context.spacing16,
+            vertical: context.spacing8,
             horizontal: context.spacing4,
           ),
           child: OsmeaComponents.row(
             children: [
-              // Icon (minimalist - no background)
+              // Icon (minimalist - no background, softer size)
               Icon(
                 _getIconData(item.iconName),
-                color: iconColor,
-                size: 24,
+                color: iconColor.withOpacity(0.9),
+                size: context.iconSizeNormal,
               ),
-              OsmeaComponents.sizedBox(width: context.spacing16),
-              // Title
+              OsmeaComponents.sizedBox(width: context.spacing12),
+              // Title - softer styling
               Expanded(
                 child: OsmeaComponents.text(
                   item.title,
-                  textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                     fontWeight: FontWeight.w500,
                     color: textColor,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
-              // Arrow Icon
+              // Arrow Icon - softer and rounded
               Icon(
-                Icons.chevron_right,
-                color: iconColor.withOpacity(0.5),
-                size: 20,
+                Icons.chevron_right_rounded,
+                color: iconColor.withOpacity(0.35),
+                size: context.iconSizeSmall,
               ),
             ],
           ),
@@ -336,6 +344,8 @@ mixin AccountWidget {
   }
 
   /// Build space style account section
+  /// Hidden: JWT token and cart token sections should not be visible
+  // ignore: unused_element
   Widget _buildSpaceAccountSection(
     BuildContext context,
     Color textColor,
@@ -449,6 +459,29 @@ mixin AccountWidget {
     Color textColor,
   ) {
     final isAuthenticated = _isAuthenticated(context);
+    final configHelper = AssetConfigHelper();
+
+    // Get button colors from config
+    final signOutBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.backgroundColor',
+      OsmeaColors.white,
+    );
+    final signOutTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.textColor',
+      OsmeaColors.black,
+    );
+    final signOutBorderColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.borderColor',
+      OsmeaColors.black,
+    );
+    final signInBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.backgroundColor',
+      primaryColor,
+    );
+    final signInTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.textColor',
+      OsmeaColors.white,
+    );
 
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -456,13 +489,14 @@ mixin AccountWidget {
         if (isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _signOut(context, viewModel),
-            variant: ButtonVariant.secondary,
+            variant: ButtonVariant.outlined,
             size: ButtonSize.large,
-            backgroundColor: primaryColor,
-            textColor: OsmeaColors.white,
+            backgroundColor: signOutBgColor,
+            textColor: signOutTextColor,
+            borderColor: signOutBorderColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.white,
+              color: signOutTextColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -471,11 +505,11 @@ mixin AccountWidget {
             onPressed: () => _navigate(context, '/auth'),
             variant: ButtonVariant.primary,
             size: ButtonSize.large,
-            backgroundColor: primaryColor,
-            textColor: OsmeaColors.white,
+            backgroundColor: signInBgColor,
+            textColor: signInTextColor,
             text: 'Sign In',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: OsmeaColors.white,
+              color: signInTextColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -618,10 +652,10 @@ mixin AccountWidget {
   Widget _buildMenuItem(BuildContext context, AccountMenuItem item) {
     // Parse color from hex string
     final iconColor = _parseColor(item.iconColor);
-    final iconBackgroundColor = iconColor.withOpacity(0.1);
+    final iconBackgroundColor = iconColor.withOpacity(0.08);
 
     return OsmeaComponents.container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: context.spacing8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -630,47 +664,63 @@ mixin AccountWidget {
               _navigate(context, item.route);
             }
           },
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(context.radiusMedium),
+          splashColor: iconColor.withOpacity(0.1),
+          highlightColor: iconColor.withOpacity(0.05),
           child: OsmeaComponents.container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing16,
+              vertical: context.spacing12,
+            ),
             decoration: BoxDecoration(
               color: OsmeaColors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: OsmeaColors.ash.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(context.radiusMedium),
+              border: Border.all(
+                color: OsmeaColors.grayMaterial[200] ?? OsmeaColors.silver.withOpacity(0.2),
+                width: 0.5,
+              ),
             ),
             child: OsmeaComponents.row(
               children: [
-                // Icon Container
+                // Icon Container - softer and more elegant
                 OsmeaComponents.container(
-                  width: 40,
-                  height: 40,
+                  width: context.iconSizeNormal + context.spacing4,
+                  height: context.iconSizeNormal + context.spacing4,
                   decoration: BoxDecoration(
                     color: iconBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(context.radiusMedium),
                   ),
                   child: OsmeaComponents.center(
                     child: Icon(
                       _getIconData(item.iconName),
                       color: iconColor,
-                      size: 20,
+                      size: context.iconSizeSmall,
                     ),
                   ),
                 ),
 
-                OsmeaComponents.sizedBox(width: 16),
+                OsmeaComponents.sizedBox(width: context.spacing12),
 
-                // Title
+                // Title - softer font weight
                 OsmeaComponents.expanded(
                   child: OsmeaComponents.text(
                     item.title,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: OsmeaColors.black,
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: OsmeaColors.black,
+                      letterSpacing: -0.2,
+                    ),
                   ),
                 ),
 
-                // Arrow Icon
-                Icon(Icons.chevron_right, color: OsmeaColors.slate, size: 20),
+                OsmeaComponents.sizedBox(width: context.spacing8),
+
+                // Arrow Icon - softer color
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: OsmeaColors.grayMaterial[400] ?? OsmeaColors.slate.withOpacity(0.4),
+                  size: context.iconSizeSmall,
+                ),
               ],
             ),
           ),
@@ -872,6 +922,8 @@ mixin AccountWidget {
   }
 
   /// Build startup style account section
+  /// Hidden: JWT token and cart token sections should not be visible
+  // ignore: unused_element
   Widget _buildStartupAccountSection(BuildContext context) {
     return _buildCardWrapper(
       context: context,
@@ -1042,32 +1094,34 @@ mixin AccountWidget {
             _navigate(context, item.route);
           }
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(context.radiusMedium),
+        splashColor: iconColor.withOpacity(0.1),
+        highlightColor: iconColor.withOpacity(0.05),
         child: _buildCardWrapper(
           context: context,
           backgroundColor: OsmeaColors.white,
-          borderColor: OsmeaColors.silver,
+          borderColor: OsmeaColors.grayMaterial[200] ?? OsmeaColors.silver.withOpacity(0.2),
           padding: EdgeInsets.all(context.spacing16),
           child: OsmeaComponents.row(
             children: [
-              // Icon Container
+              // Icon Container - softer and more elegant
               Container(
-                width: 48,
-                height: 48,
+                width: context.iconSizeExtraHigh,
+                height: context.iconSizeExtraHigh,
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: iconColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(context.radiusMedium),
                 ),
                 child: Center(
                   child: Icon(
                     _getIconData(item.iconName),
                     color: iconColor,
-                    size: 24,
+                    size: context.iconSizeNormal,
                   ),
                 ),
               ),
-              OsmeaComponents.sizedBox(width: context.spacing16),
-              // Title and Description
+              OsmeaComponents.sizedBox(width: context.spacing12),
+              // Title and Description - softer styling
               Expanded(
                 child: OsmeaComponents.column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1075,17 +1129,19 @@ mixin AccountWidget {
                   children: [
                     OsmeaComponents.text(
                       item.title,
-                      textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: OsmeaColors.thunder,
+                      textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.black,
+                        letterSpacing: -0.3,
                       ),
                     ),
                     if (description.isNotEmpty) ...[
-                      OsmeaComponents.sizedBox(height: context.spacing4),
+                      OsmeaComponents.sizedBox(height: context.spacing2),
                       OsmeaComponents.text(
                         description,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.pewter,
+                          color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,
+                          letterSpacing: 0,
                         ),
                       ),
                     ],
@@ -1093,11 +1149,11 @@ mixin AccountWidget {
                 ),
               ),
               OsmeaComponents.sizedBox(width: context.spacing8),
-              // Arrow Icon
+              // Arrow Icon - softer and rounded
               Icon(
-                Icons.chevron_right,
-                color: OsmeaColors.slate,
-                size: 24,
+                Icons.chevron_right_rounded,
+                color: OsmeaColors.grayMaterial[400] ?? OsmeaColors.slate.withOpacity(0.4),
+                size: context.iconSizeNormal,
               ),
             ],
           ),
@@ -1138,6 +1194,29 @@ mixin AccountWidget {
     AccountCubit viewModel,
   ) {
     final isAuthenticated = _isAuthenticated(context);
+    final configHelper = AssetConfigHelper();
+
+    // Get button colors from config
+    final signOutBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.backgroundColor',
+      OsmeaColors.white,
+    );
+    final signOutTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.textColor',
+      OsmeaColors.black,
+    );
+    final signOutBorderColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_out.borderColor',
+      OsmeaColors.black,
+    );
+    final signInBgColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.backgroundColor',
+      OsmeaColors.black,
+    );
+    final signInTextColor = configHelper.getColor(
+      'auth_configuration.buttons.sign_in.textColor',
+      OsmeaColors.white,
+    );
 
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1145,33 +1224,135 @@ mixin AccountWidget {
         if (isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _signOut(context, viewModel),
-            variant: ButtonVariant.secondary,
+            variant: ButtonVariant.outlined,
             size: ButtonSize.large,
-            backgroundColor: OsmeaColors.red,
-            textColor: OsmeaColors.white,
+            backgroundColor: signOutBgColor,
+            textColor: signOutTextColor,
+            borderColor: signOutBorderColor,
             text: 'Sign Out',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
-            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+            ).copyWith(color: signOutTextColor, fontWeight: FontWeight.w600),
           ),
         if (!isAuthenticated)
           OsmeaComponents.button(
             onPressed: () => _navigate(context, '/auth'),
             variant: ButtonVariant.primary,
             size: ButtonSize.large,
+            backgroundColor: signInBgColor,
+            textColor: signInTextColor,
             text: 'Sign In',
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
-            ).copyWith(color: OsmeaColors.white, fontWeight: FontWeight.w600),
+            ).copyWith(color: signInTextColor, fontWeight: FontWeight.w600),
           ),
       ],
     );
+  }
+
+  /// Show native sign out confirmation dialog
+  /// Uses CupertinoAlertDialog on iOS and AlertDialog on Android
+  /// Follows DeviceInfoHelper pattern for platform detection
+  Future<bool?> _showNativeSignOutDialog(BuildContext context) async {
+    // Use Platform.isIOS pattern (same as DeviceInfoHelper in core)
+    // Check web first to avoid Platform calls on web
+    if (kIsWeb) {
+      debugPrint('🌐 AccountWidget: Showing Material dialog for Web');
+      // Web: Use Material dialog as fallback
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: OsmeaColors.red,
+                ),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    
+    // Mobile platforms: Use Platform.isIOS (same pattern as DeviceInfoHelper)
+    if (Platform.isIOS) {
+      debugPrint('🍎 AccountWidget: Showing CupertinoAlertDialog for iOS');
+      // iOS native dialog - Cupertino style
+      // Use showCupertinoDialog which works even in MaterialApp context
+      return showCupertinoDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return CupertinoAlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                isDefaultAction: false,
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      debugPrint('🤖 AccountWidget: Showing AlertDialog for Android');
+      // Android native dialog - Material style
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: OsmeaColors.nordicBlue,
+                ),
+                child: const Text('Sign Out'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   /// Sign out helper
   /// Comprehensive logout that clears all user data, tokens, and cached information
   /// Platform-specific cleanup (cookies, wishlist, cart) is handled via onSignOutCallback
   Future<void> _signOut(BuildContext context, AccountCubit viewModel) async {
+    // Show native confirmation dialog based on platform
+    final confirmed = await _showNativeSignOutDialog(context);
+
+    // If user cancelled, don't proceed
+    if (confirmed != true) {
+      debugPrint('🚫 AccountWidget: Sign out cancelled by user');
+      return;
+    }
+
     try {
       debugPrint('🚪 AccountWidget: Starting comprehensive sign out process...');
 

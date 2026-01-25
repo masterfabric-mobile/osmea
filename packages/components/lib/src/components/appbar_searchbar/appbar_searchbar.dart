@@ -107,6 +107,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
     this.onSearchSubmitted,
     this.onSearchClear,
     this.onSearchBack,
+    this.onSearchTap,
     this.searchSuggestionProvider,
     this.searchProvider,
     this.maxHistoryItems = 10,
@@ -285,6 +286,9 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
 
   /// Callback when back button is pressed
   final VoidCallback? onSearchBack;
+
+  /// Callback when searchbar is tapped
+  final VoidCallback? onSearchTap;
 
   /// Provider for search suggestions
   final Future<List<String>> Function(String query)? searchSuggestionProvider;
@@ -471,7 +475,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
         backgroundColor: appBarBackgroundColor,
         foregroundColor: appBarForegroundColor,
         shadowColor: appBarShadowColor,
-        surfaceTintColor: appBarSurfaceTintColor,
+        surfaceTintColor: appBarSurfaceTintColor ?? Colors.transparent,
         elevation: appBarElevation,
         centerTitle: centerTitle,
         titleSpacing: titleSpacing,
@@ -481,7 +485,8 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
         automaticallyImplyLeading: automaticallyImplyLeading,
         excludeHeaderSemantics: excludeHeaderSemantics,
         primary: primary,
-        scrolledUnderElevation: scrolledUnderElevation,
+        scrolledUnderElevation:
+            scrolledUnderElevation ?? (appBarElevation ?? 0),
         flexibleSpace: flexibleSpace,
         clipBehavior: Clip.none,
         bottom: PreferredSize(
@@ -520,6 +525,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
                 onSearch: onSearch,
                 onClear: onSearchClear,
                 onBack: onSearchBack,
+                onTap: onSearchTap,
                 suggestionProvider: searchSuggestionProvider,
                 searchProvider: searchProvider,
                 maxHistoryItems: maxHistoryItems,

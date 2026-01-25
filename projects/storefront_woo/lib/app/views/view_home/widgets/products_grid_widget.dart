@@ -14,6 +14,8 @@ import 'package:storefront_woo/app/widgets/product_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
+import 'package:storefront_woo/app/utils/cart_add_helper.dart';
+// Animation helpers are now imported from core
 
 /// Products grid widget
 class ProductsGridWidget extends StatelessWidget {
@@ -84,14 +86,20 @@ class ProductsGridWidget extends StatelessWidget {
         final wishlistVm = GetIt.I<WishlistViewModel>();
         final isSaved = wishlistVm.isSaved(productId);
         
-        return ProductCardWidget(
-          product: product,
-          isSaved: isSaved,
-          onWishlistTap: () {
-            // Delegate to HomeViewModel which uses WishlistViewModel
-            viewModel.addProductToWishlist(productId);
-          },
-          onTap: () => _navigateToProductDetail(context, viewModel, product),
+        return StaggeredAnimation(
+          index: index,
+          child: ProductCardWidget(
+            product: product,
+            isSaved: isSaved,
+            onWishlistTap: () {
+              // Delegate to HomeViewModel which uses WishlistViewModel
+              viewModel.addProductToWishlist(productId);
+            },
+            onAddToCart: () async {
+              await addToCartFromProductCard(context, productId: productId);
+            },
+            onTap: () => _navigateToProductDetail(context, viewModel, product),
+          ),
         );
       },
     );

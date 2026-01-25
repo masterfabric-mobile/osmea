@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/models/empty_view_models.dart';
@@ -30,8 +29,8 @@ class EmptyViewEnterpriseWidget extends StatefulWidget {
       _EmptyViewEnterpriseWidgetState();
 }
 
-class _EmptyViewEnterpriseWidgetState
-    extends State<EmptyViewEnterpriseWidget> with TickerProviderStateMixin {
+class _EmptyViewEnterpriseWidgetState extends State<EmptyViewEnterpriseWidget>
+    with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -84,10 +83,6 @@ class _EmptyViewEnterpriseWidgetState
         }
 
         // Get colors from config
-        final backgroundColor = currentEmptyPage?.getBackgroundColor() ??
-            config?.getBackgroundColor() ??
-            config?.getPrimaryColor() ??
-            OsmeaColors.white;
         final textColor = currentEmptyPage?.getTextColor() ??
             config?.getTextColor() ??
             OsmeaColors.black;
@@ -98,92 +93,73 @@ class _EmptyViewEnterpriseWidgetState
 
         return FadeTransition(
           opacity: _fadeAnimation,
-          child: OsmeaComponents.container(
-            color: backgroundColor,
-            child: SafeArea(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: screenSize.height -
-                      MediaQuery.of(context).viewPadding.top -
-                      MediaQuery.of(context).viewPadding.bottom,
+          child: SizedBox.expand(
+            child: OsmeaComponents.center(
+              child: OsmeaComponents.container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.08,
                 ),
-                child: SingleChildScrollView(
-                  child: OsmeaComponents.container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenSize.width * 0.08,
-                      vertical: screenSize.height * 0.05,
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Professional icon circle
+                    _buildIconCircle(context, state, config, textColor),
+
+                    OsmeaComponents.sizedBox(height: context.spacing32),
+
+                    // Empty Title - Professional centered
+                    OsmeaComponents.text(
+                      title,
+                      color: textColor,
+                      textAlign: TextAlign.center,
+                      textStyle:
+                          OsmeaTextStyle.headlineMedium(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                    child: OsmeaComponents.column(
-                      crossAxisAlignment: crossStart,
-                      children: [
-                        // Image or Icon (smaller for enterprise)
-                        if (state.imagePath != null || state.iconPath != null)
-                          _buildImageOrIcon(context, state, config),
 
-                        if (state.imagePath != null || state.iconPath != null)
-                          OsmeaComponents.sizedBox(
-                              height: screenSize.height * 0.03),
+                    OsmeaComponents.sizedBox(height: context.spacing16),
 
-                        // Simple Empty Title
-                        OsmeaComponents.text(
-                          title,
-                          color: textColor,
-                          textStyle:
-                              OsmeaTextStyle.headlineSmall(context).copyWith(
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-
-                        OsmeaComponents.sizedBox(
-                            height: screenSize.height * 0.02),
-
-                        // Simple divider
-                        OsmeaComponents.container(
-                          width: 40,
-                          height: 1,
-                          color: config?.getSecondaryColor() ?? OsmeaColors.ash,
-                        ),
-
-                        OsmeaComponents.sizedBox(
-                            height: screenSize.height * 0.02),
-
-                        // Empty Description
-                        OsmeaComponents.text(
-                          description,
-                          color: textColor.withOpacity(0.8),
-                          textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
-                            fontWeight: FontWeight.w300,
-                            height: 1.6,
-                          ),
-                        ),
-
-                        OsmeaComponents.sizedBox(
-                            height: screenSize.height * 0.04),
-
-                        // Action Button (if enabled in config and callback provided) - Text style
-                        if (config?.showActionButton == true &&
-                            widget.onActionPressed != null)
-                          GestureDetector(
-                            onTap: widget.onActionPressed,
-                            child: OsmeaComponents.container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 0),
-                              child: OsmeaComponents.text(
-                                '→ ${state.actionButtonText ?? 'Continue'}',
-                                color: config?.getPrimaryColor() ??
-                                    OsmeaColors.nordicBlue,
-                                textStyle:
-                                    OsmeaTextStyle.bodyLarge(context).copyWith(
-                                  fontWeight: FontWeight.w400,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+                    // Professional divider
+                    OsmeaComponents.container(
+                      width: 60,
+                      height: 2,
+                      decoration: BoxDecoration(
+                        color: textColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(1),
+                      ),
                     ),
-                  ),
+
+                    OsmeaComponents.sizedBox(height: context.spacing20),
+
+                    // Empty Description - Professional centered
+                    OsmeaComponents.text(
+                      description,
+                      color: textColor.withValues(alpha: 0.7),
+                      textAlign: TextAlign.center,
+                      textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    OsmeaComponents.sizedBox(height: context.spacing32),
+
+                    // Action Button - Professional style
+                    if (config?.showActionButton == true &&
+                        widget.onActionPressed != null)
+                      OsmeaComponents.button(
+                        text: state.actionButtonText ?? 'Continue',
+                        onPressed: widget.onActionPressed,
+                        variant: ButtonVariant.outlined,
+                        size: ButtonSize.medium,
+                        backgroundColor: Colors.transparent,
+                        textColor: textColor,
+                        borderColor: textColor.withValues(alpha: 0.3),
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -193,62 +169,60 @@ class _EmptyViewEnterpriseWidgetState
     );
   }
 
-  Widget _buildImageOrIcon(
+  Widget _buildIconCircle(
     BuildContext context,
     EmptyViewState state,
     EmptyViewConfigModel? config,
+    Color textColor,
   ) {
-    final screenSize = MediaQuery.of(context).size;
+    return OsmeaComponents.container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: textColor.withValues(alpha: 0.15),
+          width: 2,
+        ),
+      ),
+      child: OsmeaComponents.center(
+        child: Icon(
+          _getEmptyIcon(state.currentEmptyType),
+          size: 48,
+          color: textColor.withValues(alpha: 0.4),
+        ),
+      ),
+    );
+  }
 
-    if (state.imagePath != null) {
-      // Try to load as network image first, then asset
-      if (state.imagePath!.startsWith('http://') ||
-          state.imagePath!.startsWith('https://')) {
-        return Image.network(
-          state.imagePath!,
-          width: screenSize.width * 0.3,
-          height: screenSize.width * 0.3,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return const SizedBox.shrink();
-          },
-        );
-      } else {
-        return Image.asset(
-          state.imagePath!,
-          width: screenSize.width * 0.3,
-          height: screenSize.width * 0.3,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return const SizedBox.shrink();
-          },
-        );
-      }
-    } else if (state.iconPath != null) {
-      if (state.iconPath!.startsWith('http://') ||
-          state.iconPath!.startsWith('https://')) {
-        return Image.network(
-          state.iconPath!,
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return const SizedBox.shrink();
-          },
-        );
-      } else {
-        return Image.asset(
-          state.iconPath!,
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return const SizedBox.shrink();
-          },
-        );
-      }
+  IconData _getEmptyIcon(EmptyType emptyType) {
+    switch (emptyType) {
+      case EmptyType.cart:
+        return Icons.shopping_cart_outlined;
+      case EmptyType.search:
+        return Icons.search_off;
+      case EmptyType.favorites:
+        return Icons.favorite_border;
+      case EmptyType.wishlist:
+        return Icons.favorite_border;
+      case EmptyType.products:
+        return Icons.inventory_2_outlined;
+      case EmptyType.orders:
+        return Icons.receipt_long_outlined;
+      case EmptyType.notifications:
+        return Icons.notifications_none;
+      case EmptyType.messages:
+        return Icons.message_outlined;
+      case EmptyType.history:
+        return Icons.history_outlined;
+      case EmptyType.reviews:
+        return Icons.rate_review_outlined;
+      case EmptyType.addresses:
+        return Icons.location_on_outlined;
+      case EmptyType.payments:
+        return Icons.payment_outlined;
+      default:
+        return Icons.inbox_outlined;
     }
-
-    return const SizedBox.shrink();
   }
 }

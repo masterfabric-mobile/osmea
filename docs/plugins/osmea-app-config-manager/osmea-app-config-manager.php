@@ -3,7 +3,7 @@
  * Plugin Name: OSMEA App Config Manager
  * Plugin URI: https://github.com/masterfabric-mobile/osmea
  * Description: Manage Flutter mobile app configuration file (app_config.json) from WordPress admin panel. Mobile app can fetch configuration via REST API endpoint.
- * Version: 1.0.0
+ * Version: 1.0.4
  * Author: MasterFabric Mobile
  * Author URI: https://github.com/masterfabric-mobile
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('OSMEA_CONFIG_VERSION', '1.0.0');
+define('OSMEA_CONFIG_VERSION', '1.0.4');
 define('OSMEA_CONFIG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('OSMEA_CONFIG_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('OSMEA_CONFIG_OPTION_NAME', 'osmea_app_config_json');
@@ -132,6 +132,22 @@ class OSMEA_App_Config_Manager {
             'callback' => array($this, 'update_app_config_api'),
             'permission_callback' => array($this, 'api_permission_check'),
         ));
+        
+        register_rest_route('osmea/v1', '/app-config/reset', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'reset_app_config_api'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            },
+        ));
+        
+        register_rest_route('osmea/v1', '/app-config/debug', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'debug_config_api'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            },
+        ));
     }
     
     /**
@@ -200,6 +216,73 @@ class OSMEA_App_Config_Manager {
     }
     
     /**
+     * Reset config to default (from file)
+     */
+    public function reset_app_config_api($request) {
+        $default_file = OSMEA_CONFIG_PLUGIN_DIR . 'default-config.json';
+        
+        if (!file_exists($default_file)) {
+            return new WP_Error(
+                'file_not_found',
+                __('Default configuration file not found.', 'osmea-app-config'),
+                array('status' => 404)
+            );
+        }
+        
+        $content = file_get_contents($default_file);
+        $decoded = json_decode($content, true);
+        
+        if (!$decoded) {
+            return new WP_Error(
+                'invalid_default',
+                __('Default configuration file is invalid.', 'osmea-app-config'),
+                array('status' => 500)
+            );
+        }
+        
+        $formatted = wp_json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $updated = update_option(OSMEA_CONFIG_OPTION_NAME, $formatted);
+        
+        return rest_ensure_response(array(
+            'success' => true,
+            'message' => __('Configuration reset to default successfully.', 'osmea-app-config'),
+            'config' => $decoded
+        ));
+    }
+    
+    /**
+     * Debug endpoint to check config state
+     */
+    public function debug_config_api($request) {
+        $db_config = get_option(OSMEA_CONFIG_OPTION_NAME, '');
+        $db_decoded = json_decode($db_config, true);
+        
+        $default_file = OSMEA_CONFIG_PLUGIN_DIR . 'default-config.json';
+        $default_exists = file_exists($default_file);
+        $default_decoded = null;
+        
+        if ($default_exists) {
+            $default_content = file_get_contents($default_file);
+            $default_decoded = json_decode($default_content, true);
+        }
+        
+        return rest_ensure_response(array(
+            'database' => array(
+                'raw_length' => strlen($db_config),
+                'keys_count' => $db_decoded ? count($db_decoded) : 0,
+                'keys' => $db_decoded ? array_keys($db_decoded) : [],
+            ),
+            'default_file' => array(
+                'exists' => $default_exists,
+                'path' => $default_file,
+                'keys_count' => $default_decoded ? count($default_decoded) : 0,
+                'keys' => $default_decoded ? array_keys($default_decoded) : [],
+            ),
+            'version' => OSMEA_CONFIG_VERSION,
+        ));
+    }
+    
+    /**
      * Enqueue admin scripts and styles
      */
     public function enqueue_admin_scripts($hook) {
@@ -207,11 +290,16 @@ class OSMEA_App_Config_Manager {
             return;
         }
         
+        // Use filemtime to bust cache
+        $css_version = file_exists(OSMEA_CONFIG_PLUGIN_DIR . 'assets/admin.css') 
+            ? filemtime(OSMEA_CONFIG_PLUGIN_DIR . 'assets/admin.css') 
+            : OSMEA_CONFIG_VERSION;
+        
         wp_enqueue_style(
             'osmea-config-admin',
             OSMEA_CONFIG_PLUGIN_URL . 'assets/admin.css',
             array(),
-            OSMEA_CONFIG_VERSION
+            $css_version
         );
         
         wp_enqueue_script(
@@ -225,13 +313,16 @@ class OSMEA_App_Config_Manager {
         wp_localize_script('osmea-config-admin', 'osmeaConfig', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'restUrl' => rest_url('osmea/v1/app-config'),
+            'resetUrl' => rest_url('osmea/v1/app-config/reset'),
             'nonce' => wp_create_nonce('wp_rest'),
             'strings' => array(
                 'saving' => __('Saving...', 'osmea-app-config'),
                 'saved' => __('Saved!', 'osmea-app-config'),
                 'error' => __('An error occurred.', 'osmea-app-config'),
                 'invalidJson' => __('Invalid JSON format.', 'osmea-app-config'),
-                'confirmReset' => __('Are you sure you want to reset to default configuration?', 'osmea-app-config')
+                'confirmReset' => __('Are you sure you want to reset to default configuration?', 'osmea-app-config'),
+                'resetting' => __('Resetting...', 'osmea-app-config'),
+                'resetSuccess' => __('Configuration reset to default successfully!', 'osmea-app-config')
             )
         ));
     }
@@ -330,18 +421,16 @@ add_action('plugins_loaded', 'osmea_app_config_manager_init');
 
 // Activation hook
 register_activation_hook(__FILE__, function() {
-    $config = get_option(OSMEA_CONFIG_OPTION_NAME);
-    if (empty($config)) {
-        // Load default config on activation
-        $default_file = OSMEA_CONFIG_PLUGIN_DIR . 'default-config.json';
-        if (file_exists($default_file)) {
-            $content = file_get_contents($default_file);
-            // Validate and format JSON
-            $decoded = json_decode($content, true);
-            if ($decoded) {
-                $formatted = wp_json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                update_option(OSMEA_CONFIG_OPTION_NAME, $formatted);
-            }
+    // ALWAYS load default config on activation (even if exists)
+    // This ensures the latest default-config.json is loaded
+    $default_file = OSMEA_CONFIG_PLUGIN_DIR . 'default-config.json';
+    if (file_exists($default_file)) {
+        $content = file_get_contents($default_file);
+        // Validate and format JSON
+        $decoded = json_decode($content, true);
+        if ($decoded) {
+            $formatted = wp_json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            update_option(OSMEA_CONFIG_OPTION_NAME, $formatted);
         }
     }
 });

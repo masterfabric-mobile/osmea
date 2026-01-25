@@ -25,12 +25,8 @@ mixin _$UserMeta {
   @JsonKey(name: 'subscribe_newsletter')
   bool get subscribeNewsletter => throw _privateConstructorUsedError;
 
-  /// Serializes this UserMeta to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UserMetaCopyWith<UserMeta> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -55,8 +51,6 @@ class _$UserMetaCopyWithImpl<$Res, $Val extends UserMeta>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UserMeta
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -97,8 +91,6 @@ class __$$UserMetaImplCopyWithImpl<$Res>
       _$UserMetaImpl _value, $Res Function(_$UserMetaImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UserMeta
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -151,14 +143,12 @@ class _$UserMetaImpl implements _UserMeta {
                 other.subscribeNewsletter == subscribeNewsletter));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode =>
       Object.hash(runtimeType, acceptTerms, subscribeNewsletter);
 
-  /// Create a copy of UserMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UserMetaImplCopyWith<_$UserMetaImpl> get copyWith =>
@@ -187,11 +177,8 @@ abstract class _UserMeta implements UserMeta {
   @override
   @JsonKey(name: 'subscribe_newsletter')
   bool get subscribeNewsletter;
-
-  /// Create a copy of UserMeta
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UserMetaImplCopyWith<_$UserMetaImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -218,12 +205,8 @@ mixin _$UserSignUpRequest {
   String? get referralCode => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
-  /// Serializes this UserSignUpRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UserSignUpRequestCopyWith<UserSignUpRequest> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -259,8 +242,6 @@ class _$UserSignUpRequestCopyWithImpl<$Res, $Val extends UserSignUpRequest>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -319,8 +300,6 @@ class _$UserSignUpRequestCopyWithImpl<$Res, $Val extends UserSignUpRequest>
     ) as $Val);
   }
 
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $UserMetaCopyWith<$Res> get userMeta {
@@ -362,8 +341,6 @@ class __$$UserSignUpRequestImplCopyWithImpl<$Res>
       $Res Function(_$UserSignUpRequestImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -502,7 +479,7 @@ class _$UserSignUpRequestImpl implements _UserSignUpRequest {
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -517,9 +494,7 @@ class _$UserSignUpRequestImpl implements _UserSignUpRequest {
       referralCode,
       const DeepCollectionEquality().hash(_metadata));
 
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UserSignUpRequestImplCopyWith<_$UserSignUpRequestImpl> get copyWith =>
@@ -575,11 +550,8 @@ abstract class _UserSignUpRequest implements UserSignUpRequest {
   String? get referralCode;
   @override
   Map<String, dynamic>? get metadata;
-
-  /// Create a copy of UserSignUpRequest
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UserSignUpRequestImplCopyWith<_$UserSignUpRequestImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -1,7 +1,9 @@
 import 'package:core/core.dart';
 import 'package:core/src/views/auth/widgets/auth_widget.dart';
+import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 /// 🔐 **OSMEA Auth View**
 ///
@@ -21,10 +23,11 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
       defaultRedirectPath; // Default path to redirect after successful sign in
 
   // Track if navigation has been triggered to prevent duplicate calls
-  static bool _hasNavigated = false;
+  // Use instance variable instead of static to allow proper reset on sign out
+  bool _hasNavigated = false;
 
   /// Reset navigation flag (useful for testing or re-authentication)
-  static void resetNavigationFlag() {
+  void resetNavigationFlag() {
     _hasNavigated = false;
     debugPrint('🔄 AuthView: Navigation flag reset');
   }
@@ -37,6 +40,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     super.useSafeArea = false,
     super.navbarSpacer = const SpacerVisibility.disabled(),
     super.footerSpacer = const SpacerVisibility.disabled(),
+    // Disable app bar padding to match other views
     super.appBarPadding = const AppBarPaddingVisibility.disabled(),
     super.backgroundColor = Colors.transparent,
     this.onSignInSuccess,
@@ -47,24 +51,116 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     this.initialTab = 0,
     this.defaultRedirectPath,
   }) : super(
-          coreAppBar: (context, cubit) => OsmeaComponents.appBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: OsmeaComponents.iconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-              onPressed: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                } else {
-                  goRoute('/home');
+          coreAppBar: (context, cubit) {
+            // Get variant from config to determine back button color
+            final config = cubit.state is AuthFormState
+                ? (cubit.state as AuthFormState).config
+                : null;
+
+            // Get variant from config inline (can't use instance method in initializer)
+            AuthDesignVariant variant = AuthDesignVariant.enterprise; // Default
+            if (config != null && config.containsKey('ui_style')) {
+              final uiStyle = config['ui_style'] as Map<String, dynamic>?;
+              if (uiStyle != null) {
+                final variantString = uiStyle['style'] as String? ??
+                    uiStyle['design_variant'] as String?;
+                if (variantString != null) {
+                  switch (variantString.toLowerCase()) {
+                    case 'startup':
+                      variant = AuthDesignVariant.startup;
+                      break;
+                    case 'space':
+                      variant = AuthDesignVariant.space;
+                      break;
+                    case 'enterprise':
+                    default:
+                      variant = AuthDesignVariant.enterprise;
+                      break;
+                  }
                 }
-              },
-              variant: ButtonVariant.ghost,
-              size: ButtonSize.medium,
-              backgroundColor: Colors.transparent,
-            ),
-          ),
+              }
+            }
+
+            // Determine colors based on variant
+            // For all variants, use white background for better visibility
+            final backgroundColor = OsmeaColors.white;
+            
+            // Use dark icon for visibility on white background
+            final foregroundColor = OsmeaColors.black;
+
+            // Get title from config based on current tab
+            final currentTab = cubit.state is AuthFormState
+                ? (cubit.state as AuthFormState).currentTab
+                : initialTab;
+
+            // Get title from config
+            String titleText = 'Sign In to Your Account'; // Default
+            if (config != null) {
+              if (currentTab == 0) {
+                final signInConfig = config['sign_in'] as Map<String, dynamic>?;
+                titleText = signInConfig?['title']?.toString() ??
+                    'Sign In to Your Account';
+              } else {
+                final signUpConfig = config['sign_up'] as Map<String, dynamic>?;
+                titleText =
+                    signUpConfig?['title']?.toString() ?? 'Create Your Account';
+              }
+            }
+
+            // App bar with white background and dark icons for visibility
+            return OsmeaComponents.appBar(
+              title: OsmeaComponents.text(
+                titleText,
+                color: foregroundColor,
+                textStyle: OsmeaTextStyle.titleLarge(context),
+              ),
+              backgroundColor: backgroundColor,
+              elevation: 2,
+              foregroundColor: foregroundColor,
+              variant: AppBarVariant.standard,
+              size: AppBarSize.standard,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () {
+                  // Use app router to go back, following cart view pattern
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: foregroundColor,
+                  size: context.iconSizeNormal,
+                ),
+              ),
+            );
+          },
         );
+
+  /// Get design variant from config (using 'style' instead of 'design_variant')
+  AuthDesignVariant _getDesignVariantFromConfig(Map<String, dynamic>? config) {
+    if (config != null && config.containsKey('ui_style')) {
+      final uiStyle = config['ui_style'] as Map<String, dynamic>?;
+      if (uiStyle != null) {
+        // Check for 'style' first (new format), fallback to 'design_variant' for backward compatibility
+        final variantString =
+            uiStyle['style'] as String? ?? uiStyle['design_variant'] as String?;
+        if (variantString != null) {
+          switch (variantString.toLowerCase()) {
+            case 'startup':
+              return AuthDesignVariant.startup;
+            case 'space':
+              return AuthDesignVariant.space;
+            case 'enterprise':
+            default:
+              return AuthDesignVariant.enterprise;
+          }
+        }
+      }
+    }
+    return AuthDesignVariant.enterprise; // Default
+  }
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -163,10 +259,21 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     // Get config from state if available
     final config = state is AuthFormState ? state.config : null;
 
+    // Reset navigation flag if we're in unauthenticated state
+    // This ensures navigation works after sign out -> sign in flow
+    if (state is AuthUnauthenticatedState) {
+      if (_hasNavigated) {
+        debugPrint(
+            '🔄 AuthView: viewContent rebuild - AuthUnauthenticatedState detected, resetting navigation flag...');
+        _hasNavigated = false;
+      }
+    }
+
     // Create wrapper callback that uses defaultRedirectPath if callback is null
     VoidCallback? wrappedOnSignInSuccess;
     if (onSignInSuccess != null) {
       wrappedOnSignInSuccess = onSignInSuccess;
+      debugPrint('✅ AuthView: onSignInSuccess callback is available');
     } else if (defaultRedirectPath != null) {
       // If no callback provided, use defaultRedirectPath
       wrappedOnSignInSuccess = () {
@@ -174,6 +281,9 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         debugPrint('✅ Sign in successful! Navigating to default path: $path');
         goRoute(path);
       };
+      debugPrint('✅ AuthView: Using defaultRedirectPath: $defaultRedirectPath');
+    } else {
+      debugPrint('⚠️ AuthView: No onSignInSuccess callback and no defaultRedirectPath');
     }
 
     // Use the same AuthCubit instance from BaseViewHydratedCubit (GetIt singleton)
@@ -181,28 +291,80 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
     return BlocListener<AuthCubit, AuthState>(
       bloc:
           viewModel, // Explicitly use the viewModel from BaseViewHydratedCubit
+      // Always listen to state changes to ensure navigation works after sign out -> sign in
+      listenWhen: (previous, current) {
+        // Always trigger listener for state changes
+        return true;
+      },
       listener: (context, state) {
+        debugPrint('🔔 AuthView: BlocListener triggered - state type: ${state.runtimeType}');
+        debugPrint('🔍 AuthView: Previous navigation flag: $_hasNavigated');
+        
+        // Reset navigation flag when user signs out
+        // This allows navigation to work again after sign out -> sign in flow
+        if (state is AuthUnauthenticatedState) {
+          if (_hasNavigated) {
+            debugPrint(
+                '🔄 AuthView: AuthUnauthenticatedState detected in listener, resetting navigation flag...');
+            _hasNavigated = false;
+            debugPrint('✅ AuthView: Navigation flag reset to false');
+          }
+          return;
+        }
+
         // Handle authentication state changes
         // Only navigate once when AuthAuthenticatedState is reached
         // This is the primary navigation trigger after successful signin/signup
         if (state is AuthAuthenticatedState) {
-          if (wrappedOnSignInSuccess != null && !_hasNavigated) {
+          debugPrint('✅ AuthView: AuthAuthenticatedState detected in listener');
+          
+          // Use instance variable directly instead of local closure to avoid stale references
+          final callback = onSignInSuccess;
+          final redirectPath = defaultRedirectPath;
+          
+          debugPrint('🔍 AuthView: onSignInSuccess is ${callback != null ? "not null" : "null"}');
+          debugPrint('🔍 AuthView: defaultRedirectPath is ${redirectPath ?? "null"}');
+          debugPrint('🔍 AuthView: _hasNavigated is $_hasNavigated');
+          
+          if (!_hasNavigated) {
             _hasNavigated = true;
             debugPrint(
                 '✅ AuthView: AuthAuthenticatedState detected (after sign in/sign up), calling navigation callback...');
             // Use postFrameCallback to ensure state is fully updated before navigation
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
-                wrappedOnSignInSuccess?.call();
-                debugPrint(
-                    '✅ AuthView: Navigation callback executed - navigating to home');
-              } catch (e) {
+                if (!context.mounted) {
+                  debugPrint('⚠️ AuthView: Context not mounted, skipping navigation');
+                  _hasNavigated = false;
+                  return;
+                }
+                
+                // Show success snackbar
+                context.snackbarSuccess(
+                  'Redirecting to Home Page',
+                  title: 'Login Successful',
+                  duration: const Duration(seconds: 3),
+                );
+                
+                // Use callback if available, otherwise use defaultRedirectPath
+                if (callback != null) {
+                  callback();
+                  debugPrint('✅ AuthView: onSignInSuccess callback executed');
+                } else if (redirectPath != null) {
+                  debugPrint('✅ AuthView: Navigating to defaultRedirectPath: $redirectPath');
+                  goRoute(redirectPath);
+                } else {
+                  debugPrint('⚠️ AuthView: No callback and no defaultRedirectPath, cannot navigate');
+                  _hasNavigated = false;
+                }
+              } catch (e, stackTrace) {
                 debugPrint('❌ AuthView: Error in navigation callback: $e');
+                debugPrint('❌ AuthView: Stack trace: $stackTrace');
                 // Reset flag on error so user can try again
                 _hasNavigated = false;
               }
             });
-          } else if (_hasNavigated) {
+          } else {
             debugPrint(
                 '⏸️ AuthView: Navigation already triggered, skipping...');
           }
@@ -226,6 +388,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             if (onSignInError != null) {
               onSignInError?.call(state.signInErrorMessage!);
             }
+            return; // Prevent duplicate error handling below
           }
 
           // Handle Sign Up success/error
@@ -259,12 +422,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
                 onSignUpError?.call(state.signUpErrorMessage!);
               }
             }
-            // Handle sign in error
-            if (state.signInErrorMessage != null && state.currentTab == 0) {
-              if (onSignInError != null) {
-                onSignInError?.call(state.signInErrorMessage!);
-              }
-            }
+            // Note: Sign in error is already handled above, so we don't check it again here
           }
         }
       },
@@ -276,6 +434,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         onForgotPasswordTap: onForgotPasswordTap,
         config: config,
         initialTab: initialTab,
+        designVariant: _getDesignVariantFromConfig(config),
       ),
     );
   }

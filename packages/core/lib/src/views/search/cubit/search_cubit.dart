@@ -56,6 +56,7 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
     String query, {
     Future<List<dynamic>> Function(String)? searchProvider,
     bool immediate = false,
+    bool addToHistory = true,
   }) async {
     if (query.length < minQueryLength) {
       emit(state.copyWith(
@@ -72,11 +73,11 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
 
     if (immediate) {
       // Execute immediately (e.g., on submit)
-      await _executeSearch(query, searchProvider);
+      await _executeSearch(query, searchProvider, addToHistory: addToHistory);
     } else {
       // Debounce the search
       _debounceTimer = Timer(debounceDuration, () async {
-        await _executeSearch(query, searchProvider);
+        await _executeSearch(query, searchProvider, addToHistory: addToHistory);
       });
     }
   }
@@ -85,6 +86,7 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
   Future<void> _executeSearch(
     String query,
     Future<List<dynamic>> Function(String)? searchProvider,
+    {required bool addToHistory}
   ) async {
     // Start loading
     emit(state.copyWith(
@@ -100,8 +102,10 @@ class SearchCubit extends BaseViewModelCubit<SearchState> {
         results = await searchProvider(query);
       }
 
-      // Add to history if not already present
-      _addToHistory(query);
+      // Add to history if requested
+      if (addToHistory) {
+        _addToHistory(query);
+      }
 
       emit(state.copyWith(
         results: results,

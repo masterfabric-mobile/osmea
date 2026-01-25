@@ -19,10 +19,16 @@ import 'package:storefront_woo/app/views/view_favorite_categories/models/favorit
     as _i963;
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart'
     as _i867;
+import 'package:storefront_woo/app/views/view_order_detail/models/order_detail_view_model.dart'
+    as _i245;
+import 'package:storefront_woo/app/views/view_orders_history/models/orders_history_view_model.dart'
+    as _i845;
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart'
     as _i819;
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart'
     as _i277;
+import 'package:storefront_woo/app/views/view_user_profile/models/user_profile_view_model.dart'
+    as _i32;
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart'
     as _i241;
 
@@ -37,12 +43,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i963.FavoriteCategoriesViewModel>(
       () => _i963.FavoriteCategoriesViewModel(),
     );
+    gh.factory<_i32.UserProfileViewModel>(() => _i32.UserProfileViewModel());
     gh.factory<_i277.ProductListViewModel>(() => _i277.ProductListViewModel());
     gh.factory<_i241.WishlistViewModel>(() => _i241.WishlistViewModel());
     gh.factory<_i819.ProductDetailViewModel>(
       () => _i819.ProductDetailViewModel(),
     );
+    gh.factory<_i245.OrderDetailViewModel>(() => _i245.OrderDetailViewModel());
     gh.factory<_i867.HomeViewModel>(() => _i867.HomeViewModel());
+    gh.factory<_i845.OrdersHistoryViewModel>(
+      () => _i845.OrdersHistoryViewModel(),
+    );
     gh.factory<_i439.CheckoutViewModel>(() => _i439.CheckoutViewModel());
     return this;
   }

@@ -13,11 +13,14 @@ import 'package:core/src/helper/common_logger_helper/abstract/common_logger.dart
     as _i481;
 import 'package:core/src/helper/common_logger_helper/common_logger_helper.dart'
     as _i674;
+import 'package:core/src/views/about/cubit/about_cubit.dart' as _i963;
 import 'package:core/src/views/account/cubit/account_cubit.dart' as _i111;
 import 'package:core/src/views/auth/cubit/auth_cubit.dart' as _i651;
+import 'package:core/src/views/contact_us/cubit/contact_us_cubit.dart' as _i516;
 import 'package:core/src/views/empty_view/cubit/empty_view_cubit.dart' as _i905;
 import 'package:core/src/views/error_handling/cubit/error_handling_cubit.dart'
     as _i183;
+import 'package:core/src/views/faq/cubit/faq_cubit.dart' as _i1000;
 import 'package:core/src/views/image_detail/cubit/image_detail_cubit.dart'
     as _i508;
 import 'package:core/src/views/info_bottom_sheet/cubit/info_bottom_sheet_cubit.dart'
@@ -45,10 +48,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     final commonLoggerModule = _$CommonLoggerModule();
     gh.factory<_i674.CommonLogger>(() => commonLoggerModule.commonLogger);
+    gh.factory<_i963.AboutViewCubit>(() => _i963.AboutViewCubit());
     gh.factory<_i111.AccountCubit>(() => _i111.AccountCubit());
     gh.factory<_i651.AuthCubit>(() => _i651.AuthCubit());
+    gh.factory<_i516.ContactUsViewCubit>(() => _i516.ContactUsViewCubit());
     gh.factory<_i905.EmptyViewCubit>(() => _i905.EmptyViewCubit());
     gh.factory<_i183.ErrorHandlingCubit>(() => _i183.ErrorHandlingCubit());
+    gh.factory<_i1000.FAQViewCubit>(() => _i1000.FAQViewCubit());
     gh.factory<_i508.ImageDetailCubit>(() => _i508.ImageDetailCubit());
     gh.factory<_i754.InfoBottomSheetCubit>(() => _i754.InfoBottomSheetCubit());
     gh.factory<_i525.LoadingViewCubit>(() => _i525.LoadingViewCubit());

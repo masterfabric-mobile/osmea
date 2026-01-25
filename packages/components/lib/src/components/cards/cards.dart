@@ -71,6 +71,7 @@ class _OsmeaBaseCard extends CoreContainer {
     this.borderRadius,
     this.backgroundColor,
     this.borderColor,
+    this.borderWidth,
     this.shadowColor,
     this.isClickable = false,
     super.margin,
@@ -100,6 +101,9 @@ class _OsmeaBaseCard extends CoreContainer {
 
   /// 🔲 Custom border color
   final Color? borderColor;
+
+  /// 📏 Custom border width
+  final double? borderWidth;
 
   /// 🌫️ Custom shadow color
   final Color? shadowColor;
@@ -144,7 +148,7 @@ class _OsmeaBaseCard extends CoreContainer {
           borderRadius: effectiveBorderRadius,
           border: Border.all(
             color: borderColor ?? theme.dividerColor,
-            width: 1.0,
+            width: borderWidth ?? 1.0,
           ),
         );
 
@@ -228,6 +232,7 @@ class OsmeaBasicCard extends _OsmeaBaseCard {
     super.borderRadius,
     super.backgroundColor,
     super.borderColor,
+    super.borderWidth,
     super.shadowColor,
     super.margin,
     super.padding, // 🔧 Added missing padding parameter
@@ -291,6 +296,7 @@ class OsmeaBasicCard extends _OsmeaBaseCard {
       borderRadius: borderRadius,
       backgroundColor: backgroundColor,
       borderColor: borderColor,
+      borderWidth: borderWidth,
       shadowColor: shadowColor,
       margin: margin,
       width: width,
@@ -1129,6 +1135,7 @@ class OsmeaActionCard extends _OsmeaBaseCard {
       borderRadius: borderRadius,
       backgroundColor: backgroundColor,
       borderColor: borderColor,
+      borderWidth: borderWidth,
       shadowColor: shadowColor,
       margin: margin,
       width: width,

@@ -6,16 +6,21 @@
  * Integrates with APIs package for cart operations.
  */
 
+import 'dart:async';
+import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_api/abstract/cart_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/abstract/cart_coupons_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/cart_coupons_api/freezed_model/response/list_cart_coupons_response_model.dart';
+import 'package:apis/network/remote/woocommerce/wishlist/freezed_model/request/add_wishlist_item_request.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_woo/app/views/view_cart/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:apis/apis.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 @injectable
 class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
@@ -24,7 +29,28 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   // Dependencies
   final CartService _cartService = GetIt.I<CartService>();
   final CartCouponsService _cartCouponsService = GetIt.I<CartCouponsService>();
+  final WooWishlistService _wishlistService = GetIt.I<WooWishlistService>();
+  final WishlistViewModel _wishlistViewModel = GetIt.I<WishlistViewModel>();
   final AssetConfigHelper _configHelper = AssetConfigHelper();
+  
+  // Wishlist API configuration - get from config like WishlistViewModel
+  String get _wishlistNamespace {
+    return _configHelper.getString(
+      'woocommerce_configuration.wishlist_namespace',
+      'masterfabric',
+    );
+  }
+
+  String get _wishlistApiVersion {
+    return _configHelper.getString(
+      'woocommerce_configuration.version',
+      'v1',
+    );
+  }
+
+  // Track last loaded state to show overlay during updates
+  CartLoadedState? _lastLoadedState;
+  CartLoadedState? get lastLoadedState => _lastLoadedState;
 
   // Arguments holder for route/widget inputs
   final Map<String, dynamic> _arguments = {};
@@ -38,6 +64,8 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
   // Public trigger functions - HydratedCubit pattern
   void loadCart({String? cartToken}) => _loadCart(cartToken: cartToken);
+  Future<void> refreshCart({String? cartToken}) async =>
+      await _loadCart(cartToken: cartToken);
   Future<void> addItemToCart(int productId, {int quantity = 1}) =>
       _addItemToCart(productId, quantity);
   void removeItemFromCart(int productId, {BuildContext? context}) {
@@ -47,9 +75,52 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       _removeItemFromCart(productId);
     }
   }
-  
-  /// Show confirmation dialog before removing item
-  void _showRemoveConfirmationDialog(BuildContext context, int productId) {
+
+  /// Get dialog color from config
+  Color _getDialogColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = _configHelper.getString(
+        'dialog_popup_configuration.$key',
+      );
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load dialog color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Get popup button color from config (same as wishlist)
+  Color _getPopupButtonColorFromConfig(String key, Color fallback) {
+    try {
+      final colorString = _configHelper.getString(
+        'dialog_popup_configuration.buttons.$key',
+      );
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load popup button color $key: $e');
+    }
+    return fallback;
+  }
+
+  /// Show confirmation dialog before removing item (wishlist-style popup)
+  Future<void> _showRemoveConfirmationDialog(
+    BuildContext context,
+    int productId,
+  ) async {
     // Get product name for the dialog
     final currentState = state;
     String productName = 'this item';
@@ -60,64 +131,208 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         );
         productName = item.productName;
       } catch (e) {
-        // Item not found, use default name
-        productName = 'this item';
+        debugPrint('⚠️ Item not found in cart: $e');
       }
     }
+
+    // Check if user is logged in (has valid JWT token)
+    final jwtToken = await _getJwtToken();
+    final isLoggedIn = jwtToken != null && jwtToken.isNotEmpty;
+
+    // Check if item is already in wishlist (BEFORE showing popup)
+    bool isInWishlist = false;
+    if (isLoggedIn) {
+      try {
+        // Ensure wishlist is synced before checking
+        await _wishlistViewModel.syncFromServer();
+        isInWishlist = _wishlistViewModel.isSaved(productId);
+        debugPrint('💖 Cart: Product $productId is ${isInWishlist ? "already" : "not"} in wishlist');
+      } catch (e) {
+        debugPrint('⚠️ Cart: Failed to check wishlist status: $e');
+        // Continue with popup even if check fails
+      }
+    }
+
+    // Get popup colors from config
+    final popupBgColor = _getDialogColorFromConfig(
+      'popup.backgroundColor',
+      OsmeaColors.white,
+    );
+    final popupTitleColor = _getDialogColorFromConfig(
+      'popup.titleColor',
+      const Color(0xFF1976D2),
+    );
+    final popupSubtitleColor = _getDialogColorFromConfig(
+      'popup.subtitleColor',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final popupElevation = _configHelper.getDouble(
+      'dialog_popup_configuration.popup.elevation',
+      8.0,
+    );
+
+    // Build popup buttons based on login status and wishlist status
+    List<Widget> popupButtons = [];
     
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: OsmeaComponents.text(
-            'Remove Item',
-            textStyle: OsmeaTextStyle.titleLarge(context),
-            color: OsmeaColors.thunder,
-          ),
-          content: OsmeaComponents.column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OsmeaComponents.text(
-                'Are you sure you want to remove "$productName" from your cart?',
-                textStyle: OsmeaTextStyle.bodyMedium(context),
-                color: OsmeaColors.pewter,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: [
-            // Cancel button
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: OsmeaComponents.text(
-                'Cancel',
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: OsmeaColors.pewter,
-                ),
-              ),
-            ),
-            // Remove button
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _removeItemFromCart(productId);
-              },
-              child: OsmeaComponents.text(
-                'Remove',
-                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                  color: OsmeaColors.red,
-                  fontWeight: FontWeight.bold,
-                ),
+    // Only show "Remove & save for later" button if user is logged in AND item is NOT already in wishlist
+    if (isLoggedIn && !isInWishlist) {
+      popupButtons.add(
+        OsmeaComponents.row(
+          children: [
+            OsmeaComponents.expanded(
+              child: Builder(
+                builder: (context) {
+                  final primaryBgColor = _getPopupButtonColorFromConfig(
+                    'primary.backgroundColor',
+                    OsmeaColors.black,
+                  );
+                  final primaryTextColor = _getPopupButtonColorFromConfig(
+                    'primary.textColor',
+                    OsmeaColors.white,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Remove & save for later',
+                    variant: ButtonVariant.primary,
+                    backgroundColor: primaryBgColor,
+                    textColor: primaryTextColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('save_later');
+                    },
+                  );
+                },
               ),
             ),
           ],
-        );
-      },
+        ),
+      );
+      popupButtons.add(OsmeaComponents.sizedBox(height: context.spacing8));
+    }
+
+    // "Just remove" button (or "Remove" if not logged in - make it primary)
+    popupButtons.add(
+      OsmeaComponents.row(
+        children: [
+          OsmeaComponents.expanded(
+            child: Builder(
+              builder: (context) {
+                if (isLoggedIn) {
+                  // Secondary button style when logged in
+                  final secondaryBgColor = _getPopupButtonColorFromConfig(
+                    'secondary.backgroundColor',
+                    OsmeaColors.white,
+                  );
+                  final secondaryTextColor = _getPopupButtonColorFromConfig(
+                    'secondary.textColor',
+                    OsmeaColors.black,
+                  );
+                  final secondaryBorderColor = _getPopupButtonColorFromConfig(
+                    'secondary.borderColor',
+                    OsmeaColors.black,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Just remove',
+                    variant: ButtonVariant.outlined,
+                    backgroundColor: secondaryBgColor,
+                    textColor: secondaryTextColor,
+                    borderColor: secondaryBorderColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('remove_only');
+                    },
+                  );
+                } else {
+                  // Primary button style when not logged in
+                  final primaryBgColor = _getPopupButtonColorFromConfig(
+                    'primary.backgroundColor',
+                    OsmeaColors.black,
+                  );
+                  final primaryTextColor = _getPopupButtonColorFromConfig(
+                    'primary.textColor',
+                    OsmeaColors.white,
+                  );
+
+                  return OsmeaComponents.button(
+                    text: 'Remove',
+                    variant: ButtonVariant.primary,
+                    backgroundColor: primaryBgColor,
+                    textColor: primaryTextColor,
+                    onPressed: () {
+                      Navigator.of(context).pop('remove_only');
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
+    popupButtons.add(OsmeaComponents.sizedBox(height: context.spacing8));
+
+    // Cancel button
+    popupButtons.add(
+      Builder(
+        builder: (context) {
+          final ghostTextColor = _getPopupButtonColorFromConfig(
+            'ghost.textColor',
+            OsmeaColors.black,
+          );
+
+          return OsmeaComponents.button(
+            text: 'Cancel',
+            variant: ButtonVariant.ghost,
+            textColor: ghostTextColor,
+            onPressed: () => Navigator.of(context).pop('cancel'),
+          );
+        },
+      ),
+    );
+
+    // Build subtitle based on wishlist status
+    String subtitle;
+    if (isLoggedIn) {
+      if (isInWishlist) {
+        subtitle = '"$productName" is already saved in your favorites. Would you like to remove it from your cart?';
+      } else {
+        subtitle = 'Would you like to save "$productName" for later or remove it from your cart?';
+      }
+    } else {
+      subtitle = 'Are you sure you want to remove "$productName" from your cart?';
+    }
+
+    // Show popup and wait for result
+    final result = await OsmeaComponents.showPopup<String>(
+      context: context,
+      variant: PopupVariant.dialog,
+      title: 'Remove from cart?',
+      subtitle: subtitle,
+      backgroundColor: popupBgColor,
+      titleStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+        color: popupTitleColor,
+        fontWeight: FontWeight.w600,
+      ),
+      subtitleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+        color: popupSubtitleColor,
+      ),
+      elevation: popupElevation,
+      padding: EdgeInsets.all(context.spacing16),
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: popupButtons,
+      ),
+    );
+
+    // Handle result after popup is closed - execute query based on selection
+    if (result == 'save_later') {
+      // Add to wishlist and remove from cart (query will be executed in _addToWishlistAndRemove)
+      await _addToWishlistAndRemove(context, productId);
+    } else if (result == 'remove_only') {
+      // Just remove from cart (query will be executed in _removeItemFromCart)
+      await _removeItemFromCart(productId);
+    }
   }
+
   void updateItemQuantity(int productId, int quantity) =>
       _updateItemQuantity(productId, quantity);
   void clearCart() => _clearCart();
@@ -316,21 +531,23 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: API cart processed - items: ${cartItems.length}, total: $totalPrice, currency: $currencyCode ($currencySymbol), coupons: ${coupons.length}',
       );
 
-      emit(
-        CartLoadedState(
-          cartItems: cartItems,
-          totalPrice: totalPrice,
-          totalItems: response.itemsCount ?? 0,
-          coupons: coupons,
-          shippingAddress: response.shippingAddress,
-          billingAddress: response.billingAddress,
-          currencyCode: currencyCode,
-          currencySymbol: currencySymbol,
-          currencyDecimalSeparator: currencyDecimalSeparator,
-          currencyThousandSeparator: currencyThousandSeparator,
-          currencyMinorUnit: currencyMinorUnit,
-        ),
+      final loadedState = CartLoadedState(
+        cartItems: cartItems,
+        totalPrice: totalPrice,
+        totalItems: response.itemsCount ?? 0,
+        coupons: coupons,
+        shippingAddress: response.shippingAddress,
+        billingAddress: response.billingAddress,
+        currencyCode: currencyCode,
+        currencySymbol: currencySymbol,
+        currencyDecimalSeparator: currencyDecimalSeparator,
+        currencyThousandSeparator: currencyThousandSeparator,
+        currencyMinorUnit: currencyMinorUnit,
       );
+
+      // Track last loaded state for overlay during updates
+      _lastLoadedState = loadedState;
+      emit(loadedState);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error processing cart response: $e');
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
@@ -372,12 +589,14 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       // Use empty string if cart token is null - API will handle it
       // Don't call getCart() here as it causes nonce issues with JWT
+      // Only pass jwtToken if it's not null - interceptor will handle it if null
       var response = await _cartService.addItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken ?? '',
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
+        jwtToken:
+            jwtToken, // JWT token with Bearer prefix if authenticated, null otherwise (interceptor will add it)
         id: productId,
         quantity: quantity,
       );
@@ -423,6 +642,25 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling removeItem API: productId=$productId',
       );
 
+      // Get the current state BEFORE emitting loading state
+      final currentState = state;
+      CartLoadedState? loadedState;
+      if (currentState is CartLoadedState) {
+        loadedState = currentState;
+      } else if (_lastLoadedState != null) {
+        // Use last loaded state if current state is not loaded
+        loadedState = _lastLoadedState;
+      }
+
+      if (loadedState == null) {
+        debugPrint('❌ No cart loaded to remove item from');
+        emit(CartErrorState(message: t.cartView.messages.noCartLoaded));
+        return;
+      }
+
+      // Emit loading state to show overlay (after we've saved the loaded state)
+      emit(CartLoadingState());
+
       // Get tokens before API call
       final cartToken = await _getCartToken();
       final jwtToken = await _getJwtToken();
@@ -437,21 +675,13 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for removeItem');
-        emit(CartErrorState(message: 'No cart token available'));
-        return;
-      }
-
-      // Find the cart item key for this product
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ No cart loaded to remove item from');
-        emit(CartErrorState(message: 'No cart loaded'));
+        emit(CartErrorState(message: t.cartView.messages.noCartToken));
         return;
       }
 
       // Find the item key for this product
       String? itemKey;
-      for (final item in currentState.cartItems) {
+      for (final item in loadedState.cartItems) {
         if (item.productId == productId) {
           itemKey = item.key;
           break;
@@ -503,6 +733,12 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       debugPrint(
         '🛒 CartViewModel: _updateItemQuantity called - productId: $productId, quantity: $quantity',
       );
+      
+      // Save current loaded state before showing loading
+      if (state is CartLoadedState) {
+        _lastLoadedState = state as CartLoadedState;
+      }
+      
       debugPrint('🛒 CartViewModel: Updating quantity via API');
       await _updateItemQuantityFromAPI(productId, quantity);
     } catch (e) {
@@ -518,6 +754,21 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: Calling updateItem API: productId=$productId, quantity=$quantity',
       );
 
+      // Get the current loaded state
+      final currentState = state;
+      CartLoadedState? loadedState;
+      if (currentState is CartLoadedState) {
+        loadedState = currentState;
+      } else if (_lastLoadedState != null) {
+        loadedState = _lastLoadedState;
+      }
+
+      if (loadedState == null) {
+        debugPrint('❌ No cart loaded to update item in');
+        emit(CartErrorState(message: t.cartView.messages.noCartLoaded));
+        return;
+      }
+
       // Get tokens before API call
       final cartToken = await _getCartToken();
       final jwtToken = await _getJwtToken();
@@ -530,17 +781,9 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
         '🛒 CartViewModel: updateItem - Cart Token: ${cartToken != null ? "Available" : "Not available"}',
       );
 
-      // Find the cart item key for this product
-      final currentState = state;
-      if (currentState is! CartLoadedState) {
-        debugPrint('❌ No cart loaded to update item in');
-        emit(CartErrorState(message: 'No cart loaded'));
-        return;
-      }
-
       // Find the item key for this product
       String? itemKey;
-      for (final item in currentState.cartItems) {
+      for (final item in loadedState.cartItems) {
         if (item.productId == productId) {
           itemKey = item.key;
           break;
@@ -549,22 +792,50 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (itemKey == null) {
         debugPrint('❌ Item not found in cart: $productId');
-        emit(CartErrorState(message: 'Item not found in cart'));
+        emit(CartErrorState(message: t.cartView.messages.itemNotFound));
         return;
       }
 
       if (cartToken == null || cartToken.isEmpty) {
         debugPrint('❌ No cart token available for updateItem');
-        emit(CartErrorState(message: 'No cart token available'));
+        emit(CartErrorState(message: t.cartView.messages.noCartToken));
         return;
       }
 
+      // Show loading state with updatingProductId - this will show spinner on that item
+      // Also update the quantity optimistically
+      final updatedItems = loadedState.cartItems.map((item) {
+        if (item.productId == productId) {
+          return item.copyWith(quantity: quantity);
+        }
+        return item;
+      }).toList();
+
+      // Calculate new total items count
+      int newTotalItems = 0;
+      double newTotal = 0.0;
+      for (final item in updatedItems) {
+        newTotalItems += item.quantity;
+        newTotal += item.price * item.quantity;
+      }
+
+      // Emit state with loading indicator and updated counts
+      final updatingState = loadedState.copyWith(
+        cartItems: updatedItems,
+        totalPrice: newTotal,
+        totalItems: newTotalItems,
+        updatingProductId: productId,
+      );
+      _lastLoadedState = updatingState;
+      emit(updatingState);
+
+      // Make API call in background
       final response = await _cartService.updateItem(
         apiVersion: _configHelper.getString(
           'woocommerce_configuration.version',
         ),
         cartToken: cartToken,
-        jwtToken: jwtToken, // JWT token with Bearer prefix if authenticated
+        jwtToken: jwtToken,
         key: itemKey,
         quantity: quantity,
       );
@@ -575,6 +846,10 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
 
       if (response.errors != null && response.errors!.isNotEmpty) {
         debugPrint('❌ API update item error: ${response.errors!.first}');
+        // Revert to previous state on error (without updatingProductId)
+        final revertedState = loadedState.copyWith(clearUpdatingProductId: true);
+        _lastLoadedState = revertedState;
+        emit(revertedState);
         emit(
           CartErrorState(
             message: ApiErrorUtils.getErrorMessage(response.errors!.first),
@@ -584,10 +859,19 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       }
 
       debugPrint('✅ Successfully updated item in API cart');
-      // Reload cart to get updated data from API
-      await _loadCartFromAPI();
+      
+      // Clear updating indicator
+      final finalState = updatingState.copyWith(clearUpdatingProductId: true);
+      _lastLoadedState = finalState;
+      emit(finalState);
     } catch (e) {
       debugPrint('❌ Failed to update item in API cart: $e');
+      
+      // Restore last loaded state on error (without updatingProductId)
+      if (_lastLoadedState != null) {
+        final errorState = _lastLoadedState!.copyWith(clearUpdatingProductId: true);
+        emit(errorState);
+      }
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
     }
   }
@@ -597,16 +881,18 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
       debugPrint('🛒 CartViewModel: Clearing cart');
       // WooCommerce doesn't have a direct clear cart API
       // Show empty cart state
-      emit(
-        CartLoadedState(
-          cartItems: [],
-          totalPrice: 0.0,
-          totalItems: 0,
-          coupons: [],
-          shippingAddress: null,
-          billingAddress: null,
-        ),
+      final loadedState = CartLoadedState(
+        cartItems: [],
+        totalPrice: 0.0,
+        totalItems: 0,
+        coupons: [],
+        shippingAddress: null,
+        billingAddress: null,
       );
+
+      // Track last loaded state for overlay during updates
+      _lastLoadedState = loadedState;
+      emit(loadedState);
     } catch (e) {
       debugPrint('🛒 CartViewModel: Error clearing cart: $e');
       emit(CartErrorState(message: ApiErrorUtils.getErrorMessage(e)));
@@ -763,6 +1049,11 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
   }
 
   @override
+  Future<void> close() {
+    return super.close();
+  }
+
+  @override
   CartState? fromJson(Map<String, dynamic> json) {
     return null; // State will be reconstructed from API
   }
@@ -845,6 +1136,143 @@ class CartViewModel extends BaseViewModelHydratedCubit<CartState> {
     } catch (e) {
       debugPrint('❌ Failed to get JWT token: $e');
       return null;
+    }
+  }
+
+  /// Add item to wishlist and then remove from cart
+  Future<void> _addToWishlistAndRemove(BuildContext context, int productId) async {
+    try {
+      // Get product name for the success message
+      final currentState = state;
+      String productName = 'Item';
+      if (currentState is CartLoadedState) {
+        try {
+          final item = currentState.cartItems.firstWhere(
+            (item) => item.productId == productId,
+          );
+          productName = item.productName;
+        } catch (e) {
+          debugPrint('⚠️ Could not find product name for productId: $productId');
+        }
+      }
+
+      debugPrint('💖 Adding product $productId to wishlist from cart');
+      
+      // Add to wishlist
+      final response = await _wishlistService.addItemToWishlist(
+        namespace: _wishlistNamespace,
+        apiVersion: _wishlistApiVersion,
+        request: AddWishlistItemRequest(
+          productId: productId,
+          groupId: 0, // Default group
+          quantity: 1,
+        ),
+      );
+
+      debugPrint('💖 Wishlist API response: success=${response.success}, message=${response.message}');
+
+      // Check if operation was successful or item already in wishlist
+      final message = response.message?.toLowerCase() ?? '';
+      final isAlreadyInWishlist = message.contains('already in wishlist') ||
+          message.contains('already exists') ||
+          message.contains('already added');
+
+      if (response.success == true || isAlreadyInWishlist) {
+        // Successfully added or already in wishlist - now remove from cart
+        await _removeItemFromCart(productId);
+        
+        // Show success message
+        if (context.mounted) {
+          context.snackbarSuccess(
+            '$productName moved to your favorites',
+            duration: context.durationNormal,
+          );
+        }
+      } else {
+        // Failed to add to wishlist
+        debugPrint('❌ Failed to add to wishlist: ${response.message}');
+        if (context.mounted) {
+          context.snackbarError(
+            'Failed to save to favorites',
+            duration: context.durationNormal,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding to wishlist: $e');
+      if (context.mounted) {
+        context.snackbarError(
+          'Failed to save to favorites',
+          duration: context.durationNormal,
+        );
+      }
+    }
+  }
+
+  /// Add item to wishlist only (without removing from cart)
+  Future<void> _addToWishlistOnly(BuildContext context, int productId) async {
+    try {
+      // Get product name for the success message
+      final currentState = state;
+      String productName = 'Item';
+      if (currentState is CartLoadedState) {
+        try {
+          final item = currentState.cartItems.firstWhere(
+            (item) => item.productId == productId,
+          );
+          productName = item.productName;
+        } catch (e) {
+          debugPrint('⚠️ Could not find product name for productId: $productId');
+        }
+      }
+
+      debugPrint('💖 Adding product $productId to wishlist only (keeping in cart)');
+      
+      // Add to wishlist
+      final response = await _wishlistService.addItemToWishlist(
+        namespace: _wishlistNamespace,
+        apiVersion: _wishlistApiVersion,
+        request: AddWishlistItemRequest(
+          productId: productId,
+          groupId: 0, // Default group
+          quantity: 1,
+        ),
+      );
+
+      debugPrint('💖 Wishlist API response: success=${response.success}, message=${response.message}');
+
+      // Check if operation was successful or item already in wishlist
+      final message = response.message?.toLowerCase() ?? '';
+      final isAlreadyInWishlist = message.contains('already in wishlist') ||
+          message.contains('already exists') ||
+          message.contains('already added');
+
+      if (response.success == true || isAlreadyInWishlist) {
+        // Successfully added or already in wishlist
+        if (context.mounted) {
+          context.snackbarSuccess(
+            '$productName added to your favorites',
+            duration: context.durationNormal,
+          );
+        }
+      } else {
+        // Failed to add to wishlist
+        debugPrint('❌ Failed to add to wishlist: ${response.message}');
+        if (context.mounted) {
+          context.snackbarError(
+            'Failed to add to favorites',
+            duration: context.durationNormal,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding to wishlist: $e');
+      if (context.mounted) {
+        context.snackbarError(
+          'Failed to add to favorites',
+          duration: context.durationNormal,
+        );
+      }
     }
   }
 }

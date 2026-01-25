@@ -230,6 +230,7 @@ class OsmeaComponents {
     String? tooltip,
     bool autofocus = false,
     Color? backgroundColor,
+    Color? borderColor,
   }) {
     return OsmeaIconButton(
       key: key,
@@ -243,6 +244,7 @@ class OsmeaComponents {
       tooltip: tooltip,
       autofocus: autofocus,
       backgroundColor: backgroundColor,
+      borderColor: borderColor,
       borderRadius: borderRadius,
       elevation: elevation,
     );
@@ -929,40 +931,40 @@ class OsmeaComponents {
   /// )
   /// ```
   static Widget locationPicker({
-  Key? key,
-  LocationData? initialLocation,
-  required ValueChanged<LocationData?> onLocationChanged,
-  VoidCallback? onShowMapPressed,
-  VoidCallback? onCurrentLocationPressed,
-  required String apiKey,
-  LocationPickerVariant variant = LocationPickerVariant.combined,
-  LocationPickerSize size = LocationPickerSize.medium,
-  LocationPickerStyle style = LocationPickerStyle.outlined,
-  String? label,
-  String? hintText,
-  bool isRequired = false,
-  bool showCurrentLocation = true,
-  bool autofocusCurrentLocation = false,
-  bool showMapButtonInSearch = false,
-}) {
-  return OsmeaLocationPicker(
-    key: key,
-    initialLocation: initialLocation,
-    onLocationChanged: onLocationChanged,
-    onShowMapPressed: onShowMapPressed,
-    onCurrentLocationPressed: onCurrentLocationPressed,
-    apiKey: apiKey,
-    variant: variant,
-    size: size,
-    style: style,
-    label: label,
-    hintText: hintText,
-    isRequired: isRequired,
-    showCurrentLocation: showCurrentLocation,
-    autofocusCurrentLocation: autofocusCurrentLocation,
-    showMapButtonInSearch: showMapButtonInSearch,
-  );
-}
+    Key? key,
+    LocationData? initialLocation,
+    required ValueChanged<LocationData?> onLocationChanged,
+    VoidCallback? onShowMapPressed,
+    VoidCallback? onCurrentLocationPressed,
+    required String apiKey,
+    LocationPickerVariant variant = LocationPickerVariant.combined,
+    LocationPickerSize size = LocationPickerSize.medium,
+    LocationPickerStyle style = LocationPickerStyle.outlined,
+    String? label,
+    String? hintText,
+    bool isRequired = false,
+    bool showCurrentLocation = true,
+    bool autofocusCurrentLocation = false,
+    bool showMapButtonInSearch = false,
+  }) {
+    return OsmeaLocationPicker(
+      key: key,
+      initialLocation: initialLocation,
+      onLocationChanged: onLocationChanged,
+      onShowMapPressed: onShowMapPressed,
+      onCurrentLocationPressed: onCurrentLocationPressed,
+      apiKey: apiKey,
+      variant: variant,
+      size: size,
+      style: style,
+      label: label,
+      hintText: hintText,
+      isRequired: isRequired,
+      showCurrentLocation: showCurrentLocation,
+      autofocusCurrentLocation: autofocusCurrentLocation,
+      showMapButtonInSearch: showMapButtonInSearch,
+    );
+  }
 
   /// 🔽 **OSMEA Dropdown** - A comprehensive dropdown component
   ///
@@ -1142,7 +1144,7 @@ class OsmeaComponents {
   /// Example:
   /// ```dart
   /// OsmeaComponents.navbar(
-  ///   variant: NavbarVariant.primary,
+  ///   variant: NavbarVariant.retailMain,
   ///   size: NavbarSize.medium,
   ///   position: NavbarPosition.top,
   ///   items: [
@@ -1164,14 +1166,20 @@ class OsmeaComponents {
     CoreTheme? customTheme,
     required List<NavbarItem> items,
     NavbarSize size = NavbarSize.medium,
-    NavbarVariant variant = NavbarVariant.primary,
+    NavbarVariant variant = NavbarVariant.retailMain,
     NavbarPosition position = NavbarPosition.top,
+    NavbarStyle? style,
+    NavbarIndicatorStyle indicatorStyle = NavbarIndicatorStyle.none,
     Color? backgroundColor,
     Color? textColor,
     Color? activeColor,
     Color? inactiveColor,
     Color? borderColor,
     Color? shadowColor,
+    Color? indicatorColor,
+    double? borderWidth,
+    BorderStyle? borderStyle,
+    bool? showBorder,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     Duration? animationDuration,
@@ -1191,12 +1199,18 @@ class OsmeaComponents {
       size: size,
       variant: variant,
       position: position,
+      style: style,
+      indicatorStyle: indicatorStyle,
       backgroundColor: backgroundColor,
       textColor: textColor,
       activeColor: activeColor,
       inactiveColor: inactiveColor,
       borderColor: borderColor,
       shadowColor: shadowColor,
+      indicatorColor: indicatorColor,
+      borderWidth: borderWidth,
+      borderStyle: borderStyle,
+      showBorder: showBorder,
       padding: padding,
       margin: margin,
       animationDuration: animationDuration,
@@ -2054,6 +2068,7 @@ class OsmeaComponents {
     ValueChanged<String>? onSearchSubmitted,
     VoidCallback? onSearchClear,
     VoidCallback? onSearchBack,
+    VoidCallback? onSearchTap,
     Future<List<String>> Function(String query)? searchSuggestionProvider,
     Future<List<dynamic>> Function(String query)? searchProvider,
     int maxHistoryItems = 10,
@@ -2143,6 +2158,7 @@ class OsmeaComponents {
       onSearchSubmitted: onSearchSubmitted,
       onSearchClear: onSearchClear,
       onSearchBack: onSearchBack,
+      onSearchTap: onSearchTap,
       searchSuggestionProvider: searchSuggestionProvider,
       searchProvider: searchProvider,
       maxHistoryItems: maxHistoryItems,
@@ -2699,6 +2715,7 @@ class OsmeaComponents {
     BorderRadius? borderRadius,
     Color? backgroundColor,
     Color? borderColor,
+    double? borderWidth,
     Color? shadowColor,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding, // 🔧 Added missing padding parameter
@@ -3041,6 +3058,7 @@ class OsmeaComponents {
     DotIndicatorAnimation? dotAnimation,
     Color? dotCustomActiveColor,
     Color? dotCustomInactiveColor,
+    double? itemSpacing,
   }) {
     return OsmeaCarousel(
       key: key,
@@ -3087,6 +3105,7 @@ class OsmeaComponents {
       dotAnimation: dotAnimation,
       dotCustomActiveColor: dotCustomActiveColor,
       dotCustomInactiveColor: dotCustomInactiveColor,
+      itemSpacing: itemSpacing ?? 12.0,
     );
   }
 
@@ -4757,6 +4776,7 @@ class OsmeaCollapsePanel {
   /// [disabled]: Whether the panel is disabled
   /// [loading]: Whether the panel is loading
   /// [error]: Whether the panel is in error state
+  /// [onHeaderTap]: Optional handler for header taps (prevents expand/collapse)
   const OsmeaCollapsePanel({
     required this.header,
     required this.body,
@@ -4767,6 +4787,7 @@ class OsmeaCollapsePanel {
     this.disabled = false,
     this.loading = false,
     this.error = false,
+    this.onHeaderTap,
   });
 
   /// Header content - can be a String or Widget
@@ -4796,6 +4817,12 @@ class OsmeaCollapsePanel {
   /// Whether the panel is in error state
   final bool error;
 
+  /// Optional handler for header taps.
+  ///
+  /// If provided, the panel header becomes tappable and the default
+  /// expand/collapse behavior is disabled for that panel.
+  final VoidCallback? onHeaderTap;
+
   /// Create a copy with updated values
   OsmeaCollapsePanel copyWith({
     dynamic header,
@@ -4807,6 +4834,7 @@ class OsmeaCollapsePanel {
     bool? disabled,
     bool? loading,
     bool? error,
+    VoidCallback? onHeaderTap,
   }) {
     return OsmeaCollapsePanel(
       header: header ?? this.header,
@@ -4818,6 +4846,7 @@ class OsmeaCollapsePanel {
       disabled: disabled ?? this.disabled,
       loading: loading ?? this.loading,
       error: error ?? this.error,
+      onHeaderTap: onHeaderTap ?? this.onHeaderTap,
     );
   }
 
@@ -4833,7 +4862,8 @@ class OsmeaCollapsePanel {
         other.variant == variant &&
         other.disabled == disabled &&
         other.loading == loading &&
-        other.error == error;
+        other.error == error &&
+        other.onHeaderTap == onHeaderTap;
   }
 
   @override
@@ -4848,11 +4878,12 @@ class OsmeaCollapsePanel {
       disabled,
       loading,
       error,
+      onHeaderTap,
     );
   }
 
   @override
   String toString() {
-    return 'OsmeaCollapsePanel(header: $header, value: $value, variant: $variant, disabled: $disabled, loading: $loading, error: $error)';
+    return 'OsmeaCollapsePanel(header: $header, value: $value, variant: $variant, disabled: $disabled, loading: $loading, error: $error, onHeaderTap: $onHeaderTap)';
   }
 }

@@ -305,36 +305,37 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 title: title,
                 titleAlignment: titleAlignment,
                 centerTitle: titleAlignment == AppBarTitleAlignment.center,
+                showBackButton: showBackButton,
                 leading: showBackButton
                     ? OsmeaComponents.iconButton(
                         icon: const Icon(Icons.arrow_back),
-                        onPressed:
-                            onBackPressed ?? () => Navigator.of(context).pop(),
+                        onPressed: onBackPressed ??
+                            () => Navigator.of(context).pop(),
                         variant: ButtonVariant.ghost,
                         size: ButtonSize.medium,
                         backgroundColor: Colors.transparent,
                       )
                     : null,
-                appBarBackgroundColor: appBarBackgroundColor ??
-                    configHelper.getSearchAppBarColor(),
-                searchBarBackgroundColor: searchBarBackgroundColor ??
-                    configHelper.getSearchInputBackgroundColor(),
-                searchBarBorderColor: searchBarBorderColor ??
-                    configHelper.getSearchBarBorderColor(),
-                searchBarTextColor: configHelper.getSearchViewTextColor(),
-                searchBarHintColor: configHelper.getSearchViewHintTextColor(),
-                searchBarFocusColor: configHelper.getSearchViewFocusColor(),
-                searchBarErrorColor: configHelper.getSearchViewErrorColor(),
-                searchBarActions: effectiveActions,
-                searchBarActionMargin: searchBarActionMargin,
-                searchBarActionAlignment: searchBarActionAlignment,
                 appBarVariant: appBarVariant,
                 appBarSize: appBarSize,
-                searchBarVariant: searchBarVariant,
+                appBarBackgroundColor: appBarBackgroundColor ??
+                    configHelper.getSearchAppBarColor(),
+                appBarForegroundColor: configHelper.getSearchViewTextColor(),
+                appBarElevation: elevation,
                 searchHint: searchHint ?? 'Search...',
                 searchController: searchController,
                 searchFocusNode: searchFocusNode,
+                searchBarVariant: searchBarVariant,
+                searchBarSize: searchBarSize,
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(OsmeaColors.black),
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
                 onSearch: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchSubmitted: (query) {
                   viewModel.performSearch(query,
                       searchProvider: searchProvider, immediate: true);
                   onSearchSubmitted?.call(query);
@@ -346,7 +347,7 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                   // Trigger search if query length meets minimum requirement
                   if (query.trim().length >= minQueryLength) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider);
+                        searchProvider: searchProvider, addToHistory: false);
                   } else if (query.trim().isEmpty) {
                     viewModel.clearSearch();
                   }
@@ -356,13 +357,14 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                         suggestionProvider: searchSuggestionProvider);
                   }
                 },
-                onSearchClear: () {
-                  viewModel.clearSearch();
-                  onSearchClear?.call();
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped (for navbar navigation)
+                  searchFocusNode?.requestFocus();
                 },
-                searchSuggestionProvider: searchSuggestionProvider,
+                actions: const [],
               );
             } else {
+              // showTitle is false - use appBarWithSearchBar but without showing title (same structure as home)
               // Build actions inline
               List<Widget> effectiveActions = [];
               if (searchBarActions.isNotEmpty) {
@@ -425,72 +427,68 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
                 }
               }
 
-              return OsmeaComponents.appBar(
-                backgroundColor: appBarBackgroundColor ??
-                    configHelper.getSearchAppBarColor(),
-                elevation: elevation,
-                size: AppBarSize.large,
+              // Use appBarWithSearchBar even when showTitle is false (same structure as home)
+              return OsmeaComponents.appBarWithSearchBar(
+                title: null, // Don't show title when showTitle is false
+                titleAlignment: titleAlignment,
+                centerTitle: titleAlignment == AppBarTitleAlignment.center,
+                showBackButton: showBackButton,
                 leading: showBackButton
                     ? OsmeaComponents.iconButton(
-                        icon: const Icon(Icons.arrow_back, size: 24),
-                        onPressed:
-                            onBackPressed ?? () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: onBackPressed ??
+                            () => Navigator.of(context).pop(),
                         variant: ButtonVariant.ghost,
                         size: ButtonSize.medium,
                         backgroundColor: Colors.transparent,
                       )
                     : null,
-                title: OsmeaComponents.searchbar(
-                  controller: searchController,
-                  focusNode: searchFocusNode,
-                  hint: searchHint ?? 'Search...',
-                  size: searchBarSize,
-                  showBackButton: showBackButton,
-                  searchIcon: showSearchIcon
-                      ? const Icon(Icons.search, size: 20)
-                      : null,
-                  borderColor: searchBarBorderColor ??
-                      configHelper.getSearchBarBorderColor(),
-                  variant: TextFieldVariant.outlined,
-                  backgroundColor: searchBarBackgroundColor ??
-                      configHelper.getSearchInputBackgroundColor(),
-                  textColor: configHelper.getSearchViewTextColor(),
-                  hintColor: configHelper.getSearchViewHintTextColor(),
-                  focusColor: configHelper.getSearchViewFocusColor(),
-                  errorColor: configHelper.getSearchViewErrorColor(),
-                  onChanged: (query) {
-                    viewModel.updateQuery(query);
-                    onSearchChanged?.call(query);
+                appBarVariant: appBarVariant,
+                appBarSize: appBarSize,
+                appBarBackgroundColor: appBarBackgroundColor ??
+                    configHelper.getSearchAppBarColor(),
+                appBarForegroundColor: configHelper.getSearchViewTextColor(),
+                appBarElevation: elevation,
+                searchHint: searchHint ?? 'Search...',
+                searchController: searchController,
+                searchFocusNode: searchFocusNode,
+                searchBarVariant: searchBarVariant,
+                searchBarSize: searchBarSize,
+                searchBarFocusColor: configHelper.getSearchViewFocusColor(OsmeaColors.black),
+                showClearButton: showClearButton,
+                showSearchIcon: showSearchIcon,
+                onSearch: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchSubmitted: (query) {
+                  viewModel.performSearch(query,
+                      searchProvider: searchProvider, immediate: true);
+                  onSearchSubmitted?.call(query);
+                },
+                onSearchChanged: (query) {
+                  viewModel.updateQuery(query);
+                  onSearchChanged?.call(query);
 
-                    // Trigger search if query length meets minimum requirement
-                    if (query.trim().length >= minQueryLength) {
-                      viewModel.performSearch(query,
-                          searchProvider: searchProvider);
-                    } else if (query.trim().isEmpty) {
-                      viewModel.clearSearch();
-                    }
-
-                    if (searchSuggestionProvider != null) {
-                      viewModel.getSuggestions(query,
-                          suggestionProvider: searchSuggestionProvider);
-                    }
-                  },
-                  onSubmitted: (query) {
+                  // Trigger search if query length meets minimum requirement
+                  if (query.trim().length >= minQueryLength) {
                     viewModel.performSearch(query,
-                        searchProvider: searchProvider, immediate: true);
-                    onSearchSubmitted?.call(query);
-                  },
-                  onClear: () {
+                        searchProvider: searchProvider, addToHistory: false);
+                  } else if (query.trim().isEmpty) {
                     viewModel.clearSearch();
-                    onSearchClear?.call();
-                  },
-                  showClearButton: showClearButton,
-                  showSearchIcon: showSearchIcon,
-                  actions: effectiveActions,
-                  actionMargin: searchBarActionMargin,
-                  actionAlignment: searchBarActionAlignment,
-                ),
-                actions: [],
+                  }
+
+                  if (searchSuggestionProvider != null) {
+                    viewModel.getSuggestions(query,
+                        suggestionProvider: searchSuggestionProvider);
+                  }
+                },
+                onSearchTap: () {
+                  // Request focus when searchbar is tapped (for navbar navigation)
+                  searchFocusNode?.requestFocus();
+                },
+                actions: const [],
               );
             }
           },
@@ -536,18 +534,53 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
   // Override buildLoading to use LoadingView instead of CircularProgressIndicator
   @override
-  Widget buildLoading({Color color = Colors.blue, double size = 50.0}) {
+  Widget buildLoading({Color color = Colors.black, double size = 50.0}) {
+    // Load loading configuration from app_config.json
+    final configHelper = AssetConfigHelper();
+    final loadingConfig = configHelper.getObject('search_view_configuration.loading');
+    
+    // Get loading color (default to black)
+    final loadingColorHex = loadingConfig?['color'] as String? ?? '#000000';
+    
+    // Get loading steps from config or use defaults
+    final loadingSteps = (loadingConfig?['loadingSteps'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [
+          'Initializing search...',
+          'Loading configuration...',
+          'Almost ready...',
+        ];
+    
+    // Get step duration from config or use default
+    final stepDurationMs = (loadingConfig?['stepDuration'] as num?)?.toInt() ?? 400;
+    final stepDuration = Duration(milliseconds: stepDurationMs);
+    
+    // Get other settings from config
+    final showProgress = loadingConfig?['showProgress'] as bool? ?? true;
+    final showCancelButton = loadingConfig?['showCancelButton'] as bool? ?? false;
+    
+    // Create LoadingPageModel with config values
+    final loadingPageModel = LoadingPageModel(
+      title: 'Searching',
+      description: 'Please wait...',
+      loadingType: LoadingModelType.initialization,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDurationMs,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
+      autoNavigateOnComplete: false,
+      progressColor: loadingColorHex,
+    );
+    
     return LoadingView(
       goRoute: goRoute,
       loadingType: LoadingModelType.initialization,
-      loadingSteps: [
-        'Initializing search...',
-        'Loading configuration...',
-        'Almost ready...',
-      ],
-      stepDuration: const Duration(milliseconds: 400),
-      showProgress: true,
-      showCancelButton: false,
+      loadingPageModel: loadingPageModel,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDuration,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
     );
   }
 
@@ -671,17 +704,52 @@ class SearchView extends MasterViewCubit<SearchCubit, SearchState> {
 
   /// Loading view using LoadingView
   Widget _buildLoadingView(BuildContext context) {
+    // Load loading configuration from app_config.json
+    final configHelper = AssetConfigHelper();
+    final loadingConfig = configHelper.getObject('search_view_configuration.loading');
+    
+    // Get loading color (default to black)
+    final loadingColorHex = loadingConfig?['color'] as String? ?? '#000000';
+    
+    // Get loading steps from config or use defaults
+    final loadingSteps = (loadingConfig?['loadingSteps'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [
+          'Searching products...',
+          'Fetching results...',
+          'Almost there...',
+        ];
+    
+    // Get step duration from config or use default
+    final stepDurationMs = (loadingConfig?['stepDuration'] as num?)?.toInt() ?? 500;
+    final stepDuration = Duration(milliseconds: stepDurationMs);
+    
+    // Get other settings from config
+    final showProgress = loadingConfig?['showProgress'] as bool? ?? true;
+    final showCancelButton = loadingConfig?['showCancelButton'] as bool? ?? false;
+    
+    // Create LoadingPageModel with config values
+    final loadingPageModel = LoadingPageModel(
+      title: 'Searching',
+      description: 'Please wait...',
+      loadingType: LoadingModelType.networkRequest,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDurationMs,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
+      autoNavigateOnComplete: false,
+      progressColor: loadingColorHex,
+    );
+    
     return LoadingView(
       goRoute: goRoute,
       loadingType: LoadingModelType.networkRequest,
-      loadingSteps: [
-        'Searching products...',
-        'Fetching results...',
-        'Almost there...',
-      ],
-      stepDuration: const Duration(milliseconds: 500),
-      showProgress: true,
-      showCancelButton: false,
+      loadingPageModel: loadingPageModel,
+      loadingSteps: loadingSteps,
+      stepDuration: stepDuration,
+      showProgress: showProgress,
+      showCancelButton: showCancelButton,
     );
   }
 

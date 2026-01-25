@@ -143,6 +143,8 @@ class WooCartTokenStorage {
   static const String _cartIdKey = 'woo_cart_id';
   static const String _userIdKey = 'woo_cart_user_id';
   static const String _lastSavedKey = 'woo_cart_last_saved';
+  // Must match WooCartTokenInterceptor nonce key to prevent stale nonce after logout.
+  static const String _nonceStorageKey = 'woo_cart_nonce';
 
   // Core package's LocalStorageHelper instance
   static final LocalStorageHelper _storage = LocalStorageHelper();
@@ -150,7 +152,8 @@ class WooCartTokenStorage {
   // Cache for cart token data
   static WooCartToken? _cachedToken;
   static DateTime? _lastCacheUpdate;
-  static const Duration _cacheValidityDuration = Duration(minutes: 1); // Cache valid for 1 minute
+  static const Duration _cacheValidityDuration =
+      Duration(minutes: 1); // Cache valid for 1 minute
 
   /// Clear cache (call when token is saved/cleared)
   static void _clearCache() {
@@ -355,6 +358,8 @@ class WooCartTokenStorage {
       await _storage.removeItem(_cartIdKey);
       await _storage.removeItem(_userIdKey);
       await _storage.removeItem(_lastSavedKey);
+      // Also clear nonce used for Store API cart requests.
+      await _storage.removeItem(_nonceStorageKey);
 
       // Clear cache
       _clearCache();

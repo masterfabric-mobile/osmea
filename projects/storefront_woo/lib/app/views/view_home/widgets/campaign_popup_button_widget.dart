@@ -247,6 +247,15 @@ class _CampaignPopupButtonWidgetState
       finalPosition.dy.clamp(80, screenSize.height - size - 100),
     );
 
+    // Keep the close icon on the "inner" side so it doesn't go off-screen:
+    // - If the button is on the left half -> show close on the right
+    // - If the button is on the right half -> show close on the left
+    final isOnLeftHalf = (finalPosition.dx + (size / 2)) < (screenSize.width / 2);
+
+    // Scale close button with the campaign size.
+    final closeButtonSize = (size * 0.24).clamp(18.0, 24.0);
+    final closeButtonOffset = (closeButtonSize * 0.33).clamp(6.0, 10.0);
+
     debugPrint('✅ Campaign popup button rendering at: $finalPosition');
 
     return Positioned(
@@ -282,23 +291,30 @@ class _CampaignPopupButtonWidgetState
               child: ClipOval(
                 child: hasImage && finalImageUrl != null
                     ? _buildImageContent(finalImageUrl, size)
-                    : _buildTextContent(context, text, amount, textColorParsed),
+                    : _buildTextContent(
+                        context,
+                        text,
+                        amount,
+                        textColorParsed,
+                        size,
+                      ),
               ),
             ),
           ),
           // Close button (top left) - separate GestureDetector to handle taps independently
           if (showCloseButton)
             Positioned(
-              top: -8,
-              left: -8,
+              top: -closeButtonOffset,
+              left: isOnLeftHalf ? null : -closeButtonOffset,
+              right: isOnLeftHalf ? -closeButtonOffset : null,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _handleClose,
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    width: 24,
-                    height: 24,
+                    width: closeButtonSize,
+                    height: closeButtonSize,
                     decoration: BoxDecoration(
                       color: OsmeaColors.grayMaterial[600],
                       shape: BoxShape.circle,
@@ -309,7 +325,7 @@ class _CampaignPopupButtonWidgetState
                     ),
                     child: Icon(
                       Icons.close,
-                      size: 14,
+                      size: closeButtonSize * 0.58,
                       color: OsmeaColors.white,
                     ),
                   ),
@@ -404,6 +420,7 @@ class _CampaignPopupButtonWidgetState
     String text,
     String? amount,
     Color textColorParsed,
+    double size,
   ) {
     return Container(
       decoration: BoxDecoration(
@@ -414,7 +431,7 @@ class _CampaignPopupButtonWidgetState
         shape: BoxShape.circle,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(size * 0.08),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -422,23 +439,9 @@ class _CampaignPopupButtonWidgetState
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OsmeaComponents.text(
-                  '%',
-                  textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                    color: textColorParsed,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                  ),
-                ),
+             
                 OsmeaComponents.sizedBox(width: 2),
-                OsmeaComponents.text(
-                  '%',
-                  textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                    color: textColorParsed,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                  ),
-                ),
+                
               ],
             ),
             OsmeaComponents.sizedBox(height: 2),
@@ -449,7 +452,7 @@ class _CampaignPopupButtonWidgetState
                 textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                   color: textColorParsed,
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: (size * 0.16).clamp(11.0, 14.0),
                 ),
               ),
             OsmeaComponents.sizedBox(height: 2),
@@ -459,7 +462,7 @@ class _CampaignPopupButtonWidgetState
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 color: textColorParsed,
                 fontWeight: FontWeight.w600,
-                fontSize: 11,
+                fontSize: (size * 0.12).clamp(9.0, 11.0),
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

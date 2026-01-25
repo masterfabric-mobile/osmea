@@ -295,9 +295,10 @@ class OsmeaAppBar extends CoreContainer implements PreferredSizeWidget {
       backgroundColor: _getBackgroundColor(variantConfig),
       foregroundColor: foregroundColor ?? variantConfig.foregroundColor,
       shadowColor: shadowColor ?? variantConfig.shadowColor,
-      surfaceTintColor: surfaceTintColor,
+      surfaceTintColor: surfaceTintColor ?? Colors.transparent,
       elevation: elevation ?? variantConfig.elevation,
-      scrolledUnderElevation: scrolledUnderElevation,
+      scrolledUnderElevation:
+          scrolledUnderElevation ?? (elevation ?? variantConfig.elevation),
       centerTitle: titleAlignment.shouldCenter,
       titleSpacing: titleSpacing ??
           (titleAlignment == AppBarTitleAlignment.left

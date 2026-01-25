@@ -20,6 +20,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<GetAllWishlistGroupsResponse> getAllGroups({
+    required String namespace,
     required String apiVersion,
     int? page,
     int? perPage,
@@ -40,7 +41,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/groups',
+              '/wp-json/${namespace}/${apiVersion}/groups',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -55,6 +56,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<CreateWishlistGroupResponse> createGroup({
+    required String namespace,
     required String apiVersion,
     required CreateWishlistGroupRequest request,
   }) async {
@@ -70,7 +72,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/group',
+              '/wp-json/${namespace}/${apiVersion}/group',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -85,6 +87,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistApiResponse<WishlistGroupResponse>> updateGroup({
+    required String namespace,
     required String apiVersion,
     required int groupId,
     required UpdateWishlistGroupRequest request,
@@ -101,7 +104,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/group/${groupId}',
+              '/wp-json/${namespace}/${apiVersion}/group/${groupId}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -119,6 +122,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistApiResponse<dynamic>> deleteGroup({
+    required String namespace,
     required String apiVersion,
     required int groupId,
   }) async {
@@ -134,7 +138,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/group/${groupId}',
+              '/wp-json/${namespace}/${apiVersion}/group/${groupId}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -152,6 +156,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistPaginatedResponse<WishlistItemResponse>> getWishlistItems({
+    required String namespace,
     required String apiVersion,
     int? groupId,
     int? page,
@@ -174,7 +179,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/items',
+              '/wp-json/${namespace}/${apiVersion}/items',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -192,6 +197,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistApiResponse<WishlistItemResponse>> addItemToWishlist({
+    required String namespace,
     required String apiVersion,
     required AddWishlistItemRequest request,
   }) async {
@@ -207,7 +213,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/item',
+              '/wp-json/${namespace}/${apiVersion}/item',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -225,6 +231,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistApiResponse<dynamic>> deleteItemById({
+    required String namespace,
     required String apiVersion,
     required int itemId,
   }) async {
@@ -240,7 +247,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/item/${itemId}',
+              '/wp-json/${namespace}/${apiVersion}/item/${itemId}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -258,6 +265,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
 
   @override
   Future<WishlistApiResponse<dynamic>> deleteItemByProduct({
+    required String namespace,
     required String apiVersion,
     required DeleteWishlistItemRequest request,
   }) async {
@@ -273,7 +281,7 @@ class _ApiWooWishlistService implements ApiWooWishlistService {
     )
             .compose(
               _dio.options,
-              '/wp-json/custom-wishlist/${apiVersion}/item',
+              '/wp-json/${namespace}/${apiVersion}/item',
               queryParameters: queryParameters,
               data: _data,
             )

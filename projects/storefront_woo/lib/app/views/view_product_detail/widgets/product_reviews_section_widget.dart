@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/review_item_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying product reviews section
 class ProductReviewsSectionWidget extends StatelessWidget {
@@ -42,11 +43,13 @@ class ProductReviewsSectionWidget extends StatelessWidget {
       crossAxisAlignment: context.crossStart,
       children: [
         OsmeaComponents.text(
-          validReviews.isEmpty ? 'Reviews' : 'Reviews (${validReviews.length})',
+          validReviews.isEmpty 
+              ? context.t.productDetailView.reviews.title
+              : context.t.productDetailView.reviews.titleWithCount.replaceAll('{count}', validReviews.length.toString()),
           textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.0,
-            color: OsmeaColors.thunder.withValues(alpha: 0.8),
+            color: OsmeaColors.black,
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing6),
@@ -87,23 +90,23 @@ class _EmptyReviewsWidget extends StatelessWidget {
             Icon(
               Icons.reviews_outlined,
               size: context.iconSizeHigh,
-              color: OsmeaColors.pewter.withValues(alpha: 0.5),
+              color: OsmeaColors.grayMaterial[400]!,
             ),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.text(
-              'No reviews yet',
+              context.t.productDetailView.reviews.empty.title,
               textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.w500,
-                color: OsmeaColors.thunder.withValues(alpha: 0.7),
+                color: OsmeaColors.black,
               ),
               textAlign: TextAlign.center,
             ),
             OsmeaComponents.sizedBox(height: context.spacing2),
             OsmeaComponents.text(
-              'No reviews have been made for this product yet.',
+              context.t.productDetailView.reviews.empty.message,
               textStyle: OsmeaTextStyle.bodySmall(
                 context,
-              ).copyWith(color: OsmeaColors.pewter),
+              ).copyWith(color: OsmeaColors.grayMaterial[400]!),
               textAlign: TextAlign.center,
             ),
           ],

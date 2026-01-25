@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for displaying applied coupon
 class AppliedCouponWidget extends StatelessWidget {
@@ -31,10 +32,7 @@ class AppliedCouponWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: OsmeaColors.snow,
         borderRadius: context.borderRadiusNormal,
-        border: Border.all(
-          color: OsmeaColors.silver,
-          width: 1,
-        ),
+        border: Border.all(color: OsmeaColors.silver, width: 1),
       ),
       child: OsmeaComponents.padding(
         padding: EdgeInsets.symmetric(
@@ -70,7 +68,7 @@ class AppliedCouponWidget extends StatelessWidget {
                 size: context.iconSizeSmall,
               ),
               backgroundColor: Colors.transparent,
-              tooltip: 'Remove coupon',
+              tooltip: context.t.cartView.widgets.coupon.removeTooltip,
             ),
           ],
         ),
@@ -78,4 +76,3 @@ class AppliedCouponWidget extends StatelessWidget {
     );
   }
 }
-

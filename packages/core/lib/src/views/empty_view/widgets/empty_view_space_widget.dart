@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/src/models/empty_view_models.dart';
@@ -92,10 +91,6 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
         }
 
         // Get colors from config
-        final backgroundColor = currentEmptyPage?.getBackgroundColor() ??
-            config?.getBackgroundColor() ??
-            config?.getPrimaryColor() ??
-            OsmeaColors.white;
         final textColor = currentEmptyPage?.getTextColor() ??
             config?.getTextColor() ??
             OsmeaColors.black;
@@ -110,97 +105,95 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
           opacity: _fadeAnimation,
           child: SlideTransition(
             position: _slideAnimation,
-            child: OsmeaComponents.container(
-              color: backgroundColor,
-              child: SafeArea(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: screenSize.height -
-                        MediaQuery.of(context).viewPadding.top -
-                        MediaQuery.of(context).viewPadding.bottom,
-                  ),
-                  child: SingleChildScrollView(
-                    child: OsmeaComponents.container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenSize.width * 0.1,
-                        vertical: screenSize.height * 0.05,
-                      ),
-                      child: OsmeaComponents.center(
-                        child: OsmeaComponents.column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Image or Icon
-                            if (state.imagePath != null || state.iconPath != null)
-                              _buildImageOrIcon(context, state, config, accentColor),
+            child: SafeArea(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: screenSize.height -
+                      MediaQuery.of(context).viewPadding.top -
+                      MediaQuery.of(context).viewPadding.bottom,
+                ),
+                child: SingleChildScrollView(
+                  child: OsmeaComponents.container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenSize.width * 0.1,
+                      vertical: screenSize.height * 0.05,
+                    ),
+                    child: OsmeaComponents.center(
+                      child: OsmeaComponents.column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Image or Icon
+                          if (state.imagePath != null || state.iconPath != null)
+                            _buildImageOrIcon(
+                                context, state, config, accentColor),
 
-                            if (state.imagePath != null || state.iconPath != null)
-                              OsmeaComponents.sizedBox(
-                                  height: screenSize.height * 0.03),
+                          if (state.imagePath != null || state.iconPath != null)
+                            OsmeaComponents.sizedBox(
+                                height: screenSize.height * 0.03),
 
-                            // Icon Circle (if no image/icon provided)
-                            if (state.imagePath == null && state.iconPath == null)
-                              OsmeaComponents.container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: accentColor.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  _getEmptyIcon(state.currentEmptyType),
-                                  size: 40,
-                                  color: accentColor,
-                                ),
+                          // Icon Circle (if no image/icon provided)
+                          if (state.imagePath == null && state.iconPath == null)
+                            OsmeaComponents.container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: accentColor.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
                               ),
-
-                            if (state.imagePath == null && state.iconPath == null)
-                              OsmeaComponents.sizedBox(
-                                  height: screenSize.height * 0.03),
-
-                            // Main Empty Title
-                            OsmeaComponents.text(
-                              title,
-                              color: textColor,
-                              textAlign: TextAlign.center,
-                              textStyle:
-                                  OsmeaTextStyle.headlineMedium(context).copyWith(
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.5,
+                              child: Icon(
+                                _getEmptyIcon(state.currentEmptyType),
+                                size: 40,
+                                color: accentColor,
                               ),
                             ),
 
+                          if (state.imagePath == null && state.iconPath == null)
                             OsmeaComponents.sizedBox(
-                                height: screenSize.height * 0.02),
+                                height: screenSize.height * 0.03),
 
-                            // Empty Description
-                            OsmeaComponents.text(
-                              description,
-                              color: textColor.withOpacity(0.7),
-                              textAlign: TextAlign.center,
-                              textStyle:
-                                  OsmeaTextStyle.bodyLarge(context).copyWith(
-                                fontWeight: FontWeight.w300,
-                                height: 1.6,
+                          // Main Empty Title
+                          OsmeaComponents.text(
+                            title,
+                            color: textColor,
+                            textAlign: TextAlign.center,
+                            textStyle:
+                                OsmeaTextStyle.headlineMedium(context).copyWith(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+
+                          OsmeaComponents.sizedBox(
+                              height: screenSize.height * 0.02),
+
+                          // Empty Description
+                          OsmeaComponents.text(
+                            description,
+                            color: textColor.withValues(alpha: 0.7),
+                            textAlign: TextAlign.center,
+                            textStyle:
+                                OsmeaTextStyle.bodyLarge(context).copyWith(
+                              fontWeight: FontWeight.w300,
+                              height: 1.6,
+                            ),
+                          ),
+
+                          OsmeaComponents.sizedBox(
+                              height: screenSize.height * 0.05),
+
+                          // Action Button (if enabled in config and callback provided)
+                          if (config?.showActionButton == true &&
+                              widget.onActionPressed != null)
+                            SizedBox(
+                              width: 200,
+                              child: OsmeaComponents.button(
+                                text: state.actionButtonText ?? 'Continue',
+                                onPressed: widget.onActionPressed,
+                                variant: ButtonVariant.primary,
+                                size: ButtonSize.medium,
                               ),
                             ),
-
-                            OsmeaComponents.sizedBox(
-                                height: screenSize.height * 0.05),
-
-                            // Action Button (if enabled in config and callback provided)
-                            if (config?.showActionButton == true &&
-                                widget.onActionPressed != null)
-                              SizedBox(
-                                width: 200,
-                                child: OsmeaComponents.button(
-                                  text: state.actionButtonText ?? 'Continue',
-                                  onPressed: widget.onActionPressed,
-                                  variant: ButtonVariant.primary,
-                                  size: ButtonSize.medium,
-                                ),
-                              ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
@@ -278,7 +271,7 @@ class _EmptyViewSpaceWidgetState extends State<EmptyViewSpaceWidget>
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: accentColor.withOpacity(0.1),
+        color: accentColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(

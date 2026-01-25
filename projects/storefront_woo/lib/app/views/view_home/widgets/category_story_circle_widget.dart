@@ -28,8 +28,7 @@ class CategoryStoryCircleWidget extends StatefulWidget {
       _CategoryStoryCircleWidgetState();
 }
 
-class _CategoryStoryCircleWidgetState
-    extends State<CategoryStoryCircleWidget> {
+class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
   final FavoriteCategoriesHelper _favoriteHelper = FavoriteCategoriesHelper();
   Map<int, bool> _favoriteStatus = {};
 
@@ -40,42 +39,113 @@ class _CategoryStoryCircleWidgetState
   }
 
   Future<void> _loadFavoriteStatus() async {
-    final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
-    setState(() {
-      _favoriteStatus = {
-        for (var id in favoriteIds) id: true,
-      };
-    });
+    try {
+      final favoriteIds = await _favoriteHelper.getFavoriteCategoryIds();
+      debugPrint(
+        '💖 CategoryStoryCircle: Loaded ${favoriteIds.length} favorite category IDs: $favoriteIds',
+      );
+      if (mounted) {
+        setState(() {
+          _favoriteStatus = {for (var id in favoriteIds) id: true};
+        });
+      }
+    } catch (e) {
+      debugPrint('⚠️ CategoryStoryCircle: Error loading favorite status: $e');
+      if (mounted) {
+        setState(() {
+          _favoriteStatus = {};
+        });
+      }
+    }
   }
 
   Future<void> _toggleFavorite(int categoryId, String categoryName) async {
+    debugPrint('🔵 CategoryStoryCircle: Toggle favorite clicked for category $categoryId ($categoryName)');
+    
     final wasFavorite = _favoriteStatus[categoryId] ?? false;
-    final success = await _favoriteHelper.toggleFavorite(categoryId);
+    debugPrint('🔵 CategoryStoryCircle: Current favorite status: $wasFavorite');
 
-    if (success) {
+    // Optimistically update UI first
+    if (mounted) {
       setState(() {
         _favoriteStatus[categoryId] = !wasFavorite;
       });
+      debugPrint('🔵 CategoryStoryCircle: UI updated optimistically to ${!wasFavorite}');
+    }
 
-      if (!context.mounted) return;
+    try {
+      final success = await _favoriteHelper.toggleFavorite(categoryId);
+      debugPrint('🔵 CategoryStoryCircle: toggleFavorite result: $success');
 
-      context.showSnackbar(
-        title: !wasFavorite ? 'Added to favorites' : 'Removed from favorites',
-        message: !wasFavorite
-            ? 'Category was added to your favorites'
-            : 'Category was removed from your favorites',
-        type: !wasFavorite ? SnackbarType.info : SnackbarType.error,
-        style: SnackbarStyle.minimal,
-        position: SnackbarPosition.bottom,
-        animation: SnackbarAnimation.slide,
-        actionLabel: 'Undo',
-        onAction: () async {
-          await _favoriteHelper.toggleFavorite(categoryId);
+      if (!success) {
+        debugPrint('⚠️ CategoryStoryCircle: Failed to toggle favorite, reverting UI');
+        // Revert on failure
+        if (mounted) {
           setState(() {
             _favoriteStatus[categoryId] = wasFavorite;
           });
+        }
+        
+        if (context.mounted) {
+          context.showSnackbar(
+            title: 'Error',
+            message: 'Failed to update favorites. Please try again.',
+            type: SnackbarType.error,
+            style: SnackbarStyle.minimal,
+            position: SnackbarPosition.bottom,
+            duration: const Duration(seconds: 2),
+          );
+        }
+        return;
+      }
+
+      if (!context.mounted) return;
+
+      final isNowFavorite = !wasFavorite;
+      debugPrint('🔵 CategoryStoryCircle: Showing success snackbar, isNowFavorite: $isNowFavorite');
+      
+      context.showSnackbar(
+        title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
+        message: isNowFavorite
+            ? '$categoryName was added to your favorites'
+            : '$categoryName was removed from your favorites',
+        type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
+        style: SnackbarStyle.minimal,
+        position: SnackbarPosition.bottom,
+        animation: SnackbarAnimation.slide,
+        duration: const Duration(seconds: 2),
+        actionLabel: 'Undo',
+        onAction: () async {
+          debugPrint('🔵 CategoryStoryCircle: Undo action triggered');
+          await _favoriteHelper.toggleFavorite(categoryId);
+          if (mounted) {
+            setState(() {
+              _favoriteStatus[categoryId] = wasFavorite;
+            });
+          }
         },
       );
+    } catch (e, stackTrace) {
+      debugPrint('❌ CategoryStoryCircle: Exception in _toggleFavorite: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      
+      // Revert on error
+      if (mounted) {
+        setState(() {
+          _favoriteStatus[categoryId] = wasFavorite;
+        });
+      }
+      
+      if (context.mounted) {
+        context.showSnackbar(
+          title: 'Error',
+          message: 'An error occurred: ${e.toString()}',
+          type: SnackbarType.error,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 3),
+        );
+      }
     }
   }
 
@@ -106,32 +176,25 @@ class _CategoryStoryCircleWidgetState
 
     final displayCategories = widget.categories.take(maxItems).toList();
 
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        0,
-        context.spacing20,
-        context.spacing16,
-      ),
-      child: SizedBox(
-        height: showNames
-            ? (circleSize.toDouble() + context.spacing8 + context.height20)
-            : circleSize.toDouble(),
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: displayCategories.length,
-          itemBuilder: (context, index) {
-            final category = displayCategories[index];
-            return _buildCategoryCircle(
-              context,
-              category,
-              circleSize.toDouble(),
-              imageSize.toDouble(),
-              spacing.toDouble(),
-              showNames,
-            );
-          },
-        ),
+    return SizedBox(
+      height: showNames
+          ? (circleSize.toDouble() + context.spacing8 + context.height20)
+          : circleSize.toDouble(),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(left: context.spacing8),
+        itemCount: displayCategories.length,
+        itemBuilder: (context, index) {
+          final category = displayCategories[index];
+          return _buildCategoryCircle(
+            context,
+            category,
+            circleSize.toDouble(),
+            imageSize.toDouble(),
+            spacing.toDouble(),
+            showNames,
+          );
+        },
       ),
     );
   }
@@ -167,18 +230,8 @@ class _CategoryStoryCircleWidgetState
                   height: circleSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: OsmeaColors.nordicBlue,
-                      width: 2,
-                    ),
-                    gradient: LinearGradient(
-                      begin: context.topLeft,
-                      end: context.bottomRight,
-                      colors: [
-                        OsmeaColors.nordicBlue,
-                        OsmeaColors.nordicBlue.withOpacity(0.7),
-                      ],
-                    ),
+                    border: Border.all(color: OsmeaColors.black, width: 0.5),
+                    color: OsmeaColors.white,
                   ),
                   child: ClipOval(
                     child: imageUrl != null && imageUrl.isNotEmpty
@@ -189,8 +242,25 @@ class _CategoryStoryCircleWidgetState
                             fit: BoxFit.cover,
                             variant: ImageVariant.normal,
                             cacheWidth: imageSize.toInt(),
-                            showLoadingIndicator: true,
+                            showLoadingIndicator: false,
                             errorWidget: _buildDefaultIcon(context, circleSize),
+                            placeholder: Container(
+                              width: circleSize,
+                              height: circleSize,
+                              color: OsmeaColors.white,
+                              child: Center(
+                                child: SizedBox(
+                                  width: circleSize * 0.4,
+                                  height: circleSize * 0.4,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      OsmeaColors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           )
                         : _buildDefaultIcon(context, circleSize),
                   ),
@@ -208,16 +278,13 @@ class _CategoryStoryCircleWidgetState
                     decoration: BoxDecoration(
                       color: OsmeaColors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: OsmeaColors.silver,
-                        width: 1,
-                      ),
+                      border: Border.all(color: OsmeaColors.silver, width: 1),
                     ),
                     child: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
                       size: 14,
                       color: isFavorite
-                          ? OsmeaColors.nordicBlue
+                          ? OsmeaColors.black
                           : OsmeaColors.thunder,
                     ),
                   ),
@@ -253,13 +320,17 @@ class _CategoryStoryCircleWidgetState
     return Container(
       width: size,
       height: size,
-      color: OsmeaColors.pewter,
-      child: Icon(
-        Icons.category_outlined,
-        size: size * 0.5,
-        color: OsmeaColors.thunder,
+      color: OsmeaColors.white,
+      child: Center(
+        child: SizedBox(
+          width: size * 0.4,
+          height: size * 0.4,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.0,
+            valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.black),
+          ),
+        ),
       ),
     );
   }
 }
-

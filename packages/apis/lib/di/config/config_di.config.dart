@@ -8,6 +8,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:apis/apis.dart' as _i367;
 import 'package:apis/dio_config/dio_client/abstract/api_base_client.dart'
     as _i661;
 import 'package:apis/dio_config/dio_client/api_dio_client.dart' as _i1004;
@@ -376,6 +377,8 @@ import 'package:apis/network/remote/woocommerce/store_api/product_tags_api/abstr
     as _i197;
 import 'package:apis/network/remote/woocommerce/store_api/product_tags_api/api/api_store_product_tags_service.dart'
     as _i1053;
+import 'package:apis/network/remote/woocommerce/users_manager/api/api_osmea_users_manager_service.dart'
+    as _i662;
 import 'package:apis/network/remote/woocommerce/wishlist/abstract/woo_wishlist_service.dart'
     as _i671;
 import 'package:apis/network/remote/woocommerce/wishlist/api/api_woo_wishlist_service.dart'
@@ -426,6 +429,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i1029.ApiReportsService(gh<_i361.Dio>()));
     gh.factory<_i574.TaxesRatesService>(
         () => _i842.TaxesRatesServiceClient(gh<_i361.Dio>()));
+    gh.factory<_i367.OsmeaUsersManagerService>(
+        () => _i662.ApiOsmeaUsersManagerService(gh<_i361.Dio>()));
     gh.factory<_i515.ProductAttributeTermsService>(
         () => _i44.ProductAttributeTermsServiceClient(gh<_i361.Dio>()));
     gh.factory<_i611.ShopService>(

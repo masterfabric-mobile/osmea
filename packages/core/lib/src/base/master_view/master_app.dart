@@ -94,13 +94,13 @@ class MasterApp extends StatelessWidget {
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 
     /// 🗂️ Initialize App Configuration System with Fallback Support
-    /// 
+    ///
     /// Configuration Loading Priority:
     /// 1. Try to load from specified assetConfigPath (project-specific config)
     /// 2. If fails, fallback to @core package's default config
     /// 3. If both fail, continue with default values
     debugPrint('🔄 Initializing app configuration system...');
-    
+
     // Define fallback configuration path (core package default)
     const String fallbackConfigPath = 'packages/core/assets/app_config.json';
     bool assetConfigLoaded = false;
@@ -108,13 +108,17 @@ class MasterApp extends StatelessWidget {
 
     // Try to load project-specific configuration first (without fallback)
     try {
-      debugPrint('🔍 Attempting to load project-specific configuration: $assetConfigPath');
-      assetConfigLoaded = await _assetConfigHelper.loadConfig(assetConfigPath, false); // Disable fallback
+      debugPrint(
+          '🔍 Attempting to load project-specific configuration: $assetConfigPath');
+      assetConfigLoaded = await _assetConfigHelper.loadConfig(
+          assetConfigPath, false); // Disable fallback
       if (assetConfigLoaded) {
-        debugPrint('✅ Project-specific asset configuration loaded successfully from: $assetConfigPath');
+        debugPrint(
+            '✅ Project-specific asset configuration loaded successfully from: $assetConfigPath');
         actualConfigPath = assetConfigPath;
       } else {
-        debugPrint('⚠️ Failed to load project-specific asset configuration from: $assetConfigPath');
+        debugPrint(
+            '⚠️ Failed to load project-specific asset configuration from: $assetConfigPath');
       }
     } catch (e) {
       debugPrint('❌ Error loading project-specific config: $e');
@@ -123,13 +127,17 @@ class MasterApp extends StatelessWidget {
     // If project-specific config failed, try @core package fallback
     if (!assetConfigLoaded) {
       try {
-        debugPrint('🔄 Attempting to load fallback configuration from @core package: $fallbackConfigPath');
-        assetConfigLoaded = await _assetConfigHelper.loadConfig(fallbackConfigPath, false); // Disable fallback for explicit path
+        debugPrint(
+            '🔄 Attempting to load fallback configuration from @core package: $fallbackConfigPath');
+        assetConfigLoaded = await _assetConfigHelper.loadConfig(
+            fallbackConfigPath, false); // Disable fallback for explicit path
         if (assetConfigLoaded) {
-          debugPrint('✅ Fallback asset configuration loaded successfully from: $fallbackConfigPath');
+          debugPrint(
+              '✅ Fallback asset configuration loaded successfully from: $fallbackConfigPath');
           actualConfigPath = fallbackConfigPath;
         } else {
-          debugPrint('⚠️ Failed to load fallback asset configuration from: $fallbackConfigPath');
+          debugPrint(
+              '⚠️ Failed to load fallback asset configuration from: $fallbackConfigPath');
         }
       } catch (e) {
         debugPrint('❌ Error loading fallback config: $e');
@@ -140,89 +148,108 @@ class MasterApp extends StatelessWidget {
     if (assetConfigLoaded) {
       final bool isProjectConfig = actualConfigPath == assetConfigPath;
       final String sourceEmoji = isProjectConfig ? '🎯' : '📦';
-      final String sourceName = isProjectConfig ? 'PROJECT-SPECIFIC' : 'CORE PACKAGE FALLBACK';
-      
+      final String sourceName =
+          isProjectConfig ? 'PROJECT-SPECIFIC' : 'CORE PACKAGE FALLBACK';
+
       debugPrint('');
-      debugPrint('╔══════════════════════════════════════════════════════════╗');
-      debugPrint('║                 🗂️  CONFIGURATION LOADED                 ║');
-      debugPrint('╠══════════════════════════════════════════════════════════╣');
+      debugPrint(
+          '╔══════════════════════════════════════════════════════════╗');
+      debugPrint(
+          '║                 🗂️  CONFIGURATION LOADED                 ║');
+      debugPrint(
+          '╠══════════════════════════════════════════════════════════╣');
       debugPrint('║ $sourceEmoji Source: $sourceName');
       debugPrint('║ 📁 Path: $actualConfigPath');
-      debugPrint('╠══════════════════════════════════════════════════════════╣');
-      
+      debugPrint(
+          '╠══════════════════════════════════════════════════════════╣');
+
       // Log key configuration values for debugging
-      final appName = _assetConfigHelper.getString('app_settings.app_name', 'OSMEA App');
-      final environment = _assetConfigHelper.getString('app_settings.environment', 'unknown');
-      final debugMode = _assetConfigHelper.getBool('app_settings.debug_mode', false);
-      final themeMode = _assetConfigHelper.getString('ui_configuration.theme_mode', 'light');
-      
+      final appName =
+          _assetConfigHelper.getString('app_settings.app_name', 'OSMEA App');
+      final environment =
+          _assetConfigHelper.getString('app_settings.environment', 'unknown');
+      final debugMode =
+          _assetConfigHelper.getBool('app_settings.debug_mode', false);
+      final themeMode =
+          _assetConfigHelper.getString('ui_configuration.theme_mode', 'light');
+
       debugPrint('║ 📱 App Name: $appName');
       debugPrint('║ 🔧 Environment: $environment');
       debugPrint('║ 🐛 Debug Mode: ${debugMode ? '✅ ON' : '❌ OFF'}');
       debugPrint('║ 🎨 Theme: ${themeMode.toUpperCase()}');
-      debugPrint('╚══════════════════════════════════════════════════════════╝');
+      debugPrint(
+          '╚══════════════════════════════════════════════════════════╝');
       debugPrint('');
-      
+
       if (isProjectConfig) {
         debugPrint('🎯 SUCCESS: Using your project-specific configuration!');
       } else {
         debugPrint('📦 FALLBACK: Using core package configuration as fallback');
-        debugPrint('💡 TIP: Create \'$assetConfigPath\' to use project-specific config');
+        debugPrint(
+            '💡 TIP: Create \'$assetConfigPath\' to use project-specific config');
       }
     } else {
       debugPrint('');
-      debugPrint('╔══════════════════════════════════════════════════════════╗');
+      debugPrint(
+          '╔══════════════════════════════════════════════════════════╗');
       debugPrint('║                ⚠️  CONFIGURATION FAILED                 ║');
-      debugPrint('╠══════════════════════════════════════════════════════════╣');
+      debugPrint(
+          '╠══════════════════════════════════════════════════════════╣');
       debugPrint('║ ❌ No configuration file could be loaded!');
       debugPrint('║ 🔍 Attempted paths:');
       debugPrint('║   1️⃣ $assetConfigPath (project-specific)');
       debugPrint('║   2️⃣ $fallbackConfigPath (core package fallback)');
       debugPrint('║ 💡 Using hardcoded default values only');
-      debugPrint('╚══════════════════════════════════════════════════════════╝');
+      debugPrint(
+          '╚══════════════════════════════════════════════════════════╝');
       debugPrint('');
     }
-    
+
     // Initialize and fetch remote configuration if enabled
     if (enableRemoteConfig) {
       debugPrint('🔄 Initializing Firebase Remote Config...');
-      
+
       // Get remote config settings from asset config if available
-      int fetchTimeout = assetConfigLoaded 
-          ? _assetConfigHelper.getInt('firebase_configuration.remote_config_fetch_timeout', 60)
+      int fetchTimeout = assetConfigLoaded
+          ? _assetConfigHelper.getInt(
+              'firebase_configuration.remote_config_fetch_timeout', 60)
           : 60;
-      int cacheExpiration = assetConfigLoaded 
-          ? _assetConfigHelper.getInt('firebase_configuration.remote_config_cache_expiration', 3600)
+      int cacheExpiration = assetConfigLoaded
+          ? _assetConfigHelper.getInt(
+              'firebase_configuration.remote_config_cache_expiration', 3600)
           : 3600;
-      
+
       bool remoteConfigSuccess = await _remoteConfigHelper.initializeAndFetch(
         fetchTimeoutSeconds: fetchTimeout,
         minimumFetchIntervalSeconds: cacheExpiration,
       );
-      
+
       if (remoteConfigSuccess) {
-        debugPrint('✅ Firebase Remote Config initialized and fetched successfully');
-        
+        debugPrint(
+            '✅ Firebase Remote Config initialized and fetched successfully');
+
         // Sync remote config with the actually loaded config path
-        bool syncSuccess = await _remoteConfigHelper.syncWithAssetConfig(actualConfigPath);
+        bool syncSuccess =
+            await _remoteConfigHelper.syncWithAssetConfig(actualConfigPath);
         if (syncSuccess) {
           debugPrint('✅ Remote config synced with asset config successfully');
         } else {
           debugPrint('⚠️ Remote config sync with asset config failed');
         }
       } else {
-        debugPrint('⚠️ Firebase Remote Config initialization failed, using asset config only');
+        debugPrint(
+            '⚠️ Firebase Remote Config initialization failed, using asset config only');
       }
     } else {
       debugPrint('🔒 Remote config disabled, using asset config only');
     }
-    
+
     // Log configuration status for debugging
     if (assetConfigLoaded) {
       final configStats = _assetConfigHelper.getConfigStats();
       debugPrint('📊 Asset Config Stats: $configStats');
     }
-    
+
     if (enableRemoteConfig) {
       final remoteConfigStatus = _remoteConfigHelper.getConfigStatus();
       debugPrint('📊 Remote Config Status: $remoteConfigStatus');
@@ -273,12 +300,13 @@ class MasterApp extends StatelessWidget {
               await LocaleSettings.currentLocale.toString(),
           'osmea_core_package_timezone':
               await DateTime.now().timeZoneOffset.toString(),
-                  'osmea_core_package_device_platform':
-            '${Platform.isIOS ? 'iOS' : Platform.isAndroid ? 'Android' : 'Web'}',
-        // Add configuration tracking metadata
-        'config_loaded': assetConfigLoaded,
-        'config_source': actualConfigPath == assetConfigPath ? 'project' : 'core_fallback',
-        'config_path': actualConfigPath,
+          'osmea_core_package_device_platform':
+              '${Platform.isIOS ? 'iOS' : Platform.isAndroid ? 'Android' : 'Web'}',
+          // Add configuration tracking metadata
+          'config_loaded': assetConfigLoaded,
+          'config_source':
+              actualConfigPath == assetConfigPath ? 'project' : 'core_fallback',
+          'config_path': actualConfigPath,
         });
         debugPrint(
             "Initialization event logged successfully to 🔥 Firebase Analytics.");
@@ -295,12 +323,13 @@ class MasterApp extends StatelessWidget {
     /// Initialize Local Storage
     /// local storage is used to store the app data
     await _localStorageHelper.init();
-    
+
     // Store configuration metadata in local storage
     await _localStorageHelper.setItem('osmea_config_loaded', assetConfigLoaded);
     await _localStorageHelper.setItem('osmea_config_source', actualConfigPath);
-    await _localStorageHelper.setItem('osmea_config_is_fallback', actualConfigPath != assetConfigPath);
-    
+    await _localStorageHelper.setItem(
+        'osmea_config_is_fallback', actualConfigPath != assetConfigPath);
+
     // set the app data to the local storage
     await _localStorageHelper.setItem('osmea_device_id',
         await DeviceInfoHelper.instance.platformDeviceDeviceID());
@@ -366,7 +395,7 @@ class MasterApp extends StatelessWidget {
     this.localizationsDelegates,
     this.supportedLocales = const <Locale>[Locale('en', 'US')],
     this.locale,
-  })  : assert(fontScale > 0, 'Font scale must be greater than 0! 🔍');
+  }) : assert(fontScale > 0, 'Font scale must be greater than 0! 🔍');
 
   final GoRouter router; // Router for navigation
   final bool shouldSetOrientation; // Flag to manage orientation
@@ -386,9 +415,8 @@ class MasterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 🗂️ Initialize configuration helpers if enabled
-    final RemoteConfigHelper? remoteConfigHelper = useConfigurationHelpers 
-        ? RemoteConfigHelper() 
-        : null;
+    final RemoteConfigHelper? remoteConfigHelper =
+        useConfigurationHelpers ? RemoteConfigHelper() : null;
 
     // ⚙️ Try-catch block to handle potential exceptions during orientation setting
     try {
@@ -408,10 +436,11 @@ class MasterApp extends StatelessWidget {
     // 🎨 Get theme configuration from config helpers if available
     ThemeMode effectiveThemeMode = themeMode;
     double effectiveFontScale = fontScale;
-    
+
     if (useConfigurationHelpers && remoteConfigHelper != null) {
       // Try to get theme mode from configuration
-      final String themeModeConfig = remoteConfigHelper.getString('ui_configuration.theme_mode', 'light');
+      final String themeModeConfig =
+          remoteConfigHelper.getString('ui_configuration.theme_mode', 'light');
       switch (themeModeConfig.toLowerCase()) {
         case 'dark':
           effectiveThemeMode = ThemeMode.dark;
@@ -423,11 +452,13 @@ class MasterApp extends StatelessWidget {
           effectiveThemeMode = ThemeMode.light;
           break;
       }
-      
+
       // Try to get font scale from configuration
-      effectiveFontScale = remoteConfigHelper.getDouble('ui_configuration.font_scale', fontScale);
-      
-      debugPrint('🎨 Using configuration: theme=$themeModeConfig, fontScale=$effectiveFontScale');
+      effectiveFontScale = remoteConfigHelper.getDouble(
+          'ui_configuration.font_scale', fontScale);
+
+      debugPrint(
+          '🎨 Using configuration: theme=$themeModeConfig, fontScale=$effectiveFontScale');
     }
 
     return TranslationProvider(
@@ -439,6 +470,15 @@ class MasterApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            // Keep app bars solid white even when content scrolls under.
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.black,
+          ),
         ),
         debugShowCheckedModeBanner: false,
         title: resources.appTitle,
@@ -454,8 +494,8 @@ class MasterApp extends StatelessWidget {
           debugPrint("MasterApp at build");
           // Create the MediaQuery data with the specified font scale
           final mediaQueryData = MediaQuery.of(context).copyWith(
-            textScaler:
-                TextScaler.linear(effectiveFontScale), // Apply linear text scaling
+            textScaler: TextScaler.linear(
+                effectiveFontScale), // Apply linear text scaling
           );
           Widget appContent = MediaQuery(
             data: mediaQueryData, // Provide the modified MediaQuery data

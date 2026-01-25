@@ -1,128 +1,187 @@
 /*
  * HomeErrorWidget
  * ---------------
- * User-friendly error widget for home view.
- * Provides helpful actions when products fail to load.
+ * Minimalist black & white error widget for home view.
+ * Clean, simple, and consistent with app design.
  */
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
-/// Error widget for home view with helpful actions
+/// Minimalist error widget for home view
 class HomeErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const HomeErrorWidget({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const HomeErrorWidget({super.key, required this.message, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     final configHelper = AssetConfigHelper();
-    
-    // Try to get error configuration
-    String errorTitle = 'Unable to Load Products';
-    try {
-      errorTitle = configHelper.getString(
-        'error_handling_configuration.errorTitle',
-        'Unable to Load Products',
-      );
-    } catch (e) {
-      debugPrint('⚠️ Failed to load error title from config: $e');
-    }
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.background_color',
+        '#FFFFFF',
+      ),
+    );
 
-    return OsmeaComponents.singleChildScrollView(
-      padding: context.paddingHigh,
+    return OsmeaComponents.container(
+      color: backgroundColor,
       child: OsmeaComponents.center(
-        child: OsmeaComponents.column(
-          mainAxisAlignment: context.centerMain,
-          crossAxisAlignment: context.crossCenter,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Error icon
-            OsmeaComponents.container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: OsmeaColors.pewter.withOpacity(0.1),
-                shape: BoxShape.circle,
+        child: OsmeaComponents.singleChildScrollView(
+          padding: context.paddingHigh,
+          child: OsmeaComponents.column(
+            mainAxisAlignment: context.centerMain,
+            crossAxisAlignment: context.crossCenter,
+            children: [
+              // Simple icon
+              _buildErrorIcon(context, Icons.error_outline),
+
+              OsmeaComponents.sizedBox(height: context.spacing32),
+
+              // Error message
+              OsmeaComponents.text(
+                message,
+                textStyle: OsmeaTextStyle.bodyLarge(
+                  context,
+                ).copyWith(color: _getTextColor(context), height: 1.6),
+                textAlign: TextAlign.center,
+                maxLines: 4,
               ),
-              child: Icon(
-                Icons.shopping_bag_outlined,
-                size: 64,
-                color: OsmeaColors.pewter,
-              ),
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing24),
-            // Error title
-            OsmeaComponents.text(
-              errorTitle,
-              textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
-                fontSize: context.fontSizeNormal * context.textScaleFactor,
-                fontWeight: FontWeight.w700,
-                color: OsmeaColors.thunder,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing12),
-            // Error message
-            OsmeaComponents.text(
-              message,
-              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                fontSize: context.fontSizeSmall * context.textScaleFactor,
-                color: OsmeaColors.pewter,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-            OsmeaComponents.sizedBox(height: context.spacing32),
-            // Action buttons
-            OsmeaComponents.column(
-              crossAxisAlignment: context.crossCenter,
-              children: [
-                // Retry button (primary action)
-                if (onRetry != null)
-                  OsmeaComponents.button(
-                    text: 'Try Again',
-                    onPressed: onRetry,
-                    variant: ButtonVariant.primary,
-                    size: ButtonSize.large,
-                    fullWidth: true,
-                  ),
-                if (onRetry != null) OsmeaComponents.sizedBox(height: context.spacing12),
-                // Browse products button
-                OsmeaComponents.button(
-                  text: 'Browse All Products',
-                  onPressed: () {
-                    context.push('/products');
-                  },
-                  variant: ButtonVariant.outlined,
-                  size: ButtonSize.large,
-                  fullWidth: true,
-                ),
+
+              OsmeaComponents.sizedBox(height: context.spacing48),
+
+              // Retry button
+              if (onRetry != null) ...[
+                _buildRetryButton(context),
                 OsmeaComponents.sizedBox(height: context.spacing12),
-                // Search button
-                OsmeaComponents.button(
-                  text: 'Search Products',
-                  onPressed: () {
-                    context.push('/search');
-                  },
-                  variant: ButtonVariant.ghost,
-                  size: ButtonSize.large,
-                  fullWidth: true,
-                ),
               ],
-            ),
-          ],
+
+              // Go back button
+              _buildGoBackButton(context),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
+  /// Builds error icon with config colors
+  Widget _buildErrorIcon(BuildContext context, IconData iconData) {
+    final configHelper = AssetConfigHelper();
+    final iconColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.icon_color',
+        '#000000',
+      ),
+    );
+    final borderColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.icon_border_color',
+        '#000000',
+      ),
+    );
+
+    return OsmeaComponents.container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: borderColor, width: 2),
+      ),
+      child: OsmeaComponents.center(
+        child: Icon(iconData, size: 40, color: iconColor),
+      ),
+    );
+  }
+
+  /// Gets text color from config
+  Color _getTextColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.text_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Builds retry button with config colors
+  Widget _buildRetryButton(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.retry_button_background',
+        '#000000',
+      ),
+    );
+    final textColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.retry_button_text_color',
+        '#FFFFFF',
+      ),
+    );
+
+    return OsmeaComponents.button(
+      text: context.t.homeView.error.tryAgain,
+      onPressed: onRetry,
+      variant: ButtonVariant.primary,
+      size: ButtonSize.large,
+      fullWidth: true,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+
+  /// Builds go back button with config colors
+  Widget _buildGoBackButton(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final textColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.go_back_button_text_color',
+        '#000000',
+      ),
+    );
+
+    return OsmeaComponents.button(
+      text: context.t.homeView.error.goBack,
+      onPressed: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          context.go('/home');
+        }
+      },
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.large,
+      fullWidth: true,
+      textColor: textColor,
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
+  }
+}

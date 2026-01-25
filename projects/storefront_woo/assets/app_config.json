@@ -1,577 +1,1973 @@
 {
-  "app_settings": {
-    "app_name": "Storefront WooCommerce",
-    "app_version": "1.0.0",
-    "build_number": "1",
-    "environment": "production",
-    "debug_mode": false,
-    "maintenance_mode": false
-  },
-  "api_configuration": {
-    "base_url": "https://api.masterfabric.co/woo",
-    "timeout_seconds": 45,
-    "retry_count": 3,
-    "enable_logging": true
-  },
-  "woocommerce_configuration": {
-    "store_url": "http://localhost:8000",
-    "brand_name": "WooPress Dev",
-    "auth_key": "YOUR_SPECIAL_AUTH_CODE",
-    "version": "v1",
-    "verify_ssl": true,
-    "query_string_auth": false,
-    "products_per_page": 20,
-    "enable_reviews": true,
-    "enable_coupons": true,
-    "enable_guest_checkout": true
-  },
-  "account_configuration": {
-    "style": "space",
-    "space_style_colors": {
-      "primary_color": "#000000",
-      "secondary_color": "#06060666",
-      "text_color": "#000000",
-      "icon_color": "#000000",
-      "separator_color": "#E5E5E5",
-      "background_color": "#FFFFFF"
+    "app_settings": {
+        "app_name": "Storefront WooCommerce",
+        "app_version": "1.0.0",
+        "build_number": "1",
+        "environment": "production",
+        "debug_mode": false,
+        "maintenance_mode": false
     },
-    "sections": [
-      {
-        "sectionTitle": "Orders & Requests",
-        "items": [
-          {
-            "id": "all_orders",
-            "title": "All My Orders",
-            "iconName": "shopping_bag_outlined",
-            "iconColor": "#4A90E2",
-            "route": "/orders"
-          },
-          {
-            "id": "return_requests",
-            "title": "My Return Requests",
-            "iconName": "schedule",
-            "iconColor": "#4CAF50",
-            "route": "/returns"
-          },
-          {
-            "id": "cancel_requests",
-            "title": "My Cancellation Requests",
-            "iconName": "update",
-            "iconColor": "#FFC107",
-            "route": "/cancellations"
-          }
-        ]
-      },
-      {
-        "sectionTitle": "Account & Preferences",
-        "items": [
-          {
-            "id": "account_settings",
-            "title": "Account Settings",
-            "iconName": "person_outline",
-            "iconColor": "#4A90E2",
-            "route": "/account-info"
-          },
-          {
-            "id": "notification_preferences",
-            "title": "Notification Preferences",
-            "iconName": "notifications_outlined",
-            "iconColor": "#E57373",
-            "route": "/notifications"
-          }
-        ]
-      },
-      {
-        "sectionTitle": "Alarm & Watchlists",
-        "items": [
-          {
-            "id": "stock_alarm",
-            "title": "My Stock Alarm List",
-            "iconName": "inventory_outlined",
-            "iconColor": "#9C27B0",
-            "route": "/stock-alarms"
-          },
-          {
-            "id": "price_alarm",
-            "title": "My Price Alarm List",
-            "iconName": "local_offer_outlined",
-            "iconColor": "#673AB7",
-            "route": "/price-alarms"
-          }
-        ]
-      }
-    ]
-  },
-  "firebase_configuration": {
-    "analytics_enabled": true,
-    "crashlytics_enabled": true,
-    "performance_monitoring_enabled": true,
-    "remote_config_enabled": true,
-    "remote_config_fetch_timeout": 60,
-    "remote_config_cache_expiration": 3600
-  },
-  "ui_configuration": {
-    "theme_mode": "light",
-    "primary_color": "#000000",
-    "accent_color": "#FFFFFF",
-    "search_app_bar_color": "#A3D3F2FF",
-    "font_scale": 1.0,
-    "enable_haptic_feedback": true,
-    "enable_sound_effects": true
-  },
-  "search_view_configuration": {
-    "search_app_bar_color": "#FFFFFFFF",
-    "search_bar_border_color": "#E0E0E0FF",
-    "action_icon_color": "#6B7280FF",
-    "text_color": "#000000FF",
-    "hint_text_color": "#6B7280FF",
-    "focus_color": "#2563EBFF",
-    "error_color": "#EF4444FF",
-    "search_bar_show_clear_button": true,
-    "search_bar_show_search_icon": true,
-    "elevation": 4.0,
-    "search_bar_size": "medium",
-    "search_bar_variant": "borderless",
-    "search_bar_border_radius": 20.0,
-    "title": "Search",
-    "search_hint": "Search products, brands, categories...",
-    "show_barcode_scanner": true,
-    "show_voice_search": true,
-    "show_back_button": true,
-    "action_button_spacing": 2.0,
-    "action_button_min_width": 32.0,
-    "action_button_min_height": 32.0,
-    "action_button_padding_all": 4.0
-  },
-  "security_configuration": {
-    "enable_ssl_pinning": true,
-    "certificate_validation": true,
-    "biometric_authentication": true,
-    "session_timeout_minutes": 45
-  },
-  "storage_configuration": {
-    "enable_encryption": true,
-    "cache_size_mb": 150,
-    "auto_cleanup_enabled": true,
-    "backup_enabled": true
-  },
-  "notification_configuration": {
-    "push_notifications_enabled": true,
-    "local_notifications_enabled": true,
-    "notification_sound": "default",
-    "vibration_enabled": true
-  },
-  "feature_flags": {
-    "onboarding_enabled": true,
-    "dark_mode_available": true,
-    "offline_mode_enabled": true,
-    "beta_features_enabled": false,
-    "analytics_opt_out_available": true,
-    "woocommerce_integration_enabled": true,
-    "payment_gateway_enabled": true,
-    "wishlist_enabled": true,
-    "cart_persistence_enabled": true
-  },
-  "splash_configuration": {
-    "enabled": true,
-    "style": "startup",
-    "duration_milliseconds": 3000,
-    "min_duration_milliseconds": 1500,
-    "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true",
-    "background_color": "#FFFFFF",
-    "logo_color": "#000000",
-    "show_loading_indicator": true,
-    "loading_indicator_color": "#000000",
-    "show_version_info": true,
-    "version_text_color": "#666666",
-    "fade_animation_enabled": true,
-    "animation_duration_milliseconds": 500,
-    "enable_logo_animation": true,
-    "logo_animation_type": "fade_scale",
-    "show_app_name": true,
-    "app_name_text_color": "#000000",
-    "app_name_font_size": 24,
-    "navigation_target": "/onboarding",
-    "fallback_navigation_target": "/home",
-    "check_connectivity": true,
-    "preload_critical_data": true,
-    "show_error_on_failure": false,
-    "retry_on_error": true,
-    "max_retry_attempts": 2,
-    "enable_dev_mode_tap": true,
-    "dev_mode_tap_count": 7
-  },
-  "localization_configuration": {
-    "default_language": "tr",
-    "supported_languages": [
-      "tr",
-      "en",
-      "de",
-      "fr"
-    ],
-    "rtl_support": false,
-    "auto_detect_language": true
-  },
-  "performance_configuration": {
-    "image_cache_size_mb": 75,
-    "network_cache_size_mb": 50,
-    "lazy_loading_enabled": true,
-    "preload_critical_assets": true
-  },
-  "onboarding_configuration": {
-    "style": "space",
-    "auto_advance_seconds": null,
-    "show_skip_button": true,
-    "show_page_indicator": true,
-    "animation_duration": 400,
-    "primary_color": "#000000",
-    "secondary_color": "#FFFFFF",
-    "pages": [
-      {
-        "title": "Your WooCommerce Store",
-        "description": "Easily manage your products and increase your sales with powerful WooCommerce integration.",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#FFFFFF",
-        "text_color": "#000000",
-        "button_text": null,
-        "skip_text": "Skip",
-        "next_text": "Next"
-      },
-      {
-        "title": "Easy Product Management",
-        "description": "Add, edit your products and track inventory status in real-time.",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#F5F5F5",
-        "text_color": "#000000",
-        "button_text": null,
-        "skip_text": "Skip",
-        "next_text": "Continue"
-      },
-      {
-        "title": "Inventory Control",
-        "description": "Keep track of your stock levels and get notified when products are running low.",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#E5E5E5",
-        "text_color": "#000000",
-        "button_text": null,
-        "skip_text": "Skip",
-        "next_text": "Continue"
-      },
-      {
-        "title": "Order Management",
-        "description": "Process orders efficiently and keep your customers satisfied with fast delivery.",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#D5D5D5",
-        "text_color": "#000000",
-        "button_text": null,
-        "skip_text": "Skip",
-        "next_text": "Continue"
-      },
-      {
-        "title": "Advanced Analytics",
-        "description": "Grow your business with sales reports, customer analytics and performance metrics.",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#C5C5C5",
-        "text_color": "#000000",
-        "button_text": "Open My Store",
-        "skip_text": null,
-        "next_text": null
-      }
-    ]
-  },
-  "loading_configuration": {
-    "style": "enterprise",
-    "type": "authentication",
-    "duration_milliseconds": 3000,
-    "step_duration_milliseconds": 750,
-    "background_color": "#FFFFFF",
-    "text_color": "#000000",
-    "progress_color": "#000000",
-    "animation_type": "linear",
-    "show_logo": true,
-    "logo_animation_enabled": true,
-    "auto_dismiss_enabled": true,
-    "tap_to_dismiss_enabled": true,
-    "show_progress_indicator": true,
-    "show_percentage": true,
-    "animation_enabled": true,
-    "haptic_feedback_enabled": true,
-    "steps": [],
-    "custom_messages": {
-      "network_error": "Network connection required",
-      "timeout_error": "Operation timed out",
-      "generic_error": "Something went wrong",
-      "retry_message": "Tap to retry",
-      "cancel_message": "Tap to cancel"
+    "api_configuration": {
+        "base_url": "https://api.masterfabric.co/woo",
+        "timeout_seconds": 45,
+        "retry_count": 3,
+        "enable_logging": true
     },
-    "accessibility": {
-      "enabled": true,
-      "announce_steps": true,
-      "voice_over_enabled": true,
-      "semantic_labels": {
-        "loading": "Loading in progress",
-        "progress": "Progress indicator",
-        "step": "Loading step",
-        "cancel": "Cancel loading",
-        "retry": "Retry loading"
-      }
-    }
-  },
-  "error_handling_configuration": {
-    "style": "space",
-    "errorTitle": "Something went wrong..",
-    "animation_duration": 500,
-    "primary_color": "#FAFAFAFF",
-    "secondary_color": "#7B0000FF",
-    "background_color": "#FAFAFAFF",
-    "text_color": "#000000FF"
-  },
-  "auth_configuration": {
-    "ui_style": {
-      "tab_container_radius": 12,
-      "tab_item_radius": 10,
-      "button_radius": 12,
-      "content_area_top_radius": 32,
-      "background_color": "#4A6FE8",
-      "horizontal_padding": 24
+    "woocommerce_configuration": {
+        "store_url": "http://example.com",
+        "brand_name": "example",
+        "auth_key": "exampleAUthCodE123",
+        "version": "v1",
+        "store_api_version": "v1",
+        "admin_api_version": "v3",
+        "wishlist_api_version": "v1",
+        "wishlist_namespace": "masterfabric-wishlist",
+        "verify_ssl": true,
+        "query_string_auth": false,
+        "products_per_page": 20,
+        "enable_reviews": true,
+        "enable_coupons": true,
+        "enable_guest_checkout": true
     },
-    "sign_in": {
-      "app_name": "Storefront",
-      "tab_sign_in": "Sign In",
-      "tab_sign_up": "Sign Up",
-      "email_label": "Email",
-      "email_hint": "Enter your email",
-      "password_label": "Password",
-      "password_hint": "Enter your password",
-      "remember_me_label": "Remember me",
-      "forgot_password_label": "Forgot Password?",
-      "sign_in_button": "Continue",
-      "sign_in_button_loading": "Signing in...",
-      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
-      "logo_width": 120,
-      "logo_height": 120
-    },
-    "sign_up": {
-      "app_name": "Storefront",
-      "tab_sign_in": "Sign In",
-      "tab_sign_up": "Sign Up",
-      "email_label": "Email",
-      "email_hint": "Enter your email",
-      "password_label": "Password",
-      "password_hint": "Enter your password",
-      "password_confirm_label": "Confirm Password",
-      "password_confirm_hint": "Confirm your password",
-      "privacy_policy_label": "I have read and accept the Privacy Policy",
-      "terms_label": "I have read and accept the Terms of Service",
-      "sign_up_button": "Create Account",
-      "sign_up_button_loading": "Creating account...",
-      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
-      "logo_width": 120,
-      "logo_height": 120
-    },
-    "forgot_password": {
-      "title": "Reset Password",
-      "subtitle": "Enter your email to reset"
-    }
-  },
-  "empty_view_configuration": {
-    "style": "enterprise",
-    "background_color": "#FFFFFF",
-    "text_color": "#000000",
-    "animation_duration": 400,
-    "primary_color": "#000000",
-    "secondary_color": "#FFFFFF",
-    "enable_haptic_feedback": true,
-    "default_empty_message": "No items found",
-    "show_action_button": true,
-    "empty_pages": [
-      {
-        "title": "Your cart is empty",
-        "description": "Add items to your cart to see them here.",
-        "empty_type": "cart",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#FFFFFF",
-        "text_color": "#000000",
-        "action_button_text": "Start Shopping"
-      },
-      {
-        "title": "No favorites yet",
-        "description": "Start adding items to your favorites to see them here.",
-        "empty_type": "wishlist",
-        "icon_path": null,
-        "image_path": null,
-        "background_color": "#FFFFFF",
-        "text_color": "#000000",
-        "action_button_text": "Explore Products"
-      }
-    ]
-  },
-  "home_view": {
-    "search": {
-      "enabled": true,
-      "order_id": 0,
-      "placeholder": "Search products, brands, categories...",
-      "style": "minimal",
-      "variant": "outlined"
-    },
-    "circle_categories": {
-      "enabled": true,
-      "order_id": 1,
-      "max_items": 10,
-      "circle_size": 64,
-      "show_names": true,
-      "image_size": 64,
-      "spacing": 8
-    },
-    "banner": {
-      "enabled": true,
-      "order_id": 2,
-      "items": [
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800",
-          "title": "Summer Collection",
-          "subtitle": "New Arrivals",
-          "text": "Discover the latest fashion trends",
-          "route": "/products"
+    "account_configuration": {
+        "style": "space",
+        "space_style_colors": {
+            "primary_color": "#000000",
+            "secondary_color": "#06060666",
+            "text_color": "#000000",
+            "icon_color": "#000000",
+            "separator_color": "#E5E5E5",
+            "background_color": "#FFFFFF"
         },
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800",
-          "title": "Special Offers",
-          "subtitle": "Limited Time",
-          "text": "Up to 50% off on selected items",
-          "category_id": 1
-        },
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800",
-          "title": "Premium Quality",
-          "subtitle": "Best Products",
-          "text": "Shop the finest selection",
-          "product_id": 1
+        "sections": [
+            {
+                "sectionTitle": "Account & Preferences",
+                "items": [
+                    {
+                        "id": "orders_history",
+                        "title": "Order History",
+                        "iconName": "shopping_bag_outlined",
+                        "iconColor": "#000000",
+                        "route": "/orders-history"
+                    },
+
+
+                    {
+                        "id": "user_profile",
+                        "title": "My Profile",
+                        "iconName": "person_outline",
+                        "iconColor": "#000000",
+                        "route": "/user-profile"
+                    },
+                    {
+                        "id": "about",
+                        "title": "About",
+                        "iconName": "info_outline",
+                        "iconColor": "#000000",
+                        "route": "/about"
+                    },
+                    {
+                        "id": "contact_us",
+                        "title": "Contact Us",
+                        "iconName": "email_outlined",
+                        "iconColor": "#000000",
+                        "route": "/contact-us"
+                    },
+                    {
+                        "id": "faq",
+                        "title": "FAQ",
+                        "iconName": "help_outline",
+                        "iconColor": "#000000",
+                        "route": "/faq"
+                    }
+                ]
+            }
+        ]
+    },
+    "firebase_configuration": {
+        "analytics_enabled": true,
+        "crashlytics_enabled": true,
+        "performance_monitoring_enabled": true,
+        "remote_config_enabled": true,
+        "remote_config_fetch_timeout": 60,
+        "remote_config_cache_expiration": 3600
+    },
+    "ui_configuration": {
+        "theme_mode": "light",
+        "primary_color": "#000000",
+        "accent_color": "#FFFFFF",
+        "search_app_bar_color": "#FFFFFF",
+        "font_scale": 1,
+        "enable_haptic_feedback": true,
+        "enable_sound_effects": true
+    },
+    "search_view_configuration": {
+        "search_app_bar_color": "#FFFFFFFF",
+        "search_bar_border_color": "#E0E0E0FF",
+        "action_icon_color": "#6B7280FF",
+        "text_color": "#000000FF",
+        "hint_text_color": "#6B7280FF",
+        "focus_color": "#000000FF",
+        "error_color": "#000000FF",
+        "search_bar_show_clear_button": true,
+        "search_bar_show_search_icon": true,
+        "elevation": 4,
+        "search_bar_size": "medium",
+        "search_bar_variant": "borderless",
+        "search_bar_border_radius": 20,
+        "title": "Search",
+        "search_hint": "Search products, brands, categories...",
+        "show_barcode_scanner": true,
+        "show_voice_search": true,
+        "show_back_button": true,
+        "action_button_spacing": 2,
+        "action_button_min_width": 32,
+        "action_button_min_height": 32,
+        "action_button_padding_all": 4,
+        "loading": {
+            "color": "#000000",
+            "loadingSteps": [
+                "Searching products...",
+                "Fetching results...",
+                "Almost there..."
+            ],
+            "stepDuration": 500,
+            "showProgress": true,
+            "showCancelButton": false
         }
-      ]
     },
-    "campaign_cards": {
-      "enabled": true,
-      "order_id": 3,
-      "title": "Campaigns",
-      "card_height": 160,
-      "card_width": 280,
-      "border_radius": 12,
-      "items": [
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400",
-          "title": "New Year Gift Guide",
-          "subtitle": "Special Offers",
-          "category_id": 1
-        },
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
-          "title": "Mobile Phones & Accessories",
-          "subtitle": "Discover Discounts",
-          "category_id": 2
-        },
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
-          "title": "Computers & Equipment",
-          "subtitle": "Special Prices",
-          "category_id": 3
-        },
-        {
-          "imageUrl": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400",
-          "title": "Vehicle Needs",
-          "subtitle": "Special Prices",
-          "category_id": 4
+    "security_configuration": {
+        "enable_ssl_pinning": true,
+        "certificate_validation": true,
+        "biometric_authentication": true,
+        "session_timeout_minutes": 45
+    },
+    "storage_configuration": {
+        "enable_encryption": true,
+        "cache_size_mb": 150,
+        "auto_cleanup_enabled": true,
+        "backup_enabled": true
+    },
+    "notification_configuration": {
+        "push_notifications_enabled": true,
+        "local_notifications_enabled": true,
+        "notification_sound": "default",
+        "vibration_enabled": true
+    },
+    "feature_flags": {
+        "onboarding_enabled": true,
+        "dark_mode_available": true,
+        "offline_mode_enabled": true,
+        "beta_features_enabled": false,
+        "analytics_opt_out_available": true,
+        "woocommerce_integration_enabled": true,
+        "payment_gateway_enabled": true,
+        "wishlist_enabled": true,
+        "cart_persistence_enabled": true
+    },
+    "splash_configuration": {
+        "enabled": true,
+        "style": "startup",
+        "duration_milliseconds": 3000,
+        "min_duration_milliseconds": 1500,
+        "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-21.55.23.jpeg",
+        "background_color": "#FFFFFF",
+        "logo_color": "#000000",
+        "show_loading_indicator": true,
+        "loading_indicator_color": "#000000",
+        "show_version_info": true,
+        "version_text_color": "#666666",
+        "fade_animation_enabled": true,
+        "animation_duration_milliseconds": 500,
+        "enable_logo_animation": true,
+        "logo_animation_type": "fade_scale",
+        "show_app_name": true,
+        "app_name_text_color": "#000000",
+        "app_name_font_size": 24,
+        "navigation_target": "/onboarding",
+        "fallback_navigation_target": "/home",
+        "check_connectivity": true,
+        "preload_critical_data": true,
+        "show_error_on_failure": false,
+        "retry_on_error": true,
+        "max_retry_attempts": 2,
+        "enable_dev_mode_tap": true,
+        "dev_mode_tap_count": 7
+    },
+    "localization_configuration": {
+        "default_language": "en",
+        "supported_languages": [
+            "en",
+            "tr",
+            "de",
+            "fr"
+        ],
+        "rtl_support": false,
+        "auto_detect_language": true
+    },
+    "performance_configuration": {
+        "image_cache_size_mb": 75,
+        "network_cache_size_mb": 50,
+        "lazy_loading_enabled": true,
+        "preload_critical_assets": true
+    },
+    "onboarding_configuration": {
+        "style": "space",
+        "auto_advance_seconds": null,
+        "show_skip_button": true,
+        "show_page_indicator": true,
+        "animation_duration": 400,
+        "primary_color": "#000000",
+        "secondary_color": "#FFFFFF",
+        "pages": [
+            {
+                "title": "Your WooCommerce Store",
+                "description": "Easily manage your products and increase your sales with powerful WooCommerce integration.",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "button_text": null,
+                "skip_text": "Skip",
+                "next_text": "Next"
+            },
+            {
+                "title": "Easy Product Management",
+                "description": "Add, edit your products and track inventory status in real-time.",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#F5F5F5",
+                "text_color": "#000000",
+                "button_text": null,
+                "skip_text": "Skip",
+                "next_text": "Continue"
+            },
+            {
+                "title": "Inventory Control",
+                "description": "Keep track of your stock levels and get notified when products are running low.",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#E5E5E5",
+                "text_color": "#000000",
+                "button_text": null,
+                "skip_text": "Skip",
+                "next_text": "Continue"
+            },
+            {
+                "title": "Order Management",
+                "description": "Process orders efficiently and keep your customers satisfied with fast delivery.",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#D5D5D5",
+                "text_color": "#000000",
+                "button_text": null,
+                "skip_text": "Skip",
+                "next_text": "Continue"
+            },
+            {
+                "title": "Advanced Analytics",
+                "description": "Grow your business with sales reports, customer analytics and performance metrics.",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#C5C5C5",
+                "text_color": "#000000",
+                "button_text": "Open My Store",
+                "skip_text": null,
+                "next_text": null
+            }
+        ]
+    },
+    "about_configuration": {
+        "style": "enterprise",
+        "title": "About MasterFabric",
+        "description": "Platform-Based Application Development Studio",
+        "html_content": "<div style='padding: 24px; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;'><h1 style='color: #000000; font-size: 28px; font-weight: 600; margin-bottom: 16px;'>About MasterFabric</h1><p style='color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 16px;'>We are a team of mobile application development experts who excel in creating innovative solutions across multiple industries. Our expertise spans cross-platform development, seamless backend integrations, and enterprise-grade mobile solutions.</p><p style='color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 16px;'>We don't limit ourselves to specific sectors - instead, we embrace diverse challenges and deliver exceptional results in healthcare, fintech, e-commerce, education, and logistics.</p><h2 style='color: #000000; font-size: 22px; font-weight: 600; margin-top: 24px; margin-bottom: 12px;'>Our Expertise</h2><ul style='color: #333333; font-size: 16px; line-height: 1.8; padding-left: 24px;'><li>Cross-platform mobile development (Flutter, React Native)</li><li>Native iOS and Android development</li><li>Backend integration and API development</li><li>Enterprise-grade mobile solutions</li><li>UI/UX design and implementation</li><li>Cloud infrastructure and DevOps</li></ul><h2 style='color: #000000; font-size: 22px; font-weight: 600; margin-top: 24px; margin-bottom: 12px;'>Industries We Serve</h2><p style='color: #333333; font-size: 16px; line-height: 1.6;'>Healthcare, Fintech, E-commerce, Education, Logistics, and more.</p></div>",
+        "enable_fullscreen_web_view": true,
+        "show_version": true,
+        "show_company_info": true,
+        "company_name": "MasterFabric",
+        "copyright": "© 2025 MasterFabric Inc. All rights reserved.",
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "primary_color": "#000000",
+        "app_bar": {
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
         }
-      ]
     },
-    "deals_of_day": {
-      "enabled": true,
-      "order_id": 4,
-      "title": "Deals of the Day",
-      "limit": 10
+    "contact_us_configuration": {
+        "style": "space",
+        "title": "Contact Us",
+        "description": "Get in touch with us",
+        "email": "info@masterfabric.co",
+        "phone": "+1 (555) 123-4567",
+        "address": "123 Innovation Street, Tech City, TC 12345",
+        "company_name": "MasterFabric",
+        "show_contact_form": true,
+        "show_contact_info": true,
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "primary_color": "#000000",
+        "app_bar": {
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        }
     },
-    "recommended": {
-      "enabled": true,
-      "order_id": 5,
-      "title": "Recommended for you",
-      "limit": 4,
-      "product_ids": []
+    "faq_configuration": {
+        "style": "enterprise",
+        "title": "Frequently Asked Questions",
+        "description": "Find answers to common questions",
+        "allow_multiple_expanded": true,
+        "show_search_bar": true,
+        "show_categories": false,
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "primary_color": "#000000",
+        "app_bar": {
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "title": "FAQ",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "items": [
+            {
+                "question": "What is MasterFabric?",
+                "answer": "<p>MasterFabric is a platform-based application development studio that specializes in creating innovative mobile solutions across multiple industries.</p>",
+                "expanded_by_default": false,
+                "category": null
+            },
+            {
+                "question": "What services do you offer?",
+                "answer": "<p>We offer cross-platform mobile development, native iOS and Android development, backend integration, enterprise-grade mobile solutions, UI/UX design, and cloud infrastructure services.</p>",
+                "expanded_by_default": false,
+                "category": null
+            },
+            {
+                "question": "Which industries do you serve?",
+                "answer": "<p>We serve healthcare, fintech, e-commerce, education, logistics, and many other industries. We don't limit ourselves to specific sectors and embrace diverse challenges.</p>",
+                "expanded_by_default": false,
+                "category": null
+            },
+            {
+                "question": "How can I contact you?",
+                "answer": "<p>You can reach us via email at info@masterfabric.co or through our contact form. We're always happy to discuss your project needs.</p>",
+                "expanded_by_default": false,
+                "category": null
+            },
+            {
+                "question": "Do you provide ongoing support?",
+                "answer": "<p>Yes, we provide comprehensive ongoing support and maintenance services for all our applications to ensure they continue to perform optimally.</p>",
+                "expanded_by_default": false,
+                "category": null
+            }
+        ]
     },
-    "campaign_popup_button": {
-      "enabled": true,
-      "text": "KUPON",
-      "amount": "100 TL",
-      "imageUrl": null,
-      "backgroundColor": "#2563EB",
-      "borderColor": "#FFFFFF",
-      "textColor": "#FFFFFF",
-      "position": "right",
-      "size": 100,
-      "showCloseButton": true,
-      "route": "/products",
-      "category_id": null,
-      "product_id": null
+    "loading_configuration": {
+        "style": "space",
+        "type": "dataLoading",
+        "duration_milliseconds": 3000,
+        "step_duration_milliseconds": 750,
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "progress_color": "#000000",
+        "animation_type": "linear",
+        "show_logo": true,
+        "logo_animation_enabled": true,
+        "auto_dismiss_enabled": true,
+        "tap_to_dismiss_enabled": false,
+        "show_progress_indicator": false,
+        "show_percentage": false,
+        "animation_enabled": true,
+        "haptic_feedback_enabled": true,
+        "steps": [
+            "Loading...",
+            "Almost ready...",
+            "Complete"
+        ],
+        "custom_messages": {
+            "network_error": "Network connection required",
+            "timeout_error": "Operation timed out",
+            "generic_error": "Something went wrong",
+            "retry_message": "Tap to retry",
+            "cancel_message": "Tap to cancel"
+        },
+        "accessibility": {
+            "enabled": true,
+            "announce_steps": true,
+            "voice_over_enabled": true,
+            "semantic_labels": {
+                "loading": "Loading in progress",
+                "progress": "Progress indicator",
+                "step": "Loading step",
+                "cancel": "Cancel loading",
+                "retry": "Retry loading"
+            }
+        },
+        "styles": {
+            "space": {
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "primary_color": "#000000"
+            },
+            "startup": {
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "primary_color": "#000000"
+            },
+            "enterprise": {
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "primary_color": "#000000"
+            }
+        }
+    },
+    "error_handling_configuration": {
+        "style": "space",
+        "errorTitle": "Something went wrong..",
+        "animation_duration": 500,
+        "primary_color": "#FAFAFAFF",
+        "secondary_color": "#000000FF",
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "icon_color": "#000000",
+        "icon_border_color": "#000000",
+        "retry_button_background": "#000000",
+        "retry_button_text_color": "#FFFFFF",
+        "go_back_button_text_color": "#000000"
+    },
+    "auth_configuration": {
+        "ui_style": {
+            "style": "startup",
+            "tab_container_radius": 12,
+            "tab_item_radius": 10,
+            "button_radius": 12,
+            "content_area_top_radius": 32,
+            "background_color": "#000000",
+            "horizontal_padding": 24,
+            "primary_color": "#000000"
+        },
+        "buttons": {
+            "sign_in": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "disabledBackgroundColor": "#999999",
+                "disabledTextColor": "#FFFFFF"
+            },
+            "sign_up": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "disabledBackgroundColor": "#999999",
+                "disabledTextColor": "#FFFFFF"
+            },
+            "sign_out": {
+                "backgroundColor": "#FFFFFF",
+                "textColor": "#000000",
+                "borderColor": "#000000"
+            }
+        },
+        "text_links": {
+            "sign_in_link": {
+                "color": "#000000"
+            },
+            "sign_up_link": {
+                "color": "#000000"
+            }
+        },
+        "sign_in": {
+            "app_name": "Storefront",
+            "tab_sign_in": "Sign In",
+            "tab_sign_up": "Sign Up",
+            "email_label": "Email",
+            "email_hint": "Enter your email",
+            "password_label": "Password",
+            "password_hint": "Enter your password",
+            "remember_me_label": "Remember me",
+            "forgot_password_label": "Forgot Password?",
+            "sign_in_button": "Continue",
+            "sign_in_button_loading": "Signing in...",
+            "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+            "logo_width": 120,
+            "logo_height": 120
+        },
+        "sign_up": {
+            "app_name": "Storefront",
+            "tab_sign_in": "Sign In",
+            "tab_sign_up": "Sign Up",
+            "email_label": "Email",
+            "email_hint": "Enter your email",
+            "password_label": "Password",
+            "password_hint": "Enter your password",
+            "password_confirm_label": "Confirm Password",
+            "password_confirm_hint": "Confirm your password",
+            "privacy_policy_label": "I have read and accept the Privacy Policy",
+            "terms_label": "I have read and accept the Terms of Service",
+            "sign_up_button": "Create Account",
+            "sign_up_button_loading": "Creating account...",
+            "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
+            "logo_width": 120,
+            "logo_height": 120,
+            "payment_agreements": {
+                "preliminary_information_form": {
+                    "title": "Preliminary Information Form",
+                    "content": "SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nINTERMEDIARY SERVICE PROVIDER:\nCompany Name: D-MARKET ELECTRONIC SERVICES AND TRADE INC\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12 Trump Towers Tower 2 Floor 2 Şişli/Istanbul\nTax ID: 2650179910 - Boğaziçi Corporate Tax Office\nPhone: 0850 252 40 00\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nPRELIMINARY INFORMATION FORM"
+                },
+                "distance_sales_agreement": {
+                    "title": "Distance Sales Agreement",
+                    "content": "DISTANCE SALES AGREEMENT\n\nARTICLE 1- PARTIES\n\n1.1. SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\n1.2. BUYER (\"CONSUMER\"):\nThe person placing the order is identified by the following information.\n\nARTICLE 2- SUBJECT OF THE AGREEMENT\n\nThis agreement is drawn up in accordance with the provisions of Law No. 6502 on the Protection of Consumers and the Distance Contracts Regulation regarding the sale and delivery of products ordered by the BUYER in the electronic environment and included in the SELLER's catalog.\n\nARTICLE 3- RIGHTS AND OBLIGATIONS\n\n3.1. The SELLER is responsible for delivering the product, which is the subject of the contract, sound, complete, in accordance with the specifications stated in the order, and with any warranty documents and user manuals.\n\n3.2. The BUYER is obliged to accept the delivery of the product ordered. The SELLER is not responsible for damages and expenses arising from the BUYER's late receipt or non-receipt of the product."
+                },
+                "checkbox_text": "I approve the Preliminary Information Form and the Distance Sales Agreement.",
+                "checkbox_link_color": "#FF6B00"
+            }
+        },
+        "forgot_password": {
+            "title": "Reset Password",
+            "subtitle": "Enter your email to reset"
+        }
+    },
+    "empty_view_configuration": {
+        "style": "enterprise",
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "animation_duration": 400,
+        "primary_color": "#000000",
+        "secondary_color": "#FFFFFF",
+        "enable_haptic_feedback": true,
+        "default_empty_message": "No items found",
+        "show_action_button": true,
+        "empty_pages": [
+            {
+                "title": "Your cart is empty",
+                "description": "Add items to your cart to see them here.",
+                "empty_type": "cart",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "action_button_text": "Start Shopping"
+            },
+            {
+                "title": "No favorites yet",
+                "description": "Start adding items to your favorites to see them here.",
+                "empty_type": "wishlist",
+                "icon_path": null,
+                "image_path": null,
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "action_button_text": "Explore Products"
+            }
+        ]
+    },
+    "home_view": {
+        "app_bar": {
+            "title_source": "app_settings.app_name",
+            "fallback_title": "MasterFabric",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "elevation": 0,
+            "variant": "standard",
+            "size": "standard",
+            "titleFontWeight": 700
+        },
+        "component_spacing": {
+            "top": 0,
+            "bottom": 16,
+            "horizontal": 20,
+            "title_to_content": 16
+        },
+        "search": {
+            "enabled": true,
+            "order_id": 0,
+            "placeholder": "Search products, brands, categories...",
+            "style": "minimal",
+            "variant": "outlined"
+        },
+        "circle_categories": {
+            "enabled": true,
+            "order_id": 1,
+            "max_items": 10,
+            "circle_size": 64,
+            "show_names": true,
+            "image_size": 64,
+            "spacing": 8
+        },
+        "banner": {
+            "enabled": true,
+            "order_id": 2,
+            "padding": {
+                "top": 0,
+                "bottom": 16
+            },
+            "items": [
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/banner-new.jpeg",
+                    "title": "Super Sale",
+                    "subtitle": "Limited Time",
+                    "text": "Up to 70% off on selected items",
+                    "category_id": 1,
+                    "showTitle": true,
+                    "showSubtitle": false,
+                    "showText": true
+                },
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/banner2.png",
+                    "title": "Fashion Collection",
+                    "subtitle": "Latest Styles",
+                    "text": "Discover the newest fashion trends",
+                    "route": "/products",
+                    "showTitle": true,
+                    "showSubtitle": false,
+                    "showText": true
+                },
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/banner4.jpg",
+                    "title": "Premium Products",
+                    "subtitle": "Best Sellers",
+                    "text": "Shop our curated premium collection",
+                    "product_id": 1,
+                    "showTitle": true,
+                    "showSubtitle": false,
+                    "showText": true
+                }
+            ]
+        },
+        "promotional_bar": {
+            "enabled": true,
+            "order_id": 3,
+            "border_radius": 7,
+            "height": "short",
+            "items": [
+                {
+                    "title": "Free Shipping",
+                    "subtitle": "On orders over $50",
+                    "background_color": "#000000",
+                    "text_color": "#FFFFFF",
+                    "accent_color": "#FFFFFF",
+                    "route": "/products"
+                },
+                {
+                    "title": "Special Discount",
+                    "subtitle": "Up to 40% off",
+                    "background_color": "#0000000",
+                    "text_color": "#FFFFFF",
+                    "accent_color": "#FFFFFF",
+                    "route": "/products"
+                }
+            ]
+        },
+        "campaign_cards": {
+            "enabled": true,
+            "order_id": 4,
+            "title": "Campaigns",
+            "card_height": 160,
+            "card_width": 280,
+            "border_radius": 12,
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            },
+            "items": [
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-22.09.17.jpeg",
+                    "title": "Fashion & Apparel",
+                    "subtitle": "New Collection",
+                    "category_id": 1
+                },
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-22.30.43.jpeg",
+                    "title": "Winter Is Coming",
+                    "subtitle": "Best Deals",
+                    "category_id": 2
+                },
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-22.15.51.jpeg",
+                    "title": "A Premium Workspace",
+                    "subtitle": "Special Offers",
+                    "category_id": 3
+                },
+                {
+                    "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-22.23.29.jpeg",
+                    "title": "MF Drinkware",
+                    "subtitle": "Great Prices",
+                    "category_id": 4
+                }
+            ]
+        },
+        "deals_of_day": {
+            "enabled": true,
+            "order_id": 8,
+            "title": "Deals of the Day",
+            "limit": 10,
+            "product_ids": [94,188,190],
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            }
+        },
+        "collections": {
+            "enabled": true,
+            "order_id": 9,
+            "title": "Collections",
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            },
+            "items": [
+                {
+                    "id": "winter_essentials",
+                    "title": "Winter essentials",
+                    "limit": 10,
+                    "product_ids": [94, 188, 190]
+                },
+                {
+                    "id": "developer_kits",
+                    "title": "Developer kits",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "focus_work",
+                    "title": "Focus work",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "daily_favorites",
+                    "title": "Daily favorites",
+                    "limit": 10,
+                    "product_ids": [186, 194, 293]
+                }
+            ]
+        },
+        "recommended": {
+            "enabled": true,
+            "order_id": 11,
+            "title": "Recommended for you",
+            "limit": 4,
+            "product_ids": [],
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            },
+            "titleColor": "#000000",
+            "seeAllColor": "#000000",
+            "card": {
+                "backgroundColor": "#FFFFFF",
+                "imageBackgroundColor": "#FFFFFF",
+                "borderRadius": 12,
+                "showBorder": false,
+                "borderColor": "#E5E5E5",
+                "borderWidth": 0
+            },
+            "discountBadge": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "borderRadius": 6
+            },
+            "wishlistButton": {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#E5E5E5",
+                "borderWidth": 0,
+                "iconColor": "#000000",
+                "iconColorSelected": "#000000",
+                "borderRadius": 24
+            },
+            "price": {
+                "salePriceColor": "#000000",
+                "regularPriceColor": "#000000",
+                "strikethroughPriceColor": "#666666"
+            },
+            "productName": {
+                "color": "#000000"
+            },
+            "description": {
+                "color": "#666666"
+            }
+        },
+        "campaign_alert": {
+            "enabled": true,
+            "order_id": 6,
+            "title": "Special Offer",
+            "message": "Limited time offer - Shop now!",
+            "end_time": "2026-02-14T23:59:59Z",
+            "background_color": "#000000",
+            "text_color": "#FFFFFF",
+            "route": "/products",
+            "category_id": null,
+            "product_id": null,
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            }
+        },
+        "flash_sale": {
+            "enabled": true,
+            "order_id": 10,
+            "title": "Flash Sale",
+            "limit": 10,
+            "end_time": "2026-02-01T23:59:59Z",
+            "product_ids": [],
+            "backgroundColor": "#FFFFFF",
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            }
+        },
+        "brands": {
+            "enabled": true,
+            "order_id": 7,
+            "title": "Shop by Brand",
+            "layout": "grid",
+            "brands": [
+                {
+                    "id": 1,
+                    "name": "MF Accessories",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
+                    "route": "/products?brand=1"
+                },
+                {
+                    "id": 2,
+                    "name": "MF Apparel",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
+                    "route": "/products?brand=2"
+                },
+                {
+                    "id": 3,
+                    "name": "MF Lifestyle",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
+                    "route": "/products?brand=3"
+                },
+                {
+                    "id": 4,
+                    "name": "MF Stationery",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
+                    "route": "/products?brand=4"
+                }
+            ],
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            }
+        },
+        "campaign_popup_button": {
+            "enabled": true,
+            "text": "COUPON",
+            "amount": "100",
+            "imageUrl": null,
+            "backgroundColor": "#000000",
+            "borderColor": "#FFFFFF",
+            "textColor": "#FFFFFF",
+            "position": "right",
+            "size": 80,
+            "showCloseButton": true,
+            "route": "/products",
+            "category_id": null,
+            "product_id": null
+        },
+        "bottom_foreground_banner": {
+            "enabled": true,
+            "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/bg.jpeg",
+            "title": "Limited Time Offer",
+            "description": "Get up to 60% off on selected items",
+            "height": 60,
+            "border_radius": 12,
+            "image_opacity": 0.9,
+            "overlay_color": "#000000",
+            "overlay_opacity": 0.3,
+            "background_color": "#FFFFFF",
+            "text_color": "#FFFFFF",
+            "arrow_icon_color": "#FFFFFF",
+            "tail_height": 8,
+            "tail_width": 40,
+            "tail_bottom_offset": 8,
+            "show_dismiss_button": true,
+            "route": "/products",
+            "category_id": null,
+            "product_id": null
+        }
+    },
+    "product_detail_view": {
+        "appBar": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "delivery": {
+            "estimated_label": "Estimated delivery",
+            "estimated_min_days": 7,
+            "estimated_max_days": 7,
+            "estimated_display": "date",
+            "date_format": "medium",
+            "estimated_date_single_template": "{date}",
+            "estimated_date_range_template": "{startDate} - {endDate}",
+            "estimated_exact_template": "{days} days later",
+            "estimated_range_template": "{minDays}-{maxDays} days",
+            "cutoff_title": "Order within",
+            "cutoff_hour": 16,
+            "cutoff_minute": 0,
+            "show_cutoff_time": false,
+            "show_cutoff_countdown": true,
+            "cutoff_affects_estimate": true
+        },
+        "name_and_price": {
+            "enabled": true,
+            "order_id": 1,
+            "nameColor": "#000000",
+            "priceColor": "#000000",
+            "padding": {
+                "horizontal": 16,
+                "vertical": 4
+            }
+        },
+        "attributes": {
+            "enabled": true,
+            "order_id": 3,
+            "selectedColor": "#000000",
+            "unselectedColor": "#666666",
+            "highlightedColor": "#000000",
+            "borderColor": "#E5E5E5",
+            "backgroundColor": "#FFFFFF"
+        },
+        "description": {
+            "enabled": true,
+            "order_id": 4,
+            "textColor": "#000000",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5"
+        },
+        "action_section": {
+            "wishlistIconColor": "#000000",
+            "wishlistUnselectedColor": "#666666",
+            "shareIconColor": "#000000",
+            "buttonBackgroundColor": "#000000",
+            "buttonTextColor": "#FFFFFF",
+            "buttonBorderColor": "#000000",
+            "buttonBorderWidth": 0,
+            "buttonBorderRadius": 8,
+            "addToCartButton": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "borderColor": "#000000",
+                "borderWidth": 0,
+                "borderRadius": 8
+            },
+            "counter": {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#E5E5E5",
+                "iconColor": "#000000",
+                "textColor": "#000000"
+            }
+        },
+        "quantity_selector": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "iconColor": "#000000",
+            "textColor": "#000000"
+        },
+        "counter": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "buttonColor": "#000000",
+            "buttonIconColor": "#FFFFFF",
+            "valueTextColor": "#000000",
+            "valueBackgroundColor": "#FFFFFF",
+            "borderRadius": 8
+        },
+        "reviews": {
+            "enabled": true,
+            "order_id": 2,
+            "starColor": "#000000",
+            "textColor": "#000000",
+            "nameColor": "#000000",
+            "dateColor": "#666666",
+            "verifiedBadgeColor": "#000000",
+            "verifiedBadgeTextColor": "#FFFFFF",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5"
+        },
+        "images": {
+            "enabled": true,
+            "order_id": 0,
+            "indicatorColor": "#000000",
+            "wishlistIconColor": "#000000"
+        }
+    },
+    "product_list_view": {
+        "app_bar": {
+            "title": "Products",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000"
+        },
+        "component_spacing": {
+            "top": 0,
+            "bottom": 16,
+            "horizontal": 20,
+            "vertical": 12,
+            "action_buttons_spacing": 12,
+            "filter_chips_spacing": 8,
+            "grid_spacing": 8,
+            "grid_padding": 12
+        },
+        "action_buttons": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "textColor": "#000000",
+            "iconColor": "#000000",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "badgeColor": "#000000",
+            "badgeBorderColor": "#FFFFFF",
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.04,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "filter_chips": {
+            "category": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF"
+            },
+            "on_sale": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF"
+            },
+            "featured": {
+                "backgroundColor": "#FFFFFF",
+                "textColor": "#000000"
+            },
+            "stock_status": {
+                "backgroundColor": "#FFFFFF",
+                "textColor": "#000000"
+            },
+            "clear_all": {
+                "iconColor": "#999999"
+            }
+        },
+        "empty_view": {
+            "iconBackgroundColor": "#000000",
+            "iconColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "descriptionColor": "#000000"
+        },
+        "scroll_to_top": {
+            "backgroundColor": "#000000",
+            "iconColor": "#FFFFFF",
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.3,
+            "shadowBlur": 12,
+            "shadowSpread": 1,
+            "shadowOffset": 4,
+            "elevation": 8
+        },
+        "bottom_sheet": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "subtitleColor": "#000000",
+            "apply_button_background": "#000000",
+            "apply_button_text_color": "#FFFFFF",
+            "cancel_button_text_color": "#000000"
+        },
+        "grid": {
+            "columns_tablet": 3,
+            "columns_mobile": 2,
+            "crossAxisSpacing": 8,
+            "mainAxisSpacing": 8,
+            "estimatedCardHeight": 280
+        },
+        "product_card": {
+            "loading_indicator_color": "#000000",
+            "discount_badge_background": "#000000",
+            "discount_badge_text_color": "#FFFFFF",
+            "wishlist_icon_saved_color": "#000000",
+            "wishlist_icon_unsaved_color": "#000000",
+            "sale_price_color": "#000000",
+            "regular_price_color": "#000000",
+            "product_name_color": "#000000",
+            "description_color": "#666666"
+        }
+    },
+    "product_card": {
+        "badges": {
+            "flash_sale": {
+                "enabled": true,
+                "auto": true,
+                "min_discount_percent": 10,
+                "label": "FLASH"
+            },
+            "week_star": {
+                "product_ids": [297, 305, 96]
+            }
+        }
+    },
+    "navbar_configuration": {
+        "enabled": true,
+        "variant": "transparent",
+        "size": "medium",
+        "position": "bottom",
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E5E5E5",
+        "elevation": 0.5,
+        "selectedIconColor": "#000000",
+        "unselectedIconColor": "#666666",
+        "selectedTextColor": "#000000",
+        "unselectedTextColor": "#666666",
+        "showLabels": true,
+        "showIcons": true,
+        "centerItems": true,
+        "items": [
+            {
+                "id": "home",
+                "order_id": 0,
+                "text": "Home",
+                "iconName": "home_outlined",
+                "route": "/home",
+                "tooltip": "Home"
+            },
+            {
+                "id": "search",
+                "order_id": 1,
+                "text": "Search",
+                "iconName": "search_outlined",
+                "route": "/search",
+                "tooltip": "Search"
+            },
+            {
+                "id": "saved",
+                "order_id": 3,
+                "text": "Saved",
+                "iconName": "favorite_outline",
+                "filledIconName": "favorite",
+                "route": "/saved",
+                "tooltip": "Saved Items",
+                "isAnimated": true,
+                "animationType": "scale",
+                "animationTrigger": "wishlist_count"
+            },
+            {
+                "id": "cart",
+                "order_id": 2,
+                "text": "Cart",
+                "iconName": "shopping_cart_outlined",
+                "route": "/cart",
+                "tooltip": "Shopping Cart"
+            },
+            {
+                "id": "profile",
+                "order_id": 4,
+                "text": "Profile",
+                "iconName": "person_outline",
+                "authIconName": "person_outline",
+                "guestIconName": "login_outlined",
+                "authRoute": "/profile",
+                "guestRoute": "/auth",
+                "authText": "Profile",
+                "guestText": "Sign In",
+                "isConditional": true,
+                "tooltip": "Profile"
+            }
+        ]
+    },
+    "campaign_view": {
+        "backgroundColor": "#FFFFFF",
+        "splash_image_url": "https://masterfabric.store/wp-content/uploads/2026/01/height-2.jpeg",
+        "splash_title": "",
+        "splash_subtitle": "",
+        "animation": {
+            "duration_milliseconds": 800,
+            "fade_begin": 0,
+            "fade_end": 1,
+            "scale_begin": 0.8,
+            "scale_end": 1,
+            "curve": "easeInOut"
+        },
+        "navigation": {
+            "timer_duration_milliseconds": 1500
+        },
+        "gradient_overlay": {
+            "enabled": true,
+            "startColor": "#00000000",
+            "endColor": "#000000",
+            "endColorOpacity": 0.6,
+            "begin": "topCenter",
+            "end": "bottomCenter"
+        },
+        "text_overlay": {
+            "title": {
+                "color": "#FFFFFF",
+                "shadowColor": "#000000",
+                "shadowBlur": 4,
+                "fontWeight": 700,
+                "maxLines": 2
+            },
+            "subtitle": {
+                "color": "#FFFFFF",
+                "shadowColor": "#000000",
+                "shadowBlur": 4,
+                "maxLines": 1
+            },
+            "padding": 24
+        },
+        "error_widget": {
+            "backgroundColor": "#F9FAFB",
+            "iconColor": "#9CA3AF",
+            "iconSize": 64
+        }
+    },
+    "cart_view_configuration": {
+        "app_bar": {
+            "title": "Shopping Cart",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "variant": "standard",
+            "size": "standard",
+            "show_back_button": true,
+            "show_refresh_button": true,
+            "refresh_tooltip": "Refresh cart"
+        },
+        "refresh_indicator": {
+            "color": "#000000",
+            "backgroundColor": "#FFFFFF",
+            "strokeWidth": 2,
+            "displacement": 40
+        },
+        "loading_overlay": {
+            "blur_sigma": 4,
+            "background_color": "#FFFFFF",
+            "background_alpha": 0.7,
+            "container_background_color": "#FFFFFF",
+            "container_border_radius": 16,
+            "loading_color": "#000000",
+            "loading_size": "large"
+        },
+        "cart_items": {
+            "background_color": "#FFFFFF",
+            "border_color": "#E5E5E5",
+            "separator_color": "#E5E5E5",
+            "product_name_color": "#000000",
+            "price_color": "#000000",
+            "variation_text_color": "#666666",
+            "quantity_selector_background": "#F5F5F5",
+            "quantity_selector_text_color": "#000000",
+            "quantity_selector_icon_color": "#000000",
+            "quantity_selector_disabled_color": "#999999",
+            "remove_button_color": "#000000"
+        },
+        "order_summary": {
+            "background_color": "#FFFFFF",
+            "border_color": "#E5E5E5",
+            "total_label_color": "#666666",
+            "total_amount_color": "#000000",
+            "discount_color": "#000000",
+            "expand_icon_color": "#000000",
+            "checkout_button_background": "#000000",
+            "checkout_button_text_color": "#FFFFFF",
+            "checkout_button_icon_color": "#FFFFFF",
+            "checkout_button_border_radius": 16
+        },
+        "coupon_section": {
+            "background_color": "#FFFFFF",
+            "text_color": "#000000",
+            "border_color": "#E5E5E5"
+        },
+        "empty_cart": {
+            "background_color": "#FFFFFF",
+            "text_color": "#000000",
+            "icon_color": "#000000"
+        }
+    },
+    "checkout_view_configuration": {
+        "app_bar": {
+            "title": "Checkout",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "variant": "standard",
+            "size": "standard"
+        },
+        "order_success": {
+            "icon_background_gradient_start": "#000000",
+            "icon_background_gradient_end": "#000000",
+            "icon_color": "#000000",
+            "icon_size": 64,
+            "title_color": "#000000",
+            "description_color": "#666666",
+            "card_background_color": "#FFFFFF",
+            "card_border_color": "#E5E5E5",
+            "total_label_color": "#666666",
+            "total_amount_background_start": "#000000",
+            "total_amount_background_end": "#000000",
+            "total_amount_color": "#000000",
+            "detail_label_color": "#666666",
+            "detail_value_color": "#000000",
+            "status_background_color": "#000000",
+            "status_border_color": "#000000",
+            "status_text_color": "#000000",
+            "button_background_color": "#000000",
+            "button_text_color": "#FFFFFF",
+            "button_icon_color": "#FFFFFF",
+            "button_border_radius": 12
+        },
+        "form_fields": {
+            "label_color": "#000000",
+            "input_background_color": "#FFFFFF",
+            "input_border_color": "#E5E5E5",
+            "input_focused_border_color": "#000000",
+            "input_error_border_color": "#000000",
+            "input_text_color": "#000000",
+            "input_hint_color": "#666666",
+            "prefix_icon_color": "#000000",
+            "error_text_color": "#000000",
+            "helper_text_color": "#666666"
+        },
+        "section_header": {
+            "icon_background_color": "#000000",
+            "icon_color": "#FFFFFF",
+            "title_color": "#000000"
+        },
+        "order_summary": {
+            "background_color": "#FFFFFF",
+            "border_color": "#E5E5E5",
+            "label_color": "#666666",
+            "value_color": "#000000",
+            "total_background_start": "#000000",
+            "total_background_end": "#000000",
+            "total_label_color": "#666666",
+            "total_amount_color": "#000000",
+            "button_background_color": "#000000",
+            "button_disabled_background_color": "#999999",
+            "button_text_color": "#FFFFFF",
+            "button_border_radius": 12
+        },
+        "payment_agreements": {
+            "preliminary_information_form": {
+                "title": "Preliminary Information Form",
+                "content": "SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nINTERMEDIARY SERVICE PROVIDER:\nCompany Name: D-MARKET ELECTRONIC SERVICES AND TRADE INC\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12 Trump Towers Tower 2 Floor 2 Şişli/Istanbul\nTax ID: 2650179910 - Boğaziçi Corporate Tax Office\nPhone: 0850 252 40 00\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nPRELIMINARY INFORMATION FORM"
+            },
+            "distance_sales_agreement": {
+                "title": "Distance Sales Agreement",
+                "content": "DISTANCE SALES AGREEMENT\n\nARTICLE 1- PARTIES\n\n1.1. SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\n1.2. BUYER (\"CONSUMER\"):\nThe person placing the order is identified by the following information.\n\nARTICLE 2- SUBJECT OF THE AGREEMENT\n\nThis agreement is drawn up in accordance with the provisions of Law No. 6502 on the Protection of Consumers and the Distance Contracts Regulation regarding the sale and delivery of products ordered by the BUYER in the electronic environment and included in the SELLER's catalog.\n\nARTICLE 3- RIGHTS AND OBLIGATIONS\n\n3.1. The SELLER is responsible for delivering the product, which is the subject of the contract, sound, complete, in accordance with the specifications stated in the order, and with any warranty documents and user manuals.\n\n3.2. The BUYER is obliged to accept the delivery of the product ordered. The SELLER is not responsible for damages and expenses arising from the BUYER's late receipt or non-receipt of the product."
+            },
+            "checkbox_text": "I approve the Preliminary Information Form and the Distance Sales Agreement.",
+            "checkbox_link_color": "#FF6B00",
+            "agreement_section_background_color": "#FFFFFF",
+            "agreement_section_border_color": "#E5E5E5",
+            "agreement_text_color": "#666666",
+            "agreement_title_color": "#000000"
+        }
+    },
+    "wishlist_view": {
+        "app_bar": {
+            "title": "Favourites",
+            "titleWithCount": "Favourites ({count})",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "surfaceTintColor": "#00000000",
+            "shadowColor": "#00000000"
+        },
+        "component_spacing": {
+            "horizontal": 12,
+            "vertical": 8,
+            "item_padding": 8,
+            "divider_height": 1
+        },
+        "list_item": {
+            "titleColor": "#000000",
+            "titleFontWeight": 600,
+            "imageSize": 64,
+            "imageBorderRadius": 8,
+            "placeholderBackgroundColor": "#F5F5F5",
+            "placeholderIconColor": "#999999",
+            "loadingIndicatorColor": "#000000"
+        },
+        "dismissible": {
+            "backgroundColor": "#000000",
+            "textColor": "#FFFFFF",
+            "iconColor": "#FFFFFF",
+            "textFontWeight": 600
+        },
+        "action_buttons": {
+            "cartButton": {
+                "iconColor": "#000000",
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#E5E5E5",
+                "borderWidth": 1,
+                "borderRadius": 4,
+                "size": "extraSmall",
+                "variant": "outlined"
+            },
+            "favoriteButton": {
+                "iconColor": "#000000",
+                "size": "extraSmall",
+                "variant": "ghost"
+            },
+            "spacing": 4
+        },
+        "price": {
+            "salePriceColor": "#000000",
+            "regularPriceColor": "#000000",
+            "strikethroughPriceColor": "#666666",
+            "defaultPriceColor": "#666666",
+            "fontWeight": 600
+        },
+        "divider": {
+            "color": "#E5E5E5",
+            "height": 1
+        },
+        "dialog": {
+            "titleColor": "#000000",
+            "subtitleColor": "#666666",
+            "backgroundColor": "#FFFFFF"
+        },
+        "snackbar": {
+            "title": "Removed from favorites",
+            "message": "Item was removed from your favorites",
+            "type": "error",
+            "actionLabel": "Undo"
+        }
+    },
+    "favorite_categories_view_configuration": {
+        "app_bar": {
+            "title": "Favorite Categories",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "grid": {
+            "crossAxisCount": 2,
+            "crossAxisSpacing": 12,
+            "mainAxisSpacing": 12,
+            "childAspectRatio": 0.85,
+            "padding": 16
+        },
+        "category_card": {
+            "borderRadius": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2,
+            "gradient_overlay": {
+                "enabled": true,
+                "height": 120,
+                "colors": [
+                    {
+                        "color": "#000000",
+                        "opacity": 0.85
+                    },
+                    {
+                        "color": "#000000",
+                        "opacity": 0.65
+                    },
+                    {
+                        "color": "#000000",
+                        "opacity": 0.3
+                    },
+                    {
+                        "color": "#000000",
+                        "opacity": 0
+                    }
+                ],
+                "stops": [
+                    0,
+                    0.3,
+                    0.7,
+                    1
+                ]
+            },
+            "category_name": {
+                "color": "#FFFFFF",
+                "shadowColor": "#000000",
+                "shadowOpacity": 0.3,
+                "shadowBlur": 4,
+                "shadowOffset": 1,
+                "fontWeight": 600,
+                "fontSize": 14,
+                "maxLines": 2
+            },
+            "favorite_button": {
+                "backgroundColor": "#FFFFFF",
+                "iconColor": "#000000",
+                "size": 36,
+                "elevation": 2
+            },
+            "placeholder": {
+                "gradient_start": "#F5F5F5",
+                "gradient_end": "#E0E0E0",
+                "iconColor": "#BDBDBD",
+                "iconSize": 48
+            },
+            "loading_indicator": {
+                "color": "#000000",
+                "strokeWidth": 2
+            }
+        }
+    },
+    "dialog_popup_configuration": {
+        "dialog": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "subtitleColor": "#000000",
+            "textColor": "#000000",
+            "borderRadius": 12,
+            "elevation": 8
+        },
+        "bottom_sheet": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "subtitleColor": "#000000",
+            "textColor": "#000000",
+            "borderRadius": 16,
+            "elevation": 0
+        },
+        "popup": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "subtitleColor": "#000000",
+            "textColor": "#000000",
+            "borderRadius": 12,
+            "elevation": 8
+        },
+        "buttons": {
+            "primary": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "borderColor": "#000000"
+            },
+            "secondary": {
+                "backgroundColor": "#FFFFFF",
+                "textColor": "#000000",
+                "borderColor": "#000000"
+            },
+            "ghost": {
+                "backgroundColor": "transparent",
+                "textColor": "#000000",
+                "borderColor": "transparent"
+            },
+            "danger": {
+                "backgroundColor": "#000000",
+                "textColor": "#FFFFFF",
+                "borderColor": "#000000"
+            },
+            "cancel": {
+                "backgroundColor": "transparent",
+                "textColor": "#000000",
+                "borderColor": "transparent"
+            }
+        },
+        "icons": {
+            "primaryColor": "#000000",
+            "secondaryColor": "#000000",
+            "successColor": "#000000",
+            "errorColor": "#000000"
+        },
+        "add_to_cart_popup": {
+            "backgroundColor": "#FFFFFF",
+            "titleColor": "#000000",
+            "successBackgroundColor": "#FFFFFF",
+            "successBorderColor": "#000000",
+            "successIconColor": "#000000",
+            "successTextColor": "#000000",
+            "loadingColor": "#000000",
+            "footerBackgroundColor": "#FFFFFF",
+            "footerBorderColor": "#E0E0E0"
+        }
+    },
+    "orders_history_view": {
+        "app_bar": {
+            "title": "Order History",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 4,
+            "card_margin_bottom": 6
+        },
+        "order_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "transparent",
+            "borderWidth": 0,
+            "borderRadius": 8,
+            "elevation": 0,
+            "padding": 14,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "total": {
+            "label_color": "#8A8A8A",
+            "amount_color": "#000000",
+            "amount_fontWeight": 600,
+            "fontSize": 15
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 12
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
+        }
+    },
+    "user_profile_view": {
+        "app_bar": {
+            "title": "My Profile",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "component_spacing": {
+            "horizontal": 12,
+            "vertical": 8,
+            "section_spacing": 12,
+            "item_spacing": 8
+        },
+        "profile_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "avatar": {
+            "size": 64,
+            "backgroundColor": "#000000",
+            "textColor": "#FFFFFF",
+            "fontWeight": 700
+        },
+        "profile_name": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 20
+        },
+        "profile_email": {
+            "color": "#666666",
+            "fontSize": 14
+        },
+        "profile_username": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "member_since": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "statistics_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "statistics_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "stat_value": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 24
+        },
+        "stat_label": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "address_label": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "address_text": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "default_badge": {
+            "backgroundColor": "#E3F2FD",
+            "textColor": "#1976D2",
+            "borderRadius": 8,
+            "padding_horizontal": 8,
+            "padding_vertical": 4,
+            "fontWeight": 600,
+            "fontSize": 10
+        },
+        "contract_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "contract_info": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "metadata_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "metadata_value": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "preference_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "preference_value": {
+            "color": "#666666",
+            "fontSize": 12
+        }
+    },
+    "order_detail_view": {
+        "app_bar": {
+            "title": "Order Details",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 12,
+            "section_spacing": 16
+        },
+        "order_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 20
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "order_item": {
+            "name_color": "#000000",
+            "name_fontWeight": 500,
+            "name_fontSize": 15,
+            "price_color": "#000000",
+            "price_fontWeight": 600,
+            "price_fontSize": 15,
+            "quantity_color": "#8A8A8A",
+            "quantity_fontSize": 13,
+            "image_size": 64,
+            "image_borderRadius": 12
+        },
+        "order_totals": {
+            "label_color": "#8A8A8A",
+            "label_fontSize": 14,
+            "value_color": "#000000",
+            "value_fontWeight": 500,
+            "value_fontSize": 14,
+            "total_label_color": "#000000",
+            "total_label_fontWeight": 600,
+            "total_label_fontSize": 16,
+            "total_value_color": "#000000",
+            "total_value_fontWeight": 600,
+            "total_value_fontSize": 17
+        },
+        "address_text": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
+        }
     }
-  },
-  "navbar_configuration": {
-    "enabled": true,
-    "items": [
-      {
-        "id": "home",
-        "order_id": 0,
-        "text": "Home",
-        "iconName": "home_outlined",
-        "route": "/home",
-        "tooltip": "Home"
-      },
-      {
-        "id": "search",
-        "order_id": 1,
-        "text": "Search",
-        "iconName": "search_outlined",
-        "route": "/search",
-        "tooltip": "Search"
-      },
-      {
-        "id": "saved",
-        "order_id": 3,
-        "text": "Saved",
-        "iconName": "favorite_outline",
-        "filledIconName": "favorite",
-        "route": "/saved",
-        "tooltip": "Saved Items",
-        "isAnimated": true,
-        "animationType": "scale",
-        "animationTrigger": "wishlist_count"
-      },
-      {
-        "id": "cart",
-        "order_id": 2,
-        "text": "Cart",
-        "iconName": "shopping_cart_outlined",
-        "route": "/cart",
-        "tooltip": "Shopping Cart"
-      },
-      {
-        "id": "profile",
-        "order_id": 4,
-        "text": "Profile",
-        "iconName": "person_outline",
-        "authIconName": "person_outline",
-        "guestIconName": "login_outlined",
-        "authRoute": "/profile",
-        "guestRoute": "/auth",
-        "authText": "Profile",
-        "guestText": "Sign In",
-        "isConditional": true,
-        "tooltip": "Profile"
-      }
-    ]
-  }
 }

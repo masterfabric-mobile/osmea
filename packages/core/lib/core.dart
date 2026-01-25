@@ -70,6 +70,9 @@ export 'package:core/src/helper/url_launcher_helper.dart';
 // 🗂️ Exports the asset configuration helper for JSON config management
 export 'package:core/src/helper/asset_config_helper.dart';
 
+// 🎨 Exports the color helper for hex color parsing and conversion
+export 'package:core/src/helper/color_helper.dart';
+
 // 🔥 Exports the remote configuration helper for Firebase Remote Config
 export 'package:core/src/helper/remote_config_helper.dart';
 
@@ -140,8 +143,24 @@ export 'package:core/src/views/loading/loading_view.dart';
 export 'package:core/src/views/loading/cubit/loading_cubit.dart';
 export 'package:core/src/views/loading/cubit/loading_state.dart';
 
+// 📄 Exports the About View
+export 'package:core/src/views/about/about_view.dart';
+export 'package:core/src/views/about/cubit/about_cubit.dart';
+export 'package:core/src/views/about/cubit/about_state.dart';
+
 // 🔄 Exports the loading models
 export 'package:core/src/models/loading_models.dart';
+
+// 📄 Exports the About Models
+export 'package:core/src/models/about_models.dart';
+
+// 📧 Exports the Contact Us Models
+export 'package:core/src/models/contact_us_models.dart';
+
+// 📧 Exports the Contact Us View
+export 'package:core/src/views/contact_us/contact_us_view.dart';
+export 'package:core/src/views/contact_us/cubit/contact_us_cubit.dart';
+export 'package:core/src/views/contact_us/cubit/contact_us_state.dart';
 
 // 🔄 Exports the routes
 export 'package:core/src/views/routes.dart';
@@ -154,9 +173,14 @@ export 'package:core/src/views/image_detail/cubit/image_detail_state.dart';
 // 🔐 Exports the auth storage helper
 export 'package:core/src/helper/auth_storage_helper.dart';
 
+// 🎬 Exports the animation helper for common animations and transitions
+export 'package:core/src/helper/animation_helper.dart';
+
 // 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
 export 'package:core/src/views/auth/auth_view.dart';
 
+// 🔐 Exports the auth design variant enum
+export 'package:core/src/views/auth/enums/auth_design_variant.dart';
 
 // 🔐 Exports the auth cubit and state (base implementation)
 export 'package:core/src/views/auth/cubit/auth_cubit.dart';
@@ -181,3 +205,11 @@ export 'package:core/src/views/account/cubit/account_cubit.dart';
 export 'package:core/src/views/account/cubit/account_state.dart';
 export 'package:core/src/views/account/widgets/account_widget.dart';
 export 'package:core/src/views/account/widgets/orders_list_widget.dart';
+
+// ❓ Exports the FAQ models
+export 'package:core/src/models/faq_models.dart';
+
+// ❓ Exports the FAQ view and cubit
+export 'package:core/src/views/faq/faq_view.dart';
+export 'package:core/src/views/faq/cubit/faq_cubit.dart';
+export 'package:core/src/views/faq/cubit/faq_state.dart';

@@ -1,13 +1,16 @@
 /*
  * Cart Error Widget
  * -----------------
- * Error widget for cart view.
+ * Minimalist black & white error widget for cart view.
+ * Clean, simple, and consistent with app design.
  */
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
-/// Error widget for cart view
+/// Minimalist error widget for cart view
 class CartErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -20,29 +23,170 @@ class CartErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OsmeaComponents.center(
-      child: OsmeaComponents.column(
-        mainAxisAlignment: context.centerMain,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: context.height64,
-            color: OsmeaColors.amberFlame,
+    final configHelper = AssetConfigHelper();
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.background_color',
+        '#FFFFFF',
+      ),
+    );
+
+    return SizedBox.expand(
+      child: OsmeaComponents.container(
+        color: backgroundColor,
+        child: OsmeaComponents.center(
+          child: OsmeaComponents.singleChildScrollView(
+            padding: context.paddingHigh,
+            child: OsmeaComponents.column(
+              mainAxisAlignment: context.centerMain,
+              crossAxisAlignment: context.crossCenter,
+              children: [
+                // Simple icon
+                _buildErrorIcon(context, Icons.shopping_cart_outlined),
+
+                OsmeaComponents.sizedBox(height: context.spacing32),
+
+                // Error message
+                OsmeaComponents.text(
+                  message,
+                  textStyle: OsmeaTextStyle.bodyLarge(
+                    context,
+                  ).copyWith(color: _getTextColor(context), height: 1.6),
+                  textAlign: TextAlign.center,
+                  maxLines: 4,
+                ),
+
+                OsmeaComponents.sizedBox(height: context.spacing48),
+
+                // Retry button
+                _buildRetryButton(context),
+
+                OsmeaComponents.sizedBox(height: context.spacing12),
+
+                // Go back button
+                _buildGoBackButton(context),
+              ],
+            ),
           ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.text(
-            message,
-            textStyle: OsmeaTextStyle.bodyMedium(context),
-            textAlign: TextAlign.center,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.button(
-            onPressed: onRetry,
-            text: 'Retry',
-          ),
-        ],
+        ),
       ),
     );
   }
-}
 
+  /// Builds error icon with config colors
+  Widget _buildErrorIcon(BuildContext context, IconData iconData) {
+    final configHelper = AssetConfigHelper();
+    final iconColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.icon_color',
+        '#000000',
+      ),
+    );
+    final borderColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.icon_border_color',
+        '#000000',
+      ),
+    );
+
+    return OsmeaComponents.container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: borderColor, width: 2),
+      ),
+      child: OsmeaComponents.center(
+        child: Icon(iconData, size: 40, color: iconColor),
+      ),
+    );
+  }
+
+  /// Gets text color from config
+  Color _getTextColor(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    return _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.text_color',
+        '#000000',
+      ),
+    );
+  }
+
+  /// Builds retry button with config colors
+  Widget _buildRetryButton(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final backgroundColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.retry_button_background',
+        '#000000',
+      ),
+    );
+    final textColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.retry_button_text_color',
+        '#FFFFFF',
+      ),
+    );
+
+    return OsmeaComponents.button(
+      text: context.t.cartView.error.tryAgain,
+      onPressed: onRetry,
+      variant: ButtonVariant.primary,
+      size: ButtonSize.large,
+      fullWidth: true,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+
+  /// Builds go back button with config colors
+  Widget _buildGoBackButton(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final textColor = _parseColor(
+      configHelper.getString(
+        'error_handling_configuration.go_back_button_text_color',
+        '#000000',
+      ),
+    );
+
+    return OsmeaComponents.button(
+      text: context.t.cartView.error.goBack,
+      onPressed: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          context.go('/home');
+        }
+      },
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.large,
+      fullWidth: true,
+      textColor: textColor,
+    );
+  }
+
+  /// Parses color string to Color
+  Color _parseColor(String colorString) {
+    try {
+      String hex = colorString.replaceAll('#', '');
+      if (hex.length == 8) {
+        final alpha = int.parse(hex.substring(0, 2), radix: 16);
+        final red = int.parse(hex.substring(2, 4), radix: 16);
+        final green = int.parse(hex.substring(4, 6), radix: 16);
+        final blue = int.parse(hex.substring(6, 8), radix: 16);
+        return Color.fromARGB(alpha, red, green, blue);
+      }
+      if (hex.length == 6) {
+        final red = int.parse(hex.substring(0, 2), radix: 16);
+        final green = int.parse(hex.substring(2, 4), radix: 16);
+        final blue = int.parse(hex.substring(4, 6), radix: 16);
+        return Color.fromRGBO(red, green, blue, 1.0);
+      }
+      return OsmeaColors.black;
+    } catch (e) {
+      debugPrint('⚠️ Error parsing color: $colorString - $e');
+      return OsmeaColors.black;
+    }
+  }
+}

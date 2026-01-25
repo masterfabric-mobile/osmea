@@ -41,27 +41,30 @@ _$ProcessPaymentAndOrderResponseModelImpl
         );
 
 Map<String, dynamic> _$$ProcessPaymentAndOrderResponseModelImplToJson(
-        _$ProcessPaymentAndOrderResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.orderId case final value?) 'order_id': value,
-      if (instance.status case final value?) 'status': value,
-      if (instance.orderKey case final value?) 'order_key': value,
-      if (instance.orderNumber case final value?) 'order_number': value,
-      if (instance.customerNote case final value?) 'customer_note': value,
-      if (instance.customerId case final value?) 'customer_id': value,
-      if (instance.billingAddress?.toJson() case final value?)
-        'billing_address': value,
-      if (instance.shippingAddress?.toJson() case final value?)
-        'shipping_address': value,
-      if (instance.paymentMethod case final value?) 'payment_method': value,
-      if (instance.paymentResult?.toJson() case final value?)
-        'payment_result': value,
-      if (instance.additionalFields?.toJson() case final value?)
-        'additional_fields': value,
-      if (instance.experimentalCart case final value?)
-        '__experimentalCart': value,
-      if (instance.extensions?.toJson() case final value?) 'extensions': value,
-    };
+    _$ProcessPaymentAndOrderResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('order_id', instance.orderId);
+  writeNotNull('status', instance.status);
+  writeNotNull('order_key', instance.orderKey);
+  writeNotNull('order_number', instance.orderNumber);
+  writeNotNull('customer_note', instance.customerNote);
+  writeNotNull('customer_id', instance.customerId);
+  writeNotNull('billing_address', instance.billingAddress?.toJson());
+  writeNotNull('shipping_address', instance.shippingAddress?.toJson());
+  writeNotNull('payment_method', instance.paymentMethod);
+  writeNotNull('payment_result', instance.paymentResult?.toJson());
+  writeNotNull('additional_fields', instance.additionalFields?.toJson());
+  writeNotNull('__experimentalCart', instance.experimentalCart);
+  writeNotNull('extensions', instance.extensions?.toJson());
+  return val;
+}
 
 _$AdditionalFieldsImpl _$$AdditionalFieldsImplFromJson(
         Map<String, dynamic> json) =>
@@ -86,20 +89,28 @@ _$IngAddressImpl _$$IngAddressImplFromJson(Map<String, dynamic> json) =>
       phone: json['phone'] as String?,
     );
 
-Map<String, dynamic> _$$IngAddressImplToJson(_$IngAddressImpl instance) =>
-    <String, dynamic>{
-      if (instance.firstName case final value?) 'first_name': value,
-      if (instance.lastName case final value?) 'last_name': value,
-      if (instance.company case final value?) 'company': value,
-      if (instance.address1 case final value?) 'address_1': value,
-      if (instance.address2 case final value?) 'address_2': value,
-      if (instance.city case final value?) 'city': value,
-      if (instance.state case final value?) 'state': value,
-      if (instance.postcode case final value?) 'postcode': value,
-      if (instance.country case final value?) 'country': value,
-      if (instance.email case final value?) 'email': value,
-      if (instance.phone case final value?) 'phone': value,
-    };
+Map<String, dynamic> _$$IngAddressImplToJson(_$IngAddressImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('first_name', instance.firstName);
+  writeNotNull('last_name', instance.lastName);
+  writeNotNull('company', instance.company);
+  writeNotNull('address_1', instance.address1);
+  writeNotNull('address_2', instance.address2);
+  writeNotNull('city', instance.city);
+  writeNotNull('state', instance.state);
+  writeNotNull('postcode', instance.postcode);
+  writeNotNull('country', instance.country);
+  writeNotNull('email', instance.email);
+  writeNotNull('phone', instance.phone);
+  return val;
+}
 
 _$PaymentResultImpl _$$PaymentResultImplFromJson(Map<String, dynamic> json) =>
     _$PaymentResultImpl(
@@ -110,14 +121,21 @@ _$PaymentResultImpl _$$PaymentResultImplFromJson(Map<String, dynamic> json) =>
       redirectUrl: json['redirect_url'] as String?,
     );
 
-Map<String, dynamic> _$$PaymentResultImplToJson(_$PaymentResultImpl instance) =>
-    <String, dynamic>{
-      if (instance.paymentStatus case final value?) 'payment_status': value,
-      if (instance.paymentDetails?.map((e) => e.toJson()).toList()
-          case final value?)
-        'payment_details': value,
-      if (instance.redirectUrl case final value?) 'redirect_url': value,
-    };
+Map<String, dynamic> _$$PaymentResultImplToJson(_$PaymentResultImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('payment_status', instance.paymentStatus);
+  writeNotNull('payment_details',
+      instance.paymentDetails?.map((e) => e.toJson()).toList());
+  writeNotNull('redirect_url', instance.redirectUrl);
+  return val;
+}
 
 _$PaymentDetailImpl _$$PaymentDetailImplFromJson(Map<String, dynamic> json) =>
     _$PaymentDetailImpl(
@@ -125,8 +143,16 @@ _$PaymentDetailImpl _$$PaymentDetailImplFromJson(Map<String, dynamic> json) =>
       value: json['value'] as String?,
     );
 
-Map<String, dynamic> _$$PaymentDetailImplToJson(_$PaymentDetailImpl instance) =>
-    <String, dynamic>{
-      if (instance.key case final value?) 'key': value,
-      if (instance.value case final value?) 'value': value,
-    };
+Map<String, dynamic> _$$PaymentDetailImplToJson(_$PaymentDetailImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('key', instance.key);
+  writeNotNull('value', instance.value);
+  return val;
+}

@@ -11,6 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_content_widget.dart';
+import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_skeleton_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// ProductListView displays a filtered list of products
 class ProductListView
@@ -25,6 +27,7 @@ class ProductListView
     super.footerSpacer = const SpacerVisibility.disabled(),
     super.verticalPadding = const PaddingVisibility.disabled(),
     super.horizontalPadding = const PaddingVisibility.disabled(),
+    super.useSafeArea = false,
     required super.goRoute,
   }) : super(
          coreAppBar: (context, viewModel) =>
@@ -36,11 +39,15 @@ class ProductListView
     debugPrint('🚀 ProductListView.initialContent called');
     debugPrint('🚀 Arguments: $arguments');
     viewModel.setArguments(arguments);
-    debugPrint('🚀 Calling loadProducts(refresh: true)');
-    viewModel.loadProducts(refresh: true);
+    
+    // Load categories first so category names are available for filter chips
+    viewModel.loadCategories().then((_) {
+      debugPrint('🚀 Categories loaded, now loading products');
+      viewModel.loadProducts(refresh: true);
+    });
+    
     // Load attributes early so they're available when filter dialog opens
     viewModel.loadAttributes();
-    debugPrint('🚀 loadProducts call completed');
   }
 
   @override
@@ -65,15 +72,16 @@ class ProductListView
     }
 
     if (state is ProductListLoadingState) {
-      return buildLoading(color: OsmeaColors.nordicBlue);
+      // Show skeleton loading instead of unified loading
+      return const ProductListSkeletonWidget(isGridView: true);
     }
 
     if (state is ProductListLoadedState) {
       return ProductListContentWidget(state: state, viewModel: viewModel);
     }
 
-    // Initial state - show loading
-    return buildLoading(color: OsmeaColors.nordicBlue);
+    // Initial state - show skeleton loading
+    return const ProductListSkeletonWidget(isGridView: true);
   }
 }
 
@@ -82,20 +90,51 @@ PreferredSizeWidget _buildProductListAppBar(
   BuildContext context,
   ProductListViewModel? viewModel,
 ) {
+  final configHelper = AssetConfigHelper();
+  final appBarConfig = configHelper.getObject('product_list_view.app_bar');
+  
+  final title = appBarConfig?['title'] as String? ?? context.t.productListView.appBar.title;
+  final backgroundColor = configHelper.getColor(
+    'product_list_view.app_bar.backgroundColor',
+    OsmeaColors.white,
+  );
+  final foregroundColor = configHelper.getColor(
+    'product_list_view.app_bar.foregroundColor',
+    OsmeaColors.thunder,
+  );
+  final titleColor = configHelper.getColor(
+    'product_list_view.app_bar.titleColor',
+    OsmeaColors.thunder,
+  );
+  final iconColor = configHelper.getColor(
+    'product_list_view.app_bar.iconColor',
+    OsmeaColors.thunder,
+  );
+
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
-      'Products',
-      color: OsmeaColors.thunder,
+      title,
+      color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(
         context,
       ).copyWith(fontWeight: FontWeight.w700),
     ),
     variant: AppBarVariant.standard,
     size: AppBarSize.standard,
-    backgroundColor: OsmeaColors.white,
-    foregroundColor: OsmeaColors.thunder,
+    backgroundColor: backgroundColor,
+    foregroundColor: foregroundColor,
+    actions: [
+      AppBarAction(
+        type: AppBarActionType.search,
+        icon: Icon(Icons.search, color: iconColor),
+        onPressed: () {
+          context.push('/search?fromHome=true');
+        },
+        tooltip: 'Search',
+      ),
+    ],
     leading: OsmeaComponents.iconButton(
-      icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+      icon: Icon(Icons.arrow_back, color: iconColor),
       onPressed: () {
         // Check if we can pop, otherwise navigate to home
         if (context.canPop()) {
@@ -105,7 +144,7 @@ PreferredSizeWidget _buildProductListAppBar(
         }
       },
       backgroundColor: OsmeaColors.transparent,
-      tooltip: 'Back',
+      tooltip: context.t.productListView.appBar.backTooltip,
     ),
   );
 }

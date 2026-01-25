@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:osmea_components/osmea_components.dart';
 import 'package:osmea_components/src/components/text/text.dart';
@@ -15,40 +17,102 @@ import 'package:osmea_components/src/core/container_widget.dart';
 /// {@subCategory Navigation}
 ///
 /// Features:
-/// * 🎨 Multiple style variants (primary, secondary, transparent, glass, outlined)
+/// * 🎨 Sector-based style variants (retailMain, retailSidebar, healthcareMinimal, financeBordered, mediaOverlay, socialGlass, enterpriseMain, enterpriseSidebar)
+/// * 🎭 Multiple design styles (iconOnly, iconWithText, iconWithSubtext, textOnly, iconAndTextHorizontal, appBar, appBarWithSearch, drawerTrigger, topTabBar)
+/// * 🎯 Multiple indicator styles (none, line, dot, fill, border, underline)
 /// * 📏 Three size options (small, medium, large)
 /// * 📍 Flexible positioning (top, bottom, left, right, floating)
+/// * 📋 Subtext/caption support for detailed navigation items
+/// * 🍔 Mobile app bar with hamburger menu, title, and actions
+/// * 🔍 Search bar integration for app bars
 /// * 🎯 Interactive navbar items with states
 /// * ♿ Full accessibility support
 /// * 🌐 RTL/LTR language support
 /// * 📱 Responsive design
 /// * 🎭 Custom theming capabilities
 ///
+/// **Bottom Navigation Bar (E-commerce):**
 /// ```dart
 /// OsmeaNavbar(
-///   variant: NavbarVariant.primary,
+///   variant: NavbarVariant.retailMain,
 ///   size: NavbarSize.medium,
+///   position: NavbarPosition.bottom,
+///   style: NavbarStyle.iconWithText,
+///   indicatorStyle: NavbarIndicatorStyle.line,
+///   items: [
+///     NavbarItem(text: 'Home', icon: Icon(Icons.home)),
+///     NavbarItem(text: 'Search', icon: Icon(Icons.search)),
+///     NavbarItem(text: 'Profile', icon: Icon(Icons.person)),
+///   ],
+/// )
+/// ```
+///
+/// **App Bar with Hamburger Menu (Enterprise):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.retailMain,
 ///   position: NavbarPosition.top,
+///   style: NavbarStyle.appBar,
 ///   items: [
 ///     NavbarItem(
-///       text: 'Home',
-///       icon: Icon(Icons.home),
-///       onTap: () => Navigator.pushNamed(context, '/home'),
-///     ),
-///     NavbarItem(
-///       text: 'Profile',
-///       icon: Icon(Icons.person),
-///       onTap: () => Navigator.pushNamed(context, '/profile'),
+///       text: 'My App',
+///       title: 'My App',
+///       leadingIcon: IconButton(
+///         icon: Icon(Icons.menu),
+///         onPressed: () => Scaffold.of(context).openDrawer(),
+///       ),
+///       trailingActions: [
+///         IconButton(icon: Icon(Icons.search), onPressed: () {}),
+///         IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
+///       ],
 ///     ),
 ///   ],
 /// )
 /// ```
 ///
+/// **App Bar with Search (E-commerce):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.retailMain,
+///   position: NavbarPosition.top,
+///   style: NavbarStyle.appBarWithSearch,
+///   items: [
+///     NavbarItem(
+///       text: 'Search',
+///       leadingIcon: IconButton(
+///         icon: Icon(Icons.menu),
+///         onPressed: () => Scaffold.of(context).openDrawer(),
+///       ),
+///       searchBar: TextField(
+///         decoration: InputDecoration(hintText: 'Search...'),
+///       ),
+///       trailingActions: [
+///         IconButton(icon: Icon(Icons.filter_list), onPressed: () {}),
+///       ],
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// **Navbar with Custom Border (Healthcare):**
+/// ```dart
+/// OsmeaNavbar(
+///   variant: NavbarVariant.healthcareMinimal,
+///   position: NavbarPosition.bottom,
+///   showBorder: true,
+///   borderWidth: 2.0,
+///   borderColor: OsmeaColors.nordicBlue,
+///   borderStyle: BorderStyle.solid,
+///   items: navigationItems,
+/// )
+/// ```
+///
 /// See also:
 /// * [NavbarVariant] - Style variants enum
+/// * [NavbarStyle] - Design style patterns enum
+/// * [NavbarIndicatorStyle] - Indicator style enum
 /// * [NavbarSize] - Size variants enum
 /// * [NavbarPosition] - Position options enum
-/// * [NavbarType] - Type variants enum
 /// * [NavbarItem] - Individual navigation item
 
 /// 📄 **Navbar Item Data Class**
@@ -59,6 +123,7 @@ class NavbarItem {
   const NavbarItem({
     required this.text,
     this.icon,
+    this.subtext,
     this.onTap,
     this.state = NavbarItemState.inactive,
     this.badge,
@@ -69,6 +134,11 @@ class NavbarItem {
     this.animationTrigger,
     this.animationDuration,
     this.animationCurve = Curves.elasticOut,
+    // Mobile app bar specific properties
+    this.leadingIcon,
+    this.trailingActions,
+    this.title,
+    this.searchBar,
   });
 
   /// 📝 Display text for the navbar item
@@ -76,6 +146,10 @@ class NavbarItem {
 
   /// 🎯 Optional icon for the navbar item
   final Widget? icon;
+
+  /// 📋 Optional subtext/caption for the navbar item
+  /// Displayed below the main text when style supports it
+  final String? subtext;
 
   /// 🖱️ Callback when item is tapped
   final VoidCallback? onTap;
@@ -91,6 +165,22 @@ class NavbarItem {
 
   /// 🛣️ Route path for navigation
   final String? route;
+
+  /// 🍔 Leading icon (hamburger menu, back button, etc.) for app bar style
+  /// Displayed on the left side of app bar
+  final Widget? leadingIcon;
+
+  /// ⚙️ Trailing action buttons (search, notifications, etc.) for app bar style
+  /// Displayed on the right side of app bar
+  final List<Widget>? trailingActions;
+
+  /// 📋 Title text for app bar style
+  /// Overrides text property when style is appBar or appBarWithSearch
+  final String? title;
+
+  /// 🔍 Search bar widget for appBarWithSearch style
+  /// Custom search bar implementation
+  final Widget? searchBar;
 
   /// 🎬 Optional animation trigger value for icon animation
   /// When this value changes, icon animation will be triggered
@@ -118,6 +208,7 @@ class NavbarItem {
   NavbarItem copyWith({
     String? text,
     Widget? icon,
+    String? subtext,
     VoidCallback? onTap,
     NavbarItemState? state,
     Widget? badge,
@@ -128,10 +219,15 @@ class NavbarItem {
     dynamic animationTrigger,
     Duration? animationDuration,
     Curve? animationCurve,
+    Widget? leadingIcon,
+    List<Widget>? trailingActions,
+    String? title,
+    Widget? searchBar,
   }) {
     return NavbarItem(
       text: text ?? this.text,
       icon: icon ?? this.icon,
+      subtext: subtext ?? this.subtext,
       onTap: onTap ?? this.onTap,
       state: state ?? this.state,
       badge: badge ?? this.badge,
@@ -142,6 +238,10 @@ class NavbarItem {
       animationTrigger: animationTrigger ?? this.animationTrigger,
       animationDuration: animationDuration ?? this.animationDuration,
       animationCurve: animationCurve ?? this.animationCurve,
+      leadingIcon: leadingIcon ?? this.leadingIcon,
+      trailingActions: trailingActions ?? this.trailingActions,
+      title: title ?? this.title,
+      searchBar: searchBar ?? this.searchBar,
     );
   }
 }
@@ -154,18 +254,26 @@ class NavbarItem {
 /// **Features:**
 /// - 📏 Multiple size variants (small, medium, large)
 /// - 🎨 Theme-aware colors and styles
-/// - 📍 Flexible positioning options
-/// - 🔄 Different navbar types and behaviors
-/// - 🎯 Interactive navbar items
+/// - 🎭 Multiple design styles (iconOnly, iconWithText, iconWithSubtext, textOnly, iconAndTextHorizontal, appBar, appBarWithSearch, drawerTrigger, topTabBar)
+/// - 🎯 Multiple indicator styles (none, line, dot, fill, border, underline)
+/// - 📍 Flexible positioning options (top, bottom, left, right, floating)
+/// - 📋 Subtext/caption support for detailed navigation
+/// - 🔲 Customizable border (width, style, color)
+/// - 🍔 Mobile app bar with hamburger menu, title, and actions
+/// - 🔍 Search bar integration for app bars
+/// - 🎯 Interactive navbar items with states
 /// - ✨ Built-in animations and hover effects
 /// - 🔧 Fully customizable
 ///
 /// **Example:**
 /// ```dart
 /// OsmeaNavbar(
-///   variant: NavbarVariant.primary,
+///   variant: NavbarVariant.retailMain,
 ///   size: NavbarSize.medium,
-///   position: NavbarPosition.top,
+///   position: NavbarPosition.bottom,
+///   style: NavbarStyle.iconWithText,
+///   indicatorStyle: NavbarIndicatorStyle.line,
+///   indicatorColor: OsmeaColors.nordicBlue,
 ///   items: navigationItems,
 /// )
 /// ```
@@ -175,14 +283,20 @@ class OsmeaNavbar extends CoreContainer {
     super.customTheme,
     required this.items,
     this.size = NavbarSize.medium,
-    this.variant = NavbarVariant.primary,
+    this.variant = NavbarVariant.retailMain,
     this.position = NavbarPosition.top,
+    this.style,
+    this.indicatorStyle = NavbarIndicatorStyle.none,
     this.backgroundColor,
     this.textColor,
     this.activeColor,
     this.inactiveColor,
     this.borderColor,
     this.shadowColor,
+    this.indicatorColor,
+    this.borderWidth,
+    this.borderStyle,
+    this.showBorder,
     super.padding,
     super.margin,
     this.animationDuration,
@@ -208,6 +322,13 @@ class OsmeaNavbar extends CoreContainer {
   /// 📍 The position of the navbar
   final NavbarPosition position;
 
+  /// 🎭 The design style/layout pattern of the navbar
+  /// If null, automatically determined based on items and position
+  final NavbarStyle? style;
+
+  /// 🎯 The indicator style for active items
+  final NavbarIndicatorStyle indicatorStyle;
+
   /// 🎨 Custom background color that overrides the default variant background
   final Color? backgroundColor;
 
@@ -225,6 +346,22 @@ class OsmeaNavbar extends CoreContainer {
 
   /// ✨ Shadow color for elevated navbars
   final Color? shadowColor;
+
+  /// 🎯 Color for the active indicator (line, dot, fill, etc.)
+  final Color? indicatorColor;
+
+  /// 📏 Border width (thickness)
+  /// If null, uses default based on variant (1.0 for outlined, 0.0 for others)
+  final double? borderWidth;
+
+  /// 🎨 Border style (solid, dashed, dotted)
+  /// If null, uses BorderStyle.solid
+  final BorderStyle? borderStyle;
+
+  /// 🔲 Whether to show border
+  /// If null, automatically determined based on variant
+  /// true for outlined variant, false for others
+  final bool? showBorder;
 
   /// ⏱️ Duration for navbar animations
   final Duration? animationDuration;
@@ -257,13 +394,64 @@ class OsmeaNavbar extends CoreContainer {
   Widget buildWidget(BuildContext context) {
     final config = size.config(context);
     final colors = _getNavbarColors(context);
+    final effectiveStyle = _getEffectiveStyle();
 
-    Widget navbar = _buildNavbar(context, config, colors);
+    Widget navbar = _buildNavbar(context, config, colors, effectiveStyle);
 
     // Apply positioning wrapper
     navbar = _buildPositionWrapper(context, navbar, config);
 
     return navbar;
+  }
+
+  /// Determine the effective style based on items and position
+  NavbarStyle _getEffectiveStyle() {
+    if (style != null) return style!;
+
+    // Auto-determine style based on items and position
+    final hasIcons = items.any((item) => item.icon != null);
+    final hasSubtext = items.any((item) => item.subtext != null);
+    final hasLeadingIcon = items.any((item) => item.leadingIcon != null);
+    final hasTrailingActions = items.any((item) =>
+        item.trailingActions != null && item.trailingActions!.isNotEmpty);
+    final hasSearchBar = items.any((item) => item.searchBar != null);
+    final isBottomNav = position == NavbarPosition.bottom;
+    final isTopNav = position == NavbarPosition.top;
+
+    // Check for mobile app bar patterns
+    if (hasLeadingIcon && (hasTrailingActions || hasSearchBar)) {
+      if (hasSearchBar) {
+        return NavbarStyle.appBarWithSearch;
+      }
+      return NavbarStyle.appBar;
+    }
+
+    // Check for drawer trigger
+    if (hasLeadingIcon && items.length == 1 && !hasIcons) {
+      return NavbarStyle.drawerTrigger;
+    }
+
+    // Check for tab bar
+    if (isTopNav && items.length > 1 && hasIcons) {
+      return NavbarStyle.topTabBar;
+    }
+
+    // Standard patterns
+    if (!hasIcons && showIcons) {
+      return NavbarStyle.textOnly;
+    } else if (hasSubtext) {
+      return NavbarStyle.iconWithSubtext;
+    } else if (isBottomNav || isTopNav) {
+      if (!showLabels) {
+        return NavbarStyle.iconOnly;
+      } else if (position.isHorizontal) {
+        return NavbarStyle.iconWithText;
+      } else {
+        return NavbarStyle.iconAndTextHorizontal;
+      }
+    } else {
+      return NavbarStyle.iconAndTextHorizontal;
+    }
   }
 
   Widget _buildPositionWrapper(
@@ -292,21 +480,157 @@ class OsmeaNavbar extends CoreContainer {
     BuildContext context,
     NavbarSizeConfig config,
     _NavbarColors colors,
+    NavbarStyle effectiveStyle,
   ) {
-    return Container(
+    final variantStyle = _getVariantStyle(context, config);
+
+    // Apply variant-specific padding adjustments
+    final effectivePadding = _getVariantPadding(context, config, variantStyle);
+
+    Widget navbar = Container(
       height: position.isHorizontal ? config.height : null,
       width: position.isVertical ? config.height : null,
-      padding: padding ?? config.padding,
+      padding: padding ?? effectivePadding,
       margin: margin,
-      decoration: _buildDecoration(colors, config),
-      child: _buildContent(context, config, colors),
+      decoration: _buildDecoration(context, config, colors),
+      child: ClipRect(
+        child: SizedBox(
+          height: position.isHorizontal ? config.height : null,
+          width: position.isVertical ? config.height : null,
+          child: _buildContent(context, config, colors, effectiveStyle),
+        ),
+      ),
     );
+
+    // Apply variant-specific effects (blur for glass, etc.)
+    navbar = _applyVariantEffects(context, navbar, variantStyle);
+
+    return navbar;
+  }
+
+  /// Get variant-specific padding
+  EdgeInsetsGeometry _getVariantPadding(
+    BuildContext context,
+    NavbarSizeConfig config,
+    _NavbarVariantStyle variantStyle,
+  ) {
+    final basePadding = config.padding as EdgeInsets;
+
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // Standard padding
+        return config.padding;
+
+      case NavbarVariant.healthcareMinimal:
+        // Minimal padding for clean look
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.7,
+          vertical: basePadding.vertical * 0.5,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Minimal padding for overlay
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.7,
+        );
+
+      case NavbarVariant.socialGlass:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        // Standard corporate padding
+        return config.padding;
+
+      case NavbarVariant.enterpriseSidebar:
+        // Minimal sidebar padding
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.7,
+          vertical: basePadding.vertical * 0.5,
+        );
+
+      case NavbarVariant.gradientModern:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.capsuleRounded:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.badgeIndicator:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.darkMinimal:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+
+      case NavbarVariant.cardFloating:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.8,
+          vertical: basePadding.vertical * 0.6,
+        );
+    }
+  }
+
+  /// Apply variant-specific visual effects
+  Widget _applyVariantEffects(
+    BuildContext context,
+    Widget child,
+    _NavbarVariantStyle variantStyle,
+  ) {
+    switch (variant) {
+      case NavbarVariant.socialGlass:
+        // Apply blur effect for glass morphism
+        return ClipRRect(
+          borderRadius: variantStyle.borderRadius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: child,
+          ),
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // No additional effects for overlay
+        return child;
+
+      default:
+        // No special effects for other variants
+        return child;
+    }
   }
 
   Widget _buildContent(
     BuildContext context,
     NavbarSizeConfig config,
     _NavbarColors colors,
+    NavbarStyle effectiveStyle,
   ) {
     final itemWidgets = items.asMap().entries.map((entry) {
       final index = entry.key;
@@ -320,6 +644,7 @@ class OsmeaNavbar extends CoreContainer {
         config,
         colors,
         index,
+        effectiveStyle,
       );
     }).toList();
 
@@ -340,7 +665,12 @@ class OsmeaNavbar extends CoreContainer {
           mainAxisAlignment: spaceEvenly,
           children: itemWidgets
               .map((widget) => Expanded(
-                    child: Center(child: widget),
+                    child: Center(
+                      child: SizedBox(
+                        height: config.height,
+                        child: widget,
+                      ),
+                    ),
                   ))
               .toList(),
         );
@@ -385,19 +715,33 @@ class OsmeaNavbar extends CoreContainer {
     NavbarSizeConfig config,
     _NavbarColors colors,
     int index,
+    NavbarStyle effectiveStyle,
   ) {
     final isActive = item.state == NavbarItemState.active;
     final isDisabled = item.state == NavbarItemState.disabled;
     final isLoading = item.state == NavbarItemState.loading;
 
-    Widget child = Container(
-      constraints: BoxConstraints(
-        maxHeight: config.height,
-        maxWidth: position.isHorizontal ? double.infinity : config.height,
-        minHeight: config.height * 0.8,
-      ),
-      padding: config.itemPadding,
-      child: _buildItemContent(context, item, config, colors, isActive),
+    // Get variant-specific item padding
+    final variantItemPadding = _getVariantItemPadding(context, config);
+
+    // Build item content
+    Widget itemContent = _buildItemContent(
+      context,
+      item,
+      config,
+      colors,
+      isActive,
+      effectiveStyle,
+    );
+
+    // Build variant-specific item container with design differences
+    Widget child = _buildVariantItemContainer(
+      context,
+      itemContent,
+      variantItemPadding,
+      config,
+      colors,
+      isActive,
     );
 
     if (item.tooltip != null) {
@@ -427,11 +771,24 @@ class OsmeaNavbar extends CoreContainer {
       child = _AnimatedNavbarItemWrapper(
         animationType: item.animationType,
         animationTrigger: item.animationTrigger,
-        duration: item.animationDuration ?? animationDuration ?? context.animationMedium,
+        duration: item.animationDuration ??
+            animationDuration ??
+            context.animationMedium,
         curve: item.animationCurve,
         child: child,
       );
     }
+
+    // Apply variant-specific indicator/design
+    child = _applyVariantItemDesign(
+      context,
+      child,
+      item,
+      colors,
+      isActive,
+      effectiveStyle,
+      config,
+    );
 
     return AnimatedContainer(
       duration: animationDuration ?? context.animationMedium,
@@ -445,7 +802,7 @@ class OsmeaNavbar extends CoreContainer {
                   if (onItemTap != null) onItemTap!(index);
                   if (item.onTap != null) item.onTap!();
                 },
-          borderRadius: config.borderRadius,
+          borderRadius: _getVariantItemBorderRadius(context),
           splashColor: colors.active.withValues(alpha: context.alpha20),
           highlightColor: colors.active.withValues(alpha: context.alpha10),
           child: child,
@@ -454,171 +811,1870 @@ class OsmeaNavbar extends CoreContainer {
     );
   }
 
+  /// Build variant-specific item container with completely different designs
+  /// Each variant has a UNIQUE visual design that is immediately distinguishable
+  Widget _buildVariantItemContainer(
+    BuildContext context,
+    Widget content,
+    EdgeInsetsGeometry padding,
+    NavbarSizeConfig config,
+    _NavbarColors colors,
+    bool isActive,
+  ) {
+    final effectiveIndicatorColor = indicatorColor ?? colors.active;
+
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // 🛒 RETAIL MAIN - Düz, standart tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha50),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // 🏪 RETAIL SIDEBAR - Sol border ile düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha10)
+                : colors.background.withValues(alpha: context.alpha40),
+            border: Border(
+              left: BorderSide(
+                color: isActive
+                    ? effectiveIndicatorColor
+                    : colors.border.withValues(alpha: context.alpha20),
+                width: isActive ? 3.0 : 1.0,
+              ),
+            ),
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(6.0),
+              bottomRight: Radius.circular(6.0),
+            ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.healthcareMinimal:
+        // 🏥 HEALTHCARE MINIMAL - Düz, minimal border tasarımı
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha10)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              color: isActive
+                  ? effectiveIndicatorColor.withValues(alpha: context.alpha40)
+                  : colors.border.withValues(alpha: context.alpha30),
+              width: isActive ? 1.5 : 1.0,
+            ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.financeBordered:
+        // 💼 FINANCE BORDERED - Düz, standart border tasarımı
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha10)
+                : Colors.white,
+            border: Border.all(
+              color: isActive
+                  ? effectiveIndicatorColor
+                  : colors.border.withValues(alpha: context.alpha40),
+              width: isActive ? 2.0 : 1.0,
+            ),
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // 🎬 MEDIA OVERLAY - Şeffaf, düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          padding: padding,
+          clipBehavior: Clip.none,
+          child: content,
+        );
+
+      case NavbarVariant.socialGlass:
+        // 📱 SOCIAL GLASS - Düz, yuvarlak tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha40),
+            borderRadius: BorderRadius.circular(20.0),
+            border: isActive
+                ? null
+                : Border.all(
+                    color: colors.border.withValues(alpha: context.alpha20),
+                    width: 0.5,
+                  ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        // 🏢 ENTERPRISE MAIN - Alt border ile düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isActive ? effectiveIndicatorColor : Colors.transparent,
+                width: isActive ? 3.0 : 0.0,
+              ),
+            ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.enterpriseSidebar:
+        // 🏢 ENTERPRISE SIDEBAR - Sağ border ile düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha10)
+                : colors.background.withValues(alpha: context.alpha30),
+            border: Border(
+              right: BorderSide(
+                color: isActive
+                    ? effectiveIndicatorColor
+                    : colors.border.withValues(alpha: context.alpha25),
+                width: isActive ? 3.0 : 1.0,
+              ),
+            ),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(6.0),
+              bottomLeft: Radius.circular(6.0),
+            ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.gradientModern:
+        // 🎨 GRADIENT MODERN - Düz, standart tasarım (gradient yok)
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
+                : colors.background.withValues(alpha: context.alpha50),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.capsuleRounded:
+        // 🎯 CAPSULE ROUNDED - Yuvarlak kapsül tasarımı
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
+                : colors.background.withValues(alpha: context.alpha45),
+            borderRadius: BorderRadius.circular(20.0),
+            border: isActive
+                ? null
+                : Border.all(
+                    color: colors.border.withValues(alpha: context.alpha25),
+                    width: 0.8,
+                  ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.badgeIndicator:
+        // 🔘 BADGE INDICATOR - Badge stili, düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha15)
+                : colors.background.withValues(alpha: context.alpha35),
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(
+              color: isActive
+                  ? effectiveIndicatorColor.withValues(alpha: context.alpha35)
+                  : colors.border.withValues(alpha: context.alpha25),
+              width: isActive ? 1.5 : 0.8,
+            ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.darkMinimal:
+        // 🌙 DARK MINIMAL - Koyu arka plan, düz tasarım
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha20)
+                : colors.background.withValues(alpha: context.alpha80),
+            borderRadius: BorderRadius.circular(8.0),
+            border: isActive
+                ? Border.all(
+                    color: effectiveIndicatorColor.withValues(
+                        alpha: context.alpha40),
+                    width: 1.0,
+                  )
+                : Border.all(
+                    color: colors.border.withValues(alpha: context.alpha20),
+                    width: 0.5,
+                  ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+
+      case NavbarVariant.cardFloating:
+        // 🎴 CARD FLOATING - Düz, standart card tasarımı
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: config.height,
+            minHeight: 0,
+            maxWidth: position.isHorizontal ? double.infinity : config.height,
+          ),
+          decoration: BoxDecoration(
+            color: isActive
+                ? Colors.white
+                : colors.background.withValues(alpha: context.alpha50),
+            borderRadius: BorderRadius.circular(12.0),
+            border: isActive
+                ? null
+                : Border.all(
+                    color: colors.border.withValues(alpha: context.alpha30),
+                    width: 0.8,
+                  ),
+          ),
+          padding: padding,
+          clipBehavior: Clip.hardEdge,
+          child: content,
+        );
+    }
+  }
+
+  /// Apply variant-specific visual design (indicators, effects) - Each variant has unique design
+  Widget _applyVariantItemDesign(
+    BuildContext context,
+    Widget child,
+    NavbarItem item,
+    _NavbarColors colors,
+    bool isActive,
+    NavbarStyle effectiveStyle,
+    NavbarSizeConfig config,
+  ) {
+    final effectiveIndicatorColor = indicatorColor ?? colors.active;
+
+    // Eğer text varsa indicator gösterilmesin
+    final hasText = showLabels && item.text.isNotEmpty;
+
+    // Always apply variant-specific design first
+    Widget result = child;
+
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // 🛒 Already handled in container (full segment fill)
+        return child;
+
+      case NavbarVariant.retailSidebar:
+        // 🏪 Already handled in container (left border)
+        return child;
+
+      case NavbarVariant.healthcareMinimal:
+        // 🏥 DOT INDICATOR - Small dot at bottom/right (sadece text yoksa)
+        if (hasText) return child;
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: position.isHorizontal ? 6.0 : null,
+              top: position.isHorizontal ? null : 6.0,
+              right: position.isHorizontal ? 6.0 : null,
+              left: position.isHorizontal ? null : 6.0,
+              child: Container(
+                width: 6.0,
+                height: 6.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarVariant.financeBordered:
+        // 💼 Already handled in container (bordered rectangle)
+        return child;
+
+      case NavbarVariant.mediaOverlay:
+        // 🎬 MEDIA OVERLAY - Düz underline indicator (sadece text yoksa)
+        if (hasText) return child;
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            // Underline - centered, shorter than full width
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: config.iconSize * 0.8,
+                  height: 2.0,
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor,
+                    borderRadius: BorderRadius.circular(1.0),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarVariant.socialGlass:
+        // 📱 Already handled in container (pill-shaped)
+        return child;
+
+      case NavbarVariant.enterpriseMain:
+        // 🏢 Already handled in container (bottom line)
+        return child;
+
+      case NavbarVariant.enterpriseSidebar:
+        // 🏢 Already handled in container (right border)
+        return child;
+
+      case NavbarVariant.gradientModern:
+        // 🎨 Already handled in container (gradient fill)
+        return child;
+
+      case NavbarVariant.capsuleRounded:
+        // 🎯 Already handled in container (capsule shape)
+        return child;
+
+      case NavbarVariant.badgeIndicator:
+        // 🔘 BADGE INDICATOR - Badge above item (sadece text yoksa)
+        if (hasText) return child;
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              top: -4.0,
+              right: position.isHorizontal ? null : -4.0,
+              left: position.isHorizontal ? -4.0 : null,
+              child: Container(
+                width: 12.0,
+                height: 12.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarVariant.darkMinimal:
+        // 🌙 DARK MINIMAL - Simple dark indicator, no glow
+        return child;
+
+      case NavbarVariant.cardFloating:
+        // 🎴 Already handled in container (floating card)
+        result = child;
+        break;
+    }
+
+    // If user explicitly set indicatorStyle AND item is active AND no text, apply it as additional style
+    // Text varsa indicator gösterilmesin
+    if (isActive && indicatorStyle != NavbarIndicatorStyle.none && !hasText) {
+      result = _applyIndicatorStyle(
+        context,
+        result,
+        effectiveIndicatorColor,
+        config,
+      );
+    }
+
+    return result;
+  }
+
+  /// Apply indicator style based on indicatorStyle parameter
+  Widget _applyIndicatorStyle(
+    BuildContext context,
+    Widget child,
+    Color effectiveIndicatorColor,
+    NavbarSizeConfig config,
+  ) {
+    switch (indicatorStyle) {
+      case NavbarIndicatorStyle.none:
+        return child;
+
+      case NavbarIndicatorStyle.line:
+        // Thin line indicator
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: position.isHorizontal ? 0 : null,
+              top: position.isHorizontal ? null : 0,
+              left: position.isHorizontal ? null : 0,
+              right: position.isHorizontal ? null : 0,
+              child: Center(
+                child: Container(
+                  height: position.isHorizontal ? 2.0 : null,
+                  width: position.isHorizontal ? null : 2.0,
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        position.isHorizontal ? config.iconSize * 0.6 : 2.0,
+                    maxHeight:
+                        position.isHorizontal ? 2.0 : config.iconSize * 0.6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor,
+                    borderRadius: BorderRadius.circular(1.0),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.dot:
+        // Dot indicator
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: position.isHorizontal ? 4.0 : null,
+              top: position.isHorizontal ? null : 4.0,
+              right: position.isHorizontal ? 4.0 : null,
+              left: position.isHorizontal ? null : 4.0,
+              child: Container(
+                width: 8.0,
+                height: 8.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.fill:
+        // Already handled in container
+        return child;
+
+      case NavbarIndicatorStyle.border:
+        // Already handled in container
+        return child;
+
+      case NavbarIndicatorStyle.underline:
+        // Underline indicator
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: config.iconSize * 0.8,
+                  height: 3.0,
+                  decoration: BoxDecoration(
+                    color: effectiveIndicatorColor,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.gradient:
+        // Gradient fill indicator
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                effectiveIndicatorColor,
+                effectiveIndicatorColor.withValues(alpha: context.alpha70),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: child,
+        );
+
+      case NavbarIndicatorStyle.badge:
+        // Badge indicator
+        return Stack(
+          clipBehavior: clipNone,
+          children: [
+            child,
+            Positioned(
+              top: -4.0,
+              right: position.isHorizontal ? null : -4.0,
+              left: position.isHorizontal ? -4.0 : null,
+              child: Container(
+                width: 12.0,
+                height: 12.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case NavbarIndicatorStyle.capsule:
+        // Capsule-shaped indicator
+        return Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.normalValue * 0.75,
+            vertical: context.lowValue * 0.5,
+          ),
+          decoration: BoxDecoration(
+            color: effectiveIndicatorColor.withValues(alpha: context.alpha25),
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: child,
+        );
+    }
+  }
+
+  /// Get variant-specific border radius for item - Each variant has unique radius
+  BorderRadius _getVariantItemBorderRadius(BuildContext context) {
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        return BorderRadius.circular(8.0);
+      case NavbarVariant.retailSidebar:
+        return const BorderRadius.only(
+          topRight: Radius.circular(6.0),
+          bottomRight: Radius.circular(6.0),
+        );
+      case NavbarVariant.healthcareMinimal:
+        return BorderRadius.circular(4.0);
+      case NavbarVariant.financeBordered:
+        return BorderRadius.circular(6.0);
+      case NavbarVariant.mediaOverlay:
+        return BorderRadius.circular(12.0);
+      case NavbarVariant.socialGlass:
+        return BorderRadius.circular(28.0);
+      case NavbarVariant.enterpriseMain:
+        return BorderRadius.zero;
+      case NavbarVariant.enterpriseSidebar:
+        return const BorderRadius.only(
+          topLeft: Radius.circular(4.0),
+          bottomLeft: Radius.circular(4.0),
+        );
+
+      case NavbarVariant.gradientModern:
+        return BorderRadius.circular(12.0);
+
+      case NavbarVariant.capsuleRounded:
+        return BorderRadius.circular(20.0);
+
+      case NavbarVariant.badgeIndicator:
+        return BorderRadius.circular(8.0);
+
+      case NavbarVariant.darkMinimal:
+        return BorderRadius.circular(8.0);
+
+      case NavbarVariant.cardFloating:
+        return BorderRadius.circular(12.0);
+    }
+  }
+
+  /// Get variant-specific item padding
+  EdgeInsetsGeometry _getVariantItemPadding(
+    BuildContext context,
+    NavbarSizeConfig config,
+  ) {
+    final basePadding = config.itemPadding as EdgeInsets;
+
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.retailSidebar:
+        return config.itemPadding;
+
+      case NavbarVariant.healthcareMinimal:
+        // Minimal padding for clean look
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.socialGlass:
+        // Minimal padding to prevent overflow
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        return config.itemPadding;
+
+      case NavbarVariant.enterpriseSidebar:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.gradientModern:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.capsuleRounded:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.badgeIndicator:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.darkMinimal:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+
+      case NavbarVariant.cardFloating:
+        return EdgeInsets.symmetric(
+          horizontal: basePadding.horizontal * 0.6,
+          vertical: basePadding.vertical * 0.4,
+        );
+    }
+  }
+
   Widget _buildItemContent(
     BuildContext context,
     NavbarItem item,
     NavbarSizeConfig config,
     _NavbarColors colors,
     bool isActive,
+    NavbarStyle effectiveStyle,
   ) {
     final textColor = isActive ? colors.active : colors.inactive;
+    final subtextColor = textColor.withValues(alpha: context.alpha70);
+
+    // Handle loading state
+    if (item.state == NavbarItemState.loading) {
+      return Center(
+        child: SizedBox(
+          width: config.iconSize,
+          height: config.iconSize,
+          child: CircularProgressIndicator(
+            strokeWidth: context.width2,
+            valueColor: AlwaysStoppedAnimation<Color>(textColor),
+          ),
+        ),
+      );
+    }
+
+    // Build content based on style
+    switch (effectiveStyle) {
+      case NavbarStyle.iconOnly:
+        return _buildIconOnlyContent(context, item, config, textColor);
+
+      case NavbarStyle.iconWithText:
+        return _buildIconWithTextContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.iconWithSubtext:
+        return _buildIconWithSubtextContent(
+          context,
+          item,
+          config,
+          textColor,
+          subtextColor,
+          isActive,
+        );
+
+      case NavbarStyle.textOnly:
+        return _buildTextOnlyContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.iconAndTextHorizontal:
+        return _buildIconAndTextHorizontalContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.appBar:
+        return _buildAppBarContent(
+          context,
+          item,
+          config,
+          textColor,
+          colors,
+        );
+
+      case NavbarStyle.appBarWithSearch:
+        return _buildAppBarWithSearchContent(
+          context,
+          item,
+          config,
+          textColor,
+          colors,
+        );
+
+      case NavbarStyle.drawerTrigger:
+        return _buildDrawerTriggerContent(
+          context,
+          item,
+          config,
+          textColor,
+        );
+
+      case NavbarStyle.topTabBar:
+        return _buildTopTabBarContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.segmentedControl:
+        return _buildSegmentedControlContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.floatingBottomBar:
+        return _buildFloatingBottomBarContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.denseCompact:
+        return _buildDenseCompactContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.collapsible:
+        return _buildCollapsibleContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.navigationRail:
+        return _buildNavigationRailContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+
+      case NavbarStyle.bottomSheetNav:
+        return _buildBottomSheetNavContent(
+          context,
+          item,
+          config,
+          textColor,
+          isActive,
+        );
+    }
+  }
+
+  /// Build icon-only content
+  Widget _buildIconOnlyContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color iconColor,
+  ) {
+    if (item.icon == null) return const SizedBox.shrink();
+
+    return Center(
+      child: IconTheme(
+        data: IconThemeData(
+          size: config.iconSize,
+          color: iconColor,
+        ),
+        child: item.icon!,
+      ),
+    );
+  }
+
+  /// Build icon with text content (icon above text)
+  Widget _buildIconWithTextContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
     final List<Widget> children = [];
 
     // Add icon if present and should show
     if (item.icon != null && showIcons) {
       children.add(
-        FittedBox(
-          fit: contain,
-          child: IconTheme(
-            data: IconThemeData(
-              size: config.iconSize,
-              color: textColor,
-            ),
-            child: item.icon!,
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.9,
+            color: textColor,
           ),
+          child: item.icon!,
         ),
       );
     }
 
     // Add text if should show labels
     if (showLabels) {
-      TextStyle baseStyle;
-
-      // Select appropriate text style based on navbar size
-      switch (size) {
-        case NavbarSize.small:
-          baseStyle = OsmeaTextStyle.labelSmall(context);
-          break;
-        case NavbarSize.medium:
-          baseStyle = OsmeaTextStyle.labelMedium(context);
-          break;
-        case NavbarSize.large:
-          baseStyle = OsmeaTextStyle.labelLarge(context);
-          break;
-      }
-
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(const SizedBox(height: 1.0));
       children.add(
-        Flexible(
-          flex: size == NavbarSize.large ? 2 : 1,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Use FittedBox for smaller constraints to prevent overflow
-              if (constraints.maxWidth < context.width80 ||
-                  size == NavbarSize.small) {
-                return FittedBox(
-                  fit: scaleDown,
-                  alignment: center,
-                  child: OsmeaText(
-                    item.text,
-                    style: baseStyle.copyWith(
-                      fontWeight: isActive ? context.semiBold : context.normal,
-                      color: textColor,
-                    ),
-                    maxLines: 1,
-                    overflow: ellipsis,
-                    textAlign: textCenter,
-                  ),
-                );
-              } else {
-                return Text(
-                  item.text,
-                  style: baseStyle.copyWith(
-                    fontWeight: isActive ? context.semiBold : context.normal,
-                    color: textColor,
-                  ),
-                  maxLines: size == NavbarSize.large ? 2 : 1,
-                  overflow: ellipsis,
-                  textAlign: textCenter,
-                );
-              }
-            },
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
+          ),
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65, // Much smaller text
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
           ),
         ),
       );
     }
 
-    // Handle loading state
-    if (item.state == NavbarItemState.loading) {
-      children.clear();
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
+    );
+  }
+
+  /// Build icon with subtext content
+  Widget _buildIconWithSubtextContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    Color subtextColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present and should show
+    if (item.icon != null && showIcons) {
       children.add(
-        FittedBox(
-          fit: contain,
-          child: SizedBox(
-            width: config.iconSize,
-            height: config.iconSize,
-            child: CircularProgressIndicator(
-              strokeWidth: context.width2,
-              valueColor: AlwaysStoppedAnimation<Color>(textColor),
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.9,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
+      final captionStyle = _getCaptionStyleForSize(context);
+
+      children.add(const SizedBox(height: 1.0));
+      children.add(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
+          ),
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65, // Much smaller text
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
+        ),
+      );
+
+      // Add subtext if available
+      if (item.subtext != null && item.subtext!.isNotEmpty) {
+        children.add(const SizedBox(height: 0.5));
+        children.add(
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth:
+                  position.isHorizontal ? config.height * 0.8 : double.infinity,
+            ),
+            child: OsmeaText(
+              item.subtext!,
+              style: captionStyle.copyWith(
+                color: subtextColor,
+                fontSize: config.fontSize * 0.55,
+              ),
+              maxLines: 1,
+              overflow: ellipsis,
+              textAlign: textCenter,
             ),
           ),
+        );
+      }
+    }
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
+    );
+  }
+
+  /// Build text-only content
+  Widget _buildTextOnlyContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    if (!showLabels) return const SizedBox.shrink();
+
+    final baseStyle = _getTextStyleForSize(context);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth:
+              position.isHorizontal ? config.height * 0.8 : double.infinity,
+        ),
+        child: OsmeaText(
+          item.text,
+          style: baseStyle.copyWith(
+            fontWeight: isActive ? context.semiBold : context.normal,
+            color: textColor,
+            fontSize: config.fontSize * 0.65,
+          ),
+          maxLines: 1,
+          overflow: ellipsis,
+          textAlign: textCenter,
+        ),
+      ),
+    );
+  }
+
+  /// Build icon and text horizontal content
+  Widget _buildIconAndTextHorizontalContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present and should show
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+      children.add(SizedBox(
+          width:
+              config.itemSpacing / 2)); // Can't be const due to dynamic value
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textStart,
+          ),
         ),
       );
     }
 
-    // Layout children based on navbar orientation
-    if (position.isVertical || (item.icon != null && showLabels && showIcons)) {
-      return Column(
-        mainAxisSize: min,
-        mainAxisAlignment: centerMain,
-        crossAxisAlignment: crossCenter,
-        children: children
-            .expand((widget) => [
-                  widget,
-                  if (widget != children.last)
-                    SizedBox(height: size == NavbarSize.large ? 6.0 : 4.0),
-                ])
-            .toList(),
-      );
-    } else {
-      return Row(
-        mainAxisSize: min,
-        mainAxisAlignment: centerMain,
-        crossAxisAlignment: crossCenter,
-        children: children
-            .expand((widget) => [
-                  widget,
-                  if (widget != children.last)
-                    SizedBox(width: config.itemSpacing / 2),
-                ])
-            .toList(),
-      );
+    return Row(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Get text style based on navbar size
+  TextStyle _getTextStyleForSize(BuildContext context) {
+    switch (size) {
+      case NavbarSize.small:
+        return OsmeaTextStyle.labelSmall(context);
+      case NavbarSize.medium:
+        return OsmeaTextStyle.labelMedium(context);
+      case NavbarSize.large:
+        return OsmeaTextStyle.labelLarge(context);
     }
   }
 
-  BoxDecoration _buildDecoration(
-      _NavbarColors colors, NavbarSizeConfig config) {
-    List<BoxShadow> shadows = [];
+  /// Get caption style for subtext based on navbar size
+  TextStyle _getCaptionStyleForSize(BuildContext context) {
+    switch (size) {
+      case NavbarSize.small:
+        return OsmeaTextStyle.captionSmall(context);
+      case NavbarSize.medium:
+        return OsmeaTextStyle.captionMedium(context);
+      case NavbarSize.large:
+        return OsmeaTextStyle.captionLarge(context);
+    }
+  }
 
-    if (variant != NavbarVariant.transparent &&
-        (elevation ?? config.elevation) > 0) {
-      shadows.add(
-        BoxShadow(
-          color: shadowColor ?? OsmeaColors.shadowLight,
-          blurRadius: elevation ?? config.elevation,
-          offset: Offset(0, position.isTop ? 2 : -2),
+  /// Build app bar content (hamburger menu + title + actions)
+  Widget _buildAppBarContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    _NavbarColors colors,
+  ) {
+    final List<Widget> children = [];
+
+    // Leading icon (hamburger menu or back button)
+    if (item.leadingIcon != null) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.leadingIcon!,
+        ),
+      );
+      children.add(SizedBox(width: context.normalValue * 0.5));
+    }
+
+    // Title
+    final titleText = item.title ?? item.text;
+    if (titleText.isNotEmpty) {
+      final titleStyle = _getTextStyleForSize(context).copyWith(
+        fontWeight: context.semiBold,
+        color: textColor,
+        fontSize: config.fontSize * 0.7,
+      );
+      children.add(
+        Expanded(
+          child: OsmeaText(
+            titleText,
+            style: titleStyle,
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textStart,
+          ),
         ),
       );
     }
 
-    Border? border;
-    if (variant == NavbarVariant.outlined) {
-      border = Border.all(
-        color: borderColor ?? colors.border,
-        width: 1.0,
+    // Trailing actions
+    if (item.trailingActions != null && item.trailingActions!.isNotEmpty) {
+      children.add(SizedBox(width: context.normalValue * 0.5));
+      children.add(
+        Row(
+          mainAxisSize: min,
+          children: item.trailingActions!
+              .map((action) => Padding(
+                    padding: EdgeInsets.only(left: context.lowValue * 0.5),
+                    child: action,
+                  ))
+              .toList(),
+        ),
       );
+    }
+
+    return Row(
+      mainAxisAlignment: spaceBetween,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build app bar with search content
+  Widget _buildAppBarWithSearchContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    _NavbarColors colors,
+  ) {
+    final List<Widget> children = [];
+
+    // Leading icon (hamburger menu)
+    if (item.leadingIcon != null) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.leadingIcon!,
+        ),
+      );
+      children.add(SizedBox(width: context.normalValue * 0.5));
+    }
+
+    // Search bar or title
+    if (item.searchBar != null) {
+      children.add(Expanded(child: item.searchBar!));
+    } else {
+      final titleText = item.title ?? item.text;
+      if (titleText.isNotEmpty) {
+        final titleStyle = _getTextStyleForSize(context).copyWith(
+          fontWeight: context.semiBold,
+          color: textColor,
+          fontSize: config.fontSize * 0.7,
+        );
+        children.add(
+          Expanded(
+            child: OsmeaText(
+              titleText,
+              style: titleStyle,
+              maxLines: 1,
+              overflow: ellipsis,
+              textAlign: textStart,
+            ),
+          ),
+        );
+      }
+    }
+
+    // Trailing actions
+    if (item.trailingActions != null && item.trailingActions!.isNotEmpty) {
+      children.add(SizedBox(width: context.normalValue * 0.5));
+      children.add(
+        Row(
+          mainAxisSize: min,
+          children: item.trailingActions!
+              .map((action) => Padding(
+                    padding: EdgeInsets.only(left: context.lowValue * 0.5),
+                    child: action,
+                  ))
+              .toList(),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: spaceBetween,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build drawer trigger content (hamburger menu button)
+  Widget _buildDrawerTriggerContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color iconColor,
+  ) {
+    // Use leadingIcon if provided, otherwise use default hamburger icon
+    final icon = item.leadingIcon ??
+        Icon(
+          Icons.menu,
+          size: config.iconSize,
+          color: iconColor,
+        );
+
+    return Center(
+      child: IconTheme(
+        data: IconThemeData(
+          size: config.iconSize,
+          color: iconColor,
+        ),
+        child: icon,
+      ),
+    );
+  }
+
+  /// Build top tab bar content
+  Widget _buildTopTabBarContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    // Add icon if present
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.8, // Slightly smaller for tabs
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+      if (showLabels) {
+        children.add(SizedBox(width: context.lowValue * 0.5));
+      }
+    }
+
+    // Add text if should show labels
+    if (showLabels) {
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build segmented control content (iOS-style)
+  Widget _buildSegmentedControlContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.75,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+      if (showLabels) {
+        children.add(SizedBox(width: context.lowValue * 0.5));
+      }
+    }
+
+    if (showLabels && item.text.isNotEmpty) {
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.6,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.lowValue * 0.75,
+        vertical: context.lowValue * 0.5,
+      ),
+      child: Row(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
+    );
+  }
+
+  /// Build floating bottom bar content
+  Widget _buildFloatingBottomBarContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    // Similar to iconWithText but with more spacing
+    return _buildIconWithTextContent(
+      context,
+      item,
+      config,
+      textColor,
+      isActive,
+    );
+  }
+
+  /// Build dense/compact content
+  Widget _buildDenseCompactContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize * 0.85,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+      if (showLabels) {
+        children.add(SizedBox(width: context.lowValue * 0.25));
+      }
+    }
+
+    if (showLabels && item.text.isNotEmpty) {
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        Flexible(
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65,
+            ),
+            maxLines: 1,
+            overflow: ellipsis,
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisSize: min,
+      mainAxisAlignment: centerMain,
+      crossAxisAlignment: crossCenter,
+      children: children,
+    );
+  }
+
+  /// Build collapsible content
+  Widget _buildCollapsibleContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    // Can collapse to icon-only or expand to icon+text
+    if (showLabels) {
+      return _buildIconWithTextContent(
+        context,
+        item,
+        config,
+        textColor,
+        isActive,
+      );
+    }
+    return _buildIconOnlyContent(
+      context,
+      item,
+      config,
+      textColor,
+    );
+  }
+
+  /// Build navigation rail content (Material 3)
+  Widget _buildNavigationRailContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    final List<Widget> children = [];
+
+    if (item.icon != null && showIcons) {
+      children.add(
+        IconTheme(
+          data: IconThemeData(
+            size: config.iconSize,
+            color: textColor,
+          ),
+          child: item.icon!,
+        ),
+      );
+    }
+
+    if (showLabels && item.text.isNotEmpty) {
+      children.add(SizedBox(height: context.lowValue * 0.5));
+      final baseStyle = _getTextStyleForSize(context);
+      children.add(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth:
+                position.isHorizontal ? config.height * 0.8 : double.infinity,
+          ),
+          child: OsmeaText(
+            item.text,
+            style: baseStyle.copyWith(
+              fontWeight: isActive ? context.semiBold : context.normal,
+              color: textColor,
+              fontSize: config.fontSize * 0.65,
+            ),
+            maxLines: 2,
+            overflow: ellipsis,
+            textAlign: textCenter,
+          ),
+        ),
+      );
+    }
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: config.height,
+        minHeight: 0,
+      ),
+      child: Column(
+        mainAxisSize: min,
+        mainAxisAlignment: centerMain,
+        crossAxisAlignment: crossCenter,
+        children: children,
+      ),
+    );
+  }
+
+  /// Build bottom sheet navigation content
+  Widget _buildBottomSheetNavContent(
+    BuildContext context,
+    NavbarItem item,
+    NavbarSizeConfig config,
+    Color textColor,
+    bool isActive,
+  ) {
+    // Similar to iconWithText but optimized for bottom sheet
+    return _buildIconWithTextContent(
+      context,
+      item,
+      config,
+      textColor,
+      isActive,
+    );
+  }
+
+  BoxDecoration _buildDecoration(
+      BuildContext context, NavbarSizeConfig config, _NavbarColors colors) {
+    // Get variant-specific style properties
+    final variantStyle = _getVariantStyle(context, config);
+
+    List<BoxShadow> shadows = [];
+
+    // Shadow'lar kaldırıldı - düz, standart tasarım
+    // shadows listesi boş kalıyor
+
+    // Determine if border should be shown
+    final shouldShowBorder = showBorder ?? variantStyle.hasBorder;
+
+    Border? border;
+    if (shouldShowBorder) {
+      final effectiveBorderWidth = borderWidth ?? variantStyle.borderWidth;
+
+      if (effectiveBorderWidth > 0) {
+        final effectiveBorderStyle = borderStyle ?? variantStyle.borderStyle;
+        final effectiveBorderColor = borderColor ?? colors.border;
+
+        border = Border.all(
+          color: effectiveBorderColor,
+          width: effectiveBorderWidth,
+          style: effectiveBorderStyle,
+        );
+      }
     }
 
     return BoxDecoration(
       color: backgroundColor ?? colors.background,
-      borderRadius: borderRadius ?? config.borderRadius,
+      borderRadius: borderRadius ?? variantStyle.borderRadius,
       boxShadow: shadows,
       border: border,
     );
   }
 
+  /// Get variant-specific style properties
+  _NavbarVariantStyle _getVariantStyle(
+      BuildContext context, NavbarSizeConfig config) {
+    switch (variant) {
+      case NavbarVariant.retailMain:
+        // Modern, rounded, with shadow - e-commerce friendly
+        final borderRadius = position.isBottom
+            ? BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              )
+            : position.isTop
+                ? BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  )
+                : BorderRadius.circular(20);
+        return _NavbarVariantStyle(
+          borderRadius: borderRadius,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.retailSidebar:
+        // Minimal, flat, clean - sidebar style
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.healthcareMinimal:
+        // Very clean, minimal border, flat design
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: true,
+          borderWidth: 1.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.financeBordered:
+        // Professional, sharp corners, prominent border
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: true,
+          borderWidth: 1.5,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.mediaOverlay:
+        // Floating, no border, no shadow (transparent overlay)
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.socialGlass:
+        // Glass morphism, rounded, subtle shadow
+        final borderRadius = position.isBottom
+            ? BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              )
+            : position.isTop
+                ? BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  )
+                : BorderRadius.circular(24);
+        return _NavbarVariantStyle(
+          borderRadius: borderRadius,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.enterpriseMain:
+        // Corporate, flat, subtle shadow
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.enterpriseSidebar:
+        // Minimal, flat, clean sidebar
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.zero,
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.gradientModern:
+        // Modern gradient with rounded corners
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.circular(16.0),
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.capsuleRounded:
+        // iOS-style capsule with rounded corners
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.circular(24.0),
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.badgeIndicator:
+        // Badge style with subtle elevation
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.circular(12.0),
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.darkMinimal:
+        // Dark minimal - düz, standart tasarım
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.circular(12.0),
+          elevation: 0.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+
+      case NavbarVariant.cardFloating:
+        // Floating card with prominent shadow
+        return _NavbarVariantStyle(
+          borderRadius: BorderRadius.circular(16.0),
+          elevation: 12.0,
+          shadowSpread: 0.0,
+          hasBorder: false,
+          borderWidth: 0.0,
+          borderStyle: BorderStyle.solid,
+        );
+    }
+  }
+
   _NavbarColors _getNavbarColors(BuildContext context) {
     switch (variant) {
-      case NavbarVariant.primary:
+      case NavbarVariant.retailMain:
         return _NavbarColors(
           background: OsmeaColors.nordicBlue,
           active: OsmeaColors.crystalBay,
@@ -626,7 +2682,7 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.deepSea,
         );
 
-      case NavbarVariant.secondary:
+      case NavbarVariant.retailSidebar:
         return _NavbarColors(
           background: OsmeaColors.ash,
           active: OsmeaColors.nordicBlue,
@@ -634,7 +2690,23 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.transparent:
+      case NavbarVariant.healthcareMinimal:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.financeBordered:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.mediaOverlay:
         return _NavbarColors(
           background: OsmeaColors.transparent,
           active: activeColor ?? OsmeaColors.nordicBlue,
@@ -642,7 +2714,7 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.glass:
+      case NavbarVariant.socialGlass:
         return _NavbarColors(
           background: OsmeaColors.white.withValues(alpha: context.alpha10),
           active: OsmeaColors.nordicBlue,
@@ -650,7 +2722,55 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver.withValues(alpha: context.alpha30),
         );
 
-      case NavbarVariant.outlined:
+      case NavbarVariant.enterpriseMain:
+        return _NavbarColors(
+          background: OsmeaColors.nordicBlue,
+          active: OsmeaColors.crystalBay,
+          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: OsmeaColors.deepSea,
+        );
+
+      case NavbarVariant.enterpriseSidebar:
+        return _NavbarColors(
+          background: OsmeaColors.ash,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.gradientModern:
+        return _NavbarColors(
+          background: OsmeaColors.nordicBlue,
+          active: OsmeaColors.crystalBay,
+          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: OsmeaColors.deepSea,
+        );
+
+      case NavbarVariant.capsuleRounded:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.badgeIndicator:
+        return _NavbarColors(
+          background: OsmeaColors.white,
+          active: OsmeaColors.nordicBlue,
+          inactive: OsmeaColors.pewter,
+          border: OsmeaColors.silver,
+        );
+
+      case NavbarVariant.darkMinimal:
+        return _NavbarColors(
+          background: OsmeaColors.black,
+          active: OsmeaColors.crystalBay,
+          inactive: OsmeaColors.pewter.withValues(alpha: context.alpha70),
+          border: OsmeaColors.deepSea,
+        );
+
+      case NavbarVariant.cardFloating:
         return _NavbarColors(
           background: OsmeaColors.white,
           active: OsmeaColors.nordicBlue,
@@ -676,6 +2796,25 @@ class _NavbarColors {
   });
 }
 
+/// Internal helper class for variant-specific style properties
+class _NavbarVariantStyle {
+  final BorderRadius borderRadius;
+  final double elevation;
+  final double shadowSpread;
+  final bool hasBorder;
+  final double borderWidth;
+  final BorderStyle borderStyle;
+
+  const _NavbarVariantStyle({
+    required this.borderRadius,
+    required this.elevation,
+    required this.shadowSpread,
+    required this.hasBorder,
+    required this.borderWidth,
+    required this.borderStyle,
+  });
+}
+
 /// Internal animated wrapper for navbar items
 class _AnimatedNavbarItemWrapper extends StatefulWidget {
   final NavbarItemAnimationType animationType;
@@ -697,8 +2836,7 @@ class _AnimatedNavbarItemWrapper extends StatefulWidget {
       _AnimatedNavbarItemWrapperState();
 }
 
-class _AnimatedNavbarItemWrapperState
-    extends State<_AnimatedNavbarItemWrapper>
+class _AnimatedNavbarItemWrapperState extends State<_AnimatedNavbarItemWrapper>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;

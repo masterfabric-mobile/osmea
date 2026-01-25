@@ -1,7 +1,7 @@
 /*
  * SortOptionWidget
  * ----------------
- * Widget for displaying a single sort option using OsmeaComponents.listItem.
+ * Widget for displaying a single sort option with simple, clean design.
  */
 
 import 'package:flutter/material.dart';
@@ -30,31 +30,50 @@ class SortOptionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = selectedSortBy == orderBy && selectedOrder == order;
 
-    return OsmeaComponents.listItem(
-      title: OsmeaComponents.text(
-        label,
-        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-          color: isSelected ? OsmeaColors.white : OsmeaColors.thunder,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          viewModel.updateTempFilter(orderBy: orderBy, order: order);
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing16,
+            vertical: context.spacing12,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? OsmeaColors.black.withOpacity(0.06)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: OsmeaComponents.text(
+                  label,
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: isSelected
+                        ? OsmeaColors.black
+                        : OsmeaColors.thunder,
+                    fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check_rounded,
+                  color: OsmeaColors.black,
+                  size: context.iconSizeSmall,
+                ),
+            ],
+          ),
         ),
       ),
-      variant: ListItemVariant.standard,
-      size: ListItemSize.medium,
-      selected: isSelected,
-      trailing: isSelected
-          ? Icon(
-              Icons.check_circle,
-              color: OsmeaColors.white,
-              size: context.iconSizeNormal,
-            )
-          : null,
-      onTap: () {
-        viewModel.updateTempFilter(orderBy: orderBy, order: order);
-      },
-      backgroundColor: isSelected ? OsmeaColors.nordicBlue : OsmeaColors.white,
-      outlineColor: isSelected ? OsmeaColors.nordicBlue : OsmeaColors.silver,
-      borderVariant: ListItemBorderVariant.all,
-      margin: EdgeInsets.only(bottom: context.spacing8),
     );
   }
 }

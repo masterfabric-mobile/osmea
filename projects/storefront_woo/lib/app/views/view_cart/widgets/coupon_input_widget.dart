@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_cart/models/cart_view_model.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget for coupon code input
 class CouponInputWidget extends StatelessWidget {
@@ -31,7 +32,7 @@ class CouponInputWidget extends StatelessWidget {
                   final cubit = context.read<TextFieldCubit>();
                   return OsmeaComponents.textField(
                     controller: cubit.effectiveController,
-                    hint: 'Discount code',
+                    hint: context.t.cartView.widgets.coupon.inputHint,
                     variant: TextFieldVariant.outlined,
                     size: TextFieldSize.medium,
                     prefixIcon: Icon(
@@ -47,11 +48,23 @@ class CouponInputWidget extends StatelessWidget {
             OsmeaComponents.sizedBox(width: context.spacing8),
             BlocBuilder<TextFieldCubit, TextFieldCubitState>(
               builder: (context, state) {
-                return OsmeaComponents.textButton(
-                  text: 'Apply',
+                return TextButton(
                   onPressed: () => _applyCoupon(context, state.currentValue),
-                  size: ButtonSize.small,
-                  variant: ButtonVariant.primary,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing12,
+                      vertical: context.spacing8,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: OsmeaComponents.text(
+                    context.t.cartView.widgets.coupon.apply,
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 );
               },
             ),

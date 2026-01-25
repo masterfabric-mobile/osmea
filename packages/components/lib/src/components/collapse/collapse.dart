@@ -241,6 +241,10 @@ class _CollapseView extends StatelessWidget {
         expandedHeaderPadding: EdgeInsets.zero,
         expansionCallback: (panelIndex, isExpanded) {
           final panel = children[panelIndex];
+          // If panel handles its own header tap, do not toggle expansion.
+          if (disabled || panel.disabled || panel.onHeaderTap != null) {
+            return;
+          }
           if (mode == CollapseBehaviorMode.accordion) {
             context.read<CollapseCubit>().togglePanel(panelIndex, panel.value);
           } else {
@@ -254,12 +258,23 @@ class _CollapseView extends StatelessWidget {
               ? panel.value == state.accordionValue
               : state.expandedPanels.contains(index);
 
+          Widget headerWidget = _buildHeader(context, panel, isExpanded);
+          if (!disabled && !panel.disabled && panel.onHeaderTap != null) {
+            headerWidget = Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: panel.onHeaderTap,
+                child: headerWidget,
+              ),
+            );
+          }
+
           return ExpansionPanel(
-            headerBuilder: (context, isExpanded) =>
-                _buildHeader(context, panel, isExpanded),
+            headerBuilder: (context, isExpanded) => headerWidget,
             body: _buildBody(context, panel),
             isExpanded: isExpanded,
-            canTapOnHeader: !disabled,
+            canTapOnHeader:
+                !disabled && !panel.disabled && panel.onHeaderTap == null,
             backgroundColor: OsmeaColors.transparent,
           );
         }).toList(),

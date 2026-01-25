@@ -12,9 +12,12 @@ import 'package:apis/utils/api_error_utils.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_widgets.dart';
-import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_loading_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_error_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/product_detail_skeleton_widget.dart';
+import 'package:storefront_woo/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:osmea_components/src/utils/toast_extensions.dart';
+import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/gen/translations.g.dart';
 
 /// ProductDetailView displays detailed information about a single product
 class ProductDetailView
@@ -63,9 +66,69 @@ class ProductDetailView
   ) {
     // Success state (e.g., wishlist added)
     if (state is ProductDetailSuccessState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.toastSuccess(state.message);
-      });
+      // Don't show toast/snackbar if coming from favorites/saved page
+      final currentRoute = GoRouterState.of(context).uri.path;
+      final isOnSavedPage = currentRoute.contains('/saved') || 
+                           currentRoute.contains('/wishlist') || 
+                           currentRoute.contains('/favorites');
+      
+      // Also check arguments for 'saved' flag (when navigating from wishlist)
+      final isFromWishlist = arguments['saved'] == true || 
+                            arguments['fromWishlist'] == true;
+      
+      // Check GoRouter location history to see if we came from favorites
+      bool isFromSavedRoute = false;
+      try {
+        final router = GoRouter.of(context);
+        final location = router.routerDelegate.currentConfiguration.uri.path;
+        isFromSavedRoute = location.contains('/saved') || 
+                          location.contains('/wishlist') || 
+                          location.contains('/favorites');
+      } catch (e) {
+        // If we can't check router, try ModalRoute
+        final modalRoute = ModalRoute.of(context);
+        if (modalRoute != null) {
+          final previousRoute = modalRoute.settings.arguments;
+          if (previousRoute is Map) {
+            isFromSavedRoute = (previousRoute['saved'] == true) || 
+                             (previousRoute['fromWishlist'] == true);
+          }
+          // Also check route name if available
+          final routeName = modalRoute.settings.name;
+          if (routeName != null && (routeName.contains('/saved') || 
+                                    routeName.contains('/wishlist') || 
+                                    routeName.contains('/favorites'))) {
+            isFromSavedRoute = true;
+          }
+        }
+      }
+      
+      // Check if Navigator can pop and previous route was favorites
+      bool cameFromFavorites = false;
+      if (Navigator.of(context).canPop()) {
+        try {
+          final previousRoute = ModalRoute.of(context)?.settings.name ?? '';
+          cameFromFavorites = previousRoute.contains('/saved') || 
+                             previousRoute.contains('/wishlist') || 
+                             previousRoute.contains('/favorites');
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+      
+      // Only show toast if we're not on the saved page and not coming from wishlist
+      // Also check if we're currently viewing favorites page (even if route doesn't show it)
+      final shouldShowSnackbar = !isOnSavedPage && 
+                                 !isFromWishlist && 
+                                 !isFromSavedRoute && 
+                                 !cameFromFavorites;
+      
+      if (shouldShowSnackbar) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.toastSuccess(state.message);
+        });
+      }
+      
       return ProductDetailContentWidget(
         viewModel: viewModel,
         state: state.previousState,
@@ -91,7 +154,7 @@ class ProductDetailView
         );
       }
       // Fallback to loading
-      return const ProductDetailLoadingWidget();
+      return buildUnifiedLoading(goRoute: goRoute);
     }
 
     // Error state
@@ -112,7 +175,7 @@ class ProductDetailView
             state.message,
           );
           context.snackbarError(
-            'Failed to add product to cart: $userFriendlyMessage',
+            context.t.productDetailView.error.failedToAddToCart.replaceAll('{message}', userFriendlyMessage),
             duration: context.durationVeryLong,
           );
           // Recover to previous state
@@ -135,11 +198,37 @@ class ProductDetailView
 
     // Loading state
     if (state is ProductDetailLoadingState) {
-      return const ProductDetailLoadingWidget();
+      // Show skeleton loading instead of unified loading
+      return const ProductDetailSkeletonWidget();
     }
 
     // Loaded state
     if (state is ProductDetailLoadedState) {
+      // Check if we should show add to cart popup
+      if (state.shouldShowAddToCartPopup) {
+        // Reset the flag immediately to prevent multiple popups
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // Get cart token
+          final cartToken = await viewModel.getCartTokenForNavigation();
+          
+          // Show bottom sheet
+          if (context.mounted) {
+            showAddToCartSuccessPopup(
+              context,
+              cartToken: cartToken,
+            );
+          }
+          
+          // Reset flag after showing popup
+          final currentState = viewModel.state;
+          if (currentState is ProductDetailLoadedState) {
+            viewModel.stateChanger(
+              currentState.copyWith(shouldShowAddToCartPopup: false),
+            );
+          }
+        });
+      }
+      
       return ProductDetailContentWidget(
         viewModel: viewModel,
         state: state,
@@ -147,8 +236,8 @@ class ProductDetailView
       );
     }
 
-    // Initial state
-    return const ProductDetailLoadingWidget();
+    // Initial state - show skeleton loading
+    return const ProductDetailSkeletonWidget();
   }
 }
 
@@ -158,17 +247,42 @@ PreferredSizeWidget productDetailCoreAppBar(
   ProductDetailViewModel? viewModel,
   Map<String, dynamic>? arguments,
 ]) {
+  final configHelper = AssetConfigHelper();
+  
+  // Get appBar colors from config
+  Color getAppBarColor(String key, Color fallback) {
+    try {
+      final colorString = configHelper.getString('product_detail_view.appBar.$key');
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load appBar color $key: $e');
+    }
+    return fallback;
+  }
+  
+  final backgroundColor = getAppBarColor('backgroundColor', OsmeaColors.white);
+  final titleColor = getAppBarColor('titleColor', OsmeaColors.black);
+  final iconColor = getAppBarColor('iconColor', OsmeaColors.black);
+  final elevation = configHelper.getDouble('product_detail_view.appBar.elevation', 0.0);
+  
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
-      'Product Details',
-      color: OsmeaColors.thunder,
+      context.t.productDetailView.appBar.title,
+      color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(context),
     ),
-    backgroundColor: OsmeaColors.paperWhite,
-    elevation: 0,
+    backgroundColor: backgroundColor,
+    elevation: elevation,
     leading: OsmeaComponents.iconButton(
       onPressed: () => Navigator.of(context).pop(),
-      icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+      icon: Icon(Icons.arrow_back, color: iconColor),
     ),
     actions: const [], // Cart icon removed
   );

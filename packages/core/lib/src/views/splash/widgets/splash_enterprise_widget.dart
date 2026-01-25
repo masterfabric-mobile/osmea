@@ -335,7 +335,8 @@ class SplashEnterpriseWidget extends StatelessWidget {
   Widget _buildEnterpriseLoadingIndicator(
       BuildContext context, SplashState state) {
     final config = state.config!;
-    final primaryColor = _getEnterprisePrimaryColor(state);
+    // Get loading indicator color (prefers loadingIndicatorColor, falls back to primaryColor)
+    final loadingColor = config.getLoadingIndicatorColor() ?? _getEnterprisePrimaryColor(state);
 
     return OsmeaComponents.container(
       child: OsmeaComponents.column(
@@ -344,7 +345,7 @@ class SplashEnterpriseWidget extends StatelessWidget {
           OsmeaComponents.loading(
             type: LoadingType.circularFade,
             size: config.loadingIndicatorSize.toDouble(),
-            color: primaryColor,
+            color: loadingColor,
           ),
 
           OsmeaComponents.sizedBox(height: context.spacing16),

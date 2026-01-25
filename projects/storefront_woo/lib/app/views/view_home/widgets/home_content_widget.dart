@@ -7,16 +7,22 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/banner_carousel_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/deals_of_day_carousel_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/recommended_section_widget.dart';
-import 'package:storefront_woo/app/views/view_home/widgets/search_bar_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/category_story_circle_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_card_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_popup_button_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/promotional_bar_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/bottom_foreground_banner_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/flash_sale_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/collections_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/brands_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/campaign_alert_widget.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home component model with orderID
@@ -114,22 +120,34 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     }
   }
 
+  /// Gets bottom spacing for a component from config
+  /// Returns spacing value in pixels (not EdgeInsets)
+  double _getComponentBottomSpacing(
+    AssetConfigHelper configHelper,
+    String componentName,
+  ) {
+    try {
+      final config = configHelper.getObject('home_view.$componentName');
+      final paddingConfig = config?['padding'] as Map<String, dynamic>?;
+      if (paddingConfig != null) {
+        final bottom = (paddingConfig['bottom'] as num?)?.toDouble();
+        if (bottom != null && bottom > 0) {
+          return bottom;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load spacing for $componentName: $e');
+    }
+    // Default spacing from component_spacing
+    return configHelper.getDouble('home_view.component_spacing.bottom', 16.0);
+  }
+
   /// Builds all components sorted by orderID
   List<Widget> _buildOrderedComponents(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
     final List<_HomeComponent> components = [];
 
-    // Search bar
-    if (_isEnabled(configHelper, 'search')) {
-      components.add(
-        _HomeComponent(
-          orderId: _getOrderId(configHelper, 'search'),
-          widget: SearchBarWidget(configHelper: configHelper),
-          name: 'search',
-        ),
-      );
-    }
-
+    // Search bar is now in appbar, so we don't add it here anymore
     // Category story circles
     if (_isEnabled(configHelper, 'circle_categories')) {
       components.add(
@@ -151,6 +169,17 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
           orderId: _getOrderId(configHelper, 'banner'),
           widget: BannerCarouselWidget(configHelper: configHelper),
           name: 'banner',
+        ),
+      );
+    }
+
+    // Promotional bar (2 items side by side)
+    if (_isEnabled(configHelper, 'promotional_bar')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'promotional_bar'),
+          widget: PromotionalBarWidget(configHelper: configHelper),
+          name: 'promotional_bar',
         ),
       );
     }
@@ -184,6 +213,21 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       );
     }
 
+    // Collections (curated groups) - between Deals and Flash Sale
+    if (_isEnabled(configHelper, 'collections')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'collections'),
+          widget: CollectionsSectionWidget(
+            configHelper: configHelper,
+            allProducts: widget.state.products,
+            viewModel: widget.viewModel,
+          ),
+          name: 'collections',
+        ),
+      );
+    }
+
     // Recommended section
     if (_isEnabled(configHelper, 'recommended')) {
       components.add(
@@ -199,11 +243,74 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       );
     }
 
+    // Campaign Alert section
+    if (_isEnabled(configHelper, 'campaign_alert')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'campaign_alert'),
+          widget: CampaignAlertWidget(
+            configHelper: configHelper,
+          ),
+          name: 'campaign_alert',
+        ),
+      );
+    }
+
+    // Flash Sale section
+    if (_isEnabled(configHelper, 'flash_sale')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'flash_sale'),
+          widget: FlashSaleSectionWidget(
+            configHelper: configHelper,
+            allProducts: widget.state.products,
+            viewModel: widget.viewModel,
+          ),
+          name: 'flash_sale',
+        ),
+      );
+    }
+
+    // Brands section
+    if (_isEnabled(configHelper, 'brands')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'brands'),
+          widget: BrandsSectionWidget(
+            configHelper: configHelper,
+            viewModel: widget.viewModel,
+          ),
+          name: 'brands',
+        ),
+      );
+    }
+
     // Sort by orderID
     components.sort((a, b) => a.orderId.compareTo(b.orderId));
 
-    // Convert to widgets list
-    return components.map((c) => c.widget).toList();
+    // Convert to widgets list with spacing between components
+    // Use SizedBox for spacing instead of padding
+    final List<Widget> widgets = [];
+    for (int i = 0; i < components.length; i++) {
+      final component = components[i];
+      
+      // Add the component widget
+      widgets.add(component.widget);
+      
+      // Add spacing after component (except for the last one)
+      if (i < components.length - 1) {
+        final bottomSpacing = _getComponentBottomSpacing(configHelper, component.name);
+        if (bottomSpacing > 0) {
+          widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));
+        }
+      }
+    }
+    
+    return widgets;
+  }
+
+  Future<void> _handleRefresh() async {
+    await widget.viewModel.initial();
   }
 
   @override
@@ -214,20 +321,43 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-            child: OsmeaComponents.singleChildScrollView(
-              padding: EdgeInsets.only(
-                top: context.spacing16,
-                bottom: context.spacing24 * 2,
-              ),
-              child: OsmeaComponents.column(
-                children: _buildOrderedComponents(context),
+          // iOS-styled pull-to-refresh
+          RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: OsmeaColors.black,
+            backgroundColor: OsmeaColors.white,
+            strokeWidth: 2.0,
+            displacement: 40,
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: OsmeaComponents.singleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
+                ),
+                child: OsmeaComponents.column(
+                  children: _buildOrderedComponents(context),
+                ),
               ),
             ),
           ),
           // Floating campaign popup button - positioned absolutely
           CampaignPopupButtonWidget(
+            configHelper: configHelper,
+            goRoute: (String path) {
+              if (path.contains('products')) {
+                context.go('/products');
+              } else if (path.contains('product-detail')) {
+                context.go(path);
+              } else if (path.contains('category')) {
+                context.go(path);
+              } else {
+                context.go(path);
+              }
+            },
+          ),
+          // Bottom foreground banner - dismissible banner at bottom
+          BottomForegroundBannerWidget(
             configHelper: configHelper,
             goRoute: (String path) {
               if (path.contains('products')) {

@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:osmea_components/src/enums/carousel_enums.dart';
 
 /// Banner item model from config
 class BannerItem {
@@ -19,6 +20,9 @@ class BannerItem {
   final int? categoryId;
   final int? productId;
   final VoidCallback? onTap;
+  final bool showTitle;
+  final bool showSubtitle;
+  final bool showText;
 
   BannerItem({
     this.imageUrl,
@@ -29,6 +33,9 @@ class BannerItem {
     this.categoryId,
     this.productId,
     this.onTap,
+    this.showTitle = true,
+    this.showSubtitle = true,
+    this.showText = true,
   });
 
   factory BannerItem.fromConfig(Map<String, dynamic> config) {
@@ -40,6 +47,9 @@ class BannerItem {
       route: config['route'] as String?,
       categoryId: config['category_id'] as int?,
       productId: config['product_id'] as int?,
+      showTitle: config['showTitle'] as bool? ?? true,
+      showSubtitle: config['showSubtitle'] as bool? ?? true,
+      showText: config['showText'] as bool? ?? true,
     );
   }
 }
@@ -92,7 +102,7 @@ class BannerCarouselWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => _handleBannerTap(context, banner),
       child: ClipRRect(
-        borderRadius: context.borderRadiusNormal,
+        borderRadius: context.borderRadiusMinStandard,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -108,7 +118,7 @@ class BannerCarouselWidget extends StatelessWidget {
               )
             else
               Container(
-                color: OsmeaColors.nordicBlue,
+                color: OsmeaColors.black,
               ),
             // Gradient overlay for text readability
             if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty)
@@ -124,7 +134,8 @@ class BannerCarouselWidget extends StatelessWidget {
                 ),
               ),
             // Text content overlay
-            if (banner.title != null || banner.text != null)
+            if ((banner.showTitle && banner.title != null) || 
+                (banner.showText && banner.text != null))
               Positioned.fill(
                 child: OsmeaComponents.padding(
                   padding: context.paddingNormal,
@@ -132,7 +143,7 @@ class BannerCarouselWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (banner.title != null)
+                      if (banner.showTitle && banner.title != null)
                         OsmeaComponents.text(
                           banner.title!,
                           textStyle: OsmeaTextStyle.headlineSmall(context).copyWith(
@@ -148,9 +159,10 @@ class BannerCarouselWidget extends StatelessWidget {
                           maxLines: context.maxLineTwo,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      if (banner.title != null && banner.text != null)
+                      if ((banner.showTitle && banner.title != null) && 
+                          (banner.showText && banner.text != null))
                         OsmeaComponents.sizedBox(height: context.spacing8),
-                      if (banner.text != null)
+                      if (banner.showText && banner.text != null)
                         OsmeaComponents.text(
                           banner.text!,
                           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
@@ -184,13 +196,12 @@ class BannerCarouselWidget extends StatelessWidget {
     }
 
     // Always use items (not imageUrls) to support tap handlers
-    // Build items with tap handlers for navigation
+    // Build items with tap handlers for navigation - edge to edge (no horizontal margin)
     final items = banners
         .map(
           (banner) => OsmeaComponents.container(
-            margin: EdgeInsets.symmetric(horizontal: context.spacing4),
             width: double.infinity,
-            height: context.height192,
+            height: context.height160,
             child: _buildBannerItem(context, banner),
           ),
         )
@@ -202,25 +213,53 @@ class BannerCarouselWidget extends StatelessWidget {
         .toList();
 
     return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing16,
-        0,
-        context.spacing16,
-        context.spacing16,
+      padding: EdgeInsets.only(
+        bottom: context.spacing16,
+        left: context.spacing16,
+        right: context.spacing16,
       ),
       child: OsmeaComponents.carousel(
         variant: CarouselVariant.standard,
         size: CarouselSize.large,
-        height: context.height192,
+        height: context.height160,
         items: items,
         onItemTaps: onItemTaps,
         showIndicators: true,
-        showArrows: true,
+        showArrows: false,
         autoPlay: CarouselAutoPlay.continuous,
         autoPlayInterval: 4.seconds,
-        indicatorType: CarouselIndicatorType.dot,
-        indicatorPosition: CarouselIndicatorPosition.bottomCenter,
-        borderRadiusValue: context.borderRadiusNormal,
+        transitionType: CarouselTransitionType.fade,
+        animationDuration: const Duration(milliseconds: 600),
+        indicatorType: CarouselIndicatorType.custom,
+        indicatorPosition: CarouselIndicatorPosition.bottomRight,
+        customPadding: EdgeInsets.zero,
+        itemSpacing: 0,
+        customIndicator: (context, itemCount, activeIndex) {
+          return OsmeaComponents.padding(
+            padding: EdgeInsets.only(
+              right: context.spacing16,
+              bottom: context.spacing12,
+            ),
+            child: OsmeaComponents.container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.spacing8,
+                vertical: context.spacing4,
+              ),
+              decoration: BoxDecoration(
+                color: OsmeaColors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: OsmeaComponents.text(
+                '${activeIndex + 1}/$itemCount',
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                  color: OsmeaColors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          );
+        },
+        borderRadiusValue: context.borderRadiusMinStandard,
         loop: true,
       ),
     );

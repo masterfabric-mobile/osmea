@@ -5,6 +5,7 @@ import 'package:apis/apis.dart';
 import 'package:apis/models/cart/woo_cart_token.dart';
 import 'package:apis/dio_config/dio_logger/abstract/api_base_logger.dart';
 import 'package:apis/utils/api_error_utils.dart';
+import 'package:core/core.dart';
 
 /// 🛒 Cart Token Interceptor for WooCommerce API requests
 ///
@@ -20,6 +21,9 @@ class WooCartTokenInterceptor extends Interceptor {
   static const String _cartTokenResponseHeaderName = 'Cart-Token';
   static const String _cartIdHeaderName = 'Cart-ID';
   static const String _cartIdResponseHeaderName = 'Cart-ID';
+  static const String _nonceHeaderName = 'X-WP-Nonce';
+  static const String _nonceResponseHeaderName = 'nonce';
+  static const String _nonceStorageKey = 'woo_cart_nonce';
 
   @override
   void onRequest(
@@ -30,6 +34,9 @@ class WooCartTokenInterceptor extends Interceptor {
 
       // 🛒 Add cart token to request headers
       await _addCartTokenToRequest(options);
+
+      // 🔐 Add nonce to request headers
+      await _addNonceToRequest(options);
 
       // 📋 Log outgoing request
       _dioLogger.printOnRequestLogs(options);
@@ -52,6 +59,9 @@ class WooCartTokenInterceptor extends Interceptor {
     try {
       // 🛒 Extract cart token from response headers
       await _extractCartTokenFromResponse(response);
+
+      // 🔐 Extract nonce from response headers
+      await _extractNonceFromResponse(response);
 
       // 📥 Log incoming response
       _dioLogger.printOnResponseLogs(response);
@@ -112,6 +122,30 @@ class WooCartTokenInterceptor extends Interceptor {
       }
     } catch (e) {
       debugPrint('❌ Error adding cart token to request: $e');
+    }
+  }
+
+  /// 🔐 Add nonce to request headers
+  Future<void> _addNonceToRequest(RequestOptions options) async {
+    try {
+      // Only add nonce for cart-related endpoints that require authentication
+      if (!_isCartEndpoint(options.path)) {
+        return;
+      }
+
+      // Get nonce from storage
+      final localStorage = LocalStorageHelper();
+      final nonce = await localStorage.getItem(_nonceStorageKey);
+
+      if (nonce != null && nonce.isNotEmpty) {
+        options.headers[_nonceHeaderName] = nonce;
+        debugPrint(
+            '🔐 Nonce added to request: ${nonce.length > 10 ? nonce.substring(0, 10) + "..." : nonce}');
+      } else {
+        debugPrint('⚠️ No nonce available in storage');
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding nonce to request: $e');
     }
   }
 
@@ -235,6 +269,35 @@ class WooCartTokenInterceptor extends Interceptor {
     }
   }
 
+  /// 🔐 Extract nonce from response headers and save to storage
+  Future<void> _extractNonceFromResponse(Response response) async {
+    try {
+      // Process all WooCommerce Store API responses
+      if (!_isWooCommerceStoreApiEndpoint(response.requestOptions.path)) {
+        return;
+      }
+
+      final headers = response.headers;
+      String? nonce;
+
+      // Extract nonce from response headers
+      final nonceHeader = headers[_nonceResponseHeaderName.toLowerCase()];
+      if (nonceHeader != null && nonceHeader.isNotEmpty) {
+        nonce = nonceHeader.first;
+        debugPrint('🔐 Found nonce in response header: ${nonce.length > 10 ? nonce.substring(0, 10) + "..." : nonce}');
+      }
+
+      // Save nonce if found
+      if (nonce != null && nonce.isNotEmpty) {
+        final localStorage = LocalStorageHelper();
+        await localStorage.setItem(_nonceStorageKey, nonce);
+        debugPrint('✅ Nonce saved to storage');
+      }
+    } catch (e) {
+      debugPrint('❌ Error extracting nonce from response: $e');
+    }
+  }
+
   /// 🛒 Save cart token to storage
   Future<void> _saveCartToken(
       String cartToken, String? cartId, String requestUrl) async {
@@ -337,7 +400,10 @@ class WooCartTokenInterceptor extends Interceptor {
   Future<void> clearCartToken() async {
     try {
       await WooCartTokenStorage.clearCartToken();
-      debugPrint('🗑️ Cart token cleared');
+      // Also clear nonce when clearing cart token
+      final localStorage = LocalStorageHelper();
+      await localStorage.removeItem(_nonceStorageKey);
+      debugPrint('🗑️ Cart token and nonce cleared');
     } catch (e) {
       debugPrint('❌ Error clearing cart token: $e');
     }
