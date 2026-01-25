@@ -205,7 +205,7 @@ class _CampaignViewState extends State<CampaignView>
     final duration = _getNavigationTimerDuration();
     _navigationTimer = Timer(duration, () {
       if (mounted) {
-        debugPrint('🎯 Campaign view completed, navigating to home');
+        debugPrint('🎯 Campaign view completed, checking navigation target');
         widget.goRoute('/home');
       }
     });
