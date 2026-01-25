@@ -92,15 +92,22 @@ class OnboardingCubit extends BaseViewModelCubit<OnboardingState> {
         return;
       }
 
+      // Get campaign images and merge with onboarding pages
+      final campaignImages = _getCampaignImages(configData);
+      final mergedConfig = _mergeCampaignImagesWithOnboarding(
+        onboardingConfig,
+        campaignImages,
+      );
+
       // Check onboarding seen status
       final hasSeenOnboarding = await _storageHelper.hasSeenOnboarding();
 
       stateChanger(state.copyWith(
         status: OnboardingStatus.ready,
-        config: onboardingConfig,
+        config: mergedConfig,
         currentPageIndex: 0,
         hasSeenOnboarding: hasSeenOnboarding,
-        totalPages: onboardingConfig.pages.length,
+        totalPages: mergedConfig.pages.length,
       ));
     } catch (e) {
       debugPrint("❌ Error occurred while loading onboarding data: $e");
@@ -285,6 +292,85 @@ class OnboardingCubit extends BaseViewModelCubit<OnboardingState> {
       };
     }
     return {};
+  }
+
+  /// 🖼️ Get campaign images from config
+  List<String> _getCampaignImages(Map<String, dynamic>? configData) {
+    try {
+      final homeView = configData?['home_view'] as Map<String, dynamic>?;
+      if (homeView == null) return [];
+
+      final campaignCards = homeView['campaign_cards'] as Map<String, dynamic>?;
+      if (campaignCards == null) return [];
+
+      final items = campaignCards['items'] as List<dynamic>?;
+      if (items == null || items.isEmpty) return [];
+
+      final imageUrls = <String>[];
+      for (final item in items) {
+        final map = item as Map<String, dynamic>;
+        final imageUrl = map['imageUrl'] as String?;
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          imageUrls.add(imageUrl);
+        }
+      }
+
+      debugPrint('🖼️ Found ${imageUrls.length} campaign images');
+      return imageUrls;
+    } catch (e) {
+      debugPrint('⚠️ Failed to load campaign images: $e');
+      return [];
+    }
+  }
+
+  /// 🔄 Merge campaign images with onboarding pages
+  OnboardingConfigModel _mergeCampaignImagesWithOnboarding(
+    OnboardingConfigModel onboardingConfig,
+    List<String> campaignImages,
+  ) {
+    if (campaignImages.isEmpty) {
+      return onboardingConfig;
+    }
+
+    final mergedPages = <OnboardingPageModel>[];
+    int campaignIndex = 0;
+
+    for (int i = 0; i < onboardingConfig.pages.length; i++) {
+      final page = onboardingConfig.pages[i];
+      
+      // If page has no image_url, use campaign image
+      if ((page.imageUrl == null || page.imageUrl!.isEmpty) &&
+          (page.imagePath == null || page.imagePath!.isEmpty) &&
+          (page.iconUrl == null || page.iconUrl!.isEmpty) &&
+          (page.iconPath == null || page.iconPath!.isEmpty)) {
+        
+        // Use campaign image if available
+        if (campaignIndex < campaignImages.length) {
+          final campaignImageUrl = campaignImages[campaignIndex];
+          debugPrint('🖼️ Using campaign image for page $i: $campaignImageUrl');
+          
+          mergedPages.add(
+            page.copyWith(imageUrl: campaignImageUrl),
+          );
+          campaignIndex++;
+        } else {
+          // Reuse campaign images if we run out
+          final reuseIndex = campaignIndex % campaignImages.length;
+          final campaignImageUrl = campaignImages[reuseIndex];
+          debugPrint('🖼️ Reusing campaign image for page $i: $campaignImageUrl');
+          
+          mergedPages.add(
+            page.copyWith(imageUrl: campaignImageUrl),
+          );
+          campaignIndex++;
+        }
+      } else {
+        // Keep original page with its image
+        mergedPages.add(page);
+      }
+    }
+
+    return onboardingConfig.copyWith(pages: mergedPages);
   }
 
   /// 🎮 Get default onboarding config for fallback

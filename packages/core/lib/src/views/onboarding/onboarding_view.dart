@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:core/src/base/master_view_cubit/master_view_cubit.dart';
-import 'package:core/src/models/onboarding_models.dart';
-import 'package:core/src/views/onboarding/cubit/onboarding_cubit.dart';
-import 'package:core/src/views/onboarding/cubit/onboarding_state.dart';
+import 'package:core/core.dart';
 import 'package:core/src/views/onboarding/widgets/onboarding_startup_widget.dart';
 import 'package:core/src/views/onboarding/widgets/onboarding_space_widget.dart';
 import 'package:core/src/views/onboarding/widgets/onboarding_enterprise_widget.dart';
-import 'package:osmea_components/osmea_components.dart';
 
 /// 🎯 **OSMEA Onboarding View**
 ///
@@ -39,6 +35,11 @@ class OnboardingView extends MasterViewCubit<OnboardingCubit, OnboardingState> {
   /// Callback triggered when user presses Continue/Home button
   final VoidCallback? onContinue;
 
+  // Private fields for scaffold management
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+  final ValueNotifier<bool> _didCallInitial = ValueNotifier<bool>(false);
+
   OnboardingView({
     required Function(String path) goRoute,
     Map<String, dynamic> arguments = const {'onboarding': true},
@@ -51,7 +52,168 @@ class OnboardingView extends MasterViewCubit<OnboardingCubit, OnboardingState> {
   }) : super(
           goRoute: goRoute,
           arguments: arguments,
+          // Default values - will be overridden in build based on style
+          useSafeArea: null, // Will be set dynamically based on style
+          extendBody: null, // Will be set dynamically based on style
+          extendBodyBehindAppBar: null, // Will be set dynamically based on style
+          navbarSpacer: null, // Will be set dynamically based on style
+          footerSpacer: null, // Will be set dynamically based on style
+          horizontalPadding: null, // Will be set dynamically based on style
+          verticalPadding: null, // Will be set dynamically based on style
+          appBarPadding: null, // Will be set dynamically based on style
         );
+
+  /// Override build to apply style-based configurations dynamically
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('🔍 [OnboardingView] build() called');
+
+    if (currentView != MasterViewCubitTypes.content) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          final snackBar = _onboardingCreateSnackBar(currentView);
+          _onboardingShowSnackBar(context, snackBar);
+        } catch (e) {
+          debugPrint(
+              '🔴 [OnboardingView] Error creating or showing Snackbar: $e');
+        }
+      });
+    }
+
+    try {
+      return _buildScaffoldWithStyle(context);
+    } on Exception catch (e, s) {
+      debugPrint('🔴 [OnboardingView] Exception in build: $e');
+      debugPrintStack(stackTrace: s);
+      return _onboardingBuildErrorScaffold(context, 'Exception: $e');
+    } catch (e, s) {
+      debugPrint('🔴 [OnboardingView] Unknown error in build: $e');
+      debugPrintStack(stackTrace: s);
+      return _onboardingBuildErrorScaffold(context, 'Unknown error: $e');
+    }
+  }
+
+  /// Create snackbar for non-content states (OnboardingView specific)
+  SnackBar _onboardingCreateSnackBar(MasterViewCubitTypes viewType) {
+    final message = _onboardingGetSnackbarMessage(viewType);
+    return SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(message),
+      duration: const Duration(days: 1),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () {
+          debugPrint('Snackbar Undo pressed');
+          snackBarFunction();
+        },
+      ),
+    );
+  }
+
+  /// Show snackbar (OnboardingView specific)
+  void _onboardingShowSnackBar(BuildContext context, SnackBar snackBar) {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } catch (e, s) {
+      debugPrint('Error showing snackbar: $e');
+      debugPrintStack(stackTrace: s);
+    }
+  }
+
+  /// Get snackbar message (OnboardingView specific)
+  String _onboardingGetSnackbarMessage(MasterViewCubitTypes state) {
+    switch (state) {
+      case MasterViewCubitTypes.loading:
+        return 'Loading...';
+      case MasterViewCubitTypes.error:
+        return 'An error occurred';
+      default:
+        return 'An unexpected error occurred. Please try again later.';
+    }
+  }
+
+  /// Build error scaffold (OnboardingView specific)
+  Widget _onboardingBuildErrorScaffold(BuildContext context, String message) {
+    return Scaffold(
+      key: _scaffoldMessengerKey,
+      backgroundColor: OsmeaColors.white,
+      body: buildError(message),
+    );
+  }
+
+  /// Build scaffold with style-based configuration
+  Widget _buildScaffoldWithStyle(BuildContext context) {
+    try {
+      return BaseViewCubit<OnboardingCubit, OnboardingState>(
+        onViewModelReady: (viewModel) {
+          if (!_didCallInitial.value) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!_didCallInitial.value) {
+                try {
+                  final ctx = _scaffoldMessengerKey.currentContext;
+                  if (ctx != null) {
+                    initialContent(viewModel, ctx);
+                  }
+                } catch (e, s) {
+                  debugPrint('🔴 [OnboardingView] initialContent error: $e');
+                  debugPrintStack(stackTrace: s);
+                } finally {
+                  _didCallInitial.value = true;
+                }
+              }
+            });
+          }
+        },
+        builder: (viewModel, context, state) {
+          // Get style-based configuration
+          final isStartupStyle = state.config?.style == OnboardingStyle.basic;
+          
+          return MasterScaffoldWidget(
+            scaffoldMessengerKey: _scaffoldMessengerKey,
+            appBar: coreAppBar?.call(context, viewModel),
+            body: viewContent(context, viewModel, state),
+            bottomNavigationBar: coreBottomBar != null
+                ? coreBottomBar!.call(context, viewModel)
+                : bottomNavigationBar,
+            // Style-based configuration
+            useSafeArea: isStartupStyle ? false : (useSafeArea ?? true),
+            extendBody: isStartupStyle ? true : (extendBody ?? false),
+            extendBodyBehindAppBar: isStartupStyle ? true : (extendBodyBehindAppBar ?? false),
+            backgroundColor: backgroundColor ?? _getBackgroundColor(context, state),
+            navbarSpacer: isStartupStyle 
+                ? const SpacerVisibility.disabled() 
+                : (navbarSpacer ?? const SpacerVisibility.enabled()),
+            footerSpacer: isStartupStyle 
+                ? const SpacerVisibility.disabled() 
+                : (footerSpacer ?? const SpacerVisibility.enabled()),
+            horizontalPadding: isStartupStyle 
+                ? const PaddingVisibility.disabled() 
+                : (horizontalPadding ?? const PaddingVisibility.enabled()),
+            verticalPadding: isStartupStyle 
+                ? const PaddingVisibility.disabled() 
+                : (verticalPadding ?? const PaddingVisibility.enabled()),
+            appBarPadding: isStartupStyle 
+                ? const AppBarPaddingVisibility.disabled() 
+                : (appBarPadding ?? const AppBarPaddingVisibility.enabled()),
+            customNavbarSpacerType: customNavbarSpacerType,
+            customFooterSpacerType: customFooterSpacerType,
+            defaultNavbarSpacerType: defaultNavbarSpacerType,
+            defaultFooterSpacerType: defaultFooterSpacerType,
+            customHorizontalPadding: customHorizontalPadding,
+            defaultHorizontalPadding: defaultHorizontalPadding,
+            customVerticalPadding: customVerticalPadding,
+            defaultVerticalPadding: defaultVerticalPadding,
+            customAppBarPadding: customAppBarPadding,
+            defaultAppBarPadding: defaultAppBarPadding,
+          );
+        },
+      );
+    } catch (e, s) {
+      debugPrint('Error in scaffold: $e');
+      debugPrintStack(stackTrace: s);
+      return _onboardingBuildErrorScaffold(context, 'Error: $e');
+    }
+  }
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
@@ -80,15 +242,25 @@ class OnboardingView extends MasterViewCubit<OnboardingCubit, OnboardingState> {
 
   @override
   Widget viewContent(BuildContext context, viewModel, state) {
-    return Scaffold(
-      backgroundColor: _getBackgroundColor(context, state),
-      body: _buildBody(context, state, viewModel),
+    // MasterScaffoldWidget zaten Scaffold sağlıyor, sadece body döndür
+    // Background color state'e göre belirleniyor ama MasterScaffoldWidget'a geçilecek
+    final backgroundColor = _getBackgroundColor(context, state);
+    
+    // Background color'ı state'e göre ayarlamak için Container ile wrap et
+    return Container(
+      color: backgroundColor,
+      child: _buildBody(context, state, viewModel),
     );
   }
 
   /// 🎨 Determine background color
   static Color _getBackgroundColor(
       BuildContext context, OnboardingState state) {
+    // For startup style (basic), use transparent to allow full screen images
+    if (state.config?.style == OnboardingStyle.basic) {
+      return Colors.transparent;
+    }
+
     // Use current page color if available
     final currentPageColor = state.currentPage?.getBackgroundColor();
     if (currentPageColor != null) return currentPageColor;
