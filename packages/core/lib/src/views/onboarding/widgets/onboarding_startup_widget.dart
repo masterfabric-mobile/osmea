@@ -11,7 +11,7 @@ import 'package:osmea_components/osmea_components.dart';
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
 /// Modern startup onboarding - Full screen background images, no padding/safe area
-/// Supports image_url, icon_url, image_path, icon_path from app_config
+/// Supports image_path and icon_path from app_config (priority: image_path > icon_path)
 ///
 /// {@category Widgets}
 /// {@subCategory OnboardingStartup}
@@ -148,58 +148,146 @@ class _OnboardingStartupWidgetState extends State<OnboardingStartupWidget> {
     Color primaryColor,
     int pageIndex,
   ) {
-    // Priority: image_url > image_path > icon_url > icon_path
+    // Priority: image_path > icon_path
+    // image_path can be either URL or asset path
     Widget imageWidget;
-    String? imageUrl;
 
-    if (page.imageUrl != null && page.imageUrl!.isNotEmpty) {
-      imageUrl = page.imageUrl!;
-      debugPrint('🖼️ [OnboardingStartup] Loading image_url: $imageUrl');
-      imageWidget = SizedBox.expand(
-        child: OsmeaComponents.image(
-          imageUrl: imageUrl,
+    if (page.imagePath != null && page.imagePath!.isNotEmpty) {
+      final imagePath = page.imagePath!;
+      final isUrl = imagePath.startsWith('http://') || imagePath.startsWith('https://');
+      
+      debugPrint('🖼️ [OnboardingStartup] Loading image_path: $imagePath');
+      debugPrint('🖼️ [OnboardingStartup] Is URL: $isUrl');
+      
+      if (isUrl) {
+        // Use Image.network directly for URLs
+        imageWidget = Image.network(
+          imagePath,
+          fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
-          fit: BoxFit.cover,
-          variant: ImageVariant.normal,
-        ),
-      );
-    } else if (page.imagePath != null && page.imagePath!.isNotEmpty) {
-      debugPrint('🖼️ [OnboardingStartup] Loading image_path: ${page.imagePath}');
-      imageWidget = SizedBox.expand(
-        child: OsmeaComponents.image(
-          assetPath: page.imagePath!,
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-          variant: ImageVariant.normal,
-        ),
-      );
-    } else if (page.iconUrl != null && page.iconUrl!.isNotEmpty) {
-      imageUrl = page.iconUrl!;
-      debugPrint('🖼️ [OnboardingStartup] Loading icon_url: $imageUrl');
-      imageWidget = SizedBox.expand(
-        child: OsmeaComponents.image(
-          imageUrl: imageUrl,
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-          variant: ImageVariant.normal,
-        ),
-      );
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              debugPrint('✅ [OnboardingStartup] Image loaded successfully');
+              return child;
+            }
+            debugPrint('⏳ [OnboardingStartup] Loading image: ${loadingProgress.cumulativeBytesLoaded}/${loadingProgress.expectedTotalBytes}');
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('❌ [OnboardingStartup] Image load error: $error');
+            debugPrint('❌ [OnboardingStartup] Stack trace: $stackTrace');
+            return Container(
+              color: Colors.red.withValues(alpha: 0.1),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    SizedBox(height: 8),
+                    Text(
+                      'Image load error',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        imagePath.length > 50 ? '${imagePath.substring(0, 50)}...' : imagePath,
+                        style: TextStyle(color: Colors.red.withValues(alpha: 0.7), fontSize: 10),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        // Use OsmeaComponents for asset paths
+        imageWidget = SizedBox.expand(
+          child: OsmeaComponents.image(
+            assetPath: imagePath,
+            fit: BoxFit.cover,
+            variant: ImageVariant.normal,
+            showLoadingIndicator: true,
+          ),
+        );
+      }
     } else if (page.iconPath != null && page.iconPath!.isNotEmpty) {
-      debugPrint('🖼️ [OnboardingStartup] Loading icon_path: ${page.iconPath}');
-      imageWidget = SizedBox.expand(
-        child: OsmeaComponents.image(
-          assetPath: page.iconPath!,
+      final iconPath = page.iconPath!;
+      final isUrl = iconPath.startsWith('http://') || iconPath.startsWith('https://');
+      
+      debugPrint('🖼️ [OnboardingStartup] Loading icon_path: $iconPath');
+      debugPrint('🖼️ [OnboardingStartup] Is URL: $isUrl');
+      
+      if (isUrl) {
+        // Use Image.network directly for URLs
+        imageWidget = Image.network(
+          iconPath,
+          fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
-          fit: BoxFit.cover,
-          variant: ImageVariant.normal,
-        ),
-      );
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              debugPrint('✅ [OnboardingStartup] Icon loaded successfully');
+              return child;
+            }
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('❌ [OnboardingStartup] Icon load error: $error');
+            return Container(
+              color: Colors.red.withValues(alpha: 0.1),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    SizedBox(height: 8),
+                    Text(
+                      'Icon load error',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        // Use OsmeaComponents for asset paths
+        imageWidget = SizedBox.expand(
+          child: OsmeaComponents.image(
+            assetPath: iconPath,
+            fit: BoxFit.cover,
+            variant: ImageVariant.normal,
+            showLoadingIndicator: true,
+          ),
+        );
+      }
     } else {
       debugPrint('⚠️ [OnboardingStartup] No image found, using gradient fallback');
+      debugPrint('⚠️ [OnboardingStartup] imagePath: ${page.imagePath}');
+      debugPrint('⚠️ [OnboardingStartup] iconPath: ${page.iconPath}');
       // Fallback: Gradient background if no image
       imageWidget = SizedBox.expand(
         child: OsmeaComponents.container(
