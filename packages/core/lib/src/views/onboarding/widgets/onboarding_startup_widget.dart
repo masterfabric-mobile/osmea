@@ -38,44 +38,12 @@ class OnboardingStartupWidget extends StatefulWidget {
 }
 
 class _OnboardingStartupWidgetState extends State<OnboardingStartupWidget> {
-  PageController? _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _pageController?.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OnboardingCubit, OnboardingState>(
       builder: (context, state) {
         if (!state.hasConfig || !state.hasPages) {
           return const SizedBox.shrink();
-        }
-
-        // Initialize or update PageController based on current page index
-        if (_pageController == null) {
-          _pageController = PageController(initialPage: state.currentPageIndex);
-        } else if (_pageController!.hasClients &&
-            _pageController!.page?.round() != state.currentPageIndex) {
-          // Sync PageController with state if they're out of sync
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_pageController != null &&
-                _pageController!.hasClients &&
-                _pageController!.page?.round() != state.currentPageIndex) {
-              _pageController!.animateToPage(
-                state.currentPageIndex,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            }
-          });
         }
 
         final primaryColor =
@@ -86,23 +54,39 @@ class _OnboardingStartupWidgetState extends State<OnboardingStartupWidget> {
     );
   }
 
-  /// Main content - Full screen pages
+  /// Main content - Single page with animated content switching
   Widget _buildContent(
     BuildContext context,
     OnboardingState state,
     Color primaryColor,
   ) {
+    final page = state.config!.pages[state.currentPageIndex];
+    
     return SizedBox.expand(
-      child: PageView.builder(
-        controller: _pageController,
-        onPageChanged: (index) {
-          widget.onPageChanged(index);
+      child: AnimatedSwitcher(
+        duration: Duration(
+          milliseconds: state.config?.animationDuration ?? 400,
+        ),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          // Fade + Slide transition for smooth content switching
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.03, 0.0), // Subtle slide from right
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOutCubic,
+              )),
+              child: child,
+            ),
+          );
         },
-        itemCount: state.config!.pages.length,
-        itemBuilder: (context, index) {
-          final page = state.config!.pages[index];
-          return _buildFullScreenPage(context, page, primaryColor, index, state);
-        },
+        child: KeyedSubtree(
+          key: ValueKey<int>(state.currentPageIndex),
+          child: _buildFullScreenPage(context, page, primaryColor, state.currentPageIndex, state),
+        ),
       ),
     );
   }

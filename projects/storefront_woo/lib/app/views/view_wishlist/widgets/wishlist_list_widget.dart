@@ -42,10 +42,22 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
     
     // Listen to viewModel state changes to update groups
     widget.viewModel.stream.listen((state) {
-      if (mounted && state is WishlistLoadedState) {
-        setState(() {
-          _wishlistGroups = state.groups;
-        });
+      if (mounted) {
+        if (state is WishlistLoadedState) {
+          setState(() {
+            _wishlistGroups = state.groups;
+          });
+        } else if (state is WishlistActionPromptState) {
+          // Preserve groups from previous state when action prompt is shown
+          setState(() {
+            _wishlistGroups = state.previousState.groups;
+          });
+        } else if (state is WishlistSuccessState) {
+          // Preserve groups from previous state on success
+          setState(() {
+            _wishlistGroups = state.previousState.groups;
+          });
+        }
       }
     });
   }
@@ -55,6 +67,16 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
     if (currentState is WishlistLoadedState) {
       setState(() {
         _wishlistGroups = currentState.groups;
+      });
+    } else if (currentState is WishlistActionPromptState) {
+      // Handle case when state is action prompt (e.g., after cart button tap)
+      setState(() {
+        _wishlistGroups = currentState.previousState.groups;
+      });
+    } else if (currentState is WishlistSuccessState) {
+      // Handle case when state is success
+      setState(() {
+        _wishlistGroups = currentState.previousState.groups;
       });
     }
   }
@@ -143,7 +165,8 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
     });
 
     // Don't navigate to empty view if still loading categories
-    if (!_isLoadingCategories && !hasCategories && !hasProducts) {
+    // IMPORTANT: Also check for groups (collections) - user may have items in collections
+    if (!_isLoadingCategories && !hasCategories && !hasProducts && !hasGroups) {
       // Navigate to empty view route
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.go('/empty/wishlist?actionPath=/home');

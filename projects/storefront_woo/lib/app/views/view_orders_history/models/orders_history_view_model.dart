@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
-import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
 import 'package:storefront_woo/app/views/view_orders_history/models/module/states.dart';
 
 @injectable
@@ -32,16 +32,68 @@ class OrdersHistoryViewModel
 
   // Cache for previous loaded state (to show while loading)
   OrdersHistoryLoadedState? _cachedLoadedState;
+  
+  // 🔐 SECURITY: Current user ID for user-specific cache
+  int? _currentUserId;
 
   // Public trigger functions
   Future<void> loadOrders({bool showCached = true}) => _loadOrders(showCached: showCached);
 
   Future<void> _loadOrders({bool showCached = true}) async {
     try {
-      // Keep cached state if available and showCached is true
-      if (!showCached || _cachedLoadedState == null) {
+      // 🔐 SECURITY: Get current user ID first
+      await _loadCurrentUserId();
+      
+      if (_currentUserId == null) {
+        debugPrint('⚠️ [ORDERS CACHE] No user ID, cannot load orders safely');
         stateChanger(OrdersHistoryLoadingState());
       }
+
+      // Try to load from cache first
+      debugPrint('📦 [ORDERS CACHE] Checking cache for orders...');
+      final cachedOrders = await _loadOrdersFromCache();
+
+      // If cache exists, use it first to avoid unnecessary API calls
+      if (cachedOrders != null && cachedOrders.isNotEmpty) {
+        debugPrint('✅ [ORDERS CACHE] Loaded ${cachedOrders.length} orders from cache');
+        debugPrint('   💾 Using cached data - no API call needed');
+        
+        // Get user profile from cache or load it
+        UserProfile? userProfile;
+        try {
+          final profileResponse = await _usersManagerService.getUserProfile();
+          userProfile = UserProfile(
+            userId: profileResponse.userId,
+            username: profileResponse.username,
+            email: profileResponse.email,
+            displayName: profileResponse.displayName,
+            firstName: profileResponse.firstName,
+            lastName: profileResponse.lastName,
+            nickname: null,
+            roles: null,
+            registeredAt: profileResponse.registeredAt,
+          );
+        } catch (e) {
+          debugPrint('⚠️ [ORDERS CACHE] Could not load user profile: $e');
+        }
+        
+        final loadedState = OrdersHistoryLoadedState(
+          orders: cachedOrders,
+          userProfile: userProfile,
+        );
+        
+        _cachedLoadedState = loadedState;
+        stateChanger(loadedState);
+
+        // Refresh orders from API in background to update cache
+        debugPrint('🔄 [ORDERS CACHE] Refreshing cache in background...');
+        _refreshOrdersFromApi();
+        return;
+      }
+
+      // If no cache, load from API
+      debugPrint('⚠️ [ORDERS CACHE] No cache found, loading from API...');
+      stateChanger(OrdersHistoryLoadingState());
 
       debugPrint('📦 OrdersHistoryViewModel: Loading orders...');
 
@@ -116,6 +168,9 @@ class OrdersHistoryViewModel
         userProfile = dashboard.profile;
       }
 
+      // Cache the orders
+      await _saveOrdersToCache(orders);
+
       final loadedState = OrdersHistoryLoadedState(
         orders: orders,
         userProfile: userProfile,
@@ -130,13 +185,232 @@ class OrdersHistoryViewModel
         '✅ OrdersHistoryViewModel: State changed to OrdersHistoryLoadedState',
       );
     } catch (e, stackTrace) {
-      debugPrint('❌ Error loading orders: $e');
+      debugPrint('❌ [ORDERS CACHE] Error loading orders: $e');
       debugPrint('❌ Stack trace: $stackTrace');
-      stateChanger(
-        OrdersHistoryErrorState(
-          message: 'Failed to load orders. Please try again.',
-        ),
+
+      // Try to load from cache as fallback
+      debugPrint('🔄 [ORDERS CACHE] Trying cache as fallback...');
+      final cachedOrders = await _loadOrdersFromCache();
+      if (cachedOrders != null && cachedOrders.isNotEmpty) {
+        debugPrint('✅ [ORDERS CACHE] Using cached orders as fallback (${cachedOrders.length} orders)');
+        
+        UserProfile? userProfile;
+        try {
+          final profileResponse = await _usersManagerService.getUserProfile();
+          userProfile = UserProfile(
+            userId: profileResponse.userId,
+            username: profileResponse.username,
+            email: profileResponse.email,
+            displayName: profileResponse.displayName,
+            firstName: profileResponse.firstName,
+            lastName: profileResponse.lastName,
+            nickname: null,
+            roles: null,
+            registeredAt: profileResponse.registeredAt,
+          );
+        } catch (profileError) {
+          debugPrint('⚠️ Could not load user profile: $profileError');
+        }
+        
+        final loadedState = OrdersHistoryLoadedState(
+          orders: cachedOrders,
+          userProfile: userProfile,
+        );
+        _cachedLoadedState = loadedState;
+        stateChanger(loadedState);
+      } else {
+        debugPrint('❌ [ORDERS CACHE] No cache available as fallback');
+        stateChanger(
+          OrdersHistoryErrorState(
+            message: 'Failed to load orders. Please try again.',
+          ),
+        );
+      }
+    }
+  }
+
+  /// 🔐 SECURITY: Get current user ID from API
+  Future<void> _loadCurrentUserId() async {
+    try {
+      if (_currentUserId != null) return;
+
+      final profile = await _usersManagerService.getUserProfile();
+      _currentUserId = profile.userId;
+      debugPrint('👤 [ORDERS CACHE] Current user ID: $_currentUserId');
+    } catch (e) {
+      debugPrint('❌ [ORDERS CACHE] Error loading user ID: $e');
+    }
+  }
+
+  /// Load orders from local storage cache
+  Future<List<UserOrder>?> _loadOrdersFromCache() async {
+    try {
+      if (_currentUserId == null) {
+        debugPrint('⚠️ [ORDERS CACHE] No user ID, skipping cache');
+        return null;
+      }
+
+      final storage = LocalStorageHelper();
+      final cacheKey = 'user_orders_history_cache_$_currentUserId';
+      final timestampKey = 'user_orders_history_cache_timestamp_$_currentUserId';
+      final cachedJson = await storage.getItem(cacheKey);
+      final timestamp = await storage.getItem(timestampKey);
+
+      if (cachedJson == null || cachedJson.isEmpty) {
+        debugPrint('   ⚠️ [ORDERS CACHE] Cache is empty');
+        return null;
+      }
+
+      debugPrint('   ✅ [ORDERS CACHE] Cache found');
+      debugPrint('   🕐 Cache timestamp: ${timestamp ?? "unknown"}');
+
+      final List<dynamic> ordersList = jsonDecode(cachedJson);
+      final orders = ordersList
+          .map((json) => UserOrder.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      debugPrint('   📦 Parsed ${orders.length} orders from cache');
+      return orders;
+    } catch (e) {
+      debugPrint('   ❌ [ORDERS CACHE] Error loading orders from cache: $e');
+      return null;
+    }
+  }
+
+  /// Save orders to local storage cache
+  Future<void> _saveOrdersToCache(List<UserOrder> orders) async {
+    try {
+      if (_currentUserId == null) {
+        debugPrint('⚠️ [ORDERS CACHE] No user ID, skipping cache save');
+        return;
+      }
+
+      final storage = LocalStorageHelper();
+      final cacheKey = 'user_orders_history_cache_$_currentUserId';
+      final timestampKey = 'user_orders_history_cache_timestamp_$_currentUserId';
+      final ordersJson = jsonEncode(
+        orders.map((order) => order.toJson()).toList(),
       );
+      await storage.setItem(cacheKey, ordersJson);
+      final timestamp = DateTime.now().toIso8601String();
+      await storage.setItem(timestampKey, timestamp);
+      debugPrint('✅ [ORDERS CACHE] Orders cached successfully');
+      debugPrint('   📦 Cached ${orders.length} orders');
+      debugPrint('   🕐 Cache timestamp: $timestamp');
+    } catch (e) {
+      debugPrint('❌ [ORDERS CACHE] Error saving orders to cache: $e');
+    }
+  }
+
+  /// Check if cache needs refresh (older than specified duration)
+  bool _shouldRefreshCache(
+    String? timestamp, {
+    Duration maxAge = const Duration(minutes: 10),
+  }) {
+    if (timestamp == null || timestamp.isEmpty) {
+      return true; // No timestamp, should refresh
+    }
+
+    try {
+      final cacheTime = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final age = now.difference(cacheTime);
+
+      if (age > maxAge) {
+        debugPrint('   ⏰ Cache is ${age.inMinutes} minutes old, needs refresh');
+        return true;
+      } else {
+        debugPrint(
+          '   ✅ Cache is fresh (${age.inMinutes} minutes old), skipping refresh',
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('   ⚠️ Error parsing cache timestamp: $e');
+      return true; // On error, refresh to be safe
+    }
+  }
+
+  /// Refresh orders from API in background (non-blocking)
+  /// Only refreshes if cache is older than 10 minutes
+  Future<void> _refreshOrdersFromApi() async {
+    try {
+      if (_currentUserId == null) {
+        debugPrint('⚠️ [ORDERS CACHE] No user ID, skipping refresh');
+        return;
+      }
+
+      // Check cache timestamp before refreshing
+      final storage = LocalStorageHelper();
+      final timestampKey = 'user_orders_history_cache_timestamp_$_currentUserId';
+      final timestamp = await storage.getItem(timestampKey);
+
+      if (!_shouldRefreshCache(timestamp)) {
+        debugPrint(
+          '⏭️ [ORDERS CACHE] Skipping refresh - cache is still fresh',
+        );
+        return;
+      }
+
+      debugPrint(
+        '🔄 [ORDERS CACHE] Refreshing orders from API in background...',
+      );
+
+      List<UserOrder> orders;
+      UserProfile? userProfile;
+
+      // Try getUserOrders first
+      try {
+        final ordersResponse = await _usersManagerService.getUserOrders(
+          page: 1,
+          perPage: 100,
+          status: null,
+        );
+
+        orders = await _enrichOrdersWithLineItems(ordersResponse.orders);
+
+        // Get user profile
+        final profileResponse = await _usersManagerService.getUserProfile();
+        userProfile = UserProfile(
+          userId: profileResponse.userId,
+          username: profileResponse.username,
+          email: profileResponse.email,
+          displayName: profileResponse.displayName,
+          firstName: profileResponse.firstName,
+          lastName: profileResponse.lastName,
+          nickname: null,
+          roles: null,
+          registeredAt: profileResponse.registeredAt,
+        );
+      } catch (e) {
+        // Fallback to getUserDashboard
+        debugPrint('⚠️ getUserOrders failed in background refresh: $e');
+        final dashboard = await _usersManagerService.getUserDashboard(
+          includeOrders: true,
+          ordersLimit: 100,
+          includeActivity: false,
+          activityLimit: 0,
+        );
+        orders = await _enrichOrdersWithLineItems(dashboard.orders);
+        userProfile = dashboard.profile;
+      }
+
+      await _saveOrdersToCache(orders);
+
+      debugPrint(
+        '✅ [ORDERS CACHE] Orders refreshed from API (${orders.length} orders)',
+      );
+
+      // Update UI if still mounted
+      final loadedState = OrdersHistoryLoadedState(
+        orders: orders,
+        userProfile: userProfile,
+      );
+      _cachedLoadedState = loadedState;
+      stateChanger(loadedState);
+    } catch (e) {
+      debugPrint('⚠️ [ORDERS CACHE] Error refreshing orders from API: $e');
+      // Don't show error, just log it
     }
   }
 
@@ -183,46 +457,18 @@ class OrdersHistoryViewModel
 
   @override
   Map<String, dynamic>? toJson(OrdersHistoryState state) {
-    if (state is OrdersHistoryLoadedState) {
-      return {
-        'type': 'loaded',
-        'orders': state.orders.map((order) => order.toJson()).toList(),
-        'userProfile': state.userProfile?.toJson(),
-      };
-    }
+    // 🔐 SECURITY: Disable HydratedCubit cache to prevent cross-user data leakage
+    // We use LocalStorageHelper with user-specific cache keys instead
+    debugPrint('💾 [HYDRATED CACHE] Disabled - using LocalStorageHelper');
     return null;
   }
 
   @override
   OrdersHistoryState? fromJson(Map<String, dynamic> json) {
-    try {
-      if (json['type'] == 'loaded') {
-        final ordersJson = json['orders'] as List<dynamic>;
-        final orders = ordersJson
-            .map((orderJson) => UserOrder.fromJson(orderJson as Map<String, dynamic>))
-            .toList();
-        
-        UserProfile? userProfile;
-        if (json['userProfile'] != null) {
-          userProfile = UserProfile.fromJson(
-            json['userProfile'] as Map<String, dynamic>,
-          );
-        }
-        
-        final loadedState = OrdersHistoryLoadedState(
-          orders: orders,
-          userProfile: userProfile,
-        );
-        
-        // Cache the restored state
-        _cachedLoadedState = loadedState;
-        
-        return loadedState;
-      }
-    } catch (e) {
-      debugPrint('⚠️ Failed to restore orders from cache: $e');
-    }
-    return OrdersHistoryInitialState();
+    // 🔐 SECURITY: Disable HydratedCubit cache to prevent cross-user data leakage
+    // We use LocalStorageHelper with user-specific cache keys instead
+    debugPrint('💾 [HYDRATED CACHE] Disabled - using LocalStorageHelper');
+    return null;
   }
 
   /// Get cached loaded state (for showing while loading)

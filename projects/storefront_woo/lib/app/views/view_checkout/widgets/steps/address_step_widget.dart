@@ -7,6 +7,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
@@ -753,6 +754,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                 controller: widget.billingPostcodeController,
                 hint: context.t.checkoutView.formFields.postcode,
                 icon: Icons.markunread_mailbox_outlined,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
             ),
             SizedBox(width: context.spacing8),
@@ -862,6 +865,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
                 controller: widget.shippingPostcodeController,
                 hint: context.t.checkoutView.formFields.postcode,
                 icon: Icons.markunread_mailbox_outlined,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
             ),
             SizedBox(width: context.spacing8),
@@ -937,6 +942,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     final bgColor = _getColorFromConfig(
       configHelper,
@@ -968,6 +974,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters: inputFormatters,
       style: OsmeaTextStyle.bodySmall(context),
       decoration: InputDecoration(
         hintText: hint,
@@ -1331,6 +1338,8 @@ class _AddAddressBottomSheetState extends State<_AddAddressBottomSheet> {
                             controller: widget.billingPostcodeController,
                             hint: context.t.checkoutView.formFields.postcode,
                             icon: Icons.markunread_mailbox_outlined,
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           ),
                         ),
                         SizedBox(width: context.spacing8),
@@ -1417,6 +1426,7 @@ class _AddAddressBottomSheetState extends State<_AddAddressBottomSheet> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     final bgColor = _getColorFromConfig(
       configHelper,
@@ -1448,6 +1458,7 @@ class _AddAddressBottomSheetState extends State<_AddAddressBottomSheet> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters: inputFormatters,
       style: OsmeaTextStyle.bodySmall(context),
       decoration: InputDecoration(
         hintText: hint,
