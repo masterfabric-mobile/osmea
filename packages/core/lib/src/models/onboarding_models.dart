@@ -25,6 +25,12 @@ class OnboardingPageModel {
   /// Page image (asset path)
   final String? imagePath;
 
+  /// Page image URL (network)
+  final String? imageUrl;
+
+  /// Page icon URL (network)
+  final String? iconUrl;
+
   /// Page color
   final String? backgroundColor;
 
@@ -45,6 +51,8 @@ class OnboardingPageModel {
     required this.description,
     this.iconPath,
     this.imagePath,
+    this.imageUrl,
+    this.iconUrl,
     this.backgroundColor,
     this.textColor,
     this.buttonText,
@@ -59,6 +67,8 @@ class OnboardingPageModel {
       description: json['description'] as String,
       iconPath: json['icon_path'] as String?,
       imagePath: json['image_path'] as String?,
+      imageUrl: json['image_url'] as String?,
+      iconUrl: json['icon_url'] as String?,
       backgroundColor: json['background_color'] as String?,
       textColor: json['text_color'] as String?,
       buttonText: json['button_text'] as String?,
@@ -74,6 +84,8 @@ class OnboardingPageModel {
       'description': description,
       'icon_path': iconPath,
       'image_path': imagePath,
+      'image_url': imageUrl,
+      'icon_url': iconUrl,
       'background_color': backgroundColor,
       'text_color': textColor,
       'button_text': buttonText,
@@ -129,8 +141,39 @@ class OnboardingPageModel {
         other.description == description &&
         other.iconPath == iconPath &&
         other.imagePath == imagePath &&
+        other.imageUrl == imageUrl &&
+        other.iconUrl == iconUrl &&
         other.backgroundColor == backgroundColor &&
         other.textColor == textColor;
+  }
+
+  /// Create a copy with updated fields
+  OnboardingPageModel copyWith({
+    String? title,
+    String? description,
+    String? iconPath,
+    String? imagePath,
+    String? imageUrl,
+    String? iconUrl,
+    String? backgroundColor,
+    String? textColor,
+    String? buttonText,
+    String? skipText,
+    String? nextText,
+  }) {
+    return OnboardingPageModel(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      iconPath: iconPath ?? this.iconPath,
+      imagePath: imagePath ?? this.imagePath,
+      imageUrl: imageUrl ?? this.imageUrl,
+      iconUrl: iconUrl ?? this.iconUrl,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      buttonText: buttonText ?? this.buttonText,
+      skipText: skipText ?? this.skipText,
+      nextText: nextText ?? this.nextText,
+    );
   }
 
   @override
@@ -139,6 +182,8 @@ class OnboardingPageModel {
         description.hashCode ^
         iconPath.hashCode ^
         imagePath.hashCode ^
+        imageUrl.hashCode ^
+        iconUrl.hashCode ^
         backgroundColor.hashCode ^
         textColor.hashCode;
   }
@@ -283,6 +328,29 @@ class OnboardingConfigModel {
     } catch (e) {
       return null;
     }
+  }
+
+  /// Create a copy with updated fields
+  OnboardingConfigModel copyWith({
+    List<OnboardingPageModel>? pages,
+    OnboardingStyle? style,
+    int? autoAdvanceSeconds,
+    bool? showSkipButton,
+    bool? showPageIndicator,
+    int? animationDuration,
+    String? primaryColor,
+    String? secondaryColor,
+  }) {
+    return OnboardingConfigModel(
+      pages: pages ?? this.pages,
+      style: style ?? this.style,
+      autoAdvanceSeconds: autoAdvanceSeconds ?? this.autoAdvanceSeconds,
+      showSkipButton: showSkipButton ?? this.showSkipButton,
+      showPageIndicator: showPageIndicator ?? this.showPageIndicator,
+      animationDuration: animationDuration ?? this.animationDuration,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
+    );
   }
 
   @override

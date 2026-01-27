@@ -8,9 +8,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:get_it/get_it.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
+import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
 
 class AddressStepWidget extends StatefulWidget {
   // Billing controllers
@@ -74,6 +76,7 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
   bool _showManualForm = false;
   bool _isLoadingAddresses = true;
   bool _showAllAddresses = false;
+  int? _currentUserId;
 
   @override
   void initState() {
@@ -87,10 +90,27 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
         _isLoadingAddresses = true;
       });
 
+      // 🔐 SECURITY: Get current user ID first to ensure user-specific cache
+      await _loadCurrentUserId();
+      
+      if (_currentUserId == null) {
+        debugPrint('⚠️ [CHECKOUT ADDRESS] No user ID, cannot load addresses safely');
+        setState(() {
+          _isLoadingAddresses = false;
+        });
+        return;
+      }
+
+      debugPrint('👤 [CHECKOUT ADDRESS] Loading addresses for user ID: $_currentUserId');
+
       final storage = LocalStorageHelper();
       
+      // 🔐 SECURITY: Use user-specific cache keys
+      final addressCacheKey = 'user_addresses_cache_$_currentUserId';
+      final ordersCacheKey = 'user_orders_cache_$_currentUserId';
+      
       // Load saved addresses
-      final savedAddressesJson = await storage.getItem('user_addresses_cache');
+      final savedAddressesJson = await storage.getItem(addressCacheKey);
       final List<UserAddress> savedAddresses = [];
       
       if (savedAddressesJson != null && savedAddressesJson.isNotEmpty) {
@@ -98,10 +118,11 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
         savedAddresses.addAll(
           addressesList.map((json) => UserAddress.fromJson(json as Map<String, dynamic>)).toList(),
         );
+        debugPrint('✅ [CHECKOUT ADDRESS] Loaded ${savedAddresses.length} saved addresses for user $_currentUserId');
       }
 
       // Load order addresses from order cache
-      final ordersJson = await storage.getItem('user_orders_cache');
+      final ordersJson = await storage.getItem(ordersCacheKey);
       final List<UserAddress> orderAddresses = [];
       
       if (ordersJson != null && ordersJson.isNotEmpty) {
@@ -110,6 +131,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
           final orders = ordersList
               .map((json) => DetailedUserOrder.fromJson(json as Map<String, dynamic>))
               .toList();
+          
+          debugPrint('📦 [CHECKOUT ADDRESS] Processing ${orders.length} orders for user $_currentUserId');
           
           // Extract addresses from orders
           final Set<String> seenAddresses = {};
@@ -177,6 +200,8 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
               }
             }
           }
+          
+          debugPrint('✅ [CHECKOUT ADDRESS] Extracted ${orderAddresses.length} order addresses for user $_currentUserId');
         } catch (e) {
           debugPrint('⚠️ Error parsing order addresses: $e');
         }
@@ -185,12 +210,50 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
       setState(() {
         _cachedAddresses = [...savedAddresses, ...orderAddresses];
         _isLoadingAddresses = false;
+        
+        // 🔧 FIX: If no cached addresses, automatically show manual form
+        if (_cachedAddresses.isEmpty) {
+          _showManualForm = true;
+          debugPrint('📝 [CHECKOUT ADDRESS] No cached addresses, showing manual form');
+        }
       });
+      
+      debugPrint('✅ [CHECKOUT ADDRESS] Total ${_cachedAddresses.length} addresses loaded for user $_currentUserId');
     } catch (e) {
       debugPrint('⚠️ Error loading cached addresses: $e');
       setState(() {
         _isLoadingAddresses = false;
+        // 🔧 FIX: On error, show manual form so user can proceed
+        _showManualForm = true;
       });
+    }
+  }
+
+  /// 🔐 SECURITY: Get current user ID from API to ensure user-specific cache
+  Future<void> _loadCurrentUserId() async {
+    try {
+      if (_currentUserId != null) return;
+
+      final usersManager = GetIt.I<OsmeaUsersManagerService>();
+      final profile = await usersManager.getUserProfile();
+      _currentUserId = profile.userId;
+      debugPrint('👤 [CHECKOUT ADDRESS] Current user ID: $_currentUserId');
+    } catch (e) {
+      debugPrint('❌ [CHECKOUT ADDRESS] Error loading user ID: $e');
+      // Try to get from AuthCubit as fallback
+      try {
+        final authCubit = GetIt.I<AuthCubit>();
+        final authState = authCubit.state;
+        if (authState is AuthAuthenticatedState && authState.userData != null) {
+          final userId = authState.userData!['id'];
+          if (userId is int) {
+            _currentUserId = userId;
+            debugPrint('👤 [CHECKOUT ADDRESS] Got user ID from AuthCubit: $_currentUserId');
+          }
+        }
+      } catch (authError) {
+        debugPrint('❌ [CHECKOUT ADDRESS] Error loading user ID from AuthCubit: $authError');
+      }
     }
   }
 
@@ -976,24 +1039,40 @@ class _AddressStepWidgetState extends State<AddressStepWidget> {
             // Check if address is selected or manual form is filled
             if (_selectedBillingAddress != null) {
               // Address selected from cache, proceed
+              debugPrint('✅ [CHECKOUT ADDRESS] Using selected address');
               widget.onContinue();
-            } else if (_showManualForm) {
-              // Manual form is shown, validate it
+            } else if (_showManualForm || _cachedAddresses.isEmpty) {
+              // Manual form is shown OR no cached addresses, validate the form
+              debugPrint('📝 [CHECKOUT ADDRESS] Validating manual form');
               if (widget.formKey.currentState?.validate() ?? false) {
+                debugPrint('✅ [CHECKOUT ADDRESS] Form is valid, proceeding');
                 widget.onContinue();
               } else {
                 // Form is invalid, show snackbar
+                debugPrint('⚠️ [CHECKOUT ADDRESS] Form validation failed');
                 context.snackbarWarning(
                   context.t.checkoutView.messages.fillRequiredFields,
                   duration: const Duration(seconds: 2),
                 );
               }
-            } else {
-              // No address selected, show snackbar
+            } else if (_cachedAddresses.isNotEmpty) {
+              // Has cached addresses but none selected, show snackbar
+              debugPrint('⚠️ [CHECKOUT ADDRESS] No address selected from cache');
               context.snackbarWarning(
                 context.t.checkoutView.messages.selectAddress,
                 duration: const Duration(seconds: 2),
               );
+            } else {
+              // Fallback: try to validate form anyway
+              debugPrint('⚠️ [CHECKOUT ADDRESS] Fallback validation');
+              if (widget.formKey.currentState?.validate() ?? false) {
+                widget.onContinue();
+              } else {
+                context.snackbarWarning(
+                  context.t.checkoutView.messages.fillRequiredFields,
+                  duration: const Duration(seconds: 2),
+                );
+              }
             }
           },
           style: ElevatedButton.styleFrom(

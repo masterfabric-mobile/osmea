@@ -6,17 +6,17 @@ import 'package:core/src/models/onboarding_models.dart';
 import 'package:osmea_components/osmea_components.dart';
 
 /// 🎨 **OSMEA Onboarding Startup Widget**
-
+///
 /// Copyright (c) 2025, OSMEA Team
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
-/// Basic onboarding style - Visual on top, text and buttons on bottom
-/// New layout: Skip on top-right, indicators above buttons, back (left) and next/finish (right)
+/// Modern startup onboarding - Full screen background images, no padding/safe area
+/// Supports image_path and icon_path from app_config (priority: image_path > icon_path)
 ///
 /// {@category Widgets}
 /// {@subCategory OnboardingStartup}
 
-class OnboardingStartupWidget extends StatelessWidget {
+class OnboardingStartupWidget extends StatefulWidget {
   final Function(int) onPageChanged;
   final VoidCallback onNext;
   final VoidCallback onPrevious;
@@ -33,6 +33,25 @@ class OnboardingStartupWidget extends StatelessWidget {
   });
 
   @override
+  State<OnboardingStartupWidget> createState() =>
+      _OnboardingStartupWidgetState();
+}
+
+class _OnboardingStartupWidgetState extends State<OnboardingStartupWidget> {
+  PageController? _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<OnboardingCubit, OnboardingState>(
       builder: (context, state) {
@@ -40,248 +59,437 @@ class OnboardingStartupWidget extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return OsmeaComponents.container(
-          color:
-              state.currentPage?.getBackgroundColor() ?? OsmeaColors.paperWhite,
-          child: SafeArea(
-            child: OsmeaComponents.column(
-              children: [
-                // 📱 Top section - Skip button
-                _buildTopSection(context, state),
+        // Initialize or update PageController based on current page index
+        if (_pageController == null) {
+          _pageController = PageController(initialPage: state.currentPageIndex);
+        } else if (_pageController!.hasClients &&
+            _pageController!.page?.round() != state.currentPageIndex) {
+          // Sync PageController with state if they're out of sync
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_pageController != null &&
+                _pageController!.hasClients &&
+                _pageController!.page?.round() != state.currentPageIndex) {
+              _pageController!.animateToPage(
+                state.currentPageIndex,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
+          });
+        }
 
-                // 📄 Page content (expandable)
-                Expanded(
-                  child: _buildPageContent(context, state),
-                ),
+        final primaryColor =
+            state.config?.getPrimaryColor() ?? OsmeaColors.nordicBlue;
 
-                // 📊 Bottom section - Indicators and navigation buttons
-                _buildBottomSection(context, state),
-              ],
-            ),
-          ),
-        );
+        return _buildContent(context, state, primaryColor);
       },
     );
   }
 
-  /// 📱 Top section with skip button
-  Widget _buildTopSection(BuildContext context, OnboardingState state) {
-    return OsmeaComponents.container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing16,
-        vertical: context.spacing8,
-      ),
-      child: OsmeaComponents.row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if (state.shouldShowSkipButton)
-            OsmeaComponents.button(
-              text: state.currentPage?.skipText ?? 'Skip',
-              onPressed: onSkip,
-              variant: ButtonVariant.ghost,
-              size: ButtonSize.small,
-              textColor: OsmeaColors.pewter,
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// 📄 Page content with PageView
-  Widget _buildPageContent(BuildContext context, OnboardingState state) {
-    return OsmeaComponents.container(
+  /// Main content - Full screen pages
+  Widget _buildContent(
+    BuildContext context,
+    OnboardingState state,
+    Color primaryColor,
+  ) {
+    return SizedBox.expand(
       child: PageView.builder(
-        onPageChanged: onPageChanged,
+        controller: _pageController,
+        onPageChanged: (index) {
+          widget.onPageChanged(index);
+        },
         itemCount: state.config!.pages.length,
         itemBuilder: (context, index) {
           final page = state.config!.pages[index];
-          return _buildPageItem(context, page, state);
+          return _buildFullScreenPage(context, page, primaryColor, index, state);
         },
       ),
     );
   }
 
-  /// 📄 Individual page item
-  Widget _buildPageItem(
-      BuildContext context, OnboardingPageModel page, OnboardingState state) {
-    return OsmeaComponents.container(
-      padding: context.paddingNormal,
-      child: OsmeaComponents.column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  /// Full screen page with background image
+  Widget _buildFullScreenPage(
+    BuildContext context,
+    OnboardingPageModel page,
+    Color primaryColor,
+    int pageIndex,
+    OnboardingState state,
+  ) {
+    return SizedBox.expand(
+      child: Stack(
         children: [
-          // 🖼️ Image or icon
-          _buildPageVisual(context, page),
-
-          OsmeaComponents.sizedBox(height: context.spacing32),
-
-          // 📝 Title
-          OsmeaComponents.text(
-            page.title,
-            variant: OsmeaTextVariant.headlineMedium,
-            color: page.getTextColor() ?? OsmeaColors.thunder,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.center,
+          // Full screen background image - Edge to edge, no padding
+          Positioned.fill(
+            child: _buildBackgroundImage(context, page, primaryColor, pageIndex),
           ),
 
-          OsmeaComponents.sizedBox(height: context.spacing16),
+          // Content overlay - Edge to edge
+          Column(
+            children: [
+              // Top bar - Skip button
+              _buildTopBar(context, state),
 
-          // 📖 Description
-          OsmeaComponents.text(
-            page.description,
-            variant: OsmeaTextVariant.bodyLarge,
-            color: page.getTextColor()?.withOpacity(0.8) ?? OsmeaColors.pewter,
-            textAlign: TextAlign.center,
-            maxLines: 4,
+              // Spacer
+              const Spacer(),
+
+              // Bottom section with text and navigation
+              _buildBottomSection(context, state, primaryColor),
+            ],
           ),
         ],
       ),
     );
   }
 
-  /// 🖼️ Page visual (image or icon)
-  Widget _buildPageVisual(BuildContext context, OnboardingPageModel page) {
-    return OsmeaComponents.container(
-      height: context.dynamicHeight(0.3),
-      child: OsmeaComponents.center(
-        child: page.imagePath != null
-            ? OsmeaComponents.image(
-                assetPath: page.imagePath!,
-                width: context.dynamicWidth(0.6),
-                height: context.dynamicHeight(0.25),
-                fit: BoxFit.contain,
-              )
-            : OsmeaComponents.container(
-                width: context.dynamicWidth(0.4),
-                height: context.dynamicWidth(0.4),
-                decoration: BoxDecoration(
-                  color: (page.getTextColor() ?? OsmeaColors.nordicBlue)
-                      .withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: OsmeaComponents.center(
-                  child: Icon(
-                    Icons.lightbulb_outline,
-                    size: context.iconSizeExtraHigh,
-                    color: page.getTextColor() ?? OsmeaColors.nordicBlue,
-                  ),
+  /// Full screen background image - Edge to edge, no padding
+  Widget _buildBackgroundImage(
+    BuildContext context,
+    OnboardingPageModel page,
+    Color primaryColor,
+    int pageIndex,
+  ) {
+    // Priority: image_path > icon_path
+    // image_path can be either URL or asset path
+    Widget imageWidget;
+
+    if (page.imagePath != null && page.imagePath!.isNotEmpty) {
+      final imagePath = page.imagePath!;
+      final isUrl = imagePath.startsWith('http://') || imagePath.startsWith('https://');
+      
+      debugPrint('🖼️ [OnboardingStartup] Loading image_path: $imagePath');
+      debugPrint('🖼️ [OnboardingStartup] Is URL: $isUrl');
+      
+      if (isUrl) {
+        // Use Image.network directly for URLs
+        imageWidget = Image.network(
+          imagePath,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              debugPrint('✅ [OnboardingStartup] Image loaded successfully');
+              return child;
+            }
+            debugPrint('⏳ [OnboardingStartup] Loading image: ${loadingProgress.cumulativeBytesLoaded}/${loadingProgress.expectedTotalBytes}');
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      : null,
                 ),
               ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('❌ [OnboardingStartup] Image load error: $error');
+            debugPrint('❌ [OnboardingStartup] Stack trace: $stackTrace');
+            return Container(
+              color: Colors.red.withValues(alpha: 0.1),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    SizedBox(height: 8),
+                    Text(
+                      'Image load error',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        imagePath.length > 50 ? '${imagePath.substring(0, 50)}...' : imagePath,
+                        style: TextStyle(color: Colors.red.withValues(alpha: 0.7), fontSize: 10),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        // Use OsmeaComponents for asset paths
+        imageWidget = SizedBox.expand(
+          child: OsmeaComponents.image(
+            assetPath: imagePath,
+            fit: BoxFit.cover,
+            variant: ImageVariant.normal,
+            showLoadingIndicator: true,
+          ),
+        );
+      }
+    } else if (page.iconPath != null && page.iconPath!.isNotEmpty) {
+      final iconPath = page.iconPath!;
+      final isUrl = iconPath.startsWith('http://') || iconPath.startsWith('https://');
+      
+      debugPrint('🖼️ [OnboardingStartup] Loading icon_path: $iconPath');
+      debugPrint('🖼️ [OnboardingStartup] Is URL: $isUrl');
+      
+      if (isUrl) {
+        // Use Image.network directly for URLs
+        imageWidget = Image.network(
+          iconPath,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              debugPrint('✅ [OnboardingStartup] Icon loaded successfully');
+              return child;
+            }
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('❌ [OnboardingStartup] Icon load error: $error');
+            return Container(
+              color: Colors.red.withValues(alpha: 0.1),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    SizedBox(height: 8),
+                    Text(
+                      'Icon load error',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        // Use OsmeaComponents for asset paths
+        imageWidget = SizedBox.expand(
+          child: OsmeaComponents.image(
+            assetPath: iconPath,
+            fit: BoxFit.cover,
+            variant: ImageVariant.normal,
+            showLoadingIndicator: true,
+          ),
+        );
+      }
+    } else {
+      debugPrint('⚠️ [OnboardingStartup] No image found, using gradient fallback');
+      debugPrint('⚠️ [OnboardingStartup] imagePath: ${page.imagePath}');
+      debugPrint('⚠️ [OnboardingStartup] iconPath: ${page.iconPath}');
+      // Fallback: Gradient background if no image
+      imageWidget = SizedBox.expand(
+        child: OsmeaComponents.container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                primaryColor.withValues(alpha: 0.1),
+                primaryColor.withValues(alpha: 0.3),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return imageWidget;
+  }
+
+  /// Top bar - Skip button only (edge to edge, padding only for button)
+  Widget _buildTopBar(BuildContext context, OnboardingState state) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + context.spacing12,
+        right: context.spacing20,
+        bottom: context.spacing8,
+      ),
+      child: Align(
+        alignment: Alignment.topRight,
+        child: state.shouldShowSkipButton
+            ? GestureDetector(
+                onTap: widget.onSkip,
+                child: OsmeaComponents.container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.spacing12,
+                    vertical: context.spacing6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: OsmeaComponents.text(
+                    state.currentPage?.skipText ?? 'Skip',
+                    variant: OsmeaTextVariant.bodySmall,
+                    color: OsmeaColors.thunder,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
       ),
     );
   }
 
-  /// 📊 Bottom section with indicators and navigation buttons
-  Widget _buildBottomSection(BuildContext context, OnboardingState state) {
-    return OsmeaComponents.container(
-      padding: context.paddingNormal,
-      child: OsmeaComponents.column(
-        children: [
-          // 📊 Page indicators
-          if (state.shouldShowPageIndicator)
-            _buildPageIndicator(context, state),
+  /// Bottom section - Title, subtitle, pagination, and button (edge to edge)
+  Widget _buildBottomSection(
+    BuildContext context,
+    OnboardingState state,
+    Color primaryColor,
+  ) {
+    final page = state.currentPage;
+    if (page == null) return const SizedBox.shrink();
 
-          OsmeaComponents.sizedBox(height: context.spacing24),
-
-          // 🔘 Navigation buttons (new layout)
-          _buildNavigationButtons(context, state),
-        ],
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            Colors.black.withValues(alpha: 0.3),
+            Colors.black.withValues(alpha: 0.5),
+          ],
+          stops: const [0.0, 0.7, 1.0],
+        ),
       ),
-    );
-  }
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: context.spacing40,
+          bottom: MediaQuery.of(context).padding.bottom + context.spacing20,
+          left: context.spacing24,
+          right: context.spacing24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title - Left aligned, bold, white for visibility
+            OsmeaComponents.text(
+              page.title,
+              variant: OsmeaTextVariant.headlineLarge,
+              color: OsmeaColors.white,
+              fontWeight: context.bold,
+              textAlign: TextAlign.left,
+            ),
 
-  /// 📊 Page indicator dots
-  Widget _buildPageIndicator(BuildContext context, OnboardingState state) {
-    return OsmeaComponents.row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        state.config!.pages.length,
-        (index) => _buildIndicatorDot(context, state, index),
-      ),
-    );
-  }
+            SizedBox(height: context.spacing8),
 
-  /// 🔘 Individual indicator dot
-  Widget _buildIndicatorDot(
-      BuildContext context, OnboardingState state, int index) {
-    final isActive = index == state.currentPageIndex;
-    final primaryColor =
-        state.config?.getPrimaryColor() ?? OsmeaColors.nordicBlue;
+            // Subtitle - Left aligned, regular, multi-line, white with slight transparency
+            OsmeaComponents.text(
+              page.description,
+              variant: OsmeaTextVariant.bodyMedium,
+              color: OsmeaColors.white.withValues(alpha: 0.9),
+              textAlign: TextAlign.left,
+              maxLines: 3,
+              overflow: TextOverflow.visible,
+            ),
 
-    return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(horizontal: context.spacing4),
-      child: AnimatedContainer(
-        duration:
-            Duration(milliseconds: state.config?.animationDuration ?? 300),
-        width: isActive ? 24 : 8,
-        height: 8,
-        decoration: BoxDecoration(
-          color: isActive ? primaryColor : primaryColor.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(4),
+            SizedBox(height: context.spacing32),
+
+            // Bottom navigation row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Left side: Pagination dots only (no back button)
+                _buildPaginationDots(context, state),
+
+                // Right side: Next/Get Started button
+                _buildActionButton(context, state, primaryColor),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// 🔘 Navigation buttons - NEW LAYOUT: Back (left) and Next/Finish (right)
-  Widget _buildNavigationButtons(BuildContext context, OnboardingState state) {
-    return OsmeaComponents.row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // ⬅️ Back button (left side)
-        _buildBackButton(context, state),
-
-        // ➡️ Next/Finish button (right side)
-        _buildNextFinishButton(context, state),
-      ],
-    );
-  }
-
-  /// ⬅️ Back button (left side)
-  Widget _buildBackButton(BuildContext context, OnboardingState state) {
-    if (!state.shouldShowBackButton) {
-      return OsmeaComponents.sizedBox(width: 80); // Placeholder for alignment
+  /// Pagination dots with border
+  Widget _buildPaginationDots(
+    BuildContext context,
+    OnboardingState state,
+  ) {
+    if (!state.shouldShowPageIndicator) {
+      return OsmeaComponents.sizedBox(width: 0);
     }
 
-    return OsmeaComponents.button(
-      text: 'Back',
-      onPressed: onPrevious,
-      variant: ButtonVariant.ghost,
-      size: ButtonSize.medium,
-      textColor: OsmeaColors.pewter,
-      icon: const Icon(Icons.arrow_back_ios),
-      iconPosition: IconPosition.leading,
+    return OsmeaComponents.row(
+      children: List.generate(state.config!.pages.length, (index) {
+        final isActive = index == state.currentPageIndex;
+        return OsmeaComponents.container(
+          margin: EdgeInsets.only(right: context.spacing6),
+          width: isActive ? 8 : 6,
+          height: isActive ? 8 : 6,
+          decoration: BoxDecoration(
+            color: isActive
+                ? OsmeaColors.white
+                : OsmeaColors.white.withValues(alpha: 0.5),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: OsmeaColors.white,
+              width: 1.5,
+            ),
+          ),
+        );
+      }),
     );
   }
 
-  /// ➡️ Next/Finish button (right side)
-  Widget _buildNextFinishButton(BuildContext context, OnboardingState state) {
-    final isLastPage = state.isLastPage;
-    final primaryColor =
-        state.config?.getPrimaryColor() ?? OsmeaColors.nordicBlue;
-
-    if (isLastPage) {
-      // Finish button
+  /// Action button - Circular next or rectangular Get Started
+  Widget _buildActionButton(
+    BuildContext context,
+    OnboardingState state,
+    Color primaryColor,
+  ) {
+    if (state.isLastPage) {
+      // Rectangular "Get Started" button - No shadow
       return OsmeaComponents.button(
         text: state.currentPage?.buttonText ?? 'Get Started',
-        onPressed: onFinish,
+        onPressed: widget.onFinish,
         variant: ButtonVariant.primary,
         size: ButtonSize.medium,
-        backgroundColor: primaryColor,
+        backgroundColor: OsmeaColors.thunder,
         textColor: OsmeaColors.white,
-        icon: const Icon(Icons.check_circle_outline),
-        iconPosition: IconPosition.trailing,
+        elevation: 0.0,
       );
     } else {
-      // Next button
-      return OsmeaComponents.button(
-        text: state.currentPage?.nextText ?? 'Next',
-        onPressed: onNext,
-        variant: ButtonVariant.primary,
-        size: ButtonSize.medium,
-        backgroundColor: primaryColor,
-        textColor: OsmeaColors.white,
-        icon: const Icon(Icons.arrow_forward_ios),
-        iconPosition: IconPosition.trailing,
+      // Circular next button with border
+      return GestureDetector(
+        onTap: widget.onNext,
+        child: OsmeaComponents.container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: OsmeaColors.thunder,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: OsmeaColors.white,
+              width: 2.0,
+            ),
+          ),
+          child: OsmeaComponents.center(
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              color: OsmeaColors.white,
+              size: context.iconSizeNormal,
+            ),
+          ),
+        ),
       );
     }
   }

@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
-import 'package:core/src/views/auth/widgets/auth_widget.dart';
+import 'package:core/src/views/auth/widgets/auth_enterprise_widget.dart';
+import 'package:core/src/views/auth/widgets/auth_startup_widget.dart';
+import 'package:core/src/views/auth/widgets/auth_space_widget.dart';
 import 'package:core/src/views/auth/enums/auth_design_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -84,7 +86,7 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             // Determine colors based on variant
             // For all variants, use white background for better visibility
             final backgroundColor = OsmeaColors.white;
-            
+
             // Use dark icon for visibility on white background
             final foregroundColor = OsmeaColors.black;
 
@@ -283,7 +285,8 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
       };
       debugPrint('✅ AuthView: Using defaultRedirectPath: $defaultRedirectPath');
     } else {
-      debugPrint('⚠️ AuthView: No onSignInSuccess callback and no defaultRedirectPath');
+      debugPrint(
+          '⚠️ AuthView: No onSignInSuccess callback and no defaultRedirectPath');
     }
 
     // Use the same AuthCubit instance from BaseViewHydratedCubit (GetIt singleton)
@@ -297,9 +300,10 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         return true;
       },
       listener: (context, state) {
-        debugPrint('🔔 AuthView: BlocListener triggered - state type: ${state.runtimeType}');
+        debugPrint(
+            '🔔 AuthView: BlocListener triggered - state type: ${state.runtimeType}');
         debugPrint('🔍 AuthView: Previous navigation flag: $_hasNavigated');
-        
+
         // Reset navigation flag when user signs out
         // This allows navigation to work again after sign out -> sign in flow
         if (state is AuthUnauthenticatedState) {
@@ -317,15 +321,17 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
         // This is the primary navigation trigger after successful signin/signup
         if (state is AuthAuthenticatedState) {
           debugPrint('✅ AuthView: AuthAuthenticatedState detected in listener');
-          
+
           // Use instance variable directly instead of local closure to avoid stale references
           final callback = onSignInSuccess;
           final redirectPath = defaultRedirectPath;
-          
-          debugPrint('🔍 AuthView: onSignInSuccess is ${callback != null ? "not null" : "null"}');
-          debugPrint('🔍 AuthView: defaultRedirectPath is ${redirectPath ?? "null"}');
+
+          debugPrint(
+              '🔍 AuthView: onSignInSuccess is ${callback != null ? "not null" : "null"}');
+          debugPrint(
+              '🔍 AuthView: defaultRedirectPath is ${redirectPath ?? "null"}');
           debugPrint('🔍 AuthView: _hasNavigated is $_hasNavigated');
-          
+
           if (!_hasNavigated) {
             _hasNavigated = true;
             debugPrint(
@@ -334,27 +340,30 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
                 if (!context.mounted) {
-                  debugPrint('⚠️ AuthView: Context not mounted, skipping navigation');
+                  debugPrint(
+                      '⚠️ AuthView: Context not mounted, skipping navigation');
                   _hasNavigated = false;
                   return;
                 }
-                
+
                 // Show success snackbar
                 context.snackbarSuccess(
                   'Redirecting to Home Page',
                   title: 'Login Successful',
                   duration: const Duration(seconds: 3),
                 );
-                
+
                 // Use callback if available, otherwise use defaultRedirectPath
                 if (callback != null) {
                   callback();
                   debugPrint('✅ AuthView: onSignInSuccess callback executed');
                 } else if (redirectPath != null) {
-                  debugPrint('✅ AuthView: Navigating to defaultRedirectPath: $redirectPath');
+                  debugPrint(
+                      '✅ AuthView: Navigating to defaultRedirectPath: $redirectPath');
                   goRoute(redirectPath);
                 } else {
-                  debugPrint('⚠️ AuthView: No callback and no defaultRedirectPath, cannot navigate');
+                  debugPrint(
+                      '⚠️ AuthView: No callback and no defaultRedirectPath, cannot navigate');
                   _hasNavigated = false;
                 }
               } catch (e, stackTrace) {
@@ -426,16 +435,51 @@ class AuthView extends MasterViewHydratedCubit<AuthCubit, AuthState> {
           }
         }
       },
-      child: AuthWidget(
-        onSignInSuccess: wrappedOnSignInSuccess,
-        onSignInError: onSignInError,
-        onSignUpSuccess: onSignUpSuccess,
-        onSignUpError: onSignUpError,
-        onForgotPasswordTap: onForgotPasswordTap,
+      child: _getAuthWidget(
         config: config,
-        initialTab: initialTab,
-        designVariant: _getDesignVariantFromConfig(config),
+        wrappedOnSignInSuccess: wrappedOnSignInSuccess,
       ),
     );
+  }
+
+  /// Get appropriate auth widget based on design variant (like splash_view)
+  Widget _getAuthWidget({
+    Map<String, dynamic>? config,
+    VoidCallback? wrappedOnSignInSuccess,
+  }) {
+    final variant = _getDesignVariantFromConfig(config);
+
+    switch (variant) {
+      case AuthDesignVariant.startup:
+        return AuthStartupWidget(
+          onSignInSuccess: wrappedOnSignInSuccess,
+          onSignInError: onSignInError,
+          onSignUpSuccess: onSignUpSuccess,
+          onSignUpError: onSignUpError,
+          onForgotPasswordTap: onForgotPasswordTap,
+          config: config,
+          initialTab: initialTab,
+        );
+      case AuthDesignVariant.space:
+        return AuthSpaceWidget(
+          onSignInSuccess: wrappedOnSignInSuccess,
+          onSignInError: onSignInError,
+          onSignUpSuccess: onSignUpSuccess,
+          onSignUpError: onSignUpError,
+          onForgotPasswordTap: onForgotPasswordTap,
+          config: config,
+          initialTab: initialTab,
+        );
+      case AuthDesignVariant.enterprise:
+        return AuthEnterpriseWidget(
+          onSignInSuccess: wrappedOnSignInSuccess,
+          onSignInError: onSignInError,
+          onSignUpSuccess: onSignUpSuccess,
+          onSignUpError: onSignUpError,
+          onForgotPasswordTap: onForgotPasswordTap,
+          config: config,
+          initialTab: initialTab,
+        );
+    }
   }
 }
