@@ -477,6 +477,10 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.5), // Semi-transparent overlay so background is visible
+      isDismissible: true,
+      enableDrag: true,
+      useSafeArea: true,
       builder: (bottomSheetContext) {
         // Move isDeleting outside the builder to persist across rebuilds
         bool isDeleting = false;
@@ -575,7 +579,11 @@ class _WishlistListWidgetState extends State<WishlistListWidget> {
           },
         );
       },
-    );
+    ).then((_) {
+      // Refresh wishlist when bottom sheet is dismissed
+      // This ensures the background page shows updated data
+      widget.viewModel.refresh();
+    });
   }
 }
 
@@ -610,11 +618,10 @@ class _CollectionDetailContentState extends State<_CollectionDetailContent> {
     setState(() => _isLoading = true);
     try {
       // Wait a bit for server to process the change
-      await Future.delayed(const Duration(milliseconds: 800));
-      // Reload groups to get updated item counts
-      await widget.viewModel.loadGroups();
-      // Wait a bit more for groups to update
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 500));
+      // Only load collection items - DON'T call loadGroups() here
+      // This preserves the background state while bottom sheet is open
+      // Groups will be refreshed when bottom sheet closes (onDismissed)
       final items = await widget.viewModel.getCollectionItems(widget.groupId);
       if (mounted) {
         setState(() {

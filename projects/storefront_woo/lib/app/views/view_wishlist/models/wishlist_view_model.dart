@@ -934,47 +934,36 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         debugPrint(
           '✅ Wishlist: Item added successfully, syncing from server...',
         );
-        // Always sync from server after successful add to ensure state consistency
-        try {
-          await _syncFromServer(groupId: groupId);
-          // After successful sync, emit success state to show snackbar
-          final currentState = state;
-          if (currentState is WishlistLoadedState) {
-            emit(
-              WishlistSuccessState(
-                message: 'Added to favorites',
-                previousState: currentState,
-              ),
-            );
-          }
-        } catch (syncError) {
-          debugPrint(
-            '⚠️ Wishlist: Sync after successful add failed: $syncError',
+        
+        // If adding to a collection (groupId is not null), refresh entire wishlist
+        // Otherwise, just sync items
+        if (groupId != null) {
+          debugPrint('💖 Wishlist: Added to collection, refreshing entire wishlist...');
+          await Future.delayed(const Duration(milliseconds: 300));
+          await _refreshWishlist();
+        } else {
+          // For general wishlist (no group), just sync items
+          await _syncFromServer();
+        }
+        
+        // Emit success state with current loaded state
+        final currentState = state;
+        if (currentState is WishlistLoadedState) {
+          emit(
+            WishlistSuccessState(
+              message: groupId != null ? 'Added to collection' : 'Added to favorites',
+              previousState: currentState,
+            ),
           );
-          // If sync fails, add item optimistically to current state
-          final cur = state;
-          WishlistLoadedState? optimisticState;
-          if (cur is WishlistLoadedState) {
-            if (!cur.items.any((w) => w.id == item.id)) {
-              final items = [...cur.items, item];
-              optimisticState = WishlistLoadedState(items: items, groups: cur.groups);
-              emit(optimisticState);
-            }
-          } else if (preservedState != null) {
-            if (!preservedState.items.any((w) => w.id == item.id)) {
-              final items = [...preservedState.items, item];
-              optimisticState = WishlistLoadedState(items: items, groups: preservedState.groups);
-              emit(optimisticState);
-            } else {
-              emit(preservedState);
-            }
-          }
-          // Emit success state even if sync failed
-          if (optimisticState != null) {
+        } else {
+          // If state is not loaded, try to refresh again
+          await _refreshWishlist();
+          final refreshedState = state;
+          if (refreshedState is WishlistLoadedState) {
             emit(
               WishlistSuccessState(
-                message: 'Added to favorites',
-                previousState: optimisticState,
+                message: groupId != null ? 'Added to collection' : 'Added to favorites',
+                previousState: refreshedState,
               ),
             );
           }
@@ -1562,7 +1551,47 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
   // Private group management implementations
   Future<void> _loadGroups() async {
-    await _loadGroupsAndGetList();
+    final groups = await _loadGroupsAndGetList();
+    
+    // Update current state with groups (preserve items)
+    final currentState = state;
+    if (currentState is WishlistLoadedState) {
+      emit(currentState.copyWith(groups: groups));
+    } else if (currentState is! WishlistLoadingState) {
+      // Only emit if not loading (to avoid overriding loading state)
+      emit(WishlistLoadedState(
+        items: const [],
+        groups: groups,
+      ));
+    }
+  }
+
+  /// Refresh entire wishlist from server - loads both items and groups
+  /// Public method to refresh wishlist from external sources (e.g., bottom sheet)
+  Future<void> refresh() async {
+    await _refreshWishlist();
+  }
+
+  /// Refresh entire wishlist from server - loads both items and groups
+  Future<void> _refreshWishlist() async {
+    debugPrint('🔄 Wishlist: Refreshing entire wishlist from server...');
+    try {
+      // Sync items from server (groupId=null means ALL items)
+      // _syncFromServer() already loads groups internally, so we just call it
+      await _syncFromServer();
+      
+      // _syncFromServer() already emits WishlistLoadedState with items and groups
+      // No need to do anything else - state is already updated
+      final currentState = state;
+      if (currentState is WishlistLoadedState) {
+        debugPrint('✅ Wishlist: Refresh completed - ${currentState.items.length} items, ${currentState.groups.length} groups');
+      } else {
+        debugPrint('⚠️ Wishlist: Refresh completed but state is not WishlistLoadedState: ${currentState.runtimeType}');
+      }
+    } catch (e) {
+      debugPrint('❌ Wishlist: Error refreshing wishlist: $e');
+      // Don't emit error state, keep current state
+    }
   }
 
   Future<List<WishlistGroup>> _loadGroupsAndGetList() async {
@@ -1593,18 +1622,8 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
         );
       }).toList();
 
-      // Update current state with groups (preserve items)
-      final currentState = state;
-      if (currentState is WishlistLoadedState) {
-        emit(currentState.copyWith(groups: mappedGroups));
-      } else if (currentState is! WishlistLoadingState) {
-        // Only emit if not loading (to avoid overriding loading state)
-        emit(WishlistLoadedState(
-          items: const [],
-          groups: mappedGroups,
-        ));
-      }
-
+      // DON'T emit state here - let _loadGroups() handle it
+      // This prevents duplicate emits and preserves items
       debugPrint('✅ Wishlist: Loaded ${mappedGroups.length} groups');
       return mappedGroups;
     } catch (e) {
@@ -1645,114 +1664,34 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
       debugPrint('💖 Wishlist: Create group response: success=${response.success}, data=${response.data}');
 
       if (response.success == true) {
-        WishlistGroup newGroup;
+        debugPrint('✅ Wishlist: Group created successfully: $name');
         
-        if (response.data != null) {
-          // Standard format with data object
-          newGroup = WishlistGroup(
-            id: response.data!.id?.toString() ?? '',
-            name: response.data!.name ?? name.trim(),
-            description: response.data!.description,
-            isDefault: response.data!.isDefault ?? false,
-            itemCount: 0,
-            createdAt: response.data!.createdAt,
-            userId: response.data!.userId,
-          );
-          debugPrint('✅ Wishlist: Group created with data object: ${newGroup.name}');
-        } else {
-          // API returns {success: true, group_id: X} format
-          // Reload groups to get the newly created group with full details
-          debugPrint('💡 Wishlist: Response has no data object, reloading groups to get full info');
-          
-          // Wait a bit for server to process
-          await Future.delayed(const Duration(milliseconds: 500));
-          
-          // Reload groups to get the newly created group
-          await _loadGroups();
-          
-          // Find the newly created group by name
-          final currentState = state;
-          WishlistGroup? foundGroup;
-          if (currentState is WishlistLoadedState) {
-            final allGroups = currentState.groups;
-            // Find groups with matching name, prefer the one with most recent created_at
-            final matchingGroups = allGroups.where((g) => g.name == name.trim()).toList();
-            if (matchingGroups.isNotEmpty) {
-              // Sort by created_at if available, otherwise take first
-              matchingGroups.sort((a, b) {
-                if (a.createdAt == null && b.createdAt == null) return 0;
-                if (a.createdAt == null) return 1;
-                if (b.createdAt == null) return -1;
-                return b.createdAt!.compareTo(a.createdAt!);
-              });
-              foundGroup = matchingGroups.first;
-              debugPrint('✅ Wishlist: Found newly created group: ${foundGroup.name} (id: ${foundGroup.id})');
-            }
-          }
-          
-          // If still not found, create a basic group object with the name
-          newGroup = foundGroup ?? WishlistGroup(
-            id: '', // Will be updated when groups are reloaded next time
-            name: name.trim(),
-            description: description?.trim(),
-            isDefault: false,
-            itemCount: 0,
-          );
-          
-          if (foundGroup == null) {
-            debugPrint('⚠️ Wishlist: Could not find newly created group, created basic object');
-          }
-        }
-
-        // Update current state with new group
+        // Wait a bit for server to process the new collection
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        // Refresh entire wishlist from server - this will load both items and groups
+        await _refreshWishlist();
+        
+        // Emit success state with current loaded state
         final currentState = state;
         if (currentState is WishlistLoadedState) {
-          // Check if group already exists (avoid duplicates)
-          final groupExists = currentState.groups.any((g) => g.id == newGroup.id && g.id.isNotEmpty);
-          if (!groupExists && newGroup.id.isNotEmpty) {
-            final updatedGroups = [...currentState.groups, newGroup];
-            emit(currentState.copyWith(groups: updatedGroups));
-            emit(WishlistSuccessState(
-              message: 'Collection created successfully',
-              previousState: currentState.copyWith(groups: updatedGroups),
-            ));
-          } else {
-            // Group already exists or ID is empty, reload to ensure we have latest data
-            await _loadGroups();
-            final updatedState = state;
-            if (updatedState is WishlistLoadedState) {
-              emit(WishlistSuccessState(
-                message: 'Collection created successfully',
-                previousState: updatedState,
-              ));
-            }
-          }
+          emit(WishlistSuccessState(
+            message: 'Collection created successfully',
+            previousState: currentState,
+          ));
         } else {
-          // If state is not loaded, ensure we have loaded state with the new group
-          if (newGroup.id.isNotEmpty) {
-            emit(WishlistLoadedState(
-              items: const [],
-              groups: [newGroup],
-            ));
-            final loadedState = state as WishlistLoadedState;
+          // If state is not loaded after refresh, ensure we have loaded state
+          await _refreshWishlist();
+          final refreshedState = state;
+          if (refreshedState is WishlistLoadedState) {
             emit(WishlistSuccessState(
               message: 'Collection created successfully',
-              previousState: loadedState,
+              previousState: refreshedState,
             ));
-          } else {
-            // If group ID is empty, reload groups to get proper state
-            await _loadGroups();
-            final updatedState = state;
-            if (updatedState is WishlistLoadedState) {
-              emit(WishlistSuccessState(
-                message: 'Collection created successfully',
-                previousState: updatedState,
-              ));
-            }
           }
         }
-
-        debugPrint('✅ Wishlist: Group created successfully: ${newGroup.name}');
+        
+        debugPrint('✅ Wishlist: Collection "$name" created and wishlist refreshed');
       } else {
         emit(WishlistErrorState(
           message: response.message ?? 'Failed to create collection',
@@ -1785,7 +1724,22 @@ class WishlistViewModel extends BaseViewModelHydratedCubit<WishlistState> {
 
       if (response.success == true) {
         debugPrint('✅ Wishlist: Group deleted successfully');
-        await _loadGroups();
+        
+        // Wait a bit for server to process
+        await Future.delayed(const Duration(milliseconds: 300));
+        
+        // Refresh entire wishlist from server
+        await _refreshWishlist();
+        
+        // Emit success state
+        final currentState = state;
+        if (currentState is WishlistLoadedState) {
+          emit(WishlistSuccessState(
+            message: 'Collection deleted successfully',
+            previousState: currentState,
+          ));
+        }
+        
         return;
       }
 
