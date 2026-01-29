@@ -92,7 +92,9 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
   }
 
   void _refreshConfig() {
-    debugPrint('🔄 HomeContentWidget: Refreshing configuration from app_config.json');
+    debugPrint(
+      '🔄 HomeContentWidget: Refreshing configuration from app_config.json',
+    );
     setState(() {
       _loadConfig();
     });
@@ -248,9 +250,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       components.add(
         _HomeComponent(
           orderId: _getOrderId(configHelper, 'campaign_alert'),
-          widget: CampaignAlertWidget(
-            configHelper: configHelper,
-          ),
+          widget: CampaignAlertWidget(configHelper: configHelper),
           name: 'campaign_alert',
         ),
       );
@@ -293,19 +293,22 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     final List<Widget> widgets = [];
     for (int i = 0; i < components.length; i++) {
       final component = components[i];
-      
+
       // Add the component widget
       widgets.add(component.widget);
-      
+
       // Add spacing after component (except for the last one)
       if (i < components.length - 1) {
-        final bottomSpacing = _getComponentBottomSpacing(configHelper, component.name);
+        final bottomSpacing = _getComponentBottomSpacing(
+          configHelper,
+          component.name,
+        );
         if (bottomSpacing > 0) {
           widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));
         }
       }
     }
-    
+
     return widgets;
   }
 
@@ -313,10 +316,35 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     await widget.viewModel.initial();
   }
 
+  /// Bottom padding for scroll so content is not hidden under the bottom foreground banner + tab bar.
+  double _getScrollBottomPadding(
+    AssetConfigHelper configHelper,
+    BuildContext context,
+  ) {
+    final baseSpacing =
+        configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2;
+    try {
+      final bannerConfig = configHelper.getObject(
+        'home_view.bottom_foreground_banner',
+      );
+      final enabled = bannerConfig?['enabled'] as bool? ?? false;
+      if (!enabled) return baseSpacing;
+      final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+      final tailBottomOffset =
+          (bannerConfig?['tail_bottom_offset'] as num?)?.toDouble() ?? 56.0;
+      final height = (bannerConfig?['height'] as num?)?.toDouble() ?? 60.0;
+      final reservedFromBottom = safeAreaBottom + tailBottomOffset + height;
+      return baseSpacing + reservedFromBottom;
+    } catch (_) {
+      return baseSpacing;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    
+    final scrollBottomPadding = _getScrollBottomPadding(configHelper, context);
+
     return SizedBox.expand(
       child: Stack(
         clipBehavior: Clip.none,
@@ -329,10 +357,13 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
             strokeWidth: 2.0,
             displacement: 40,
             child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              behavior: ScrollConfiguration.of(
+                context,
+              ).copyWith(scrollbars: false),
               child: OsmeaComponents.singleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.only(
+                  top: 15, // Extra spacing between app bar and categories
                   bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
                 ),
                 child: OsmeaComponents.column(

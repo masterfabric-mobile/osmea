@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:osmea_components/src/enums/carousel_enums.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Deals of the day carousel widget (stateless)
 /// Uses OsmeaComponents.carousel for state/indicator management
@@ -122,7 +123,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
         _loadDealsConfig() ??
         {'title': 'Deals of the day', 'show_see_all': false};
 
-    final sectionTitle = cfg['title'] as String? ?? 'Deals of the day';
+    final sectionTitle = configString(cfg['title']) ?? 'Deals of the day';
     final showSeeAll = cfg['show_see_all'] as bool? ?? false;
 
     // Show an empty carousel when there are no products (as requested)

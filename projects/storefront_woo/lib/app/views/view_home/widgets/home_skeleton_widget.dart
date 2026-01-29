@@ -8,6 +8,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Skeleton component model with orderID
 class _SkeletonComponent {
@@ -352,7 +353,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
     double getSkeletonHeight() {
       try {
         final config = configHelper.getObject('home_view.promotional_bar');
-        final heightStr = config?['height'] as String? ?? 'medium';
+        final heightStr = configString(config?['height']) ?? 'medium';
 
         switch (heightStr.toLowerCase()) {
           case 'short':
@@ -704,7 +705,10 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
 
   Widget _buildCollectionsSkeleton(BuildContext context) {
     final configHelper = _configHelper ?? AssetConfigHelper();
-    final horizontalPadding = _getHorizontalPadding(configHelper, 'collections');
+    final horizontalPadding = _getHorizontalPadding(
+      configHelper,
+      'collections',
+    );
     final titleSpacing = _getTitleSpacing(configHelper);
 
     final imageHeight = context.height160 + context.spacing10;
@@ -754,10 +758,7 @@ class _HomeSkeletonWidgetState extends State<HomeSkeletonWidget>
                 }),
               ),
               OsmeaComponents.sizedBox(height: context.spacing8),
-              Container(
-                height: 1,
-                color: OsmeaColors.silver.withOpacity(0.35),
-              ),
+              Container(height: 1, color: OsmeaColors.silver.withOpacity(0.35)),
             ],
           ),
         ),

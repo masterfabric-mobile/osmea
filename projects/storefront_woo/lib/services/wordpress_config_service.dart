@@ -6,18 +6,18 @@ class WordPressConfigService {
   final String baseUrl;
   final Duration timeout;
   final Dio? dio;
-  
+
   WordPressConfigService({
     required this.baseUrl,
     this.timeout = const Duration(seconds: 30),
     this.dio,
   });
-  
+
   /// Get Dio instance for WordPress config fetch
   /// Creates a simple Dio instance without cookie jar to avoid file system issues
   Dio get _dio {
     if (dio != null) return dio!;
-    
+
     // Create a simple Dio instance without cookie jar for WordPress config fetch
     // This avoids file system errors when cookie jar tries to create .cookies directory
     final simpleDio = Dio()
@@ -31,35 +31,44 @@ class WordPressConfigService {
         sendTimeout: timeout,
         responseType: ResponseType.json,
       );
-    
+
     debugPrint('📡 WordPress config Dio client configured (no cookies)');
     return simpleDio;
   }
-  
+
   /// Fetch app configuration from WordPress REST API
-  /// 
-  /// Returns the full app_config.json structure
-  /// Throws exception on error
-  Future<Map<String, dynamic>> fetchAppConfig() async {
+  ///
+  /// [bypassCache] – when true, appends a timestamp query param so version-check
+  /// requests get fresh config (avoids stale plugin_version).
+  ///
+  /// Returns the full app_config.json structure.
+  /// Throws exception on error.
+  Future<Map<String, dynamic>> fetchAppConfig({
+    bool bypassCache = false,
+  }) async {
     try {
-      final url = '$baseUrl/wp-json/osmea/v1/app-config';
-      
+      var url = '$baseUrl/wp-json/osmea/v1/app-config';
+      if (bypassCache) {
+        url += '?_t=${DateTime.now().millisecondsSinceEpoch}';
+      }
+
       debugPrint('📡 Fetching config from: $url');
-      
+
       final response = await _dio.get<Map<String, dynamic>>(
         url,
         options: Options(
           responseType: ResponseType.json,
+          headers: bypassCache
+              ? {'Cache-Control': 'no-cache', 'Pragma': 'no-cache'}
+              : null,
         ),
       );
-      
+
       if (response.statusCode == 200 && response.data != null) {
         debugPrint('✅ Config fetched successfully');
         return response.data!;
       } else {
-        throw Exception(
-          'Failed to load config: ${response.statusCode}',
-        );
+        throw Exception('Failed to load config: ${response.statusCode}');
       }
     } on DioException catch (e) {
       debugPrint('❌ Dio error fetching config:');
@@ -69,7 +78,7 @@ class WordPressConfigService {
       debugPrint('  - Response status: ${e.response?.statusCode}');
       debugPrint('  - Response data: ${e.response?.data}');
       debugPrint('  - Request path: ${e.requestOptions.path}');
-      
+
       if (e.response != null) {
         final statusCode = e.response?.statusCode;
         final responseData = e.response?.data;
@@ -77,7 +86,7 @@ class WordPressConfigService {
           'Failed to load config: HTTP $statusCode - $responseData',
         );
       }
-      
+
       // Provide more detailed error message
       String errorMsg = 'Network error';
       if (e.type == DioExceptionType.connectionTimeout) {
@@ -93,7 +102,7 @@ class WordPressConfigService {
       } else if (e.error != null) {
         errorMsg = 'Error: ${e.error}';
       }
-      
+
       throw Exception('Network error: $errorMsg');
     } catch (e, stackTrace) {
       debugPrint('❌ Error fetching config: $e');
@@ -101,9 +110,9 @@ class WordPressConfigService {
       rethrow;
     }
   }
-  
+
   /// Fetch config with retry logic
-  /// 
+  ///
   /// [maxRetries] - Maximum number of retry attempts
   /// [retryDelay] - Delay between retries
   Future<Map<String, dynamic>> fetchAppConfigWithRetry({
@@ -112,27 +121,30 @@ class WordPressConfigService {
   }) async {
     int attempts = 0;
     Exception? lastException;
-    
+
     while (attempts < maxRetries) {
       try {
         return await fetchAppConfig();
       } catch (e) {
         lastException = e is Exception ? e : Exception(e.toString());
         attempts++;
-        
+
         if (attempts >= maxRetries) {
           debugPrint('❌ Failed after $maxRetries attempts');
           break;
         }
-        
-        debugPrint('⚠️ Retry attempt $attempts/$maxRetries after ${retryDelay.inSeconds}s');
+
+        debugPrint(
+          '⚠️ Retry attempt $attempts/$maxRetries after ${retryDelay.inSeconds}s',
+        );
         await Future.delayed(retryDelay);
       }
     }
-    
-    throw lastException ?? Exception('Failed to fetch config after $maxRetries attempts');
+
+    throw lastException ??
+        Exception('Failed to fetch config after $maxRetries attempts');
   }
-  
+
   /// Check if WordPress endpoint is available
   Future<bool> isAvailable() async {
     try {
@@ -150,4 +162,3 @@ class WordPressConfigService {
     }
   }
 }
-
