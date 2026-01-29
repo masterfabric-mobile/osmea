@@ -15,7 +15,10 @@ dependencies:
   
   # Core Package
   core:
-    path: ../../packages/core
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
   
   # API Package
   apis:
@@ -23,7 +26,7 @@ dependencies:
   
   # Dependency Injection
   injectable: ^2.5.1
-  get_it: 7.7.0
+  get_it: ^8.3.0
 
   # Routing
   go_router: ^15.1.1
