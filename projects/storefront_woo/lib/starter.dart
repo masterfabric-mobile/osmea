@@ -70,7 +70,7 @@ launchApp({String environment = 'dev'}) async {
     debugPrint('📡 Attempting to load configuration from WordPress...');
 
     wordPressService = WordPressConfigService(
-      baseUrl: 'https://example.com', // WordPress site URL
+      baseUrl: 'https://masterfabric.store', // WordPress site URL
     );
 
     wordPressConfigIntegration = WordPressConfigIntegration(
@@ -432,8 +432,7 @@ launchApp({String environment = 'dev'}) async {
                           mergedConfig['woocommerce_configuration']
                               as Map<String, dynamic>;
                       final baseUrl =
-                          wordPressService?.baseUrl ??
-                          'https://example.com';
+                          wordPressService?.baseUrl ?? 'https://masterfabric.store';
                       if (wooConfig['store_url'] == null ||
                           wooConfig['store_url'].toString().isEmpty ||
                           wooConfig['store_url'] == 'http://example.com') {
