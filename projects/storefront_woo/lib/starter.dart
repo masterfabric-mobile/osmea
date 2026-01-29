@@ -433,7 +433,7 @@ launchApp({String environment = 'dev'}) async {
                               as Map<String, dynamic>;
                       final baseUrl =
                           wordPressService?.baseUrl ??
-                          'https://masterfabric.store';
+                          'https://example.com';
                       if (wooConfig['store_url'] == null ||
                           wooConfig['store_url'].toString().isEmpty ||
                           wooConfig['store_url'] == 'http://example.com') {
