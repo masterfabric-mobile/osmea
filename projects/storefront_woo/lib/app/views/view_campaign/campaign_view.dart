@@ -125,7 +125,9 @@ class _CampaignViewState extends State<CampaignView>
   /// Get splash image URL from config if available
   String? _getSplashImageUrl() {
     try {
-      final splashImageUrl = _configHelper?.getString('campaign_view.splash_image_url');
+      final splashImageUrl = _configHelper?.getString(
+        'campaign_view.splash_image_url',
+      );
       if (splashImageUrl != null && splashImageUrl.isNotEmpty) {
         return splashImageUrl;
       }
@@ -135,11 +137,17 @@ class _CampaignViewState extends State<CampaignView>
     return null;
   }
 
-  /// Get splash title from config if available
+  /// Get splash title from config if available.
+  /// Treats "true"/"false" (config booleans coerced to string) as no title.
   String? _getSplashTitle() {
     try {
-      final splashTitle = _configHelper?.getString('campaign_view.splash_title');
-      if (splashTitle != null && splashTitle.isNotEmpty) {
+      final splashTitle = _configHelper?.getString(
+        'campaign_view.splash_title',
+      );
+      if (splashTitle != null &&
+          splashTitle.isNotEmpty &&
+          splashTitle != 'true' &&
+          splashTitle != 'false') {
         return splashTitle;
       }
     } catch (e) {
@@ -148,11 +156,17 @@ class _CampaignViewState extends State<CampaignView>
     return null;
   }
 
-  /// Get splash subtitle from config if available
+  /// Get splash subtitle from config if available.
+  /// Treats "true"/"false" (config booleans coerced to string) as no subtitle.
   String? _getSplashSubtitle() {
     try {
-      final splashSubtitle = _configHelper?.getString('campaign_view.splash_subtitle');
-      if (splashSubtitle != null && splashSubtitle.isNotEmpty) {
+      final splashSubtitle = _configHelper?.getString(
+        'campaign_view.splash_subtitle',
+      );
+      if (splashSubtitle != null &&
+          splashSubtitle.isNotEmpty &&
+          splashSubtitle != 'true' &&
+          splashSubtitle != 'false') {
         return splashSubtitle;
       }
     } catch (e) {
@@ -241,8 +255,8 @@ class _CampaignViewState extends State<CampaignView>
         child: _shouldUseSplashImage()
             ? _buildSplashImage()
             : (_campaignImages.isEmpty
-                ? _buildLoadingState()
-                : _buildCampaignImage()),
+                  ? _buildLoadingState()
+                  : _buildCampaignImage()),
       ),
     );
   }
@@ -512,9 +526,12 @@ class _CampaignViewState extends State<CampaignView>
   }
 
   /// Get translated text from slang or return original text
-  /// If the text starts with '@', it's treated as a translation key
+  /// If the text starts with '@', it's treated as a translation key.
+  /// Treats "true"/"false" (config booleans coerced to string) as no text.
   String _getTranslatedText(BuildContext context, String? text) {
-    if (text == null || text.isEmpty) return '';
+    if (text == null || text.isEmpty || text == 'true' || text == 'false') {
+      return '';
+    }
     // If text starts with '@', treat it as a translation key
     if (text.startsWith('@')) {
       final key = text.substring(1);
