@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Brands section widget
 class BrandsSectionWidget extends StatelessWidget {
@@ -35,11 +36,9 @@ class BrandsSectionWidget extends StatelessWidget {
   List<Map<String, dynamic>> _getBrands() {
     final config = _loadBrandsConfig();
     final brandsList = config?['brands'] as List<dynamic>?;
-    
+
     if (brandsList != null && brandsList.isNotEmpty) {
-      return brandsList
-          .map((b) => b as Map<String, dynamic>)
-          .toList();
+      return brandsList.map((b) => b as Map<String, dynamic>).toList();
     }
 
     // Return empty list if no brands configured
@@ -60,20 +59,27 @@ class BrandsSectionWidget extends StatelessWidget {
     } catch (e) {
       debugPrint('Failed to load horizontal padding: $e');
     }
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing() {
-    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final config = _loadBrandsConfig();
-    final sectionTitle = config?['title'] as String? ?? 'Shop by Brand';
+    final sectionTitle = configString(config?['title']) ?? 'Shop by Brand';
     final showSection = config?['enabled'] as bool? ?? true;
-    final layout = config?['layout'] as String? ?? 'grid'; // 'grid' or 'carousel'
+    final layout =
+        configString(config?['layout']) ?? 'grid'; // 'grid' or 'carousel'
 
     if (!showSection) return const SizedBox.shrink();
 
@@ -110,7 +116,9 @@ class BrandsSectionWidget extends StatelessWidget {
                 child: OsmeaComponents.text(
                   'See all',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
+                    fontSize:
+                        context.fontSizeExtraSmallMedium *
+                        context.textScaleFactor,
                     fontWeight: FontWeight.w500,
                     color: OsmeaColors.black,
                   ),
@@ -145,8 +153,10 @@ class BrandsSectionWidget extends StatelessWidget {
               final isEvenCount = brands.length % 2 == 0;
               final columns = isEvenCount ? 2 : 3;
               final totalSpacing = context.spacing16 * (columns - 1);
-              final itemWidth = (context.allWidth - (horizontalPadding * 2) - totalSpacing) / columns;
-              
+              final itemWidth =
+                  (context.allWidth - (horizontalPadding * 2) - totalSpacing) /
+                  columns;
+
               return OsmeaComponents.padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: Wrap(
@@ -167,15 +177,12 @@ class BrandsSectionWidget extends StatelessWidget {
   }
 
   /// Builds a single brand card
-  Widget _buildBrandCard(
-    BuildContext context,
-    Map<String, dynamic> brand,
-  ) {
-    final brandName = brand['name'] as String? ?? 'Brand';
-    final imageUrl = brand['image_url'] as String?;
-    final logoUrl = brand['logo_url'] as String?;
+  Widget _buildBrandCard(BuildContext context, Map<String, dynamic> brand) {
+    final brandName = configString(brand['name']) ?? 'Brand';
+    final imageUrl = configString(brand['image_url']);
+    final logoUrl = configString(brand['logo_url']);
     final brandId = brand['id'] as int?;
-    final route = brand['route'] as String?;
+    final route = configString(brand['route']);
     final categoryId = brand['category_id'] as int?;
 
     // Use logo_url if available, otherwise fall back to image_url
@@ -223,7 +230,9 @@ class BrandsSectionWidget extends StatelessWidget {
                     child: OsmeaComponents.text(
                       brandName,
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                        fontSize:
+                            context.fontSizeExtraSmall *
+                            context.textScaleFactor,
                         fontWeight: FontWeight.w600,
                         color: OsmeaColors.thunder,
                       ),
@@ -239,7 +248,8 @@ class BrandsSectionWidget extends StatelessWidget {
                 child: OsmeaComponents.text(
                   brandName,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                    fontSize:
+                        context.fontSizeExtraSmall * context.textScaleFactor,
                     fontWeight: FontWeight.w600,
                     color: OsmeaColors.thunder,
                   ),
@@ -252,4 +262,3 @@ class BrandsSectionWidget extends StatelessWidget {
     );
   }
 }
-

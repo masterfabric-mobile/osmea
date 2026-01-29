@@ -14,6 +14,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:osmea_components/src/enums/carousel_enums.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Flash sale section widget with countdown timer
 class FlashSaleSectionWidget extends StatefulWidget {
@@ -62,13 +63,13 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
 
   void _initializeTimer() {
     final config = _loadFlashSaleConfig();
-    final endTimeStr = config?['end_time'] as String?;
-    
+    final endTimeStr = configString(config?['end_time']);
+
     if (endTimeStr != null) {
       try {
         final endTime = DateTime.parse(endTimeStr);
         _updateTimeRemaining(endTime);
-        
+
         _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
           if (mounted) {
             _updateTimeRemaining(endTime);
@@ -83,7 +84,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
       // Default: 24 hours from now
       final endTime = DateTime.now().add(const Duration(hours: 24));
       _updateTimeRemaining(endTime);
-      
+
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (mounted) {
           _updateTimeRemaining(endTime);
@@ -97,7 +98,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
   void _updateTimeRemaining(DateTime endTime) {
     final now = DateTime.now();
     final remaining = endTime.difference(now);
-    
+
     if (remaining.isNegative) {
       setState(() {
         _timeRemaining = Duration.zero;
@@ -124,7 +125,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
   List<ListAllProductsResponseModel> _getFlashSaleProducts() {
     final config = _loadFlashSaleConfig();
     final productIds = config?['product_ids'] as List<dynamic>?;
-    
+
     if (productIds != null && productIds.isNotEmpty) {
       final ids = productIds.map((e) => e as int).toSet();
       return widget.allProducts
@@ -154,19 +155,25 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     } catch (e) {
       debugPrint('Failed to load horizontal padding: $e');
     }
-    return widget.configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return widget.configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing() {
-    return widget.configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return widget.configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   /// Gets background color from config
   Color _getBackgroundColor() {
     try {
       final config = _loadFlashSaleConfig();
-      final colorString = config?['backgroundColor'] as String?;
+      final colorString = configString(config?['backgroundColor']);
       if (colorString != null && colorString.isNotEmpty) {
         // Handle hex color strings
         if (colorString.startsWith('#')) {
@@ -188,7 +195,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     final days = duration.inDays;
     final hours = duration.inHours.remainder(24);
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (days > 0) {
       return '${days}d ${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
     } else if (hours > 0) {
@@ -201,7 +208,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
   @override
   Widget build(BuildContext context) {
     final config = _loadFlashSaleConfig();
-    final sectionTitle = config?['title'] as String? ?? 'Flash Sale';
+    final sectionTitle = configString(config?['title']) ?? 'Flash Sale';
     final showSection = config?['enabled'] as bool? ?? true;
 
     if (!showSection) return const SizedBox.shrink();
@@ -226,119 +233,128 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border(
-          left: BorderSide(
-            color: OsmeaColors.silver,
-            width: 1,
-          ),
-          right: BorderSide(
-            color: OsmeaColors.silver,
-            width: 1,
-          ),
-          bottom: BorderSide(
-            color: OsmeaColors.silver,
-            width: 1,
-          ),
+          left: BorderSide(color: OsmeaColors.silver, width: 1),
+          right: BorderSide(color: OsmeaColors.silver, width: 1),
+          bottom: BorderSide(color: OsmeaColors.silver, width: 1),
         ),
         borderRadius: BorderRadius.circular(context.spacing12),
       ),
       child: OsmeaComponents.column(
         crossAxisAlignment: context.crossStart,
         children: [
-        // Section header with countdown timer
-        OsmeaComponents.padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: OsmeaComponents.row(
-            mainAxisAlignment: context.spaceBetween,
-            crossAxisAlignment: context.crossCenter,
-            children: [
-              OsmeaComponents.row(
-                children: [
-                  OsmeaComponents.text(
-                    sectionTitle,
-                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-                      fontSize: context.fontSizeNormal * context.textScaleFactor,
-                      fontWeight: FontWeight.w600,
-                      height: context.lineHeightTight,
-                      letterSpacing: -0.2,
-                      color: OsmeaColors.thunder,
+          // Section header with countdown timer
+          OsmeaComponents.padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: OsmeaComponents.row(
+              mainAxisAlignment: context.spaceBetween,
+              crossAxisAlignment: context.crossCenter,
+              children: [
+                OsmeaComponents.row(
+                  children: [
+                    OsmeaComponents.text(
+                      sectionTitle,
+                      textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                        fontSize:
+                            context.fontSizeNormal * context.textScaleFactor,
+                        fontWeight: FontWeight.w600,
+                        height: context.lineHeightTight,
+                        letterSpacing: -0.2,
+                        color: OsmeaColors.thunder,
+                      ),
                     ),
-                  ),
-                  OsmeaComponents.sizedBox(width: context.spacing8),
-                  // Countdown timer
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.spacing8,
-                      vertical: context.spacing4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: OsmeaColors.black.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(context.spacing8),
-                    ),
-                    child: OsmeaComponents.row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: context.iconSizeSmall,
-                          color: OsmeaColors.black,
-                        ),
-                        OsmeaComponents.sizedBox(width: context.spacing4),
-                        OsmeaComponents.text(
-                          _formatDuration(_timeRemaining),
-                          textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                            fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
-                            fontWeight: FontWeight.w700,
+                    OsmeaComponents.sizedBox(width: context.spacing8),
+                    // Countdown timer
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing8,
+                        vertical: context.spacing4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: OsmeaColors.black.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(context.spacing8),
+                      ),
+                      child: OsmeaComponents.row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: context.iconSizeSmall,
                             color: OsmeaColors.black,
                           ),
-                        ),
-                      ],
+                          OsmeaComponents.sizedBox(width: context.spacing4),
+                          OsmeaComponents.text(
+                            _formatDuration(_timeRemaining),
+                            textStyle: OsmeaTextStyle.bodySmall(context)
+                                .copyWith(
+                                  fontSize:
+                                      context.fontSizeExtraSmall *
+                                      context.textScaleFactor,
+                                  fontWeight: FontWeight.w700,
+                                  color: OsmeaColors.black,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                // See all button
+                GestureDetector(
+                  onTap: () {
+                    context.push('/products?on_sale=true');
+                  },
+                  child: OsmeaComponents.text(
+                    'See all',
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      fontSize:
+                          context.fontSizeExtraSmallMedium *
+                          context.textScaleFactor,
+                      fontWeight: FontWeight.w500,
+                      color: OsmeaColors.black,
                     ),
                   ),
-                ],
-              ),
-              // See all button
-              GestureDetector(
-                onTap: () {
-                  context.push('/products?on_sale=true');
-                },
-                child: OsmeaComponents.text(
-                  'See all',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                    fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
-                    fontWeight: FontWeight.w500,
-                            color: OsmeaColors.black,
+                ),
+              ],
+            ),
+          ),
+          OsmeaComponents.sizedBox(height: _getTitleSpacing()),
+          // Product carousel
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(
+              context,
+            ).copyWith(scrollbars: false),
+            child: OsmeaComponents.carousel(
+              variant: CarouselVariant.standard,
+              size: CarouselSize.small,
+              height: context.height160 + context.spacing10 + context.height80,
+              items: flashSaleProducts.map((product) {
+                return OsmeaComponents.container(
+                  margin: EdgeInsets.only(
+                    left: flashSaleProducts.indexOf(product) == 0
+                        ? horizontalPadding
+                        : context.spacing8,
+                    right:
+                        flashSaleProducts.indexOf(product) ==
+                            flashSaleProducts.length - 1
+                        ? horizontalPadding
+                        : 0,
                   ),
-                ),
-              ),
-            ],
+                  width:
+                      (context.allWidth -
+                          (horizontalPadding * 2) -
+                          context.spacing16) /
+                      2,
+                  child: _buildFlashSaleCard(context, product),
+                );
+              }).toList(),
+              width: context.allWidth,
+              customPadding: context.paddingZero,
+              backgroundColor: backgroundColor,
+              showIndicators: false,
+              showArrows: false,
+              autoPlay: CarouselAutoPlay.none,
+            ),
           ),
-        ),
-        OsmeaComponents.sizedBox(height: _getTitleSpacing()),
-        // Product carousel
-        ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-          child: OsmeaComponents.carousel(
-            variant: CarouselVariant.standard,
-            size: CarouselSize.small,
-            height: context.height160 + context.spacing10 + context.height80,
-            items: flashSaleProducts.map((product) {
-              return OsmeaComponents.container(
-                margin: EdgeInsets.only(
-                  left: flashSaleProducts.indexOf(product) == 0 ? horizontalPadding : context.spacing8,
-                  right: flashSaleProducts.indexOf(product) == flashSaleProducts.length - 1 ? horizontalPadding : 0,
-                ),
-                width: (context.allWidth - (horizontalPadding * 2) - context.spacing16) / 2,
-                child: _buildFlashSaleCard(context, product),
-              );
-            }).toList(),
-            width: context.allWidth,
-            customPadding: context.paddingZero,
-            backgroundColor: backgroundColor,
-            showIndicators: false,
-            showArrows: false,
-            autoPlay: CarouselAutoPlay.none,
-          ),
-        ),
-      ],
+        ],
       ),
     );
   }
@@ -354,7 +370,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
         prices?.salePrice != null &&
         (prices?.salePrice?.isNotEmpty ?? false) &&
         prices?.salePrice != prices?.regularPrice;
-    
+
     int? discountPct;
     if (hasSale) {
       final rp = PriceInfoCurrencyHelper.parsePriceToDouble(
@@ -390,10 +406,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
             decoration: BoxDecoration(
               color: OsmeaColors.white,
               borderRadius: context.borderRadiusNormal,
-              border: Border.all(
-                color: OsmeaColors.silver,
-                width: 1,
-              ),
+              border: Border.all(color: OsmeaColors.silver, width: 1),
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(
@@ -434,14 +447,16 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         vertical: context.spacing2,
                       ),
                       decoration: BoxDecoration(
-                            color: OsmeaColors.black,
+                        color: OsmeaColors.black,
                         borderRadius: BorderRadius.circular(context.spacing6),
                       ),
                       child: OsmeaComponents.text(
                         '$discountPct% OFF',
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.white,
-                          fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                          fontSize:
+                              context.fontSizeExtraSmall *
+                              context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -454,24 +469,28 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                   child: Builder(
                     builder: (context) {
                       final productId = product.id ?? 0;
-                      final localIsSaved = _productWishlistStates[productId] ?? false;
-                      
+                      final localIsSaved =
+                          _productWishlistStates[productId] ?? false;
+
                       return GestureDetector(
                         onTap: () {
                           // Store previous state to determine action
                           final wasSaved = localIsSaved;
-                          
+
                           // Immediately update local state for instant UI feedback
                           setState(() {
                             _productWishlistStates[productId] = !wasSaved;
                           });
-                          
+
                           // Check if we're on wishlist/favorites/saved page - don't show snackbar there
-                          final currentRoute = GoRouterState.of(context).uri.path;
-                          final isOnWishlistPage = currentRoute.contains('/wishlist') || 
-                                                 currentRoute.contains('/favorites') ||
-                                                 currentRoute.contains('/saved');
-                          
+                          final currentRoute = GoRouterState.of(
+                            context,
+                          ).uri.path;
+                          final isOnWishlistPage =
+                              currentRoute.contains('/wishlist') ||
+                              currentRoute.contains('/favorites') ||
+                              currentRoute.contains('/saved');
+
                           // Show snackbar immediately when button is pressed (but not on wishlist page)
                           if (!isOnWishlistPage) {
                             if (!wasSaved) {
@@ -492,7 +511,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                               );
                             }
                           }
-                          
+
                           // Then call the viewModel callback
                           widget.viewModel.addProductToWishlist(productId);
                         },
@@ -501,14 +520,18 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                           height: context.height32,
                           decoration: BoxDecoration(
                             color: OsmeaColors.white,
-                            borderRadius: BorderRadius.circular(context.spacing24),
+                            borderRadius: BorderRadius.circular(
+                              context.spacing24,
+                            ),
                             border: Border.all(
                               color: OsmeaColors.thunder,
                               width: context.borderWidth,
                             ),
                           ),
                           child: Icon(
-                            localIsSaved ? Icons.favorite : Icons.favorite_border,
+                            localIsSaved
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: context.iconSizeExtraSmall,
                             color: localIsSaved
                                 ? OsmeaColors.black
@@ -537,12 +560,16 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         _formatPrice(
                           prices?.salePrice,
                           currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyDecimalSeparator:
+                              prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator:
+                              prices?.currencyThousandSeparator,
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
+                          fontSize:
+                              context.fontSizeExtraSmallMedium *
+                              context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                           color: OsmeaColors.black,
                         ),
@@ -552,12 +579,15 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                         _formatPrice(
                           prices?.regularPrice,
                           currencyCode: prices?.currencyCode,
-                          currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                          currencyThousandSeparator: prices?.currencyThousandSeparator,
+                          currencyDecimalSeparator:
+                              prices?.currencyDecimalSeparator,
+                          currencyThousandSeparator:
+                              prices?.currencyThousandSeparator,
                           currencyMinorUnit: prices?.currencyMinorUnit,
                         ),
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          fontSize: context.fontSizeSmall * context.textScaleFactor,
+                          fontSize:
+                              context.fontSizeSmall * context.textScaleFactor,
                           color: OsmeaColors.pewter,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -569,12 +599,16 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                     _formatPrice(
                       prices?.regularPrice,
                       currencyCode: prices?.currencyCode,
-                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
-                      currencyThousandSeparator: prices?.currencyThousandSeparator,
+                      currencyDecimalSeparator:
+                          prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator:
+                          prices?.currencyThousandSeparator,
                       currencyMinorUnit: prices?.currencyMinorUnit,
                     ),
                     textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                      fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
+                      fontSize:
+                          context.fontSizeExtraSmallMedium *
+                          context.textScaleFactor,
                       fontWeight: FontWeight.w700,
                       color: OsmeaColors.thunder,
                     ),
@@ -585,7 +619,9 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                 OsmeaComponents.text(
                   product.name ?? 'Product',
                   textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    fontSize: context.fontSizeExtraSmallMedium * context.textScaleFactor,
+                    fontSize:
+                        context.fontSizeExtraSmallMedium *
+                        context.textScaleFactor,
                     fontWeight: FontWeight.w500,
                     height: 1.14,
                     color: OsmeaColors.thunder,
@@ -611,13 +647,15 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     if (priceString == null || priceString.isEmpty) {
       return PriceInfoCurrencyHelper.getDefaultPrice();
     }
-    final parsedPrice = PriceInfoCurrencyHelper.parsePriceToDouble(
-      priceString,
-      currencyCode: currencyCode,
-      currencyDecimalSeparator: currencyDecimalSeparator,
-      currencyThousandSeparator: currencyThousandSeparator,
-      currencyMinorUnit: currencyMinorUnit,
-    ) ?? 0.0;
+    final parsedPrice =
+        PriceInfoCurrencyHelper.parsePriceToDouble(
+          priceString,
+          currencyCode: currencyCode,
+          currencyDecimalSeparator: currencyDecimalSeparator,
+          currencyThousandSeparator: currencyThousandSeparator,
+          currencyMinorUnit: currencyMinorUnit,
+        ) ??
+        0.0;
     return PriceInfoCurrencyHelper.formatPrice(
       parsedPrice,
       currencyCode: currencyCode,
@@ -628,4 +666,3 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
     );
   }
 }
-

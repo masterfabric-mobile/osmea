@@ -10,15 +10,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Campaign alert widget with countdown timer
 class CampaignAlertWidget extends StatefulWidget {
   final AssetConfigHelper configHelper;
 
-  const CampaignAlertWidget({
-    super.key,
-    required this.configHelper,
-  });
+  const CampaignAlertWidget({super.key, required this.configHelper});
 
   @override
   State<CampaignAlertWidget> createState() => _CampaignAlertWidgetState();
@@ -42,13 +40,13 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
 
   void _initializeTimer() {
     final config = _loadCampaignConfig();
-    final endTimeStr = config?['end_time'] as String?;
-    
+    final endTimeStr = configString(config?['end_time']);
+
     if (endTimeStr != null) {
       try {
         final endTime = DateTime.parse(endTimeStr);
         _updateTimeRemaining(endTime);
-        
+
         _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
           if (mounted) {
             _updateTimeRemaining(endTime);
@@ -62,7 +60,7 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
     } else {
       final endTime = DateTime.now().add(const Duration(hours: 24));
       _updateTimeRemaining(endTime);
-      
+
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (mounted) {
           _updateTimeRemaining(endTime);
@@ -76,7 +74,7 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
   void _updateTimeRemaining(DateTime endTime) {
     final now = DateTime.now();
     final remaining = endTime.difference(now);
-    
+
     if (remaining.isNegative) {
       setState(() {
         _timeRemaining = Duration.zero;
@@ -113,14 +111,17 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
     } catch (e) {
       debugPrint('Failed to load horizontal padding: $e');
     }
-    return widget.configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return widget.configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   String _formatDuration(Duration duration) {
     final days = duration.inDays;
     final hours = duration.inHours.remainder(24);
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (days > 0) {
       return '${days}d ${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
     } else if (hours > 0) {
@@ -134,11 +135,12 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
   Widget build(BuildContext context) {
     final config = _loadCampaignConfig();
     final showAlert = config?['enabled'] as bool? ?? true;
-    final title = config?['title'] as String? ?? 'Special Offer';
-    final message = config?['message'] as String? ?? 'Limited time offer';
-    final backgroundColor = config?['background_color'] as String? ?? '#FF4444';
-    final textColor = config?['text_color'] as String? ?? '#FFFFFF';
-    final route = config?['route'] as String?;
+    final title = configString(config?['title']) ?? 'Special Offer';
+    final message = configString(config?['message']) ?? 'Limited time offer';
+    final backgroundColor =
+        configString(config?['background_color']) ?? '#FF4444';
+    final textColor = configString(config?['text_color']) ?? '#FFFFFF';
+    final route = configString(config?['route']);
     final categoryId = config?['category_id'] as int?;
     final productId = config?['product_id'] as int?;
 
@@ -182,7 +184,8 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
                     OsmeaComponents.text(
                       title,
                       textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                        fontSize: context.fontSizeNormal * context.textScaleFactor,
+                        fontSize:
+                            context.fontSizeNormal * context.textScaleFactor,
                         fontWeight: FontWeight.w700,
                         color: txtColor,
                       ),
@@ -191,7 +194,8 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
                     OsmeaComponents.text(
                       message,
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        fontSize: context.fontSizeSmall * context.textScaleFactor,
+                        fontSize:
+                            context.fontSizeSmall * context.textScaleFactor,
                         color: txtColor.withOpacity(0.9),
                       ),
                     ),
@@ -214,7 +218,9 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
                     OsmeaComponents.text(
                       'ENDS IN',
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                        fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                        fontSize:
+                            context.fontSizeExtraSmall *
+                            context.textScaleFactor,
                         fontWeight: FontWeight.w600,
                         color: txtColor,
                       ),
@@ -223,7 +229,8 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
                     OsmeaComponents.text(
                       _formatDuration(_timeRemaining),
                       textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                        fontSize: context.fontSizeNormal * context.textScaleFactor,
+                        fontSize:
+                            context.fontSizeNormal * context.textScaleFactor,
                         fontWeight: FontWeight.w700,
                         color: txtColor,
                         letterSpacing: 1.2,
@@ -250,4 +257,3 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
     }
   }
 }
-

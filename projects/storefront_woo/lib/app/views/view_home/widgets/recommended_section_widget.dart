@@ -16,6 +16,7 @@ import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/freezed_model/response/list_all_products_response_model.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Recommended section widget
 class RecommendedSectionWidget extends StatelessWidget {
@@ -79,12 +80,18 @@ class RecommendedSectionWidget extends StatelessWidget {
       debugPrint('⚠️ Failed to load horizontal padding: $e');
     }
     // Default from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing() {
-    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   /// Get color from config
@@ -108,7 +115,9 @@ class RecommendedSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _loadRecommendedConfig();
-    final sectionTitle = config?['title'] as String? ?? context.t.homeView.widgets.recommended.title;
+    final sectionTitle =
+        configString(config?['title']) ??
+        context.t.homeView.widgets.recommended.title;
     final showSection = config?['enabled'] as bool? ?? true;
 
     if (!showSection) return const SizedBox.shrink();
@@ -150,7 +159,10 @@ class RecommendedSectionWidget extends StatelessWidget {
                         context.fontSizeExtraSmallMedium *
                         context.textScaleFactor,
                     fontWeight: FontWeight.w500,
-                    color: _getColorFromConfig('seeAllColor', OsmeaColors.black),
+                    color: _getColorFromConfig(
+                      'seeAllColor',
+                      OsmeaColors.black,
+                    ),
                   ),
                 ),
               ),
@@ -186,9 +198,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                         return ProductCardWidget(
                           product: product,
                           isSaved: isSaved,
-                          badges: {
-                            if (index == 0) ProductCardBadge.weekStar,
-                          },
+                          badges: {if (index == 0) ProductCardBadge.weekStar},
                           onWishlistTap: () async {
                             await viewModel.addProductToWishlist(productId);
                           },
@@ -214,5 +224,4 @@ class RecommendedSectionWidget extends StatelessWidget {
       ],
     );
   }
-
 }

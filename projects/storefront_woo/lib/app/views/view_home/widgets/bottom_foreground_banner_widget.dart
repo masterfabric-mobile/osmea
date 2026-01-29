@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 import 'dart:async';
 
 /// Bottom foreground banner widget
@@ -44,13 +45,13 @@ class _BottomForegroundBannerWidgetState
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1), // Hidden below
-      end: Offset.zero, // Visible
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOut,
-    ));
+    _slideAnimation =
+        Tween<Offset>(
+          begin: const Offset(0, 1), // Hidden below
+          end: Offset.zero, // Visible
+        ).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
+        );
     _loadSavedVisibility();
   }
 
@@ -63,7 +64,9 @@ class _BottomForegroundBannerWidgetState
   /// Load bottom banner configuration
   Map<String, dynamic>? _loadBannerConfig() {
     try {
-      return widget.configHelper.getObject('home_view.bottom_foreground_banner');
+      return widget.configHelper.getObject(
+        'home_view.bottom_foreground_banner',
+      );
     } catch (e) {
       debugPrint('⚠️ Failed to load bottom_foreground_banner config: $e');
       return null;
@@ -81,7 +84,7 @@ class _BottomForegroundBannerWidgetState
     try {
       await _storageHelper.init();
       final savedVisible = await _storageHelper.getItem(_visibilityKey);
-      
+
       if (savedVisible != null) {
         setState(() {
           _isVisible = savedVisible.toString().toLowerCase() == 'true';
@@ -121,7 +124,6 @@ class _BottomForegroundBannerWidgetState
     }
   }
 
-
   /// Handle dismiss button tap with smooth animation
   void _handleDismiss() {
     // Start reverse animation (keep _isVisible true during animation)
@@ -151,7 +153,7 @@ class _BottomForegroundBannerWidgetState
     if (config == null) return;
 
     // Get navigation options
-    final route = config['route'] as String?;
+    final route = configString(config['route']);
     final categoryId = config['category_id'] as int?;
     final productId = config['product_id'] as int?;
 
@@ -196,26 +198,30 @@ class _BottomForegroundBannerWidgetState
       return const SizedBox.shrink();
     }
 
-    // Get configuration values
-    final imageUrl = config['imageUrl'] as String?;
-    final title = config['title'] as String? ?? '';
-    final description = config['description'] as String? ?? '';
+    // Get configuration values (use configString to avoid bool->String? cast errors)
+    final imageUrl = configString(config['imageUrl']);
+    final title = configString(config['title']) ?? '';
+    final description = configString(config['description']) ?? '';
     final height = (config['height'] as num?)?.toDouble() ?? 60.0;
     final borderRadius = (config['border_radius'] as num?)?.toDouble() ?? 12.0;
     final imageOpacity = (config['image_opacity'] as num?)?.toDouble() ?? 0.4;
-    final overlayColor = config['overlay_color'] as String? ?? '#000000';
-    final overlayOpacity = (config['overlay_opacity'] as num?)?.toDouble() ?? 0.3;
-    final backgroundColor = config['background_color'] as String?;
-    final textColor = config['text_color'] as String? ?? '#000000';
-    final arrowIconColor = config['arrow_icon_color'] as String? ?? '#000000';
+    final overlayColor = configString(config['overlay_color']) ?? '#000000';
+    final overlayOpacity =
+        (config['overlay_opacity'] as num?)?.toDouble() ?? 0.3;
+    final backgroundColor = configString(config['background_color']);
+    final textColor = configString(config['text_color']) ?? '#000000';
+    final arrowIconColor =
+        configString(config['arrow_icon_color']) ?? '#000000';
     final tailHeight = (config['tail_height'] as num?)?.toDouble() ?? 8.0;
     final tailWidth = (config['tail_width'] as num?)?.toDouble() ?? 40.0;
-    final tailBottomOffset = (config['tail_bottom_offset'] as num?)?.toDouble() ?? 56.0;
+    final tailBottomOffset =
+        (config['tail_bottom_offset'] as num?)?.toDouble() ?? 56.0;
     final showDismissButton = config['show_dismiss_button'] as bool? ?? true;
 
-    final bgColor = backgroundColor != null
+    // Use configured background; when no imageUrl avoid solid white so overlap is less harsh
+    final bgColor = backgroundColor != null && backgroundColor.isNotEmpty
         ? _parseColor(backgroundColor, OsmeaColors.white)
-        : null;
+        : OsmeaColors.white.withOpacity(0.94);
     final overlayColorParsed = _parseColor(overlayColor, OsmeaColors.black);
     final textColorParsed = _parseColor(textColor, OsmeaColors.thunder);
     final arrowColorParsed = _parseColor(arrowIconColor, OsmeaColors.thunder);
@@ -224,7 +230,8 @@ class _BottomForegroundBannerWidgetState
     final screenSize = MediaQuery.of(context).size;
     final safeAreaBottom = MediaQuery.of(context).padding.bottom;
     // Navbar is typically around 56-64px for medium size, position banner above it
-    final navbarHeight = safeAreaBottom + tailBottomOffset; // Navbar height from config
+    final navbarHeight =
+        safeAreaBottom + tailBottomOffset; // Navbar height from config
     // Tail should sit right on top of navbar (configurable offset from bottom)
     final tailBottomPosition = safeAreaBottom + tailBottomOffset;
 
@@ -259,21 +266,24 @@ class _BottomForegroundBannerWidgetState
                     borderRadius: BorderRadius.circular(borderRadius),
                     child: Stack(
                       children: [
-                        // Background image with opacity
+                        // Background image with opacity. KeyedSubtree keeps image stable
+                        // on config rebuild so it doesn't flash white when config changes.
                         if (imageUrl != null && imageUrl.isNotEmpty)
                           Positioned.fill(
-                            child: Opacity(
-                              opacity: imageOpacity,
-                              child: OsmeaComponents.image(
-                                imageUrl: imageUrl,
-                                width: double.infinity,
-                                height: height,
-                                fit: BoxFit.cover,
-                                variant: ImageVariant.normal,
-                                borderRadius: BorderRadius.zero,
-                                showLoadingIndicator: true,
-                                errorWidget: Container(
-                                  color: bgColor ?? OsmeaColors.white,
+                            child: KeyedSubtree(
+                              key: ValueKey(imageUrl),
+                              child: Opacity(
+                                opacity: imageOpacity,
+                                child: OsmeaComponents.image(
+                                  imageUrl: imageUrl,
+                                  width: double.infinity,
+                                  height: height,
+                                  fit: BoxFit.cover,
+                                  variant: ImageVariant.normal,
+                                  borderRadius: BorderRadius.zero,
+                                  showLoadingIndicator: true,
+                                  placeholder: Container(color: bgColor),
+                                  errorWidget: Container(color: bgColor),
                                 ),
                               ),
                             ),
@@ -282,7 +292,9 @@ class _BottomForegroundBannerWidgetState
                         if (imageUrl != null && imageUrl.isNotEmpty)
                           Positioned.fill(
                             child: Container(
-                              color: overlayColorParsed.withOpacity(overlayOpacity),
+                              color: overlayColorParsed.withOpacity(
+                                overlayOpacity,
+                              ),
                             ),
                           ),
                         // Content row
@@ -302,23 +314,33 @@ class _BottomForegroundBannerWidgetState
                                     if (title.isNotEmpty)
                                       OsmeaComponents.text(
                                         title,
-                                        textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                                          color: textColorParsed,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: context.fontSizeSmall,
-                                        ),
+                                        textStyle:
+                                            OsmeaTextStyle.titleSmall(
+                                              context,
+                                            ).copyWith(
+                                              color: textColorParsed,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: context.fontSizeSmall,
+                                            ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     if (description.isNotEmpty) ...[
-                                      OsmeaComponents.sizedBox(height: context.spacing2),
+                                      OsmeaComponents.sizedBox(
+                                        height: context.spacing2,
+                                      ),
                                       OsmeaComponents.text(
                                         description,
-                                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                                          color: textColorParsed.withOpacity(0.8),
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: context.fontSizeExtraSmall,
-                                        ),
+                                        textStyle:
+                                            OsmeaTextStyle.bodySmall(
+                                              context,
+                                            ).copyWith(
+                                              color: textColorParsed
+                                                  .withOpacity(0.8),
+                                              fontWeight: FontWeight.w500,
+                                              fontSize:
+                                                  context.fontSizeExtraSmall,
+                                            ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -335,7 +357,9 @@ class _BottomForegroundBannerWidgetState
                               ),
                               // Dismiss button
                               if (showDismissButton) ...[
-                                OsmeaComponents.sizedBox(width: context.spacing8),
+                                OsmeaComponents.sizedBox(
+                                  width: context.spacing8,
+                                ),
                                 GestureDetector(
                                   onTap: _handleDismiss,
                                   behavior: HitTestBehavior.opaque,
@@ -390,4 +414,3 @@ class _BottomForegroundBannerWidgetState
     );
   }
 }
-

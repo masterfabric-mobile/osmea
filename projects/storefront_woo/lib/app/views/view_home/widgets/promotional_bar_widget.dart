@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Promotional bar item model from config
 class PromotionalBarItem {
@@ -38,16 +39,16 @@ class PromotionalBarItem {
 
   factory PromotionalBarItem.fromConfig(Map<String, dynamic> config) {
     return PromotionalBarItem(
-      title: config['title'] as String?,
-      subtitle: config['subtitle'] as String?,
-      backgroundColor: config['background_color'] as String?,
-      textColor: config['text_color'] as String?,
-      accentColor: config['accent_color'] as String?,
-      imageUrl: config['imageUrl'] as String?,
-      route: config['route'] as String?,
+      title: configString(config['title']),
+      subtitle: configString(config['subtitle']),
+      backgroundColor: configString(config['background_color']),
+      textColor: configString(config['text_color']),
+      accentColor: configString(config['accent_color']),
+      imageUrl: configString(config['imageUrl']),
+      route: configString(config['route']),
       categoryId: config['category_id'] as int?,
       productId: config['product_id'] as int?,
-      icon: config['icon'] as String?,
+      icon: configString(config['icon']),
     );
   }
 }
@@ -56,10 +57,7 @@ class PromotionalBarItem {
 class PromotionalBarWidget extends StatelessWidget {
   final AssetConfigHelper configHelper;
 
-  const PromotionalBarWidget({
-    super.key,
-    required this.configHelper,
-  });
+  const PromotionalBarWidget({super.key, required this.configHelper});
 
   /// Loads promotional bar configuration
   Map<String, dynamic>? _loadPromotionalConfig() {
@@ -86,7 +84,10 @@ class PromotionalBarWidget extends StatelessWidget {
       debugPrint('⚠️ Failed to load horizontal padding: $e');
     }
     // Default from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Loads promotional bar items from config
@@ -99,7 +100,10 @@ class PromotionalBarWidget extends StatelessWidget {
       if (itemsList == null || itemsList.isEmpty) return [];
 
       return itemsList
-          .map((item) => PromotionalBarItem.fromConfig(item as Map<String, dynamic>))
+          .map(
+            (item) =>
+                PromotionalBarItem.fromConfig(item as Map<String, dynamic>),
+          )
           .toList();
     } catch (e) {
       debugPrint('⚠️ Failed to load promotional bar items: $e');
@@ -149,8 +153,8 @@ class PromotionalBarWidget extends StatelessWidget {
   double _getHeight(BuildContext context) {
     try {
       final config = _loadPromotionalConfig();
-      final heightStr = config?['height'] as String? ?? 'medium';
-      
+      final heightStr = configString(config?['height']) ?? 'medium';
+
       switch (heightStr.toLowerCase()) {
         case 'short':
           return 60.0; // Short
@@ -212,7 +216,8 @@ class PromotionalBarWidget extends StatelessWidget {
                       OsmeaComponents.text(
                         item.title!,
                         textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                          fontSize: context.fontSizeSmall * context.textScaleFactor,
+                          fontSize:
+                              context.fontSizeSmall * context.textScaleFactor,
                           fontWeight: FontWeight.w700,
                           color: accentColor,
                           height: 1.2,
@@ -225,7 +230,9 @@ class PromotionalBarWidget extends StatelessWidget {
                       OsmeaComponents.text(
                         item.subtitle!,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          fontSize: context.fontSizeExtraSmall * context.textScaleFactor,
+                          fontSize:
+                              context.fontSizeExtraSmall *
+                              context.textScaleFactor,
                           fontWeight: FontWeight.w500,
                           color: textColor,
                           height: 1.3,
@@ -239,11 +246,7 @@ class PromotionalBarWidget extends StatelessWidget {
               ),
               // Arrow icon at end (right side)
               OsmeaComponents.sizedBox(width: context.spacing8),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 14,
-                color: accentColor,
-              ),
+              Icon(Icons.arrow_forward_ios, size: 14, color: accentColor),
             ],
           ),
         ),
@@ -269,22 +272,17 @@ class PromotionalBarWidget extends StatelessWidget {
     return OsmeaComponents.padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: OsmeaComponents.row(
-        children: displayItems
-            .asMap()
-            .entries
-            .map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              return _buildPromotionalItem(
-                context,
-                item,
-                index == 0,
-                index == displayItems.length - 1,
-              );
-            })
-            .toList(),
+        children: displayItems.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          return _buildPromotionalItem(
+            context,
+            item,
+            index == 0,
+            index == displayItems.length - 1,
+          );
+        }).toList(),
       ),
     );
   }
 }
-

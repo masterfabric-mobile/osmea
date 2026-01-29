@@ -17,6 +17,7 @@ import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 import 'package:storefront_woo/app/widgets/product_card_widget.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 class CollectionsSectionWidget extends StatefulWidget {
   final AssetConfigHelper configHelper;
@@ -133,11 +134,11 @@ class _CollectionsSectionWidgetState extends State<CollectionsSectionWidget>
     if (rawItems.isEmpty) return const SizedBox.shrink();
 
     final horizontalPadding = _getHorizontalPadding(cfg);
-    final sectionTitle = cfg?['title'] as String? ?? 'Collections';
+    final sectionTitle = configString(cfg?['title']) ?? 'Collections';
 
     final items = rawItems
         .map((item) {
-          final title = (item['title'] as String?)?.trim() ?? 'Collection';
+          final title = (configString(item['title']))?.trim() ?? 'Collection';
           final products = _pickProductsForItem(item);
           return (title: title, products: products);
         })
