@@ -1,7 +1,7 @@
 name: storefront_woo
 description: "Ecommerce Storefront App - Modern Flutter-based storefront application for WooCommerce with BLoC state management, localization support, and responsive design"
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+3
+publish_to: 'none' 
+version: 1.0.0+4
 
 environment:
   sdk: ^3.8.1
@@ -10,22 +10,22 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Local path: yerel değişikliklerin görünmesi için. Git kullanmak için yorumu kaldırıp path'leri kaldırın.
+  # Git (remote repo). Use path override for local development.
   core:
-    path: ../../packages/core # Shared business logic, constants, utilities
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
   apis:
-    path: ../../packages/apis # Networking layer (REST, GraphQL, etc.)
-  # Git (uzak repo - yerel değişiklikler yansımaz):
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/apis
+  # Local path override (uncomment to use local packages):
   # core:
-  #   git:
-  #     url: https://github.com/masterfabric-mobile/osmea.git
-  #     ref: dev
-  #     path: packages/core
+  #   path: ../../packages/core
   # apis:
-  #   git:
-  #     url: https://github.com/masterfabric-mobile/osmea.git
-  #     ref: dev
-  #     path: packages/apis
+  #   path: ../../packages/apis
 
   cupertino_icons: ^1.0.8
   flutter_dotenv: ^5.1.0
