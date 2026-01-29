@@ -1,7 +1,7 @@
 name: storefront_woo
 description: "Ecommerce Storefront App - Modern Flutter-based storefront application for WooCommerce with BLoC state management, localization support, and responsive design"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ^3.8.1
