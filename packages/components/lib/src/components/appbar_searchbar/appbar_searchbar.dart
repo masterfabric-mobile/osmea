@@ -8,6 +8,7 @@ import 'package:osmea_components/src/components/searchbar/searchbar.dart';
 import 'package:osmea_components/src/components/searchbar/cubit/searchbar_cubit.dart';
 import 'package:osmea_components/src/enums/appbar_enums.dart';
 import 'package:osmea_components/src/enums/components_enum.dart';
+import 'package:osmea_components/src/styles/colors.dart';
 import 'package:osmea_components/src/utils/appbar_extensions.dart';
 import 'package:osmea_components/src/utils/text_field_size_extensions.dart';
 
@@ -513,7 +514,7 @@ class OsmeaAppBarWithSearchBar extends CoreScaffold
                 textInputAction: searchBarTextInputAction,
                 textStyle: searchBarTextStyle,
                 textColor: searchBarTextColor,
-                backgroundColor: searchBarBackgroundColor,
+                backgroundColor: searchBarBackgroundColor ?? OsmeaColors.white,
                 borderColor: searchBarBorderColor,
                 focusColor: searchBarFocusColor,
                 errorColor: searchBarErrorColor,
