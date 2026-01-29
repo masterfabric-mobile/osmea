@@ -363,7 +363,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
               child: OsmeaComponents.singleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.only(
-                  top: 5, // Extra spacing between app bar and categories
+                  top: 15, // Extra spacing between app bar and categories
                   bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
                 ),
                 child: OsmeaComponents.column(
