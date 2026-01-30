@@ -262,10 +262,10 @@ class _ModernSidebarState extends State<ModernSidebar>
               // Responsive Sidebar Header
               OsmeaComponents.container(
                 constraints: BoxConstraints(
-                  minHeight: isMobile ? 120 : 140,
-                  maxHeight: isMobile ? 160 : 180,
+                  minHeight: isMobile ? 90 : 110,
+                  maxHeight: isMobile ? 115 : 140,
                 ),
-                padding: EdgeInsets.all(isNarrow ? 12 : 16),
+                padding: EdgeInsets.all(isNarrow ? 10 : 14),
                 decoration: BoxDecoration(
                   gradient: Theme.of(context).brightness == Brightness.dark
                       ? OsmeaAppTheme.createGradient(
@@ -284,7 +284,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                     OsmeaComponents.row(
                       children: [
                         OsmeaComponents.container(
-                          padding: EdgeInsets.all(isNarrow ? 8 : 12),
+                          padding: EdgeInsets.all(isNarrow ? 6 : 8),
                           decoration: BoxDecoration(
                             color: OsmeaColors.white.withValues(alpha: 0.2),
                             borderRadius: context.borderRadiusMinStandard,
@@ -292,10 +292,10 @@ class _ModernSidebarState extends State<ModernSidebar>
                           child: Icon(
                             Icons.explore_rounded,
                             color: OsmeaColors.white,
-                            size: isNarrow ? 20 : 24,
+                            size: isNarrow ? 18 : 20,
                           ),
                         ),
-                        OsmeaComponents.sizedBox(width: 12),
+                        OsmeaComponents.sizedBox(width: 8),
                         OsmeaComponents.expanded(
                           child: OsmeaComponents.column(
                             mainAxisSize: MainAxisSize.min,
@@ -304,7 +304,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                               OsmeaComponents.text(
                                 'API Explorer',
                                 variant: OsmeaTextVariant.titleMedium,
-                                fontSize: isNarrow ? 16 : 18,
+                                fontSize: isNarrow ? 14 : 16,
                                 fontWeight: FontWeight.w700,
                                 color: OsmeaColors.white,
                               ),
@@ -312,7 +312,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                                 OsmeaComponents.text(
                                   'Browse and test APIs',
                                   variant: OsmeaTextVariant.bodySmall,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color:
                                       OsmeaColors.white.withValues(alpha: 0.8),
                                 ),
@@ -321,7 +321,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                         ),
                       ],
                     ),
-                    OsmeaComponents.sizedBox(height: 8),
+                    OsmeaComponents.sizedBox(height: 6),
 
                     // Store Status Indicator
                     if (_currentStore != null)
@@ -331,15 +331,15 @@ class _ModernSidebarState extends State<ModernSidebar>
                             color: OsmeaColors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: EdgeInsets.all(12),
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           child: OsmeaComponents.row(
                             children: [
                               Icon(
                                 Icons.store,
-                                size: 16,
+                                size: 14,
                                 color: OsmeaColors.white,
                               ),
-                              OsmeaComponents.sizedBox(width: 8),
+                              OsmeaComponents.sizedBox(width: 6),
                               OsmeaComponents.expanded(
                                 child: OsmeaComponents.column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,19 +348,23 @@ class _ModernSidebarState extends State<ModernSidebar>
                                     OsmeaComponents.text(
                                       _currentStore!.platform.toUpperCase(),
                                       variant: OsmeaTextVariant.labelMedium,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                       color: OsmeaColors.white,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     OsmeaComponents.text(
                                       _isCurrentStoreComplete
                                           ? 'Ready'
                                           : 'Setup Incomplete',
                                       variant: OsmeaTextVariant.labelSmall,
-                                      fontSize: 10,
+                                      fontSize: 9,
                                       color: _isCurrentStoreComplete
                                           ? OsmeaColors.green[100]
                                           : OsmeaColors.orange[100],
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
@@ -378,8 +382,8 @@ class _ModernSidebarState extends State<ModernSidebar>
                   _isCurrentStoreComplete &&
                   widget.expanded)
                 OsmeaComponents.container(
-                  margin: EdgeInsets.all(isNarrow ? 12 : 16),
-                  padding: EdgeInsets.all(isNarrow ? 16 : 20),
+                  margin: EdgeInsets.all(isNarrow ? 6 : 10),
+                  padding: EdgeInsets.all(isNarrow ? 10 : 14),
                   decoration: BoxDecoration(
                     gradient: OsmeaAppTheme.createGradient(
                       Theme.of(context).brightness == Brightness.dark
@@ -401,7 +405,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                       OsmeaComponents.row(
                         children: [
                           OsmeaComponents.container(
-                            padding: EdgeInsets.all(isNarrow ? 8 : 10),
+                            padding: EdgeInsets.all(isNarrow ? 6 : 8),
                             decoration: BoxDecoration(
                               color: OsmeaAppTheme.primaryColor
                                   .withValues(alpha: 0.2),
@@ -409,11 +413,11 @@ class _ModernSidebarState extends State<ModernSidebar>
                             ),
                             child: Icon(
                               Icons.rocket_launch_rounded,
-                              size: isNarrow ? 16 : 18,
+                              size: isNarrow ? 14 : 16,
                               color: OsmeaColors.nordicBlue,
                             ),
                           ),
-                          OsmeaComponents.sizedBox(width: isNarrow ? 8 : 12),
+                          OsmeaComponents.sizedBox(width: isNarrow ? 6 : 8),
                           OsmeaComponents.expanded(
                             child: OsmeaComponents.column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,25 +425,27 @@ class _ModernSidebarState extends State<ModernSidebar>
                                 OsmeaComponents.text(
                                   'Ready to Explore!',
                                   variant: OsmeaTextVariant.labelMedium,
-                                  fontSize: isNarrow ? 13 : 14,
+                                  fontSize: isNarrow ? 11 : 12,
                                   fontWeight: FontWeight.w600,
                                   color: OsmeaColors.nordicBlue,
                                 ),
                                 OsmeaComponents.text(
                                   'Your ${_currentStore!.platform.toUpperCase()} store is configured',
                                   variant: OsmeaTextVariant.bodySmall,
-                                  fontSize: isNarrow ? 10 : 11,
+                                  fontSize: isNarrow ? 9 : 10,
                                   color: OsmeaAppTheme.primaryColor
                                       .withValues(alpha: 0.7),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      OsmeaComponents.sizedBox(height: isNarrow ? 8 : 12),
+                      OsmeaComponents.sizedBox(height: isNarrow ? 6 : 8),
                       OsmeaComponents.container(
-                        padding: EdgeInsets.all(isNarrow ? 8 : 10),
+                        padding: EdgeInsets.all(isNarrow ? 6 : 8),
                         decoration: BoxDecoration(
                           color: OsmeaAppTheme.primaryColor
                               .withValues(alpha: 0.05),
@@ -453,18 +459,19 @@ class _ModernSidebarState extends State<ModernSidebar>
                           children: [
                             Icon(
                               Icons.explore_rounded,
-                              size: isNarrow ? 14 : 16,
+                              size: isNarrow ? 12 : 14,
                               color: OsmeaColors.nordicBlue,
                             ),
-                            OsmeaComponents.sizedBox(width: isNarrow ? 6 : 8),
+                            OsmeaComponents.sizedBox(width: isNarrow ? 4 : 6),
                             OsmeaComponents.expanded(
                               child: OsmeaComponents.text(
                                 'Select a category below to start exploring APIs',
                                 variant: OsmeaTextVariant.bodySmall,
-                                fontSize: isNarrow ? 11 : 12,
+                                fontSize: isNarrow ? 10 : 11,
                                 color: OsmeaColors.nordicBlue,
                                 fontWeight: FontWeight.w500,
                                 maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -480,13 +487,13 @@ class _ModernSidebarState extends State<ModernSidebar>
                   widget.expanded)
                 OsmeaComponents.container(
                   margin: EdgeInsets.symmetric(
-                    horizontal: isNarrow ? 12 : 16,
-                    vertical: isNarrow ? 8 : 12,
+                    horizontal: isNarrow ? 8 : 12,
+                    vertical: isNarrow ? 4 : 6,
                   ),
                   child: OsmeaComponents.searchbar(
                     controller: _searchController,
                     hint: 'Search APIs, categories, endpoints...',
-                    size: TextFieldSize.small,
+                    size: TextFieldSize.medium,
                     variant: TextFieldVariant.outlined,
                     searchbarVariant: SearchbarVariant.outlined,
                     searchbarStyle: SearchbarStyle.standard,
@@ -566,7 +573,7 @@ class _ModernSidebarState extends State<ModernSidebar>
                               OsmeaComponents.container(
                                 constraints: BoxConstraints(
                                   maxHeight: constraints.maxHeight *
-                                      0.4, // Dynamic height based on screen
+                                      0.6, // Dynamic height based on screen
                                 ),
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -1101,12 +1108,12 @@ class _ModernSidebarState extends State<ModernSidebar>
                       if (_currentStore != null && _isCurrentStoreComplete)
                         OsmeaComponents.container(
                           constraints: BoxConstraints(
-                            maxHeight: constraints.maxHeight * 0.5,
+                            maxHeight: constraints.maxHeight * 0.75,
                           ),
                           child: Scrollbar(
-                            controller: _scrollController,
                             child: ListView.builder(
-                              controller: _scrollController,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
                               padding: EdgeInsets.all(isNarrow ? 6 : 8),
                               itemCount: ApiServiceRegistry.categories
                                   .where((cat) => _hasStoreForPlatform(cat))

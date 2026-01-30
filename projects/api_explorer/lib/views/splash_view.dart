@@ -25,7 +25,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 
   bool _isInitialized = false;
   bool _hasError = false;
-  bool _shouldSkipToHome = false;
 
   @override
   void initState() {
@@ -43,12 +42,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 
       if (currentStore != null) {
         debugPrint('✅ Found existing store: ${currentStore.storeName}');
-        setState(() {
-          _shouldSkipToHome = true;
-        });
-
-        // Skip animations and go directly to home
-        _navigateToHome();
+        
+        // Show splash animation even if store exists
+        _initializeApp();
         return;
       }
 
@@ -90,9 +86,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   }
 
   void _initializeAnimations() {
-    // Logo animations - reduced duration
+    // Logo animations - extended duration for better visibility
     _logoController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
@@ -110,9 +106,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       ),
     );
 
-    // Text animations - reduced duration
+    // Text animations - extended duration
     _textController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
@@ -131,9 +127,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       curve: Curves.easeOutCubic,
     ));
 
-    // Progress animation - reduced duration
+    // Progress animation - extended duration
     _progressController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
@@ -151,15 +147,15 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     try {
       debugPrint('🔧 Starting animation sequence...');
 
-      // Run animations in parallel for faster loading
+      // Run animations in parallel for smoother experience
       await Future.wait([
         _logoController.forward(),
         _textController.forward(),
         _progressController.forward(),
       ]);
 
-      // Short delay before navigation
-      await Future.delayed(const Duration(milliseconds: 200));
+      // Extended delay before navigation to show splash longer
+      await Future.delayed(const Duration(milliseconds: 800));
 
       if (mounted) {
         debugPrint('🔧 Navigating to home...');
@@ -187,42 +183,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Eğer zaten store varsa, loading göster ve home'a git
-    if (_shouldSkipToHome) {
-      return OsmeaComponents.scaffold(
-        body: OsmeaComponents.container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                OsmeaColors.sunsetGlow,
-                OsmeaColors.deepSea,
-                OsmeaColors.atlantic,
-              ],
-            ),
-          ),
-          child: OsmeaComponents.center(
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.white),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing20),
-                OsmeaComponents.text(
-                  'Loading your store...',
-                  color: OsmeaColors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     // Hata durumunda basit loading göster
     if (_hasError) {
       return OsmeaComponents.scaffold(

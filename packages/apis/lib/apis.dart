@@ -345,13 +345,6 @@ Future<void> initNetworksFromWizard(GetIt getIt) async {
           'No complete configuration found. Please complete the setup wizard first.');
     }
 
-    // Reset GetIt registrations to avoid conflicts
-    try {
-      getIt.resetLazySingleton();
-    } catch (e) {
-      debugPrint('[initNetworksFromWizard] Warning: Could not reset GetIt: $e');
-    }
-
     // Initialize based on platform
     if (config.platform == 'shopify') {
       try {

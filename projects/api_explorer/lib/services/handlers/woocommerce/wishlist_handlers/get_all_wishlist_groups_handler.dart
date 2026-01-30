@@ -29,6 +29,7 @@ class GetAllWishlistGroupsHandler implements ApiRequestHandler {
           params['per_page'] != null ? int.tryParse(params['per_page']!) : null;
 
       final response = await GetIt.I<WooWishlistService>().getAllGroups(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         page: page,
         perPage: perPage,
@@ -36,7 +37,9 @@ class GetAllWishlistGroupsHandler implements ApiRequestHandler {
 
       // Handle the wrapper response structure
       final responseJson = response.toJson();
-      final groups = responseJson['groups'] as List<dynamic>? ?? [];
+      final groups = (responseJson['groups'] as List<dynamic>?)
+          ?.map((group) => group as Map<String, dynamic>)
+          .toList() ?? [];
 
       return {
         "status": "success",

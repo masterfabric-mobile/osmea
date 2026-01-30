@@ -42,6 +42,7 @@ class DeleteWishlistGroupHandler implements ApiRequestHandler {
       }
 
       final response = await GetIt.I<WooWishlistService>().deleteGroup(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         groupId: groupId,
       );

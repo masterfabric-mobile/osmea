@@ -43,6 +43,7 @@ class CreateWishlistGroupHandler implements ApiRequestHandler {
       );
 
       final response = await GetIt.I<WooWishlistService>().createGroup(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         request: groupData,
       );
