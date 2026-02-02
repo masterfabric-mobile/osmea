@@ -193,6 +193,15 @@ class WooNetwork {
   static String password = '';
   static String apiVersion = 'v3';
 
+  /// Normalize store URL to HTTPS to avoid 301 redirects (e.g. server redirecting http -> https).
+  static String _normalizeStoreUrl(String url) {
+    if (url.isEmpty) return url;
+    String u = url.trim();
+    if (u.endsWith('/')) u = u.substring(0, u.length - 1);
+    if (u.startsWith('http://')) u = 'https://${u.substring(7)}';
+    return u;
+  }
+
   static GetIt init(
     GetIt getIt, {
     required String storeUrl,
@@ -202,7 +211,7 @@ class WooNetwork {
     String? apiVersion,
   }) {
     WooNetwork.getIt = getIt;
-    WooNetwork.storeUrl = storeUrl;
+    WooNetwork.storeUrl = _normalizeStoreUrl(storeUrl);
     WooNetwork.storeName = storeName ?? '';
     WooNetwork.username = username;
     WooNetwork.password = password;
@@ -267,7 +276,7 @@ class WooNetwork {
   }
 
   static void updateStoreUrl(String url) {
-    WooNetwork.storeUrl = url;
+    WooNetwork.storeUrl = _normalizeStoreUrl(url);
   }
 
   static void updateStoreName(String name) {

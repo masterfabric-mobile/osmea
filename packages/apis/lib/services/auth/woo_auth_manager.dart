@@ -170,14 +170,16 @@ class WooAuthManager {
         // Response might have data field or we need to check the response structure
         // Some APIs return user data directly in the response
         UserSignUpData? userData = response.data;
-        
+
         // If data is null but response is successful, try to extract from response
         // This handles cases where the API structure is different
         if (userData == null) {
-          debugPrint('⚠️ Response data is null but success is true, checking response structure...');
+          debugPrint(
+              '⚠️ Response data is null but success is true, checking response structure...');
           // Response might be successful but data parsing failed
           // In this case, we still consider it successful since the API returned success
-          debugPrint('✅ Sign up successful (API confirmed), but data parsing returned null');
+          debugPrint(
+              '✅ Sign up successful (API confirmed), but data parsing returned null');
           // Return success even without data - the user was created
           return WooAuthResult.success(
             data: UserSignUpData(
@@ -266,7 +268,9 @@ class WooAuthManager {
     }
   }
 
-  /// 📧 Send Reset Password Email
+  /// 📧 Send Reset Password Email (Şifremi unuttum)
+  /// Sends a password reset link to the given email via backend.
+  /// Use [forgotPassword] as a convenience alias for the same operation.
   Future<WooAuthResult<SendResetPasswordResponse>> sendResetPassword({
     required String email,
   }) async {
@@ -301,6 +305,13 @@ class WooAuthManager {
       );
     }
   }
+
+  /// 📧 Forgot Password (Şifremi unuttum) — alias for [sendResetPassword]
+  /// Call this when user taps "Forgot password?" and enters their email.
+  Future<WooAuthResult<SendResetPasswordResponse>> forgotPassword({
+    required String email,
+  }) async =>
+      sendResetPassword(email: email);
 
   /// 🚪 User Logout
   Future<WooAuthResult<void>> logout() async {
