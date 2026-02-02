@@ -1,6 +1,30 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+/// Get delete account color from config or fallback to orange
+Color _getDeleteAccountColor() {
+  try {
+    final configHelper = AssetConfigHelper();
+    final colorString = configHelper.getString(
+      'user_profile_view.delete_account.color',
+      '#FF6B35', // Default orange
+    );
+    
+    if (colorString.isNotEmpty && colorString.startsWith('#')) {
+      final hexString = colorString.substring(1);
+      if (hexString.length == 6) {
+        return Color(int.parse('FF$hexString', radix: 16));
+      } else if (hexString.length == 8) {
+        return Color(int.parse(hexString, radix: 16));
+      }
+    }
+  } catch (e) {
+    debugPrint('⚠️ Failed to load delete account color: $e');
+  }
+  // Fallback to orange
+  return const Color(0xFFFF6B35);
+}
+
 /// Delete Account Dialog
 /// 
 /// A two-step confirmation dialog for account deletion.
@@ -48,6 +72,8 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   }
 
   Widget _buildInitialWarningDialog(BuildContext context) {
+    final deleteColor = _getDeleteAccountColor();
+    
     return AlertDialog(
       backgroundColor: OsmeaColors.white,
       shape: RoundedRectangleBorder(
@@ -57,7 +83,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
         children: [
           Icon(
             Icons.warning_outlined,
-            color: OsmeaColors.red,
+            color: deleteColor,
             size: 28,
           ),
           OsmeaComponents.sizedBox(width: context.spacing12),
@@ -93,7 +119,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           Container(
             padding: EdgeInsets.all(context.spacing12),
             decoration: BoxDecoration(
-              color: OsmeaColors.red.withOpacity(0.1),
+              color: deleteColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: OsmeaComponents.row(
@@ -101,7 +127,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: OsmeaColors.red,
+                  color: deleteColor,
                   size: 20,
                 ),
                 OsmeaComponents.sizedBox(width: context.spacing8),
@@ -109,7 +135,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                   child: OsmeaComponents.text(
                     'This action cannot be undone. All your data will be permanently deleted.',
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                      color: OsmeaColors.red,
+                      color: deleteColor,
                     ),
                   ),
                 ),
@@ -136,7 +162,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: OsmeaColors.red,
+            backgroundColor: deleteColor,
           ),
           child: OsmeaComponents.text(
             'Continue',
@@ -151,6 +177,8 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   }
 
   Widget _buildFinalConfirmationDialog(BuildContext context) {
+    final deleteColor = _getDeleteAccountColor();
+    
     return AlertDialog(
       backgroundColor: OsmeaColors.white,
       shape: RoundedRectangleBorder(
@@ -202,7 +230,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                           _isConfirmed = value ?? false;
                         });
                       },
-                      activeColor: OsmeaColors.red,
+                      activeColor: deleteColor,
                     ),
                   ),
                   OsmeaComponents.sizedBox(width: context.spacing12),
@@ -245,7 +273,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
-                _isConfirmed ? OsmeaColors.red : OsmeaColors.silver,
+                _isConfirmed ? deleteColor : OsmeaColors.silver,
           ),
           child: OsmeaComponents.text(
             'Delete My Account',
@@ -260,6 +288,8 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   }
 
   Widget _buildDeleteItem(BuildContext context, String text) {
+    final deleteColor = _getDeleteAccountColor();
+    
     return Padding(
       padding: EdgeInsets.only(bottom: context.spacing8),
       child: OsmeaComponents.row(
@@ -267,7 +297,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
         children: [
           Icon(
             Icons.close,
-            color: OsmeaColors.red,
+            color: deleteColor,
             size: 18,
           ),
           OsmeaComponents.sizedBox(width: context.spacing8),

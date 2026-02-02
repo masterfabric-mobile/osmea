@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_user_profile/models/user_profile_view_model.dart';
 import 'package:storefront_woo/app/views/view_user_profile/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_user_profile/widgets/delete_account_dialog.dart';
-import 'package:storefront_woo/app/views/view_user_profile/widgets/account_danger_zone.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
 
@@ -86,10 +85,10 @@ class UserProfileView
         children: [
           // Profile Header - Simple and minimal
           _buildProfileHeader(context, state.profile),
-          
+
           // Statistics Row - Simple inline display
           _buildStatisticsRow(context, state.statistics),
-          
+
           // Menu Items - minimal design
           _buildSectionHeader(context, 'Account'),
           _buildMenuItem(
@@ -103,17 +102,17 @@ class UserProfileView
             'Addresses',
             Icons.location_on_outlined,
             () => context.go('/user-profile/addresses'),
-            subtitle: state.addresses.isNotEmpty 
+            subtitle: state.addresses.isNotEmpty
                 ? '${state.addresses.length} saved'
                 : null,
           ),
+
           // _buildMenuItem(
           //   context,
           //   'Settings',
           //   Icons.settings_outlined,
           //   () => context.go('/user-profile/settings'),
           // ),
-
           _buildSectionHeader(context, 'Orders'),
           _buildMenuItem(
             context,
@@ -153,14 +152,16 @@ class UserProfileView
                 subtitle: '${state.preferences.length} preferences',
               ),
           ],
-          
-          // Danger Zone - Account Deletion
-          OsmeaComponents.sizedBox(height: context.spacing32),
-          AccountDangerZone(
-            onDeleteAccount: () => _handleDeleteAccount(context, state, viewModel),
-            isLoading: false,
+
+          // Account Deletion - Styled like Order History
+          OsmeaComponents.sizedBox(height: context.spacing24),
+          _buildDeleteMenuItem(
+            context,
+            'Delete Account',
+            Icons.delete_outline,
+            () => _handleDeleteAccount(context, state, viewModel),
           ),
-          
+
           // Bottom spacing
           OsmeaComponents.sizedBox(height: context.spacing32),
         ],
@@ -168,10 +169,7 @@ class UserProfileView
     );
   }
 
-  Widget _buildProfileHeader(
-    BuildContext context,
-    UserProfile profile,
-  ) {
+  Widget _buildProfileHeader(BuildContext context, UserProfile profile) {
     final initials = _getInitials(profile.displayName);
 
     return Container(
@@ -219,9 +217,9 @@ class UserProfileView
                 OsmeaComponents.sizedBox(height: context.spacing6),
                 OsmeaComponents.text(
                   profile.email,
-                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    color: OsmeaColors.pewter,
-                  ),
+                  textStyle: OsmeaTextStyle.bodyMedium(
+                    context,
+                  ).copyWith(color: OsmeaColors.pewter),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -233,22 +231,13 @@ class UserProfileView
     );
   }
 
-  Widget _buildStatisticsRow(
-    BuildContext context,
-    UserStatistics stats,
-  ) {
+  Widget _buildStatisticsRow(BuildContext context, UserStatistics stats) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: context.spacing24),
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: OsmeaColors.silver,
-            width: 1,
-          ),
-          bottom: BorderSide(
-            color: OsmeaColors.silver,
-            width: 1,
-          ),
+          top: BorderSide(color: OsmeaColors.silver, width: 1),
+          bottom: BorderSide(color: OsmeaColors.silver, width: 1),
         ),
       ),
       child: OsmeaComponents.row(
@@ -265,11 +254,7 @@ class UserProfileView
   }
 
   Widget _buildStatDivider(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 32,
-      color: OsmeaColors.silver,
-    );
+    return Container(width: 1, height: 32, color: OsmeaColors.silver);
   }
 
   Widget _buildSectionHeader(BuildContext context, String title) {
@@ -309,20 +294,13 @@ class UserProfileView
           ),
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(
-                color: OsmeaColors.silver,
-                width: 1,
-              ),
+              bottom: BorderSide(color: OsmeaColors.silver, width: 1),
             ),
           ),
           child: OsmeaComponents.row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: OsmeaColors.black,
-                size: 22,
-              ),
+              Icon(icon, color: OsmeaColors.black, size: 22),
               OsmeaComponents.sizedBox(width: context.spacing16),
               Expanded(
                 child: OsmeaComponents.column(
@@ -340,20 +318,16 @@ class UserProfileView
                       OsmeaComponents.sizedBox(height: context.spacing4),
                       OsmeaComponents.text(
                         subtitle,
-                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                          color: OsmeaColors.pewter,
-                        ),
+                        textStyle: OsmeaTextStyle.bodySmall(
+                          context,
+                        ).copyWith(color: OsmeaColors.pewter),
                       ),
                     ],
                   ],
                 ),
               ),
               OsmeaComponents.sizedBox(width: context.spacing8),
-              Icon(
-                Icons.chevron_right,
-                color: OsmeaColors.steel,
-                size: 20,
-              ),
+              Icon(Icons.chevron_right, color: OsmeaColors.steel, size: 20),
             ],
           ),
         ),
@@ -361,11 +335,38 @@ class UserProfileView
     );
   }
 
-  Widget _buildStatItem(
+  Widget _buildDeleteMenuItem(
     BuildContext context,
-    String label,
-    int value,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
   ) {
+    final deleteColor = _getDeleteButtonColor(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing20,
+          vertical: context.spacing16,
+        ),
+        child: OsmeaComponents.row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, color: deleteColor, size: 22),
+            OsmeaComponents.sizedBox(width: context.spacing16),
+            OsmeaComponents.text(
+              title,
+              textStyle: OsmeaTextStyle.bodyMedium(
+                context,
+              ).copyWith(fontWeight: FontWeight.w500, color: deleteColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String label, int value) {
     return Expanded(
       child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
@@ -373,17 +374,16 @@ class UserProfileView
         children: [
           OsmeaComponents.text(
             value.toString(),
-            textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
-              fontWeight: FontWeight.w600,
-              color: OsmeaColors.black,
-            ),
+            textStyle: OsmeaTextStyle.titleLarge(
+              context,
+            ).copyWith(fontWeight: FontWeight.w600, color: OsmeaColors.black),
           ),
           OsmeaComponents.sizedBox(height: context.spacing6),
           OsmeaComponents.text(
             label,
-            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-              color: OsmeaColors.pewter,
-            ),
+            textStyle: OsmeaTextStyle.bodySmall(
+              context,
+            ).copyWith(color: OsmeaColors.pewter),
             textAlign: TextAlign.center,
           ),
         ],
@@ -400,6 +400,30 @@ class UserProfileView
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   }
 
+  /// Get delete button color from config or fallback to orange
+  Color _getDeleteButtonColor(BuildContext context) {
+    try {
+      final configHelper = AssetConfigHelper();
+      final colorString = configHelper.getString(
+        'user_profile_view.delete_account.color',
+        '#FF6B35', // Default orange
+      );
+
+      if (colorString.isNotEmpty && colorString.startsWith('#')) {
+        final hexString = colorString.substring(1);
+        if (hexString.length == 6) {
+          return Color(int.parse('FF$hexString', radix: 16));
+        } else if (hexString.length == 8) {
+          return Color(int.parse(hexString, radix: 16));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load delete button color: $e');
+    }
+    // Fallback to orange
+    return const Color(0xFFFF6B35);
+  }
+
   void _handleDeleteAccount(
     BuildContext context,
     UserProfileLoadedState state,
@@ -411,29 +435,60 @@ class UserProfileView
       onConfirmDelete: () async {
         // Capture router early before any async operations
         final router = GoRouter.of(context);
-        
+
         // Show loading indicator - use rootNavigator to prevent issues
         showDialog(
           context: context,
           barrierDismissible: false,
           useRootNavigator: true,
+          barrierColor: OsmeaColors.black.withOpacity(0.5),
           builder: (loadingContext) => PopScope(
             canPop: false,
             child: Center(
               child: Container(
-                padding: EdgeInsets.all(loadingContext.spacing24),
+                margin: EdgeInsets.symmetric(
+                  horizontal: loadingContext.spacing32,
+                ),
+                padding: EdgeInsets.all(loadingContext.spacing32),
                 decoration: BoxDecoration(
                   color: OsmeaColors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: OsmeaColors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: OsmeaComponents.column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircularProgressIndicator(),
-                    OsmeaComponents.sizedBox(height: loadingContext.spacing16),
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          OsmeaColors.black,
+                        ),
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: loadingContext.spacing24),
                     OsmeaComponents.text(
                       'Deleting account...',
-                      textStyle: OsmeaTextStyle.bodyMedium(loadingContext),
+                      textStyle: OsmeaTextStyle.titleMedium(loadingContext)
+                          .copyWith(
+                            color: OsmeaColors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    OsmeaComponents.sizedBox(height: loadingContext.spacing8),
+                    OsmeaComponents.text(
+                      'Please wait',
+                      textStyle: OsmeaTextStyle.bodySmall(
+                        loadingContext,
+                      ).copyWith(color: OsmeaColors.pewter),
                     ),
                   ],
                 ),
@@ -462,25 +517,47 @@ class UserProfileView
         if (success) {
           // Account deleted successfully
           debugPrint('✅ Account deleted successfully, navigating to home...');
-          
+
           // Navigate to home
           router.go('/home');
           debugPrint('✅ Navigated to home');
-          
+
           // Show success message after navigation completes
           Future.delayed(const Duration(milliseconds: 1000), () {
             try {
-              final currentContext = router.routerDelegate.navigatorKey.currentContext;
+              final currentContext =
+                  router.routerDelegate.navigatorKey.currentContext;
               if (currentContext != null && currentContext.mounted) {
                 ScaffoldMessenger.of(currentContext).showSnackBar(
                   SnackBar(
-                    content: OsmeaComponents.text(
-                      'Your account has been successfully deleted',
-                      textStyle: OsmeaTextStyle.bodyMedium(currentContext).copyWith(
-                        color: OsmeaColors.white,
-                      ),
+                    content: OsmeaComponents.row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          color: OsmeaColors.white,
+                          size: 20,
+                        ),
+                        OsmeaComponents.sizedBox(
+                          width: currentContext.spacing12,
+                        ),
+                        Expanded(
+                          child: OsmeaComponents.text(
+                            'Your account has been successfully deleted',
+                            textStyle: OsmeaTextStyle.bodyMedium(currentContext)
+                                .copyWith(
+                                  color: OsmeaColors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                     backgroundColor: OsmeaColors.black,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: EdgeInsets.all(currentContext.spacing16),
                     duration: const Duration(seconds: 4),
                   ),
                 );
@@ -492,22 +569,41 @@ class UserProfileView
         } else {
           // Failed to delete account
           debugPrint('❌ Account deletion failed');
-          
+
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: OsmeaComponents.text(
-                  'Failed to delete account. Please try again or contact support.',
-                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    color: OsmeaColors.white,
-                  ),
+                content: OsmeaComponents.row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: OsmeaColors.white,
+                      size: 20,
+                    ),
+                    OsmeaComponents.sizedBox(width: context.spacing12),
+                    Expanded(
+                      child: OsmeaComponents.text(
+                        'Failed to delete account. Please try again or contact support.',
+                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                          color: OsmeaColors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                backgroundColor: OsmeaColors.red,
+                backgroundColor: _getDeleteButtonColor(context),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.all(context.spacing16),
                 duration: const Duration(seconds: 5),
                 action: SnackBarAction(
                   label: 'Retry',
                   textColor: OsmeaColors.white,
-                  onPressed: () => _handleDeleteAccount(context, state, viewModel),
+                  onPressed: () =>
+                      _handleDeleteAccount(context, state, viewModel),
                 ),
               ),
             );
