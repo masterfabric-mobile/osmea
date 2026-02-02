@@ -617,7 +617,7 @@
         "scrolling_banner": {
             "enabled": true,
             "order_id": 0,
-            "text": "Masterfabric Store is an open source project • Explore our code and contribute on GitHub",
+            "text": "MasterFabric Store is an open source project • Explore our code and contribute on GitHub",
             "link": "https://github.com/masterfabric-mobile/osmea",
             "background_color": "#000000",
             "text_color": "#FFFFFF",
