@@ -33,3 +33,5 @@ class UserProfileErrorState extends UserProfileState {
 
   UserProfileErrorState({required this.message});
 }
+
+class UserProfileDeletingState extends UserProfileState {}

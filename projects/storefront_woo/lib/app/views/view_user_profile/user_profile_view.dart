@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_woo/app/views/view_user_profile/models/user_profile_view_model.dart';
 import 'package:storefront_woo/app/views/view_user_profile/models/module/states.dart';
+import 'package:storefront_woo/app/views/view_user_profile/widgets/delete_account_dialog.dart';
+import 'package:storefront_woo/app/views/view_user_profile/widgets/account_danger_zone.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
 
@@ -151,6 +153,16 @@ class UserProfileView
                 subtitle: '${state.preferences.length} preferences',
               ),
           ],
+          
+          // Danger Zone - Account Deletion
+          OsmeaComponents.sizedBox(height: context.spacing32),
+          AccountDangerZone(
+            onDeleteAccount: () => _handleDeleteAccount(context, state, viewModel),
+            isLoading: false,
+          ),
+          
+          // Bottom spacing
+          OsmeaComponents.sizedBox(height: context.spacing32),
         ],
       ),
     );
@@ -386,6 +398,123 @@ class UserProfileView
       return words[0].substring(0, words[0].length > 2 ? 2 : 1).toUpperCase();
     }
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
+
+  void _handleDeleteAccount(
+    BuildContext context,
+    UserProfileLoadedState state,
+    UserProfileViewModel viewModel,
+  ) {
+    DeleteAccountDialog.show(
+      context: context,
+      userEmail: state.profile.email,
+      onConfirmDelete: () async {
+        // Capture router early before any async operations
+        final router = GoRouter.of(context);
+        
+        // Show loading indicator - use rootNavigator to prevent issues
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          useRootNavigator: true,
+          builder: (loadingContext) => PopScope(
+            canPop: false,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.all(loadingContext.spacing24),
+                decoration: BoxDecoration(
+                  color: OsmeaColors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    OsmeaComponents.sizedBox(height: loadingContext.spacing16),
+                    OsmeaComponents.text(
+                      'Deleting account...',
+                      textStyle: OsmeaTextStyle.bodyMedium(loadingContext),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Call delete account
+        debugPrint('🗑️ Starting account deletion...');
+        final success = await viewModel.deleteAccount();
+        debugPrint('🗑️ Account deletion result: $success');
+
+        // Always close the loading dialog first
+        try {
+          // Use root navigator to close the dialog
+          Navigator.of(context, rootNavigator: true).pop();
+          debugPrint('✅ Loading dialog closed');
+        } catch (e) {
+          debugPrint('⚠️ Failed to close loading dialog: $e');
+        }
+
+        // Wait a moment for dialog to fully close
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        if (success) {
+          // Account deleted successfully
+          debugPrint('✅ Account deleted successfully, navigating to home...');
+          
+          // Navigate to home
+          router.go('/home');
+          debugPrint('✅ Navigated to home');
+          
+          // Show success message after navigation completes
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            try {
+              final currentContext = router.routerDelegate.navigatorKey.currentContext;
+              if (currentContext != null && currentContext.mounted) {
+                ScaffoldMessenger.of(currentContext).showSnackBar(
+                  SnackBar(
+                    content: OsmeaComponents.text(
+                      'Your account has been successfully deleted',
+                      textStyle: OsmeaTextStyle.bodyMedium(currentContext).copyWith(
+                        color: OsmeaColors.white,
+                      ),
+                    ),
+                    backgroundColor: OsmeaColors.black,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
+              }
+            } catch (e) {
+              debugPrint('⚠️ Failed to show success message: $e');
+            }
+          });
+        } else {
+          // Failed to delete account
+          debugPrint('❌ Account deletion failed');
+          
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: OsmeaComponents.text(
+                  'Failed to delete account. Please try again or contact support.',
+                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                    color: OsmeaColors.white,
+                  ),
+                ),
+                backgroundColor: OsmeaColors.red,
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                  label: 'Retry',
+                  textColor: OsmeaColors.white,
+                  onPressed: () => _handleDeleteAccount(context, state, viewModel),
+                ),
+              ),
+            );
+          }
+        }
+      },
+    );
   }
 }
 

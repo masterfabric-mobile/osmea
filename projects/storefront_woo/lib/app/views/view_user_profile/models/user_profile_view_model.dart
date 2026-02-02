@@ -3,8 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
+import 'package:apis/network/remote/woocommerce/auth/freezed_model/request/delete_user_request.dart';
 import 'package:storefront_woo/app/views/view_user_profile/models/module/states.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
+import 'package:apis/models/auth/woo_jwt_token.dart';
+import 'package:apis/models/cart/woo_cart_token.dart';
+import 'package:apis/dio_config/dio_client/api_dio_client.dart';
+import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
 
 @injectable
 class UserProfileViewModel
@@ -14,6 +20,7 @@ class UserProfileViewModel
   // Dependencies
   final OsmeaUsersManagerService _usersManagerService =
       GetIt.I<OsmeaUsersManagerService>();
+  final WooAuthService _authService = GetIt.I<WooAuthService>();
 
   // Arguments holder
   final Map<String, dynamic> _arguments = {};
@@ -31,6 +38,10 @@ class UserProfileViewModel
 
   // Public trigger functions
   Future<void> loadProfile() => _loadProfile();
+  
+  /// Delete user account
+  /// Returns true if successful, false otherwise
+  Future<bool> deleteAccount() => _deleteAccount();
 
   Future<void> _loadProfile() async {
     try {
@@ -143,6 +154,140 @@ class UserProfileViewModel
       stateChanger(UserProfileErrorState(
         message: 'Failed to load profile. Please try again.',
       ));
+    }
+  }
+
+  Future<bool> _deleteAccount() async {
+    try {
+      stateChanger(UserProfileDeletingState());
+      
+      debugPrint('🗑️ UserProfileViewModel: Starting account deletion...');
+      
+      // Get current user info and tokens
+      final authCubit = GetIt.I<AuthCubit>();
+      final authState = authCubit.state;
+      
+      if (authState is! AuthAuthenticatedState) {
+        debugPrint('❌ UserProfileViewModel: User not authenticated');
+        stateChanger(UserProfileErrorState(
+          message: 'Authentication required to delete account',
+        ));
+        return false;
+      }
+      
+      // Get required data from auth state
+      final userId = authState.userData?['id']?.toString() ?? '';
+      final jwtToken = authState.jwtToken ?? '';
+      
+      if (userId.isEmpty || jwtToken.isEmpty) {
+        debugPrint('❌ UserProfileViewModel: Missing user ID or JWT token');
+        stateChanger(UserProfileErrorState(
+          message: 'Missing authentication data',
+        ));
+        return false;
+      }
+      
+      // Get config for auth key
+      final configHelper = AssetConfigHelper();
+      final authKey = configHelper.getString(
+        'woocommerce_configuration.auth_key',
+        '',
+      );
+      final brandName = configHelper.getString(
+        'woocommerce_configuration.brand_name',
+        '',
+      );
+      
+      if (authKey.isEmpty || brandName.isEmpty) {
+        debugPrint('❌ UserProfileViewModel: Missing auth key or brand name');
+        stateChanger(UserProfileErrorState(
+          message: 'Configuration error. Please contact support.',
+        ));
+        return false;
+      }
+      
+      debugPrint('🗑️ UserProfileViewModel: Calling delete API...');
+      debugPrint('🗑️ UserProfileViewModel: User ID: $userId');
+      
+      // Call the delete user API
+      final response = await _authService.deleteUser(
+        brandName,
+        jwtToken,
+        authKey,
+        DeleteUserRequest(
+          userId: userId,
+          deleteOrders: true,
+          deleteReviews: true,
+          reason: 'user_request',
+          metadata: {
+            'deletion_date': DateTime.now().toIso8601String(),
+            'deletion_source': 'mobile_app',
+            'platform': 'flutter',
+          },
+        ),
+      );
+      
+      debugPrint('✅ UserProfileViewModel: Account deleted from server');
+      debugPrint('🗑️ Response: ${response.message}');
+      
+      // Clear all local data
+      debugPrint('🧹 UserProfileViewModel: Clearing local data...');
+      
+      // 1. Clear JWT Token
+      try {
+        await WooJwtTokenStorage.clearToken();
+        debugPrint('✅ JWT token cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear JWT token: $e');
+      }
+      
+      // 2. Clear Cart Token
+      try {
+        await WooCartTokenStorage.clearCartToken();
+        debugPrint('✅ Cart token cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear cart token: $e');
+      }
+      
+      // 3. Clear all cookies
+      try {
+        await ApiDioClient.clearAllCookies();
+        debugPrint('✅ All cookies cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear cookies: $e');
+      }
+      
+      // 4. Clear wishlist
+      try {
+        final wishlistViewModel = GetIt.I<WishlistViewModel>();
+        await wishlistViewModel.clearAll();
+        debugPrint('✅ Wishlist cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to clear wishlist: $e');
+      }
+      
+      // 5. Sign out from AuthCubit (this will clear auth state)
+      try {
+        await authCubit.signOut();
+        debugPrint('✅ Auth state cleared');
+      } catch (e) {
+        debugPrint('⚠️ Failed to sign out: $e');
+      }
+      
+      debugPrint('✅ UserProfileViewModel: Account deletion completed successfully');
+      
+      // Don't change state here - let the caller handle navigation
+      return true;
+      
+    } catch (e, stackTrace) {
+      debugPrint('❌ UserProfileViewModel: Error deleting account: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      
+      stateChanger(UserProfileErrorState(
+        message: 'Failed to delete account. Please try again or contact support.',
+      ));
+      
+      return false;
     }
   }
 
