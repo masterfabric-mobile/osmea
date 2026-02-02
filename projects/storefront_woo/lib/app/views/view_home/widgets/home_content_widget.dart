@@ -22,6 +22,7 @@ import 'package:storefront_woo/app/views/view_home/widgets/bottom_foreground_ban
 import 'package:storefront_woo/app/views/view_home/widgets/flash_sale_section_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/collections_section_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/brands_section_widget.dart';
+import 'package:storefront_woo/app/views/view_home/widgets/scrolling_banner_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/campaign_alert_widget.dart';
 import 'package:go_router/go_router.dart';
 
@@ -285,6 +286,19 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       );
     }
 
+    // Scrolling banner
+    if (_isEnabled(configHelper, 'scrolling_banner')) {
+      components.add(
+        _HomeComponent(
+          orderId: _getOrderId(configHelper, 'scrolling_banner'),
+          widget: ScrollingBannerWidget(
+            configHelper: configHelper,
+          ),
+          name: 'scrolling_banner',
+        ),
+      );
+    }
+
     // Sort by orderID
     components.sort((a, b) => a.orderId.compareTo(b.orderId));
 
@@ -362,10 +376,6 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
               ).copyWith(scrollbars: false),
               child: OsmeaComponents.singleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.only(
-                  top: 15, // Extra spacing between app bar and categories
-                  bottom: configHelper.getDouble('home_view.component_spacing.bottom', 16.0) * 2,
-                ),
                 child: OsmeaComponents.column(
                   children: _buildOrderedComponents(context),
                 ),
