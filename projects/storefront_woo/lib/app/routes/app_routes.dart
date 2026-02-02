@@ -24,6 +24,7 @@ import 'package:storefront_woo/app/views/view_user_profile/preferences/user_pref
 import 'package:storefront_woo/app/views/view_user_profile/contracts/user_contracts_sub_view.dart';
 import 'package:storefront_woo/app/views/view_user_profile/edit/user_edit_profile_sub_view.dart';
 import 'package:storefront_woo/app/views/view_order_detail/order_detail_view.dart';
+import 'package:storefront_woo/app/core/config/app_config_paths.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -1553,8 +1554,8 @@ final GoRouter appRouter = GoRouter(
                   try {
                     // Get auth key from config
                     final configHelper = AssetConfigHelper();
-                    final loaded = await configHelper.loadConfig(
-                      'assets/app_config.json',
+                    final loaded = await configHelper.loadConfigWithPlatform(
+                      AppConfigPaths.baseConfigPath,
                     );
 
                     debugPrint('📁 Config load result: $loaded');
