@@ -59,6 +59,18 @@ class _AuthSpaceWidgetState extends State<AuthSpaceWidget>
     super.dispose();
   }
 
+  bool _getConfigBool(String section, String key, bool fallback) {
+    final config = widget.config;
+    if (config == null || !config.containsKey(section)) return fallback;
+    final sectionData = config[section] as Map<String, dynamic>?;
+    if (sectionData == null || !sectionData.containsKey(key)) return fallback;
+    final v = sectionData[key];
+    if (v == null) return fallback;
+    if (v is bool) return v;
+    if (v is String) return v.toLowerCase().trim() == 'true' || v == '1';
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AuthCubit>();
@@ -359,13 +371,16 @@ class _AuthSpaceWidgetState extends State<AuthSpaceWidget>
               : null,
           isLoading: state.operationStatus == AuthOperationStatus.loading,
         ),
-        if (widget.onForgotPasswordTap != null) ...[
+        if (widget.onForgotPasswordTap != null &&
+            _getConfigBool('sign_in', 'show_forgot_password', true)) ...[
           OsmeaComponents.sizedBox(height: context.spacing12),
           Center(
             child: GestureDetector(
               onTap: widget.onForgotPasswordTap,
               child: OsmeaComponents.text(
-                'Forgot Password?',
+                widget.config?['sign_in']?['forgot_password_label']
+                        ?.toString() ??
+                    'Forgot Password?',
                 variant: OsmeaTextVariant.bodyMedium,
                 color: const Color(0xFF111827),
                 fontWeight: FontWeight.w600,

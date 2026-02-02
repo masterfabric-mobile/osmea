@@ -45,8 +45,7 @@ Future<void> _handleCampaignNavigation(BuildContext context) async {
   try {
     final authCubit = GetIt.I<AuthCubit>();
     final isAuthenticated =
-        authCubit.state is AuthAuthenticatedState &&
-        authCubit.isAuthenticated;
+        authCubit.state is AuthAuthenticatedState && authCubit.isAuthenticated;
 
     if (!context.mounted) return;
 
@@ -59,20 +58,25 @@ Future<void> _handleCampaignNavigation(BuildContext context) async {
       // User not authenticated, check onboarding status
       final onboardingHelper = OnboardingStorageHelper();
       final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
-      
+
       // Check if onboarding is enabled in config
       final configHelper = AssetConfigHelper();
-      final onboardingEnabled = configHelper.getBool('feature_flags.onboarding_enabled', true);
-      
+      final onboardingEnabled = configHelper.getBool(
+        'feature_flags.onboarding_enabled',
+        true,
+      );
+
       if (!context.mounted) return;
-      
+
       if (onboardingEnabled && !hasSeenOnboarding) {
         // First-time user, show onboarding
         debugPrint('📚 First-time user, navigating to onboarding');
         context.go('/onboarding');
       } else {
         // User has seen onboarding or onboarding is disabled, go to home
-        debugPrint('🏠 User has seen onboarding or onboarding disabled, navigating to home');
+        debugPrint(
+          '🏠 User has seen onboarding or onboarding disabled, navigating to home',
+        );
         context.go('/home');
       }
     }
@@ -83,10 +87,13 @@ Future<void> _handleCampaignNavigation(BuildContext context) async {
       final onboardingHelper = OnboardingStorageHelper();
       final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
       final configHelper = AssetConfigHelper();
-      final onboardingEnabled = configHelper.getBool('feature_flags.onboarding_enabled', true);
-      
+      final onboardingEnabled = configHelper.getBool(
+        'feature_flags.onboarding_enabled',
+        true,
+      );
+
       if (!context.mounted) return;
-      
+
       if (onboardingEnabled && !hasSeenOnboarding) {
         context.go('/onboarding');
       } else {
@@ -114,24 +121,23 @@ class _RouteErrorHandlingView extends ErrorHandlingView {
     required super.goRoute,
     super.onGoHome,
     super.onGoBack,
-  }) : super(
-          arguments: const {'routeError': true},
-        );
+  }) : super(arguments: const {'routeError': true});
 
   @override
   Future<void> initialContent(viewModel, BuildContext context) async {
     debugPrint('🎯 Route Error Handling View Start!');
     debugPrint('📍 Error path: $errorPath');
     debugPrint('❌ Error: $error');
-    
+
     // Load error handling config from app_config.json
     await viewModel.loadErrorHandlingConfig();
 
     // Show route error with custom message
     // Error message will be styled according to app_config.json configuration
-    final errorMessage = 'The route "$errorPath" could not be found. '
+    final errorMessage =
+        'The route "$errorPath" could not be found. '
         'Please check the URL and try again.';
-    
+
     await viewModel.showError(
       errorType: ErrorType.general,
       errorMessage: errorMessage,
@@ -152,7 +158,7 @@ final GoRouter appRouter = GoRouter(
   // Error handling for deep links - uses ErrorHandlingView from core package
   errorBuilder: (BuildContext context, GoRouterState state) {
     debugPrint('⚠️ Route error: ${state.error} for path: ${state.uri.path}');
-    
+
     // Use ErrorHandlingView from core package with app_config.json configuration
     return ErrorHandlingProvider(
       child: _RouteErrorHandlingView(
@@ -183,7 +189,7 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state, Widget child) {
         // Get navbar widget - always returns navbar if route should show it (config'de olsa da olmasa da)
         final navbar = _getNavbarForRoute(state.uri.path, null);
-        
+
         return _AppShellWithMiniCart(
           child: child,
           navbar: navbar,
@@ -203,7 +209,7 @@ final GoRouter appRouter = GoRouter(
               'showNavbar': routeExtra?['showNavbar'] ?? true,
               ...?routeExtra,
             };
-            
+
             return CustomTransitionPage(
               child: HomeView(
                 arguments: arguments,
@@ -228,7 +234,6 @@ final GoRouter appRouter = GoRouter(
           },
         ),
 
-
         // Saved Page
         GoRoute(
           path: '/saved',
@@ -240,7 +245,7 @@ final GoRouter appRouter = GoRouter(
               'showNavbar': routeExtra?['showNavbar'] ?? true,
               ...?routeExtra,
             };
-            
+
             return CustomTransitionPage(
               child: WishlistView(
                 goRoute: (String path) {
@@ -451,7 +456,7 @@ final GoRouter appRouter = GoRouter(
               'showNavbar': routeExtra?['showNavbar'] ?? true,
               ...?routeExtra,
             };
-            
+
             return CustomTransitionPage(
               child: FavoriteCategoriesView(
                 arguments: arguments,
@@ -715,10 +720,12 @@ final GoRouter appRouter = GoRouter(
             final routeExtra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'user_profile': true,
-              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              'showNavbar':
+                  routeExtra?['showNavbar'] ??
+                  true, // Navbar shown on all pages
               ...?routeExtra,
             };
-            
+
             return CustomTransitionPage(
               child: UserProfileView(
                 arguments: arguments,
@@ -748,10 +755,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'edit_profile': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserEditProfileView(
                     arguments: arguments,
@@ -774,10 +783,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'addresses': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserAddressesView(
                     arguments: arguments,
@@ -800,10 +811,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'settings': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserSettingsView(
                     arguments: arguments,
@@ -826,10 +839,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'metadata': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserMetadataView(
                     arguments: arguments,
@@ -852,10 +867,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'preferences': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserPreferencesView(
                     arguments: arguments,
@@ -878,10 +895,12 @@ final GoRouter appRouter = GoRouter(
                 final routeExtra = state.extra as Map<String, dynamic>?;
                 final arguments = {
                   'contracts': true,
-                  'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+                  'showNavbar':
+                      routeExtra?['showNavbar'] ??
+                      true, // Navbar shown on all pages
                   ...?routeExtra,
                 };
-                
+
                 return CustomTransitionPage(
                   child: UserContractsView(
                     arguments: arguments,
@@ -910,10 +929,12 @@ final GoRouter appRouter = GoRouter(
             final arguments = {
               'order_detail': true,
               'orderId': orderId,
-              'showNavbar': routeExtra?['showNavbar'] ?? true, // Navbar shown on all pages
+              'showNavbar':
+                  routeExtra?['showNavbar'] ??
+                  true, // Navbar shown on all pages
               ...?routeExtra,
             };
-            
+
             return CustomTransitionPage(
               child: OrderDetailView(
                 arguments: arguments,
@@ -949,7 +970,8 @@ final GoRouter appRouter = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'productDetail': true,
-              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
+              'showNavbar':
+                  extra?['showNavbar'] ?? true, // Navbar shown on all pages
               if (extra != null && extra.containsKey('cartToken'))
                 'cartToken': extra['cartToken'] as String?,
             };
@@ -989,7 +1011,8 @@ final GoRouter appRouter = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             final arguments = {
               'checkout': true,
-              'showNavbar': extra?['showNavbar'] ?? true, // Navbar shown on all pages
+              'showNavbar':
+                  extra?['showNavbar'] ?? true, // Navbar shown on all pages
               if (extra != null) ...extra,
             };
             return CustomTransitionPage(
@@ -1244,6 +1267,9 @@ final GoRouter appRouter = GoRouter(
             // Show error snackbar to user
             context.snackbarError(error, duration: const Duration(seconds: 3));
           },
+          onForgotPasswordTap: () {
+            context.push('/auth/forgot-password');
+          },
           arguments: {
             'auth': true,
             'onSignIn': (String email, String password, {bool? rememberMe}) async {
@@ -1420,37 +1446,51 @@ final GoRouter appRouter = GoRouter(
                 try {
                   // Wait a short time for backend to process user data after login
                   await Future.delayed(const Duration(milliseconds: 500));
-                  
-                  debugPrint('📍 [ADDRESS CACHE] Loading user addresses for caching...');
-                  final usersManagerService = GetIt.I<OsmeaUsersManagerService>();
-                  
+
+                  debugPrint(
+                    '📍 [ADDRESS CACHE] Loading user addresses for caching...',
+                  );
+                  final usersManagerService =
+                      GetIt.I<OsmeaUsersManagerService>();
+
                   // Try to fetch addresses with retry mechanism
                   GetUserAddressesResponse? addressesResponse;
                   int retryCount = 0;
                   const maxRetries = 2;
-                  
+
                   while (retryCount <= maxRetries) {
                     try {
-                      addressesResponse = await usersManagerService.getUserAddresses();
-                      debugPrint('📍 [ADDRESS CACHE] API Response: ${addressesResponse.addresses.length} addresses received');
-                      
+                      addressesResponse = await usersManagerService
+                          .getUserAddresses();
+                      debugPrint(
+                        '📍 [ADDRESS CACHE] API Response: ${addressesResponse.addresses.length} addresses received',
+                      );
+
                       // If we got addresses (even if 0), cache them
                       // But if we got 0 and it's the first try, wait and retry once
-                      if (addressesResponse.addresses.isNotEmpty || retryCount > 0) {
+                      if (addressesResponse.addresses.isNotEmpty ||
+                          retryCount > 0) {
                         break; // Success or already retried
                       }
-                      
+
                       // If 0 addresses on first try, wait and retry
-                      if (retryCount == 0 && addressesResponse.addresses.isEmpty) {
-                        debugPrint('⚠️ [ADDRESS CACHE] Got 0 addresses on first try, waiting 1 second and retrying...');
+                      if (retryCount == 0 &&
+                          addressesResponse.addresses.isEmpty) {
+                        debugPrint(
+                          '⚠️ [ADDRESS CACHE] Got 0 addresses on first try, waiting 1 second and retrying...',
+                        );
                         await Future.delayed(const Duration(seconds: 1));
                         retryCount++;
                         continue;
                       }
                     } catch (e) {
-                      debugPrint('⚠️ [ADDRESS CACHE] Error fetching addresses (attempt ${retryCount + 1}): $e');
+                      debugPrint(
+                        '⚠️ [ADDRESS CACHE] Error fetching addresses (attempt ${retryCount + 1}): $e',
+                      );
                       if (retryCount < maxRetries) {
-                        await Future.delayed(Duration(milliseconds: 500 * (retryCount + 1)));
+                        await Future.delayed(
+                          Duration(milliseconds: 500 * (retryCount + 1)),
+                        );
                         retryCount++;
                         continue;
                       }
@@ -1458,28 +1498,42 @@ final GoRouter appRouter = GoRouter(
                     }
                     break;
                   }
-                  
+
                   if (addressesResponse != null) {
                     // Cache addresses in local storage
                     final storage = LocalStorageHelper();
                     final addressesJson = jsonEncode(
-                      addressesResponse.addresses.map((addr) => addr.toJson()).toList(),
+                      addressesResponse.addresses
+                          .map((addr) => addr.toJson())
+                          .toList(),
                     );
-                    await storage.setItem('user_addresses_cache', addressesJson);
+                    await storage.setItem(
+                      'user_addresses_cache',
+                      addressesJson,
+                    );
                     final timestamp = DateTime.now().toIso8601String();
-                    await storage.setItem('user_addresses_cache_timestamp', timestamp);
-                    
-                    debugPrint('✅ [ADDRESS CACHE] User addresses cached successfully');
-                    debugPrint('   📦 Cached ${addressesResponse.addresses.length} addresses');
+                    await storage.setItem(
+                      'user_addresses_cache_timestamp',
+                      timestamp,
+                    );
+
+                    debugPrint(
+                      '✅ [ADDRESS CACHE] User addresses cached successfully',
+                    );
+                    debugPrint(
+                      '   📦 Cached ${addressesResponse.addresses.length} addresses',
+                    );
                     debugPrint('   🕐 Cache timestamp: $timestamp');
                     debugPrint('   💾 Cache key: user_addresses_cache');
                   }
-                  
+
                   // Cache order addresses in background (this is slow, so don't block login)
                   // Order addresses will be loaded from cache when user visits addresses page
                   _cacheOrdersInBackground(usersManagerService);
                 } catch (e, stackTrace) {
-                  debugPrint('❌ [ADDRESS CACHE] Error caching user addresses after login: $e');
+                  debugPrint(
+                    '❌ [ADDRESS CACHE] Error caching user addresses after login: $e',
+                  );
                   debugPrint('   Stack trace: $stackTrace');
                   // Don't block login if address caching fails
                   // Addresses will be loaded when user visits the addresses page
@@ -1556,18 +1610,59 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
+    // Forgot Password (full-page from core, config from app_config.json)
+    GoRoute(
+      path: '/auth/forgot-password',
+      builder: (BuildContext context, GoRouterState state) {
+        final authManager = GetIt.I<WooAuthManager>();
+        final configHelper = AssetConfigHelper();
+        final authConfig = configHelper.getObject('auth_configuration');
+        final config = authConfig is Map<String, dynamic> ? authConfig : null;
+        return ForgotPasswordView(
+          config: config,
+          goRoute: (String path) {
+            if (path == '/auth' || path.contains('auth')) {
+              context.pop();
+            } else {
+              context.go(path);
+            }
+          },
+          onSendResetEmail: (String email) async {
+            final result = await authManager.sendResetPassword(email: email);
+            if (!context.mounted) return false;
+            if (result.isSuccess) {
+              if (context.mounted) {
+                context.snackbarSuccess(
+                  result.message,
+                  title: 'Reset link sent',
+                  duration: const Duration(seconds: 4),
+                );
+              }
+              return true;
+            }
+            throw Exception(result.message);
+          },
+          onBack: () => context.pop(),
+        );
+      },
+    ),
   ],
 );
 
 /// Cache user orders in background after login
 /// This caches orders which can be used to extract addresses and for other purposes
 /// Note: This is a slow operation (many API calls), so it runs in background
-Future<void> _cacheOrdersInBackground(OsmeaUsersManagerService usersManagerService) async {
+Future<void> _cacheOrdersInBackground(
+  OsmeaUsersManagerService usersManagerService,
+) async {
   // Run in background without blocking
   Future.microtask(() async {
     try {
-      debugPrint('📍 [ORDER CACHE] Starting to cache user orders in background...');
-      
+      debugPrint(
+        '📍 [ORDER CACHE] Starting to cache user orders in background...',
+      );
+
       // Get order IDs from getUserDashboard
       List<int> orderIds = [];
       try {
@@ -1586,16 +1681,21 @@ Future<void> _cacheOrdersInBackground(OsmeaUsersManagerService usersManagerServi
         debugPrint('⚠️ [ORDER CACHE] No orders found, caching empty list');
         final storage = LocalStorageHelper();
         await storage.setItem('user_orders_cache', jsonEncode([]));
-        await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
+        await storage.setItem(
+          'user_orders_cache_timestamp',
+          DateTime.now().toIso8601String(),
+        );
         return;
       }
 
       // Fetch detailed order information (limit to 50 to avoid too many calls)
       final List<Map<String, dynamic>> detailedOrders = [];
       final limitedOrderIds = orderIds.take(50).toList();
-      
-      debugPrint('📦 [ORDER CACHE] Fetching ${limitedOrderIds.length} order details...');
-      
+
+      debugPrint(
+        '📦 [ORDER CACHE] Fetching ${limitedOrderIds.length} order details...',
+      );
+
       for (final orderId in limitedOrderIds) {
         try {
           final detailedOrder = await usersManagerService.getUserOrder(orderId);
@@ -1610,8 +1710,11 @@ Future<void> _cacheOrdersInBackground(OsmeaUsersManagerService usersManagerServi
       final storage = LocalStorageHelper();
       final ordersJson = jsonEncode(detailedOrders);
       await storage.setItem('user_orders_cache', ordersJson);
-      await storage.setItem('user_orders_cache_timestamp', DateTime.now().toIso8601String());
-      
+      await storage.setItem(
+        'user_orders_cache_timestamp',
+        DateTime.now().toIso8601String(),
+      );
+
       debugPrint('✅ [ORDER CACHE] Cached ${detailedOrders.length} orders');
       debugPrint('   💾 Cache key: user_orders_cache');
     } catch (e, stackTrace) {
@@ -1763,14 +1866,14 @@ double? _getNavbarDouble(AssetConfigHelper configHelper, String key) {
 bool _shouldShowNavbarForPath(String path) {
   // Routes that should NOT show navbar (only special pages like auth, onboarding, etc.)
   final hideNavbarRoutes = [
-    '/auth',            // Authentication pages
-    '/onboarding',      // Onboarding flow
-    '/campaign',        // Campaign splash
-    '/',                // Root/splash route
-    '/empty',           // Empty state pages
-    '/loading',         // Loading pages
+    '/auth', // Authentication pages
+    '/onboarding', // Onboarding flow
+    '/campaign', // Campaign splash
+    '/', // Root/splash route
+    '/empty', // Empty state pages
+    '/loading', // Loading pages
   ];
-  
+
   // Check if path matches exactly or starts with any hide navbar route
   for (final route in hideNavbarRoutes) {
     if (path == route || path.startsWith('$route/')) {
@@ -1778,7 +1881,7 @@ bool _shouldShowNavbarForPath(String path) {
       return false;
     }
   }
-  
+
   // Default: show navbar for all other routes (including product-detail, checkout, order-detail, etc.)
   debugPrint('✅ Navbar shown for route: $path');
   return true;
@@ -1803,15 +1906,19 @@ Widget? _getNavbarForRoute(String location, Map<String, dynamic>? routeExtra) {
     }
 
     final itemsList = navbarConfig?['items'] as List<dynamic>?;
-    final List<NavbarItemModel> itemModels = itemsList != null && itemsList.isNotEmpty
+    final List<NavbarItemModel> itemModels =
+        itemsList != null && itemsList.isNotEmpty
         ? itemsList
-            .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
-            .toList()
+              .map(
+                (item) =>
+                    NavbarItemModel.fromConfig(item as Map<String, dynamic>),
+              )
+              .toList()
         : [];
 
     // Try to find currentIndex from config
     int? currentIndex;
-    
+
     if (itemModels.isNotEmpty) {
       for (final model in itemModels) {
         // Check standard route
@@ -1831,8 +1938,8 @@ Widget? _getNavbarForRoute(String location, Map<String, dynamic>? routeExtra) {
 
     // If not found in config, try fallback index or use default
     // _getFallbackIndex always returns a value (defaults to 0), so currentIndex will never be null
-    final finalCurrentIndex = currentIndex != null 
-        ? currentIndex 
+    final finalCurrentIndex = currentIndex != null
+        ? currentIndex
         : _getFallbackIndex(location);
 
     // Return a Builder widget to access context
@@ -2088,7 +2195,7 @@ Widget? _getNavbarForRouteFallback(String location) {
   if (!shouldShow) {
     return null;
   }
-  
+
   // Show navbar for main app sections and other routes that should show navbar
   if (location == '/home' ||
       location == '/search' ||
@@ -2796,9 +2903,6 @@ class _AppShellWithMiniCartState extends State<_AppShellWithMiniCart> {
   Widget build(BuildContext context) {
     // Navbar visibility is already determined in ShellRoute builder
     // If navbar is null, it means the route shouldn't show navbar
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: widget.navbar,
-    );
+    return Scaffold(body: widget.child, bottomNavigationBar: widget.navbar);
   }
 }

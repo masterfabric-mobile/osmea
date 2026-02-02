@@ -52,6 +52,18 @@ class AuthEnterpriseWidget extends StatelessWidget {
     return fallback;
   }
 
+  /// Get bool from config (handles string "true"/"false" from JSON/WordPress).
+  bool _getConfigBool(String section, String key, bool fallback) {
+    if (config == null || !config!.containsKey(section)) return fallback;
+    final sectionData = config![section] as Map<String, dynamic>?;
+    if (sectionData == null || !sectionData.containsKey(key)) return fallback;
+    final v = sectionData[key];
+    if (v == null) return fallback;
+    if (v is bool) return v;
+    if (v is String) return v.toLowerCase().trim() == 'true' || v == '1';
+    return fallback;
+  }
+
   /// Get enterprise primary color from config
   Color _getEnterprisePrimaryColor() {
     if (config != null && config!.containsKey('ui_style')) {
@@ -522,7 +534,8 @@ class AuthEnterpriseWidget extends StatelessWidget {
             ),
           ],
         ),
-        if (onForgotPasswordTap != null)
+        if (onForgotPasswordTap != null &&
+            _getConfigBool('sign_in', 'show_forgot_password', true))
           GestureDetector(
             onTap: onForgotPasswordTap,
             child: OsmeaComponents.text(

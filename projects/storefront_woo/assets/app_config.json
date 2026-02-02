@@ -445,7 +445,7 @@
     },
     "auth_configuration": {
         "ui_style": {
-            "style": "startup",
+            "style": "enterprise",
             "tab_container_radius": 12,
             "tab_item_radius": 10,
             "button_radius": 12,
@@ -490,7 +490,9 @@
             "password_label": "Password",
             "password_hint": "Enter your password",
             "remember_me_label": "Remember me",
+            "show_forgot_password": true,
             "forgot_password_label": "Forgot Password?",
+            "forgot_password_label_tr": "Şifremi unuttum",
             "sign_in_button": "Continue",
             "sign_in_button_loading": "Signing in...",
             "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
@@ -529,7 +531,36 @@
         },
         "forgot_password": {
             "title": "Reset Password",
-            "subtitle": "Enter your email to reset"
+            "subtitle": "Enter your email and we'll send you a link to reset your password.",
+            "email_label": "Email",
+            "email_hint": "Email",
+            "submit_button": "Send reset link",
+            "back_to_sign_in": "Back to Sign In",
+            "sending": "Sending...",
+            "email_required": "Please enter your email",
+            "email_invalid": "Please enter a valid email",
+            "primary_color": "#000000",
+            "link_color": "#000000",
+            "background_color": "#FFFFFF",
+            "app_bar_background_color": "#FFFFFF",
+            "app_bar_foreground_color": "#000000",
+            "app_bar_title_color": "#000000",
+            "button_background_color": "#000000",
+            "button_text_color": "#FFFFFF",
+            "icon_background_color": "#00000014",
+            "title_text_color": "#000000",
+            "subtitle_text_color": "#6B7280",
+            "label_text_color": "#374151",
+            "input_background_color": "#FFFFFF",
+            "input_border_color": "#E5E7EB",
+            "input_hint_color": "#9CA3AF",
+            "border_radius": 12
+        },
+        "sign_in_forgot_password_link": {
+            "color": "#000000",
+            "enterprise": { "color": "#000000" },
+            "startup": { "color": "#000000" },
+            "space": { "color": "#6366F1" }
         }
     },
     "empty_view_configuration": {

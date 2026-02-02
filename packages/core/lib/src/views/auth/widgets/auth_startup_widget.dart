@@ -52,6 +52,17 @@ class AuthStartupWidget extends StatelessWidget {
     return fallback;
   }
 
+  bool _getConfigBool(String section, String key, bool fallback) {
+    if (config == null || !config!.containsKey(section)) return fallback;
+    final sectionData = config![section] as Map<String, dynamic>?;
+    if (sectionData == null || !sectionData.containsKey(key)) return fallback;
+    final v = sectionData[key];
+    if (v == null) return fallback;
+    if (v is bool) return v;
+    if (v is String) return v.toLowerCase().trim() == 'true' || v == '1';
+    return fallback;
+  }
+
   /// Get button color from config
   Color _getButtonColor(
       String buttonType, String colorType, Color defaultColor) {
@@ -222,14 +233,11 @@ class AuthStartupWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing24),
         _buildStartupPasswordField(context, formState, cubit),
         OsmeaComponents.sizedBox(height: context.spacing20),
-        _buildStartupRememberMe(context, formState, cubit, primaryColor),
+        _buildStartupRememberMeAndForgotPassword(
+            context, formState, cubit, primaryColor),
         OsmeaComponents.sizedBox(height: context.spacing32),
         _buildStartupSignInButton(
             context, formState, cubit, buttonRadius, primaryColor),
-        OsmeaComponents.sizedBox(height: context.spacing16),
-        if (onForgotPasswordTap != null)
-          _buildStartupForgotPasswordButton(
-              context, primaryColor, buttonRadius),
         if (cubit.signUpCallback != null) ...[
           OsmeaComponents.sizedBox(height: context.spacing24),
           _buildStartupSignUpLink(context, cubit),
@@ -369,24 +377,41 @@ class AuthStartupWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStartupRememberMe(BuildContext context, AuthFormState state,
-      AuthCubit cubit, Color primaryColor) {
+  /// Remember me (left) + Forgot Password? link (right) — standard single row.
+  Widget _buildStartupRememberMeAndForgotPassword(BuildContext context,
+      AuthFormState state, AuthCubit cubit, Color primaryColor) {
     return OsmeaComponents.row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        OsmeaComponents.checkbox(
-          value: state.signInRememberMe,
-          onChanged: (value) => cubit.toggleRememberMe(),
-          activeColor: OsmeaColors.black,
-          size: CheckboxSize.small,
+        OsmeaComponents.row(
+          children: [
+            OsmeaComponents.checkbox(
+              value: state.signInRememberMe,
+              onChanged: (value) => cubit.toggleRememberMe(),
+              activeColor: OsmeaColors.black,
+              size: CheckboxSize.small,
+            ),
+            OsmeaComponents.sizedBox(width: context.spacing8),
+            OsmeaComponents.text(
+              _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
+              variant: OsmeaTextVariant.bodyMedium,
+              color: OsmeaColors.thunder,
+              fontWeight: FontWeight.w400,
+            ),
+          ],
         ),
-        OsmeaComponents.sizedBox(width: context.spacing8),
-        OsmeaComponents.text(
-          _getConfigValue('sign_in', 'remember_me_label', 'Remember me'),
-          variant: OsmeaTextVariant.bodyMedium,
-          color: OsmeaColors.thunder,
-          fontWeight: FontWeight.w400,
-        ),
+        if (onForgotPasswordTap != null &&
+            _getConfigBool('sign_in', 'show_forgot_password', true))
+          GestureDetector(
+            onTap: onForgotPasswordTap,
+            child: OsmeaComponents.text(
+              _getConfigValue(
+                  'sign_in', 'forgot_password_label', 'Forgot Password?'),
+              variant: OsmeaTextVariant.bodyMedium,
+              color: primaryColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
       ],
     );
   }
@@ -414,7 +439,7 @@ class AuthStartupWidget extends StatelessWidget {
           : _getConfigValue('sign_in', 'sign_in_button', 'Continue'),
       onPressed: isEnabled ? cubit.signIn : null,
       variant: ButtonVariant.primary,
-      size: ButtonSize.medium,
+      size: ButtonSize.large,
       state: isLoading
           ? ButtonState.loading
           : (isEnabled ? ButtonState.enabled : ButtonState.disabled),
@@ -423,22 +448,6 @@ class AuthStartupWidget extends StatelessWidget {
       textColor: buttonTextColor,
       disabledBackgroundColor: disabledBgColor,
       disabledTextColor: disabledTextColor,
-      borderRadius: buttonRadius,
-    );
-  }
-
-  Widget _buildStartupForgotPasswordButton(
-      BuildContext context, Color primaryColor, double buttonRadius) {
-    return OsmeaComponents.button(
-      text: _getConfigValue(
-          'sign_in', 'forgot_password_label', 'Forgot Password?'),
-      onPressed: onForgotPasswordTap,
-      variant: ButtonVariant.outlined,
-      size: ButtonSize.large,
-      fullWidth: true,
-      backgroundColor: OsmeaColors.white,
-      textColor: primaryColor,
-      borderColor: primaryColor,
       borderRadius: buttonRadius,
     );
   }
