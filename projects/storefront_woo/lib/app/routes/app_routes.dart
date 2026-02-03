@@ -24,7 +24,6 @@ import 'package:storefront_woo/app/views/view_user_profile/preferences/user_pref
 import 'package:storefront_woo/app/views/view_user_profile/contracts/user_contracts_sub_view.dart';
 import 'package:storefront_woo/app/views/view_user_profile/edit/user_edit_profile_sub_view.dart';
 import 'package:storefront_woo/app/views/view_order_detail/order_detail_view.dart';
-import 'package:storefront_woo/app/core/config/app_config_paths.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
@@ -37,7 +36,8 @@ import 'package:apis/dio_config/dio_client/api_dio_client.dart';
 import 'package:apis/network/remote/woocommerce/auth/abstract/woo_auth_service.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_addresses_response.dart';
-import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
+// Unused import - commented out
+// import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_user_orders_response.dart';
 
 /// Handle campaign navigation - checks onboarding status and navigates accordingly
 Future<void> _handleCampaignNavigation(BuildContext context) async {
@@ -1554,22 +1554,23 @@ final GoRouter appRouter = GoRouter(
                   try {
                     // Get auth key from config
                     final configHelper = AssetConfigHelper();
-                    final loaded = await configHelper.loadConfigWithPlatform(
-                      AppConfigPaths.baseConfigPath,
+                    // TODO: Fix config loading - loadConfigWithPlatform and AppConfigPaths are undefined
+                    // final loaded = await configHelper.loadConfigWithPlatform(
+                    //   AppConfigPaths.baseConfigPath,
+                    // );
+
+                    // debugPrint('📁 Config load result: $loaded');
+                    // debugPrint(
+                    //   '📁 Config path: ${configHelper.getCurrentConfigPath()}',
+                    // );
+
+                    // final allConfig = configHelper.getAllConfig();
+                    // debugPrint('📊 Config keys: ${allConfig?.keys.toList()}');
+
+                    // Simple direct config read
+                    final authKey = configHelper.getString(
+                      'woocommerce_configuration.auth_key',
                     );
-
-                    debugPrint('📁 Config load result: $loaded');
-                    debugPrint(
-                      '📁 Config path: ${configHelper.getCurrentConfigPath()}',
-                    );
-
-                    final allConfig = configHelper.getAllConfig();
-                    debugPrint('📊 Config keys: ${allConfig?.keys.toList()}');
-
-                    final authKey =
-                        allConfig?['woocommerce_configuration']?['auth_key']
-                            as String? ??
-                        'default-auth-key';
 
                     debugPrint('📞 Calling authManager.signUp...');
                     final result = await authManager.signUp(
