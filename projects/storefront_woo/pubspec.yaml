@@ -1,7 +1,7 @@
 name: storefront_woo
 description: "Ecommerce Storefront App - Modern Flutter-based storefront application for WooCommerce with BLoC state management, localization support, and responsive design"
 publish_to: 'none' 
-version: 1.0.0+4
+version: 1.0.0+10
 
 environment:
   sdk: ^3.8.1
@@ -10,22 +10,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Git (remote repo). Use path override for local development.
   core:
     git:
       url: https://github.com/masterfabric-mobile/osmea.git
       ref: dev
-      path: packages/core
+      path: packages/core # Shared business logic, constants, utilities
   apis:
     git:
       url: https://github.com/masterfabric-mobile/osmea.git
       ref: dev
-      path: packages/apis
-  # Local path override (uncomment to use local packages):
-  # core:
-  #   path: ../../packages/core
-  # apis:
-  #   path: ../../packages/apis
+      path: packages/apis # Networking layer (REST, GraphQL, etc.)
 
   cupertino_icons: ^1.0.8
   flutter_dotenv: ^5.1.0
