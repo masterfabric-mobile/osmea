@@ -408,6 +408,11 @@ class OsmeaNavbar extends CoreContainer {
   NavbarStyle _getEffectiveStyle() {
     if (style != null) return style!;
 
+    // Special case: iconGrid variant should always show only icons
+    if (variant == NavbarVariant.iconGrid) {
+      return NavbarStyle.iconOnly;
+    }
+
     // Auto-determine style based on items and position
     final hasIcons = items.any((item) => item.icon != null);
     final hasSubtext = items.any((item) => item.subtext != null);
