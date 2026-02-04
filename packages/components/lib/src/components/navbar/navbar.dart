@@ -583,7 +583,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
-        // Pill/Capsule shaped padding - kompakt ve yuvarlak
+        // Pill/Capsule shaped padding - compact and rounded
         return EdgeInsets.symmetric(
           horizontal: basePadding.horizontal * 0.5,
           vertical: basePadding.vertical * 0.4,
@@ -874,7 +874,7 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // 🛒 RETAIL MAIN - Düz, standart tasarım
+        // 🛒 RETAIL MAIN - Flat, standard design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -890,7 +890,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.dottedOutline:
-        // 🔘 DOTTED OUTLINE - Üst çizgi indicator ile minimal tasarım
+        // 🔘 DOTTED OUTLINE - Top line indicator with minimal design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -904,7 +904,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.healthcareMinimal:
-        // 🏥 HEALTHCARE MINIMAL - Düz, minimal border tasarımı
+        // 🏥 HEALTHCARE MINIMAL - Flat, minimal border design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -926,7 +926,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.outlinedMinimal:
-        // 🪟 OUTLINED MINIMAL - Temiz, ince kenarlık tasarımı
+        // 🪟 OUTLINED MINIMAL - Clean, thin border design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -948,7 +948,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.mediaOverlay:
-        // 🎬 MEDIA OVERLAY - Şeffaf, düz tasarım
+        // 🎬 MEDIA OVERLAY - Transparent, flat design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -958,7 +958,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.socialGlass:
-        // 📱 SOCIAL GLASS - Düz, yuvarlak tasarım
+        // 📱 SOCIAL GLASS - Flat, rounded design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -980,7 +980,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.enterpriseMain:
-        // 🏢 ENTERPRISE MAIN - Alt border ile düz tasarım
+        // 🏢 ENTERPRISE MAIN - Flat design with bottom border
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -998,7 +998,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.iconGrid:
-        // 🔳 ICON GRID - Grid tabanlı icon navigasyonu
+        // 🔳 ICON GRID - Grid-based icon navigation
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1076,16 +1076,29 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.brutalist:
-        // ⬛ BRUTALIST - Sert köşeli, bold tasarım
+        // ⬛ BRUTALIST - Sharp corners, bold border design
         return Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: isActive ? Colors.black : Colors.white,
-            border: Border.all(
-              color: Colors.black,
-              width: 3.0,
-            ),
+            color: Colors.white, // Always white background - text is readable
+            border: isActive
+                ? Border.all(
+                    color: Colors.black,
+                    width: 0.5, // Bold border only for active item
+                  )
+                : null, // No border for inactive items
+            borderRadius: BorderRadius.zero, // Sharp corners
+            boxShadow: isActive
+                ? [
+                    // Brutalist hard shadow - no blur, offset only
+                    const BoxShadow(
+                      color: Colors.black,
+                      offset: Offset(3, 3), // Hard, geometric shadow
+                      blurRadius: 0, // Blur yok - brutalist
+                    ),
+                  ]
+                : null,
           ),
           padding: padding,
           clipBehavior: Clip.hardEdge,
@@ -1093,7 +1106,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.badgeIndicator:
-        // 🔘 BADGE INDICATOR - Badge stili, düz tasarım
+        // 🔘 BADGE INDICATOR - Badge style, flat design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1115,7 +1128,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.neumorphic:
-        // 🌙 NEUMORPHIC - Soft 3D efekt tasarımı
+        // 🌙 NEUMORPHIC - Soft 3D effect design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1131,7 +1144,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.cardFloating:
-        // 🎴 CARD FLOATING - Düz, standart card tasarımı
+        // 🎴 CARD FLOATING - Flat, standard card design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1153,7 +1166,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.bubble:
-        // 🫧 BUBBLE - Playful bubble tasarımı
+        // 🫧 BUBBLE - Playful bubble design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1169,7 +1182,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.glassyBlur:
-        // ✨ GLASSY BLUR - Glassmorphism tasarımı
+        // ✨ GLASSY BLUR - Glassmorphism design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1191,7 +1204,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.markerTab:
-        // 📍 MARKER TAB - Marker göstergeli tab
+        // 📍 MARKER TAB - Tab with marker indicator
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1204,7 +1217,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.stepped:
-        // 🔲 STEPPED - Kademeli tasarım
+        // 🔲 STEPPED - Stepped design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1231,7 +1244,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.ribbon:
-        // 🎪 RIBBON - Kurdele tasarımı
+        // 🎪 RIBBON - Ribbon design
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -1260,7 +1273,7 @@ class OsmeaNavbar extends CoreContainer {
   ) {
     final effectiveIndicatorColor = indicatorColor ?? colors.active;
 
-    // Eğer text varsa indicator gösterilmesin
+    // Don't show indicator if text is present
     final hasText = showLabels && item.text.isNotEmpty;
 
     // Always apply variant-specific design first
@@ -1272,7 +1285,7 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.dottedOutline:
-        // 🔘 TOP INDICATOR BAR - Üstte renkli çizgi göstergesi
+        // 🔘 TOP INDICATOR BAR - Colored line indicator at top
         if (!isActive) return child;
         return Stack(
           clipBehavior: clipNone,
@@ -1295,7 +1308,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.healthcareMinimal:
-        // 🏥 DOT INDICATOR - Small dot at bottom/right (sadece text yoksa)
+        // 🏥 DOT INDICATOR - Small dot at bottom/right (only when no text)
         if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
@@ -1323,7 +1336,7 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.mediaOverlay:
-        // 🎬 MEDIA OVERLAY - Düz underline indicator (sadece text yoksa)
+        // 🎬 MEDIA OVERLAY - Flat underline indicator (only when no text)
         if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
@@ -1365,8 +1378,8 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.pillShaped:
-        // 💊 PILL SHAPED - Aktif item beyaz içerik ile
-        // Container'da zaten dolu arka plan var, burada ekstra bir şey yapmasak da olur
+        // 💊 PILL SHAPED - Active item with white content
+        // Container already has filled background, no extra styling needed here
         return child;
 
       case NavbarVariant.brutalist:
@@ -1374,7 +1387,7 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.badgeIndicator:
-        // 🔘 BADGE INDICATOR - Badge above item (sadece text yoksa)
+        // 🔘 BADGE INDICATOR - Badge above item (only when no text)
         if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
@@ -1418,7 +1431,7 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.markerTab:
-        // 📍 MARKER TAB - Marker indicator (sadece text yoksa)
+        // 📍 MARKER TAB - Marker indicator (only when no text)
         if (hasText) return child;
         return Stack(
           clipBehavior: clipNone,
@@ -1452,7 +1465,7 @@ class OsmeaNavbar extends CoreContainer {
     }
 
     // If user explicitly set indicatorStyle AND item is active AND no text, apply it as additional style
-    // Text varsa indicator gösterilmesin
+    // Don't show indicator if text is present
     if (isActive && indicatorStyle != NavbarIndicatorStyle.none && !hasText) {
       result = _applyIndicatorStyle(
         context,
@@ -1643,7 +1656,7 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.floatingCards:
         return BorderRadius.circular(12.0);
       case NavbarVariant.pillShaped:
-        return BorderRadius.circular(100.0); // Tam kapsül şekli
+        return BorderRadius.circular(100.0); // Full capsule shape
       case NavbarVariant.brutalist:
         return BorderRadius.zero;
       case NavbarVariant.badgeIndicator:
@@ -2691,8 +2704,8 @@ class OsmeaNavbar extends CoreContainer {
 
     List<BoxShadow> shadows = [];
 
-    // Shadow'lar kaldırıldı - düz, standart tasarım
-    // shadows listesi boş kalıyor
+    // Shadows removed - flat, standard design
+    // shadows list remains empty
 
     // Determine if border should be shown
     final shouldShowBorder = showBorder ?? variantStyle.hasBorder;
@@ -2847,7 +2860,7 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
-        // Pill/capsule shaped style - yumuşak gölgeli
+        // Pill/capsule shaped style - soft shadow
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(100.0),
           elevation: 4.0,
@@ -2858,13 +2871,13 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.brutalist:
-        // Brutalist design - bold borders
+        // Brutalist design - bold borders, hard shadow
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.zero,
-          elevation: 0.0,
+          elevation: 0.0, // Using custom shadow
           shadowSpread: 0.0,
           hasBorder: true,
-          borderWidth: 3.0,
+          borderWidth: 2.5,
           borderStyle: BorderStyle.solid,
         );
 
