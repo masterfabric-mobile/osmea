@@ -257,8 +257,8 @@ extension NavbarVariantExtension on NavbarVariant {
   /// 🔳 Check if variant is icon grid
   bool get isIconGrid => this == NavbarVariant.iconGrid;
 
-  /// 🌈 Check if variant is neon glow
-  bool get isNeonGlow => this == NavbarVariant.neonGlow;
+  /// 📱 Check if variant is floating cards
+  bool get isFloatingCards => this == NavbarVariant.floatingCards;
 
   /// 🎯 Check if variant is pill shaped
   bool get isPillShaped => this == NavbarVariant.pillShaped;
@@ -314,7 +314,7 @@ extension NavbarVariantExtension on NavbarVariant {
   bool get isForCreative => isDottedOutline || isBrutalist || isStepped;
 
   /// 🎯 Check if variant is for media/entertainment sector
-  bool get isForMedia => isMediaOverlay || isNeonGlow;
+  bool get isForMedia => isMediaOverlay || isFloatingCards;
 
   /// 🎯 Check if variant is for social media sector
   bool get isForSocial => isSocialGlass || isBubble;
@@ -345,7 +345,7 @@ extension NavbarVariantExtension on NavbarVariant {
       case NavbarVariant.glassyBlur:
         return 0.8;
       case NavbarVariant.mediaOverlay:
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.floatingCards:
         return 0.0;
     }
   }
@@ -507,8 +507,8 @@ extension NavbarVariantStringExtension on NavbarVariant {
         return NavbarVariant.enterpriseMain;
       case 'icongrid':
         return NavbarVariant.iconGrid;
-      case 'neonglow':
-        return NavbarVariant.neonGlow;
+      case 'floatingcards':
+        return NavbarVariant.floatingCards;
       case 'pillshaped':
         return NavbarVariant.pillShaped;
       case 'brutalist':

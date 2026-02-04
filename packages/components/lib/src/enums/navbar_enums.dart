@@ -82,7 +82,7 @@ enum NavbarSize {
 /// - `socialGlass`: Frosted glass effect navigation
 /// - `enterpriseMain`: Enterprise/B2B main navigation
 /// - `iconGrid`: Grid-based icon navigation
-/// - `neonGlow`: Vibrant neon-style navigation
+/// - `floatingCards`: Elevated floating card navigation
 /// - `pillShaped`: Pill/capsule shaped items
 /// - `brutalist`: Bold brutalist design
 /// - `badgeIndicator`: Badge-style indicators
@@ -176,14 +176,14 @@ enum NavbarVariant {
   /// - Sectors: All sectors, Utility apps
   iconGrid,
 
-  /// 🌈 **Neon Glow** - Vibrant neon-style navigation with glow effects
-  /// - Background: Dark/Black
-  /// - Text: Neon colors (cyan, magenta, lime)
-  /// - Border: Neon glow border (color varies)
-  /// - Active: Intense glow effect
-  /// - Use for: Gaming apps, Night mode, Entertainment, Music apps
-  /// - Sectors: Gaming, Entertainment, Music, Nightlife
-  neonGlow,
+  /// 📱 **Floating Cards** - Elevated floating card navigation
+  /// - Background: White elevated cards with subtle shadow
+  /// - Text: Clean typography with good contrast
+  /// - Border: None (elevation creates visual separation)
+  /// - Active: Slightly higher elevation and subtle tint
+  /// - Use for: Modern apps, Clean interfaces, Premium feel
+  /// - Sectors: Lifestyle, Finance, Productivity, Social
+  floatingCards,
 
   /// 🎯 **Pill Shaped** - Pill/capsule shaped navigation items
   /// - Background: Light/Dark adaptive

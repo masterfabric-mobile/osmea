@@ -575,11 +575,11 @@ class OsmeaNavbar extends CoreContainer {
           vertical: basePadding.vertical * 0.5,
         );
 
-      case NavbarVariant.neonGlow:
-        // Neon glow padding
+      case NavbarVariant.floatingCards:
+        // Floating cards padding
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.8,
-          vertical: basePadding.vertical * 0.6,
+          horizontal: basePadding.horizontal * 0.5,
+          vertical: basePadding.vertical * 0.3,
         );
 
       case NavbarVariant.pillShaped:
@@ -1016,28 +1016,33 @@ class OsmeaNavbar extends CoreContainer {
           child: Center(child: content),
         );
 
-      case NavbarVariant.neonGlow:
-        // 🌈 NEON GLOW - Neon parlama efekti
+      case NavbarVariant.floatingCards:
+        // 📱 FLOATING CARDS - Clean elevated cards with subtle shadows
         return Container(
           width: double.infinity,
           height: double.infinity,
+          margin: const EdgeInsets.all(4.0),
           decoration: BoxDecoration(
-            color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha30)
-                : Colors.black.withValues(alpha: context.alpha80),
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(
-              color: isActive
-                  ? effectiveIndicatorColor
-                  : colors.border.withValues(alpha: context.alpha30),
-              width: isActive ? 2.0 : 1.0,
-            ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 4.0,
+                offset: const Offset(0, 2.0),
+                spreadRadius: 0,
+              ),
+            ],
           ),
           padding: padding,
-          clipBehavior: Clip.hardEdge,
-          child: Center(child: content),
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              transform: Matrix4.identity()..scale(isActive ? 1.02 : 1.0),
+              child: content,
+            ),
+          ),
         );
-
       case NavbarVariant.pillShaped:
         // 💊 PILL/CAPSULE SHAPED
         return Container(
@@ -1355,8 +1360,8 @@ class OsmeaNavbar extends CoreContainer {
         // 🔳 Already handled in container (grid)
         return child;
 
-      case NavbarVariant.neonGlow:
-        // 🌈 Already handled in container (neon glow)
+      case NavbarVariant.floatingCards:
+        // 📱 Already handled in container (floating cards)
         return child;
 
       case NavbarVariant.pillShaped:
@@ -1635,8 +1640,8 @@ class OsmeaNavbar extends CoreContainer {
         return BorderRadius.zero;
       case NavbarVariant.iconGrid:
         return BorderRadius.zero;
-      case NavbarVariant.neonGlow:
-        return BorderRadius.circular(8.0);
+      case NavbarVariant.floatingCards:
+        return BorderRadius.circular(12.0);
       case NavbarVariant.pillShaped:
         return BorderRadius.circular(100.0); // Tam kapsül şekli
       case NavbarVariant.brutalist:
@@ -1721,10 +1726,10 @@ class OsmeaNavbar extends CoreContainer {
           vertical: basePadding.vertical * 0.5,
         );
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.floatingCards:
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.6,
-          vertical: basePadding.vertical * 0.4,
+          horizontal: basePadding.horizontal * 0.4,
+          vertical: basePadding.vertical * 0.3,
         );
 
       case NavbarVariant.pillShaped:
@@ -2830,11 +2835,11 @@ class OsmeaNavbar extends CoreContainer {
           borderStyle: BorderStyle.solid,
         );
 
-      case NavbarVariant.neonGlow:
-        // Neon glow style
+      case NavbarVariant.floatingCards:
+        // Floating cards style
         return _NavbarVariantStyle(
           borderRadius: BorderRadius.circular(12.0),
-          elevation: 0.0,
+          elevation: 4.0,
           shadowSpread: 0.0,
           hasBorder: false,
           borderWidth: 0.0,
@@ -3022,12 +3027,12 @@ class OsmeaNavbar extends CoreContainer {
           border: OsmeaColors.silver,
         );
 
-      case NavbarVariant.neonGlow:
+      case NavbarVariant.floatingCards:
         return _NavbarColors(
-          background: OsmeaColors.black,
-          active: OsmeaColors.crystalBay,
-          inactive: OsmeaColors.pewter.withValues(alpha: context.alpha70),
-          border: OsmeaColors.crystalBay,
+          background: Colors.transparent,
+          active: Colors.grey.shade800,
+          inactive: Colors.grey.shade500,
+          border: Colors.transparent,
         );
 
       case NavbarVariant.pillShaped:
