@@ -5,8 +5,7 @@
         "build_number": "1",
         "environment": "production",
         "debug_mode": false,
-        "maintenance_mode": false,
-        "wordpress_config_check_interval_seconds": 60
+        "maintenance_mode": false
     },
     "api_configuration": {
         "base_url": "https://api.masterfabric.co/woo",
@@ -15,9 +14,9 @@
         "enable_logging": true
     },
     "woocommerce_configuration": {
-        "store_url": "https://masterfabric.store",
-        "brand_name": "masterfabric",
-        "auth_key": "THISISMySpeCiaLAUthCodeMasterFabric",
+        "store_url": "https://yourwoocommerce.store",
+        "brand_name": "yourwoocommerce",
+        "auth_key": "ThisISMySpecialAuthcode",
         "version": "v1",
         "store_api_version": "v1",
         "admin_api_version": "v3",
@@ -213,7 +212,7 @@
         "preload_critical_assets": true
     },
     "onboarding_configuration": {
-        "style": "startup",
+        "style": "space",
         "auto_advance_seconds": null,
         "show_skip_button": true,
         "show_page_indicator": true,
@@ -222,10 +221,10 @@
         "secondary_color": "#FFFFFF",
         "pages": [
             {
-                "title": "Your WooCommerce Store",
+                "title": "Your Store",
                 "description": "Easily manage your products and increase your sales with powerful WooCommerce integration.",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_first.jpeg",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_first.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
                 "button_text": null,
@@ -235,8 +234,8 @@
             {
                 "title": "Easy Product Management",
                 "description": "Add, edit your products and track inventory status in real-time.",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_2.jpeg",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_2.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#F5F5F5",
                 "text_color": "#000000",
                 "button_text": null,
@@ -246,8 +245,8 @@
             {
                 "title": "Inventory Control",
                 "description": "Keep track of your stock levels and get notified when products are running low.",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_2.jpeg",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_2.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#E5E5E5",
                 "text_color": "#000000",
                 "button_text": null,
@@ -257,8 +256,8 @@
             {
                 "title": "Order Management",
                 "description": "Process orders efficiently and keep your customers satisfied with fast delivery.",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_3.jpeg",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_3.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#D5D5D5",
                 "text_color": "#000000",
                 "button_text": null,
@@ -268,8 +267,8 @@
             {
                 "title": "Advanced Analytics",
                 "description": "Grow your business with sales reports, customer analytics and performance metrics.",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_4.jpeg",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/onboarding_image_4.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#C5C5C5",
                 "text_color": "#000000",
                 "button_text": "Open My Store",
@@ -446,7 +445,7 @@
     },
     "auth_configuration": {
         "ui_style": {
-            "style": "startup",
+            "style": "enterprise",
             "tab_container_radius": 12,
             "tab_item_radius": 10,
             "button_radius": 12,
@@ -491,7 +490,9 @@
             "password_label": "Password",
             "password_hint": "Enter your password",
             "remember_me_label": "Remember me",
+            "show_forgot_password": true,
             "forgot_password_label": "Forgot Password?",
+            "forgot_password_label_tr": "Şifremi unuttum",
             "sign_in_button": "Continue",
             "sign_in_button_loading": "Signing in...",
             "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
@@ -530,7 +531,36 @@
         },
         "forgot_password": {
             "title": "Reset Password",
-            "subtitle": "Enter your email to reset"
+            "subtitle": "Enter your email and we'll send you a link to reset your password.",
+            "email_label": "Email",
+            "email_hint": "Email",
+            "submit_button": "Send reset link",
+            "back_to_sign_in": "Back to Sign In",
+            "sending": "Sending...",
+            "email_required": "Please enter your email",
+            "email_invalid": "Please enter a valid email",
+            "primary_color": "#000000",
+            "link_color": "#000000",
+            "background_color": "#FFFFFF",
+            "app_bar_background_color": "#FFFFFF",
+            "app_bar_foreground_color": "#000000",
+            "app_bar_title_color": "#000000",
+            "button_background_color": "#000000",
+            "button_text_color": "#FFFFFF",
+            "icon_background_color": "#00000014",
+            "title_text_color": "#000000",
+            "subtitle_text_color": "#6B7280",
+            "label_text_color": "#374151",
+            "input_background_color": "#FFFFFF",
+            "input_border_color": "#E5E7EB",
+            "input_hint_color": "#9CA3AF",
+            "border_radius": 12
+        },
+        "sign_in_forgot_password_link": {
+            "color": "#000000",
+            "enterprise": { "color": "#000000" },
+            "startup": { "color": "#000000" },
+            "space": { "color": "#6366F1" }
         }
     },
     "empty_view_configuration": {
@@ -548,8 +578,8 @@
                 "title": "Your cart is empty",
                 "description": "Add items to your cart to see them here.",
                 "empty_type": "cart",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/cart_empty_icon.png",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/cart_empty_image.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
                 "action_button_text": "Start Shopping"
@@ -558,8 +588,8 @@
                 "title": "No favorites yet",
                 "description": "Start adding items to your favorites to see them here.",
                 "empty_type": "wishlist",
-                "icon_path": "https://masterfabric.store/wp-content/uploads/2026/01/wishlist_empty_icon.png",
-                "image_path": "https://masterfabric.store/wp-content/uploads/2026/01/wishlist_empty_image.jpeg",
+                "icon_path": null,
+                "image_path": null,
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
                 "action_button_text": "Explore Products"
@@ -584,16 +614,34 @@
             "horizontal": 20,
             "title_to_content": 16
         },
-        "search": {
+        "scrolling_banner": {
             "enabled": true,
             "order_id": 0,
+            "text": "MasterFabric Store is an open source project • Explore our code and contribute on GitHub",
+            "link": "https://github.com/masterfabric-mobile/osmea",
+            "background_color": "#000000",
+            "text_color": "#FFFFFF",
+            "height": 40,
+            "font_size": 14,
+            "animation_duration": 15,
+            "animation_direction": "left",
+            "show_separator": true,
+            "separator": "•",
+            "padding": {
+                "vertical": 8,
+                "horizontal": 0
+            }
+        },
+        "search": {
+            "enabled": true,
+            "order_id": 1,
             "placeholder": "Search products, brands, categories...",
             "style": "minimal",
             "variant": "outlined"
         },
         "circle_categories": {
             "enabled": true,
-            "order_id": 1,
+            "order_id": 2,
             "max_items": 10,
             "circle_size": 64,
             "show_names": true,
@@ -602,7 +650,7 @@
         },
         "banner": {
             "enabled": true,
-            "order_id": 2,
+            "order_id": 3,
             "padding": {
                 "top": 0,
                 "bottom": 16
@@ -652,18 +700,14 @@
                     "background_color": "#000000",
                     "text_color": "#FFFFFF",
                     "accent_color": "#FFFFFF",
-                    "imageUrl": "",
-                    "icon": "",
                     "route": "/products"
                 },
                 {
                     "title": "Special Discount",
                     "subtitle": "Up to 40% off",
-                    "background_color": "#000000",
+                    "background_color": "#0000000",
                     "text_color": "#FFFFFF",
                     "accent_color": "#FFFFFF",
-                    "imageUrl": "",
-                    "icon": "",
                     "route": "/products"
                 }
             ]
@@ -877,7 +921,7 @@
             "enabled": true,
             "text": "COUPON",
             "amount": "100",
-            "imageUrl": "https://masterfabric.store/wp-content/uploads/2026/01/coupon_badge.png",
+            "imageUrl": null,
             "backgroundColor": "#000000",
             "borderColor": "#FFFFFF",
             "textColor": "#FFFFFF",
