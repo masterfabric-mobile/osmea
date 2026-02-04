@@ -72,5 +72,4 @@ flutter:
   assets:
     - assets/images/               # Image assets directory
     - assets/
-    - .env                      # All assets including screen_titles.json
 
