@@ -10,6 +10,21 @@ class StepperExample extends StatefulWidget {
 }
 
 class _StepperExampleState extends State<StepperExample> {
+  int _horizontalStepperStep = 0;
+  int _restrictedStepperStep = 0;
+  int _verticalStepperStep = 0;
+  int _dotsStepperStep = 0;
+  int _numberedOnlyStepperStep = 0;
+  int _dotsOnlyStepperStep = 0;
+
+  static const int _stepsCount = 3;
+
+  void _advanceStep(ValueSetter<int> setCurrentStep, int stepIndex) {
+    if (stepIndex < _stepsCount - 1) {
+      setCurrentStep((stepIndex + 1).clamp(0, _stepsCount - 1));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.scaffold(
@@ -35,26 +50,38 @@ class _StepperExampleState extends State<StepperExample> {
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.stepper(
+              key: ValueKey('horizontal_$_horizontalStepperStep'),
+              currentStep: _horizontalStepperStep,
               steps: [
                 OsmeaStep(
                   label: 'Personal',
                   content: _buildStepContent(
+                    context,
                     'Enter your personal information',
                     Icons.person,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _horizontalStepperStep = s), 0),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Contact',
                   content: _buildStepContent(
+                    context,
                     'Provide your contact information',
                     Icons.contact_mail,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _horizontalStepperStep = s), 1),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Review',
                   content: _buildStepContent(
+                    context,
                     'Review and submit your information',
                     Icons.check_circle,
+                    isLastStep: true,
                   ),
                 ),
               ],
@@ -64,6 +91,7 @@ class _StepperExampleState extends State<StepperExample> {
               size: ComponentSize.medium,
               appearance: ComponentAppearance.filled,
               onStepChanged: (step) {
+                setState(() => _horizontalStepperStep = step);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                       content: OsmeaComponents.text('Step changed to: $step')),
@@ -78,26 +106,38 @@ class _StepperExampleState extends State<StepperExample> {
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.stepper(
+              key: ValueKey('restricted_$_restrictedStepperStep'),
+              currentStep: _restrictedStepperStep,
               steps: [
                 OsmeaStep(
                   label: 'Step 1',
                   content: _buildStepContent(
+                    context,
                     'First step - cannot click other steps',
                     Icons.looks_one,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _restrictedStepperStep = s), 0),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Step 2',
                   content: _buildStepContent(
+                    context,
                     'Second step - sequential only',
                     Icons.looks_two,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _restrictedStepperStep = s), 1),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Step 3',
                   content: _buildStepContent(
+                    context,
                     'Third step - linear progression',
                     Icons.looks_3,
+                    isLastStep: true,
                   ),
                 ),
               ],
@@ -105,6 +145,8 @@ class _StepperExampleState extends State<StepperExample> {
               allowStepTapping: false, // Disable free step navigation
               size: ComponentSize.medium,
               appearance: ComponentAppearance.ghost,
+              onStepChanged: (step) =>
+                  setState(() => _restrictedStepperStep = step),
             ),
             OsmeaComponents.sizedBox(height: 40),
             OsmeaComponents.text(
@@ -116,26 +158,40 @@ class _StepperExampleState extends State<StepperExample> {
             OsmeaComponents.sizedBox(
               height: 300,
               child: OsmeaComponents.stepper(
+                key: ValueKey('vertical_$_verticalStepperStep'),
+                currentStep: _verticalStepperStep,
+                onStepChanged: (step) =>
+                    setState(() => _verticalStepperStep = step),
                 steps: [
                   OsmeaStep(
                     label: 'Setup',
                     content: _buildStepContent(
+                      context,
                       'Initialize your account',
                       Icons.settings,
+                      onContinue: () => _advanceStep(
+                          (s) => setState(() => _verticalStepperStep = s), 0),
+                      isLastStep: false,
                     ),
                   ),
                   OsmeaStep(
                     label: 'Configure',
                     content: _buildStepContent(
+                      context,
                       'Configure your preferences',
                       Icons.tune,
+                      onContinue: () => _advanceStep(
+                          (s) => setState(() => _verticalStepperStep = s), 1),
+                      isLastStep: false,
                     ),
                   ),
                   OsmeaStep(
                     label: 'Complete',
                     content: _buildStepContent(
+                      context,
                       'Finalize setup',
                       Icons.done,
+                      isLastStep: true,
                     ),
                   ),
                 ],
@@ -152,26 +208,39 @@ class _StepperExampleState extends State<StepperExample> {
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.stepper(
+              key: ValueKey('dots_$_dotsStepperStep'),
+              currentStep: _dotsStepperStep,
+              onStepChanged: (step) => setState(() => _dotsStepperStep = step),
               steps: [
                 OsmeaStep(
                   label: 'Start',
                   content: _buildStepContent(
+                    context,
                     'Begin your journey with dots and lines',
                     Icons.start,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _dotsStepperStep = s), 0),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Process',
                   content: _buildStepContent(
+                    context,
                     'Continue with dot-style progression',
                     Icons.trending_up,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _dotsStepperStep = s), 1),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Finish',
                   content: _buildStepContent(
+                    context,
                     'Complete with check mark',
                     Icons.flag,
+                    isLastStep: true,
                   ),
                 ),
               ],
@@ -186,26 +255,40 @@ class _StepperExampleState extends State<StepperExample> {
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.stepper(
+              key: ValueKey('numbered_$_numberedOnlyStepperStep'),
+              currentStep: _numberedOnlyStepperStep,
+              onStepChanged: (step) =>
+                  setState(() => _numberedOnlyStepperStep = step),
               steps: [
                 OsmeaStep(
                   label: 'First',
                   content: _buildStepContent(
+                    context,
                     'Simple numbered steps without lines',
                     Icons.filter_1,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _numberedOnlyStepperStep = s), 0),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Second',
                   content: _buildStepContent(
+                    context,
                     'Clean numbered design',
                     Icons.filter_2,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _numberedOnlyStepperStep = s), 1),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Third',
                   content: _buildStepContent(
+                    context,
                     'Minimalist approach',
                     Icons.filter_3,
+                    isLastStep: true,
                   ),
                 ),
               ],
@@ -220,26 +303,40 @@ class _StepperExampleState extends State<StepperExample> {
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.stepper(
+              key: ValueKey('dotsOnly_$_dotsOnlyStepperStep'),
+              currentStep: _dotsOnlyStepperStep,
+              onStepChanged: (step) =>
+                  setState(() => _dotsOnlyStepperStep = step),
               steps: [
                 OsmeaStep(
                   label: 'Hidden',
                   content: _buildStepContent(
+                    context,
                     'Compact dot design with connecting lines',
                     Icons.circle,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _dotsOnlyStepperStep = s), 0),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Hidden',
                   content: _buildStepContent(
+                    context,
                     'Space-efficient progression',
                     Icons.circle_outlined,
+                    onContinue: () => _advanceStep(
+                        (s) => setState(() => _dotsOnlyStepperStep = s), 1),
+                    isLastStep: false,
                   ),
                 ),
                 OsmeaStep(
                   label: 'Hidden',
                   content: _buildStepContent(
+                    context,
                     'Clean line completion',
                     Icons.check_circle,
+                    isLastStep: true,
                   ),
                 ),
               ],
@@ -276,7 +373,13 @@ class _StepperExampleState extends State<StepperExample> {
     );
   }
 
-  Widget _buildStepContent(String description, IconData icon) {
+  Widget _buildStepContent(
+    BuildContext context,
+    String description,
+    IconData icon, {
+    VoidCallback? onContinue,
+    bool isLastStep = false,
+  }) {
     return OsmeaComponents.container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -294,9 +397,11 @@ class _StepperExampleState extends State<StepperExample> {
             fontSize: 16,
           ),
           OsmeaComponents.sizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {},
-            child: OsmeaComponents.text('Continue'),
+          OsmeaComponents.button(
+            text: isLastStep ? 'Submit' : 'Continue',
+            onPressed: onContinue,
+            variant: ButtonVariant.primary,
+            size: ButtonSize.medium,
           ),
         ],
       ),
