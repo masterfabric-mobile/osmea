@@ -15,7 +15,7 @@ class InfoHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

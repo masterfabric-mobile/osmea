@@ -86,17 +86,17 @@ extension NavbarSizeExtension on NavbarSize {
     switch (this) {
       case NavbarSize.small:
         return NavbarSizeConfig(
-          height: 56.0, // Fixed height to prevent overflow
+          height: 50.0, // Comfortable height for mobile
           padding: EdgeInsets.symmetric(
             horizontal: context.lowValue,
-            vertical: context.lowValue * 0.3,
+            vertical: context.lowValue * 0.2,
           ),
           itemPadding: EdgeInsets.symmetric(
             horizontal: context.lowValue * 0.5,
-            vertical: context.lowValue * 0.2,
+            vertical: context.lowValue * 0.15,
           ),
-          iconSize: context.iconSizeSmall, // Using sizer extension
-          fontSize: context.fontSizeSmall, // Using sizer extension
+          iconSize: context.iconSizeSmall, // Standard icon size
+          fontSize: context.fontSizeSmall, // Standard text size
           borderRadius: context.borderRadiusZero, // No radius by default
           elevation: 0.0, // No shadow by default
           itemSpacing: context.lowValue,

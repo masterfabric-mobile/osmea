@@ -518,10 +518,10 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // Minimal padding to prevent overflow
+        // Minimal padding for compact look
         return EdgeInsets.symmetric(
           horizontal: basePadding.horizontal * 0.8,
-          vertical: basePadding.vertical * 0.6,
+          vertical: basePadding.vertical * 0.3,
         );
 
       case NavbarVariant.retailSidebar:
@@ -1497,10 +1497,10 @@ class OsmeaNavbar extends CoreContainer {
 
     switch (variant) {
       case NavbarVariant.retailMain:
-        // Minimal padding to prevent overflow
+        // Minimal padding for compact look
         return EdgeInsets.symmetric(
           horizontal: basePadding.horizontal * 0.6,
-          vertical: basePadding.vertical * 0.4,
+          vertical: basePadding.vertical * 0.15,
         );
 
       case NavbarVariant.retailSidebar:
@@ -1779,7 +1779,7 @@ class OsmeaNavbar extends CoreContainer {
     // Add text if should show labels
     if (showLabels) {
       final baseStyle = _getTextStyleForSize(context);
-      children.add(const SizedBox(height: 1.0));
+      children.add(const SizedBox(height: 0.5));
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
@@ -1791,7 +1791,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.65, // Much smaller text
+              fontSize: config.fontSize * 0.6, // Compact text
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -1844,7 +1844,7 @@ class OsmeaNavbar extends CoreContainer {
       final baseStyle = _getTextStyleForSize(context);
       final captionStyle = _getCaptionStyleForSize(context);
 
-      children.add(const SizedBox(height: 1.0));
+      children.add(const SizedBox(height: 0.5));
       children.add(
         ConstrainedBox(
           constraints: BoxConstraints(
@@ -1856,7 +1856,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.65, // Much smaller text
+              fontSize: config.fontSize * 0.6, // Compact text
             ),
             maxLines: 1,
             overflow: ellipsis,
@@ -2409,7 +2409,7 @@ class OsmeaNavbar extends CoreContainer {
     }
 
     if (showLabels && item.text.isNotEmpty) {
-      children.add(SizedBox(height: context.lowValue * 0.5));
+      children.add(SizedBox(height: context.lowValue * 0.25));
       final baseStyle = _getTextStyleForSize(context);
       children.add(
         ConstrainedBox(
@@ -2422,7 +2422,7 @@ class OsmeaNavbar extends CoreContainer {
             style: baseStyle.copyWith(
               fontWeight: isActive ? context.semiBold : context.normal,
               color: textColor,
-              fontSize: config.fontSize * 0.65,
+              fontSize: config.fontSize * 0.6,
             ),
             maxLines: 2,
             overflow: ellipsis,

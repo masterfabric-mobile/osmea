@@ -367,6 +367,17 @@ class MasterApp extends StatelessWidget {
     // Initialize permission handler for real devices
     await PermissionHandlerHelper.instance.initializeForRealDevice();
 
+    /// Set system UI overlay style for consistent status/navigation bar appearance
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     /// Log the initialization status
     debugPrint("MasterApp at runBefore Local Storage Initialized");
     final allItems = await _localStorageHelper.getAllItems();
@@ -468,8 +479,11 @@ class MasterApp extends StatelessWidget {
         // Theme for the app our favorite color is blue always
         // We can change it to any color we want and we can use it in the app
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)
+              .copyWith(surface: Colors.white),
           useMaterial3: true,
+          scaffoldBackgroundColor: Colors.white,
+          canvasColor: Colors.white,
           appBarTheme: const AppBarTheme(
             // Keep app bars solid white even when content scrolls under.
             backgroundColor: Colors.white,
@@ -511,6 +525,9 @@ class MasterApp extends StatelessWidget {
           // Create overlays - grid should be on top of everything
           final overlays = <Widget>[];
 
+          // White background as base layer - ensures seamless status bar on iOS
+          overlays.add(const ColoredBox(color: Colors.white));
+
           // First add the app content with SafeArea
           overlays.add(SafeArea(child: appContent, bottom: true, top: false));
 
@@ -526,7 +543,16 @@ class MasterApp extends StatelessWidget {
             children: overlays,
           );
 
-          return appContent;
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: const SystemUiOverlayStyle(
+              statusBarColor: Colors.white,
+              statusBarIconBrightness: Brightness.dark,
+              statusBarBrightness: Brightness.light,
+              systemNavigationBarColor: Colors.white,
+              systemNavigationBarIconBrightness: Brightness.dark,
+            ),
+            child: appContent,
+          );
         },
       ),
     );

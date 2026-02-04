@@ -126,7 +126,7 @@ class _IntroScreenState extends State<IntroScreen>
             children: [
               // Header with Logo and Skip button
               OsmeaComponents.padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
                 child: OsmeaComponents.row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

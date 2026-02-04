@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     return OsmeaComponents.scaffold(
       body: widget.child,
