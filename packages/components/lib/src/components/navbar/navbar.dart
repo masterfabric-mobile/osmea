@@ -890,22 +890,13 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.dottedOutline:
-        // 🔘 DOTTED OUTLINE - Noktalı kenarlık tasarımı
+        // 🔘 DOTTED OUTLINE - Üst çizgi indicator ile minimal tasarım
         return Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha15)
-                : Colors.transparent,
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(
-              color: isActive
-                  ? effectiveIndicatorColor
-                  : colors.border.withValues(alpha: context.alpha50),
-              width: 2.0,
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
           ),
           padding: padding,
           clipBehavior: Clip.hardEdge,
@@ -1266,8 +1257,27 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.dottedOutline:
-        // 🔘 Already handled in container (dotted outline)
-        return child;
+        // 🔘 TOP INDICATOR BAR - Üstte renkli çizgi göstergesi
+        if (!isActive) return child;
+        return Stack(
+          clipBehavior: clipNone,
+          alignment: Alignment.topCenter,
+          children: [
+            child,
+            Positioned(
+              top: 0,
+              left: config.iconSize * 0.2,
+              right: config.iconSize * 0.2,
+              child: Container(
+                height: 2.0,
+                decoration: BoxDecoration(
+                  color: effectiveIndicatorColor,
+                  borderRadius: BorderRadius.circular(1.0),
+                ),
+              ),
+            ),
+          ],
+        );
 
       case NavbarVariant.healthcareMinimal:
         // 🏥 DOT INDICATOR - Small dot at bottom/right (sadece text yoksa)
