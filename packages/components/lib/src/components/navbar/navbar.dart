@@ -583,10 +583,10 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
-        // Pill shaped padding
+        // Pill/Capsule shaped padding - kompakt ve yuvarlak
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.8,
-          vertical: basePadding.vertical * 0.6,
+          horizontal: basePadding.horizontal * 0.5,
+          vertical: basePadding.vertical * 0.4,
         );
 
       case NavbarVariant.brutalist:
@@ -1039,21 +1039,31 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
-        // 🎯 PILL SHAPED - Hap şekilli tasarım
+        // 💊 PILL/CAPSULE SHAPED
         return Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
             color: isActive
-                ? effectiveIndicatorColor.withValues(alpha: context.alpha25)
-                : colors.background.withValues(alpha: context.alpha45),
-            borderRadius: BorderRadius.circular(24.0),
+                ? effectiveIndicatorColor.withValues(alpha: context.alpha15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(100.0), 
             border: isActive
-                ? null
-                : Border.all(
-                    color: colors.border.withValues(alpha: context.alpha25),
-                    width: 0.8,
-                  ),
+                ? Border.all(
+                    color: effectiveIndicatorColor,
+                    width: 0.5,
+                  )
+                : null,
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: effectiveIndicatorColor.withValues(alpha: context.alpha20),
+                      blurRadius: 6.0,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
           padding: padding,
           clipBehavior: Clip.hardEdge,
@@ -1350,7 +1360,8 @@ class OsmeaNavbar extends CoreContainer {
         return child;
 
       case NavbarVariant.pillShaped:
-        // 🎯 Already handled in container (pill shape)
+        // 💊 PILL SHAPED - Aktif item beyaz içerik ile
+        // Container'da zaten dolu arka plan var, burada ekstra bir şey yapmasak da olur
         return child;
 
       case NavbarVariant.brutalist:
@@ -1627,7 +1638,7 @@ class OsmeaNavbar extends CoreContainer {
       case NavbarVariant.neonGlow:
         return BorderRadius.circular(8.0);
       case NavbarVariant.pillShaped:
-        return BorderRadius.circular(24.0);
+        return BorderRadius.circular(100.0); // Tam kapsül şekli
       case NavbarVariant.brutalist:
         return BorderRadius.zero;
       case NavbarVariant.badgeIndicator:
@@ -1717,9 +1728,10 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
+        // Pill/Capsule item padding - kompakt
         return EdgeInsets.symmetric(
-          horizontal: basePadding.horizontal * 0.6,
-          vertical: basePadding.vertical * 0.4,
+          horizontal: basePadding.horizontal * 0.7,
+          vertical: basePadding.vertical * 0.5,
         );
 
       case NavbarVariant.brutalist:
@@ -2830,11 +2842,11 @@ class OsmeaNavbar extends CoreContainer {
         );
 
       case NavbarVariant.pillShaped:
-        // Pill/capsule shaped style
+        // Pill/capsule shaped style - yumuşak gölgeli
         return _NavbarVariantStyle(
-          borderRadius: BorderRadius.circular(28.0),
-          elevation: 0.0,
-          shadowSpread: 0.0,
+          borderRadius: BorderRadius.circular(100.0),
+          elevation: 4.0,
+          shadowSpread: 2.0,
           hasBorder: false,
           borderWidth: 0.0,
           borderStyle: BorderStyle.solid,
