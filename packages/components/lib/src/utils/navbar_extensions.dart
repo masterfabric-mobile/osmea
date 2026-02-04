@@ -236,14 +236,14 @@ extension NavbarVariantExtension on NavbarVariant {
   /// 🛒 Check if variant is retail main
   bool get isRetailMain => this == NavbarVariant.retailMain;
 
-  /// 🏪 Check if variant is retail sidebar
-  bool get isRetailSidebar => this == NavbarVariant.retailSidebar;
+  /// 🔘 Check if variant is dotted outline
+  bool get isDottedOutline => this == NavbarVariant.dottedOutline;
 
   /// 🏥 Check if variant is healthcare minimal
   bool get isHealthcareMinimal => this == NavbarVariant.healthcareMinimal;
 
-  /// 💼 Check if variant is finance bordered
-  bool get isFinanceBordered => this == NavbarVariant.financeBordered;
+  /// 🪟 Check if variant is outlined minimal
+  bool get isOutlinedMinimal => this == NavbarVariant.outlinedMinimal;
 
   /// 🎬 Check if variant is media overlay
   bool get isMediaOverlay => this == NavbarVariant.mediaOverlay;
@@ -254,54 +254,98 @@ extension NavbarVariantExtension on NavbarVariant {
   /// 🏢 Check if variant is enterprise main
   bool get isEnterpriseMain => this == NavbarVariant.enterpriseMain;
 
-  /// 🏛️ Check if variant is enterprise sidebar
-  bool get isEnterpriseSidebar => this == NavbarVariant.enterpriseSidebar;
+  /// 🔳 Check if variant is icon grid
+  bool get isIconGrid => this == NavbarVariant.iconGrid;
+
+  /// 🌈 Check if variant is neon glow
+  bool get isNeonGlow => this == NavbarVariant.neonGlow;
+
+  /// 🎯 Check if variant is pill shaped
+  bool get isPillShaped => this == NavbarVariant.pillShaped;
+
+  /// ⬛ Check if variant is brutalist
+  bool get isBrutalist => this == NavbarVariant.brutalist;
+
+  /// 🔘 Check if variant is badge indicator
+  bool get isBadgeIndicator => this == NavbarVariant.badgeIndicator;
+
+  /// 🌙 Check if variant is neumorphic
+  bool get isNeumorphic => this == NavbarVariant.neumorphic;
+
+  /// 🎴 Check if variant is card floating
+  bool get isCardFloating => this == NavbarVariant.cardFloating;
+
+  /// 🫧 Check if variant is bubble
+  bool get isBubble => this == NavbarVariant.bubble;
+
+  /// ✨ Check if variant is glassy blur
+  bool get isGlassyBlur => this == NavbarVariant.glassyBlur;
+
+  /// 📍 Check if variant is marker tab
+  bool get isMarkerTab => this == NavbarVariant.markerTab;
+
+  /// 🔲 Check if variant is stepped
+  bool get isStepped => this == NavbarVariant.stepped;
+
+  /// 🎪 Check if variant is ribbon
+  bool get isRibbon => this == NavbarVariant.ribbon;
 
   /// 🎯 Check if variant has transparent background
-  bool get hasTransparentBackground => isMediaOverlay || isSocialGlass;
+  bool get hasTransparentBackground =>
+      isMediaOverlay || isSocialGlass || isGlassyBlur;
 
   /// 🎯 Check if variant needs backdrop blur
-  bool get needsBackdropBlur => isSocialGlass;
+  bool get needsBackdropBlur => isSocialGlass || isGlassyBlur;
 
   /// 🎯 Check if variant needs border
-  bool get needsBorder => isHealthcareMinimal || isFinanceBordered;
+  bool get needsBorder =>
+      isHealthcareMinimal ||
+      isOutlinedMinimal ||
+      isDottedOutline ||
+      isBrutalist;
 
   /// 🎯 Check if variant is for e-commerce/retail sector
-  bool get isForRetail => isRetailMain || isRetailSidebar;
+  bool get isForRetail => isRetailMain || isRibbon;
 
   /// 🎯 Check if variant is for healthcare sector
   bool get isForHealthcare => isHealthcareMinimal;
 
-  /// 🎯 Check if variant is for finance sector
-  bool get isForFinance => isFinanceBordered;
+  /// 🎯 Check if variant is for creative sector
+  bool get isForCreative => isDottedOutline || isBrutalist || isStepped;
 
   /// 🎯 Check if variant is for media/entertainment sector
-  bool get isForMedia => isMediaOverlay;
+  bool get isForMedia => isMediaOverlay || isNeonGlow;
 
   /// 🎯 Check if variant is for social media sector
-  bool get isForSocial => isSocialGlass;
+  bool get isForSocial => isSocialGlass || isBubble;
 
   /// 🎯 Check if variant is for enterprise sector
-  bool get isForEnterprise => isEnterpriseMain || isEnterpriseSidebar;
+  bool get isForEnterprise => isEnterpriseMain || isIconGrid;
 
   /// 🎯 Get relative opacity level (0.0 to 1.0)
   double get opacity {
     switch (this) {
       case NavbarVariant.retailMain:
-      case NavbarVariant.retailSidebar:
+      case NavbarVariant.dottedOutline:
       case NavbarVariant.healthcareMinimal:
-      case NavbarVariant.financeBordered:
+      case NavbarVariant.outlinedMinimal:
       case NavbarVariant.enterpriseMain:
-      case NavbarVariant.enterpriseSidebar:
-      case NavbarVariant.gradientModern:
-      case NavbarVariant.capsuleRounded:
+      case NavbarVariant.iconGrid:
+      case NavbarVariant.pillShaped:
+      case NavbarVariant.brutalist:
       case NavbarVariant.badgeIndicator:
+      case NavbarVariant.neumorphic:
       case NavbarVariant.cardFloating:
+      case NavbarVariant.bubble:
+      case NavbarVariant.markerTab:
+      case NavbarVariant.stepped:
+      case NavbarVariant.ribbon:
         return 1.0;
       case NavbarVariant.socialGlass:
+      case NavbarVariant.glassyBlur:
         return 0.8;
       case NavbarVariant.mediaOverlay:
-      case NavbarVariant.darkMinimal:
+      case NavbarVariant.neonGlow:
         return 0.0;
     }
   }
@@ -423,8 +467,7 @@ extension NavbarIndicatorStyleExtension on NavbarIndicatorStyle {
 
   /// 🎯 Check if indicator affects border
   bool get affectsBorder =>
-      this == NavbarIndicatorStyle.border ||
-      this == NavbarIndicatorStyle.line;
+      this == NavbarIndicatorStyle.border || this == NavbarIndicatorStyle.line;
 
   /// 🎯 Get indicator thickness (for line/underline)
   double get thickness {
@@ -443,42 +486,54 @@ extension NavbarIndicatorStyleExtension on NavbarIndicatorStyle {
 /// Extension for parsing NavbarVariant from string
 extension NavbarVariantStringExtension on NavbarVariant {
   /// Parse NavbarVariant from string (case-insensitive)
-  /// Supports both new sectoral names and legacy names
+  /// Supports both new design names and legacy names
   static NavbarVariant? fromString(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase().replaceAll('_', '').replaceAll('-', '')) {
-      // New sectoral variants
+      // New design variants
       case 'retailmain':
         return NavbarVariant.retailMain;
-      case 'retailsidebar':
-        return NavbarVariant.retailSidebar;
+      case 'dottedoutline':
+        return NavbarVariant.dottedOutline;
       case 'healthcareminimal':
         return NavbarVariant.healthcareMinimal;
-      case 'financebordered':
-        return NavbarVariant.financeBordered;
+      case 'outlinedminimal':
+        return NavbarVariant.outlinedMinimal;
       case 'mediaoverlay':
         return NavbarVariant.mediaOverlay;
       case 'socialglass':
         return NavbarVariant.socialGlass;
       case 'enterprisemain':
         return NavbarVariant.enterpriseMain;
-      case 'enterprisesidebar':
-        return NavbarVariant.enterpriseSidebar;
-      case 'gradientmodern':
-        return NavbarVariant.gradientModern;
-      case 'capsulerounded':
-        return NavbarVariant.capsuleRounded;
+      case 'icongrid':
+        return NavbarVariant.iconGrid;
+      case 'neonglow':
+        return NavbarVariant.neonGlow;
+      case 'pillshaped':
+        return NavbarVariant.pillShaped;
+      case 'brutalist':
+        return NavbarVariant.brutalist;
       case 'badgeindicator':
         return NavbarVariant.badgeIndicator;
-      case 'darkminimal':
-        return NavbarVariant.darkMinimal;
+      case 'neumorphic':
+        return NavbarVariant.neumorphic;
       case 'cardfloating':
         return NavbarVariant.cardFloating;
+      case 'bubble':
+        return NavbarVariant.bubble;
+      case 'glassyblur':
+        return NavbarVariant.glassyBlur;
+      case 'markertab':
+        return NavbarVariant.markerTab;
+      case 'stepped':
+        return NavbarVariant.stepped;
+      case 'ribbon':
+        return NavbarVariant.ribbon;
       // Legacy support (backward compatibility)
       case 'primary':
         return NavbarVariant.retailMain;
       case 'secondary':
-        return NavbarVariant.retailSidebar;
+        return NavbarVariant.dottedOutline;
       case 'transparent':
         return NavbarVariant.mediaOverlay;
       case 'glass':

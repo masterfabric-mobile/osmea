@@ -73,15 +73,26 @@ enum NavbarSize {
 /// Defines the visual appearance and semantic meaning of navbar.
 /// Each variant has specific color schemes optimized for different sectors and use cases.
 ///
-/// **Sector-Based Variants:**
+/// **Design-Based Variants:**
 /// - `retailMain`: E-commerce/Retail main navigation with brand colors
-/// - `retailSidebar`: E-commerce/Retail sidebar navigation with neutral colors
-/// - `healthcareMinimal`: Healthcare minimal navigation with clean borders
-/// - `financeBordered`: Finance/Banking professional navigation with borders
-/// - `mediaOverlay`: Media/Entertainment floating overlay navigation
-/// - `socialGlass`: Social Media frosted glass effect navigation
-/// - `enterpriseMain`: Enterprise/B2B main navigation with brand colors
-/// - `enterpriseSidebar`: Enterprise/B2B sidebar navigation
+/// - `dottedOutline`: Creative dotted border navigation
+/// - `healthcareMinimal`: Healthcare minimal with clean borders
+/// - `outlinedMinimal`: Clean outlined navigation
+/// - `mediaOverlay`: Floating overlay navigation
+/// - `socialGlass`: Frosted glass effect navigation
+/// - `enterpriseMain`: Enterprise/B2B main navigation
+/// - `iconGrid`: Grid-based icon navigation
+/// - `neonGlow`: Vibrant neon-style navigation
+/// - `pillShaped`: Pill/capsule shaped items
+/// - `brutalist`: Bold brutalist design
+/// - `badgeIndicator`: Badge-style indicators
+/// - `neumorphic`: Soft 3D neumorphic design
+/// - `cardFloating`: Floating card-style
+/// - `bubble`: Playful bubble-style
+/// - `glassyBlur`: Glassmorphism with blur
+/// - `markerTab`: Tab-style with markers
+/// - `stepped`: Stepped/stair-like design
+/// - `ribbon`: Ribbon/banner style
 ///
 /// **Usage:**
 /// ```dart
@@ -91,9 +102,9 @@ enum NavbarSize {
 ///   items: navigationItems,
 /// )
 ///
-/// // Healthcare sidebar
+/// // Creative dotted style
 /// OsmeaNavbar(
-///   variant: NavbarVariant.healthcareMinimal,
+///   variant: NavbarVariant.dottedOutline,
 ///   items: navigationItems,
 /// )
 /// ```
@@ -106,13 +117,14 @@ enum NavbarVariant {
   /// - Sectors: E-commerce, Retail, Shopping, Marketplace
   retailMain,
 
-  /// 🏪 **Retail Sidebar** - E-commerce/Retail sidebar navigation with neutral colors
-  /// - Background: Light gray (neutral)
-  /// - Text: Dark gray
-  /// - Border: None (subtle background)
-  /// - Use for: Category sidebar, Filter sidebar, Product filters, Settings
-  /// - Sectors: E-commerce, Retail, Shopping
-  retailSidebar,
+  /// 🔘 **Dotted Outline** - Navigation with dotted border outline
+  /// - Background: Transparent
+  /// - Text: Adaptive contrast
+  /// - Border: Dotted border (2px, playful/creative)
+  /// - Active: Solid border transition
+  /// - Use for: Creative apps, Portfolio sites, Art galleries, Design tools
+  /// - Sectors: Creative, Design, Art, Portfolio
+  dottedOutline,
 
   /// 🏥 **Healthcare Minimal** - Healthcare minimal navigation with clean borders
   /// - Background: White/Light (clean, medical)
@@ -122,13 +134,14 @@ enum NavbarVariant {
   /// - Sectors: Healthcare, Medical, Hospital, Clinic, Health & Wellness
   healthcareMinimal,
 
-  /// 💼 **Finance Bordered** - Finance/Banking professional navigation with borders
-  /// - Background: White (professional, trustworthy)
-  /// - Text: Dark gray
-  /// - Border: Subtle border (1px, professional separation)
-  /// - Use for: Banking apps, Financial dashboards, Investment apps, Payment apps
-  /// - Sectors: Finance, Banking, Investment, FinTech, Payment
-  financeBordered,
+  /// 🪟 **Outlined Minimal** - Clean outlined navigation with minimal fill
+  /// - Background: Transparent with subtle hover fill
+  /// - Text: Dark/Light adaptive
+  /// - Border: Thin solid border (1px)
+  /// - Active: Border highlight + subtle fill
+  /// - Use for: Minimalist apps, Professional tools, Documentation sites
+  /// - Sectors: Tech, Professional, Documentation
+  outlinedMinimal,
 
   /// 🎬 **Media Overlay** - Media/Entertainment floating overlay navigation
   /// - Background: Transparent/Semi-transparent
@@ -154,29 +167,41 @@ enum NavbarVariant {
   /// - Sectors: Enterprise, B2B, SaaS, Business, Professional Services
   enterpriseMain,
 
-  /// 🏛️ **Enterprise Sidebar** - Enterprise/B2B sidebar navigation
-  /// - Background: Light gray (neutral, professional)
-  /// - Text: Dark gray
-  /// - Border: None (subtle background)
-  /// - Use for: Admin sidebars, Settings navigation, Configuration menus, Secondary navigation
-  /// - Sectors: Enterprise, B2B, SaaS, Business, All sectors (secondary navigation)
-  enterpriseSidebar,
+  /// 🔳 **Icon Grid** - Grid-based icon navigation without text
+  /// - Background: Transparent
+  /// - Icons: Centered in grid cells
+  /// - Border: Grid lines (subtle, 1px)
+  /// - Active: Cell highlight with accent color
+  /// - Use for: Dashboard shortcuts, Quick actions, App launchers
+  /// - Sectors: All sectors, Utility apps
+  iconGrid,
 
-  /// 🎨 **Gradient Modern** - Modern gradient background navigation
-  /// - Background: Gradient (colorful, vibrant)
-  /// - Text: White/Contrast
-  /// - Border: None (gradient fills)
-  /// - Use for: Modern apps, Creative apps, Lifestyle apps, Gaming apps
-  /// - Sectors: Creative, Gaming, Lifestyle, Entertainment, Social
-  gradientModern,
+  /// 🌈 **Neon Glow** - Vibrant neon-style navigation with glow effects
+  /// - Background: Dark/Black
+  /// - Text: Neon colors (cyan, magenta, lime)
+  /// - Border: Neon glow border (color varies)
+  /// - Active: Intense glow effect
+  /// - Use for: Gaming apps, Night mode, Entertainment, Music apps
+  /// - Sectors: Gaming, Entertainment, Music, Nightlife
+  neonGlow,
 
-  /// 🎯 **Capsule Rounded** - Capsule-shaped rounded navigation
-  /// - Background: Light/Dark (adaptive)
+  /// 🎯 **Pill Shaped** - Pill/capsule shaped navigation items
+  /// - Background: Light/Dark adaptive
   /// - Text: Adaptive contrast
-  /// - Border: None (capsule shape)
+  /// - Border: None (pill shape defines boundary)
+  /// - Active: Filled pill with accent color
   /// - Use for: iOS-style apps, Modern mobile apps, Clean interfaces
   /// - Sectors: All sectors (modern design)
-  capsuleRounded,
+  pillShaped,
+
+  /// ⬛ **Brutalist** - Bold brutalist design with harsh edges
+  /// - Background: Solid black/white contrast
+  /// - Text: High contrast (black on white / white on black)
+  /// - Border: Thick solid border (3-4px)
+  /// - Active: Inverted colors
+  /// - Use for: Art galleries, Creative studios, Bold designs, Editorial
+  /// - Sectors: Art, Creative, Editorial, Architecture
+  brutalist,
 
   /// 🔘 **Badge Indicator** - Navigation with badge-style indicators
   /// - Background: Neutral/Light
@@ -186,13 +211,14 @@ enum NavbarVariant {
   /// - Sectors: Social, Messaging, Communication, All sectors
   badgeIndicator,
 
-  /// 🌙 **Dark Minimal** - Dark mode minimal navigation
-  /// - Background: Dark/Black
-  /// - Text: Light colors
-  /// - Border: Subtle border
-  /// - Use for: Dark mode apps, Gaming apps, Entertainment apps
-  /// - Sectors: Gaming, Entertainment, Creative, Tech
-  darkMinimal,
+  /// 🌙 **Neumorphic** - Soft 3D neumorphic design
+  /// - Background: Soft gray (matching app background)
+  /// - Text: Muted colors
+  /// - Border: None (shadows create depth)
+  /// - Active: Inset shadow effect (pressed look)
+  /// - Use for: Modern dashboard, iOS-inspired, Premium apps
+  /// - Sectors: Tech, Premium, Lifestyle, Health
+  neumorphic,
 
   /// 🎴 **Card Floating** - Floating card-style navigation
   /// - Background: White/Light (card)
@@ -201,6 +227,51 @@ enum NavbarVariant {
   /// - Use for: Modern mobile apps, Material Design 3, Card-based UIs
   /// - Sectors: All sectors (modern design)
   cardFloating,
+
+  /// 🫧 **Bubble** - Playful bubble-style navigation
+  /// - Background: Transparent with bubble shapes
+  /// - Text: Colorful/Adaptive
+  /// - Border: None (bubble shapes)
+  /// - Active: Filled bubble with bounce animation
+  /// - Use for: Kids apps, Playful apps, Casual games, Fun interfaces
+  /// - Sectors: Kids, Entertainment, Casual Gaming, Education
+  bubble,
+
+  /// ✨ **Glassy Blur** - Modern glassmorphism with blur effects
+  /// - Background: Semi-transparent with blur
+  /// - Text: High contrast (dark/light)
+  /// - Border: Subtle white/black border (1px)
+  /// - Active: Increased opacity + glow
+  /// - Use for: iOS 15+ style, Modern dashboards, Premium apps
+  /// - Sectors: Tech, Premium, Lifestyle, Social
+  glassyBlur,
+
+  /// 📍 **Marker Tab** - Tab-style with marker indicators
+  /// - Background: Transparent
+  /// - Text: Adaptive contrast
+  /// - Border: None
+  /// - Active: Small marker/dot above or below item
+  /// - Use for: Minimal navigation, Clean UIs, Content-focused apps
+  /// - Sectors: All sectors, Content apps, Reading apps
+  markerTab,
+
+  /// 🔲 **Stepped** - Stepped/stair-like navigation design
+  /// - Background: Stepped layers with depth
+  /// - Text: Dark/Light adaptive
+  /// - Border: None (layered effect creates depth)
+  /// - Active: Elevated step effect
+  /// - Use for: Unique designs, Creative apps, Architecture apps
+  /// - Sectors: Architecture, Design, Creative
+  stepped,
+
+  /// 🎪 **Ribbon** - Ribbon/banner style navigation
+  /// - Background: Gradient or solid with ribbon shape
+  /// - Text: White/Contrast
+  /// - Border: None (ribbon edges)
+  /// - Active: Ribbon unfolds/highlights
+  /// - Use for: E-commerce promotions, Event apps, Festive themes
+  /// - Sectors: E-commerce, Events, Marketing, Seasonal
+  ribbon,
 }
 
 /// 📍 **Navbar Position Options**
@@ -558,7 +629,6 @@ enum NavbarIndicatorStyle {
   /// - Notification-style indicator
   /// - Use for: Social apps, Messaging apps, Notification-heavy apps
   badge,
-
 
   /// 🎯 **Capsule** - Capsule-shaped indicator
   /// - Rounded capsule background
