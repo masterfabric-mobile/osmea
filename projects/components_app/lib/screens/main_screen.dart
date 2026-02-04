@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: _navItems,
-        variant: NavbarVariant.transparent,
+        variant: NavbarVariant.retailMain,
         size: NavbarSize.small,
         currentIndex: _currentIndex,
         onItemTap: (index) {
