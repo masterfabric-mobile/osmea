@@ -2,6 +2,19 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_appbar.dart';
 
+class _DistributionItemStyle {
+  const _DistributionItemStyle({
+    this.height = 36,
+    this.radius = 4,
+    this.leftBorder = false,
+    this.withShadow = false,
+  });
+  final int height;
+  final int radius;
+  final bool leftBorder;
+  final bool withShadow;
+}
+
 /// 📊 **OSMEA Column Examples**
 ///
 /// This file demonstrates various ways to use the OSMEA Column component.
@@ -20,6 +33,7 @@ class ColumnExample extends StatelessWidget {
       body: OsmeaComponents.singleChildScrollView(
         padding: context.paddingNormal,
         child: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section title
@@ -365,110 +379,136 @@ class ColumnExample extends StatelessWidget {
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OsmeaComponents.text('MainAxisAlignment.start:'),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.container(
-            height: 150,
-            color: OsmeaColors.grey.shade100,
-            padding: const EdgeInsets.all(8),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.azureWave.withValues(alpha: 0.3)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.azureWave.withValues(alpha: 0.4)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.azureWave.withValues(alpha: 0.5)),
-              ],
-            ),
+          _buildDistributionRow(
+            'MainAxisAlignment.start',
+            'Items aligned at top',
+            MainAxisAlignment.start,
+            OsmeaColors.azureWave,
+            _DistributionItemStyle(height: 32, radius: 4),
           ),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.text('MainAxisAlignment.center:'),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.container(
-            height: 150,
-            color: OsmeaColors.grey.shade100,
-            padding: const EdgeInsets.all(8),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.3)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.4)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.5)),
-              ],
-            ),
+          OsmeaComponents.sizedBox(height: 20),
+          _buildDistributionRow(
+            'MainAxisAlignment.center',
+            'Items centered vertically',
+            MainAxisAlignment.center,
+            OsmeaColors.sunsetGlow,
+            _DistributionItemStyle(height: 36, radius: 18),
           ),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.text('MainAxisAlignment.end:'),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.container(
-            height: 150,
-            color: OsmeaColors.grey.shade100,
-            padding: const EdgeInsets.all(8),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.3)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.4)),
-                OsmeaComponents.container(
-                    height: 30,
-                    color: OsmeaColors.sunsetGlow.withValues(alpha: 0.5)),
-              ],
-            ),
+          OsmeaComponents.sizedBox(height: 20),
+          _buildDistributionRow(
+            'MainAxisAlignment.end',
+            'Items aligned at bottom',
+            MainAxisAlignment.end,
+            OsmeaColors.goldenHour,
+            _DistributionItemStyle(height: 34, radius: 8, leftBorder: true),
           ),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.text('MainAxisAlignment.spaceBetween:'),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.container(
-            height: 150,
-            color: OsmeaColors.grey.shade100,
-            padding: const EdgeInsets.all(8),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.red.shade300),
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.red.shade400),
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.red.shade500),
-              ],
-            ),
+          OsmeaComponents.sizedBox(height: 20),
+          _buildDistributionRow(
+            'MainAxisAlignment.spaceBetween',
+            'Equal space between items',
+            MainAxisAlignment.spaceBetween,
+            OsmeaColors.forestHeart,
+            _DistributionItemStyle(height: 38, radius: 12, withShadow: true),
           ),
-          OsmeaComponents.sizedBox(height: 16),
-          OsmeaComponents.text('MainAxisAlignment.spaceEvenly:'),
-          OsmeaComponents.sizedBox(height: 8),
-          OsmeaComponents.container(
-            height: 150,
-            color: OsmeaColors.grey.shade100,
-            padding: const EdgeInsets.all(8),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.blue.withValues(alpha: 0.3)),
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.blue.withValues(alpha: 0.4)),
-                OsmeaComponents.container(
-                    height: 30, color: OsmeaColors.blue.withValues(alpha: 0.5)),
-              ],
-            ),
+          OsmeaComponents.sizedBox(height: 20),
+          _buildDistributionRow(
+            'MainAxisAlignment.spaceEvenly',
+            'Space distributed evenly',
+            MainAxisAlignment.spaceEvenly,
+            OsmeaColors.nordicBlue,
+            _DistributionItemStyle(height: 36, radius: 6),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDistributionRow(
+    String label,
+    String hint,
+    MainAxisAlignment alignment,
+    Color baseColor,
+    _DistributionItemStyle itemStyle,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            color: OsmeaColors.black,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          hint,
+          style: TextStyle(
+            fontSize: 12,
+            color: OsmeaColors.pewter,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 150,
+          decoration: BoxDecoration(
+            color: OsmeaColors.snow,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: OsmeaColors.silver),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: alignment,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _distributionItem(baseColor, 'A', itemStyle),
+              _distributionItem(
+                  baseColor.withValues(alpha: 0.85), 'B', itemStyle),
+              _distributionItem(
+                  baseColor.withValues(alpha: 0.7), 'C', itemStyle),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _distributionItem(
+      Color color, String text, _DistributionItemStyle style) {
+    return Container(
+      height: style.height.toDouble(),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(style.radius.toDouble()),
+        border: style.leftBorder
+            ? Border(
+                left: BorderSide(color: OsmeaColors.eclipse, width: 4),
+                top: BorderSide(color: OsmeaColors.platinum),
+                right: BorderSide(color: OsmeaColors.platinum),
+                bottom: BorderSide(color: OsmeaColors.platinum),
+              )
+            : Border.all(color: OsmeaColors.platinum),
+        boxShadow: style.withShadow
+            ? [
+                BoxShadow(
+                  color: OsmeaColors.shadowLight,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: OsmeaColors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
       ),
     );
   }

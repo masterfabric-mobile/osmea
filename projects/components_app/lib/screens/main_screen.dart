@@ -37,27 +37,26 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return OsmeaComponents.scaffold(
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: _navItems,
-        variant: NavbarVariant.neumorphic,
+        variant: NavbarVariant.outlinedMinimal,
         size: NavbarSize.small,
         currentIndex: _currentIndex,
         centerItems: true,
-        showBorder: false,
-        padding: EdgeInsets.zero,
-        margin: EdgeInsets.zero,
+        showBorder: true,
+        showLabels: false, // Sadece icon göster
         onItemTap: (index) {
           setState(() {
             _currentIndex = index;
           });
           _navigateToPage(index);
         },
-        activeColor: OsmeaColors.black,
-        inactiveColor: OsmeaColors.grayMaterial,
+        activeColor: OsmeaColors.nordicBlue,
+        inactiveColor: OsmeaColors.pewter,
         backgroundColor: OsmeaColors.white,
       ),
     );
