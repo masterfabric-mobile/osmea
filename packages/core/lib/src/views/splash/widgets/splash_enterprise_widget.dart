@@ -9,19 +9,71 @@ import 'package:osmea_components/osmea_components.dart';
 /// Copyright (c) 2025, OSMEA Team
 /// https://github.com/masterfabric-mobile/osmea/tree/dev/packages/core
 ///
-/// Professional splash style - Corporate card-based design with professional aesthetics
-/// Features: Card layouts, professional typography, corporate color schemes, loading indicators
+/// Premium enterprise splash design with modern aesthetics
+/// Features: Gradient backgrounds, glassmorphism, animated elements, premium typography
 ///
 /// {@category Widgets}
 /// {@subCategory SplashEnterprise}
 
-class SplashEnterpriseWidget extends StatelessWidget {
+class SplashEnterpriseWidget extends StatefulWidget {
   final VoidCallback? onLogoTap;
 
   const SplashEnterpriseWidget({
     super.key,
     this.onLogoTap,
   });
+
+  @override
+  State<SplashEnterpriseWidget> createState() => _SplashEnterpriseWidgetState();
+}
+
+class _SplashEnterpriseWidgetState extends State<SplashEnterpriseWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,31 +84,205 @@ class SplashEnterpriseWidget extends StatelessWidget {
         }
 
         return OsmeaComponents.container(
-          color: _getBackgroundColor(state),
-          child: SafeArea(
-            child: OsmeaComponents.container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing20,
-                vertical: context.spacing16,
-              ),
-              child: OsmeaComponents.column(
-                children: [
-                  // 📱 Professional header with branding
-                  _buildEnterpriseHeader(context, state),
+          decoration: BoxDecoration(
+            gradient: _buildEnterpriseGradient(state),
+          ),
+          child: Stack(
+            children: [
+              // Decorative background elements
+              _buildBackgroundDecoration(context),
 
-                  // 📄 Main content area with card layout
-                  Expanded(
-                    child: _buildCardContent(context, state),
-                  ),
+              // Main content
+              SafeArea(
+                child: OsmeaComponents.column(
+                  children: [
+                    // Main content area
+                    Expanded(
+                      child: OsmeaComponents.center(
+                        child: SingleChildScrollView(
+                          child: _buildMainContent(context, state),
+                        ),
+                      ),
+                    ),
 
-                  // 🔘 Professional footer with loading
-                  _buildEnterpriseFooter(context, state),
-                ],
+                    // Bottom section with loading
+                    _buildBottomSection(context, state),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
         );
       },
+    );
+  }
+
+  /// 🎨 Build enterprise gradient background
+  LinearGradient _buildEnterpriseGradient(SplashState state) {
+    final backgroundColor = _getBackgroundColor(state);
+
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        backgroundColor,
+        backgroundColor,
+      ],
+    );
+  }
+
+  /// 🎨 Background decorative elements
+  Widget _buildBackgroundDecoration(BuildContext context) {
+    return const SizedBox.shrink();
+  }
+
+  /// 📄 Main content area
+  Widget _buildMainContent(BuildContext context, SplashState state) {
+    final config = state.config!;
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: OsmeaComponents.container(
+          padding: EdgeInsets.symmetric(horizontal: context.spacing24),
+          child: OsmeaComponents.column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Logo with glassmorphism card
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: _buildGlassmorphicLogoCard(context, state),
+              ),
+
+              OsmeaComponents.sizedBox(height: context.spacing32),
+
+              // App name with gradient
+              if (config.appName != null) _buildGradientAppName(context, state),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🎨 Glassmorphic logo card
+  Widget _buildGlassmorphicLogoCard(BuildContext context, SplashState state) {
+    final config = state.config!;
+
+    return GestureDetector(
+      onTap: widget.onLogoTap,
+      child: OsmeaComponents.container(
+        width: context.dynamicWidth(0.5),
+        height: context.dynamicWidth(0.5),
+        child: OsmeaComponents.center(
+          child: OsmeaComponents.image(
+            imageUrl: config.logoUrl,
+            width: config.logoWidth * 0.7,
+            height: config.logoHeight * 0.7,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🎨 Gradient app name
+  Widget _buildGradientAppName(BuildContext context, SplashState state) {
+    final config = state.config!;
+    final textColor = _getTextColor(state);
+
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        colors: [
+          textColor,
+          textColor.withValues(alpha: 0.8),
+        ],
+      ).createShader(bounds),
+      child: OsmeaComponents.text(
+        config.appName!,
+        variant: OsmeaTextVariant.headlineLarge,
+        color: OsmeaColors.white,
+        fontWeight: FontWeight.w700,
+        textAlign: TextAlign.center,
+        letterSpacing: 1.0,
+      ),
+    );
+  }
+
+  /// 🔘 Bottom section with loading
+  Widget _buildBottomSection(BuildContext context, SplashState state) {
+    final config = state.config!;
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: OsmeaComponents.container(
+        padding: EdgeInsets.all(context.spacing32),
+        child: OsmeaComponents.column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Loading indicator
+            if (config.showLoadingIndicator)
+              _buildModernLoadingIndicator(context, state),
+
+            if (config.showLoadingIndicator)
+              OsmeaComponents.sizedBox(height: context.spacing24),
+
+            // Developed by Masterfabric
+            OsmeaComponents.text(
+              'Developed by Masterfabric',
+              variant: OsmeaTextVariant.bodySmall,
+              color: OsmeaColors.pewter,
+              textAlign: TextAlign.center,
+              fontWeight: FontWeight.w400,
+            ),
+
+            OsmeaComponents.sizedBox(height: context.spacing8),
+
+            // Version info at the bottom
+            if (config.showAppVersion && config.appVersion != null)
+              OsmeaComponents.text(
+                'Version ${config.appVersion}',
+                variant: OsmeaTextVariant.bodySmall,
+                color: OsmeaColors.pewter,
+                textAlign: TextAlign.center,
+                fontWeight: FontWeight.w400,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 📊 Modern loading indicator
+  Widget _buildModernLoadingIndicator(
+    BuildContext context,
+    SplashState state,
+  ) {
+    final config = state.config!;
+    final loadingColor =
+        config.getLoadingIndicatorColor() ?? _getEnterprisePrimaryColor(state);
+
+    return OsmeaComponents.column(
+      children: [
+        // Animated loading without glow effect
+        OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: config.loadingIndicatorSize.toDouble(),
+          color: loadingColor,
+        ),
+
+        OsmeaComponents.sizedBox(height: context.spacing16),
+
+        // Loading text
+        OsmeaComponents.text(
+          config.loadingText,
+          variant: OsmeaTextVariant.bodyMedium,
+          color: OsmeaColors.pewter,
+          textAlign: TextAlign.center,
+          fontWeight: FontWeight.w500,
+        ),
+      ],
     );
   }
 
@@ -66,15 +292,13 @@ class SplashEnterpriseWidget extends StatelessWidget {
     if (config?.backgroundColor != null) {
       try {
         String colorString = config!.backgroundColor!;
-        // Handle both 6-digit (#RRGGBB) and 8-digit (#RRGGBBAA) hex colors
         if (colorString.startsWith('#')) {
-          colorString = colorString.substring(1); // Remove #
+          colorString = colorString.substring(1);
           if (colorString.length == 8) {
-            // 8-digit hex: RRGGBBAA - keep as is, just add FF prefix for full opacity
             return Color(
-                int.parse('FF${colorString.substring(0, 6)}', radix: 16));
+              int.parse('FF${colorString.substring(0, 6)}', radix: 16),
+            );
           } else if (colorString.length == 6) {
-            // 6-digit hex: RRGGBB - add FF prefix for full opacity
             return Color(int.parse('FF$colorString', radix: 16));
           }
         }
@@ -82,24 +306,22 @@ class SplashEnterpriseWidget extends StatelessWidget {
         debugPrint('⚠️ Invalid background color: ${config!.backgroundColor}');
       }
     }
-    return OsmeaColors.paperWhite; // Default for enterprise theme
+    return OsmeaColors.snow;
   }
 
-  /// 🎨 Get enterprise color scheme
+  /// 🎨 Get enterprise primary color
   Color _getEnterprisePrimaryColor(SplashState state) {
     final config = state.config;
     if (config?.primaryColor != null) {
       try {
         String colorString = config!.primaryColor!;
-        // Handle both 6-digit (#RRGGBB) and 8-digit (#RRGGBBAA) hex colors
         if (colorString.startsWith('#')) {
-          colorString = colorString.substring(1); // Remove #
+          colorString = colorString.substring(1);
           if (colorString.length == 8) {
-            // 8-digit hex: RRGGBBAA - keep as is, just add FF prefix for full opacity
             return Color(
-                int.parse('FF${colorString.substring(0, 6)}', radix: 16));
+              int.parse('FF${colorString.substring(0, 6)}', radix: 16),
+            );
           } else if (colorString.length == 6) {
-            // 6-digit hex: RRGGBB - add FF prefix for full opacity
             return Color(int.parse('FF$colorString', radix: 16));
           }
         }
@@ -116,15 +338,13 @@ class SplashEnterpriseWidget extends StatelessWidget {
     if (config?.textColor != null) {
       try {
         String colorString = config!.textColor!;
-        // Handle both 6-digit (#RRGGBB) and 8-digit (#RRGGBBAA) hex colors
         if (colorString.startsWith('#')) {
-          colorString = colorString.substring(1); // Remove #
+          colorString = colorString.substring(1);
           if (colorString.length == 8) {
-            // 8-digit hex: RRGGBBAA - keep as is, just add FF prefix for full opacity
             return Color(
-                int.parse('FF${colorString.substring(0, 6)}', radix: 16));
+              int.parse('FF${colorString.substring(0, 6)}', radix: 16),
+            );
           } else if (colorString.length == 6) {
-            // 6-digit hex: RRGGBB - add FF prefix for full opacity
             return Color(int.parse('FF$colorString', radix: 16));
           }
         }
@@ -133,255 +353,5 @@ class SplashEnterpriseWidget extends StatelessWidget {
       }
     }
     return OsmeaColors.thunder;
-  }
-
-  /// 📱 Professional header section
-  Widget _buildEnterpriseHeader(BuildContext context, SplashState state) {
-    final primaryColor = _getEnterprisePrimaryColor(state);
-
-    return OsmeaComponents.container(
-      height: context.height80,
-      child: OsmeaComponents.row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // OSMEA Logo area
-          OsmeaComponents.row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OsmeaComponents.text(
-                'OSMEA',
-                variant: OsmeaTextVariant.titleLarge,
-                color: primaryColor,
-                fontWeight: FontWeight.w700,
-              ),
-            ],
-          ),
-
-          // App version (if enabled)
-          if (state.config!.showAppVersion && state.config!.appVersion != null)
-            OsmeaComponents.text(
-              'v${state.config!.appVersion!}',
-              variant: OsmeaTextVariant.bodySmall,
-              color: OsmeaColors.pewter,
-              fontWeight: FontWeight.w500,
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// 📄 Card-based content area
-  Widget _buildCardContent(BuildContext context, SplashState state) {
-    final config = state.config!;
-
-    return OsmeaComponents.container(
-      margin: EdgeInsets.symmetric(
-        horizontal: context.spacing8,
-        vertical: context.spacing16,
-      ),
-      child: OsmeaComponents.container(
-        decoration: BoxDecoration(
-          color: OsmeaColors.white,
-          borderRadius: BorderRadius.circular(context.spacing12),
-          border: Border.all(
-            color: OsmeaColors.silver,
-            width: context.width1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: OsmeaColors.ash,
-              blurRadius: context.blurRadius8,
-              offset: context.offsetVertical2,
-            ),
-          ],
-        ),
-        child: SingleChildScrollView(
-          child: OsmeaComponents.container(
-            padding: EdgeInsets.all(context.spacing24),
-            child: OsmeaComponents.column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 🖼️ Professional logo area
-                _buildEnterpriseLogo(context, state),
-
-                OsmeaComponents.sizedBox(height: context.spacing24),
-
-                // 📝 App name with enterprise typography
-                if (config.appName != null)
-                  OsmeaComponents.text(
-                    config.appName!,
-                    variant: OsmeaTextVariant.headlineMedium,
-                    color: _getTextColor(state),
-                    fontWeight: FontWeight.w600,
-                    textAlign: TextAlign.center,
-                  ),
-
-                OsmeaComponents.sizedBox(height: context.spacing16),
-
-                // 🎯 Feature highlights
-                _buildFeatureHighlights(context, state),
-
-                OsmeaComponents.sizedBox(height: context.spacing24),
-
-                // 📊 Professional loading indicator
-                if (config.showLoadingIndicator)
-                  _buildEnterpriseLoadingIndicator(context, state),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🖼️ Enterprise logo element
-  Widget _buildEnterpriseLogo(BuildContext context, SplashState state) {
-    final config = state.config!;
-
-    return OsmeaComponents.container(
-      height: context.dynamicHeight(0.15),
-      child: OsmeaComponents.center(
-        child: GestureDetector(
-          onTap: onLogoTap,
-          child: OsmeaComponents.container(
-            width: config.logoWidth,
-            height: config.logoHeight,
-            decoration: BoxDecoration(
-              color: OsmeaColors.snow,
-              borderRadius: BorderRadius.circular(context.spacing16),
-              border: Border.all(
-                color: OsmeaColors.silver,
-                width: context.width1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: OsmeaColors.ash,
-                  blurRadius: context.blurRadius8,
-                  offset: context.offsetVertical4,
-                ),
-              ],
-            ),
-            child: OsmeaComponents.center(
-              child: OsmeaComponents.image(
-                imageUrl: config.logoUrl,
-                width: config.logoWidth * 0.8,
-                height: config.logoHeight * 0.8,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🎯 Feature highlights for professional look
-  Widget _buildFeatureHighlights(BuildContext context, SplashState state) {
-    final primaryColor = _getEnterprisePrimaryColor(state);
-
-    return OsmeaComponents.container(
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: context.spacing8,
-        runSpacing: context.spacing8,
-        children: [
-          _buildFeatureBadge(context, 'Secure', Icons.security, primaryColor),
-          _buildFeatureBadge(
-              context, 'Professional', Icons.business_center, primaryColor),
-          _buildFeatureBadge(context, 'Reliable', Icons.verified, primaryColor),
-        ],
-      ),
-    );
-  }
-
-  /// 🏷️ Feature badge
-  Widget _buildFeatureBadge(
-      BuildContext context, String label, IconData icon, Color color) {
-    return OsmeaComponents.container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.spacing12,
-        vertical: context.spacing8,
-      ),
-      decoration: BoxDecoration(
-        color: OsmeaColors.snow,
-        borderRadius: BorderRadius.circular(context.spacing8),
-        border: Border.all(
-          color: OsmeaColors.silver,
-          width: context.width1,
-        ),
-      ),
-      child: OsmeaComponents.row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: context.iconSizeSmall,
-            color: color,
-          ),
-          OsmeaComponents.sizedBox(width: context.spacing6),
-          OsmeaComponents.text(
-            label,
-            variant: OsmeaTextVariant.bodySmall,
-            color: color,
-            fontWeight: FontWeight.w500,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 📊 Professional loading indicator
-  Widget _buildEnterpriseLoadingIndicator(
-      BuildContext context, SplashState state) {
-    final config = state.config!;
-    // Get loading indicator color (prefers loadingIndicatorColor, falls back to primaryColor)
-    final loadingColor = config.getLoadingIndicatorColor() ?? _getEnterprisePrimaryColor(state);
-
-    return OsmeaComponents.container(
-      child: OsmeaComponents.column(
-        children: [
-          // Professional loading indicator
-          OsmeaComponents.loading(
-            type: LoadingType.circularFade,
-            size: config.loadingIndicatorSize.toDouble(),
-            color: loadingColor,
-          ),
-
-          OsmeaComponents.sizedBox(height: context.spacing16),
-
-          // Loading text with professional styling
-          OsmeaComponents.text(
-            config.loadingText,
-            variant: OsmeaTextVariant.bodyMedium,
-            color: OsmeaColors.pewter,
-            textAlign: TextAlign.center,
-            fontWeight: FontWeight.w500,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 🔘 Professional footer with copyright
-  Widget _buildEnterpriseFooter(BuildContext context, SplashState state) {
-    final config = state.config!;
-
-    return OsmeaComponents.container(
-      padding: EdgeInsets.symmetric(vertical: context.spacing24),
-      child: OsmeaComponents.column(
-        children: [
-          // Copyright text (if enabled)
-          if (config.showCopyright)
-            OsmeaComponents.text(
-              config.copyrightText,
-              variant: OsmeaTextVariant.bodySmall,
-              color: OsmeaColors.pewter,
-              textAlign: TextAlign.center,
-              fontWeight: FontWeight.w400,
-            ),
-        ],
-      ),
-    );
   }
 }

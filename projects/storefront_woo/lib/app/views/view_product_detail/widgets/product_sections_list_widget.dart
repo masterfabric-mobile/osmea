@@ -1,22 +1,19 @@
 /*
  * Product Sections List Widget
  * -----------------------------
- * Modern expandable sections list for product details (Attributes, Description, Reviews)
+ * Menu items list for product details (Attributes, Description, Reviews)
  */
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
-import 'package:osmea_components/src/components/collapse/cubit/collapse_cubit.dart';
-import 'package:osmea_components/src/enums/collapse_enums.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_attributes_widget.dart';
 import 'package:storefront_woo/app/views/view_product_detail/widgets/product_reviews_widget.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
-/// Modern expandable sections list widget
+/// Menu items list widget for product details
 class ProductSectionsListWidget extends StatelessWidget {
   final ProductDetailViewModel viewModel;
   final ProductDetailLoadedState state;
@@ -32,6 +29,7 @@ class ProductSectionsListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sections = <_SectionItem>[];
+    final configHelper = AssetConfigHelper();
 
     // Attributes section
     if (state.product.attributes != null &&
@@ -41,6 +39,11 @@ class ProductSectionsListWidget extends StatelessWidget {
           title: 'Options',
           icon: Icons.tune,
           widget: ProductAttributesWidget(viewModel: viewModel, state: state),
+          onTap: () => _showContentBottomSheet(
+            context,
+            'Options',
+            ProductAttributesWidget(viewModel: viewModel, state: state),
+          ),
         ),
       );
     }
@@ -51,13 +54,64 @@ class ProductSectionsListWidget extends StatelessWidget {
         _SectionItem(
           title: context.t.productDetailView.description.details,
           icon: Icons.description_outlined,
-          widget:
-              const SizedBox.shrink(), // Empty widget, will open bottom sheet
+          widget: const SizedBox.shrink(),
           onTap: () =>
               _showDescriptionBottomSheet(context, viewModel, state, goRoute),
         ),
       );
     }
+
+    // Cancellation & returns policy section (menu item)
+    sections.add(
+      _SectionItem(
+        title: configHelper.getString(
+          'product_detail_view.policies.cancellation_returns.title',
+          'Cancellation & returns',
+        ),
+        icon: Icons.assignment_return_outlined,
+        widget: OsmeaComponents.padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing16,
+            vertical: context.spacing12,
+          ),
+          child: OsmeaComponents.text(
+            configHelper.getString(
+              'product_detail_view.policies.cancellation_returns.body',
+              'Due to our policy, cancellation and returns are currently not available.\n\nPlease review your order carefully before placing it.',
+            ),
+            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.thunder,
+              height: 1.35,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        onTap: () => _showContentBottomSheet(
+          context,
+          configHelper.getString(
+            'product_detail_view.policies.cancellation_returns.title',
+            'Cancellation & returns',
+          ),
+          OsmeaComponents.padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing16,
+              vertical: context.spacing12,
+            ),
+            child: OsmeaComponents.text(
+              configHelper.getString(
+                'product_detail_view.policies.cancellation_returns.body',
+                'Due to our policy, cancellation and returns are currently not available.\n\nPlease review your order carefully before placing it.',
+              ),
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                color: OsmeaColors.thunder,
+                height: 1.35,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
     // Reviews section
     sections.add(
@@ -65,6 +119,11 @@ class ProductSectionsListWidget extends StatelessWidget {
         title: context.t.productDetailView.reviews.title,
         icon: Icons.star_outline,
         widget: ProductReviewsWidget(state: state),
+        onTap: () => _showContentBottomSheet(
+          context,
+          context.t.productDetailView.reviews.title,
+          ProductReviewsWidget(state: state),
+        ),
       ),
     );
 
@@ -72,62 +131,88 @@ class ProductSectionsListWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return OsmeaComponents.collapse(
-      size: CollapseSize.small,
-      variant: CollapseVariant.ghost,
-      mode: CollapseBehaviorMode.multiple,
-      padding: EdgeInsets.zero,
-      expansionCallback: (panelIndex, isExpanded) {
-        // If section has onTap callback, call it and prevent expansion
-        final section = sections[panelIndex];
-        if (section.onTap != null) {
-          section.onTap!();
-          // Prevent expansion by not toggling the panel
-          // We need to access the cubit to prevent expansion
-          final cubit = context.read<CollapseCubit>();
-          // If it expanded, immediately collapse it
-          if (isExpanded) {
-            cubit.collapsePanel(panelIndex);
-          }
-          return;
-        }
-        // Otherwise, let the default expansion behavior happen
-      },
+    return OsmeaComponents.column(
       children: sections.map((section) {
-        // Build header - same for all sections
-        final header = OsmeaComponents.container(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.spacing8,
-            vertical: context.spacing4,
-          ),
-          child: OsmeaComponents.row(
-            children: [
-              Icon(
-                section.icon,
-                size: context.iconSizeSmall,
-                color: OsmeaColors.black,
-              ),
-              OsmeaComponents.sizedBox(width: context.spacing6),
-              OsmeaComponents.expanded(
-                child: OsmeaComponents.text(
-                  section.title,
-                  textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: OsmeaColors.black,
-                    letterSpacing: -0.2,
+        return _buildMenuItem(context, section);
+      }).toList(),
+    );
+  }
+
+  Widget _buildMenuItem(BuildContext context, _SectionItem section) {
+    return OsmeaComponents.container(
+      margin: EdgeInsets.only(bottom: context.spacing8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: section.onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: OsmeaComponents.container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing8,
+              vertical: context.spacing4,
+            ),
+            child: OsmeaComponents.row(
+              children: [
+                Icon(
+                  section.icon,
+                  size: context.iconSizeSmall,
+                  color: OsmeaColors.black,
+                ),
+                OsmeaComponents.sizedBox(width: context.spacing6),
+                OsmeaComponents.expanded(
+                  child: OsmeaComponents.text(
+                    section.title,
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.black,
+                      letterSpacing: -0.2,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Icon(
+                  Icons.chevron_right,
+                  size: context.iconSizeSmall,
+                  color: OsmeaColors.black.withOpacity(0.4),
+                ),
+              ],
+            ),
           ),
-        );
+        ),
+      ),
+    );
+  }
 
-        return OsmeaCollapsePanel(
-          header: header,
-          value: section.title.toLowerCase(),
-          body: section.widget,
-        );
-      }).toList(),
+  /// Shows content in bottom sheet
+  void _showContentBottomSheet(
+    BuildContext context,
+    String title,
+    Widget content,
+  ) {
+    OsmeaBottomSheetHelpers.showModal(
+      context: context,
+      size: BottomSheetSize.large,
+      backgroundColor: OsmeaColors.white,
+      child: OsmeaComponents.singleChildScrollView(
+        child: OsmeaComponents.column(
+          crossAxisAlignment: context.crossStart,
+          children: [
+            // Title
+            OsmeaComponents.padding(
+              padding: EdgeInsets.all(context.spacing16),
+              child: OsmeaComponents.text(
+                title,
+                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.black,
+                ),
+              ),
+            ),
+            // Content
+            content,
+            OsmeaComponents.sizedBox(height: context.spacing24),
+          ],
+        ),
+      ),
     );
   }
 
@@ -239,13 +324,13 @@ class ProductSectionsListWidget extends StatelessWidget {
 class _SectionItem {
   final String title;
   final IconData icon;
-  final Widget widget;
+  final Widget? widget;
   final VoidCallback? onTap;
 
   _SectionItem({
     required this.title,
     required this.icon,
-    required this.widget,
+    this.widget,
     this.onTap,
   });
 }

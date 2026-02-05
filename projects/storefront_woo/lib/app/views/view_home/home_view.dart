@@ -17,6 +17,8 @@ import 'package:storefront_woo/app/views/view_home/widgets/home_content_widget.d
 import 'package:storefront_woo/app/views/view_home/widgets/home_error_widget.dart';
 import 'package:storefront_woo/app/views/view_home/widgets/home_skeleton_widget.dart';
 import 'package:storefront_woo/app/utils/unified_loading_widget.dart';
+import 'package:storefront_woo/app/widgets/config_update_notifier.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// HomeView displays the main e-commerce product catalog
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
@@ -162,6 +164,15 @@ class _HomeViewWithRouteAwareState extends State<_HomeViewWithRouteAware>
         _hasInitialized = true;
       }
     }
+
+    // When user is on home and there is a pending config update, show snackbar and restart
+    final scope = ConfigUpdateScope.maybeOf(context);
+    if (scope?.hasPendingConfigUpdate == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ConfigUpdateScope.maybeOf(context)?.showSnackbarAndRestart();
+      });
+    }
   }
 
   void _refreshConfig() {
@@ -229,9 +240,9 @@ PreferredSizeWidget _buildHomeAppBar(
   // Get search config
   final searchConfig = configHelper.getObject('home_view.search');
   final searchPlaceholder =
-      searchConfig?['placeholder'] as String? ??
+      configString(searchConfig?['placeholder']) ??
       context.t.homeView.widgets.search.placeholder;
-  final searchVariant = searchConfig?['variant'] as String? ?? 'outlined';
+  final searchVariant = configString(searchConfig?['variant']) ?? 'outlined';
 
   // Create controllers for home searchbar (just for navigation)
   final searchFocusNode = FocusNode();

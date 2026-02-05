@@ -62,6 +62,7 @@ class UpdateWishlistGroupHandler implements ApiRequestHandler {
       );
 
       final response = await GetIt.I<WooWishlistService>().updateGroup(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         groupId: groupId,
         request: updateData,
@@ -76,7 +77,7 @@ class UpdateWishlistGroupHandler implements ApiRequestHandler {
           "description": response.data!.description,
           "created_at": response.data!.createdAt,
         } : {
-          "id": groupId.toString(),
+          "id": groupId,
           "name": name,
           "description": description,
         };

@@ -6,15 +6,12 @@
  * Includes filter chips at the top for active filters.
  */
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:apis/network/remote/woocommerce/store_api/product_api/abstract/product_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_categories_api/freezed_model/response/list_product_categories_response_model.dart';
-import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_woo/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_woo/app/views/view_wishlist/models/wishlist_view_model.dart';
@@ -24,6 +21,7 @@ import 'package:storefront_woo/app/views/view_product_list/widgets/product_list_
 // Animation helpers are now imported from core
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
+import 'package:storefront_woo/app/utils/cart_add_helper.dart';
 
 /// Main content widget for product list view
 class ProductListContentWidget extends StatefulWidget {
@@ -44,31 +42,18 @@ class ProductListContentWidget extends StatefulWidget {
 class _ProductListContentWidgetState extends State<ProductListContentWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollToTop = false;
-  bool _showFiltersBar = false;
   final AssetConfigHelper _configHelper = AssetConfigHelper();
-  late final TextEditingController _searchController;
-  late final FocusNode _searchFocusNode;
-  late final List<String> _initialSearchHistory;
-  late final ProductSearchHistoryCubit _historyCubit;
-  late final ProductService _productService;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _searchController = TextEditingController(text: widget.viewModel.filters.search ?? '');
-    _searchFocusNode = FocusNode();
-    _historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-    _productService = GetIt.I<ProductService>();
-    _initialSearchHistory = List<String>.from(_historyCubit.state);
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -79,18 +64,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
         _showScrollToTop = shouldShow;
       });
     }
-
-    // Filter/sort bar: show after a small scroll up (content moves up).
-    // Hysteresis prevents flicker near the threshold.
-    final offset = _scrollController.offset;
-    final shouldShowFilters = offset > 60
-        ? true
-        : (offset < 20 ? false : _showFiltersBar);
-    if (shouldShowFilters != _showFiltersBar) {
-      setState(() {
-        _showFiltersBar = shouldShowFilters;
-      });
-    }
   }
 
   void _scrollToTop() {
@@ -99,6 +72,26 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
+  }
+
+  /// Calculates the height of action buttons (sort/filter)
+  double _getActionButtonsHeight(BuildContext context) {
+    final verticalPadding = _configHelper.getDouble(
+      'product_list_view.component_spacing.vertical',
+      context.spacing12,
+    ) * 2; // top + bottom padding
+    final buttonHeight = context.spacing10 * 2 + context.iconSizeNormal; // vertical padding + icon size
+    return verticalPadding + buttonHeight;
+  }
+
+  /// Calculates the approximate height of filter chips
+  double _getFilterChipsHeight(BuildContext context) {
+    final verticalPadding = _configHelper.getDouble(
+      'product_list_view.component_spacing.vertical',
+      context.spacing12,
+    ) * 2; // top + bottom padding
+    final chipHeight = context.spacing32; // approximate chip height
+    return verticalPadding + chipHeight;
   }
 
   @override
@@ -159,37 +152,49 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                 SliverToBoxAdapter(
                   child: SizedBox(height: context.highValue * 1.5),
                 ),
-                SliverToBoxAdapter(child: _buildSearchBar(context)),
-                // Icon buttons for Sort by / Filters (scrolls away with content)
+                // Add padding for fixed sort/filter buttons and chips
                 SliverToBoxAdapter(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    switchInCurve: Curves.easeOut,
-                    switchOutCurve: Curves.easeIn,
-                    child: _showFiltersBar
-                        ? _buildActionButtons(context)
-                        : const SizedBox.shrink(),
+                  child: SizedBox(
+                    height: _getActionButtonsHeight(context) + 
+                        (_hasChipWorthyFilters() 
+                          ? _getFilterChipsHeight(context) 
+                          : 0) +
+                        context.spacing16,
                   ),
                 ),
-                // Active filter chips (scrolls away with content)
-                if (_hasChipWorthyFilters())
-                  SliverToBoxAdapter(
-                    child: OsmeaComponents.padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: _configHelper.getDouble(
-                          'product_list_view.component_spacing.horizontal',
-                          context.spacing20,
-                        ),
-                        vertical: _configHelper.getDouble(
-                          'product_list_view.component_spacing.vertical',
-                          context.spacing12,
-                        ),
-                      ),
-                      child: _buildActiveFilterChips(context),
-                    ),
-                  ),
                 // Product grid
                 _buildProductGridSliver(context),
+              ],
+            ),
+          ),
+        ),
+        // Fixed sort and filter buttons at the top
+        Positioned(
+          top: context.highValue * 1.5 - 15, // 10 pixels higher
+          left: 0,
+          right: 0,
+          child: Material(
+            color: OsmeaColors.white,
+            elevation: 2,
+            shadowColor: OsmeaColors.black.withValues(alpha: 0.1),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildActionButtons(context),
+                if (_hasChipWorthyFilters())
+                  OsmeaComponents.padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: _configHelper.getDouble(
+                        'product_list_view.component_spacing.horizontal',
+                        context.spacing20,
+                      ),
+                      vertical: _configHelper.getDouble(
+                        'product_list_view.component_spacing.vertical',
+                        context.spacing12,
+                      ),
+                    ),
+                    child: _buildActiveFilterChips(context),
+                  ),
               ],
             ),
           ),
@@ -270,119 +275,6 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    // Match HomeView's SearchBarWidget styling/config.
-    final searchConfig = _configHelper.getObject('home_view.search');
-    final placeholder =
-        searchConfig?['placeholder'] as String? ??
-        context.t.homeView.widgets.search.placeholder;
-    final variant = searchConfig?['variant'] as String? ?? 'outlined';
-
-    return OsmeaComponents.padding(
-      padding: EdgeInsets.fromLTRB(
-        context.spacing20,
-        context.spacing16,
-        context.spacing20,
-        context.spacing16,
-      ),
-      child: OsmeaComponents.searchbar(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        hint: placeholder,
-        size: TextFieldSize.medium,
-        searchbarStyle: SearchbarStyle.minimal,
-        searchbarVariant: variant == 'outlined'
-            ? SearchbarVariant.outlined
-            : SearchbarVariant.borderless,
-        state: TextFieldState.enabled,
-        showSearchIcon: true,
-        showClearButton: true,
-        showSuggestions: true,
-        minQueryLength: 2,
-        maxHistoryItems: _historyCubit.maxItems,
-        initialHistory: _initialSearchHistory,
-        backgroundColor: OsmeaColors.white,
-        borderColor: OsmeaColors.pewter,
-        focusColor: _configHelper.getSearchViewFocusColor(OsmeaColors.black),
-        textColor: OsmeaColors.thunder,
-        hintColor: OsmeaColors.pewter,
-        suggestionProvider: _buildSuggestionProvider(),
-        onSearch: (query) {
-          _applySearch(query);
-        },
-        onSubmitted: (query) {
-          _applySearch(query);
-        },
-        onClear: () {
-          _searchController.clear();
-          _applySearch('');
-        },
-      ),
-    );
-  }
-
-  Future<List<String>> Function(String query) _buildSuggestionProvider() {
-    return (query) async {
-      final q = query.trim();
-      if (q.isEmpty) return const <String>[];
-
-      final lc = q.toLowerCase();
-
-      final historyMatches = _historyCubit.history
-          .where((h) => h.toLowerCase().contains(lc))
-          .take(5)
-          .toList();
-
-      final localProductMatches = widget.state.products
-          .map((p) => (p.name ?? '').trim())
-          .where((name) => name.isNotEmpty && name.toLowerCase().contains(lc))
-          .take(5)
-          .toList();
-
-      final combined = <String>[...historyMatches, ...localProductMatches];
-
-      // Remote enrichment (keep it light)
-      if (combined.length < 8 && q.length >= 3) {
-        try {
-          final remote = await _productService.listAllProducts(
-            apiVersion: 'v1',
-            search: q,
-            page: 1,
-            perPage: 10,
-          );
-          for (final p in remote) {
-            final name = (p.name ?? '').trim();
-            if (name.isEmpty) continue;
-            combined.add(name);
-          }
-        } catch (e) {
-          // suggestions are best-effort
-          debugPrint('⚠️ SuggestionProvider remote failed: $e');
-        }
-      }
-
-      // Uniq + limit
-      final seen = <String>{};
-      final out = <String>[];
-      for (final item in combined) {
-        final key = item.toLowerCase();
-        if (seen.add(key)) out.add(item);
-        if (out.length >= 10) break;
-      }
-      return out;
-    };
-  }
-
-  void _applySearch(String query) {
-    final q = query.trim();
-    if (q.isEmpty) {
-      widget.viewModel.updateFilter(search: null);
-      return;
-    }
-
-    _historyCubit.addQuery(q);
-    widget.viewModel.updateFilter(search: q);
-  }
 
   /// Builds icon buttons for Sort by / Filters
   Widget _buildActionButtons(BuildContext context) {
@@ -505,7 +397,7 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
             border: Border.all(color: borderColor, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: shadowColor.withOpacity(shadowOpacity),
+                color: shadowColor.withValues(alpha: shadowOpacity),
                 blurRadius: shadowBlur,
                 offset: context.offsetVerticalCustom(shadowOffset),
                 spreadRadius: 0,
@@ -996,9 +888,19 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                     final wishlistVm = GetIt.I<WishlistViewModel>();
                     final currentIsSaved = wishlistVm.isSaved(productId);
 
+                    final Set<ProductCardBadge> badges = {};
+                    // Flash sale badge for products list (on sale items)
+                    if (product.onSale == true) {
+                      badges.add(ProductCardBadge.flashSale);
+                    }
+                    // Week star is handled inside ProductCardWidget via config
+                    // (product_card.badges.week_star.product_ids)
+
                     return ProductCardWidget(
                       product: product,
                       isSaved: currentIsSaved,
+                      badges: badges,
+                      allowWeekStarBadge: true,
                       onWishlistTap: () async {
                         try {
                           final wasSaved = wishlistVm.isSaved(productId);
@@ -1049,6 +951,12 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                             );
                           }
                         }
+                      },
+                      onAddToCart: () async {
+                        await addToCartFromProductCard(
+                          context,
+                          productId: productId,
+                        );
                       },
                       onTap: () => context.push('/product-detail/$productId'),
                     );

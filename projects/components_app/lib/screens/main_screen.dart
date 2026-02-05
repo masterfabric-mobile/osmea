@@ -43,17 +43,20 @@ class _MainScreenState extends State<MainScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: _navItems,
-        variant: NavbarVariant.transparent,
+        variant: NavbarVariant.outlinedMinimal,
         size: NavbarSize.small,
         currentIndex: _currentIndex,
+        centerItems: true,
+        showBorder: true,
+        showLabels: false, // Sadece icon göster
         onItemTap: (index) {
           setState(() {
             _currentIndex = index;
           });
           _navigateToPage(index);
         },
-        activeColor: OsmeaColors.black,
-        inactiveColor: OsmeaColors.grayMaterial,
+        activeColor: OsmeaColors.nordicBlue,
+        inactiveColor: OsmeaColors.pewter,
         backgroundColor: OsmeaColors.white,
       ),
     );

@@ -152,7 +152,8 @@ class WooCartTokenStorage {
   // Cache for cart token data
   static WooCartToken? _cachedToken;
   static DateTime? _lastCacheUpdate;
-  static const Duration _cacheValidityDuration = Duration(minutes: 1); // Cache valid for 1 minute
+  static const Duration _cacheValidityDuration =
+      Duration(minutes: 1); // Cache valid for 1 minute
 
   /// Clear cache (call when token is saved/cleared)
   static void _clearCache() {

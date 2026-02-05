@@ -36,7 +36,7 @@ class HelpersScreen extends StatelessWidget {
 
   Widget _buildModernHeader() {
     return OsmeaComponents.padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

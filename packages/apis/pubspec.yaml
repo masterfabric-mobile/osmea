@@ -37,6 +37,8 @@ dependencies:
   # Logging
   logger: ^2.5.0
 
+  # NOTE: Keep `core` source consistent across the workspace (path vs git).
+  # Using `path` avoids version solving conflicts in local development.
   core:
     git:
       url: https://github.com/masterfabric-mobile/osmea.git

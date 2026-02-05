@@ -91,6 +91,26 @@
             "status": "Status",
             "backToHome": "Back to Home"
         },
+        "steps": {
+            "address": "Address",
+            "shipping": "Shipping",
+            "payment": "Payment",
+            "summary": "Summary",
+            "selectShipping": "Select Shipping Method",
+            "shippingDescription": "Choose how you would like your order delivered",
+            "selectPayment": "Select Payment Method",
+            "orderReview": "Order Review"
+        },
+        "summary": {
+            "title": "Order Summary",
+            "subtitle": "Please review your order details before placing",
+            "deliveryAddress": "Delivery Address",
+            "shippingMethod": "Shipping Method",
+            "paymentMethod": "Payment Method",
+            "edit": "Edit",
+            "noShippingSelected": "No shipping method selected",
+            "noPaymentSelected": "No payment method selected"
+        },
         "sections": {
             "billingAddress": "Billing Address",
             "shippingAddress": "Shipping Address",
@@ -111,15 +131,42 @@
             "required": "Required",
             "invalidEmail": "Invalid email"
         },
+        "shipping": {
+            "noMethodsAvailable": "No shipping methods available",
+            "contactSupport": "Please contact support for assistance",
+            "free": "Free"
+        },
+        "orderSummary": {
+            "subtotal": "Subtotal",
+            "shipping": "Shipping",
+            "tax": "Tax",
+            "total": "Total"
+        },
         "payment": {
             "bankTransfer": "Bank Transfer",
-            "bankTransferSubtitle": "Havale/EFT"
+            "bankTransferSubtitle": "Direct bank transfer",
+            "cashOnDelivery": "Cash on Delivery",
+            "cashOnDeliverySubtitle": "Pay when you receive",
+            "creditCard": "Credit Card",
+            "creditCardSubtitle": "Pay securely with your card",
+            "deliveryAddress": "Delivery Address",
+            "shippingMethod": "Shipping Method",
+            "standardShipping": "Standard Shipping",
+            "noAddressSet": "No address set"
         },
         "buttons": {
-            "completeOrder": "Complete Order"
+            "back": "Back",
+            "continueToShipping": "Continue to Shipping",
+            "continueToPayment": "Continue to Payment",
+            "continueToSummary": "Continue to Summary",
+            "completeOrder": "Complete Order",
+            "placeOrder": "Place Order"
         },
         "messages": {
-            "fillRequiredFields": "Please fill in all required fields"
+            "fillRequiredFields": "Please fill in all required fields",
+            "selectShippingMethod": "Please select a shipping method",
+            "selectPaymentMethod": "Please select a payment method",
+            "selectAddress": "Please select an address or add a new one"
         }
     },
     "favoriteCategoriesView": {
@@ -216,6 +263,7 @@
             "failed": "Failed to share product",
             "error": "Error sharing product"
         },
+        "discount": "{percentage}% Sale",
         "unknownProduct": "Unknown Product"
     },
     "productListView": {

@@ -77,7 +77,27 @@ class OnboardingCubit extends BaseViewModelCubit<OnboardingState> {
         return;
       }
 
+      // Debug: Log onboarding data structure
+      debugPrint('🔍 [OnboardingCubit] onboardingData keys: ${onboardingData.keys}');
+      if (onboardingData['pages'] != null) {
+        final pages = onboardingData['pages'] as List?;
+        debugPrint('🔍 [OnboardingCubit] Found ${pages?.length ?? 0} pages');
+        if (pages != null && pages.isNotEmpty) {
+          final firstPage = pages[0] as Map<String, dynamic>?;
+          debugPrint('🔍 [OnboardingCubit] First page keys: ${firstPage?.keys}');
+          debugPrint('🔍 [OnboardingCubit] First page image_path: ${firstPage?['image_path']}');
+          debugPrint('🔍 [OnboardingCubit] First page icon_path: ${firstPage?['icon_path']}');
+        }
+      }
+
       final onboardingConfig = OnboardingConfigModel.fromJson(onboardingData);
+      
+      // Debug: Log parsed config
+      if (onboardingConfig.pages.isNotEmpty) {
+        final firstPage = onboardingConfig.pages[0];
+        debugPrint('🔍 [OnboardingCubit] Parsed first page imagePath: ${firstPage.imagePath}');
+        debugPrint('🔍 [OnboardingCubit] Parsed first page iconPath: ${firstPage.iconPath}');
+      }
 
       // Use defaults if no pages found
       if (onboardingConfig.pages.isEmpty) {
@@ -286,6 +306,7 @@ class OnboardingCubit extends BaseViewModelCubit<OnboardingState> {
     }
     return {};
   }
+
 
   /// 🎮 Get default onboarding config for fallback
   OnboardingConfigModel _getDefaultOnboardingConfig() {

@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +8,6 @@ import 'package:apis/network/remote/woocommerce/store_api/product_categories_api
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/abstract/store_product_brands_service.dart';
 import 'package:apis/network/remote/woocommerce/store_api/product_brands_api/freezed_model/response/list_product_brands_response_model.dart'
     as brand_models;
-import 'package:storefront_woo/app/search/product_search_history_cubit.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
 
 /// Widget to load and display categories and brands in search empty state
@@ -36,24 +34,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
   String? _error;
   int _columnCount = 2; // Default to 2 columns for category grid
   bool _isListView = false; // Default to grid view
-
-  Future<void> _searchFromHistory(String query) async {
-    final q = query.trim();
-    if (q.isEmpty) return;
-    if (widget.searchCubit == null || widget.searchProvider == null) {
-      debugPrint('⚠️ SearchEmptyStateWidget: searchCubit/provider missing');
-      return;
-    }
-
-    // Persist + bump to top
-    GetIt.I<ProductSearchHistoryCubit>().addQuery(q);
-
-    await widget.searchCubit!.performSearch(
-      q,
-      searchProvider: widget.searchProvider,
-      immediate: true,
-    );
-  }
 
   @override
   void initState() {
@@ -302,59 +282,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         vertical: context.spacing10,
       ),
       children: [
-        // Recent searches (persisted)
-        BlocBuilder<ProductSearchHistoryCubit, List<String>>(
-          bloc: GetIt.I<ProductSearchHistoryCubit>(),
-          builder: (context, history) {
-            if (history.isEmpty) return const SizedBox.shrink();
-
-            return OsmeaComponents.column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                OsmeaComponents.text(
-                  'Recent searches',
-                  textStyle: OsmeaTextStyle.titleMedium(context),
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing8),
-                Wrap(
-                  spacing: context.spacing8,
-                  runSpacing: context.spacing8,
-                  children: [
-                    ...history.take(8).map((q) {
-                      return OsmeaComponents.chips(
-                        text: q,
-                        variant: ChipsVariant.neutral,
-                        style: ChipsStyle.outlined,
-                        selected: false,
-                        closable: true,
-                        onTap: () => _searchFromHistory(q),
-                        onClose: () {
-                          final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-                          historyCubit.removeQuery(q);
-                          widget.searchCubit?.removeFromHistory(q);
-                        },
-                      );
-                    }),
-                    OsmeaComponents.chips(
-                      text: 'Clear',
-                      variant: ChipsVariant.neutral,
-                      style: ChipsStyle.normal,
-                      icon: const Icon(Icons.close, size: 16),
-                      iconPosition: ChipsIconPosition.start,
-                      onTap: () {
-                        final historyCubit = GetIt.I<ProductSearchHistoryCubit>();
-                        historyCubit.clearAll();
-                        widget.searchCubit?.clearHistory();
-                      },
-                    ),
-                  ],
-                ),
-                OsmeaComponents.sizedBox(height: context.spacing16),
-              ],
-            );
-          },
-        ),
-
         // Brands section with horizontal scroll
         if (_brands.isNotEmpty) ...[
           OsmeaComponents.text(
@@ -379,47 +306,14 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
           ),
           OsmeaComponents.sizedBox(height: context.spacing16),
         ],
-        // Categories section with toggle button
+        // Categories section
         Padding(
           padding: EdgeInsets.only(right: context.spacing8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              OsmeaComponents.text(
-                context.t.searchView.sections.categories,
-                textStyle: OsmeaTextStyle.titleMedium(
-                  context,
-                ).copyWith(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildIconButton(
-                    icon: Icons.grid_view,
-                    isActive: !_isListView && _columnCount == 2,
-                    onTap: () => setState(() {
-                      _isListView = false;
-                      _columnCount = 2;
-                    }),
-                  ),
-                  SizedBox(width: context.spacing8),
-                  _buildIconButton(
-                    icon: Icons.apps,
-                    isActive: !_isListView && _columnCount == 3,
-                    onTap: () => setState(() {
-                      _isListView = false;
-                      _columnCount = 3;
-                    }),
-                  ),
-                  SizedBox(width: context.spacing8),
-                  _buildIconButton(
-                    icon: Icons.list,
-                    isActive: _isListView,
-                    onTap: () => setState(() => _isListView = true),
-                  ),
-                ],
-              ),
-            ],
+          child: OsmeaComponents.text(
+            context.t.searchView.sections.categories,
+            textStyle: OsmeaTextStyle.titleMedium(
+              context,
+            ).copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         OsmeaComponents.sizedBox(height: context.spacing12),
@@ -469,35 +363,6 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
     );
   }
 
-  Widget _buildIconButton({
-    required IconData icon,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isActive ? OsmeaColors.black : OsmeaColors.snow,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive ? OsmeaColors.black : Colors.grey.shade300,
-              width: 1,
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: isActive ? OsmeaColors.white : OsmeaColors.pewter,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _BrandCard extends StatelessWidget {

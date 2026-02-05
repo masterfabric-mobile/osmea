@@ -14,10 +14,13 @@
         "enable_logging": true
     },
     "woocommerce_configuration": {
-        "store_url": "http://example.com",
-        "brand_name": "example",
-        "auth_key": "exampleAUthCodE123",
+        "store_url": "https://yourwoocommerce.store",
+        "brand_name": "yourwoocommerce",
+        "auth_key": "ThisISMySpecialAuthcode",
         "version": "v1",
+        "store_api_version": "v1",
+        "admin_api_version": "v3",
+        "wishlist_api_version": "v1",
         "wishlist_namespace": "masterfabric-wishlist",
         "verify_ssl": true,
         "query_string_auth": false,
@@ -40,6 +43,22 @@
             {
                 "sectionTitle": "Account & Preferences",
                 "items": [
+                    {
+                        "id": "orders_history",
+                        "title": "Order History",
+                        "iconName": "shopping_bag_outlined",
+                        "iconColor": "#000000",
+                        "route": "/orders-history"
+                    },
+
+
+                    {
+                        "id": "user_profile",
+                        "title": "My Profile",
+                        "iconName": "person_outline",
+                        "iconColor": "#000000",
+                        "route": "/user-profile"
+                    },
                     {
                         "id": "about",
                         "title": "About",
@@ -176,10 +195,10 @@
         "dev_mode_tap_count": 7
     },
     "localization_configuration": {
-        "default_language": "tr",
+        "default_language": "en",
         "supported_languages": [
-            "tr",
             "en",
+            "tr",
             "de",
             "fr"
         ],
@@ -202,7 +221,7 @@
         "secondary_color": "#FFFFFF",
         "pages": [
             {
-                "title": "Your WooCommerce Store",
+                "title": "Your Store",
                 "description": "Easily manage your products and increase your sales with powerful WooCommerce integration.",
                 "icon_path": null,
                 "image_path": null,
@@ -426,7 +445,7 @@
     },
     "auth_configuration": {
         "ui_style": {
-            "style": "startup",
+            "style": "enterprise",
             "tab_container_radius": 12,
             "tab_item_radius": 10,
             "button_radius": 12,
@@ -471,7 +490,9 @@
             "password_label": "Password",
             "password_hint": "Enter your password",
             "remember_me_label": "Remember me",
+            "show_forgot_password": true,
             "forgot_password_label": "Forgot Password?",
+            "forgot_password_label_tr": "Şifremi unuttum",
             "sign_in_button": "Continue",
             "sign_in_button_loading": "Signing in...",
             "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
@@ -494,11 +515,52 @@
             "sign_up_button_loading": "Creating account...",
             "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_white.png?raw=true",
             "logo_width": 120,
-            "logo_height": 120
+            "logo_height": 120,
+            "payment_agreements": {
+                "preliminary_information_form": {
+                    "title": "Preliminary Information Form",
+                    "content": "SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nINTERMEDIARY SERVICE PROVIDER:\nCompany Name: D-MARKET ELECTRONIC SERVICES AND TRADE INC\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12 Trump Towers Tower 2 Floor 2 Şişli/Istanbul\nTax ID: 2650179910 - Boğaziçi Corporate Tax Office\nPhone: 0850 252 40 00\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nPRELIMINARY INFORMATION FORM"
+                },
+                "distance_sales_agreement": {
+                    "title": "Distance Sales Agreement",
+                    "content": "DISTANCE SALES AGREEMENT\n\nARTICLE 1- PARTIES\n\n1.1. SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\n1.2. BUYER (\"CONSUMER\"):\nThe person placing the order is identified by the following information.\n\nARTICLE 2- SUBJECT OF THE AGREEMENT\n\nThis agreement is drawn up in accordance with the provisions of Law No. 6502 on the Protection of Consumers and the Distance Contracts Regulation regarding the sale and delivery of products ordered by the BUYER in the electronic environment and included in the SELLER's catalog.\n\nARTICLE 3- RIGHTS AND OBLIGATIONS\n\n3.1. The SELLER is responsible for delivering the product, which is the subject of the contract, sound, complete, in accordance with the specifications stated in the order, and with any warranty documents and user manuals.\n\n3.2. The BUYER is obliged to accept the delivery of the product ordered. The SELLER is not responsible for damages and expenses arising from the BUYER's late receipt or non-receipt of the product."
+                },
+                "checkbox_text": "I approve the Preliminary Information Form and the Distance Sales Agreement.",
+                "checkbox_link_color": "#FF6B00"
+            }
         },
         "forgot_password": {
             "title": "Reset Password",
-            "subtitle": "Enter your email to reset"
+            "subtitle": "Enter your email and we'll send you a link to reset your password.",
+            "email_label": "Email",
+            "email_hint": "Email",
+            "submit_button": "Send reset link",
+            "back_to_sign_in": "Back to Sign In",
+            "sending": "Sending...",
+            "email_required": "Please enter your email",
+            "email_invalid": "Please enter a valid email",
+            "primary_color": "#000000",
+            "link_color": "#000000",
+            "background_color": "#FFFFFF",
+            "app_bar_background_color": "#FFFFFF",
+            "app_bar_foreground_color": "#000000",
+            "app_bar_title_color": "#000000",
+            "button_background_color": "#000000",
+            "button_text_color": "#FFFFFF",
+            "icon_background_color": "#00000014",
+            "title_text_color": "#000000",
+            "subtitle_text_color": "#6B7280",
+            "label_text_color": "#374151",
+            "input_background_color": "#FFFFFF",
+            "input_border_color": "#E5E7EB",
+            "input_hint_color": "#9CA3AF",
+            "border_radius": 12
+        },
+        "sign_in_forgot_password_link": {
+            "color": "#000000",
+            "enterprise": { "color": "#000000" },
+            "startup": { "color": "#000000" },
+            "space": { "color": "#6366F1" }
         }
     },
     "empty_view_configuration": {
@@ -552,16 +614,34 @@
             "horizontal": 20,
             "title_to_content": 16
         },
-        "search": {
+        "scrolling_banner": {
             "enabled": true,
             "order_id": 0,
+            "text": "MasterFabric Store is an open source project • Explore our code and contribute on GitHub",
+            "link": "https://github.com/masterfabric-mobile/osmea",
+            "background_color": "#000000",
+            "text_color": "#FFFFFF",
+            "height": 40,
+            "font_size": 14,
+            "animation_duration": 15,
+            "animation_direction": "left",
+            "show_separator": true,
+            "separator": "•",
+            "padding": {
+                "vertical": 8,
+                "horizontal": 0
+            }
+        },
+        "search": {
+            "enabled": true,
+            "order_id": 1,
             "placeholder": "Search products, brands, categories...",
             "style": "minimal",
             "variant": "outlined"
         },
         "circle_categories": {
             "enabled": true,
-            "order_id": 1,
+            "order_id": 2,
             "max_items": 10,
             "circle_size": 64,
             "show_names": true,
@@ -570,7 +650,7 @@
         },
         "banner": {
             "enabled": true,
-            "order_id": 2,
+            "order_id": 3,
             "padding": {
                 "top": 0,
                 "bottom": 16
@@ -676,15 +756,52 @@
             "order_id": 8,
             "title": "Deals of the Day",
             "limit": 10,
+            "product_ids": [94,188,190],
             "padding": {
                 "top": 0,
                 "bottom": 16,
                 "horizontal": 20
             }
         },
+        "collections": {
+            "enabled": true,
+            "order_id": 9,
+            "title": "Collections",
+            "padding": {
+                "top": 0,
+                "bottom": 16,
+                "horizontal": 20
+            },
+            "items": [
+                {
+                    "id": "winter_essentials",
+                    "title": "Winter essentials",
+                    "limit": 10,
+                    "product_ids": [94, 188, 190]
+                },
+                {
+                    "id": "developer_kits",
+                    "title": "Developer kits",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "focus_work",
+                    "title": "Focus work",
+                    "limit": 10,
+                    "product_ids": [297, 305, 96]
+                },
+                {
+                    "id": "daily_favorites",
+                    "title": "Daily favorites",
+                    "limit": 10,
+                    "product_ids": [186, 194, 293]
+                }
+            ]
+        },
         "recommended": {
             "enabled": true,
-            "order_id": 10,
+            "order_id": 11,
             "title": "Recommended for you",
             "limit": 4,
             "product_ids": [],
@@ -747,7 +864,7 @@
         },
         "flash_sale": {
             "enabled": true,
-            "order_id": 9,
+            "order_id": 10,
             "title": "Flash Sale",
             "limit": 10,
             "end_time": "2026-02-01T23:59:59Z",
@@ -768,29 +885,29 @@
                 {
                     "id": 1,
                     "name": "MF Accessories",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/accessories.jpeg",
                     "route": "/products?brand=1"
                 },
                 {
                     "id": 2,
                     "name": "MF Apparel",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Apparel.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Apparel.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/apparel.jpeg",
                     "route": "/products?brand=2"
                 },
                 {
                     "id": 3,
                     "name": "MF Lifestyle",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Lifestyle.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Lifestyle.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/lifestyle.jpeg",
                     "route": "/products?brand=3"
                 },
                 {
                     "id": 4,
                     "name": "MF Stationery",
-                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/Stationery.jpg",
-                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/Stationery.jpg",
+                    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
+                    "image_url": "https://masterfabric.store/wp-content/uploads/2026/01/stationery.jpeg",
                     "route": "/products?brand=4"
                 }
             ],
@@ -802,14 +919,14 @@
         },
         "campaign_popup_button": {
             "enabled": true,
-            "text": "KUPON",
-            "amount": "100 TL",
+            "text": "COUPON",
+            "amount": "100",
             "imageUrl": null,
             "backgroundColor": "#000000",
             "borderColor": "#FFFFFF",
             "textColor": "#FFFFFF",
             "position": "right",
-            "size": 100,
+            "size": 80,
             "showCloseButton": true,
             "route": "/products",
             "category_id": null,
@@ -843,6 +960,23 @@
             "titleColor": "#000000",
             "iconColor": "#000000",
             "elevation": 0
+        },
+        "delivery": {
+            "estimated_label": "Estimated delivery",
+            "estimated_min_days": 7,
+            "estimated_max_days": 7,
+            "estimated_display": "date",
+            "date_format": "medium",
+            "estimated_date_single_template": "{date}",
+            "estimated_date_range_template": "{startDate} - {endDate}",
+            "estimated_exact_template": "{days} days later",
+            "estimated_range_template": "{minDays}-{maxDays} days",
+            "cutoff_title": "Order within",
+            "cutoff_hour": 16,
+            "cutoff_minute": 0,
+            "show_cutoff_time": false,
+            "show_cutoff_countdown": true,
+            "cutoff_affects_estimate": true
         },
         "name_and_price": {
             "enabled": true,
@@ -1021,6 +1155,19 @@
             "regular_price_color": "#000000",
             "product_name_color": "#000000",
             "description_color": "#666666"
+        }
+    },
+    "product_card": {
+        "badges": {
+            "flash_sale": {
+                "enabled": true,
+                "auto": true,
+                "min_discount_percent": 10,
+                "label": "FLASH"
+            },
+            "week_star": {
+                "product_ids": [297, 305, 96]
+            }
         }
     },
     "navbar_configuration": {
@@ -1266,6 +1413,22 @@
             "button_disabled_background_color": "#999999",
             "button_text_color": "#FFFFFF",
             "button_border_radius": 12
+        },
+        "payment_agreements": {
+            "preliminary_information_form": {
+                "title": "Preliminary Information Form",
+                "content": "SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nINTERMEDIARY SERVICE PROVIDER:\nCompany Name: D-MARKET ELECTRONIC SERVICES AND TRADE INC\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12 Trump Towers Tower 2 Floor 2 Şişli/Istanbul\nTax ID: 2650179910 - Boğaziçi Corporate Tax Office\nPhone: 0850 252 40 00\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\nPRELIMINARY INFORMATION FORM"
+            },
+            "distance_sales_agreement": {
+                "title": "Distance Sales Agreement",
+                "content": "DISTANCE SALES AGREEMENT\n\nARTICLE 1- PARTIES\n\n1.1. SELLER:\nCompany Name: D-Market Electronic Services and Trade Inc.\nAddress: Kuştepe Mah. Mecidiyeköy Yolu Cad. Trump Towers No:12 Tower:2 Floor:2 Şişli/ISTANBUL\nPhone: 0212 705 68 00\nFax: 0216 592 65 28\nCustomer Service Phone: 0850 252 40 00\nMERSIS Number: 0265017991000011\n\n1.2. BUYER (\"CONSUMER\"):\nThe person placing the order is identified by the following information.\n\nARTICLE 2- SUBJECT OF THE AGREEMENT\n\nThis agreement is drawn up in accordance with the provisions of Law No. 6502 on the Protection of Consumers and the Distance Contracts Regulation regarding the sale and delivery of products ordered by the BUYER in the electronic environment and included in the SELLER's catalog.\n\nARTICLE 3- RIGHTS AND OBLIGATIONS\n\n3.1. The SELLER is responsible for delivering the product, which is the subject of the contract, sound, complete, in accordance with the specifications stated in the order, and with any warranty documents and user manuals.\n\n3.2. The BUYER is obliged to accept the delivery of the product ordered. The SELLER is not responsible for damages and expenses arising from the BUYER's late receipt or non-receipt of the product."
+            },
+            "checkbox_text": "I approve the Preliminary Information Form and the Distance Sales Agreement.",
+            "checkbox_link_color": "#FF6B00",
+            "agreement_section_background_color": "#FFFFFF",
+            "agreement_section_border_color": "#E5E5E5",
+            "agreement_text_color": "#666666",
+            "agreement_title_color": "#000000"
         }
     },
     "wishlist_view": {
@@ -1487,6 +1650,373 @@
             "loadingColor": "#000000",
             "footerBackgroundColor": "#FFFFFF",
             "footerBorderColor": "#E0E0E0"
+        }
+    },
+    "orders_history_view": {
+        "app_bar": {
+            "title": "Order History",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 4,
+            "card_margin_bottom": 6
+        },
+        "order_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "transparent",
+            "borderWidth": 0,
+            "borderRadius": 8,
+            "elevation": 0,
+            "padding": 14,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "total": {
+            "label_color": "#8A8A8A",
+            "amount_color": "#000000",
+            "amount_fontWeight": 600,
+            "fontSize": 15
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 12
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
+        }
+    },
+    "user_profile_view": {
+        "app_bar": {
+            "title": "My Profile",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0
+        },
+        "component_spacing": {
+            "horizontal": 12,
+            "vertical": 8,
+            "section_spacing": 12,
+            "item_spacing": 8
+        },
+        "profile_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "avatar": {
+            "size": 64,
+            "backgroundColor": "#000000",
+            "textColor": "#FFFFFF",
+            "fontWeight": 700
+        },
+        "profile_name": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 20
+        },
+        "profile_email": {
+            "color": "#666666",
+            "fontSize": 14
+        },
+        "profile_username": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "member_since": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "statistics_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "statistics_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "stat_value": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 24
+        },
+        "stat_label": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E5E5E5",
+            "borderWidth": 1,
+            "borderRadius": 16,
+            "elevation": 0,
+            "padding": 16,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0.05,
+            "shadowBlur": 8,
+            "shadowOffset": 2
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 700,
+            "fontSize": 18
+        },
+        "address_label": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "address_text": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "default_badge": {
+            "backgroundColor": "#E3F2FD",
+            "textColor": "#1976D2",
+            "borderRadius": 8,
+            "padding_horizontal": 8,
+            "padding_vertical": 4,
+            "fontWeight": 600,
+            "fontSize": 10
+        },
+        "contract_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "contract_info": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "metadata_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "metadata_value": {
+            "color": "#666666",
+            "fontSize": 12
+        },
+        "preference_key": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 14
+        },
+        "preference_value": {
+            "color": "#666666",
+            "fontSize": 12
+        }
+    },
+    "order_detail_view": {
+        "app_bar": {
+            "title": "Order Details",
+            "backgroundColor": "#FFFFFF",
+            "foregroundColor": "#000000",
+            "titleColor": "#000000",
+            "iconColor": "#000000",
+            "elevation": 0,
+            "padding_bottom": 0
+        },
+        "component_spacing": {
+            "horizontal": 16,
+            "vertical": 12,
+            "section_spacing": 16
+        },
+        "order_header_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "order_number": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 20
+        },
+        "status_badge": {
+            "borderRadius": 12,
+            "padding_horizontal": 10,
+            "padding_vertical": 5,
+            "fontWeight": 500,
+            "fontSize": 11,
+            "colors": {
+                "processing": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "completed": {
+                    "background": "#E8F5E9",
+                    "text": "#2E7D32"
+                },
+                "on-hold": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "pending": {
+                    "background": "#FFF3E0",
+                    "text": "#E65100"
+                },
+                "cancelled": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "refunded": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "failed": {
+                    "background": "#FFEBEE",
+                    "text": "#C62828"
+                },
+                "default": {
+                    "background": "#F5F5F5",
+                    "text": "#666666"
+                }
+            }
+        },
+        "date": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "payment_method": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "section_card": {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#F0F0F0",
+            "borderWidth": 0.5,
+            "borderRadius": 18,
+            "elevation": 0,
+            "padding": 18,
+            "shadowColor": "#000000",
+            "shadowOpacity": 0,
+            "shadowBlur": 0,
+            "shadowOffset": 0
+        },
+        "section_title": {
+            "color": "#000000",
+            "fontWeight": 600,
+            "fontSize": 17
+        },
+        "order_item": {
+            "name_color": "#000000",
+            "name_fontWeight": 500,
+            "name_fontSize": 15,
+            "price_color": "#000000",
+            "price_fontWeight": 600,
+            "price_fontSize": 15,
+            "quantity_color": "#8A8A8A",
+            "quantity_fontSize": 13,
+            "image_size": 64,
+            "image_borderRadius": 12
+        },
+        "order_totals": {
+            "label_color": "#8A8A8A",
+            "label_fontSize": 14,
+            "value_color": "#000000",
+            "value_fontWeight": 500,
+            "value_fontSize": 14,
+            "total_label_color": "#000000",
+            "total_label_fontWeight": 600,
+            "total_label_fontSize": 16,
+            "total_value_color": "#000000",
+            "total_value_fontWeight": 600,
+            "total_value_fontSize": 17
+        },
+        "address_text": {
+            "color": "#8A8A8A",
+            "fontSize": 13
+        },
+        "empty_state": {
+            "icon_color": "#CCCCCC",
+            "icon_size": 72,
+            "title_color": "#000000",
+            "subtitle_color": "#8A8A8A"
         }
     }
 }

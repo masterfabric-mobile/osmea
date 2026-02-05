@@ -12,6 +12,18 @@ export 'services/auth/woo_jwt_signin_manager.dart';
 export 'services/auth/woo_jwt_auth_service.dart';
 export 'models/auth/woo_jwt_token.dart';
 
+// 👥 OSMEA Users Manager Services
+export 'network/remote/woocommerce/users_manager/abstract/osmea_users_manager_service.dart';
+export 'network/remote/woocommerce/users_manager/api/api_osmea_users_manager_service.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/request/update_user_metadata_request.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/delete_user_metadata_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_all_users_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_by_id_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_dashboard_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_metadata_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/get_user_profile_response.dart';
+export 'network/remote/woocommerce/users_manager/freezed_model/response/update_user_metadata_response.dart';
+
 // 🛒 Cart Token Services
 export 'models/cart/woo_cart_token.dart';
 export 'dio_config/interceptors/woo_cart_token_interceptor.dart';
@@ -181,6 +193,15 @@ class WooNetwork {
   static String password = '';
   static String apiVersion = 'v3';
 
+  /// Normalize store URL to HTTPS to avoid 301 redirects (e.g. server redirecting http -> https).
+  static String _normalizeStoreUrl(String url) {
+    if (url.isEmpty) return url;
+    String u = url.trim();
+    if (u.endsWith('/')) u = u.substring(0, u.length - 1);
+    if (u.startsWith('http://')) u = 'https://${u.substring(7)}';
+    return u;
+  }
+
   static GetIt init(
     GetIt getIt, {
     required String storeUrl,
@@ -190,7 +211,7 @@ class WooNetwork {
     String? apiVersion,
   }) {
     WooNetwork.getIt = getIt;
-    WooNetwork.storeUrl = storeUrl;
+    WooNetwork.storeUrl = _normalizeStoreUrl(storeUrl);
     WooNetwork.storeName = storeName ?? '';
     WooNetwork.username = username;
     WooNetwork.password = password;
@@ -255,7 +276,7 @@ class WooNetwork {
   }
 
   static void updateStoreUrl(String url) {
-    WooNetwork.storeUrl = url;
+    WooNetwork.storeUrl = _normalizeStoreUrl(url);
   }
 
   static void updateStoreName(String name) {
@@ -331,13 +352,6 @@ Future<void> initNetworksFromWizard(GetIt getIt) async {
     if (config == null || !config.isComplete) {
       throw Exception(
           'No complete configuration found. Please complete the setup wizard first.');
-    }
-
-    // Reset GetIt registrations to avoid conflicts
-    try {
-      getIt.resetLazySingleton();
-    } catch (e) {
-      debugPrint('[initNetworksFromWizard] Warning: Could not reset GetIt: $e');
     }
 
     // Initialize based on platform

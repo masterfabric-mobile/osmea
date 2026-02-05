@@ -95,6 +95,7 @@ class AddWishlistItemHandler implements ApiRequestHandler {
       );
 
       final response = await GetIt.I<WooWishlistService>().addItemToWishlist(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         request: itemData,
       );

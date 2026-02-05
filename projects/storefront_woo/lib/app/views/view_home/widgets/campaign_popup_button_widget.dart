@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 import 'dart:async';
 
 /// Floating circular campaign button widget
@@ -26,8 +27,7 @@ class CampaignPopupButtonWidget extends StatefulWidget {
       _CampaignPopupButtonWidgetState();
 }
 
-class _CampaignPopupButtonWidgetState
-    extends State<CampaignPopupButtonWidget> {
+class _CampaignPopupButtonWidgetState extends State<CampaignPopupButtonWidget> {
   bool _isVisible = true;
   Offset _position = Offset.zero;
   bool _isPositionLoaded = false;
@@ -65,7 +65,7 @@ class _CampaignPopupButtonWidgetState
     try {
       await _storageHelper.init();
       final savedVisible = await _storageHelper.getItem(_visibilityKey);
-      
+
       if (savedVisible != null) {
         setState(() {
           _isVisible = savedVisible.toString().toLowerCase() == 'true';
@@ -108,7 +108,11 @@ class _CampaignPopupButtonWidgetState
   }
 
   /// Handle drag update
-  void _handleDragUpdate(DragUpdateDetails details, Size screenSize, double buttonSize) {
+  void _handleDragUpdate(
+    DragUpdateDetails details,
+    Size screenSize,
+    double buttonSize,
+  ) {
     setState(() {
       // Calculate new position
       double newX = _position.dx + details.delta.dx;
@@ -155,7 +159,7 @@ class _CampaignPopupButtonWidgetState
     if (config == null) return;
 
     // Get navigation route
-    final route = config['route'] as String?;
+    final route = configString(config['route']);
     final categoryId = config['category_id'] as int?;
     final productId = config['product_id'] as int?;
 
@@ -191,17 +195,20 @@ class _CampaignPopupButtonWidgetState
 
     // Wait for position and visibility to load before showing
     if (!_isPositionLoaded || !_isVisibilityLoaded) {
-      debugPrint('⏳ Campaign popup button not ready yet (position: $_isPositionLoaded, visibility: $_isVisibilityLoaded)');
+      debugPrint(
+        '⏳ Campaign popup button not ready yet (position: $_isPositionLoaded, visibility: $_isVisibilityLoaded)',
+      );
       return const SizedBox.shrink();
     }
 
-    // Get configuration values
-    final text = config['text'] as String? ?? 'KUPON';
-    final amount = config['amount'] as String?;
-    final imageUrl = config['imageUrl'] as String?;
-    final backgroundColor = config['backgroundColor'] as String? ?? '#2563EB';
-    final borderColor = config['borderColor'] as String? ?? '#FFFFFF';
-    final textColor = config['textColor'] as String? ?? '#FFFFFF';
+    // Get configuration values (use configString to avoid bool->String? cast errors)
+    final text = configString(config['text']) ?? 'KUPON';
+    final amount = configString(config['amount']);
+    final imageUrl = configString(config['imageUrl']);
+    final backgroundColor =
+        configString(config['backgroundColor']) ?? '#2563EB';
+    final borderColor = configString(config['borderColor']) ?? '#FFFFFF';
+    final textColor = configString(config['textColor']) ?? '#FFFFFF';
     final sizeInt = config['size'] as int? ?? 100;
     double size = sizeInt.toDouble();
     final showCloseButton = config['showCloseButton'] as bool? ?? true;
@@ -228,17 +235,21 @@ class _CampaignPopupButtonWidgetState
     Offset finalPosition = _position;
     if (_position.dx == 0 && _position.dy == 0) {
       // Set default position from config
-      final position = config['position'] as String? ?? 'right';
+      final position = configString(config['position']) ?? 'right';
       final isRight = position == 'right';
       finalPosition = Offset(
         isRight ? screenSize.width - size - 16 : 16,
         120.0,
       );
       _position = finalPosition;
-      debugPrint('📍 Campaign popup button default position: $finalPosition (screen: $screenSize, size: $size)');
+      debugPrint(
+        '📍 Campaign popup button default position: $finalPosition (screen: $screenSize, size: $size)',
+      );
     } else {
       // Use current position (from drag during this session)
-      debugPrint('📍 Campaign popup button using current position: $finalPosition');
+      debugPrint(
+        '📍 Campaign popup button using current position: $finalPosition',
+      );
     }
 
     // Ensure position is within bounds
@@ -246,6 +257,16 @@ class _CampaignPopupButtonWidgetState
       finalPosition.dx.clamp(0, screenSize.width - size),
       finalPosition.dy.clamp(80, screenSize.height - size - 100),
     );
+
+    // Keep the close icon on the "inner" side so it doesn't go off-screen:
+    // - If the button is on the left half -> show close on the right
+    // - If the button is on the right half -> show close on the left
+    final isOnLeftHalf =
+        (finalPosition.dx + (size / 2)) < (screenSize.width / 2);
+
+    // Scale close button with the campaign size.
+    final closeButtonSize = (size * 0.24).clamp(18.0, 24.0);
+    final closeButtonOffset = (closeButtonSize * 0.33).clamp(6.0, 10.0);
 
     debugPrint('✅ Campaign popup button rendering at: $finalPosition');
 
@@ -257,7 +278,8 @@ class _CampaignPopupButtonWidgetState
         children: [
           // Campaign button (draggable)
           GestureDetector(
-            onPanUpdate: (details) => _handleDragUpdate(details, screenSize, size),
+            onPanUpdate: (details) =>
+                _handleDragUpdate(details, screenSize, size),
             onPanEnd: _handleDragEnd,
             onTap: _handleCampaignTap,
             behavior: HitTestBehavior.opaque,
@@ -267,10 +289,7 @@ class _CampaignPopupButtonWidgetState
               decoration: BoxDecoration(
                 color: hasImage ? Colors.transparent : bgColor,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: borderColorParsed,
-                  width: 3,
-                ),
+                border: Border.all(color: borderColorParsed, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: bgColor.withOpacity(0.3),
@@ -282,34 +301,38 @@ class _CampaignPopupButtonWidgetState
               child: ClipOval(
                 child: hasImage && finalImageUrl != null
                     ? _buildImageContent(finalImageUrl, size)
-                    : _buildTextContent(context, text, amount, textColorParsed),
+                    : _buildTextContent(
+                        context,
+                        text,
+                        amount,
+                        textColorParsed,
+                        size,
+                      ),
               ),
             ),
           ),
           // Close button (top left) - separate GestureDetector to handle taps independently
           if (showCloseButton)
             Positioned(
-              top: -8,
-              left: -8,
+              top: -closeButtonOffset,
+              left: isOnLeftHalf ? null : -closeButtonOffset,
+              right: isOnLeftHalf ? -closeButtonOffset : null,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _handleClose,
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    width: 24,
-                    height: 24,
+                    width: closeButtonSize,
+                    height: closeButtonSize,
                     decoration: BoxDecoration(
                       color: OsmeaColors.grayMaterial[600],
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: OsmeaColors.white,
-                        width: 2,
-                      ),
+                      border: Border.all(color: OsmeaColors.white, width: 2),
                     ),
                     child: Icon(
                       Icons.close,
-                      size: 14,
+                      size: closeButtonSize * 0.58,
                       color: OsmeaColors.white,
                     ),
                   ),
@@ -338,10 +361,11 @@ class _CampaignPopupButtonWidgetState
   /// Build placeholder widget for campaign images
   Widget _buildImagePlaceholder(double size) {
     final config = _loadCampaignPopupConfig();
-    final backgroundColor = config?['backgroundColor'] as String? ?? '#2563EB';
-    final textColor = config?['textColor'] as String? ?? '#FFFFFF';
-    final text = config?['text'] as String? ?? 'KUPON';
-    final amount = config?['amount'] as String?;
+    final backgroundColor =
+        configString(config?['backgroundColor']) ?? '#2563EB';
+    final textColor = configString(config?['textColor']) ?? '#FFFFFF';
+    final text = configString(config?['text']) ?? 'KUPON';
+    final amount = configString(config?['amount']);
     final bgColor = _parseColor(backgroundColor);
     final textColorParsed = _parseColor(textColor);
 
@@ -352,10 +376,7 @@ class _CampaignPopupButtonWidgetState
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            bgColor,
-            bgColor.withOpacity(0.8),
-          ],
+          colors: [bgColor, bgColor.withOpacity(0.8)],
         ),
       ),
       child: Column(
@@ -404,28 +425,27 @@ class _CampaignPopupButtonWidgetState
     String text,
     String? amount,
     Color textColorParsed,
+    double size,
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: _parseColor(widget.configHelper.getString(
-          'home_view.campaign_popup_button.backgroundColor',
-          '#2563EB',
-        )),
+        color: _parseColor(
+          widget.configHelper.getString(
+            'home_view.campaign_popup_button.backgroundColor',
+            '#2563EB',
+          ),
+        ),
         shape: BoxShape.circle,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(size * 0.08),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Percentage signs (two % symbols)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-             
-                OsmeaComponents.sizedBox(width: 2),
-                
-              ],
+              children: [OsmeaComponents.sizedBox(width: 2)],
             ),
             OsmeaComponents.sizedBox(height: 2),
             // Amount text
@@ -435,7 +455,7 @@ class _CampaignPopupButtonWidgetState
                 textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
                   color: textColorParsed,
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: (size * 0.16).clamp(11.0, 14.0),
                 ),
               ),
             OsmeaComponents.sizedBox(height: 2),
@@ -445,7 +465,7 @@ class _CampaignPopupButtonWidgetState
               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 color: textColorParsed,
                 fontWeight: FontWeight.w600,
-                fontSize: 11,
+                fontSize: (size * 0.12).clamp(9.0, 11.0),
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -473,4 +493,3 @@ class _CampaignPopupButtonWidgetState
     }
   }
 }
-

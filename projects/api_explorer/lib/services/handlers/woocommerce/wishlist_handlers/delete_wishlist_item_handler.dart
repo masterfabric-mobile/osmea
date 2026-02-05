@@ -36,6 +36,7 @@ class DeleteWishlistItemHandler implements ApiRequestHandler {
         }
 
         final response = await GetIt.I<WooWishlistService>().deleteItemById(
+          namespace: 'masterfabric-wishlist',
           apiVersion: 'v1',
           itemId: itemId,
         );
@@ -87,6 +88,7 @@ class DeleteWishlistItemHandler implements ApiRequestHandler {
         );
 
         final response = await GetIt.I<WooWishlistService>().deleteItemByProduct(
+          namespace: 'masterfabric-wishlist',
           apiVersion: 'v1',
           request: deleteRequest,
         );

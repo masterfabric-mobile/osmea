@@ -137,7 +137,7 @@ mixin AccountWidget {
             children: [
               // User Account Header (space style - minimalist)
               _buildSpaceAccountHeader(context, state, textColor, iconColor),
-              OsmeaComponents.sizedBox(height: context.spacing32),
+              OsmeaComponents.sizedBox(height: context.spacing6),
 
               // Dynamic Sections with separators
               ...sections.expand((section) => [
@@ -165,7 +165,7 @@ mixin AccountWidget {
                         ],
                       );
                     }),
-                    OsmeaComponents.sizedBox(height: context.spacing24),
+                    OsmeaComponents.sizedBox(height: context.spacing4),
                   ]),
 
               // Account Details Section (only if authenticated)
@@ -264,7 +264,7 @@ mixin AccountWidget {
           ],
         ),
         if (isAuthenticated) ...[
-          OsmeaComponents.sizedBox(height: context.spacing12),
+          OsmeaComponents.sizedBox(height: context.spacing8),
           OsmeaComponents.row(
             children: [
               Icon(
@@ -307,7 +307,7 @@ mixin AccountWidget {
         highlightColor: iconColor.withOpacity(0.04),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: context.spacing12,
+            vertical: context.spacing8,
             horizontal: context.spacing4,
           ),
           child: OsmeaComponents.row(

@@ -222,6 +222,16 @@ class AssetConfigHelper {
     if (value is String) {
       return value;
     }
+    // Defense: config may have bool for string/color keys (e.g. from plugin or merge).
+    // Return default for color-like keys so UI never sees bool; elsewhere coerce to "true"/"false".
+    if (value is bool) {
+      final k = key.toLowerCase().split('.').last;
+      if (k.contains('color') || k.contains('url')) {
+        debugPrint('⚠️ Key "$key" has bool (expected string); using default');
+        return defaultValue;
+      }
+      return value ? 'true' : 'false';
+    }
     debugPrint(
         '⚠️ Key "$key" not found or not a string, returning default: $defaultValue');
     return defaultValue;

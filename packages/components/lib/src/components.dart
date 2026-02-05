@@ -2715,6 +2715,7 @@ class OsmeaComponents {
     BorderRadius? borderRadius,
     Color? backgroundColor,
     Color? borderColor,
+    double? borderWidth,
     Color? shadowColor,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding, // 🔧 Added missing padding parameter
@@ -4775,6 +4776,7 @@ class OsmeaCollapsePanel {
   /// [disabled]: Whether the panel is disabled
   /// [loading]: Whether the panel is loading
   /// [error]: Whether the panel is in error state
+  /// [onHeaderTap]: Optional handler for header taps (prevents expand/collapse)
   const OsmeaCollapsePanel({
     required this.header,
     required this.body,
@@ -4785,6 +4787,7 @@ class OsmeaCollapsePanel {
     this.disabled = false,
     this.loading = false,
     this.error = false,
+    this.onHeaderTap,
   });
 
   /// Header content - can be a String or Widget
@@ -4814,6 +4817,12 @@ class OsmeaCollapsePanel {
   /// Whether the panel is in error state
   final bool error;
 
+  /// Optional handler for header taps.
+  ///
+  /// If provided, the panel header becomes tappable and the default
+  /// expand/collapse behavior is disabled for that panel.
+  final VoidCallback? onHeaderTap;
+
   /// Create a copy with updated values
   OsmeaCollapsePanel copyWith({
     dynamic header,
@@ -4825,6 +4834,7 @@ class OsmeaCollapsePanel {
     bool? disabled,
     bool? loading,
     bool? error,
+    VoidCallback? onHeaderTap,
   }) {
     return OsmeaCollapsePanel(
       header: header ?? this.header,
@@ -4836,6 +4846,7 @@ class OsmeaCollapsePanel {
       disabled: disabled ?? this.disabled,
       loading: loading ?? this.loading,
       error: error ?? this.error,
+      onHeaderTap: onHeaderTap ?? this.onHeaderTap,
     );
   }
 
@@ -4851,7 +4862,8 @@ class OsmeaCollapsePanel {
         other.variant == variant &&
         other.disabled == disabled &&
         other.loading == loading &&
-        other.error == error;
+        other.error == error &&
+        other.onHeaderTap == onHeaderTap;
   }
 
   @override
@@ -4866,11 +4878,12 @@ class OsmeaCollapsePanel {
       disabled,
       loading,
       error,
+      onHeaderTap,
     );
   }
 
   @override
   String toString() {
-    return 'OsmeaCollapsePanel(header: $header, value: $value, variant: $variant, disabled: $disabled, loading: $loading, error: $error)';
+    return 'OsmeaCollapsePanel(header: $header, value: $value, variant: $variant, disabled: $disabled, loading: $loading, error: $error, onHeaderTap: $onHeaderTap)';
   }
 }

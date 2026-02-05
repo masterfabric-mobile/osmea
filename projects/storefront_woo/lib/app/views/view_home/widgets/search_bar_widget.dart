@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/gen/translations.g.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Search bar widget for home view
 class SearchBarWidget extends StatefulWidget {
@@ -59,9 +60,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     if (!showSearch) return const SizedBox.shrink();
 
     final placeholder =
-        config?['placeholder'] as String? ??
+        configString(config?['placeholder']) ??
         context.t.homeView.widgets.search.placeholder;
-    final variant = config?['variant'] as String? ?? 'outlined';
+    final variant = configString(config?['variant']) ?? 'outlined';
 
     return OsmeaComponents.padding(
       padding: EdgeInsets.fromLTRB(
@@ -83,7 +84,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         showClearButton: true,
         backgroundColor: OsmeaColors.white,
         borderColor: OsmeaColors.pewter,
-        focusColor: widget.configHelper.getSearchViewFocusColor(OsmeaColors.black),
+        focusColor: widget.configHelper.getSearchViewFocusColor(
+          OsmeaColors.black,
+        ),
         textColor: OsmeaColors.thunder,
         hintColor: OsmeaColors.pewter,
         onTap: () {

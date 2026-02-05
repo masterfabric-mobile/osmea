@@ -1,0 +1,143 @@
+/**
+ * OSMEA Users Manager - Admin Styles
+ */
+
+.osmea-users-manager-wrap {
+    max-width: 1200px;
+}
+
+.osmea-users-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.osmea-users-stats .stat-box {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.osmea-users-stats .stat-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #50575e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.osmea-users-stats .stat-box .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2271b1;
+    margin: 10px 0;
+    line-height: 1.2;
+}
+
+.osmea-users-stats .stat-box .stat-label {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #646970;
+}
+
+.osmea-users-info {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.osmea-users-info h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #dcdcde;
+    padding-bottom: 10px;
+}
+
+.osmea-users-info h3 {
+    margin-top: 20px;
+    color: #1d2327;
+}
+
+.osmea-users-info ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.osmea-users-info ul li {
+    margin: 8px 0;
+}
+
+.osmea-users-info code {
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #d63638;
+}
+
+.osmea-users-info .description {
+    color: #646970;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Legal Notice Styles */
+.osmea-legal-notice {
+    position: relative;
+}
+
+.osmea-legal-notice details summary {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.osmea-legal-notice details summary:hover {
+    text-decoration: underline;
+}
+
+.osmea-legal-notice details[open] summary {
+    margin-bottom: 10px;
+}
+
+/* Tooltip style for legal notice icon */
+.osmea-legal-notice .legal-icon {
+    position: relative;
+    cursor: help;
+}
+
+.osmea-legal-notice .legal-icon:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1d2327;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.osmea-legal-notice .legal-icon:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 95%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1d2327;
+    z-index: 1000;
+}

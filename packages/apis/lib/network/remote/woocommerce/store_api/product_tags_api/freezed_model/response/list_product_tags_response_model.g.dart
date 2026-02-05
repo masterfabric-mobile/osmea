@@ -18,12 +18,20 @@ _$ListProductTagsResponseModelImpl _$$ListProductTagsResponseModelImplFromJson(
     );
 
 Map<String, dynamic> _$$ListProductTagsResponseModelImplToJson(
-        _$ListProductTagsResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.id case final value?) 'id': value,
-      if (instance.name case final value?) 'name': value,
-      if (instance.slug case final value?) 'slug': value,
-      if (instance.description case final value?) 'description': value,
-      if (instance.parent case final value?) 'parent': value,
-      if (instance.count case final value?) 'count': value,
-    };
+    _$ListProductTagsResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('slug', instance.slug);
+  writeNotNull('description', instance.description);
+  writeNotNull('parent', instance.parent);
+  writeNotNull('count', instance.count);
+  return val;
+}

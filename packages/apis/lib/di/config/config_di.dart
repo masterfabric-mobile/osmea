@@ -23,8 +23,16 @@ final Logger logger = Logger();
 @InjectableInit(preferRelativeImports: false)
 GetIt configureDependencies() {
   try {
-    // 🏗️ Initialize dependencies using the generated config
-    final getIt = ApiNetwork.getIt.init();
+    final getIt = ApiNetwork.getIt;
+
+    // 🏗️ Initialize dependencies using the generated config only if not already initialized
+    // Check if key services are already registered to avoid duplicate registration
+    if (!getIt.isRegistered<ApiBaseClient>()) {
+      getIt.init();
+      logger.i('🏗️ Dependencies initialized using generated config');
+    } else {
+      logger.i('⚠️ Dependencies already initialized, skipping init()');
+    }
 
     // 🔌 Register services manually if needed
     _registerServices(getIt);
@@ -60,8 +68,16 @@ void _initializeCookieJarAsync() {
 /// 🍪 Synchronous version for cases where cookie jar must be ready
 Future<GetIt> configureDependenciesAsync() async {
   try {
-    // 🏗️ Initialize dependencies using the generated config
-    final getIt = ApiNetwork.getIt.init();
+    final getIt = ApiNetwork.getIt;
+
+    // 🏗️ Initialize dependencies using the generated config only if not already initialized
+    // Check if key services are already registered to avoid duplicate registration
+    if (!getIt.isRegistered<ApiBaseClient>()) {
+      getIt.init();
+      logger.i('🏗️ Dependencies initialized using generated config');
+    } else {
+      logger.i('⚠️ Dependencies already initialized, skipping init()');
+    }
 
     // 🔌 Register services manually if needed
     _registerServices(getIt);

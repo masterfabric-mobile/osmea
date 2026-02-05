@@ -1,0 +1,11 @@
+.osmea-smtp-wrap pre {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  padding: 12px;
+  overflow: auto;
+}
+
+.osmea-smtp-hints {
+  margin-top: 24px;
+}
+

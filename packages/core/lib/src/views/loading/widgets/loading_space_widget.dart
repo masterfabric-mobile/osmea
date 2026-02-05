@@ -53,7 +53,7 @@ class LoadingSpaceWidget extends StatelessWidget {
         width: 48,
         height: 48,
         child: CircularProgressIndicator(
-          value: state.isLoading ? null : state.progress,
+          value: null, // Always indeterminate for continuous rotation
           strokeWidth: 3,
           valueColor: AlwaysStoppedAnimation<Color>(progressColor),
           backgroundColor: progressColor.withOpacity(0.1),

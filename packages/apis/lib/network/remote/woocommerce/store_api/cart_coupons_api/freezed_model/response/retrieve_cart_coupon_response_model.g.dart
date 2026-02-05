@@ -17,12 +17,20 @@ _$RetrieveCartCouponResponseModelImpl
         );
 
 Map<String, dynamic> _$$RetrieveCartCouponResponseModelImplToJson(
-        _$RetrieveCartCouponResponseModelImpl instance) =>
-    <String, dynamic>{
-      if (instance.code case final value?) 'code': value,
-      if (instance.type case final value?) 'type': value,
-      if (instance.totals?.toJson() case final value?) 'totals': value,
-    };
+    _$RetrieveCartCouponResponseModelImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('code', instance.code);
+  writeNotNull('type', instance.type);
+  writeNotNull('totals', instance.totals?.toJson());
+  return val;
+}
 
 _$TotalsImpl _$$TotalsImplFromJson(Map<String, dynamic> json) => _$TotalsImpl(
       currencyCode: json['currency_code'] as String?,
@@ -36,19 +44,24 @@ _$TotalsImpl _$$TotalsImplFromJson(Map<String, dynamic> json) => _$TotalsImpl(
       totalDiscountTax: json['total_discount_tax'] as String?,
     );
 
-Map<String, dynamic> _$$TotalsImplToJson(_$TotalsImpl instance) =>
-    <String, dynamic>{
-      if (instance.currencyCode case final value?) 'currency_code': value,
-      if (instance.currencySymbol case final value?) 'currency_symbol': value,
-      if (instance.currencyMinorUnit case final value?)
-        'currency_minor_unit': value,
-      if (instance.currencyDecimalSeparator case final value?)
-        'currency_decimal_separator': value,
-      if (instance.currencyThousandSeparator case final value?)
-        'currency_thousand_separator': value,
-      if (instance.currencyPrefix case final value?) 'currency_prefix': value,
-      if (instance.currencySuffix case final value?) 'currency_suffix': value,
-      if (instance.totalDiscount case final value?) 'total_discount': value,
-      if (instance.totalDiscountTax case final value?)
-        'total_discount_tax': value,
-    };
+Map<String, dynamic> _$$TotalsImplToJson(_$TotalsImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('currency_code', instance.currencyCode);
+  writeNotNull('currency_symbol', instance.currencySymbol);
+  writeNotNull('currency_minor_unit', instance.currencyMinorUnit);
+  writeNotNull('currency_decimal_separator', instance.currencyDecimalSeparator);
+  writeNotNull(
+      'currency_thousand_separator', instance.currencyThousandSeparator);
+  writeNotNull('currency_prefix', instance.currencyPrefix);
+  writeNotNull('currency_suffix', instance.currencySuffix);
+  writeNotNull('total_discount', instance.totalDiscount);
+  writeNotNull('total_discount_tax', instance.totalDiscountTax);
+  return val;
+}

@@ -50,44 +50,42 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
 
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.white,
-      body: SafeArea(
-        child: OsmeaComponents.column(
-          children: [
-            // Modern header with progress
-            _buildModernHeader(),
-
-            // Show tabbar only when not searching
-            if (!isSearching) _buildModernTabBar(),
-
-            // Content area
-            OsmeaComponents.expanded(
-              child: isSearching
-                  ? _buildSearchResults()
-                  : TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildComponentsGrid(
-                            'Layout Components', _getLayoutComponents()),
-                        _buildComponentsGrid(
-                            'Input Components', _getInputComponents()),
-                        _buildComponentsGrid(
-                            'Display Components', _getDisplayComponents()),
-                        _buildComponentsGrid('Navigation Components',
-                            _getNavigationComponents()),
-                        _buildComponentsGrid(
-                            'Feedback Components', _getFeedbackComponents()),
-                      ],
-                    ),
-            ),
-          ],
-        ),
+      body: OsmeaComponents.column(
+        children: [
+          // Modern header with progress
+          _buildModernHeader(),
+      
+          // Show tabbar only when not searching
+          if (!isSearching) _buildModernTabBar(),
+      
+          // Content area
+          OsmeaComponents.expanded(
+            child: isSearching
+                ? _buildSearchResults()
+                : TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildComponentsGrid(
+                          'Layout Components', _getLayoutComponents()),
+                      _buildComponentsGrid(
+                          'Input Components', _getInputComponents()),
+                      _buildComponentsGrid(
+                          'Display Components', _getDisplayComponents()),
+                      _buildComponentsGrid('Navigation Components',
+                          _getNavigationComponents()),
+                      _buildComponentsGrid(
+                          'Feedback Components', _getFeedbackComponents()),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildModernHeader() {
     return OsmeaComponents.padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -182,7 +180,7 @@ class _ModernComponentsScreenState extends State<ModernComponentsScreen>
   Widget _buildComponentsGrid(
       String title, List<Map<String, dynamic>> componentsList) {
     return OsmeaComponents.padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

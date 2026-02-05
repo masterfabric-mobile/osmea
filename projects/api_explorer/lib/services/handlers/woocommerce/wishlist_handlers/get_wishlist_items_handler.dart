@@ -31,6 +31,7 @@ class GetWishlistItemsHandler implements ApiRequestHandler {
           params['per_page'] != null ? int.tryParse(params['per_page']!) : null;
 
       final response = await GetIt.I<WooWishlistService>().getWishlistItems(
+        namespace: 'masterfabric-wishlist',
         apiVersion: 'v1',
         groupId: groupId,
         page: page,

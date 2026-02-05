@@ -6,6 +6,7 @@ import 'package:apis/di/config/config_di.config.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:dio/dio.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -24,6 +25,7 @@ Future<GetIt> configureDependencies() async {
 
     // Try to initialize networks from wizard configuration
     // This will be empty initially until user completes wizard
+    // Note: This may call apis configureDependencies() which does getIt.init()
     try {
       await initNetworksFromWizard(getIt);
       debugPrint('✅ Networks initialized from wizard configuration');
@@ -33,9 +35,17 @@ Future<GetIt> configureDependencies() async {
       // This is expected for first-time users
     }
 
-    // Initialize dependency injection
-    final result = await getIt.init();
-    debugPrint('✅ Dependency injection initialized successfully');
+    // Initialize dependency injection ONLY if not already initialized
+    // Check if Dio is registered (indicates apis package already initialized)
+    GetIt result;
+    if (!getIt.isRegistered<Dio>()) {
+      result = await getIt.init();
+      debugPrint('✅ Dependency injection initialized successfully');
+    } else {
+      debugPrint('⚠️ Dependencies already initialized by apis package, skipping init()');
+      result = getIt;
+    }
+    
     return result;
   } catch (e) {
     debugPrint('❌ Error in dependency injection: $e');

@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_woo/utils/config_utils.dart';
 
 /// Campaign card item model from config
 class CampaignCardItem {
@@ -30,10 +31,10 @@ class CampaignCardItem {
 
   factory CampaignCardItem.fromConfig(Map<String, dynamic> config) {
     return CampaignCardItem(
-      imageUrl: config['imageUrl'] as String,
-      title: config['title'] as String?,
-      subtitle: config['subtitle'] as String?,
-      route: config['route'] as String?,
+      imageUrl: configString(config['imageUrl']) ?? '',
+      title: configString(config['title']),
+      subtitle: configString(config['subtitle']),
+      route: configString(config['route']),
       categoryId: config['category_id'] as int?,
       productId: config['product_id'] as int?,
     );
@@ -44,10 +45,7 @@ class CampaignCardItem {
 class CampaignCardWidget extends StatelessWidget {
   final AssetConfigHelper configHelper;
 
-  const CampaignCardWidget({
-    super.key,
-    required this.configHelper,
-  });
+  const CampaignCardWidget({super.key, required this.configHelper});
 
   /// Loads campaign cards configuration
   Map<String, dynamic>? _loadCampaignConfig() {
@@ -68,7 +66,9 @@ class CampaignCardWidget extends StatelessWidget {
       if (cardsList == null || cardsList.isEmpty) return [];
 
       return cardsList
-          .map((item) => CampaignCardItem.fromConfig(item as Map<String, dynamic>))
+          .map(
+            (item) => CampaignCardItem.fromConfig(item as Map<String, dynamic>),
+          )
           .toList();
     } catch (e) {
       debugPrint('⚠️ Failed to load campaign cards: $e');
@@ -91,12 +91,18 @@ class CampaignCardWidget extends StatelessWidget {
       debugPrint('⚠️ Failed to load horizontal padding: $e');
     }
     // Default from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.horizontal', 20.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.horizontal',
+      20.0,
+    );
   }
 
   /// Gets title to content spacing from config
   double _getTitleSpacing() {
-    return configHelper.getDouble('home_view.component_spacing.title_to_content', 16.0);
+    return configHelper.getDouble(
+      'home_view.component_spacing.title_to_content',
+      16.0,
+    );
   }
 
   /// Handles campaign card tap navigation
@@ -115,9 +121,18 @@ class CampaignCardWidget extends StatelessWidget {
   }
 
   Widget _buildCampaignCard(BuildContext context, CampaignCardItem card) {
-    final cardHeight = configHelper.getDouble('home_view.campaign_cards.card_height', 160.0);
-    final cardWidth = configHelper.getDouble('home_view.campaign_cards.card_width', 280.0);
-    final borderRadius = configHelper.getDouble('home_view.campaign_cards.border_radius', 12.0);
+    final cardHeight = configHelper.getDouble(
+      'home_view.campaign_cards.card_height',
+      160.0,
+    );
+    final cardWidth = configHelper.getDouble(
+      'home_view.campaign_cards.card_width',
+      280.0,
+    );
+    final borderRadius = configHelper.getDouble(
+      'home_view.campaign_cards.border_radius',
+      12.0,
+    );
 
     return GestureDetector(
       onTap: () => _handleCardTap(context, card),
@@ -176,16 +191,17 @@ class CampaignCardWidget extends StatelessWidget {
                       if (card.title != null)
                         OsmeaComponents.text(
                           card.title!,
-                          textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: OsmeaColors.white,
-                            shadows: [
-                              Shadow(
-                                color: OsmeaColors.thunder,
-                                blurRadius: context.blurRadius2,
+                          textStyle: OsmeaTextStyle.titleMedium(context)
+                              .copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: OsmeaColors.white,
+                                shadows: [
+                                  Shadow(
+                                    color: OsmeaColors.thunder,
+                                    blurRadius: context.blurRadius2,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -226,7 +242,7 @@ class CampaignCardWidget extends StatelessWidget {
     final campaignCards = _loadCampaignCards();
     if (campaignCards.isEmpty) return const SizedBox.shrink();
 
-    final sectionTitle = config?['title'] as String? ?? 'Campaigns';
+    final sectionTitle = configString(config?['title']) ?? 'Campaigns';
     final horizontalPadding = _getHorizontalPadding();
 
     return OsmeaComponents.column(
@@ -259,6 +275,3 @@ class CampaignCardWidget extends StatelessWidget {
     );
   }
 }
-
-
-

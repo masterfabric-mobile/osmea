@@ -43,29 +43,80 @@ body.admin-color .osmea-config-wrap,
     padding: 0 20px;
 }
 
-/* Header Section */
+/* Layout: content on top, Configuration block at bottom */
+.osmea-config-form {
+    margin-top: 16px;
+}
+
+.osmea-config-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 16px;
+}
+
+.osmea-config-footer {
+    order: 2;
+    padding: 20px 0 0;
+    border-top: 1px solid var(--osmea-gray-200, #e5e7eb);
+    margin-top: 8px;
+}
+
+.osmea-config-footer .osmea-config-actions {
+    flex-direction: row !important;
+}
+
+.osmea-config-title {
+    margin: 0 0 12px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--osmea-gray-800) !important;
+    line-height: 1.3 !important;
+}
+
+.osmea-config-meta {
+    font-size: 12px !important;
+    margin: 0 0 16px !important;
+    color: var(--osmea-gray-600) !important;
+    line-height: 1.5 !important;
+}
+
+.osmea-config-main {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.osmea-config-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 0 !important;
+}
+
+.osmea-config-actions .button {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Legacy header (no longer used, backwards compat) */
 body.wp-admin .osmea-config-header,
 .osmea-config-wrap .osmea-config-header {
-    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
+    background: #fff !important;
     border: 1px solid var(--osmea-gray-200) !important;
     border-radius: var(--osmea-radius-lg) !important;
-    padding: 28px 32px !important;
-    margin: 24px 0 !important;
+    padding: 20px 24px !important;
+    margin: 20px 0 !important;
     box-shadow: var(--osmea-shadow-sm) !important;
-    transition: var(--osmea-transition) !important;
 }
 
-body.wp-admin .osmea-config-header:hover,
-.osmea-config-wrap .osmea-config-header:hover {
-    box-shadow: var(--osmea-shadow-md) !important;
+.osmea-meta-sep {
+    margin: 0 10px;
+    color: var(--osmea-gray-300);
 }
 
-body.wp-admin .osmea-config-header .description,
-.osmea-config-header .description {
-    color: var(--osmea-gray-600) !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-    margin: 0 !important;
+.osmea-meta-item strong {
+    color: var(--osmea-gray-800);
 }
 
 /* Action Buttons */
@@ -141,7 +192,22 @@ body.wp-admin .osmea-config-actions .button-primary:hover {
     color: #ffffff !important;
 }
 
-/* JSON Editor */
+/* Hidden JSON store – admin never sees raw JSON */
+.osmea-config-json-hidden,
+textarea.osmea-config-json-hidden,
+#osmea-config-json-store {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* JSON Editor (kept for any legacy use) */
 .osmea-json-editor,
 body.wp-admin .osmea-json-editor,
 textarea.osmea-json-editor,
@@ -236,6 +302,32 @@ body.wp-admin .osmea-json-status.invalid,
     border: 1px solid var(--osmea-error) !important;
     color: #991b1b !important;
     display: flex !important;
+}
+
+/* Unsaved changes notice */
+body.wp-admin .osmea-json-status.unsaved,
+.osmea-json-status.unsaved,
+#osmea-json-status.unsaved {
+    background: linear-gradient(135deg, var(--osmea-warning-light) 0%, #fffbeb 100%) !important;
+    border: 1px solid var(--osmea-warning) !important;
+    color: #92400e !important;
+    display: flex !important;
+}
+
+body.wp-admin .osmea-json-status.unsaved::before,
+.osmea-json-status.unsaved::before,
+#osmea-json-status.unsaved::before {
+    content: '●' !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    background: var(--osmea-warning) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
 }
 
 body.wp-admin .osmea-json-status.invalid::before,
@@ -365,26 +457,614 @@ body.wp-admin .osmea-config-info:hover,
     margin: 20px 0;
 }
 
-/* Form Table Enhancements */
-body.wp-admin .osmea-config-wrap .form-table,
+/* Outer form-table wrapper - panel tables .osmea-tab-panel .form-table override */
 .osmea-config-wrap .form-table {
-    background: #ffffff !important;
-    border-radius: var(--osmea-radius-lg) !important;
-    padding: 24px !important;
-    box-shadow: var(--osmea-shadow) !important;
-    border: 1px solid var(--osmea-gray-200) !important;
-    margin-top: 24px !important;
+    margin-top: 16px;
 }
 
-.osmea-config-wrap .form-table th {
-    padding: 16px 0;
+/* Guided UI – tabbar + form-table (UI/UX focused) */
+.osmea-config-ui {
+    margin-bottom: 28px;
+}
+
+.osmea-config-ui-inner {
+    background: #fff;
+    border: 1px solid var(--osmea-gray-200);
+    border-radius: var(--osmea-radius-lg);
+    box-shadow: var(--osmea-shadow-sm);
+    overflow: hidden;
+}
+
+
+.osmea-config-ui-description {
+    margin-bottom: 14px;
+    color: var(--osmea-gray-600);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Tabbar: sticky, compact, single row + horizontal scroll */
+.osmea-config-tabbar-wrap {
+    position: sticky;
+    top: 32px;
+    z-index: 10;
+    background: #fff;
+    padding: 6px 12px 0;
+    margin: -1px -1px 0 -1px;
+    border-bottom: 1px solid var(--osmea-gray-200);
+    max-height: 40px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.osmea-config-tabbar {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin: 0;
+    padding: 2px 0 6px;
+    background: transparent;
+    border: none;
+    min-width: min-content;
+}
+
+.osmea-tab-item {
+    flex: 0 0 auto;
+    padding: 4px 10px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--osmea-gray-700);
+    background: var(--osmea-gray-100);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--osmea-transition);
+}
+
+.osmea-tab-item:hover {
+    color: var(--osmea-primary);
+    background: var(--osmea-gray-200);
+}
+
+.osmea-tab-item.active {
+    color: #fff;
+    background: var(--osmea-primary);
+    font-weight: 600;
+    box-shadow: var(--osmea-shadow-sm);
+}
+
+.osmea-tab-item.active:hover {
+    background: var(--osmea-primary-hover);
+    color: #fff;
+}
+
+.osmea-tab-item:focus-visible {
+    outline: 2px solid var(--osmea-primary);
+    outline-offset: 2px;
+}
+
+.osmea-config-tabbar-wrap::-webkit-scrollbar {
+    height: 6px;
+}
+
+.osmea-config-tabbar-wrap::-webkit-scrollbar-track {
+    background: var(--osmea-gray-100);
+    border-radius: 3px;
+}
+
+.osmea-config-tabbar-wrap::-webkit-scrollbar-thumb {
+    background: var(--osmea-gray-300);
+    border-radius: 3px;
+}
+
+.osmea-config-tabbar-wrap::-webkit-scrollbar-thumb:hover {
+    background: var(--osmea-gray-600);
+}
+
+/* Panels: ample space, rows easy to read */
+.osmea-config-ui-sections {
+    display: block;
+    padding: 0;
+    min-height: 160px;
+}
+
+/* Global search above tabbar */
+.osmea-config-search-wrap {
+    padding: 14px 16px 4px;
+    border-bottom: 1px solid var(--osmea-gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #fff;
+}
+
+.osmea-config-search-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--osmea-gray-600);
+}
+
+.osmea-config-search-input {
+    max-width: 360px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--osmea-gray-300);
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.osmea-config-search-input:focus {
+    border-color: var(--osmea-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.osmea-tab-panel {
+    display: none;
+    background: #fff;
+    border: 1px solid var(--osmea-gray-200);
+    border-radius: var(--osmea-radius-lg);
+    padding: 0;
+    margin: 0;
+    box-shadow: var(--osmea-shadow-sm);
+    overflow: hidden;
+}
+
+.osmea-tab-panel[aria-hidden="false"] {
+    display: block;
+}
+
+/* Panel title: clear which tab */
+.osmea-panel-title-row,
+.osmea-tab-panel .osmea-panel-title-row {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--osmea-gray-200);
+    background: linear-gradient(to bottom, var(--osmea-gray-50) 0%, #fff 100%);
+}
+
+.osmea-panel-title {
+    margin: 0;
+    font-size: 17px;
     font-weight: 600;
     color: var(--osmea-gray-800);
-    font-size: 15px;
+    letter-spacing: -0.01em;
 }
 
-.osmea-config-wrap .form-table td {
-    padding: 16px 0;
+/* View sub-tabs (Views panel) */
+.osmea-view-subtabbar-wrap {
+    padding: 0 16px 12px;
+    border-bottom: 1px solid var(--osmea-gray-200);
+}
+
+.osmea-view-subtabbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 8px 0 0;
+}
+
+.osmea-view-subtab {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--osmea-gray-700);
+    background: var(--osmea-gray-100);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--osmea-transition);
+}
+
+.osmea-view-subtab:hover {
+    color: var(--osmea-primary);
+    background: var(--osmea-gray-200);
+}
+
+.osmea-view-subtab.active {
+    color: #fff;
+    background: var(--osmea-primary);
+    font-weight: 600;
+}
+
+.osmea-view-panels {
+    padding: 0;
+}
+
+.osmea-view-panel {
+    padding: 0 16px 20px;
+}
+
+/* Accordion structure */
+.osmea-accordion-wrap {
+    padding: 12px 16px 24px;
+}
+
+.osmea-accordion-item {
+    border: 1px solid var(--osmea-gray-200);
+    border-radius: var(--osmea-radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: var(--osmea-transition);
+}
+
+.osmea-accordion-item:last-child {
+    margin-bottom: 0;
+}
+
+.osmea-accordion-item.is-open {
+    box-shadow: var(--osmea-shadow-sm);
+}
+
+.osmea-accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--osmea-gray-800);
+    background: var(--osmea-gray-50);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: var(--osmea-transition);
+}
+
+.osmea-accordion-trigger:hover {
+    background: var(--osmea-gray-200);
+}
+
+.osmea-accordion-trigger::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--osmea-gray-600);
+    transition: transform 0.2s ease;
+}
+
+.osmea-accordion-item.is-open .osmea-accordion-trigger::after {
+    transform: rotate(180deg);
+}
+
+.osmea-accordion-content {
+    border-top: 1px solid var(--osmea-gray-200);
+    background: #fff;
+}
+
+.osmea-accordion-content .form-table {
+    margin: 0 !important;
+}
+
+.osmea-accordion-content .form-table th,
+.osmea-accordion-content .form-table td {
+    padding: 12px 18px !important;
+}
+
+/* Section title within category (e.g. App Settings, API, WooCommerce) */
+.osmea-tab-section-header-row td {
+    padding: 18px 24px 8px;
+    border-bottom: none;
+    vertical-align: bottom;
+}
+
+.osmea-tab-section-header-row:first-of-type td {
+    padding-top: 8px;
+}
+
+.osmea-tab-section-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--osmea-gray-800);
+    padding: 8px 0 6px;
+    margin: 0;
+    border-bottom: 1px solid var(--osmea-gray-200);
+}
+
+.osmea-tab-section-header-row td {
+    background: #fff;
+}
+
+/* Group title: related fields together */
+.osmea-group-header-row td {
+    padding: 14px 24px 6px;
+    border-bottom: none;
+    vertical-align: bottom;
+}
+
+.osmea-group-header {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--osmea-gray-600);
+    padding: 4px 0;
+    margin: 0;
+}
+
+.osmea-group-header-row + tr th,
+.osmea-group-header-row + tr td {
+    padding-top: 18px;
+}
+
+/* Form-table: row-by-row zebra + hover for easier scanning */
+.osmea-tab-panel .form-table {
+    margin: 0;
+    border: none;
+    width: 100%;
+}
+
+.osmea-tab-panel .form-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.osmea-tab-panel .form-table tbody tr.osmea-field-row:nth-child(odd) {
+    background: #fff;
+}
+
+.osmea-tab-panel .form-table tbody tr.osmea-field-row:nth-child(even) {
+    background: var(--osmea-gray-50);
+}
+
+.osmea-tab-panel .form-table tbody tr.osmea-field-row:hover {
+    background: var(--osmea-primary-light);
+}
+
+.osmea-tab-panel .form-table tbody tr.osmea-field-row:hover td,
+.osmea-tab-panel .form-table tbody tr.osmea-field-row:hover th {
+    border-color: transparent;
+}
+
+.osmea-tab-panel .form-table th {
+    padding: 14px 20px 14px 24px;
+    width: 220px;
+    vertical-align: middle;
+    font-weight: 600;
+    color: var(--osmea-gray-800);
+    font-size: 14px;
+    border-bottom: 1px solid var(--osmea-gray-200);
+}
+
+.osmea-tab-panel .form-table td {
+    padding: 14px 24px 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--osmea-gray-200);
+}
+
+.osmea-tab-panel .form-table tbody tr:last-child th,
+.osmea-tab-panel .form-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.osmea-tab-panel .form-table input.regular-text,
+.osmea-tab-panel .form-table input[type="number"],
+.osmea-tab-panel .form-table .osmea-field-color-text {
+    width: 25em;
+    max-width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--osmea-radius);
+    border: 1px solid var(--osmea-gray-300);
+    font-size: 14px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.osmea-tab-panel .form-table input[type="number"] {
+    width: 8em;
+}
+
+.osmea-tab-panel .form-table input.regular-text:focus,
+.osmea-tab-panel .form-table input[type="number"]:focus,
+.osmea-tab-panel .form-table .osmea-field-color-text:focus {
+    border-color: var(--osmea-primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+.osmea-tab-panel .form-table select {
+    min-width: 14em;
+    padding: 8px 12px;
+    border-radius: var(--osmea-radius);
+    border: 1px solid var(--osmea-gray-300);
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.osmea-tab-panel .form-table select:focus {
+    border-color: var(--osmea-primary);
+    outline: none;
+}
+
+.osmea-tab-panel .form-table label {
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.osmea-tab-panel .form-table .osmea-field-boolean {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--osmea-primary);
+}
+
+/* Color picker: compact, readable */
+.osmea-color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.osmea-field-color-pick {
+    width: 44px;
+    height: 34px;
+    padding: 3px;
+    border: 1px solid var(--osmea-gray-300);
+    border-radius: var(--osmea-radius);
+    cursor: pointer;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.osmea-field-color-pick:hover {
+    border-color: var(--osmea-primary);
+}
+
+.osmea-field-color-pick::-webkit-color-swatch-wrapper { padding: 2px; }
+.osmea-field-color-pick::-webkit-color-swatch { border-radius: 4px; border: 1px solid var(--osmea-gray-300); }
+
+.osmea-field-color-text {
+    flex: 1;
+    min-width: 100px;
+    max-width: 12em;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+}
+
+/* Image URL fields: preview */
+.osmea-image-url-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.osmea-image-url-row .regular-text {
+    flex: 1;
+    min-width: 200px;
+}
+
+.osmea-image-preview-wrap {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--osmea-gray-200);
+    border-radius: var(--osmea-radius);
+    overflow: hidden;
+    background: var(--osmea-gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.osmea-image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.osmea-image-preview.osmea-image-preview-fail {
+    min-width: 24px;
+    min-height: 24px;
+    background: var(--osmea-gray-200);
+}
+
+.osmea-image-preview[src=""],
+.osmea-image-preview.osmea-image-preview-fail {
+    opacity: 0.35;
+}
+
+/* Clickable image preview: full-size popup */
+.osmea-image-preview-clickable {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.osmea-image-preview-clickable:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.osmea-image-preview-clickable:focus {
+    outline: 2px solid var(--osmea-primary);
+    outline-offset: 2px;
+}
+
+/* Full-size image popup (lightbox) */
+.osmea-image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.osmea-image-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.osmea-image-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+}
+
+.osmea-image-lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+
+.osmea-image-lightbox-img {
+    max-width: 100%;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--osmea-radius);
+    box-shadow: var(--osmea-shadow-xl);
+}
+
+.osmea-image-lightbox-close {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    font-size: 24px;
+    line-height: 1;
+    color: #fff;
+    background: var(--osmea-gray-800);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.osmea-image-lightbox-close:hover {
+    background: var(--osmea-error);
+    transform: scale(1.05);
+}
+
+/* Save area: clear separation from config card */
+.osmea-config-wrap .submit {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--osmea-gray-200);
 }
 
 /* Submit Button Enhancement */
@@ -427,19 +1107,27 @@ body.wp-admin .osmea-config-wrap .submit .button-primary:active,
         padding: 0 12px;
     }
 
-    .osmea-config-header {
-        padding: 20px;
-        margin: 16px 0;
+    .osmea-config-layout {
+        flex-direction: column;
+    }
+
+    .osmea-config-footer {
+        width: 100%;
     }
 
     .osmea-config-actions {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row !important;
+        flex-wrap: wrap;
     }
 
     .osmea-config-actions .button {
-        width: 100%;
-        justify-content: center;
+        flex: 1 1 auto;
+        min-width: 120px;
+    }
+
+    .osmea-config-header {
+        padding: 20px;
+        margin: 16px 0;
     }
 
     .osmea-json-editor {
@@ -452,8 +1140,12 @@ body.wp-admin .osmea-config-wrap .submit .button-primary:active,
         padding: 16px 20px;
     }
 
-    .osmea-config-wrap .form-table {
-        padding: 16px;
+    .osmea-tab-panel .form-table th {
+        width: 140px;
+        padding: 12px 12px 12px 16px;
+    }
+    .osmea-tab-panel .form-table td {
+        padding: 12px 16px 12px 0;
     }
 }
 

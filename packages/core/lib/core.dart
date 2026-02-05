@@ -179,6 +179,9 @@ export 'package:core/src/helper/animation_helper.dart';
 // 🔐 Exports the combined auth view (Sign In + Sign Up with TabBar)
 export 'package:core/src/views/auth/auth_view.dart';
 
+// 🔐 Exports the forgot password page (full-page, no popup)
+export 'package:core/src/views/auth/forgot_password_view.dart';
+
 // 🔐 Exports the auth design variant enum
 export 'package:core/src/views/auth/enums/auth_design_variant.dart';
 

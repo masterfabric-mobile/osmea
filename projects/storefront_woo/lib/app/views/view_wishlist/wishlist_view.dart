@@ -65,7 +65,7 @@ class WishlistView
     Map<String, dynamic>? arguments,
   }) : super(
          arguments: arguments ?? const {'saved': true},
-         coreAppBar: (context, cubit) => PreferredSize(
+         coreAppBar: (BuildContext context, WishlistViewModel cubit) => PreferredSize(
            preferredSize: Size.fromHeight(kToolbarHeight),
            child: BlocBuilder<WishlistViewModel, WishlistState>(
              bloc: cubit,
@@ -139,46 +139,72 @@ class WishlistView
                    backgroundColor: OsmeaColors.transparent,
                  ),
                  actions: [
-                  
+                   // Add collection button
+                   AppBarAction(
+                     icon: Icon(Icons.add, color: iconColor),
+                     onPressed: () => _showCreateCollectionDialog(context, cubit),
+                     tooltip: 'Create new collection',
+                   ),
                    if (hasItems)
                      AppBarAction(
                        icon: Icon(Icons.delete_outline, color: iconColor),
-                       onPressed: () async {
-                         final confirmed = await OsmeaComponents.showPopup<bool>(
-                           context: context,
-                           variant: PopupVariant.dialog,
-                           title: context.t.wishlistView.removeAll.dialog.title,
-                           subtitle: context.t.wishlistView.removeAll.dialog.subtitle,
-                           padding: context.paddingNormal,
-                           child: OsmeaComponents.column(
-                             mainAxisSize: MainAxisSize.min,
-                             children: [
-                               OsmeaComponents.row(
-                                 children: [
-                                   OsmeaComponents.expanded(
-                                     child: OsmeaComponents.button(
-                                       text: context.t.wishlistView.removeAll.dialog.cancel,
-                                       variant: ButtonVariant.outlined,
-                                       onPressed: () =>
-                                           Navigator.of(context).pop(false),
-                                     ),
-                                   ),
-                                   OsmeaComponents.sizedBox(
-                                     width: context.spacing8,
-                                   ),
-                                   OsmeaComponents.expanded(
-                                     child: OsmeaComponents.button(
-                                       text: context.t.wishlistView.removeAll.dialog.confirm,
-                                       variant: ButtonVariant.primary,
-                                       onPressed: () =>
-                                           Navigator.of(context).pop(true),
-                                     ),
-                                   ),
-                                 ],
-                               ),
-                             ],
-                           ),
-                         );
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (dialogContext) => OsmeaComponents.popup(
+                            variant: PopupVariant.dialog,
+                            title: context.t.wishlistView.removeAll.dialog.title,
+                            subtitle: context.t.wishlistView.removeAll.dialog.subtitle,
+                            padding: context.paddingNormal,
+                            backgroundColor: OsmeaColors.white,
+                            titleStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                              color: OsmeaColors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            subtitleStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                              color: OsmeaColors.black,
+                            ),
+                            showCloseButton: true,
+                            closeButtonIcon: Icon(
+                              Icons.close,
+                              color: OsmeaColors.black,
+                              size: 20,
+                            ),
+                            child: OsmeaComponents.column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                OsmeaComponents.row(
+                                  children: [
+                                    OsmeaComponents.expanded(
+                                      child: OsmeaComponents.button(
+                                        text: context.t.wishlistView.removeAll.dialog.cancel,
+                                        variant: ButtonVariant.outlined,
+                                        borderColor: OsmeaColors.black,
+                                        textColor: OsmeaColors.black,
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(false),
+                                      ),
+                                    ),
+                                    OsmeaComponents.sizedBox(
+                                      width: context.spacing8,
+                                    ),
+                                    OsmeaComponents.expanded(
+                                      child: OsmeaComponents.button(
+                                        text: context.t.wishlistView.removeAll.dialog.confirm,
+                                        variant: ButtonVariant.primary,
+                                        backgroundColor: OsmeaColors.black,
+                                        textColor: OsmeaColors.white,
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(true),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
 
                          if (confirmed == true) {
                            final previousState = state is WishlistLoadedState
@@ -186,7 +212,7 @@ class WishlistView
                                : null;
                            final previousItems = previousState?.items ?? [];
 
-                           cubit.clearAll();
+                           await cubit.clearAll();
 
                            if (previousItems.isNotEmpty) {
                              context.showSnackbar(
@@ -252,9 +278,20 @@ class WishlistView
     }
 
     if (state is WishlistSuccessState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.snackbarSuccess(state.message);
-      });
+      // Don't show snackbar on favorites/saved page - it's already shown in ProductCardWidget
+      // Only show snackbar if it's not the initial page load
+      final currentRoute = GoRouterState.of(context).uri.path;
+      final isOnSavedPage = currentRoute.contains('/saved') || 
+                           currentRoute.contains('/wishlist') || 
+                           currentRoute.contains('/favorites');
+      
+      // Only show snackbar if we're not on the saved page (to avoid duplicate snackbars)
+      if (!isOnSavedPage) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.snackbarSuccess(state.message);
+        });
+      }
+      
       return WishlistListWidget(
         items: state.previousState.items,
         viewModel: viewModel,
@@ -296,6 +333,7 @@ class WishlistView
           ).copyWith(color: popupSubtitleColor),
           elevation: popupElevation,
           padding: context.paddingNormal,
+          showCloseButton: true,
           child: OsmeaComponents.column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -410,6 +448,103 @@ class WishlistView
     return WishlistListWidget(
       items: const <WishlistItem>[],
       viewModel: viewModel,
+    );
+  }
+
+  /// Show dialog for creating a new wishlist collection
+  static void _showCreateCollectionDialog(
+    BuildContext context,
+    WishlistViewModel viewModel,
+  ) {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Create New Collection',
+          style: OsmeaTextStyle.titleLarge(context).copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Collection Name',
+                    hintText: 'Enter collection name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Collection name is required';
+                    }
+                    return null;
+                  },
+                  autofocus: true,
+                ),
+                SizedBox(height: context.spacing16),
+                TextFormField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description (Optional)',
+                    hintText: 'Enter collection description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancel',
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.black,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState?.validate() ?? false) {
+                Navigator.of(context).pop();
+                await viewModel.createGroup(
+                  nameController.text.trim(),
+                  description: descriptionController.text.trim().isEmpty
+                      ? null
+                      : descriptionController.text.trim(),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: OsmeaColors.black,
+              foregroundColor: OsmeaColors.white,
+            ),
+            child: Text(
+              'Create',
+              style: OsmeaTextStyle.bodyMedium(context).copyWith(
+                color: OsmeaColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

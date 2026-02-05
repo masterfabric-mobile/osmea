@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_product_detail/models/product_detail_view_model.dart';
-import 'package:storefront_woo/gen/translations.g.dart';
+import 'package:storefront_woo/app/views/view_product_detail/models/module/states.dart';
 
 /// Modern widget for displaying product images with carousel and overlay actions
 class ProductImagesWidget extends StatefulWidget {
@@ -37,11 +37,22 @@ class ProductImagesWidget extends StatefulWidget {
 class _ProductImagesWidgetState extends State<ProductImagesWidget> {
   late PageController _pageController;
   int _currentPage = 0;
+  late bool _localIsInWishlist; // Local state for immediate UI feedback
 
   @override
   void initState() {
     super.initState();
+    _localIsInWishlist = widget.isInWishlist; // Initialize from prop
     _pageController = PageController();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductImagesWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sync local state with prop when it changes from parent
+    if (oldWidget.isInWishlist != widget.isInWishlist) {
+      _localIsInWishlist = widget.isInWishlist;
+    }
   }
 
   @override
@@ -217,7 +228,15 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () => widget.viewModel.addProductToWishlistFire(widget.productId),
+                      onTap: () {
+                        // Immediately update local state for instant UI feedback
+                        setState(() {
+                          _localIsInWishlist = !_localIsInWishlist;
+                        });
+                        
+                        // Call the viewModel callback - it will show the success snackbar
+                        widget.viewModel.addProductToWishlistFire(widget.productId);
+                      },
                       borderRadius: BorderRadius.circular(20),
                       child: OsmeaComponents.container(
                         width: 40,
@@ -228,7 +247,7 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                         ),
                         child: OsmeaComponents.center(
                           child: Icon(
-                            widget.isInWishlist
+                            _localIsInWishlist
                                 ? Icons.favorite
                                 : Icons.favorite_outline,
                             color: OsmeaColors.black,
@@ -238,31 +257,199 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                       ),
                     ),
                   ),
-                  OsmeaComponents.sizedBox(height: context.spacing6),
-                  // Share button - elegant
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _shareProduct(context),
-                      borderRadius: BorderRadius.circular(20),
-                      child: OsmeaComponents.container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: OsmeaColors.white.withValues(alpha: 0.9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: OsmeaComponents.center(
-                          child: Icon(
-                            Icons.share_outlined,
+                ],
+              ),
+            ),
+
+          // Badges on product detail (same style as cards)
+          if (widget.withOverlays)
+            Positioned(
+              left: context.spacing12,
+              top: context.spacing12,
+              child: Builder(
+                builder: (context) {
+                  final configHelper = AssetConfigHelper();
+                  final state = widget.viewModel.state;
+                  if (state is! ProductDetailLoadedState) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final product = state.product;
+                  final productId = product.id ?? widget.productId;
+                  final onSale = product.onSale == true;
+
+                  // Week Star (ONLY config products)
+                  final weekStarConfig =
+                      configHelper.getObject('product_card.badges.week_star') ??
+                          const {};
+                  final weekStarIds =
+                      (weekStarConfig['product_ids'] as List<dynamic>?) ??
+                          const [];
+                  final weekStarIdSet = weekStarIds
+                      .map((e) => int.tryParse(e.toString()) ?? -1)
+                      .where((id) => id > 0)
+                      .toSet();
+                  final showWeekStar = weekStarIdSet.isNotEmpty &&
+                      weekStarIdSet.contains(productId);
+
+                  // Flash badge (only if discount >= config threshold)
+                  final flashEnabled = configHelper.getBool(
+                    'product_card.badges.flash_sale.enabled',
+                    true,
+                  );
+                  final flashMinDiscount = configHelper.getInt(
+                    'product_card.badges.flash_sale.min_discount_percent',
+                    0,
+                  );
+                  final flashLabel = configHelper.getString(
+                    'product_card.badges.flash_sale.label',
+                    'FLASH',
+                  );
+                  int? discountPct;
+                  try {
+                    final prices = product.prices;
+                    final rp = PriceInfoCurrencyHelper.parsePriceToDouble(
+                      prices?.regularPrice,
+                      currencyCode: prices?.currencyCode,
+                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator: prices?.currencyThousandSeparator,
+                      currencyMinorUnit: prices?.currencyMinorUnit,
+                    );
+                    final sp = PriceInfoCurrencyHelper.parsePriceToDouble(
+                      prices?.salePrice,
+                      currencyCode: prices?.currencyCode,
+                      currencyDecimalSeparator: prices?.currencyDecimalSeparator,
+                      currencyThousandSeparator: prices?.currencyThousandSeparator,
+                      currencyMinorUnit: prices?.currencyMinorUnit,
+                    );
+                    if (rp != null && sp != null && rp > 0 && sp < rp) {
+                      discountPct = (((rp - sp) / rp) * 100).round();
+                    }
+                  } catch (_) {
+                    // ignore
+                  }
+
+                  // If both apply, only show Week Star.
+                  final showFlash = flashEnabled &&
+                      onSale &&
+                      !showWeekStar &&
+                      discountPct != null &&
+                      discountPct >= flashMinDiscount;
+
+                  if (!showWeekStar && !showFlash) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showWeekStar)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.spacing10,
+                            vertical: context.spacing4,
+                          ),
+                          decoration: BoxDecoration(
                             color: OsmeaColors.black,
-                            size: 20,
+                            borderRadius: BorderRadius.circular(
+                              context.spacing6,
+                            ),
+                            border: Border.all(
+                              color: OsmeaColors.white,
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    OsmeaColors.black.withValues(alpha: 0.12),
+                                blurRadius: context.blurRadius8,
+                                offset: context.offsetVerticalCustom(
+                                  context.spacing2,
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: OsmeaComponents.row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                size: context.iconSizeExtraSmall,
+                                color: OsmeaColors.white,
+                              ),
+                              OsmeaComponents.sizedBox(
+                                width: context.spacing4,
+                              ),
+                              OsmeaComponents.text(
+                                'WEEK STAR',
+                                textStyle:
+                                    OsmeaTextStyle.bodySmall(context).copyWith(
+                                  color: OsmeaColors.white,
+                                  fontSize: context.fontSizeExtraSmall * 0.82,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.0,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
+                      if (showWeekStar)
+                        OsmeaComponents.sizedBox(height: context.spacing4),
+                      if (showFlash)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.spacing10,
+                            vertical: context.spacing4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: OsmeaColors.white,
+                            borderRadius: BorderRadius.circular(
+                              context.spacing6,
+                            ),
+                            border: Border.all(
+                              color: OsmeaColors.black,
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    OsmeaColors.black.withValues(alpha: 0.08),
+                                blurRadius: context.blurRadius8,
+                                offset: context.offsetVerticalCustom(
+                                  context.spacing2,
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: OsmeaComponents.row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.flash_on_rounded,
+                                size: context.iconSizeExtraSmall,
+                                color: OsmeaColors.black,
+                              ),
+                              OsmeaComponents.sizedBox(
+                                width: context.spacing4,
+                              ),
+                              OsmeaComponents.text(
+                                flashLabel,
+                                textStyle:
+                                    OsmeaTextStyle.bodySmall(context).copyWith(
+                                  color: OsmeaColors.black,
+                                  fontSize: context.fontSizeExtraSmall * 0.82,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.0,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
         ],
@@ -292,33 +479,6 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
     }
     
     return OsmeaColors.white;
-  }
-
-  /// Shares product information
-  Future<void> _shareProduct(BuildContext context) async {
-    try {
-      final name = widget.productName ?? 'Product';
-      final shareText = '$name\n\n/product-detail/${widget.productId}';
-      
-      final success = await ApplicationShareHelper.shareText(
-        shareText,
-        subject: name,
-      );
-      
-      if (success) {
-        debugPrint('✅ Product shared successfully: $name');
-      } else {
-        debugPrint('⚠️ Failed to share product');
-        if (context.mounted) {
-          context.snackbarError(context.t.productDetailView.share.failed);
-        }
-      }
-    } catch (e) {
-      debugPrint('❌ Error sharing product: $e');
-      if (context.mounted) {
-        context.snackbarError(context.t.productDetailView.share.error);
-      }
-    }
   }
 }
 

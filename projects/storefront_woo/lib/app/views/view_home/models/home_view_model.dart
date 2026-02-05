@@ -162,13 +162,28 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
       debugPrint('🛍️ API Version: $apiVersion');
       debugPrint('🛍️ Page: $_currentPage, Per Page: $_productsPerPage');
 
-      final products = await _productService.listAllProducts(
-        apiVersion: apiVersion,
-        page: _currentPage,
-        perPage: _productsPerPage,
-        status: 'publish',
-        stockStatus: 'instock',
-      );
+      List<ListAllProductsResponseModel> products;
+      try {
+        // Primary attempt (preferred filters)
+        products = await _productService.listAllProducts(
+          apiVersion: apiVersion,
+          page: _currentPage,
+          perPage: _productsPerPage,
+          status: 'publish',
+          stockStatus: 'instock',
+        );
+      } catch (e) {
+        // Some hosts (often behind Cloudflare) intermittently 5xx on filtered queries.
+        // Fallback to a minimal query to keep the app usable.
+        debugPrint(
+          '⚠️ loadProducts primary query failed, retrying with minimal query. Error: $e',
+        );
+        products = await _productService.listAllProducts(
+          apiVersion: apiVersion,
+          page: _currentPage,
+          perPage: _productsPerPage,
+        );
+      }
 
       debugPrint('🛍️ API Response received: ${products.length} products');
       if (products.isNotEmpty) {
@@ -279,13 +294,25 @@ class HomeViewModel extends BaseViewModelHydratedCubit<HomeState> {
         'woocommerce_configuration.version',
         'v1',
       );
-      final products = await _productService.listAllProducts(
-        apiVersion: apiVersion,
-        page: _currentPage,
-        perPage: _productsPerPage,
-        status: 'publish',
-        stockStatus: 'instock',
-      );
+      List<ListAllProductsResponseModel> products;
+      try {
+        products = await _productService.listAllProducts(
+          apiVersion: apiVersion,
+          page: _currentPage,
+          perPage: _productsPerPage,
+          status: 'publish',
+          stockStatus: 'instock',
+        );
+      } catch (e) {
+        debugPrint(
+          '⚠️ loadMoreProducts primary query failed, retrying with minimal query. Error: $e',
+        );
+        products = await _productService.listAllProducts(
+          apiVersion: apiVersion,
+          page: _currentPage,
+          perPage: _productsPerPage,
+        );
+      }
 
       _products.addAll(products);
       _allProducts.addAll(products); // Add to all products cache
