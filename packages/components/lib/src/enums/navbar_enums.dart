@@ -77,7 +77,7 @@ enum NavbarSize {
 /// - `retailMain`: E-commerce/Retail main navigation with brand colors
 /// - `dottedOutline`: Creative dotted border navigation
 /// - `healthcareMinimal`: Healthcare minimal with clean borders
-/// - `outlinedMinimal`: Clean outlined navigation
+/// - `outlinedMinimal`: Pill-shaped hamburger navbar
 /// - `mediaOverlay`: Floating overlay navigation
 /// - `socialGlass`: Frosted glass effect navigation
 /// - `enterpriseMain`: Enterprise/B2B main navigation
@@ -134,13 +134,14 @@ enum NavbarVariant {
   /// - Sectors: Healthcare, Medical, Hospital, Clinic, Health & Wellness
   healthcareMinimal,
 
-  /// 🪟 **Outlined Minimal** - Clean outlined navigation with minimal fill
-  /// - Background: Transparent with subtle hover fill
-  /// - Text: Dark/Light adaptive
-  /// - Border: Thin solid border (1px)
-  /// - Active: Border highlight + subtle fill
-  /// - Use for: Minimalist apps, Professional tools, Documentation sites
-  /// - Sectors: Tech, Professional, Documentation
+  /// 🍔 **Outlined Minimal** - Border'lı açık renkli pill-shaped navbar
+  /// - Background: Açık tonlu aktif renk (alpha: 0.1)
+  /// - Text: Aktif olduğunda renkli, pasif olduğunda gri
+  /// - Border: 0.5px border sadece aktif item'da
+  /// - Active: Hafif renkli arkaplan + border
+  /// - Border Radius: 100px (full pill/capsule shape)
+  /// - Use for: Modern apps, Mobile navigation, Subtle emphasis
+  /// - Sectors: Modern UI, Mobile Apps, Social Media, Consumer Apps
   outlinedMinimal,
 
   /// 🎬 **Media Overlay** - Media/Entertainment floating overlay navigation
@@ -185,14 +186,42 @@ enum NavbarVariant {
   /// - Sectors: Lifestyle, Finance, Productivity, Social
   floatingCards,
 
-  /// 🎯 **Pill Shaped** - Pill/capsule shaped navigation items
-  /// - Background: Light/Dark adaptive
-  /// - Text: Adaptive contrast
-  /// - Border: None (pill shape defines boundary)
-  /// - Active: Filled pill with accent color
-  /// - Use for: iOS-style apps, Modern mobile apps, Clean interfaces
-  /// - Sectors: All sectors (modern design)
+  /// 🎯 **Pill Shaped** - Solid fill pill-shaped navbar (minimal style)
+  /// - Background: Solid aktif renk
+  /// - Text: Beyaz aktif, renkli pasif
+  /// - Border: None
+  /// - Active: Tam renk dolgusu
+  /// - Border Radius: 100px (full pill/capsule shape)
+  /// - Use for: Modern apps, Bold navigation, Clean design
+  /// - Sectors: Modern UI, E-commerce, Social Media
   pillShaped,
+
+  /// 🎯 **Minimal** - Minimal navbar with only icon color change
+  /// - Background: Transparent
+  /// - Text: Sadece aktif icon renkli, pasif gri
+  /// - Border: None
+  /// - Active: Only icon color changes
+  /// - Use for: Ultra minimal apps, Clean interfaces, Subtle navigation
+  /// - Sectors: Minimal UI, Professional Apps
+  minimal,
+
+  /// 🎨 **Solid Outlined** - Solid background with border
+  /// - Background: Aktif renk (solid fill)
+  /// - Text: Beyaz
+  /// - Border: 0.5px border
+  /// - Active: Solid color background + border
+  /// - Use for: Bold navigation, Modern apps
+  /// - Sectors: Modern UI, Mobile Apps
+  solidOutlined,
+
+  /// ⭕ **Minimal Dot** - Minimal with dot indicator
+  /// - Background: Transparent
+  /// - Text: Renkli icon
+  /// - Border: None
+  /// - Active: Small dot indicator below icon
+  /// - Use for: Clean minimal apps, iOS style
+  /// - Sectors: iOS Apps, Minimal Design
+  minimalDot,
 
   /// ⬛ **Brutalist** - Bold brutalist design with harsh edges
   /// - Background: Solid black/white contrast

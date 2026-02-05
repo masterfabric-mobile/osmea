@@ -332,6 +332,9 @@ extension NavbarVariantExtension on NavbarVariant {
       case NavbarVariant.enterpriseMain:
       case NavbarVariant.iconGrid:
       case NavbarVariant.pillShaped:
+      case NavbarVariant.minimal:
+      case NavbarVariant.solidOutlined:
+      case NavbarVariant.minimalDot:
       case NavbarVariant.brutalist:
       case NavbarVariant.badgeIndicator:
       case NavbarVariant.neumorphic:
