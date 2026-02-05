@@ -9,6 +9,8 @@ import 'package:core/core.dart'
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the enum
@@ -238,49 +240,53 @@ class ProductDetailView
   Widget _buildPriceDisplay(BuildContext context, Product product) {
     final hasDiscount = product.hasDiscount;
 
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.row(
+    return BlocBuilder<CurrencyCubit, String>(
+      builder: (context, currency) {
+        return OsmeaComponents.column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (hasDiscount) ...[
-              OsmeaComponents.text(
-                '\$${product.price.toStringAsFixed(2)}',
-                textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  decoration: TextDecoration.lineThrough,
-                  color: Colors.grey[600],
+            OsmeaComponents.row(
+              children: [
+                if (hasDiscount) ...[
+                  OsmeaComponents.text(
+                    PriceHelper.format(product.price, currency, Localizations.localeOf(context).toString()),
+                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                  OsmeaComponents.sizedBox(width: 8),
+                ],
+                OsmeaComponents.text(
+                  PriceHelper.format(product.effectivePrice, currency, Localizations.localeOf(context).toString()),
+                  textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            if (hasDiscount && product.discountPercentage != null) ...[
+              OsmeaComponents.sizedBox(height: 4),
+              OsmeaComponents.container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF000000),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: OsmeaComponents.text(
+                  'SALE -${product.discountPercentage!.toStringAsFixed(0)}%',
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              OsmeaComponents.sizedBox(width: 8),
             ],
-            OsmeaComponents.text(
-              '\$${product.effectivePrice.toStringAsFixed(2)}',
-              textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ],
-        ),
-        if (hasDiscount && product.discountPercentage != null) ...[
-          OsmeaComponents.sizedBox(height: 4),
-          OsmeaComponents.container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF000000),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: OsmeaComponents.text(
-              'SALE -${product.discountPercentage!.toStringAsFixed(0)}%',
-              textStyle: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ],
+        );
+      },
     );
   }
 

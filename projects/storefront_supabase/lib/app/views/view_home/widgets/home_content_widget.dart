@@ -4,6 +4,9 @@ import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/app/views/view_home/models/states.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class HomeContentWidget extends StatefulWidget {
@@ -330,27 +333,30 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                         ),
                   ),
                   OsmeaComponents.sizedBox(height: 4),
-                  OsmeaComponents.row(
-                    children: [
-                      if (hasDiscount) ...[
-                        OsmeaComponents.text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          textStyle:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                  BlocBuilder<CurrencyCubit, String>(
+                    builder: (context, currency) {
+                      return OsmeaComponents.row(
+                        children: [
+                          if (hasDiscount) ...[
+                            OsmeaComponents.text(
+                              PriceHelper.format(product.price, currency, Localizations.localeOf(context).toString()),
+                              textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     decoration: TextDecoration.lineThrough,
                                     color: Colors.grey[600],
                                   ),
-                        ),
-                        OsmeaComponents.sizedBox(width: 4),
-                      ],
-                      OsmeaComponents.text(
-                        '\$${product.effectivePrice.toStringAsFixed(2)}',
-                        textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF000000),
-                              fontWeight: FontWeight.bold,
                             ),
-                      ),
-                    ],
+                            OsmeaComponents.sizedBox(width: 4),
+                          ],
+                          OsmeaComponents.text(
+                            PriceHelper.format(product.effectivePrice, currency, Localizations.localeOf(context).toString()),
+                            textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFF000000),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -428,28 +434,30 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                           ),
                     ),
                     OsmeaComponents.sizedBox(height: 8),
-                    OsmeaComponents.row(
-                      children: [
-                        if (hasDiscount) ...[
-                          OsmeaComponents.text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            textStyle:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                    BlocBuilder<CurrencyCubit, String>(
+                      builder: (context, currency) {
+                        return OsmeaComponents.row(
+                          children: [
+                            if (hasDiscount) ...[
+                              OsmeaComponents.text(
+                                PriceHelper.format(product.price, currency, Localizations.localeOf(context).toString()),
+                                textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       decoration: TextDecoration.lineThrough,
                                       color: Colors.grey[600],
                                     ),
-                          ),
-                          OsmeaComponents.sizedBox(width: 8),
-                        ],
-                        OsmeaComponents.text(
-                          '\$${product.effectivePrice.toStringAsFixed(2)}',
-                          textStyle:
-                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                              ),
+                              OsmeaComponents.sizedBox(width: 8),
+                            ],
+                            OsmeaComponents.text(
+                              PriceHelper.format(product.effectivePrice, currency, Localizations.localeOf(context).toString()),
+                              textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                                     color: const Color(0xFF000000),
                                     fontWeight: FontWeight.bold,
                                   ),
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

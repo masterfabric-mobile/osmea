@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
@@ -62,6 +63,16 @@ class SettingsView
             leading: const Icon(Icons.language),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageSheet(context),
+          ),
+          BlocBuilder<CurrencyCubit, String>(
+            builder: (context, currency) {
+              return OsmeaComponents.listItem(
+                title: OsmeaComponents.text('Currency ($currency)'),
+                leading: const Icon(Icons.attach_money),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showCurrencySheet(context),
+              );
+            },
           ),
         ],
       );
@@ -130,6 +141,48 @@ class SettingsView
                 countryCode: locale.countryCode,
               );
               LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCurrencySheet(BuildContext context) {
+    OsmeaComponents.bottomSheet(
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OsmeaComponents.listItem(
+            leading: const Text('🇺🇸'),
+            title: const Text('USD'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('USD');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇪🇺'),
+            title: const Text('EUR'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('EUR');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇹🇷'),
+            title: const Text('TRY'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('TRY');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇬🇧'),
+            title: const Text('GBP'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('GBP');
               Navigator.pop(context);
             },
           ),

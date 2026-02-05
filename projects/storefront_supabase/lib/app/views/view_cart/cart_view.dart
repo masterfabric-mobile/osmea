@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/models/cart_item.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'models/view_model.dart';
@@ -144,9 +147,16 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
             OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                OsmeaComponents.text(
-                  '\$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                  textStyle: Theme.of(context).textTheme.titleMedium,
+                BlocBuilder<CurrencyCubit, String>(
+                  builder: (context, currency) {
+                    return OsmeaComponents.text(
+                      PriceHelper.format(
+                          item.product.price * item.quantity,
+                          currency,
+                          Localizations.localeOf(context).toString()),
+                      textStyle: Theme.of(context).textTheme.titleMedium,
+                    );
+                  },
                 ),
                 OsmeaComponents.sizedBox(height: 4),
                 OsmeaComponents.textButton(
@@ -183,8 +193,13 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               OsmeaComponents.text('${context.resources.total}:', textStyle: Theme.of(context).textTheme.headlineSmall),
-              OsmeaComponents.text('\$${totalPrice.toStringAsFixed(2)}',
-                  textStyle: Theme.of(context).textTheme.headlineSmall),
+              BlocBuilder<CurrencyCubit, String>(
+                builder: (context, currency) {
+                  return OsmeaComponents.text(
+                      PriceHelper.format(totalPrice, currency, Localizations.localeOf(context).toString()),
+                      textStyle: Theme.of(context).textTheme.headlineSmall);
+                },
+              ),
             ],
           ),
           OsmeaComponents.sizedBox(height: 16),

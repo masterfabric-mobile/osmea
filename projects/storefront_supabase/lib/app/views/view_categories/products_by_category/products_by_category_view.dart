@@ -1,5 +1,8 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_categories/products_by_category/states.dart';
 import 'package:storefront_supabase/app/views/view_categories/products_by_category/view_model.dart';
@@ -175,15 +178,23 @@ class ProductsByCategoryView
                                           ),
                                     ),
                                     OsmeaComponents.sizedBox(height: 4),
-                                    OsmeaComponents.text(
-                                      '\$${product.price.toStringAsFixed(2)}',
-                                      textStyle: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: const Color(0xFF000000),
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    BlocBuilder<CurrencyCubit, String>(
+                                      builder: (context, currency) {
+                                        return OsmeaComponents.text(
+                                          PriceHelper.format(
+                                              product.price,
+                                              currency,
+                                              Localizations.localeOf(context)
+                                                  .toString()),
+                                          textStyle: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: const Color(0xFF000000),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),

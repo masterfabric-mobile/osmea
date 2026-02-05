@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/models/order.dart';
@@ -75,22 +78,39 @@ class AdminDashboardView
 
   Widget _buildStatsGrid(BuildContext context, AdminDashboardLoadedState state) {
     final resources = context.resources;
-    final formatCurrency = NumberFormat.simpleCurrency(locale: 'en_US'); // locale should be dynamic
+    // final formatCurrency = NumberFormat.simpleCurrency(locale: 'en_US'); // locale should be dynamic -- Removing this line as per PriceHelper usage
     return LayoutBuilder(
       builder: (context, constraints) {
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: constraints.maxWidth > 600 ? 4 : 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
-          children: [
-            _buildStatCard(context, resources.totalRevenue, formatCurrency.format(state.totalRevenue), Icons.monetization_on, Colors.green),
-            _buildStatCard(context, resources.totalOrders, state.orderCount.toString(), Icons.shopping_cart, Colors.orange),
-            _buildStatCard(context, resources.totalUsers, state.userCount.toString(), Icons.people, Colors.blue),
-            _buildStatCard(context, resources.totalProducts, state.productCount.toString(), Icons.inventory_2, Colors.purple),
-          ],
+        return BlocBuilder<CurrencyCubit, String>(
+          builder: (context, currency) {
+            return GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: constraints.maxWidth > 600 ? 4 : 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.5,
+              children: [
+                _buildStatCard(
+                    context,
+                    resources.totalRevenue,
+                    PriceHelper.format(state.totalRevenue, currency,
+                        Localizations.localeOf(context).toString()),
+                    Icons.monetization_on,
+                    Colors.green),
+                _buildStatCard(context, resources.totalOrders,
+                    state.orderCount.toString(), Icons.shopping_cart, Colors.orange),
+                _buildStatCard(context, resources.totalUsers,
+                    state.userCount.toString(), Icons.people, Colors.blue),
+                _buildStatCard(
+                    context,
+                    resources.totalProducts,
+                    state.productCount.toString(),
+                    Icons.inventory_2,
+                    Colors.purple),
+              ],
+            );
+          },
         );
       },
     );
@@ -153,7 +173,12 @@ class AdminDashboardView
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OsmeaComponents.text(NumberFormat.simpleCurrency(locale: 'en_US').format(order.total)),
+                BlocBuilder<CurrencyCubit, String>(
+                  builder: (context, currency) {
+                    return OsmeaComponents.text(PriceHelper.format(order.total,
+                        currency, Localizations.localeOf(context).toString()));
+                  },
+                ),
                 OsmeaComponents.text(order.status, textStyle: TextStyle(color: _getStatusColor(order.status))),
               ],
             ),

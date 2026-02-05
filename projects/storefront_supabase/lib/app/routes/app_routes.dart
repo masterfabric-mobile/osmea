@@ -74,6 +74,12 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: '/auth',
+          builder: (BuildContext context, GoRouterState state) {
+            return ProfileView(goRoute: (String path) => context.go(path));
+          },
+        ),
+        GoRoute(
           path: '/home',
           builder: (BuildContext context, GoRouterState state) =>
               SupabaseHomeView(goRoute: (String path) => context.go(path)),

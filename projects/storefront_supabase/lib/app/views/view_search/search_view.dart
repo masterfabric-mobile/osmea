@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide SearchState, BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -100,7 +103,12 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
                 errorWidget: const Icon(Icons.error),
               ),
               title: OsmeaComponents.text(product.name),
-              subtitle: OsmeaComponents.text('\$${product.price.toStringAsFixed(2)}'),
+              subtitle: BlocBuilder<CurrencyCubit, String>(
+                builder: (context, currency) {
+                  return OsmeaComponents.text(PriceHelper.format(product.price,
+                      currency, Localizations.localeOf(context).toString()));
+                },
+              ),
               onTap: () {
                 goRoute('/product-detail/${product.id}');
               },

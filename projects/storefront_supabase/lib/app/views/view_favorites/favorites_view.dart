@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
@@ -139,12 +142,18 @@ class FavoritesView
                                 ),
                           ),
                           OsmeaComponents.sizedBox(height: 8),
-                          OsmeaComponents.text(
-                            '\$${product.effectivePrice.toStringAsFixed(2)}',
-                            textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          BlocBuilder<CurrencyCubit, String>(
+                            builder: (context, currency) {
+                              return OsmeaComponents.text(
+                                PriceHelper.format(product.effectivePrice, currency,
+                                    Localizations.localeOf(context).toString()),
+                                textStyle:
+                                    Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                              );
+                            },
                           ),
                         ],
                       ),

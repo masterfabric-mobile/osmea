@@ -75,12 +75,19 @@ class SignupFormWidget extends StatelessWidget {
           backgroundColor: OsmeaColors.black,
           textColor: OsmeaColors.white,
         ),
-        OsmeaComponents.sizedBox(height: 16),
-        OsmeaComponents.textButton(
-          text: resources.alreadyHaveAccount,
-          onPressed: onSwitchToLogin,
-        ),
-      ],
-    );
-  }
-}
+                OsmeaComponents.sizedBox(height: 16),
+                GestureDetector(
+                  onTap: onSwitchToLogin,
+                  child: OsmeaComponents.text(
+                    resources.alreadyHaveAccount,
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        }
+        
