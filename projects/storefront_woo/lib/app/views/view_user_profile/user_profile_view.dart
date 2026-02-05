@@ -93,12 +93,6 @@ class UserProfileView
           _buildSectionHeader(context, 'Account'),
           _buildMenuItem(
             context,
-            'Edit Profile',
-            Icons.edit_outlined,
-            () => context.go('/user-profile/edit'),
-          ),
-          _buildMenuItem(
-            context,
             'Addresses',
             Icons.location_on_outlined,
             () => context.go('/user-profile/addresses'),

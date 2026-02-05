@@ -22,7 +22,6 @@ import 'package:storefront_woo/app/views/view_user_profile/settings/user_setting
 import 'package:storefront_woo/app/views/view_user_profile/metadata/user_metadata_sub_view.dart';
 import 'package:storefront_woo/app/views/view_user_profile/preferences/user_preferences_sub_view.dart';
 import 'package:storefront_woo/app/views/view_user_profile/contracts/user_contracts_sub_view.dart';
-import 'package:storefront_woo/app/views/view_user_profile/edit/user_edit_profile_sub_view.dart';
 import 'package:storefront_woo/app/views/view_order_detail/order_detail_view.dart';
 import 'package:storefront_woo/app/models/navbar_item_model.dart';
 import 'package:storefront_woo/app/utils/navbar_icon_helper.dart';
@@ -749,34 +748,6 @@ final GoRouter appRouter = GoRouter(
             );
           },
           routes: [
-            // User Edit Profile Route
-            GoRoute(
-              path: 'edit',
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                final routeExtra = state.extra as Map<String, dynamic>?;
-                final arguments = {
-                  'edit_profile': true,
-                  'showNavbar':
-                      routeExtra?['showNavbar'] ??
-                      true, // Navbar shown on all pages
-                  ...?routeExtra,
-                };
-
-                return CustomTransitionPage(
-                  child: UserEditProfileView(
-                    arguments: arguments,
-                    goRoute: (String path) {
-                      context.go(path);
-                    },
-                  ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                  transitionDuration: const Duration(milliseconds: 300),
-                );
-              },
-            ),
             // User Addresses Route
             GoRoute(
               path: 'addresses',
