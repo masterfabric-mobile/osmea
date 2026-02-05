@@ -1,3 +1,5 @@
+import 'package:storefront_supabase/app/models/product_variant.dart';
+
 class Product {
   final String id;
   final String name;
@@ -13,6 +15,7 @@ class Product {
   final int? viewCount;
   final int? salesCount;
   final List<String>? tags;
+  final List<ProductVariant> variants; // Added
 
   Product({
     required this.id,
@@ -29,6 +32,7 @@ class Product {
     this.viewCount,
     this.salesCount,
     this.tags,
+    this.variants = const [], // Added
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -72,6 +76,14 @@ class Product {
       }
     }
 
+    // Parse variants if available
+    List<ProductVariant> variantsList = [];
+    if (json['product_variants'] != null) {
+      variantsList = (json['product_variants'] as List)
+          .map((e) => ProductVariant.fromJson(e))
+          .toList();
+    }
+
     return Product(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -91,6 +103,7 @@ class Product {
       viewCount: json['view_count'] as int?,
       salesCount: json['sales_count'] as int?,
       tags: tagsList,
+      variants: variantsList, // Added
     );
   }
 

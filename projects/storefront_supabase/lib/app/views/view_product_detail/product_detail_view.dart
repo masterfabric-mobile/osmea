@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the enum
 
@@ -198,7 +199,17 @@ class ProductDetailView
                   OsmeaComponents.sizedBox(height: 16),
                   _buildReviewsList(context, reviews),
                   OsmeaComponents.sizedBox(height: 24),
-                  _buildAddReviewForm(context, viewModel, product.id),
+                  if (Supabase.instance.client.auth.currentUser != null)
+                    _buildAddReviewForm(context, viewModel, product.id)
+                  else
+                    Center(
+                      child: OsmeaComponents.text(
+                        resources.loginToViewInfo, // Reusing existing string "Please log in..." or similar implies action needed
+                        // Or better: "Giriş yaparak yorum yapabilirsiniz" if we had that string.
+                        // "loginToViewInfo" is "Please log in to view information.", close enough for now.
+                        color: Colors.grey,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -338,20 +349,30 @@ class ProductDetailView
                 OsmeaComponents.row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    OsmeaComponents.text(
-                      review.authorName,
-                      textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    OsmeaComponents.expanded(
+                      child: OsmeaComponents.text(
+                        review.authorName,
+                        textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    OsmeaComponents.sizedBox(width: 8),
                     OsmeaComponents.text(
                       DateFormat.yMMMd().format(review.createdAt),
                       textStyle: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
-                OsmeaComponents.sizedBox(height: 4),
+                OsmeaComponents.sizedBox(height: 12),
                 
+                // --- Product Review Section ---
+                OsmeaComponents.text(
+                  'Product Evaluation',
+                  textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey),
+                ),
+                OsmeaComponents.sizedBox(height: 4),
                 OsmeaComponents.row(
                   children: List.generate(
                     5,
@@ -372,6 +393,36 @@ class ProductDetailView
                 if (review.comment != null && review.comment!.isNotEmpty) ...[
                   OsmeaComponents.sizedBox(height: 8),
                   OsmeaComponents.text(review.comment!),
+                ],
+
+                // --- Delivery Review Section ---
+                if (review.deliveryRating != null) ...[
+                  OsmeaComponents.sizedBox(height: 16),
+                  const Divider(),
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OsmeaComponents.text(
+                        'Delivery Experience',
+                         textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey),
+                      ),
+                      OsmeaComponents.row(
+                        children: List.generate(
+                          5,
+                          (i) => Icon(
+                            i < review.deliveryRating! ? Icons.local_shipping : Icons.local_shipping_outlined,
+                            color: Colors.blueGrey, 
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (review.deliveryComment != null && review.deliveryComment!.isNotEmpty) ...[
+                   OsmeaComponents.sizedBox(height: 8),
+                   OsmeaComponents.text(review.deliveryComment!),
                 ],
               ],
             ),
@@ -396,29 +447,40 @@ class ProductDetailView
               resources.writeReview,
               textStyle: Theme.of(context).textTheme.titleLarge,
             ),
-            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.sizedBox(height: 24),
+            
+            // --- Section 1: Product Review ---
+            OsmeaComponents.text(
+              '1. Product Evaluation',
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
             OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                OsmeaComponents.text('${resources.rating}: '),
-                ...List.generate(
-                  5,
-                  (index) => IconButton(
-                    icon: Icon(
-                      index < viewModel.currentRating
-                          ? Icons.star
-                          : Icons.star_border,
-                      color: Colors.amber,
+                Expanded(child: OsmeaComponents.text('${resources.rating}: ')),
+                OsmeaComponents.row(
+                  mainAxisSize: MainAxisSize.min, // Ensure the inner row only takes necessary space
+                  children: List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(
+                        index < viewModel.currentRating
+                            ? Icons.star
+                            : Icons.star_border,
+                        color: Colors.amber,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          viewModel.setRating(index + 1.0);
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        viewModel.setRating(index + 1.0);
-                      });
-                    },
                   ),
                 ),
               ],
             ),
-            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.sizedBox(height: 8),
             OsmeaComponents.textField(
               controller: viewModel.reviewTitleController,
               label: resources.reviewTitle,
@@ -431,7 +493,51 @@ class ProductDetailView
               maxLines: 4,
               variant: TextFieldVariant.outlined,
             ),
-            OsmeaComponents.sizedBox(height: 16),
+            
+            OsmeaComponents.sizedBox(height: 24),
+            const Divider(),
+            OsmeaComponents.sizedBox(height: 24),
+
+            // --- Section 2: Delivery Review ---
+            OsmeaComponents.text(
+              '2. Delivery Experience',
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(child: Text('Delivery Rating: ')), 
+                OsmeaComponents.row(
+                  mainAxisSize: MainAxisSize.min, // Ensure the inner row only takes necessary space
+                  children: List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(
+                        index < viewModel.currentDeliveryRating
+                            ? Icons.local_shipping
+                            : Icons.local_shipping_outlined,
+                        color: Colors.blueGrey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          viewModel.setDeliveryRating(index + 1.0);
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.textField(
+              controller: viewModel.deliveryReviewCommentController,
+              label: 'Delivery Comment (Optional)',
+              maxLines: 2,
+              variant: TextFieldVariant.outlined,
+            ),
+            OsmeaComponents.sizedBox(height: 24),
+
             OsmeaComponents.button(
               text: resources.submitReview,
               onPressed: () async {

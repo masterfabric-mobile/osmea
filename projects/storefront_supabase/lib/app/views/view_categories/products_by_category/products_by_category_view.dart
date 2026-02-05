@@ -140,6 +140,7 @@ class ProductsByCategoryView
                     itemCount: state.products.length,
                     itemBuilder: (context, index) {
                       final product = state.products[index];
+                      final hasDiscount = product.hasDiscount;
                       return Card(
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
@@ -148,18 +149,48 @@ class ProductsByCategoryView
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               OsmeaComponents.expanded(
-                                child: (product.imageUrl
-                                        .contains('placehold.co'))
-                                    ? const Center(
-                                        child: Icon(Icons.image,
-                                            color: Colors.grey))
-                                    : OsmeaComponents.image(
-                                        imageUrl: product.imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorWidget: const Center(
-                                              child: Icon(Icons.error,
-                                                  color: Colors.red)),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: (product.imageUrl
+                                              .contains('placehold.co'))
+                                          ? const Center(
+                                              child: Icon(Icons.image,
+                                                  color: Colors.grey))
+                                          : OsmeaComponents.image(
+                                              imageUrl: product.imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorWidget: const Center(
+                                                  child: Icon(Icons.error,
+                                                      color: Colors.red)),
+                                            ),
+                                    ),
+                                    if (hasDiscount)
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: OsmeaComponents.container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 4,
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF000000),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4)),
+                                          ),
+                                          child: OsmeaComponents.text(
+                                            'SALE',
+                                            textStyle: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       ),
+                                  ],
+                                ),
                               ),
                               OsmeaComponents.padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -180,19 +211,45 @@ class ProductsByCategoryView
                                     OsmeaComponents.sizedBox(height: 4),
                                     BlocBuilder<CurrencyCubit, String>(
                                       builder: (context, currency) {
-                                        return OsmeaComponents.text(
-                                          PriceHelper.format(
-                                              product.price,
-                                              currency,
-                                              Localizations.localeOf(context)
-                                                  .toString()),
-                                          textStyle: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                color: const Color(0xFF000000),
-                                                fontWeight: FontWeight.bold,
+                                        return OsmeaComponents.row(
+                                          children: [
+                                            if (hasDiscount) ...[
+                                              OsmeaComponents.text(
+                                                PriceHelper.format(
+                                                    product.price,
+                                                    currency,
+                                                    Localizations.localeOf(
+                                                            context)
+                                                        .toString()),
+                                                textStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      decoration: TextDecoration
+                                                          .lineThrough,
+                                                      color: Colors.grey[600],
+                                                    ),
                                               ),
+                                              OsmeaComponents.sizedBox(
+                                                  width: 4),
+                                            ],
+                                            OsmeaComponents.text(
+                                              PriceHelper.format(
+                                                  product.effectivePrice,
+                                                  currency,
+                                                  Localizations.localeOf(
+                                                          context)
+                                                      .toString()),
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color:
+                                                        const Color(0xFF000000),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ],
                                         );
                                       },
                                     ),

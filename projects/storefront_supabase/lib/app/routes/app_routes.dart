@@ -560,7 +560,30 @@ NavbarItem _buildNavbarItemFromModel(
   bool isAuthenticated,
   int wishlistCount,
 ) {
-  final text = model.getText(isAuthenticated);
+  // Try to translate based on ID, fallback to config text
+  String text;
+  final resources = context.resources;
+  
+  switch (model.id) {
+    case 'home':
+      text = resources.home;
+      break;
+    case 'search':
+      text = resources.search;
+      break;
+    case 'cart':
+      text = resources.cart;
+      break;
+    case 'saved':
+      text = resources.favorites;
+      break;
+    case 'profile':
+      text = resources.profile;
+      break;
+    default:
+      text = model.getText(isAuthenticated);
+  }
+
   final iconName = model.getIconName(isAuthenticated);
 
   // Handle icons

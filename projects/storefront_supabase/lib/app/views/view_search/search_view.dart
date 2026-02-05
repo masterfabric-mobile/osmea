@@ -92,21 +92,77 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
         itemCount: state.searchResults.length,
         itemBuilder: (context, index) {
           final product = state.searchResults[index];
+          final hasDiscount = product.hasDiscount;
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: OsmeaComponents.listItem(
-              leading: OsmeaComponents.image(
-                imageUrl: product.imageUrl,
+              leading: SizedBox(
                 width: 50,
                 height: 50,
-                fit: BoxFit.cover,
-                errorWidget: const Icon(Icons.error),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: OsmeaComponents.image(
+                        imageUrl: product.imageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: const Icon(Icons.error),
+                      ),
+                    ),
+                    if (hasDiscount)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: OsmeaComponents.container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF000000),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(4),
+                            ),
+                          ),
+                          child: OsmeaComponents.text(
+                            'SALE',
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               title: OsmeaComponents.text(product.name),
               subtitle: BlocBuilder<CurrencyCubit, String>(
                 builder: (context, currency) {
-                  return OsmeaComponents.text(PriceHelper.format(product.price,
-                      currency, Localizations.localeOf(context).toString()));
+                  return OsmeaComponents.row(
+                    children: [
+                      if (hasDiscount) ...[
+                        OsmeaComponents.text(
+                          PriceHelper.format(product.price, currency,
+                              Localizations.localeOf(context).toString()),
+                          textStyle:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey[600],
+                                  ),
+                        ),
+                        OsmeaComponents.sizedBox(width: 8),
+                      ],
+                      OsmeaComponents.text(
+                        PriceHelper.format(product.effectivePrice, currency,
+                            Localizations.localeOf(context).toString()),
+                        textStyle:
+                            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ],
+                  );
                 },
               ),
               onTap: () {

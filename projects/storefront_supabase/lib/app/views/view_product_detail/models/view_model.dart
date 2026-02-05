@@ -5,6 +5,7 @@ import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:storefront_supabase/app/models/product_variant.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the new enum
 
 import 'states.dart';
@@ -15,18 +16,23 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
   late final TextEditingController reviewTitleController;
   late final TextEditingController reviewCommentController;
+  late final TextEditingController deliveryReviewCommentController;
   double currentRating = 3;
+  double currentDeliveryRating = 3;
 
   ProductDetailViewModel(this._supabaseClient)
       : super(ProductDetailInitialState()) {
     reviewTitleController = TextEditingController();
     reviewCommentController = TextEditingController();
+    deliveryReviewCommentController = TextEditingController();
   }
 
   Future<void> initial({String? productId, Product? product}) async {
     if (product != null) {
       stateChanger(ProductDetailLoadedState(product: product, reviews: []));
-      return;
+      // Even if we have the product object, we should probably fetch fresh data (variants, reviews)
+      // falling through to fetch if productId is available is safer for full data.
+      if (productId == null) return;
     }
 
     if (productId == null) {
@@ -38,11 +44,11 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     try {
       final userId = _supabaseClient.auth.currentUser?.id;
 
-      // Fetch product, reviews, and favorite status in parallel
+      // Fetch product (with variants), reviews, and favorite status in parallel
       final responses = await Future.wait<dynamic>([
         _supabaseClient
             .from('products')
-            .select('*, product_images(*)')
+            .select('*, product_images(*), product_variants(*)') // Included product_variants
             .eq('id', productId)
             .single(),
         _supabaseClient
@@ -78,6 +84,13 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     } catch (e) {
       stateChanger(
           ProductDetailErrorState('Failed to load product details: $e'));
+    }
+  }
+
+  void selectVariant(ProductVariant variant) {
+    if (state is ProductDetailLoadedState) {
+      final currentState = state as ProductDetailLoadedState;
+      stateChanger(currentState.copyWith(selectedVariant: variant));
     }
   }
 
@@ -142,6 +155,16 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   }
 
   Future<bool> addToCart(String productId, int quantity) async {
+    if (state is! ProductDetailLoadedState) return false;
+    final currentState = state as ProductDetailLoadedState;
+
+    // Check for variants
+    if (currentState.product.variants.isNotEmpty && currentState.selectedVariant == null) {
+      // Logic for enforcing variant selection will be handled in View (showing a message)
+      // Returning false here so view can show snackbar "Please select a variant"
+      return false;
+    }
+
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) {
       debugPrint("User not logged in, can't add to cart.");
@@ -149,13 +172,22 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     }
 
     try {
-      // Check if the item is already in the cart
-      final existingCartItem = await _supabaseClient
+      final variantId = currentState.selectedVariant?.id;
+
+      // Check if the item is already in the cart (match product AND variant)
+      final query = _supabaseClient
           .from('cart')
           .select('id, quantity')
           .eq('user_id', userId)
-          .eq('product_id', productId)
-          .maybeSingle();
+          .eq('product_id', productId);
+      
+      if (variantId != null) {
+        query.eq('variant_id', variantId);
+      } else {
+        query.isFilter('variant_id', null);
+      }
+
+      final existingCartItem = await query.maybeSingle();
 
       if (existingCartItem != null) {
         // If it exists, update the quantity
@@ -170,6 +202,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
         await _supabaseClient.from('cart').insert({
           'user_id': userId,
           'product_id': productId,
+          'variant_id': variantId,
           'quantity': quantity,
         });
         debugPrint('Product $productId added to cart with quantity $quantity.');
@@ -183,6 +216,10 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
   void setRating(double rating) {
     currentRating = rating;
+  }
+
+  void setDeliveryRating(double rating) {
+    currentDeliveryRating = rating;
   }
 
   Future<bool> submitReview(String productId) async {
@@ -201,10 +238,14 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
         'rating': currentRating.toInt(),
         'title': reviewTitleController.text,
         'comment': reviewCommentController.text,
+        'delivery_rating': currentDeliveryRating.toInt(),
+        'delivery_comment': deliveryReviewCommentController.text,
       });
       reviewTitleController.clear();
       reviewCommentController.clear();
+      deliveryReviewCommentController.clear();
       currentRating = 3;
+      currentDeliveryRating = 3;
       initial(productId: productId);
       return true;
     } catch (e) {
@@ -215,6 +256,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   void dispose() {
     reviewTitleController.dispose();
     reviewCommentController.dispose();
+    deliveryReviewCommentController.dispose();
   }
 }
 

@@ -81,6 +81,13 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   }
 
   Future<void> _fetchUserProfile(String userId) async {
+    bool justLoggedIn = false;
+    if (state is ProfileUnauthenticated || (state is ProfileAuthenticated && !(state as ProfileAuthenticated).user.id.contains(userId))) {
+      // If previous state was unauthenticated, or a different user was logged in,
+      // it means a new login just occurred.
+      justLoggedIn = true;
+    }
+
     try {
       final response = await _supabaseClient
           .from('users')
@@ -110,9 +117,15 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
       selectedCountry = user.country;
       selectedCity = user.city;
 
-      stateChanger(ProfileAuthenticated(user: user));
+      stateChanger(ProfileAuthenticated(user: user, shouldRedirectToHome: justLoggedIn));
     } catch (e) {
       stateChanger(const ProfileUnauthenticated(errorMessage: "Failed to load profile"));
+    }
+  }
+
+  void resetRedirectFlag() {
+    if (state is ProfileAuthenticated) {
+      stateChanger((state as ProfileAuthenticated).copyWith(shouldRedirectToHome: false));
     }
   }
 

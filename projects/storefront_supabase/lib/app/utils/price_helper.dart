@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-import 'package:flutter/material.dart';
 
 class PriceHelper {
   // Hardcoded rates for demo purposes. Base is USD.

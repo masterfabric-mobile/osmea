@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart'
     hide
         BuildContextTranslationsExtension,
@@ -11,9 +12,7 @@ import 'package:storefront_supabase/app/views/view_home/models/states.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_content_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_error_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_skeleton_widget.dart';
-
-
-import 'package:storefront_supabase/app/views/view_home/widgets/home_category_list_widget.dart';
+import 'package:storefront_supabase/app/utils/localization_helper.dart';
 
 class SupabaseHomeView
     extends MasterViewCubit<SupabaseHomeViewModel, SupabaseHomeState> {
@@ -37,6 +36,14 @@ class SupabaseHomeView
             titleSpacing: 0.0,
             actions: [
               AppBarAction(
+                type: AppBarActionType.more, // Using generic type for custom icon
+                icon: const Icon(
+                  Icons.language, // Globe/Language icon
+                  color: Color(0xFF000000),
+                ),
+                onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
+              ),
+              AppBarAction(
                 type: AppBarActionType.more,
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
@@ -45,43 +52,19 @@ class SupabaseHomeView
                 onPressed: () => goRoute('/cart'),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(196), 
-              child: OsmeaComponents.container(
-                color: Colors.white,
-                child: OsmeaComponents.column(
-                  children: [
-                    // Search Bar
-                    OsmeaComponents.padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: OsmeaComponents.textField(
-                        key: const ValueKey('homeSearchBar'),
-                        controller: viewModel.searchController,
-                        label: context.resources.searchProductsHint,
-                        prefixIcon: const Icon(Icons.search),
-                        variant: TextFieldVariant.outlined,
-                        focusColor: Colors.black,
-                        onChanged: viewModel.setSearchQuery,
-                      ),
-                    ),
-                    OsmeaComponents.sizedBox(height: 16), 
-                    // Category Bubbles (moved here)
-                    HomeCategoryListWidget(
-                      allCategories: (viewModel.state is SupabaseHomeLoadedState)
-                          ? (viewModel.state as SupabaseHomeLoadedState).allCategories
-                          : [],
-                      goRoute: goRoute,
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
         );
 
   @override
   void initialContent(SupabaseHomeViewModel viewModel, BuildContext context) {
     viewModel.initial();
+    
+    // Check for login success flag from navigation
+    final loginSuccess = arguments['loginSuccess'] == 'true';
+    if (loginSuccess) {
+      // Trigger the snackbar via state change
+      viewModel.showLoginSuccess();
+    }
   }
 
   @override
@@ -90,27 +73,47 @@ class SupabaseHomeView
     SupabaseHomeViewModel viewModel,
     SupabaseHomeState state,
   ) {
-    if (state is SupabaseHomeErrorState) {
-      return HomeErrorWidget(
-        message: state.message, 
-        onRetry: () => viewModel.initial(),
-      );
-    }
+    return BlocListener<SupabaseHomeViewModel, SupabaseHomeState>(
+      bloc: viewModel,
+      listener: (context, state) {
+        if (state is SupabaseHomeLoadedState && state.showLoginSuccessSnackbar) {
+           // Ensure context is mounted and available
+           Future.delayed(Duration.zero, () {
+             if (context.mounted) {
+                context.showSnackbar(
+                  message: "Welcome back! You have successfully logged in.",
+                  type: SnackbarType.success,
+                );
+                viewModel.resetLoginSnackbar();
+             }
+           });
+        }
+      },
+      child: Builder(
+        builder: (context) {
+          if (state is SupabaseHomeErrorState) {
+            return HomeErrorWidget(
+              message: state.message,
+              onRetry: () => viewModel.initial(),
+            );
+          }
 
-    if (state is SupabaseHomeLoadingState ||
-        state is SupabaseHomeInitialState) {
-      return const HomeSkeletonWidget();
-    }
+          if (state is SupabaseHomeLoadingState ||
+              state is SupabaseHomeInitialState) {
+            return const HomeSkeletonWidget();
+          }
 
-    if (state is SupabaseHomeLoadedState) {
-      return HomeContentWidget(
-        state: state,
-        viewModel: viewModel,
-        goRoute: goRoute,
-      );
-    }
+          if (state is SupabaseHomeLoadedState) {
+            return HomeContentWidget(
+              state: state,
+              viewModel: viewModel,
+              goRoute: goRoute,
+            );
+          }
 
-   
-    return HomeErrorWidget(message: context.resources.somethingWentWrong);
+          return HomeErrorWidget(message: context.resources.somethingWentWrong);
+        }
+      ),
+    );
   }
 }

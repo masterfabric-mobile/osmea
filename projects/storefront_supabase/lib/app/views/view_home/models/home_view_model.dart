@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider, AuthState;
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,6 +12,7 @@ import 'states.dart';
 @lazySingleton
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final SupabaseClient _supabaseClient;
+  StreamSubscription<AuthState>? _authSubscription;
 
   // Options for sizes/ages
   final List<String> clothingSizesAndAges = [
@@ -23,7 +24,31 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final TextEditingController searchController = TextEditingController(); // Added this back
 
   SupabaseHomeViewModel(this._supabaseClient)
-      : super(SupabaseHomeInitialState());
+      : super(SupabaseHomeInitialState()) {
+    // Listen for Auth Changes
+    _authSubscription = _supabaseClient.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn) {
+        if (state is SupabaseHomeLoadedState) {
+          stateChanger(
+              (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: true));
+        }
+      }
+    });
+  }
+
+  void resetLoginSnackbar() {
+    if (state is SupabaseHomeLoadedState) {
+      stateChanger(
+          (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: false));
+    }
+  }
+
+  void showLoginSuccess() {
+    if (state is SupabaseHomeLoadedState) {
+      stateChanger(
+          (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: true));
+    }
+  }
 
   /* -------------------- SEARCH -------------------- */
 
@@ -226,15 +251,47 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       // --- EXECUTION ---
       
       List<Product> products = [];
+      List<Product> onSaleProducts = currentState.onSaleProducts; 
+      List<Product> productsOfTheDay = currentState.productsOfTheDay;
+      List<Product> recommendedProducts = currentState.recommendedProducts; // Preserve or fetch
+      List<Product> collectionProducts = currentState.collectionProducts; // Preserve or fetch
       List<Category> allCategories = currentState.allCategories;
       List<Brand> allBrands = currentState.allBrands;
 
       if (currentState.allCategories.isEmpty || currentState.allBrands.isEmpty) {
-        // Initial Fetch: Parallelize Categories, Brands, and Products
+        // Initial Fetch: Parallelize Categories, Brands, Products, On Sale, and Featured
         final results = await Future.wait([
           _supabaseClient.from('categories').select(),
           _supabaseClient.from('brand').select(),
           finalOrderedQuery,
+          // 3. Fetch On Sale Items
+          _supabaseClient
+              .from('products')
+              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .eq('is_active', true)
+              .not('sale_price', 'is', null) 
+              .order('created_at', ascending: false) 
+              .limit(10),
+          // 4. Fetch candidates for "Product of the Day"
+          _supabaseClient
+              .from('products')
+              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .eq('is_active', true)
+              .limit(20),
+          // 5. Fetch "Collections" (Featured Products)
+          _supabaseClient
+              .from('products')
+              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .eq('is_active', true)
+              .eq('is_featured', true)
+              .limit(10),
+          // 6. Fetch "Recommended" (Most Viewed)
+          _supabaseClient
+              .from('products')
+              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .eq('is_active', true)
+              .order('view_count', ascending: false)
+              .limit(10),
         ]);
 
         allCategories = (results[0] as List)
@@ -247,8 +304,29 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         products = (results[2] as List)
             .map((e) => Product.fromJson(e))
             .toList();
+            
+        onSaleProducts = (results[3] as List)
+            .map((e) => Product.fromJson(e))
+            .where((p) => p.hasDiscount) 
+            .toList();
+
+        // Randomize 3 products for "Product of the Day"
+        final pool = (results[4] as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
+        pool.shuffle();
+        productsOfTheDay = pool.take(3).toList();
+
+        collectionProducts = (results[5] as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
+
+        recommendedProducts = (results[6] as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
+
       } else {
-        // Subsequent Fetch: Only Products
+        // Subsequent Fetch: Only Products (Main List)
         final response = await finalOrderedQuery;
         products = (response as List)
             .map((e) => Product.fromJson(e))
@@ -267,6 +345,10 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       stateChanger(
         SupabaseHomeLoadedState(
           products: products,
+          onSaleProducts: onSaleProducts, 
+          productsOfTheDay: productsOfTheDay,
+          collectionProducts: collectionProducts, // Update state
+          recommendedProducts: recommendedProducts, // Update state
           searchQuery: finalQuery,
           priceSort: finalPriceSort,
           dateSort: finalDateSort,
@@ -289,6 +371,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   @override
   Future<void> close() {
     searchController.dispose();
+    _authSubscription?.cancel();
     return super.close();
   }
 }
