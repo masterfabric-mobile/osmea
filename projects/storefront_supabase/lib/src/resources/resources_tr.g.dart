@@ -208,6 +208,10 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get goToHome => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Ana Sayfaya Git';
 	@override String get password => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Şifre';
 	@override String get confirmPassword => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Şifreyi Onayla';
+	@override String get logoutSuccess => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Başarıyla çıkış yapıldı!';
+	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Favorilere eklendi!';
+	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Favorilerden çıkarıldı.';
+	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -388,6 +392,10 @@ extension on TranslationsTr {
 			'goToHome' => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Ana Sayfaya Git',
 			'password' => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Şifre',
 			'confirmPassword' => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Şifreyi Onayla',
+			'logoutSuccess' => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Başarıyla çıkış yapıldı!',
+			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Favorilere eklendi!',
+			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Favorilerden çıkarıldı.',
+			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.',
 			_ => null,
 		};
 	}

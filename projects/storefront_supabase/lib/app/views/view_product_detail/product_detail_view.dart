@@ -9,8 +9,12 @@ import 'package:core/core.dart'
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/favorite_action_status.dart'; // Import the enum
 
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -26,11 +30,17 @@ class ProductDetailView
            final productId = arguments['productId'] as String?;
            return OsmeaComponents.appBar(
              title: (viewModel.state is ProductDetailLoadedState)
-                 ? Text(
+                 ? OsmeaComponents.text(
                      (viewModel.state as ProductDetailLoadedState).product.name,
+                     textStyle: const TextStyle(color: Colors.black),
                    )
-                 : Text(context.resources.productDetail),
+                 : OsmeaComponents.text(
+                     context.resources.productDetail,
+                     textStyle: const TextStyle(color: Colors.black),
+                   ),
              variant: AppBarVariant.primary,
+             backgroundColor: Colors.white,
+             foregroundColor: Colors.black,
              leading: OsmeaComponents.iconButton(
                onPressed: () {
                  if (context.canPop()) {
@@ -53,12 +63,42 @@ class ProductDetailView
                      }
                      return Icon(
                        isInWishlist ? Icons.favorite : Icons.favorite_border,
+                       color: Colors.black, // Explicitly set to black
                      );
                    },
                  ),
-                 onPressed: () {
+                 onPressed: () async {
                    if (productId != null) {
-                     viewModel.toggleFavorite(productId);
+                     final status = await viewModel.toggleFavorite(productId);
+                     if (!context.mounted) return;
+                     String message;
+                     SnackbarType type;
+                     switch (status) {
+                       case FavoriteActionStatus.added:
+                         message = context.resources.addedToFavorites;
+                         type = SnackbarType.success;
+                         break;
+                       case FavoriteActionStatus.removed:
+                         message = context.resources.removedFromFavorites;
+                         type = SnackbarType.info;
+                         break;
+                       case FavoriteActionStatus.errorLogin:
+                         message = context.resources.loginToViewInfo;
+                         type = SnackbarType.error;
+                         break;
+                       case FavoriteActionStatus.errorFailed:
+                         message = context.resources.wishlistUpdateFailed;
+                         type = SnackbarType.error;
+                         break;
+                       case FavoriteActionStatus.unknownError:
+                         message = context.resources.unexpectedError;
+                         type = SnackbarType.error;
+                         break;
+                     }
+                     context.showSnackbar(
+                       message: message,
+                       type: type,
+                     );
                    }
                  },
                ),
@@ -98,58 +138,29 @@ class ProductDetailView
       final reviews = state.reviews;
 
       return SingleChildScrollView(
-        child: Column(
+        child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            (product.imageUrl.contains('placehold.co'))
-                ? Container(
-                    height: 300,
-                    width: double.infinity,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(Icons.image, color: Colors.grey, size: 50),
-                    ),
-                  )
-                : Image.network(
-                    product.imageUrl,
-                    height: 300,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 300,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.error, color: Colors.red, size: 50),
-                        ),
-                      );
-                    },
-                  ),
-            Padding(
+            _buildProductImagesCarousel(context, product),
+            OsmeaComponents.padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
+              child: OsmeaComponents.column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  OsmeaComponents.text(
                     product.name,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    textStyle: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 8),
+                  _buildPriceDisplay(context, product),
+                  OsmeaComponents.sizedBox(height: 16),
+                  OsmeaComponents.text(
                     product.description,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 24),
+                  OsmeaComponents.sizedBox(height: 24),
                   _buildQuantitySelector(context, viewModel, state),
-                  const SizedBox(height: 16),
+                  OsmeaComponents.sizedBox(height: 16),
                   OsmeaComponents.button(
                     text: resources.addToCart,
                     onPressed: () async {
@@ -159,38 +170,46 @@ class ProductDetailView
                       );
                       if (!context.mounted) return;
                       if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(resources.productAddedToCart),
-                            backgroundColor: Colors.green,
-                          ),
+                        context.showSnackbar(
+                          message: resources.productAddedToCart,
+                          type: SnackbarType.success,
                         );
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(resources.failedToAddCart),
-                            backgroundColor: Colors.red,
-                          ),
+                        context.showSnackbar(
+                          message: resources.failedToAddCart,
+                          type: SnackbarType.error,
                         );
                       }
                     },
                     variant: ButtonVariant.primary,
+                    backgroundColor: Colors.black, // Explicitly set background
+                    textColor: Colors.white, // Explicitly set text color
                     fullWidth: true,
                   ),
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 24),
+                  const Divider(), // OsmeaComponents.divider() might need context/theme, keeping const Divider() is simpler if equivalent
+                  OsmeaComponents.sizedBox(height: 16),
+                  OsmeaComponents.text(
                     resources.reviewsCount.replaceAll(
                       '{count}',
                       reviews.length.toString(),
                     ),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    textStyle: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 16),
+                  OsmeaComponents.sizedBox(height: 16),
                   _buildReviewsList(context, reviews),
-                  const SizedBox(height: 24),
-                  _buildAddReviewForm(context, viewModel, product.id),
+                  OsmeaComponents.sizedBox(height: 24),
+                  if (Supabase.instance.client.auth.currentUser != null)
+                    _buildAddReviewForm(context, viewModel, product.id)
+                  else
+                    Center(
+                      child: OsmeaComponents.text(
+                        resources.loginToViewInfo, // Reusing existing string "Please log in..." or similar implies action needed
+                        // Or better: "Giriş yaparak yorum yapabilirsiniz" if we had that string.
+                        // "loginToViewInfo" is "Please log in to view information.", close enough for now.
+                        color: Colors.grey,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -198,7 +217,88 @@ class ProductDetailView
         ),
       );
     }
-    return Center(child: Text(resources.somethingWentWrong));
+    return OsmeaComponents.center(child: OsmeaComponents.text(resources.somethingWentWrong));
+  }
+
+  Widget _buildProductImagesCarousel(BuildContext context, Product product) {
+    final imageUrls = product.imageUrls.isNotEmpty
+        ? product.imageUrls
+        : [product.imageUrl];
+
+    if (imageUrls.isEmpty ||
+        (imageUrls.length == 1 && imageUrls.first.contains('placehold.co'))) {
+      return OsmeaComponents.container(
+        height: 300,
+        width: double.infinity,
+        color: Colors.grey[200],
+        child: const Center(
+          child: Icon(Icons.image, color: Colors.grey, size: 50),
+        ),
+      );
+    }
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return _ProductImagesCarousel(
+          imageUrls: imageUrls,
+          hasDiscount: product.hasDiscount,
+          discountPercentage: product.discountPercentage,
+        );
+      },
+    );
+  }
+
+  Widget _buildPriceDisplay(BuildContext context, Product product) {
+    final hasDiscount = product.hasDiscount;
+
+    return BlocBuilder<CurrencyCubit, String>(
+      builder: (context, currency) {
+        return OsmeaComponents.column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OsmeaComponents.row(
+              children: [
+                if (hasDiscount) ...[
+                  OsmeaComponents.text(
+                    PriceHelper.format(product.price, currency, Localizations.localeOf(context).toString()),
+                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                  OsmeaComponents.sizedBox(width: 8),
+                ],
+                OsmeaComponents.text(
+                  PriceHelper.format(product.effectivePrice, currency, Localizations.localeOf(context).toString()),
+                  textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            if (hasDiscount && product.discountPercentage != null) ...[
+              OsmeaComponents.sizedBox(height: 4),
+              OsmeaComponents.container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF000000),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: OsmeaComponents.text(
+                  'SALE -${product.discountPercentage!.toStringAsFixed(0)}%',
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildQuantitySelector(
@@ -206,23 +306,23 @@ class ProductDetailView
     ProductDetailViewModel viewModel,
     ProductDetailLoadedState state,
   ) {
-    return Row(
+    return OsmeaComponents.row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         OsmeaComponents.iconButton(
           onPressed: viewModel.decreaseQuantity,
-          icon: const Icon(Icons.remove),
+          icon: const Icon(Icons.remove, color: Colors.black),
         ),
-        Padding(
+        OsmeaComponents.padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
+          child: OsmeaComponents.text(
             '${state.detailPageQuantity}',
-            style: Theme.of(context).textTheme.headlineMedium,
+            textStyle: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         OsmeaComponents.iconButton(
           onPressed: viewModel.increaseQuantity,
-          icon: const Icon(Icons.add),
+          icon: const Icon(Icons.add, color: Colors.black),
         ),
       ],
     );
@@ -231,7 +331,7 @@ class ProductDetailView
   Widget _buildReviewsList(BuildContext context, List<ProductReview> reviews) {
     final resources = context.resources;
     if (reviews.isEmpty) {
-      return Center(child: Text(resources.noReviewsYet));
+      return OsmeaComponents.center(child: OsmeaComponents.text(resources.noReviewsYet));
     }
     return ListView.builder(
       shrinkWrap: true,
@@ -241,29 +341,39 @@ class ProductDetailView
         final review = reviews[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
-          child: Padding(
+          child: OsmeaComponents.padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                OsmeaComponents.row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      review.authorName,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    OsmeaComponents.expanded(
+                      child: OsmeaComponents.text(
+                        review.authorName,
+                        textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(
+                    OsmeaComponents.sizedBox(width: 8),
+                    OsmeaComponents.text(
                       DateFormat.yMMMd().format(review.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      textStyle: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                // Simple star rating display
-                Row(
+                OsmeaComponents.sizedBox(height: 12),
+                
+                // --- Product Review Section ---
+                OsmeaComponents.text(
+                  'Product Evaluation',
+                  textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey),
+                ),
+                OsmeaComponents.sizedBox(height: 4),
+                OsmeaComponents.row(
                   children: List.generate(
                     5,
                     (i) => Icon(
@@ -274,15 +384,45 @@ class ProductDetailView
                   ),
                 ),
                 if (review.title != null && review.title!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.text(
                     review.title!,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    textStyle: Theme.of(context).textTheme.titleMedium,
                   ),
                 ],
                 if (review.comment != null && review.comment!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(review.comment!),
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.text(review.comment!),
+                ],
+
+                // --- Delivery Review Section ---
+                if (review.deliveryRating != null) ...[
+                  OsmeaComponents.sizedBox(height: 16),
+                  const Divider(),
+                  OsmeaComponents.sizedBox(height: 8),
+                  OsmeaComponents.row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OsmeaComponents.text(
+                        'Delivery Experience',
+                         textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey),
+                      ),
+                      OsmeaComponents.row(
+                        children: List.generate(
+                          5,
+                          (i) => Icon(
+                            i < review.deliveryRating! ? Icons.local_shipping : Icons.local_shipping_outlined,
+                            color: Colors.blueGrey, 
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (review.deliveryComment != null && review.deliveryComment!.isNotEmpty) ...[
+                   OsmeaComponents.sizedBox(height: 8),
+                   OsmeaComponents.text(review.deliveryComment!),
                 ],
               ],
             ),
@@ -300,53 +440,104 @@ class ProductDetailView
     final resources = context.resources;
     return StatefulBuilder(
       builder: (context, setState) {
-        return Column(
+        return OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            OsmeaComponents.text(
               resources.writeReview,
-              style: Theme.of(context).textTheme.titleLarge,
+              textStyle: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
-            Row(
+            OsmeaComponents.sizedBox(height: 24),
+            
+            // --- Section 1: Product Review ---
+            OsmeaComponents.text(
+              '1. Product Evaluation',
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${resources.rating}: '),
-                ...List.generate(
-                  5,
-                  (index) => IconButton(
-                    icon: Icon(
-                      index < viewModel.currentRating
-                          ? Icons.star
-                          : Icons.star_border,
-                      color: Colors.amber,
+                Expanded(child: OsmeaComponents.text('${resources.rating}: ')),
+                OsmeaComponents.row(
+                  mainAxisSize: MainAxisSize.min, // Ensure the inner row only takes necessary space
+                  children: List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(
+                        index < viewModel.currentRating
+                            ? Icons.star
+                            : Icons.star_border,
+                        color: Colors.amber,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          viewModel.setRating(index + 1.0);
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        viewModel.setRating(index + 1.0);
-                      });
-                    },
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            TextField(
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.textField(
               controller: viewModel.reviewTitleController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: resources.reviewTitle,
-              ),
+              label: resources.reviewTitle,
+              variant: TextFieldVariant.outlined,
             ),
-            const SizedBox(height: 16),
-            TextField(
+            OsmeaComponents.sizedBox(height: 16),
+            OsmeaComponents.textField(
               controller: viewModel.reviewCommentController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: resources.yourReview,
-              ),
+              label: resources.yourReview,
               maxLines: 4,
+              variant: TextFieldVariant.outlined,
             ),
-            const SizedBox(height: 16),
+            
+            OsmeaComponents.sizedBox(height: 24),
+            const Divider(),
+            OsmeaComponents.sizedBox(height: 24),
+
+            // --- Section 2: Delivery Review ---
+            OsmeaComponents.text(
+              '2. Delivery Experience',
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(child: Text('Delivery Rating: ')), 
+                OsmeaComponents.row(
+                  mainAxisSize: MainAxisSize.min, // Ensure the inner row only takes necessary space
+                  children: List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(
+                        index < viewModel.currentDeliveryRating
+                            ? Icons.local_shipping
+                            : Icons.local_shipping_outlined,
+                        color: Colors.blueGrey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          viewModel.setDeliveryRating(index + 1.0);
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.textField(
+              controller: viewModel.deliveryReviewCommentController,
+              label: 'Delivery Comment (Optional)',
+              maxLines: 2,
+              variant: TextFieldVariant.outlined,
+            ),
+            OsmeaComponents.sizedBox(height: 24),
+
             OsmeaComponents.button(
               text: resources.submitReview,
               onPressed: () async {
@@ -372,6 +563,170 @@ class ProductDetailView
           ],
         );
       },
+    );
+  }
+}
+
+/// Product Images Carousel with Page Indicator
+class _ProductImagesCarousel extends StatefulWidget {
+  final List<String> imageUrls;
+  final bool hasDiscount;
+  final double? discountPercentage;
+
+  const _ProductImagesCarousel({
+    required this.imageUrls,
+    required this.hasDiscount,
+    this.discountPercentage,
+  });
+
+  @override
+  State<_ProductImagesCarousel> createState() => _ProductImagesCarouselState();
+}
+
+class _ProductImagesCarouselState extends State<_ProductImagesCarousel> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = 300.0;
+
+    return OsmeaComponents.sizedBox(
+      height: height,
+      child: OsmeaComponents.stack(
+        children: [
+          // Image carousel
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Image.network(
+                widget.imageUrls[index],
+                height: height,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return OsmeaComponents.container(
+                    height: height,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.error, color: Colors.red, size: 50),
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return OsmeaComponents.container(
+                    height: height,
+                    width: double.infinity,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: const Color(0xFF000000),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+
+          // SALE badge (only on first image)
+          if (widget.hasDiscount && _currentPage == 0)
+            OsmeaComponents.positioned(
+              top: 16,
+              right: 16,
+              child: OsmeaComponents.container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF000000),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: OsmeaComponents.text(
+                  widget.discountPercentage != null
+                      ? 'SALE -${widget.discountPercentage!.toStringAsFixed(0)}%'
+                      : 'SALE',
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+          // Page indicator (if multiple images)
+          if (widget.imageUrls.length > 1)
+            OsmeaComponents.positioned(
+              bottom: 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: OsmeaComponents.container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB((255 * 0.4).round(), 0, 0, 0),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: OsmeaComponents.row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      widget.imageUrls.length,
+                      (index) => GestureDetector(
+                        onTap: () {
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: OsmeaComponents.container(
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          width: _currentPage == index ? 20 : 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: _currentPage == index
+                                ? Colors.white
+                                : Color.fromARGB((255 * 0.5).round(), 255, 255, 255),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

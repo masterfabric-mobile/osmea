@@ -51,12 +51,19 @@ class LoginFormWidget extends StatelessWidget {
           backgroundColor: OsmeaColors.black,
           textColor: OsmeaColors.white,
         ),
-        OsmeaComponents.sizedBox(height: 16),
-        OsmeaComponents.textButton(
-          text: resources.dontHaveAccount,
-          onPressed: onSwitchToSignup,
-        ),
-      ],
-    );
-  }
-}
+                OsmeaComponents.sizedBox(height: 16),
+                GestureDetector(
+                  onTap: onSwitchToSignup,
+                  child: OsmeaComponents.text(
+                    resources.dontHaveAccount,
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        }
+        

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
@@ -17,16 +20,32 @@ class FavoritesView
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              context.resources.favorites, // Changed to English
-              color: Theme.of(context)
-                  .colorScheme
-                  .onPrimary, // Text color matches onPrimary
+              context.resources.favorites,
+              color: Colors.black,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
+            actions: [
+              if (viewModel.state is FavoritesLoadedState && 
+                  (viewModel.state as FavoritesLoadedState).favoriteProducts.isNotEmpty)
+                AppBarAction(
+                  type: AppBarActionType.more, // Using 'more' as a generic action type
+                  icon: const Icon(Icons.delete_outline, color: Colors.black),
+                  onPressed: () async {
+                    // Show confirmation dialog could be good here, but for now executing directly as requested
+                    final success = await viewModel.clearAllFavorites();
+                    if (!context.mounted) return;
+                    if (success) {
+                      context.showSnackbar(
+                        message: context.resources.removedFromFavorites, // Or generic cleared message
+                        type: SnackbarType.info,
+                      );
+                    }
+                  },                ),
+            ],
           ),
         );
 
@@ -44,21 +63,23 @@ class FavoritesView
     FavoritesViewModel viewModel,
     FavoritesState state,
   ) {
+    final resources = context.resources;
+
     if (state is FavoritesLoadingState || state is FavoritesInitialState) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (state is FavoritesErrorState) {
-      return Center(
-        child: Padding(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
+          child: OsmeaComponents.column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(state.message, textAlign: TextAlign.center),
-              const SizedBox(height: 20),
+              OsmeaComponents.text(state.message, textAlign: TextAlign.center),
+              OsmeaComponents.sizedBox(height: 20),
               OsmeaComponents.button(
-                text: context.resources.loginSignup, // Changed to English
+                text: resources.loginSignup,
                 onPressed: () => goRoute('/profile'),
                 variant: ButtonVariant.primary,
               ),
@@ -70,62 +91,111 @@ class FavoritesView
 
     if (state is FavoritesLoadedState) {
       if (state.favoriteProducts.isEmpty) {
-        return Center(
-          child: OsmeaComponents.text(context.resources.noFavorites), // Changed to English
+        return OsmeaComponents.center(
+          child: OsmeaComponents.text(resources.noFavorites),
         );
       }
-      return GridView.builder(
+      
+      return ListView.separated(
         padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: 0.75,
-        ),
         itemCount: state.favoriteProducts.length,
+        separatorBuilder: (context, index) => OsmeaComponents.sizedBox(height: 16),
         itemBuilder: (context, index) {
           final product = state.favoriteProducts[index];
           return Card(
             clipBehavior: Clip.antiAlias,
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: InkWell(
               onTap: () => goRoute('/product-detail/${product.id}'),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: OsmeaComponents.row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  // Image (Left)
+                  OsmeaComponents.container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[200],
                     child: (product.imageUrl.contains('placehold.co'))
-                        ? const Center(
-                            child: Icon(Icons.image, color: Colors.grey))
-                        : Image.network(
-                            product.imageUrl,
+                        ? const Center(child: Icon(Icons.image, color: Colors.grey))
+                        : OsmeaComponents.image(
+                            imageUrl: product.imageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                  child: Icon(Icons.error, color: Colors.red));
-                            },
+                            errorWidget: const Center(
+                                child: Icon(Icons.error, color: Colors.red)),
                           ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  
+                  // Details (Middle)
+                  OsmeaComponents.expanded(
+                    child: OsmeaComponents.padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: OsmeaComponents.column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          OsmeaComponents.text(
+                            product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          OsmeaComponents.sizedBox(height: 8),
+                          BlocBuilder<CurrencyCubit, String>(
+                            builder: (context, currency) {
+                              return OsmeaComponents.text(
+                                PriceHelper.format(product.effectivePrice, currency,
+                                    Localizations.localeOf(context).toString()),
+                                textStyle:
+                                    Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Actions (Right)
+                  OsmeaComponents.padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: OsmeaComponents.column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          product.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        OsmeaComponents.iconButton(
+                          icon: const Icon(Icons.favorite, color: Colors.red),
+                          onPressed: () async {
+                            final success = await viewModel.removeFavorite(product.id);
+                            if (!context.mounted) return;
+                            if (success) {
+                              context.showSnackbar(
+                                message: resources.removedFromFavorites,
+                                type: SnackbarType.info,
+                              );
+                            }
+                          },
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
+                        OsmeaComponents.iconButton(
+                          icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+                          onPressed: () async {
+                            final success = await viewModel.addToCart(product.id);
+                            if (!context.mounted) return;
+                            if (success) {
+                              context.showSnackbar(
+                                message: resources.productAddedToCart,
+                                type: SnackbarType.success,
+                              );
+                            } else {
+                              context.showSnackbar(
+                                message: resources.failedToAddCart,
+                                type: SnackbarType.error,
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -138,8 +208,6 @@ class FavoritesView
       );
     }
 
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const Center(child: CircularProgressIndicator());
   }
 }

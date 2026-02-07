@@ -16,6 +16,7 @@ import 'package:storefront_supabase/app/core/config/config_di.dart';
 
 import 'package:storefront_supabase/app/routes/app_routes.dart';
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 /// 🚀 Launch the Storefront WooCommerce application
@@ -192,6 +193,8 @@ launchApp({String environment = 'dev'}) async {
         BlocProvider(create: (context) => AccountCubit()..initialize()),
 
         BlocProvider(create: (context) => LanguageCubit()),
+
+        BlocProvider(create: (context) => CurrencyCubit()),
       ],
 
       child: BlocBuilder<LanguageCubit, Locale?>(

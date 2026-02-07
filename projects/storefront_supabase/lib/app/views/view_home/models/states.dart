@@ -11,6 +11,10 @@ class SupabaseHomeLoadingState extends SupabaseHomeState {}
 
 class SupabaseHomeLoadedState extends SupabaseHomeState {
   final List<Product> products;
+  final List<Product> onSaleProducts;
+  final List<Product> productsOfTheDay;
+  final List<Product> recommendedProducts; // Added
+  final List<Product> collectionProducts; // Added
   final String searchQuery;
   final PriceSort priceSort;
   final DateSort dateSort;
@@ -26,9 +30,16 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final Category? selectedLeafCategory;
   final Set<int> selectedBrandIds;
   final List<String> selectedSizesOrAges;
+  final bool isLoading;
+  final bool isListView;
+  final bool showLoginSuccessSnackbar;
 
   SupabaseHomeLoadedState({
     required this.products,
+    this.onSaleProducts = const [],
+    this.productsOfTheDay = const [],
+    this.recommendedProducts = const [], // Default empty
+    this.collectionProducts = const [], // Default empty
     this.searchQuery = '',
     this.priceSort = PriceSort.none,
     this.dateSort = DateSort.newestFirst,
@@ -40,10 +51,17 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     this.selectedLeafCategory,
     this.selectedBrandIds = const <int>{},
     this.selectedSizesOrAges = const [],
+    this.isLoading = false,
+    this.isListView = false,
+    this.showLoginSuccessSnackbar = false,
   });
 
   SupabaseHomeLoadedState copyWith({
     List<Product>? products,
+    List<Product>? onSaleProducts,
+    List<Product>? productsOfTheDay,
+    List<Product>? recommendedProducts, // Added
+    List<Product>? collectionProducts, // Added
     String? searchQuery,
     PriceSort? priceSort,
     DateSort? dateSort,
@@ -55,9 +73,16 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     Category? selectedLeafCategory,
     Set<int>? selectedBrandIds,
     List<String>? selectedSizesOrAges,
+    bool? isLoading,
+    bool? isListView,
+    bool? showLoginSuccessSnackbar,
   }) {
     return SupabaseHomeLoadedState(
       products: products ?? this.products,
+      onSaleProducts: onSaleProducts ?? this.onSaleProducts,
+      productsOfTheDay: productsOfTheDay ?? this.productsOfTheDay,
+      recommendedProducts: recommendedProducts ?? this.recommendedProducts, // Added
+      collectionProducts: collectionProducts ?? this.collectionProducts, // Added
       searchQuery: searchQuery ?? this.searchQuery,
       priceSort: priceSort ?? this.priceSort,
       dateSort: dateSort ?? this.dateSort,
@@ -69,6 +94,9 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
       selectedLeafCategory: selectedLeafCategory ?? this.selectedLeafCategory,
       selectedBrandIds: selectedBrandIds ?? this.selectedBrandIds,
       selectedSizesOrAges: selectedSizesOrAges ?? this.selectedSizesOrAges,
+      isLoading: isLoading ?? this.isLoading,
+      isListView: isListView ?? this.isListView,
+      showLoginSuccessSnackbar: showLoginSuccessSnackbar ?? this.showLoginSuccessSnackbar,
     );
   }
 }

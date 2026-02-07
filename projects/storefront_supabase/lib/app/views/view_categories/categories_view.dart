@@ -18,10 +18,10 @@ class CategoriesView
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.categories,
-              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+              color: Colors.black,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
@@ -58,7 +58,7 @@ class CategoriesView
 
     if (state is CategoriesLoadedState) {
       if (state.rootCategories.isEmpty) {
-        return Center(
+        return OsmeaComponents.center(
           child: OsmeaComponents.text(resources.noCategories),
         );
       }

@@ -1,5 +1,6 @@
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
+import 'package:storefront_supabase/app/models/product_variant.dart';
 
 abstract class ProductDetailState {}
 
@@ -12,12 +13,14 @@ class ProductDetailLoadedState extends ProductDetailState {
   final List<ProductReview> reviews;
   final bool isInWishlist; // Added for wishlist feature
   final int detailPageQuantity;
+  final ProductVariant? selectedVariant; // Added
 
   ProductDetailLoadedState({
     required this.product,
     required this.reviews,
     this.isInWishlist = false, // Default to false
     this.detailPageQuantity = 1,
+    this.selectedVariant, // Added
   });
 
   ProductDetailLoadedState copyWith({
@@ -25,12 +28,14 @@ class ProductDetailLoadedState extends ProductDetailState {
     List<ProductReview>? reviews,
     bool? isInWishlist,
     int? detailPageQuantity,
+    ProductVariant? selectedVariant, // Added
   }) {
     return ProductDetailLoadedState(
       product: product ?? this.product,
       reviews: reviews ?? this.reviews,
       isInWishlist: isInWishlist ?? this.isInWishlist,
       detailPageQuantity: detailPageQuantity ?? this.detailPageQuantity,
+      selectedVariant: selectedVariant ?? this.selectedVariant, // Added
     );
   }
 }

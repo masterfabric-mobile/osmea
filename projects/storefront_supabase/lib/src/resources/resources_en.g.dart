@@ -550,6 +550,18 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Confirm Password'
 	String get confirmPassword => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Confirm Password';
+
+	/// en: 'Logged out successfully!'
+	String get logoutSuccess => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Logged out successfully!';
+
+	/// en: 'Added to favorites!'
+	String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Added to favorites!';
+
+	/// en: 'Removed from favorites.'
+	String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Removed from favorites.';
+
+	/// en: 'Failed to update wishlist. Please try again.'
+	String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -730,6 +742,10 @@ extension on Translations {
 			'goToHome' => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Go to Home',
 			'password' => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Password',
 			'confirmPassword' => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Confirm Password',
+			'logoutSuccess' => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Logged out successfully!',
+			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Added to favorites!',
+			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Removed from favorites.',
+			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.',
 			_ => null,
 		};
 	}

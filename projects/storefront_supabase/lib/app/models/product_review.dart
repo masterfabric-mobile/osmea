@@ -5,6 +5,8 @@ class ProductReview {
   final String? comment;
   final DateTime createdAt;
   final String authorName;
+  final int? deliveryRating;
+  final String? deliveryComment;
 
   ProductReview({
     required this.id,
@@ -13,6 +15,8 @@ class ProductReview {
     this.comment,
     required this.createdAt,
     required this.authorName,
+    this.deliveryRating,
+    this.deliveryComment,
   });
 
   factory ProductReview.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class ProductReview {
       comment: json['comment'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       authorName: author,
+      deliveryRating: json['delivery_rating'] as int?,
+      deliveryComment: json['delivery_comment'] as String?,
     );
   }
 }

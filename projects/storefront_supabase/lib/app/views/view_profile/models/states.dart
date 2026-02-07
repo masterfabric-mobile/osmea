@@ -10,7 +10,23 @@ class ProfileLoading extends ProfileState {}
 
 class ProfileAuthenticated extends ProfileState {
   final AppUser user;
-  const ProfileAuthenticated({required this.user});
+  final bool shouldRedirectToHome; // New field
+
+  const ProfileAuthenticated({
+    required this.user,
+    this.shouldRedirectToHome = false, // Default to false
+  });
+
+  // Add copyWith for convenience
+  ProfileAuthenticated copyWith({
+    AppUser? user,
+    bool? shouldRedirectToHome,
+  }) {
+    return ProfileAuthenticated(
+      user: user ?? this.user,
+      shouldRedirectToHome: shouldRedirectToHome ?? this.shouldRedirectToHome,
+    );
+  }
 }
 
 class ProfileUnauthenticated extends ProfileState {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension; 
 
 class OnboardingView extends StatelessWidget {
   final void Function(String) goRoute;
@@ -8,17 +9,25 @@ class OnboardingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.resources.onboarding)),
-      body: Center(
-        child: Column(
+    return OsmeaComponents.scaffold(
+      appBar: OsmeaComponents.appBar(
+        title: OsmeaComponents.text(
+          context.resources.onboarding,
+          textStyle: const TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(context.resources.onboardingScreen),
-            const SizedBox(height: 20),
-            ElevatedButton(
+            OsmeaComponents.text(context.resources.onboardingScreen),
+            OsmeaComponents.sizedBox(height: 20),
+            OsmeaComponents.button(
               onPressed: () => goRoute('/home'),
-              child: Text(context.resources.goToHome),
+              text: context.resources.goToHome,
             ),
           ],
         ),

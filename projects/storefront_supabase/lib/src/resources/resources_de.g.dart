@@ -208,6 +208,10 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get goToHome => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Zur Startseite';
 	@override String get password => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Passwort';
 	@override String get confirmPassword => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Passwort bestätigen';
+	@override String get logoutSuccess => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Erfolgreich abgemeldet!';
+	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Zu Favoriten hinzugefügt!';
+	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Aus Favoriten entfernt.';
+	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -388,6 +392,10 @@ extension on TranslationsDe {
 			'goToHome' => TranslationOverrides.string(_root.$meta, 'goToHome', {}) ?? 'Zur Startseite',
 			'password' => TranslationOverrides.string(_root.$meta, 'password', {}) ?? 'Passwort',
 			'confirmPassword' => TranslationOverrides.string(_root.$meta, 'confirmPassword', {}) ?? 'Passwort bestätigen',
+			'logoutSuccess' => TranslationOverrides.string(_root.$meta, 'logoutSuccess', {}) ?? 'Erfolgreich abgemeldet!',
+			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Zu Favoriten hinzugefügt!',
+			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Aus Favoriten entfernt.',
+			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.',
 			_ => null,
 		};
 	}

@@ -31,12 +31,16 @@ class _AdminUsersViewState extends State<AdminUsersView> {
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
-    return Scaffold(
+    return OsmeaComponents.scaffold(
+      backgroundColor: Colors.white,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text(resources.users),
+        title: OsmeaComponents.text(
+          resources.users,
+          color: Colors.black,
+        ),
         variant: AppBarVariant.primary,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         leading: OsmeaComponents.iconButton(
           onPressed: () => context.go('/profile'),
           icon: const Icon(Icons.arrow_back),
@@ -49,30 +53,30 @@ class _AdminUsersViewState extends State<AdminUsersView> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('${resources.errorPrefix}${snapshot.error}'));
+            return OsmeaComponents.center(child: OsmeaComponents.text('${resources.errorPrefix}${snapshot.error}'));
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return Center(child: Text(resources.noUsersFound));
+            return OsmeaComponents.center(child: OsmeaComponents.text(resources.noUsersFound));
           }
           final users = snapshot.data!;
           return ListView.builder(
             itemCount: users.length,
             itemBuilder: (context, index) {
               final user = users[index];
-              return ListTile(
-                leading: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(user.avatarUrl!),
-                      )
-                    : CircleAvatar(
-                        child: Text(user.fullName?.substring(0, 1) ??
-                            user.email?.substring(0, 1) ??
-                            '?'),
-                      ),
-                title: Text(user.username != null
+              return OsmeaComponents.listItem(
+                leading: OsmeaComponents.avatar(
+                  size: ComponentSize.medium,
+                  imageUrl: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) ? user.avatarUrl : null,
+                  text: (user.avatarUrl == null || user.avatarUrl!.isEmpty)
+                      ? (user.fullName?.substring(0, 1) ??
+                          user.email?.substring(0, 1) ??
+                          '?')
+                      : null,
+                ),
+                title: OsmeaComponents.text(user.username != null
                     ? '${user.fullName ?? resources.unnamed} (@${user.username})'
                     : user.fullName ?? user.email ?? resources.unnamedUser),
-                subtitle: Text(
+                subtitle: OsmeaComponents.text(
                     '${user.email ?? resources.noEmail} - ${resources.rolePrefix}${user.role ?? 'N/A'}'),
               );
             },

@@ -175,6 +175,10 @@
   "onboardingScreen": "Karşılama Ekranı",
   "goToHome": "Ana Sayfaya Git",
   "password": "Şifre",
-  "confirmPassword": "Şifreyi Onayla"
+  "confirmPassword": "Şifreyi Onayla",
+  "logoutSuccess": "Başarıyla çıkış yapıldı!",
+  "addedToFavorites": "Favorilere eklendi!",
+  "removedFromFavorites": "Favorilerden çıkarıldı.",
+  "wishlistUpdateFailed": "İstek listesi güncellenemedi. Lütfen tekrar deneyin."
 }
 

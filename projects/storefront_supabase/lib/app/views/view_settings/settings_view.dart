@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/view_model.dart';
@@ -19,10 +20,10 @@ class SettingsView
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.settings,
-              color: Theme.of(context).colorScheme.onPrimary, // Text color matches onPrimary
+              color: Colors.black,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
@@ -63,6 +64,16 @@ class SettingsView
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageSheet(context),
           ),
+          BlocBuilder<CurrencyCubit, String>(
+            builder: (context, currency) {
+              return OsmeaComponents.listItem(
+                title: OsmeaComponents.text('Currency ($currency)'),
+                leading: const Icon(Icons.attach_money),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showCurrencySheet(context),
+              );
+            },
+          ),
         ],
       );
     }
@@ -73,71 +84,110 @@ class SettingsView
   }
 
   void _showLanguageSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Text('🇺🇸'),
-              title: const Text('English'),
-              onTap: () {
-                final locale = const Locale('en');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇹🇷'),
-              title: const Text('Türkçe'),
-              onTap: () {
-                final locale = const Locale('tr');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇩🇪'),
-              title: const Text('Deutsch'),
-              onTap: () {
-                final locale = const Locale('de');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇫🇷'),
-              title: const Text('Français'),
-              onTap: () {
-                final locale = const Locale('fr');
-                context.read<LanguageCubit>().changeLanguage(locale);
-                final appLocale = AppLocaleUtils.parseLocaleParts(
-                  languageCode: locale.languageCode,
-                  countryCode: locale.countryCode,
-                );
-                LocaleSettings.setLocaleSync(appLocale);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+    OsmeaComponents.bottomSheet(
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OsmeaComponents.listItem(
+            leading: const Text('🇺🇸'),
+            title: const Text('English'),
+            onTap: () {
+              final locale = const Locale('en');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇹🇷'),
+            title: const Text('Türkçe'),
+            onTap: () {
+              final locale = const Locale('tr');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇩🇪'),
+            title: const Text('Deutsch'),
+            onTap: () {
+              final locale = const Locale('de');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇫🇷'),
+            title: const Text('Français'),
+            onTap: () {
+              final locale = const Locale('fr');
+              context.read<LanguageCubit>().changeLanguage(locale);
+              final appLocale = AppLocaleUtils.parseLocaleParts(
+                languageCode: locale.languageCode,
+                countryCode: locale.countryCode,
+              );
+              LocaleSettings.setLocaleSync(appLocale);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCurrencySheet(BuildContext context) {
+    OsmeaComponents.bottomSheet(
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OsmeaComponents.listItem(
+            leading: const Text('🇺🇸'),
+            title: const Text('USD'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('USD');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇪🇺'),
+            title: const Text('EUR'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('EUR');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇹🇷'),
+            title: const Text('TRY'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('TRY');
+              Navigator.pop(context);
+            },
+          ),
+          OsmeaComponents.listItem(
+            leading: const Text('🇬🇧'),
+            title: const Text('GBP'),
+            onTap: () {
+              context.read<CurrencyCubit>().changeCurrency('GBP');
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 }
