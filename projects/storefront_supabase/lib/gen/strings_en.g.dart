@@ -266,6 +266,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Admin'
 	String get admin => 'Admin';
 
+	/// en: 'Coupons'
+	String get coupons => 'Coupons';
+
 	/// en: 'Welcome to Storefront'
 	String get welcomeTitle => 'Welcome to Storefront';
 
@@ -698,6 +701,7 @@ extension on Translations {
 			'shopping' => 'Shopping',
 			'general' => 'General',
 			'admin' => 'Admin',
+			'coupons' => 'Coupons',
 			'welcomeTitle' => 'Welcome to Storefront',
 			'welcomeSubtitle' => 'Sign in or create an account to continue',
 			'dontHaveAccount' => 'Don\'t have an account? Sign Up',

@@ -11,6 +11,8 @@ import 'package:core/core.dart'
         TranslationProvider,
         AuthState; // Hide AuthState from core to avoid conflict with Supabase
 import 'package:storefront_supabase/app/models/product.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/admin_coupons_view.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/add_coupon_view.dart';
 import 'package:storefront_supabase/app/views/admin/dashboard/dashboard_view.dart';
 import 'package:storefront_supabase/app/views/admin/orders/orders_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/products_view.dart';
@@ -218,6 +220,30 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: '/admin/coupons',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminCouponsView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/coupons/add',
+          builder: (BuildContext context, GoRouterState state) {
+            return AddCouponView(goRoute: (String path) => context.go(path));
+          },
+        ),
+        GoRoute(
+          path: '/admin/coupons/edit/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            final couponId = state.pathParameters['id'];
+            return AddCouponView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'couponId': couponId},
+            );
+          },
+        ),
+        GoRoute(
           path: '/admin/orders',
           builder: (BuildContext context, GoRouterState state) {
             return AdminOrdersView();
@@ -301,10 +327,20 @@ class _AdminScreenState extends State<AdminScreen> {
         onTap: () {},
       ),
       NavbarItem(
+        text: resources.coupons,
+        icon: Icon(
+          Icons.confirmation_number_outlined,
+          color: _calculateSelectedIndex(context) == 3
+              ? activeColor
+              : inactiveColor,
+        ),
+        onTap: () {},
+      ),
+      NavbarItem(
         text: resources.orders,
         icon: Icon(
           Icons.receipt,
-          color: _calculateSelectedIndex(context) == 3
+          color: _calculateSelectedIndex(context) == 4
               ? activeColor
               : inactiveColor,
         ),
@@ -314,7 +350,7 @@ class _AdminScreenState extends State<AdminScreen> {
         text: resources.settings,
         icon: Icon(
           Icons.settings,
-          color: _calculateSelectedIndex(context) == 4
+          color: _calculateSelectedIndex(context) == 5
               ? activeColor
               : inactiveColor,
         ),
@@ -341,8 +377,9 @@ class _AdminScreenState extends State<AdminScreen> {
     final String location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/admin/users')) return 1;
     if (location.startsWith('/admin/products')) return 2;
-    if (location.startsWith('/admin/orders')) return 3;
-    if (location.startsWith('/admin/settings')) return 4;
+    if (location.startsWith('/admin/coupons')) return 3;
+    if (location.startsWith('/admin/orders')) return 4;
+    if (location.startsWith('/admin/settings')) return 5;
     return 0;
   }
 
@@ -358,9 +395,12 @@ class _AdminScreenState extends State<AdminScreen> {
         context.go('/admin/products');
         break;
       case 3:
-        context.go('/admin/orders');
+        context.go('/admin/coupons');
         break;
       case 4:
+        context.go('/admin/orders');
+        break;
+      case 5:
         context.go('/admin/settings');
         break;
     }

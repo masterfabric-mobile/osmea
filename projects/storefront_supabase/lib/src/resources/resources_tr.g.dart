@@ -113,6 +113,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => TranslationOverrides.string(_root.$meta, 'shopping', {}) ?? 'Alışveriş';
 	@override String get general => TranslationOverrides.string(_root.$meta, 'general', {}) ?? 'Genel';
 	@override String get admin => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Yönetici';
+	@override String get coupons => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Kuponlar';
 	@override String get welcomeTitle => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Mağazaya Hoşgeldiniz';
 	@override String get welcomeSubtitle => TranslationOverrides.string(_root.$meta, 'welcomeSubtitle', {}) ?? 'Devam etmek için giriş yapın veya hesap oluşturun';
 	@override String get dontHaveAccount => TranslationOverrides.string(_root.$meta, 'dontHaveAccount', {}) ?? 'Hesabınız yok mu? Kayıt Ol';
@@ -217,6 +218,18 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Ürün Puanı';
 	@override String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Teslimat Puanı';
 	@override String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Yorumlu';
+	@override String get haveACoupon => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Kuponunuz var mı?';
+	@override String get enterCouponCode => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Kupon kodunu girin';
+	@override String get applyCoupon => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Uygula';
+	@override String get removeCoupon => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Kuponu Kaldır';
+	@override String get discount => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'İndirim';
+	@override String get couponRemoved => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Kupon kaldırıldı.';
+	@override String get couponAppliedSuccessfully => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Kupon başarıyla uygulandı!';
+	@override String get invalidCouponCode => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Geçersiz kupon kodu.';
+	@override String get couponNotActive => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Kupon aktif değil.';
+	@override String get couponExpired => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Kuponun süresi doldu.';
+	@override String get couponLimitReached => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Kupon kullanım sınırı aşıldı.';
+	@override String get minimumPurchaseRequired => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum {amount} tutarında alışveriş gerekli.';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -302,6 +315,7 @@ extension on TranslationsTr {
 			'shopping' => TranslationOverrides.string(_root.$meta, 'shopping', {}) ?? 'Alışveriş',
 			'general' => TranslationOverrides.string(_root.$meta, 'general', {}) ?? 'Genel',
 			'admin' => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Yönetici',
+			'coupons' => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Kuponlar',
 			'welcomeTitle' => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Mağazaya Hoşgeldiniz',
 			'welcomeSubtitle' => TranslationOverrides.string(_root.$meta, 'welcomeSubtitle', {}) ?? 'Devam etmek için giriş yapın veya hesap oluşturun',
 			'dontHaveAccount' => TranslationOverrides.string(_root.$meta, 'dontHaveAccount', {}) ?? 'Hesabınız yok mu? Kayıt Ol',
@@ -406,6 +420,18 @@ extension on TranslationsTr {
 			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Ürün Puanı',
 			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Teslimat Puanı',
 			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Yorumlu',
+			'haveACoupon' => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Kuponunuz var mı?',
+			'enterCouponCode' => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Kupon kodunu girin',
+			'applyCoupon' => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Uygula',
+			'removeCoupon' => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Kuponu Kaldır',
+			'discount' => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'İndirim',
+			'couponRemoved' => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Kupon kaldırıldı.',
+			'couponAppliedSuccessfully' => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Kupon başarıyla uygulandı!',
+			'invalidCouponCode' => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Geçersiz kupon kodu.',
+			'couponNotActive' => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Kupon aktif değil.',
+			'couponExpired' => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Kuponun süresi doldu.',
+			'couponLimitReached' => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Kupon kullanım sınırı aşıldı.',
+			'minimumPurchaseRequired' => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum {amount} tutarında alışveriş gerekli.',
 			_ => null,
 		};
 	}

@@ -112,6 +112,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => 'Alışveriş';
 	@override String get general => 'Genel';
 	@override String get admin => 'Yönetici';
+	@override String get coupons => 'Kuponlar';
 	@override String get welcomeTitle => 'Mağazaya Hoşgeldiniz';
 	@override String get welcomeSubtitle => 'Devam etmek için giriş yapın veya hesap oluşturun';
 	@override String get dontHaveAccount => 'Hesabınız yok mu? Kayıt Ol';
@@ -313,6 +314,7 @@ extension on TranslationsTr {
 			'shopping' => 'Alışveriş',
 			'general' => 'Genel',
 			'admin' => 'Yönetici',
+			'coupons' => 'Kuponlar',
 			'welcomeTitle' => 'Mağazaya Hoşgeldiniz',
 			'welcomeSubtitle' => 'Devam etmek için giriş yapın veya hesap oluşturun',
 			'dontHaveAccount' => 'Hesabınız yok mu? Kayıt Ol',

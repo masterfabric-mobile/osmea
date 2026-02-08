@@ -112,6 +112,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => 'Einkaufen';
 	@override String get general => 'Allgemein';
 	@override String get admin => 'Admin';
+	@override String get coupons => 'Gutscheine';
 	@override String get welcomeTitle => 'Willkommen im Storefront';
 	@override String get welcomeSubtitle => 'Melden Sie sich an oder erstellen Sie ein Konto';
 	@override String get dontHaveAccount => 'Noch kein Konto? Registrieren';
@@ -313,6 +314,7 @@ extension on TranslationsDe {
 			'shopping' => 'Einkaufen',
 			'general' => 'Allgemein',
 			'admin' => 'Admin',
+			'coupons' => 'Gutscheine',
 			'welcomeTitle' => 'Willkommen im Storefront',
 			'welcomeSubtitle' => 'Melden Sie sich an oder erstellen Sie ein Konto',
 			'dontHaveAccount' => 'Noch kein Konto? Registrieren',
