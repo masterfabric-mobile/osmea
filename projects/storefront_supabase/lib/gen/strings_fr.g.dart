@@ -216,6 +216,18 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get filterProductRating => 'Note du produit';
 	@override String get filterDeliveryRating => 'Note de livraison';
 	@override String get filterWithComment => 'Avec commentaire';
+	@override String get haveACoupon => 'Vous avez un bon de réduction ?';
+	@override String get enterCouponCode => 'Entrez le code de réduction';
+	@override String get applyCoupon => 'Appliquer';
+	@override String get removeCoupon => 'Supprimer le bon de réduction';
+	@override String get discount => 'Remise';
+	@override String get couponRemoved => 'Bon de réduction supprimé.';
+	@override String get couponAppliedSuccessfully => 'Bon de réduction appliqué avec succès !';
+	@override String get invalidCouponCode => 'Code de bon de réduction invalide.';
+	@override String get couponNotActive => 'Le bon de réduction n\'est pas actif.';
+	@override String get couponExpired => 'Le bon de réduction a expiré.';
+	@override String get couponLimitReached => 'Limite d\'utilisation du bon de réduction atteinte.';
+	@override String get minimumPurchaseRequired => 'Achat minimum de {amount} requis.';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -405,6 +417,18 @@ extension on TranslationsFr {
 			'filterProductRating' => 'Note du produit',
 			'filterDeliveryRating' => 'Note de livraison',
 			'filterWithComment' => 'Avec commentaire',
+			'haveACoupon' => 'Vous avez un bon de réduction ?',
+			'enterCouponCode' => 'Entrez le code de réduction',
+			'applyCoupon' => 'Appliquer',
+			'removeCoupon' => 'Supprimer le bon de réduction',
+			'discount' => 'Remise',
+			'couponRemoved' => 'Bon de réduction supprimé.',
+			'couponAppliedSuccessfully' => 'Bon de réduction appliqué avec succès !',
+			'invalidCouponCode' => 'Code de bon de réduction invalide.',
+			'couponNotActive' => 'Le bon de réduction n\'est pas actif.',
+			'couponExpired' => 'Le bon de réduction a expiré.',
+			'couponLimitReached' => 'Limite d\'utilisation du bon de réduction atteinte.',
+			'minimumPurchaseRequired' => 'Achat minimum de {amount} requis.',
 			_ => null,
 		};
 	}

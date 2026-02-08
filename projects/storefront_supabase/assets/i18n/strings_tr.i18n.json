@@ -159,7 +159,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Henüz yorum yok.",
+  },
+  "noReviewsYet": "Henüz yorum yok.",
   "emailCannotBeChanged": "* E-posta adresi buradan doğrudan değiştirilemez.",
   "genderMale": "Erkek",
   "genderFemale": "Kadın",
@@ -184,5 +185,17 @@
   "filterVerified": "Doğrulanmış Satın Alma",
   "filterProductRating": "Ürün Puanı",
   "filterDeliveryRating": "Teslimat Puanı",
-  "filterWithComment": "Yorumlu"
+  "filterWithComment": "Yorumlu",
+  "haveACoupon": "Kuponunuz var mı?",
+  "enterCouponCode": "Kupon kodunu girin",
+  "applyCoupon": "Uygula",
+  "removeCoupon": "Kuponu Kaldır",
+  "discount": "İndirim",
+  "couponRemoved": "Kupon kaldırıldı.",
+  "couponAppliedSuccessfully": "Kupon başarıyla uygulandı!",
+  "invalidCouponCode": "Geçersiz kupon kodu.",
+  "couponNotActive": "Kupon aktif değil.",
+  "couponExpired": "Kuponun süresi doldu.",
+  "couponLimitReached": "Kupon kullanım sınırı aşıldı.",
+  "minimumPurchaseRequired": "Minimum {amount} tutarında alışveriş gerekli."
 }

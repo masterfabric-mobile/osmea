@@ -185,5 +185,17 @@
   "filterVerified": "Verified Purchase",
   "filterProductRating": "Product Rating",
   "filterDeliveryRating": "Delivery Rating",
-  "filterWithComment": "With Comment"
+  "filterWithComment": "With Comment",
+  "haveACoupon": "Have a coupon?",
+  "enterCouponCode": "Enter coupon code",
+  "applyCoupon": "Apply",
+  "removeCoupon": "Remove Coupon",
+  "discount": "Discount",
+  "couponRemoved": "Coupon removed.",
+  "couponAppliedSuccessfully": "Coupon applied successfully!",
+  "invalidCouponCode": "Invalid coupon code.",
+  "couponNotActive": "Coupon is not active.",
+  "couponExpired": "Coupon has expired.",
+  "couponLimitReached": "Coupon usage limit reached.",
+  "minimumPurchaseRequired": "Minimum purchase of {amount} required."
 }

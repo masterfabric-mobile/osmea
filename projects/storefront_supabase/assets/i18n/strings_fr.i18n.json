@@ -159,7 +159,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Pas encore d'avis.",
+  },
+  "noReviewsYet": "Pas encore d'avis.",
   "emailCannotBeChanged": "* L'e-mail ne peut pas être modifié ici directement.",
   "genderMale": "Homme",
   "genderFemale": "Femme",
@@ -184,6 +185,17 @@
   "filterVerified": "Achat vérifié",
   "filterProductRating": "Note du produit",
   "filterDeliveryRating": "Note de livraison",
-  "filterWithComment": "Avec commentaire"
+  "filterWithComment": "Avec commentaire",
+  "haveACoupon": "Vous avez un bon de réduction ?",
+  "enterCouponCode": "Entrez le code de réduction",
+  "applyCoupon": "Appliquer",
+  "removeCoupon": "Supprimer le bon de réduction",
+  "discount": "Remise",
+  "couponRemoved": "Bon de réduction supprimé.",
+  "couponAppliedSuccessfully": "Bon de réduction appliqué avec succès !",
+  "invalidCouponCode": "Code de bon de réduction invalide.",
+  "couponNotActive": "Le bon de réduction n'est pas actif.",
+  "couponExpired": "Le bon de réduction a expiré.",
+  "couponLimitReached": "Limite d'utilisation du bon de réduction atteinte.",
+  "minimumPurchaseRequired": "Achat minimum de {amount} requis."
 }
-

@@ -216,6 +216,18 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get filterProductRating => 'Produktbewertung';
 	@override String get filterDeliveryRating => 'Lieferbewertung';
 	@override String get filterWithComment => 'Mit Kommentar';
+	@override String get haveACoupon => 'Haben Sie einen Gutschein?';
+	@override String get enterCouponCode => 'Gutscheincode eingeben';
+	@override String get applyCoupon => 'Anwenden';
+	@override String get removeCoupon => 'Gutschein entfernen';
+	@override String get discount => 'Rabatt';
+	@override String get couponRemoved => 'Gutschein entfernt.';
+	@override String get couponAppliedSuccessfully => 'Gutschein erfolgreich angewendet!';
+	@override String get invalidCouponCode => 'Ungültiger Gutscheincode.';
+	@override String get couponNotActive => 'Gutschein ist nicht aktiv.';
+	@override String get couponExpired => 'Gutschein ist abgelaufen.';
+	@override String get couponLimitReached => 'Nutzungslimit für Gutschein erreicht.';
+	@override String get minimumPurchaseRequired => 'Mindestkauf von {amount} erforderlich.';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -405,6 +417,18 @@ extension on TranslationsDe {
 			'filterProductRating' => 'Produktbewertung',
 			'filterDeliveryRating' => 'Lieferbewertung',
 			'filterWithComment' => 'Mit Kommentar',
+			'haveACoupon' => 'Haben Sie einen Gutschein?',
+			'enterCouponCode' => 'Gutscheincode eingeben',
+			'applyCoupon' => 'Anwenden',
+			'removeCoupon' => 'Gutschein entfernen',
+			'discount' => 'Rabatt',
+			'couponRemoved' => 'Gutschein entfernt.',
+			'couponAppliedSuccessfully' => 'Gutschein erfolgreich angewendet!',
+			'invalidCouponCode' => 'Ungültiger Gutscheincode.',
+			'couponNotActive' => 'Gutschein ist nicht aktiv.',
+			'couponExpired' => 'Gutschein ist abgelaufen.',
+			'couponLimitReached' => 'Nutzungslimit für Gutschein erreicht.',
+			'minimumPurchaseRequired' => 'Mindestkauf von {amount} erforderlich.',
 			_ => null,
 		};
 	}

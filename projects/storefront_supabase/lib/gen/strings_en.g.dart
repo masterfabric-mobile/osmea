@@ -577,6 +577,42 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'With Comment'
 	String get filterWithComment => 'With Comment';
+
+	/// en: 'Have a coupon?'
+	String get haveACoupon => 'Have a coupon?';
+
+	/// en: 'Enter coupon code'
+	String get enterCouponCode => 'Enter coupon code';
+
+	/// en: 'Apply'
+	String get applyCoupon => 'Apply';
+
+	/// en: 'Remove Coupon'
+	String get removeCoupon => 'Remove Coupon';
+
+	/// en: 'Discount'
+	String get discount => 'Discount';
+
+	/// en: 'Coupon removed.'
+	String get couponRemoved => 'Coupon removed.';
+
+	/// en: 'Coupon applied successfully!'
+	String get couponAppliedSuccessfully => 'Coupon applied successfully!';
+
+	/// en: 'Invalid coupon code.'
+	String get invalidCouponCode => 'Invalid coupon code.';
+
+	/// en: 'Coupon is not active.'
+	String get couponNotActive => 'Coupon is not active.';
+
+	/// en: 'Coupon has expired.'
+	String get couponExpired => 'Coupon has expired.';
+
+	/// en: 'Coupon usage limit reached.'
+	String get couponLimitReached => 'Coupon usage limit reached.';
+
+	/// en: 'Minimum purchase of {amount} required.'
+	String get minimumPurchaseRequired => 'Minimum purchase of {amount} required.';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -766,6 +802,18 @@ extension on Translations {
 			'filterProductRating' => 'Product Rating',
 			'filterDeliveryRating' => 'Delivery Rating',
 			'filterWithComment' => 'With Comment',
+			'haveACoupon' => 'Have a coupon?',
+			'enterCouponCode' => 'Enter coupon code',
+			'applyCoupon' => 'Apply',
+			'removeCoupon' => 'Remove Coupon',
+			'discount' => 'Discount',
+			'couponRemoved' => 'Coupon removed.',
+			'couponAppliedSuccessfully' => 'Coupon applied successfully!',
+			'invalidCouponCode' => 'Invalid coupon code.',
+			'couponNotActive' => 'Coupon is not active.',
+			'couponExpired' => 'Coupon has expired.',
+			'couponLimitReached' => 'Coupon usage limit reached.',
+			'minimumPurchaseRequired' => 'Minimum purchase of {amount} required.',
 			_ => null,
 		};
 	}

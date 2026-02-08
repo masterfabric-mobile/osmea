@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 4
-/// Strings: 716 (179 per locale)
+/// Strings: 764 (191 per locale)
 ///
-/// Built on 2026-02-08 at 09:27 UTC
+/// Built on 2026-02-08 at 10:19 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
@@ -23,12 +23,7 @@ import 'strings_fr.g.dart' deferred as l_fr;
 import 'strings_tr.g.dart' deferred as l_tr;
 part 'strings_en.g.dart';
 
-/// Supported locales.
-///
-/// Usage:
-/// - LocaleSettings.setLocale(AppLocale.en) // set locale
-/// - Locale locale = AppLocale.en.flutterLocale // get flutter locale from enum
-/// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
+
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en'),
 	de(languageCode: 'de'),
@@ -116,52 +111,24 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 		}
 	}
 
-	/// Gets current instance managed by [LocaleSettings].
+
 	Translations get translations => LocaleSettings.instance.getTranslations(this);
 }
 
-/// Method A: Simple
-///
-/// No rebuild after locale change.
-/// Translation happens during initialization of the widget (call of t).
-/// Configurable via 'translate_var'.
-///
-/// Usage:
-/// String a = t.someKey.anotherKey;
-/// String b = t['someKey.anotherKey']; // Only for edge cases!
+
 Translations get t => LocaleSettings.instance.currentTranslations;
 
-/// Method B: Advanced
-///
-/// All widgets using this method will trigger a rebuild when locale changes.
-/// Use this if you have e.g. a settings page where the user can select the locale during runtime.
-///
-/// Step 1:
-/// wrap your App with
-/// TranslationProvider(
-/// 	child: MyApp()
-/// );
-///
-/// Step 2:
-/// final t = Translations.of(context); // Get t variable.
-/// String a = t.someKey.anotherKey; // Use t variable.
-/// String b = t['someKey.anotherKey']; // Only for edge cases!
 class TranslationProvider extends BaseTranslationProvider<AppLocale, Translations> {
 	TranslationProvider({required super.child}) : super(settings: LocaleSettings.instance);
 
 	static InheritedLocaleData<AppLocale, Translations> of(BuildContext context) => InheritedLocaleData.of<AppLocale, Translations>(context);
 }
 
-/// Method B shorthand via [BuildContext] extension method.
-/// Configurable via 'translate_var'.
-///
-/// Usage (e.g. in a widget's build method):
-/// context.t.someKey.anotherKey
+
 extension BuildContextTranslationsExtension on BuildContext {
 	Translations get t => TranslationProvider.of(this).translations;
 }
 
-/// Manages all translation instances and the current locale
 class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, Translations> {
 	LocaleSettings._() : super(
 		utils: AppLocaleUtils.instance,
@@ -170,7 +137,7 @@ class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, Translations> 
 
 	static final instance = LocaleSettings._();
 
-	// static aliases (checkout base methods for documentation)
+
 	static AppLocale get currentLocale => instance.currentLocale;
 	static Stream<AppLocale> getLocaleStream() => instance.getLocaleStream();
 	static Future<AppLocale> setLocale(AppLocale locale, {bool? listenToDeviceLocale = false}) => instance.setLocale(locale, listenToDeviceLocale: listenToDeviceLocale);
@@ -183,7 +150,7 @@ class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, Translations> 
 		ordinalResolver: ordinalResolver,
 	);
 
-	// synchronous versions
+
 	static AppLocale setLocaleSync(AppLocale locale, {bool? listenToDeviceLocale = false}) => instance.setLocaleSync(locale, listenToDeviceLocale: listenToDeviceLocale);
 	static AppLocale setLocaleRawSync(String rawLocale, {bool? listenToDeviceLocale = false}) => instance.setLocaleRawSync(rawLocale, listenToDeviceLocale: listenToDeviceLocale);
 	static AppLocale useDeviceLocaleSync() => instance.useDeviceLocaleSync();
@@ -195,7 +162,6 @@ class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, Translations> 
 	);
 }
 
-/// Provides utility functions without any side effects.
 class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, Translations> {
 	AppLocaleUtils._() : super(
 		baseLocale: AppLocale.en,
@@ -204,7 +170,7 @@ class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, Translations> {
 
 	static final instance = AppLocaleUtils._();
 
-	// static aliases (checkout base methods for documentation)
+	
 	static AppLocale parse(String rawLocale) => instance.parse(rawLocale);
 	static AppLocale parseLocaleParts({required String languageCode, String? scriptCode, String? countryCode}) => instance.parseLocaleParts(languageCode: languageCode, scriptCode: scriptCode, countryCode: countryCode);
 	static AppLocale findDeviceLocale() => instance.findDeviceLocale();

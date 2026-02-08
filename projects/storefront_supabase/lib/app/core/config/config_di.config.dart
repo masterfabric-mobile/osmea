@@ -13,6 +13,10 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:storefront_supabase/app/core/config/register_module.dart'
     as _i1006;
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/view_model.dart'
+    as _i332;
+import 'package:storefront_supabase/app/views/admin/coupons/models/view_model.dart'
+    as _i221;
 import 'package:storefront_supabase/app/views/admin/dashboard/models/view_model.dart'
     as _i821;
 import 'package:storefront_supabase/app/views/admin/products/add_product/view_model.dart'
@@ -57,6 +61,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.lazySingleton<_i482.SupabaseHomeViewModel>(
       () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i332.AddCouponViewModel>(
+      () => _i332.AddCouponViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i221.AdminCouponsViewModel>(
+      () => _i221.AdminCouponsViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i821.AdminDashboardViewModel>(
       () => _i821.AdminDashboardViewModel(gh<_i454.SupabaseClient>()),

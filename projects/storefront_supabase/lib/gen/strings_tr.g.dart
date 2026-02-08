@@ -216,6 +216,18 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get filterProductRating => 'Ürün Puanı';
 	@override String get filterDeliveryRating => 'Teslimat Puanı';
 	@override String get filterWithComment => 'Yorumlu';
+	@override String get haveACoupon => 'Kuponunuz var mı?';
+	@override String get enterCouponCode => 'Kupon kodunu girin';
+	@override String get applyCoupon => 'Uygula';
+	@override String get removeCoupon => 'Kuponu Kaldır';
+	@override String get discount => 'İndirim';
+	@override String get couponRemoved => 'Kupon kaldırıldı.';
+	@override String get couponAppliedSuccessfully => 'Kupon başarıyla uygulandı!';
+	@override String get invalidCouponCode => 'Geçersiz kupon kodu.';
+	@override String get couponNotActive => 'Kupon aktif değil.';
+	@override String get couponExpired => 'Kuponun süresi doldu.';
+	@override String get couponLimitReached => 'Kupon kullanım sınırı aşıldı.';
+	@override String get minimumPurchaseRequired => 'Minimum {amount} tutarında alışveriş gerekli.';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -405,6 +417,18 @@ extension on TranslationsTr {
 			'filterProductRating' => 'Ürün Puanı',
 			'filterDeliveryRating' => 'Teslimat Puanı',
 			'filterWithComment' => 'Yorumlu',
+			'haveACoupon' => 'Kuponunuz var mı?',
+			'enterCouponCode' => 'Kupon kodunu girin',
+			'applyCoupon' => 'Uygula',
+			'removeCoupon' => 'Kuponu Kaldır',
+			'discount' => 'İndirim',
+			'couponRemoved' => 'Kupon kaldırıldı.',
+			'couponAppliedSuccessfully' => 'Kupon başarıyla uygulandı!',
+			'invalidCouponCode' => 'Geçersiz kupon kodu.',
+			'couponNotActive' => 'Kupon aktif değil.',
+			'couponExpired' => 'Kuponun süresi doldu.',
+			'couponLimitReached' => 'Kupon kullanım sınırı aşıldı.',
+			'minimumPurchaseRequired' => 'Minimum {amount} tutarında alışveriş gerekli.',
 			_ => null,
 		};
 	}

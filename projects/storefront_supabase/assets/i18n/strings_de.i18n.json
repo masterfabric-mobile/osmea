@@ -159,7 +159,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Noch keine Bewertungen.",
+  },
+  "noReviewsYet": "Noch keine Bewertungen.",
   "emailCannotBeChanged": "* E-Mail kann hier nicht direkt geändert werden.",
   "genderMale": "Männlich",
   "genderFemale": "Weiblich",
@@ -184,6 +185,17 @@
   "filterVerified": "Verifizierter Kauf",
   "filterProductRating": "Produktbewertung",
   "filterDeliveryRating": "Lieferbewertung",
-  "filterWithComment": "Mit Kommentar"
+  "filterWithComment": "Mit Kommentar",
+  "haveACoupon": "Haben Sie einen Gutschein?",
+  "enterCouponCode": "Gutscheincode eingeben",
+  "applyCoupon": "Anwenden",
+  "removeCoupon": "Gutschein entfernen",
+  "discount": "Rabatt",
+  "couponRemoved": "Gutschein entfernt.",
+  "couponAppliedSuccessfully": "Gutschein erfolgreich angewendet!",
+  "invalidCouponCode": "Ungültiger Gutscheincode.",
+  "couponNotActive": "Gutschein ist nicht aktiv.",
+  "couponExpired": "Gutschein ist abgelaufen.",
+  "couponLimitReached": "Nutzungslimit für Gutschein erreicht.",
+  "minimumPurchaseRequired": "Mindestkauf von {amount} erforderlich."
 }
-
