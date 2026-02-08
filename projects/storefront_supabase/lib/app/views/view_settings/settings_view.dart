@@ -94,11 +94,6 @@ class SettingsView
             onTap: () {
               final locale = const Locale('en');
               context.read<LanguageCubit>().changeLanguage(locale);
-              final appLocale = AppLocaleUtils.parseLocaleParts(
-                languageCode: locale.languageCode,
-                countryCode: locale.countryCode,
-              );
-              LocaleSettings.setLocaleSync(appLocale);
               Navigator.pop(context);
             },
           ),
@@ -108,11 +103,6 @@ class SettingsView
             onTap: () {
               final locale = const Locale('tr');
               context.read<LanguageCubit>().changeLanguage(locale);
-              final appLocale = AppLocaleUtils.parseLocaleParts(
-                languageCode: locale.languageCode,
-                countryCode: locale.countryCode,
-              );
-              LocaleSettings.setLocaleSync(appLocale);
               Navigator.pop(context);
             },
           ),
@@ -122,11 +112,6 @@ class SettingsView
             onTap: () {
               final locale = const Locale('de');
               context.read<LanguageCubit>().changeLanguage(locale);
-              final appLocale = AppLocaleUtils.parseLocaleParts(
-                languageCode: locale.languageCode,
-                countryCode: locale.countryCode,
-              );
-              LocaleSettings.setLocaleSync(appLocale);
               Navigator.pop(context);
             },
           ),
@@ -136,11 +121,6 @@ class SettingsView
             onTap: () {
               final locale = const Locale('fr');
               context.read<LanguageCubit>().changeLanguage(locale);
-              final appLocale = AppLocaleUtils.parseLocaleParts(
-                languageCode: locale.languageCode,
-                countryCode: locale.countryCode,
-              );
-              LocaleSettings.setLocaleSync(appLocale);
               Navigator.pop(context);
             },
           ),

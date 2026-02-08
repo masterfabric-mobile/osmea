@@ -562,6 +562,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Failed to update wishlist. Please try again.'
 	String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.';
+
+	/// en: 'All'
+	String get filterAll => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'All';
+
+	/// en: 'Verified Purchase'
+	String get filterVerified => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verified Purchase';
+
+	/// en: 'Product Rating'
+	String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Product Rating';
+
+	/// en: 'Delivery Rating'
+	String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Delivery Rating';
+
+	/// en: 'With Comment'
+	String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'With Comment';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -746,6 +761,11 @@ extension on Translations {
 			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Added to favorites!',
 			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Removed from favorites.',
 			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.',
+			'filterAll' => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'All',
+			'filterVerified' => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verified Purchase',
+			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Product Rating',
+			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Delivery Rating',
+			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'With Comment',
 			_ => null,
 		};
 	}

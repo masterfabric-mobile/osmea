@@ -211,6 +211,11 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Favorilere eklendi!';
 	@override String get removedFromFavorites => 'Favorilerden çıkarıldı.';
 	@override String get wishlistUpdateFailed => 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.';
+	@override String get filterAll => 'Tümü';
+	@override String get filterVerified => 'Doğrulanmış Satın Alma';
+	@override String get filterProductRating => 'Ürün Puanı';
+	@override String get filterDeliveryRating => 'Teslimat Puanı';
+	@override String get filterWithComment => 'Yorumlu';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -395,6 +400,11 @@ extension on TranslationsTr {
 			'addedToFavorites' => 'Favorilere eklendi!',
 			'removedFromFavorites' => 'Favorilerden çıkarıldı.',
 			'wishlistUpdateFailed' => 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.',
+			'filterAll' => 'Tümü',
+			'filterVerified' => 'Doğrulanmış Satın Alma',
+			'filterProductRating' => 'Ürün Puanı',
+			'filterDeliveryRating' => 'Teslimat Puanı',
+			'filterWithComment' => 'Yorumlu',
 			_ => null,
 		};
 	}

@@ -44,26 +44,30 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     try {
       final userId = _supabaseClient.auth.currentUser?.id;
 
-      // Fetch product (with variants), reviews, and favorite status in parallel
-      final responses = await Future.wait<dynamic>([
-        _supabaseClient
-            .from('products')
-            .select('*, product_images(*), product_variants(*)') // Included product_variants
-            .eq('id', productId)
-            .single(),
-        _supabaseClient
-            .from('product_reviews')
-            .select('*, users(full_name)')
-            .eq('product_id', productId),
-        if (userId != null)
-          _supabaseClient
+      // 1. Fetch Product
+      final productFuture = _supabaseClient
+          .from('products')
+          .select('*, product_images(*), product_variants(*)')
+          .eq('id', productId)
+          .single();
+
+      // 2. Fetch Reviews (Robust)
+      final reviewsFuture = _fetchReviewsSafely(productId);
+
+      // 3. Fetch Favorite Status
+      final favoriteFuture = (userId != null)
+          ? _supabaseClient
               .from('favorites')
               .select('id')
               .eq('user_id', userId)
               .eq('product_id', productId)
               .limit(1)
-        else
-          Future.value([]),
+          : Future.value([]);
+
+      final responses = await Future.wait<dynamic>([
+        productFuture,
+        reviewsFuture,
+        favoriteFuture,
       ]);
 
       final productResponse = responses[0] as PostgrestMap;
@@ -79,12 +83,70 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
       stateChanger(ProductDetailLoadedState(
           product: loadedProduct,
-          reviews: reviews,
+          reviews: reviews, // This sets both reviews and allReviews (via constructor logic)
           isInWishlist: isInWishlist));
     } catch (e) {
       stateChanger(
           ProductDetailErrorState('Failed to load product details: $e'));
     }
+  }
+
+  Future<List<dynamic>> _fetchReviewsSafely(String productId) async {
+    try {
+      // Attempt 1: Fetch with user details (names)
+      final response = await _supabaseClient
+          .from('product_reviews')
+          .select('*, users(full_name)')
+          .eq('product_id', productId)
+          .order('created_at', ascending: false);
+      return response as List<dynamic>;
+    } catch (e) {
+      debugPrint('Review fetch with join failed: $e. Falling back to raw fetch.');
+      try {
+        // Attempt 2: Fetch raw reviews (content only, for guests/restricted RLS)
+        final response = await _supabaseClient
+            .from('product_reviews')
+            .select('*')
+            .eq('product_id', productId)
+            .order('created', ascending: false);
+        return response as List<dynamic>;
+      } catch (e2) {
+        debugPrint('Raw review fetch failed: $e2');
+        rethrow; // If both fail, propagate error
+      }
+    }
+  }
+
+  void filterReviews(ReviewFilterType filter) {
+    if (state is! ProductDetailLoadedState) return;
+    final currentState = state as ProductDetailLoadedState;
+    
+    List<ProductReview> filtered = currentState.allReviews;
+
+    switch (filter) {
+      case ReviewFilterType.verified:
+        filtered = filtered.where((r) => r.isVerifiedPurchase).toList();
+        break;
+      case ReviewFilterType.productRatingHigh:
+        // Show 4 & 5 stars
+        filtered = filtered.where((r) => r.rating >= 4).toList();
+        break;
+      case ReviewFilterType.deliveryRatingHigh:
+        // Show 4 & 5 stars delivery
+        filtered = filtered.where((r) => r.deliveryRating != null && r.deliveryRating! >= 4).toList();
+        break;
+      case ReviewFilterType.withComment:
+        filtered = filtered.where((r) => r.comment != null && r.comment!.isNotEmpty).toList();
+        break;
+      case ReviewFilterType.all:
+        // Keep all
+        break;
+    }
+
+    stateChanger(currentState.copyWith(
+      reviews: filtered,
+      activeFilter: filter,
+    ));
   }
 
   void selectVariant(ProductVariant variant) {

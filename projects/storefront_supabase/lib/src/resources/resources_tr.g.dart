@@ -212,6 +212,11 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Favorilere eklendi!';
 	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Favorilerden çıkarıldı.';
 	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.';
+	@override String get filterAll => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Tümü';
+	@override String get filterVerified => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Doğrulanmış Satın Alma';
+	@override String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Ürün Puanı';
+	@override String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Teslimat Puanı';
+	@override String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Yorumlu';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -396,6 +401,11 @@ extension on TranslationsTr {
 			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Favorilere eklendi!',
 			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Favorilerden çıkarıldı.',
 			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.',
+			'filterAll' => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Tümü',
+			'filterVerified' => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Doğrulanmış Satın Alma',
+			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Ürün Puanı',
+			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Teslimat Puanı',
+			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Yorumlu',
 			_ => null,
 		};
 	}

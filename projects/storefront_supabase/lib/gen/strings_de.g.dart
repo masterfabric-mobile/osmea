@@ -211,6 +211,11 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Zu Favoriten hinzugefügt!';
 	@override String get removedFromFavorites => 'Aus Favoriten entfernt.';
 	@override String get wishlistUpdateFailed => 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.';
+	@override String get filterAll => 'Alle';
+	@override String get filterVerified => 'Verifizierter Kauf';
+	@override String get filterProductRating => 'Produktbewertung';
+	@override String get filterDeliveryRating => 'Lieferbewertung';
+	@override String get filterWithComment => 'Mit Kommentar';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -395,6 +400,11 @@ extension on TranslationsDe {
 			'addedToFavorites' => 'Zu Favoriten hinzugefügt!',
 			'removedFromFavorites' => 'Aus Favoriten entfernt.',
 			'wishlistUpdateFailed' => 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.',
+			'filterAll' => 'Alle',
+			'filterVerified' => 'Verifizierter Kauf',
+			'filterProductRating' => 'Produktbewertung',
+			'filterDeliveryRating' => 'Lieferbewertung',
+			'filterWithComment' => 'Mit Kommentar',
 			_ => null,
 		};
 	}

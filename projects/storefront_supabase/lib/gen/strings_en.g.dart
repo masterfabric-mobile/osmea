@@ -562,6 +562,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Failed to update wishlist. Please try again.'
 	String get wishlistUpdateFailed => 'Failed to update wishlist. Please try again.';
+
+	/// en: 'All'
+	String get filterAll => 'All';
+
+	/// en: 'Verified Purchase'
+	String get filterVerified => 'Verified Purchase';
+
+	/// en: 'Product Rating'
+	String get filterProductRating => 'Product Rating';
+
+	/// en: 'Delivery Rating'
+	String get filterDeliveryRating => 'Delivery Rating';
+
+	/// en: 'With Comment'
+	String get filterWithComment => 'With Comment';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -746,6 +761,11 @@ extension on Translations {
 			'addedToFavorites' => 'Added to favorites!',
 			'removedFromFavorites' => 'Removed from favorites.',
 			'wishlistUpdateFailed' => 'Failed to update wishlist. Please try again.',
+			'filterAll' => 'All',
+			'filterVerified' => 'Verified Purchase',
+			'filterProductRating' => 'Product Rating',
+			'filterDeliveryRating' => 'Delivery Rating',
+			'filterWithComment' => 'With Comment',
 			_ => null,
 		};
 	}

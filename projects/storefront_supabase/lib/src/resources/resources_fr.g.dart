@@ -212,6 +212,11 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Ajouté aux favoris !';
 	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Retiré des favoris.';
 	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.';
+	@override String get filterAll => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Tous';
+	@override String get filterVerified => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Achat vérifié';
+	@override String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Note du produit';
+	@override String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Note de livraison';
+	@override String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Avec commentaire';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -396,6 +401,11 @@ extension on TranslationsFr {
 			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Ajouté aux favoris !',
 			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Retiré des favoris.',
 			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.',
+			'filterAll' => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Tous',
+			'filterVerified' => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Achat vérifié',
+			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Note du produit',
+			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Note de livraison',
+			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Avec commentaire',
 			_ => null,
 		};
 	}

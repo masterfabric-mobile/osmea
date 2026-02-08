@@ -301,10 +301,13 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
         separatorBuilder: (_, __) => const SizedBox(width: 16),
         itemBuilder: (context, index) {
           final brand = brands[index];
+          final isSelected = widget.state.selectedBrandIds.contains(brand.id);
+          
           return GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () {
-              // Trigger filter for this brand
-              widget.viewModel.setBrandFilters({brand.id});
+              // Navigate to ProductsByBrandView
+              widget.goRoute('/brands/${brand.id}');
             },
             child: Column(
               children: [
@@ -312,12 +315,16 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: isSelected ? Colors.black : Colors.grey[100], // Highlight selected
                     shape: BoxShape.circle,
+                    border: isSelected ? Border.all(color: Colors.black, width: 2) : null,
                     image: brand.logoUrl != null
                         ? DecorationImage(
                             image: NetworkImage(brand.logoUrl!),
                             fit: BoxFit.cover,
+                            colorFilter: isSelected 
+                                ? const ColorFilter.mode(Colors.grey, BlendMode.darken) 
+                                : null, // Dim image slightly if selected
                           )
                         : null,
                   ),
@@ -325,14 +332,16 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                       ? Center(
                           child: Text(
                             brand.name.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
-                              color: Colors.black54,
+                              color: isSelected ? Colors.white : Colors.black54, // Text color change
                             ),
                           ),
                         )
-                      : null,
+                      : (isSelected 
+                          ? const Center(child: Icon(Icons.check, color: Colors.white)) 
+                          : null),
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
@@ -342,7 +351,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
                 ),
               ],

@@ -197,17 +197,39 @@ class ProductDetailView
                     textStyle: Theme.of(context).textTheme.titleLarge,
                   ),
                   OsmeaComponents.sizedBox(height: 16),
+                  _buildReviewFilters(context, viewModel, state),
+                  OsmeaComponents.sizedBox(height: 16),
                   _buildReviewsList(context, reviews),
                   OsmeaComponents.sizedBox(height: 24),
                   if (Supabase.instance.client.auth.currentUser != null)
                     _buildAddReviewForm(context, viewModel, product.id)
                   else
-                    Center(
-                      child: OsmeaComponents.text(
-                        resources.loginToViewInfo, // Reusing existing string "Please log in..." or similar implies action needed
-                        // Or better: "Giriş yaparak yorum yapabilirsiniz" if we had that string.
-                        // "loginToViewInfo" is "Please log in to view information.", close enough for now.
-                        color: Colors.grey,
+                    OsmeaComponents.container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200), // Added border for visibility on white bg
+                      ),
+                      child: Column(
+                        children: [
+                          OsmeaComponents.text(
+                            resources.writeReview,
+                            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                          ),
+                          OsmeaComponents.sizedBox(height: 16),
+                          OsmeaComponents.button(
+                            text: resources.login,
+                            onPressed: () => goRoute('/profile'),
+                            variant: ButtonVariant.primary,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                          ),
+                        ],
                       ),
                     ),
                 ],
@@ -325,6 +347,43 @@ class ProductDetailView
           icon: const Icon(Icons.add, color: Colors.black),
         ),
       ],
+    );
+  }
+
+  Widget _buildReviewFilters(BuildContext context, ProductDetailViewModel viewModel, ProductDetailLoadedState state) {
+    final resources = context.resources;
+    final filters = [
+      {'type': ReviewFilterType.all, 'label': resources.filterAll},
+      {'type': ReviewFilterType.verified, 'label': resources.filterVerified},
+      {'type': ReviewFilterType.productRatingHigh, 'label': resources.filterProductRating},
+      {'type': ReviewFilterType.deliveryRatingHigh, 'label': resources.filterDeliveryRating},
+      {'type': ReviewFilterType.withComment, 'label': resources.filterWithComment},
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((filter) {
+          final type = filter['type'] as ReviewFilterType;
+          final label = filter['label'] as String;
+          final isSelected = state.activeFilter == type;
+          
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: FilterChip(
+              label: Text(label),
+              selected: isSelected,
+              onSelected: (_) => viewModel.filterReviews(type),
+              selectedColor: Colors.black,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+              checkmarkColor: Colors.white,
+              backgroundColor: Colors.grey[200],
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 

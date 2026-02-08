@@ -211,6 +211,11 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Ajouté aux favoris !';
 	@override String get removedFromFavorites => 'Retiré des favoris.';
 	@override String get wishlistUpdateFailed => 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.';
+	@override String get filterAll => 'Tous';
+	@override String get filterVerified => 'Achat vérifié';
+	@override String get filterProductRating => 'Note du produit';
+	@override String get filterDeliveryRating => 'Note de livraison';
+	@override String get filterWithComment => 'Avec commentaire';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -395,6 +400,11 @@ extension on TranslationsFr {
 			'addedToFavorites' => 'Ajouté aux favoris !',
 			'removedFromFavorites' => 'Retiré des favoris.',
 			'wishlistUpdateFailed' => 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.',
+			'filterAll' => 'Tous',
+			'filterVerified' => 'Achat vérifié',
+			'filterProductRating' => 'Note du produit',
+			'filterDeliveryRating' => 'Note de livraison',
+			'filterWithComment' => 'Avec commentaire',
 			_ => null,
 		};
 	}

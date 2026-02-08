@@ -30,6 +30,7 @@ import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
+import 'package:storefront_supabase/app/views/view_brands/products_by_brand/products_by_brand_view.dart'; // Added
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/models/navbar_item_model.dart';
 import 'package:storefront_supabase/app/utils/navbar_icon_helper.dart';
@@ -60,6 +61,16 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           builder: (BuildContext context, GoRouterState state) {
             return SettingsView(goRoute: (String path) => context.go(path));
+          },
+        ),
+        GoRoute(
+          path: '/brands/:brandId',
+          builder: (BuildContext context, GoRouterState state) {
+            final brandId = state.pathParameters['brandId'];
+            return ProductsByBrandView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'brandId': brandId},
+            );
           },
         ),
         GoRoute(

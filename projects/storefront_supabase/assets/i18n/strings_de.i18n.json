@@ -179,6 +179,11 @@
   "logoutSuccess": "Erfolgreich abgemeldet!",
   "addedToFavorites": "Zu Favoriten hinzugefügt!",
   "removedFromFavorites": "Aus Favoriten entfernt.",
-  "wishlistUpdateFailed": "Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+  "wishlistUpdateFailed": "Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+  "filterAll": "Alle",
+  "filterVerified": "Verifizierter Kauf",
+  "filterProductRating": "Produktbewertung",
+  "filterDeliveryRating": "Lieferbewertung",
+  "filterWithComment": "Mit Kommentar"
 }
 

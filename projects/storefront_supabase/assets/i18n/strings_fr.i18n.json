@@ -179,6 +179,11 @@
   "logoutSuccess": "Déconnexion réussie !",
   "addedToFavorites": "Ajouté aux favoris !",
   "removedFromFavorites": "Retiré des favoris.",
-  "wishlistUpdateFailed": "Échec de la mise à jour de la liste de souhaits. Veuillez réessayer."
+  "wishlistUpdateFailed": "Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.",
+  "filterAll": "Tous",
+  "filterVerified": "Achat vérifié",
+  "filterProductRating": "Note du produit",
+  "filterDeliveryRating": "Note de livraison",
+  "filterWithComment": "Avec commentaire"
 }
 

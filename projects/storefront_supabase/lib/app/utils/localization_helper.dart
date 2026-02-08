@@ -82,11 +82,6 @@ class LocalizationHelper {
           trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.black) : null,
           onTap: () {
             context.read<LanguageCubit>().changeLanguage(locale);
-            final appLocale = AppLocaleUtils.parseLocaleParts(
-              languageCode: locale.languageCode,
-              countryCode: locale.countryCode,
-            );
-            LocaleSettings.setLocaleSync(appLocale);
             Navigator.pop(context);
           },
           contentPadding: EdgeInsets.zero,
