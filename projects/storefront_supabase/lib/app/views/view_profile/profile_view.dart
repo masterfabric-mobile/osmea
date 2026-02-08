@@ -46,13 +46,45 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                     type: AppBarActionType.profile,
                     icon: const Icon(Icons.logout, color: Colors.black),
                     onPressed: () async {
-                      await viewModel.logout();
-                      if (context.mounted) {
-                        context.showSnackbar(
-                          message: context.resources.logoutSuccess,
-                          type: SnackbarType.success,
-                        );
-                      }
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final resources = context.resources;
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: OsmeaComponents.text(resources.logout),
+                            content: OsmeaComponents.text(resources.confirmLogoutMessage),
+                            actions: [
+                              OsmeaComponents.button(
+                                text: resources.cancel,
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                variant: ButtonVariant.ghost,
+                                textColor: Colors.black, // Explicitly set text color for ghost variant
+                              ),
+                              OsmeaComponents.button(
+                                text: resources.logout,
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await viewModel.logout();
+                                  if (context.mounted) {
+                                    context.showSnackbar(
+                                      message: resources.logoutSuccess,
+                                      type: SnackbarType.success,
+                                    );
+                                  }
+                                  
+                                },
+                                
+                                variant: ButtonVariant.primary,
+                                backgroundColor: Colors.red, // Use red for logout action
+                                textColor: Colors.white,
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                 ],

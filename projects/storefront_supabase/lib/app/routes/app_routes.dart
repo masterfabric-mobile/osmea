@@ -94,8 +94,10 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/home',
-          builder: (BuildContext context, GoRouterState state) =>
-              SupabaseHomeView(goRoute: (String path) => context.go(path)),
+          builder: (BuildContext context, GoRouterState state) => SupabaseHomeView(
+            goRoute: (String path) => context.go(path),
+            arguments: {'home': true, ...state.uri.queryParameters},
+          ),
         ),
         GoRoute(
           path: '/categories',

@@ -198,5 +198,6 @@
   "couponNotActive": "Kupon aktif değil.",
   "couponExpired": "Kuponun süresi doldu.",
   "couponLimitReached": "Kupon kullanım sınırı aşıldı.",
-  "minimumPurchaseRequired": "Minimum {amount} tutarında alışveriş gerekli."
+  "minimumPurchaseRequired": "Minimum {amount} tutarında alışveriş gerekli.",
+  "confirmLogoutMessage": "Çıkış yapmak istediğinizden emin misiniz?"
 }

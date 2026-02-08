@@ -198,5 +198,6 @@
   "couponNotActive": "Coupon is not active.",
   "couponExpired": "Coupon has expired.",
   "couponLimitReached": "Coupon usage limit reached.",
-  "minimumPurchaseRequired": "Minimum purchase of {amount} required."
+  "minimumPurchaseRequired": "Minimum purchase of {amount} required.",
+  "confirmLogoutMessage": "Are you sure you want to log out?"
 }

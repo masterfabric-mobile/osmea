@@ -198,5 +198,6 @@
   "couponNotActive": "Le bon de réduction n'est pas actif.",
   "couponExpired": "Le bon de réduction a expiré.",
   "couponLimitReached": "Limite d'utilisation du bon de réduction atteinte.",
-  "minimumPurchaseRequired": "Achat minimum de {amount} requis."
+  "minimumPurchaseRequired": "Achat minimum de {amount} requis.",
+  "confirmLogoutMessage": "Êtes-vous sûr de vouloir vous déconnecter ?"
 }

@@ -198,5 +198,6 @@
   "couponNotActive": "Gutschein ist nicht aktiv.",
   "couponExpired": "Gutschein ist abgelaufen.",
   "couponLimitReached": "Nutzungslimit für Gutschein erreicht.",
-  "minimumPurchaseRequired": "Mindestkauf von {amount} erforderlich."
+  "minimumPurchaseRequired": "Mindestkauf von {amount} erforderlich.",
+  "confirmLogoutMessage": "Möchten Sie sich wirklich abmelden?"
 }
