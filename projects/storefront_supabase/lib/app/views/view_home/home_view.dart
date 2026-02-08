@@ -19,11 +19,14 @@ class SupabaseHomeView
   SupabaseHomeView({
     super.key,
     super.arguments = const {'home': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(
-          horizontalPadding: const PaddingVisibility.disabled(),
-          verticalPadding: const PaddingVisibility.disabled(),
-          appBarPadding: const AppBarPaddingVisibility.disabled(),
+         
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.appTitle,
