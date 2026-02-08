@@ -179,6 +179,10 @@
   "logoutSuccess": "Başarıyla çıkış yapıldı!",
   "addedToFavorites": "Favorilere eklendi!",
   "removedFromFavorites": "Favorilerden çıkarıldı.",
-  "wishlistUpdateFailed": "İstek listesi güncellenemedi. Lütfen tekrar deneyin."
+  "wishlistUpdateFailed": "İstek listesi güncellenemedi. Lütfen tekrar deneyin.",
+  "filterAll": "Tümü",
+  "filterVerified": "Doğrulanmış Satın Alma",
+  "filterProductRating": "Ürün Puanı",
+  "filterDeliveryRating": "Teslimat Puanı",
+  "filterWithComment": "Yorumlu"
 }
-
