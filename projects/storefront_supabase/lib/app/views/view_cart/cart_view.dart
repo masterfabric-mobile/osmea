@@ -78,7 +78,8 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
               },
             ),
           ),
-          _buildSummary(context, state.totalPrice),
+          _buildCouponSection(context, viewModel, state), // New coupon section
+          _buildSummary(context, state), // Pass the whole state for discount details
         ],
       );
     }
@@ -173,7 +174,59 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
     );
   }
 
-  Widget _buildSummary(BuildContext context, double totalPrice) {
+  Widget _buildCouponSection(BuildContext context, CartViewModel viewModel, CartLoadedState state) {
+    return OsmeaComponents.container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: OsmeaComponents.column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OsmeaComponents.text('Have a coupon?', textStyle: Theme.of(context).textTheme.titleMedium),
+          OsmeaComponents.sizedBox(height: 8),
+          OsmeaComponents.row(
+            children: [
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.textField(
+                  controller: viewModel.couponCodeController,
+                  hint: 'Enter coupon code',
+                  variant: TextFieldVariant.outlined,
+                ),
+              ),
+              OsmeaComponents.sizedBox(width: 8),
+              OsmeaComponents.button(
+                text: 'Apply',
+                onPressed: () => viewModel.applyCoupon(viewModel.couponCodeController.text),
+                variant: ButtonVariant.primary,
+                backgroundColor: Colors.black,
+                textColor: Colors.white,
+              ),
+            ],
+          ),
+          if (state.couponMessage != null) ...[
+            OsmeaComponents.sizedBox(height: 8),
+            OsmeaComponents.text(
+              state.couponMessage!,
+              textStyle: TextStyle(
+                color: state.appliedCoupon != null ? Colors.green : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (state.appliedCoupon != null)
+              OsmeaComponents.textButton(
+                text: 'Remove Coupon',
+                onPressed: viewModel.removeCoupon,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummary(BuildContext context, CartLoadedState state) { // Changed to take CartLoadedState
     return OsmeaComponents.container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -189,19 +242,14 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OsmeaComponents.row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              OsmeaComponents.text('${context.resources.total}:', textStyle: Theme.of(context).textTheme.headlineSmall),
-              BlocBuilder<CurrencyCubit, String>(
-                builder: (context, currency) {
-                  return OsmeaComponents.text(
-                      PriceHelper.format(totalPrice, currency, Localizations.localeOf(context).toString()),
-                      textStyle: Theme.of(context).textTheme.headlineSmall);
-                },
-              ),
-            ],
-          ),
+          _buildSummaryRow(context, 'Subtotal', state.totalPrice),
+          if (state.discountAmount != null && state.discountAmount! > 0) ...[
+            _buildSummaryRow(context, 'Discount', -state.discountAmount!, textColor: Colors.green),
+            OsmeaComponents.sizedBox(height: 8),
+            Divider(color: Colors.grey.shade300),
+            OsmeaComponents.sizedBox(height: 8),
+          ],
+          _buildSummaryRow(context, context.resources.total, state.discountedTotal, isBold: true),
           OsmeaComponents.sizedBox(height: 16),
           OsmeaComponents.button(
             text: context.resources.proceedToCheckout,
@@ -212,6 +260,32 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSummaryRow(BuildContext context, String label, double amount, {Color? textColor, bool isBold = false}) {
+    return OsmeaComponents.row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        OsmeaComponents.text(
+          label,
+          textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            color: textColor ?? Colors.black,
+          ),
+        ),
+        BlocBuilder<CurrencyCubit, String>(
+          builder: (context, currency) {
+            return OsmeaComponents.text(
+              PriceHelper.format(amount, currency, Localizations.localeOf(context).toString()),
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: textColor ?? Colors.black,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

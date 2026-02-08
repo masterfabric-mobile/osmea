@@ -109,38 +109,48 @@ class AdminProductsView
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.4,
-              maxChildSize: 0.6,
+              initialChildSize: 0.5,
+              maxChildSize: 0.75,
               builder: (context, scrollController) {
-                return OsmeaComponents.column(
+                return Column(
                   children: [
-                    OsmeaComponents.padding(
-                      padding: const EdgeInsets.all(16),
-                      child: OsmeaComponents.row(
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           OsmeaComponents.text(
                             resources.sort,
-                            textStyle: Theme.of(context).textTheme.titleLarge,
+                            textStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                          OsmeaComponents.iconButton(
+                          IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ],
                       ),
                     ),
-                    OsmeaComponents.expanded(
+                    const Divider(height: 1),
+                    
+                    // Content
+                    Expanded(
                       child: ListView(
                         controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         children: [
-                          _buildSortSection(
+                          _buildModernSortSection(
                             context,
                             resources.sortByDate,
                             tempDateSort,
@@ -153,7 +163,7 @@ class AdminProductsView
                               });
                             },
                           ),
-                          _buildSortSection(
+                          _buildModernSortSection(
                             context,
                             resources.sortByPopularity,
                             tempPopularitySort,
@@ -166,7 +176,7 @@ class AdminProductsView
                               });
                             },
                           ),
-                          _buildSortSection(
+                          _buildModernSortSection(
                             context,
                             resources.sortByPrice,
                             tempPriceSort,
@@ -182,11 +192,14 @@ class AdminProductsView
                         ],
                       ),
                     ),
-                    OsmeaComponents.padding(
+                    
+                    // Footer
+                    const Divider(height: 1),
+                    Padding(
                       padding: const EdgeInsets.all(16),
-                      child: OsmeaComponents.row(
+                      child: Row(
                         children: [
-                          OsmeaComponents.expanded(
+                          Expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
@@ -195,11 +208,19 @@ class AdminProductsView
                                   tempPopularitySort = PopularitySort.none;
                                 });
                               },
-                              child: OsmeaComponents.text(resources.clear),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(color: Colors.black),
+                              ),
+                              child: OsmeaComponents.text(resources.clear, color: Colors.black),
                             ),
                           ),
-                          OsmeaComponents.sizedBox(width: 16),
-                          OsmeaComponents.expanded(
+                          const SizedBox(width: 16),
+                          Expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
@@ -209,7 +230,15 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: OsmeaComponents.text(resources.apply),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: OsmeaComponents.text(resources.apply, color: Colors.white),
                             ),
                           ),
                         ],
@@ -225,13 +254,67 @@ class AdminProductsView
     );
   }
 
+  Widget _buildModernSortSection<T>(
+    BuildContext context,
+    String title,
+    T currentSort,
+    List<T> allSorts,
+    ValueChanged<T?> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16, bottom: 8),
+          child: OsmeaComponents.text(
+            title,
+            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: allSorts.map((sort) {
+            final isSelected = currentSort == sort;
+            final label = (sort as Enum).name;
+            return InkWell(
+              onTap: () => onChanged(sort),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.black : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? Colors.black : Colors.grey[300]!,
+                  ),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   void _showFilterSheet(
     BuildContext context,
     AdminProductsViewModel viewModel,
     AdminProductsLoaded currentState,
   ) {
     final resources = context.resources;
-    // Temp State for Filter Sheet
+    
     Category? tempRoot = currentState.selectedRootCategory;
     Category? tempSub = currentState.selectedSubCategory;
     Category? tempLeaf = currentState.selectedLeafCategory;
@@ -241,14 +324,18 @@ class AdminProductsView
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             
-            // Helpers
             final rootCats = viewModel.getRootCategories(currentState.allCategories);
-            final subCats = viewModel.getSubCategories(currentState.allCategories, tempRoot?.id);
-            final leafCats = viewModel.getSubCategories(currentState.allCategories, tempSub?.id);
+            // We only show root categories in the modern filter for simplicity in this refactor,
+            // or we could show sub-cats dynamically. Let's stick to Root for the chip list to mimic Home.
+            // If user wants deep hierarchy, they can select one.
             
             final isShoe = viewModel.isShoeCategory(tempLeaf, tempSub, tempRoot);
             final isFashion = viewModel.isFashionCategory(tempRoot);
@@ -258,67 +345,100 @@ class AdminProductsView
               initialChildSize: 0.85,
               maxChildSize: 0.95,
               builder: (context, scrollController) {
-                return OsmeaComponents.column(
+                return Column(
                   children: [
                     // Header
-                    OsmeaComponents.padding(
+                    Padding(
                       padding: const EdgeInsets.all(16),
-                      child: OsmeaComponents.row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          OsmeaComponents.text(resources.filters, textStyle: Theme.of(context).textTheme.titleLarge),
-                          OsmeaComponents.iconButton(
+                          OsmeaComponents.text(resources.filters, textStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ],
                       ),
                     ),
-                    OsmeaComponents.expanded(
+                    const Divider(height: 1),
+
+                    Expanded(
                       child: ListView(
                         controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.all(16),
                         children: [
-                           // --- Category Hierarchy ---
-                          _buildSafeDropdown<Category>(
-                            resources.mainCategory,
-                            rootCats,
-                            (c) => c.name,
-                            tempRoot,
-                            (val) => setModalState(() {
-                              tempRoot = val;
-                              tempSub = null;
-                              tempLeaf = null;
-                              tempSizes.clear(); // Reset sizes on root change
-                            }),
-                          ),
-                          if (tempRoot != null && subCats.isNotEmpty) ...[
-                            OsmeaComponents.sizedBox(height: 16),
-                            _buildSafeDropdown<Category>(
-                              resources.subCategory,
-                              subCats,
-                              (c) => c.name,
-                              tempSub,
-                              (val) => setModalState(() {
-                                tempSub = val;
-                                tempLeaf = null;
-                                tempSizes.clear();
-                              }),
-                            ),
-                          ],
-                          if (tempSub != null && leafCats.isNotEmpty) ...[
-                            OsmeaComponents.sizedBox(height: 16),
-                            _buildSafeDropdown<Category>(
-                              resources.specificCategory,
-                              leafCats,
-                              (c) => c.name,
-                              tempLeaf,
-                              (val) => setModalState(() {
-                                tempLeaf = val;
-                                tempSizes.clear();
-                              }),
-                            ),
-                          ],
+                           // --- Categories (Root) ---
+                           OsmeaComponents.text(
+                             resources.categories, 
+                             textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
+                           ),
+                           const SizedBox(height: 12),
+                           Wrap(
+                             spacing: 8,
+                             runSpacing: 8,
+                             children: rootCats.map((cat) {
+                               final isSelected = tempRoot?.id == cat.id;
+                               return FilterChip(
+                                 label: Text(cat.name),
+                                 selected: isSelected,
+                                 onSelected: (selected) {
+                                   setModalState(() {
+                                     // Toggle logic
+                                     if (selected) {
+                                       tempRoot = cat;
+                                     } else {
+                                       tempRoot = null;
+                                     }
+                                     tempSub = null;
+                                     tempLeaf = null;
+                                     tempSizes.clear();
+                                   });
+                                 },
+                                 selectedColor: Colors.black,
+                                 checkmarkColor: Colors.white,
+                                 labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+                                 backgroundColor: Colors.white,
+                                 shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.circular(20),
+                                   side: BorderSide(color: Colors.grey[300]!),
+                                 ),
+                               );
+                             }).toList(),
+                           ),
+                           
+                           // Sub Categories (Only if root selected)
+                           if (tempRoot != null) ...[
+                             const SizedBox(height: 24),
+                             OsmeaComponents.text(resources.subCategory, textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                             const SizedBox(height: 12),
+                             Wrap(
+                               spacing: 8,
+                               runSpacing: 8,
+                               children: viewModel.getSubCategories(currentState.allCategories, tempRoot?.id).map((sub) {
+                                 final isSelected = tempSub?.id == sub.id;
+                                 return FilterChip(
+                                   label: Text(sub.name),
+                                   selected: isSelected,
+                                   onSelected: (selected) {
+                                     setModalState(() {
+                                       tempSub = selected ? sub : null;
+                                       tempLeaf = null;
+                                       tempSizes.clear();
+                                     });
+                                   },
+                                   selectedColor: Colors.black,
+                                   checkmarkColor: Colors.white,
+                                   labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+                                   backgroundColor: Colors.white,
+                                   shape: RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(20),
+                                     side: BorderSide(color: Colors.grey[300]!),
+                                   ),
+                                 );
+                               }).toList(),
+                             ),
+                           ],
 
                           const Divider(height: 32),
 
@@ -326,11 +446,12 @@ class AdminProductsView
                           if (isShoe || isFashion) ...[
                             OsmeaComponents.text(
                               isShoe ? resources.shoeSizes : resources.sizeAgeGroups,
-                              textStyle: Theme.of(context).textTheme.titleMedium,
+                              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             ),
-                            OsmeaComponents.sizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Wrap(
                               spacing: 8,
+                              runSpacing: 8,
                               children: (isShoe ? viewModel.shoeSizes : viewModel.clothingSizesAndAges).map((opt) {
                                 final isSelected = tempSizes.contains(opt);
                                 return FilterChip(
@@ -341,6 +462,14 @@ class AdminProductsView
                                       selected ? tempSizes.add(opt) : tempSizes.remove(opt);
                                     });
                                   },
+                                  selectedColor: Colors.black,
+                                  checkmarkColor: Colors.white,
+                                  labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8), // Square-ish for sizes
+                                    side: BorderSide(color: Colors.grey[300]!),
+                                  ),
                                 );
                               }).toList(),
                             ),
@@ -348,29 +477,52 @@ class AdminProductsView
                           ],
 
                           // --- Brand Filter ---
-                          OsmeaComponents.text(resources.brands, textStyle: Theme.of(context).textTheme.titleMedium),
-                          ...currentState.allBrands.map((brand) {
-                            final isSelected = tempBrandIds.contains(brand.id);
-                            return CheckboxListTile(
-                              title: Text(brand.name),
-                              value: isSelected,
-                              onChanged: (val) {
-                                setModalState(() {
-                                  val == true ? tempBrandIds.add(brand.id) : tempBrandIds.remove(brand.id);
-                                });
-                              },
-                            );
-                          }),
+                          OsmeaComponents.text(resources.brands, textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: currentState.allBrands.map((brand) {
+                              final isSelected = tempBrandIds.contains(brand.id);
+                              return FilterChip(
+                                label: Text(brand.name),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setModalState(() {
+                                    selected ? tempBrandIds.add(brand.id) : tempBrandIds.remove(brand.id);
+                                  });
+                                },
+                                selectedColor: Colors.black,
+                                checkmarkColor: Colors.white,
+                                labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: BorderSide(color: Colors.grey[300]!),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ],
                       ),
                     ),
                     
                     // Buttons
-                    OsmeaComponents.padding(
+                    Container(
                       padding: const EdgeInsets.all(16),
-                      child: OsmeaComponents.row(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
                         children: [
-                          OsmeaComponents.expanded(
+                          Expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
@@ -381,11 +533,17 @@ class AdminProductsView
                                   tempSizes.clear();
                                 });
                               },
-                              child: OsmeaComponents.text(resources.clear),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(color: Colors.black),
+                              ),
+                              child: OsmeaComponents.text(resources.clear, color: Colors.black),
                             ),
                           ),
-                          OsmeaComponents.sizedBox(width: 16),
-                          OsmeaComponents.expanded(
+                          const SizedBox(width: 16),
+                          Expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 viewModel.fetchProducts(
@@ -397,7 +555,13 @@ class AdminProductsView
                                 );
                                 Navigator.pop(context);
                               },
-                              child: OsmeaComponents.text(resources.apply),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: OsmeaComponents.text(resources.apply, color: Colors.white),
                             ),
                           ),
                         ],
@@ -410,66 +574,6 @@ class AdminProductsView
           },
         );
       },
-    );
-  }
-
-  Widget _buildSafeDropdown<T>(
-    String label,
-    List<T> items,
-    String Function(T) itemToString,
-    T? selectedItem,
-    void Function(T?) onChanged,
-  ) {
-    T? effectiveValue;
-    if (selectedItem != null) {
-      try {
-        effectiveValue = items.firstWhere((item) => item == selectedItem);
-      } catch (e) {
-        effectiveValue = null;
-      }
-    }
-    return DropdownButtonFormField<T>(
-      // ignore: deprecated_member_use
-      value: effectiveValue,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: items.map((item) {
-        return DropdownMenuItem<T>(
-          value: item,
-          child: Text(itemToString(item)),
-        );
-      }).toList(),
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildSortSection<T>(
-    BuildContext context,
-    String title,
-    T currentSort,
-    List<T> allSorts,
-    ValueChanged<T?> onChanged,
-  ) {
-    return OsmeaComponents.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OsmeaComponents.text(title, textStyle: Theme.of(context).textTheme.titleMedium),
-        ...allSorts.map(
-          (sort) => RadioListTile<T>(
-            title: Text((sort as Enum).name),
-            // ignore: deprecated_member_use
-            value: sort,
-            // ignore: deprecated_member_use
-            groupValue: currentSort,
-            // ignore: deprecated_member_use
-            onChanged: onChanged,
-            // selected: sort == currentSort, // Optional: highlight selected
-          ),
-        ),
-        const Divider(),
-      ],
     );
   }
 
