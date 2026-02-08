@@ -32,19 +32,19 @@ class FavoritesView
               if (viewModel.state is FavoritesLoadedState && 
                   (viewModel.state as FavoritesLoadedState).favoriteProducts.isNotEmpty)
                 AppBarAction(
-                  type: AppBarActionType.more, // Using 'more' as a generic action type
-                  icon: const Icon(Icons.delete_outline, color: Colors.black),
+                  type: AppBarActionType.more,
+                  icon: const Icon(Icons.delete_sweep, color: Colors.black),
                   onPressed: () async {
-                    // Show confirmation dialog could be good here, but for now executing directly as requested
                     final success = await viewModel.clearAllFavorites();
                     if (!context.mounted) return;
                     if (success) {
                       context.showSnackbar(
-                        message: context.resources.removedFromFavorites, // Or generic cleared message
+                        message: context.resources.removedFromFavorites,
                         type: SnackbarType.info,
                       );
                     }
-                  },                ),
+                  },
+                ),
             ],
           ),
         );
@@ -90,124 +90,383 @@ class FavoritesView
     }
 
     if (state is FavoritesLoadedState) {
-      if (state.favoriteProducts.isEmpty) {
-        return OsmeaComponents.center(
-          child: OsmeaComponents.text(resources.noFavorites),
-        );
-      }
-      
-      return ListView.separated(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: state.favoriteProducts.length,
-        separatorBuilder: (context, index) => OsmeaComponents.sizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final product = state.favoriteProducts[index];
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: InkWell(
-              onTap: () => goRoute('/product-detail/${product.id}'),
-              child: OsmeaComponents.row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Image (Left)
-                  OsmeaComponents.container(
-                    width: 100,
-                    height: 100,
-                    color: Colors.grey[200],
-                    child: (product.imageUrl.contains('placehold.co'))
-                        ? const Center(child: Icon(Icons.image, color: Colors.grey))
-                        : OsmeaComponents.image(
-                            imageUrl: product.imageUrl,
-                            fit: BoxFit.cover,
-                            errorWidget: const Center(
-                                child: Icon(Icons.error, color: Colors.red)),
-                          ),
-                  ),
-                  
-                  // Details (Middle)
-                  OsmeaComponents.expanded(
-                    child: OsmeaComponents.padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: OsmeaComponents.column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          OsmeaComponents.text(
-                            product.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          OsmeaComponents.sizedBox(height: 8),
-                          BlocBuilder<CurrencyCubit, String>(
-                            builder: (context, currency) {
-                              return OsmeaComponents.text(
-                                PriceHelper.format(product.effectivePrice, currency,
-                                    Localizations.localeOf(context).toString()),
-                                textStyle:
-                                    Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+      return Column(
+        children: [
+          // 1. Tab Selector (Products / Brands)
+          _buildTabSelector(context, viewModel, state),
+          
+          // 2. Group Selector (Only visible for Products view usually, but can be for both)
+          if (state.viewType == FavoritesViewType.products)
+            _buildGroupSelector(context, viewModel, state),
 
-                  // Actions (Right)
-                  OsmeaComponents.padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: OsmeaComponents.column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        OsmeaComponents.iconButton(
-                          icon: const Icon(Icons.favorite, color: Colors.red),
-                          onPressed: () async {
-                            final success = await viewModel.removeFavorite(product.id);
-                            if (!context.mounted) return;
-                            if (success) {
-                              context.showSnackbar(
-                                message: resources.removedFromFavorites,
-                                type: SnackbarType.info,
-                              );
-                            }
-                          },
+          // 3. Content
+          Expanded(
+            child: state.viewType == FavoritesViewType.products
+                ? _buildProductsList(context, viewModel, state)
+                : _buildBrandsGrid(context, viewModel, state),
+          ),
+        ],
+      );
+    }
+
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildTabSelector(
+      BuildContext context, FavoritesViewModel viewModel, FavoritesLoadedState state) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: Colors.white,
+      child: Row(
+        children: [
+          _buildTabButton(
+            context,
+            text: context.resources.products,
+            isSelected: state.viewType == FavoritesViewType.products,
+            onTap: () => viewModel.setViewType(FavoritesViewType.products),
+          ),
+          const SizedBox(width: 12),
+          _buildTabButton(
+            context,
+            text: context.resources.brands, // Using existing 'brands' string
+            isSelected: state.viewType == FavoritesViewType.brands,
+            onTap: () => viewModel.setViewType(FavoritesViewType.brands),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(BuildContext context,
+      {required String text,
+      required bool isSelected,
+      required VoidCallback onTap}) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.black : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupSelector(
+      BuildContext context, FavoritesViewModel viewModel, FavoritesLoadedState state) {
+    return Container(
+      height: 50,
+      width: double.infinity,
+      color: Colors.white,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          // "All" Chip
+          _buildGroupChip(
+            context,
+            label: "All",
+            isSelected: state.selectedGroupId == null,
+            onTap: () => viewModel.selectGroup(null),
+          ),
+          const SizedBox(width: 8),
+          
+          // Groups Chips
+          ...state.groups.map((group) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _buildGroupChip(
+                context,
+                label: group.name,
+                isSelected: state.selectedGroupId == group.id,
+                onTap: () => viewModel.selectGroup(group.id),
+              ),
+            );
+          }),
+
+          // "Create Group" Button
+          ActionChip(
+            label: const Icon(Icons.add, size: 18, color: Colors.black),
+            onPressed: () => _showCreateGroupDialog(context, viewModel),
+            backgroundColor: Colors.white,
+            shape: const CircleBorder(side: BorderSide(color: Colors.grey)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupChip(BuildContext context,
+      {required String label,
+      required bool isSelected,
+      required VoidCallback onTap}) {
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onTap(),
+      backgroundColor: Colors.white,
+      selectedColor: Colors.black,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.black,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: isSelected ? Colors.transparent : Colors.grey[300]!),
+      ),
+      showCheckmark: false,
+    );
+  }
+
+  void _showCreateGroupDialog(BuildContext context, FavoritesViewModel viewModel) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Create New Group'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Group Name'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                viewModel.createGroup(controller.text);
+                Navigator.pop(ctx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductsList(
+      BuildContext context, FavoritesViewModel viewModel, FavoritesLoadedState state) {
+    final resources = context.resources;
+    if (state.favoriteProducts.isEmpty) {
+      return OsmeaComponents.center(
+        child: OsmeaComponents.text(resources.noFavorites),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: state.favoriteProducts.length,
+      separatorBuilder: (context, index) => OsmeaComponents.sizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final product = state.favoriteProducts[index];
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: InkWell(
+            onTap: () => goRoute('/product-detail/${product.id}'),
+            child: OsmeaComponents.row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Image (Left)
+                OsmeaComponents.container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey[200],
+                  child: (product.imageUrl.contains('placehold.co'))
+                      ? const Center(child: Icon(Icons.image, color: Colors.grey))
+                      : OsmeaComponents.image(
+                          imageUrl: product.imageUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: const Center(
+                              child: Icon(Icons.error, color: Colors.red)),
                         ),
-                        OsmeaComponents.iconButton(
-                          icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
-                          onPressed: () async {
-                            final success = await viewModel.addToCart(product.id);
-                            if (!context.mounted) return;
-                            if (success) {
-                              context.showSnackbar(
-                                message: resources.productAddedToCart,
-                                type: SnackbarType.success,
-                              );
-                            } else {
-                              context.showSnackbar(
-                                message: resources.failedToAddCart,
-                                type: SnackbarType.error,
-                              );
-                            }
+                ),
+                
+                // Details (Middle)
+                OsmeaComponents.expanded(
+                  child: OsmeaComponents.padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: OsmeaComponents.column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        OsmeaComponents.text(
+                          product.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        OsmeaComponents.sizedBox(height: 8),
+                        BlocBuilder<CurrencyCubit, String>(
+                          builder: (context, currency) {
+                            return OsmeaComponents.text(
+                              PriceHelper.format(product.effectivePrice, currency,
+                                  Localizations.localeOf(context).toString()),
+                              textStyle:
+                                  Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                            );
                           },
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                // Actions (Right)
+                OsmeaComponents.padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: OsmeaComponents.column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      OsmeaComponents.iconButton(
+                        icon: const Icon(Icons.favorite, color: Colors.red),
+                        onPressed: () async {
+                          final success = await viewModel.removeFavorite(product.id);
+                          if (!context.mounted) return;
+                          if (success) {
+                            context.showSnackbar(
+                              message: resources.removedFromFavorites,
+                              type: SnackbarType.info,
+                            );
+                          }
+                        },
+                      ),
+                      OsmeaComponents.iconButton(
+                        icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+                        onPressed: () async {
+                          final success = await viewModel.addToCart(product.id);
+                          if (!context.mounted) return;
+                          if (success) {
+                            context.showSnackbar(
+                              message: resources.productAddedToCart,
+                              type: SnackbarType.success,
+                            );
+                          } else {
+                            context.showSnackbar(
+                              message: resources.failedToAddCart,
+                              type: SnackbarType.error,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBrandsGrid(
+      BuildContext context, FavoritesViewModel viewModel, FavoritesLoadedState state) {
+    if (state.favoriteBrands.isEmpty) {
+      return OsmeaComponents.center(
+        child: OsmeaComponents.text("No favorite brands yet."), // Add to resources later
       );
     }
 
-    return const Center(child: CircularProgressIndicator());
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.8,
+      ),
+      itemCount: state.favoriteBrands.length,
+      itemBuilder: (context, index) {
+        final brand = state.favoriteBrands[index];
+        return GestureDetector(
+          onTap: () => goRoute('/brands/${brand.id}'),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                    image: brand.logoUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(brand.logoUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: brand.logoUrl == null
+                      ? Center(
+                          child: Text(
+                            brand.name[0].toUpperCase(),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      brand.name,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await viewModel.removeFavoriteBrand(brand.id);
+                      if (context.mounted) {
+                         context.showSnackbar(message: "Brand removed", type: SnackbarType.info);
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 4.0),
+                      child: Icon(Icons.favorite, size: 14, color: Colors.red),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

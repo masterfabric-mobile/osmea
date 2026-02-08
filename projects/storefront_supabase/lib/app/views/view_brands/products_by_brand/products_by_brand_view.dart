@@ -39,6 +39,26 @@ class ProductsByBrandView
                 },
                 icon: const Icon(Icons.arrow_back),
               ),
+              actions: [
+                if (viewModel.state is ProductsByBrandLoaded)
+                  AppBarAction(
+                    type: AppBarActionType.favorite,
+                    icon: Icon(
+                      (viewModel.state as ProductsByBrandLoaded).isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: (viewModel.state as ProductsByBrandLoaded).isFavorite
+                          ? Colors.red
+                          : Colors.black,
+                    ),
+                    onPressed: () {
+                      final brandId = arguments['brandId'] as String?;
+                      if (brandId != null) {
+                        viewModel.toggleBrandFavorite(brandId);
+                      }
+                    },
+                  ),
+              ],
             );
           },
         );

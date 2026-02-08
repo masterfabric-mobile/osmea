@@ -160,11 +160,11 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
                   },
                 ),
                 OsmeaComponents.sizedBox(height: 4),
-                OsmeaComponents.textButton(
+                OsmeaComponents.button(
                   onPressed: () => viewModel.removeItem(item.id),
-                  text: context.resources.remove, 
-                  // variant: ButtonVariant.ghost, // TextButton default variant usually
-                  // style: const TextStyle(color: Colors.red), // Need to check if textButton supports style
+                  text: context.resources.remove,
+                  variant: ButtonVariant.ghost,
+                  textColor: Colors.black,
                 ),
               ],
             ),
@@ -257,6 +257,8 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
               // TODO: Implement checkout flow
             },
             variant: ButtonVariant.primary,
+            backgroundColor: Colors.black, // Set background color to black
+            textColor: Colors.white,       // Set text color to white
           ),
         ],
       ),
