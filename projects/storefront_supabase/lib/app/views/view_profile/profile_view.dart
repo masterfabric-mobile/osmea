@@ -48,7 +48,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                     onPressed: () async {
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) {
+                        builder: (BuildContext dialogContext) {
                           final resources = context.resources;
                           return AlertDialog(
                             backgroundColor: Colors.white,
@@ -58,25 +58,26 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                               OsmeaComponents.button(
                                 text: resources.cancel,
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.of(dialogContext).pop();
                                 },
                                 variant: ButtonVariant.ghost,
                                 textColor: Colors.black, // Explicitly set text color for ghost variant
                               ),
                               OsmeaComponents.button(
                                 text: resources.logout,
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  await viewModel.logout();
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                  
                                   if (context.mounted) {
                                     context.showSnackbar(
                                       message: resources.logoutSuccess,
                                       type: SnackbarType.success,
                                     );
+                                    context.go('/home');
                                   }
                                   
+                                  viewModel.logout();
                                 },
-                                
                                 variant: ButtonVariant.primary,
                                 backgroundColor: Colors.red, // Use red for logout action
                                 textColor: Colors.white,
