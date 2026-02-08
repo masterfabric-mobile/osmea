@@ -166,6 +166,8 @@ CREATE TABLE public.product_reviews (
   is_approved boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  delivery_rating integer CHECK (delivery_rating >= 1 AND delivery_rating <= 5),
+  delivery_comment text,
   CONSTRAINT product_reviews_pkey PRIMARY KEY (id),
   CONSTRAINT product_reviews_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
   CONSTRAINT product_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
@@ -201,6 +203,7 @@ CREATE TABLE public.products (
   updated_at timestamp with time zone DEFAULT now(),
   brand_id bigint,
   target_age_group text,
+  view_count integer DEFAULT 0,
   CONSTRAINT products_pkey PRIMARY KEY (id),
   CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id),
   CONSTRAINT products_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id)
