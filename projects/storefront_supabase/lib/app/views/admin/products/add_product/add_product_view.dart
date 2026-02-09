@@ -22,10 +22,10 @@ class AddProductView
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
                 productId == null ? resources.addNewProduct : resources.editProduct,
-                color: Colors.black,
+                color: OsmeaColors.black,
               ),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: OsmeaColors.white,
+              foregroundColor: OsmeaColors.black,
               variant: AppBarVariant.primary,
             );
           },
@@ -81,7 +81,7 @@ class AddProductView
         child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 50),
+            Icon(Icons.check_circle, color: OsmeaColors.forestHeart, size: 50),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.text(isEditMode
                 ? resources.productUpdatedSuccess
@@ -110,7 +110,7 @@ class AddProductView
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
                   content: Text(listenState.errorMessage!),
-                  backgroundColor: Colors.red));
+                  backgroundColor: OsmeaColors.black));
           }
         },
         child: SingleChildScrollView(
@@ -311,7 +311,7 @@ class AddProductView
     } else if (existingImageUrl != null && existingImageUrl.isNotEmpty) {
       imageWidget = Image.network(existingImageUrl, fit: BoxFit.cover);
     } else {
-      imageWidget = const Icon(Icons.image, size: 50, color: Colors.grey);
+      imageWidget = Icon(Icons.image, size: 50, color: OsmeaColors.pewter);
     }
 
     return Center(
@@ -321,7 +321,7 @@ class AddProductView
             height: 150,
             width: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: OsmeaColors.pewter),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(

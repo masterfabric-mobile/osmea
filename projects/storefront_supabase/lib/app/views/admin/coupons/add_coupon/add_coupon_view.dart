@@ -14,11 +14,11 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               'Manage Coupon',
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.go('/admin/coupons'),
               icon: const Icon(Icons.arrow_back),
@@ -37,7 +37,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
       BuildContext context, AddCouponViewModel viewModel, AddCouponState state) {
     
     if (state is AddCouponLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.black));
+      return const Center(child: CircularProgressIndicator(color: OsmeaColors.black));
     }
 
     if (state is AddCouponSuccess) {
@@ -45,15 +45,15 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle, size: 64, color: Colors.green),
+            Icon(Icons.check_circle, size: 64, color: OsmeaColors.forestHeart),
             const SizedBox(height: 16),
             const Text('Coupon saved successfully!'),
             const SizedBox(height: 24),
             OsmeaComponents.button(
               text: 'Back to List',
               onPressed: () => context.go('/admin/coupons'),
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         ),
@@ -65,7 +65,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64, color: OsmeaColors.black),
             const SizedBox(height: 16),
             Text(state.message),
             const SizedBox(height: 24),
@@ -75,8 +75,8 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
                  final couponId = arguments['couponId'] as String?;
                  viewModel.initial(couponId: couponId);
               },
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         ),
@@ -94,8 +94,8 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
               Container(
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.only(bottom: 16),
-                color: Colors.red.shade100,
-                child: Text(state.errorMessage!, style: TextStyle(color: Colors.red.shade900)),
+                color: OsmeaColors.silver,
+                child: Text(state.errorMessage!, style: TextStyle(color: OsmeaColors.black)),
               ),
 
             _buildTextField(viewModel.codeController, 'Coupon Code', Icons.confirmation_number),
@@ -108,7 +108,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
               decoration: const InputDecoration(
                 labelText: 'Discount Type',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.category, color: Colors.black),
+                prefixIcon: Icon(Icons.category, color: OsmeaColors.black),
               ),
               items: const [
                 DropdownMenuItem(value: 'percentage', child: Text('Percentage (%)')),
@@ -139,13 +139,13 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
                     return Theme(
                       data: Theme.of(context).copyWith(
                         colorScheme: const ColorScheme.light(
-                          primary: Colors.black, // Header background color
-                          onPrimary: Colors.white, // Header text color
-                          onSurface: Colors.black, // Body text color
+                          primary: OsmeaColors.black, // Header background color
+                          onPrimary: OsmeaColors.white, // Header text color
+                          onSurface: OsmeaColors.black, // Body text color
                         ),
                         textButtonTheme: TextButtonThemeData(
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.black, // Button text color
+                            foregroundColor: OsmeaColors.black, // Button text color
                           ),
                         ),
                       ),
@@ -169,7 +169,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
                 decoration: const InputDecoration(
                   labelText: 'Expiry Date (Optional)',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today, color: Colors.black),
+                  prefixIcon: Icon(Icons.calendar_today, color: OsmeaColors.black),
                 ),
                 child: Text(
                   viewModel.expiryDate != null 
@@ -185,7 +185,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
               title: const Text('Is Active'),
               value: viewModel.isActive,
               // ignore: deprecated_member_use
-              activeColor: Colors.black,
+              activeColor: OsmeaColors.black,
               onChanged: (val) {
                 viewModel.toggleActive(val);
                 (context as Element).markNeedsBuild();
@@ -198,8 +198,8 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
               onPressed: () => viewModel.saveCoupon(couponId: couponId),
               variant: ButtonVariant.primary,
               fullWidth: true,
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         ),
@@ -216,13 +216,13 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        prefixIcon: Icon(icon, color: Colors.black),
+        prefixIcon: Icon(icon, color: OsmeaColors.black),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black, width: 2),
+          borderSide: BorderSide(color: OsmeaColors.black, width: 2),
         ),
-        labelStyle: const TextStyle(color: Colors.black),
+        labelStyle: const TextStyle(color: OsmeaColors.black),
       ),
-      cursorColor: Colors.black,
+      cursorColor: OsmeaColors.black,
     );
   }
 }

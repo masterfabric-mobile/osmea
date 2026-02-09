@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'states.dart';
 
-@injectable
+@lazySingleton
 class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
   final SupabaseClient _supabaseClient;
 
@@ -196,6 +196,32 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// [productForOptimisticUpdate] When provided, adds this product to state immediately
+  /// so the heart icon updates before initial() refetch (better UX on home/search).
+  Future<bool> addFavorite(String productId, {Product? productForOptimisticUpdate}) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      await _supabaseClient.from('favorites').insert({
+        'user_id': userId,
+        'product_id': productId,
+      });
+      if (productForOptimisticUpdate != null && state is FavoritesLoadedState) {
+        final curr = state as FavoritesLoadedState;
+        if (!curr.favoriteProducts.any((p) => p.id == productId)) {
+          stateChanger(curr.copyWith(
+            favoriteProducts: [...curr.favoriteProducts, productForOptimisticUpdate],
+          ));
+        }
+      }
+      await initial();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> removeFavorite(String productId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) return false;
@@ -205,21 +231,18 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
           .from('favorites')
           .delete()
           .match({'user_id': userId, 'product_id': productId});
-      
-      // Refresh list
       if (state is FavoritesLoadedState) {
         final curr = state as FavoritesLoadedState;
-        // Simple local removal if in "All" view or specific group view
-        // Ideally we re-fetch to be safe, but local removal is snappier
         final updated = curr.favoriteProducts.where((p) => p.id != productId).toList();
         stateChanger(curr.copyWith(favoriteProducts: updated));
       }
+      await initial();
       return true;
     } catch (e) {
       return false;
     }
   }
-  
+
   Future<bool> removeFavoriteBrand(int brandId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) return false;

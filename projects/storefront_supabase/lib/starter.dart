@@ -85,6 +85,7 @@ launchApp({String environment = 'dev'}) async {
   // Perform any necessary setup before the app starts with configuration management
 
   await MasterApp.runBefore(
+    hydrated: true,
     allowCollectDataTelemetry: allowTelemetry,
 
     enableRemoteConfig: enableRemoteConfig,

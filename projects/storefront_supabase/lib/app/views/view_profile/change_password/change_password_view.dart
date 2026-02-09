@@ -17,11 +17,11 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.changePassword,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back),
@@ -78,7 +78,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(resources.passwordChanged),
-                    backgroundColor: Colors.green,
+                    backgroundColor: OsmeaColors.forestHeart,
                   ),
                 );
                 context.pop(); // Go back to profile after success
@@ -86,7 +86,7 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(resources.failedChangePassword),
-                    backgroundColor: Colors.red,
+                    backgroundColor: OsmeaColors.black,
                   ),
                 );
               }
@@ -107,9 +107,9 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
     return OsmeaComponents.textField(
       controller: controller,
       label: label,
-      prefixIcon: Icon(icon, color: Colors.black),
+      prefixIcon: Icon(icon, color: OsmeaColors.black),
       variant: TextFieldVariant.outlined,
-      focusColor: Colors.black,
+      focusColor: OsmeaColors.black,
       obscureText: obscureText,
       type: TextFieldType.text,
     );

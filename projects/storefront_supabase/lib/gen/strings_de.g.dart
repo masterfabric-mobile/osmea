@@ -229,6 +229,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get couponExpired => 'Gutschein ist abgelaufen.';
 	@override String get couponLimitReached => 'Nutzungslimit für Gutschein erreicht.';
 	@override String get minimumPurchaseRequired => 'Mindestkauf von {amount} erforderlich.';
+	@override String get confirmLogoutMessage => 'Möchten Sie sich wirklich abmelden?';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -431,6 +432,7 @@ extension on TranslationsDe {
 			'couponExpired' => 'Gutschein ist abgelaufen.',
 			'couponLimitReached' => 'Nutzungslimit für Gutschein erreicht.',
 			'minimumPurchaseRequired' => 'Mindestkauf von {amount} erforderlich.',
+			'confirmLogoutMessage' => 'Möchten Sie sich wirklich abmelden?',
 			_ => null,
 		};
 	}

@@ -616,6 +616,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Minimum purchase of {amount} required.'
 	String get minimumPurchaseRequired => 'Minimum purchase of {amount} required.';
+
+	/// en: 'Are you sure you want to log out?'
+	String get confirmLogoutMessage => 'Are you sure you want to log out?';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -818,6 +821,7 @@ extension on Translations {
 			'couponExpired' => 'Coupon has expired.',
 			'couponLimitReached' => 'Coupon usage limit reached.',
 			'minimumPurchaseRequired' => 'Minimum purchase of {amount} required.',
+			'confirmLogoutMessage' => 'Are you sure you want to log out?',
 			_ => null,
 		};
 	}

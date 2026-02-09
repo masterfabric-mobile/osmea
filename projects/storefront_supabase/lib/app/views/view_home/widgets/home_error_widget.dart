@@ -1,8 +1,15 @@
+/*
+ * HomeErrorWidget
+ * ---------------
+ * Minimalist black & white error widget for home view.
+ * Clean, simple, and consistent with app design.
+ */
+
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
-
+/// Minimalist error widget for home view
 class HomeErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -50,6 +57,8 @@ class HomeErrorWidget extends StatelessWidget {
                 _buildRetryButton(context),
                 OsmeaComponents.sizedBox(height: context.spacing12),
               ],
+
+              // Go back button (removed as Home is root)
             ],
           ),
         ),

@@ -229,6 +229,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get couponExpired => 'Kuponun süresi doldu.';
 	@override String get couponLimitReached => 'Kupon kullanım sınırı aşıldı.';
 	@override String get minimumPurchaseRequired => 'Minimum {amount} tutarında alışveriş gerekli.';
+	@override String get confirmLogoutMessage => 'Çıkış yapmak istediğinizden emin misiniz?';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -431,6 +432,7 @@ extension on TranslationsTr {
 			'couponExpired' => 'Kuponun süresi doldu.',
 			'couponLimitReached' => 'Kupon kullanım sınırı aşıldı.',
 			'minimumPurchaseRequired' => 'Minimum {amount} tutarında alışveriş gerekli.',
+			'confirmLogoutMessage' => 'Çıkış yapmak istediğinizden emin misiniz?',
 			_ => null,
 		};
 	}

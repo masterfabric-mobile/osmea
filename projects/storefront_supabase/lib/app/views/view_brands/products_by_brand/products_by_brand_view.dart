@@ -25,10 +25,10 @@ class ProductsByBrandView
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
                 title,
-                color: Colors.black,
+                color: OsmeaColors.black,
               ),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: OsmeaColors.white,
+              foregroundColor: OsmeaColors.black,
               leading: OsmeaComponents.iconButton(
                 onPressed: () {
                   if (context.canPop()) {
@@ -48,8 +48,8 @@ class ProductsByBrandView
                           ? Icons.favorite
                           : Icons.favorite_border,
                       color: (viewModel.state as ProductsByBrandLoaded).isFavorite
-                          ? Colors.red
-                          : Colors.black,
+                          ? OsmeaColors.black
+                          : OsmeaColors.black,
                     ),
                     onPressed: () {
                       final brandId = arguments['brandId'] as String?;
@@ -118,14 +118,14 @@ class ProductsByBrandView
                       children: [
                         Positioned.fill(
                           child: (product.imageUrl.contains('placehold.co'))
-                              ? const Center(
-                                  child: Icon(Icons.image, color: Colors.grey))
+                              ? Center(
+                                  child: Icon(Icons.image, color: OsmeaColors.pewter))
                               : OsmeaComponents.image(
                                   imageUrl: product.imageUrl,
                                   fit: BoxFit.cover,
-                                  errorWidget: const Center(
+                                  errorWidget: Center(
                                       child: Icon(Icons.error,
-                                          color: Colors.red)),
+                                          color: OsmeaColors.black)),
                                 ),
                         ),
                         if (hasDiscount)
@@ -145,7 +145,7 @@ class ProductsByBrandView
                               child: OsmeaComponents.text(
                                 'SALE',
                                 textStyle: const TextStyle(
-                                  color: Colors.white,
+                                  color: OsmeaColors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -189,7 +189,7 @@ class ProductsByBrandView
                                         ?.copyWith(
                                           decoration:
                                               TextDecoration.lineThrough,
-                                          color: Colors.grey[600],
+                                          color: OsmeaColors.slate,
                                         ),
                                   ),
                                   OsmeaComponents.sizedBox(width: 4),

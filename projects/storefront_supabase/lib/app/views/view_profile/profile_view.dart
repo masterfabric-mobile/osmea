@@ -26,10 +26,10 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
               return OsmeaComponents.appBar(
                 title: OsmeaComponents.text(
                   context.resources.profile,
-                  color: Colors.black,
+                  color: OsmeaColors.black,
                 ),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: OsmeaColors.white,
+                foregroundColor: OsmeaColors.black,
                 variant: AppBarVariant.primary,
                 size: AppBarSize.large,
                 elevation: 0,
@@ -38,20 +38,20 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   // Language/Currency Selector
                   AppBarAction(
                     type: AppBarActionType.more,
-                    icon: const Icon(Icons.language, color: Colors.black),
+                    icon: const Icon(Icons.language, color: OsmeaColors.black),
                     onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
                   ),
                   // Settings button for both authenticated and unauthenticated
                   AppBarAction(
                     type: AppBarActionType.profile,
-                    icon: const Icon(Icons.logout, color: Colors.black),
+                    icon: const Icon(Icons.logout, color: OsmeaColors.black),
                     onPressed: () async {
                       showDialog(
                         context: context,
                         builder: (BuildContext dialogContext) {
                           final resources = context.resources;
                           return AlertDialog(
-                            backgroundColor: Colors.white,
+                            backgroundColor: OsmeaColors.white,
                             title: OsmeaComponents.text(resources.logout),
                             content: OsmeaComponents.text(resources.confirmLogoutMessage),
                             actions: [
@@ -61,7 +61,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                                   Navigator.of(dialogContext).pop();
                                 },
                                 variant: ButtonVariant.ghost,
-                                textColor: Colors.black, // Explicitly set text color for ghost variant
+                                textColor: OsmeaColors.black, // Explicitly set text color for ghost variant
                               ),
                               OsmeaComponents.button(
                                 text: resources.logout,
@@ -79,8 +79,8 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                                   viewModel.logout();
                                 },
                                 variant: ButtonVariant.primary,
-                                backgroundColor: Colors.red, // Use red for logout action
-                                textColor: Colors.white,
+                                backgroundColor: OsmeaColors.black,
+                                textColor: OsmeaColors.white,
                               ),
                             ],
                           );
@@ -207,8 +207,8 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                       OsmeaComponents.text(
                         state.errorMessage!,
                         color: state.errorMessage!.startsWith('Success')
-                            ? OsmeaColors.green
-                            : OsmeaColors.red,
+                            ? OsmeaColors.black
+                            : OsmeaColors.black,
                         textAlign: TextAlign.center,
                       ),
                       OsmeaComponents.sizedBox(height: 16),
@@ -246,7 +246,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       child: OsmeaComponents.text(
         title,
         textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Colors.grey,
+              color: OsmeaColors.pewter,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
             ),

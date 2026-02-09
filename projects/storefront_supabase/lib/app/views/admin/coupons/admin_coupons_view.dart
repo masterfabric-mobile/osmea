@@ -14,11 +14,11 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               'Coupons', // Localize later
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.go('/admin/dashboard'),
               icon: const Icon(Icons.arrow_back),
@@ -63,13 +63,13 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
                     Text('${coupon.discountType == 'percentage' ? '%' : '\$'}${coupon.discountValue} Off'),
                     if (coupon.expiryDate != null)
                       Text('Expires: ${DateFormat.yMMMd().format(coupon.expiryDate!)}',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                          style: TextStyle(color: OsmeaColors.slate, fontSize: 12)),
                     Text('Status: ${coupon.isActive ? "Active" : "Inactive"}',
-                        style: TextStyle(color: coupon.isActive ? Colors.green : Colors.red, fontSize: 12)),
+                        style: TextStyle(color: coupon.isActive ? OsmeaColors.black : OsmeaColors.pewter, fontSize: 12)),
                   ],
                 ),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.black),
+                  icon: const Icon(Icons.delete_outline, color: OsmeaColors.black),
                   onPressed: () => _confirmDelete(context, viewModel, coupon.id),
                 ),
                 onTap: () => context.go('/admin/coupons/edit/${coupon.id}'),
@@ -78,8 +78,8 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
           },
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: OsmeaColors.black,
+          foregroundColor: OsmeaColors.white,
           onPressed: () => context.go('/admin/coupons/add'),
           child: const Icon(Icons.add),
         ),
@@ -95,15 +95,15 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.confirmation_number_outlined, size: 64, color: Colors.grey),
+            Icon(Icons.confirmation_number_outlined, size: 64, color: OsmeaColors.pewter),
             const SizedBox(height: 16),
             const Text('No coupons found'),
             const SizedBox(height: 24),
             OsmeaComponents.button(
               text: 'Add Coupon',
               onPressed: () => goRoute('/admin/coupons/add'),
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         ),
@@ -120,14 +120,14 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: const Text('Cancel', style: TextStyle(color: OsmeaColors.black)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               viewModel.deleteCoupon(id);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('Delete', style: TextStyle(color: OsmeaColors.black)),
           ),
         ],
       ),

@@ -33,8 +33,18 @@ class ProductsByCategoryViewModel extends BaseViewModelCubit<ProductsByCategoryS
   // but for now we'll fetch fresh to ensure consistency.
   List<Category> _allCachedCategories = [];
 
+  static final RegExp _uuidRegex = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
+
   Future<void> fetchProductsByCategory(String categoryId) async {
     _currentCategoryId = categoryId;
+    if (!_uuidRegex.hasMatch(categoryId)) {
+      stateChanger(ProductsByCategoryError(
+        'Invalid category. Special offer and campaign links must use a valid category ID.',
+      ));
+      return;
+    }
     stateChanger(ProductsByCategoryLoading());
     try {
       // 1. Fetch ALL categories at once to build hierarchy in memory.

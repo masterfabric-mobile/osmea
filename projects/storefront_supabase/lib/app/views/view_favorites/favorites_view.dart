@@ -18,35 +18,81 @@ class FavoritesView
   }) : super(
           horizontalPadding: const PaddingVisibility.disabled(),
           appBarPadding: const AppBarPaddingVisibility.disabled(),
-          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(
-              context.resources.favorites,
-              color: Colors.black,
-            ),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            size: AppBarSize.large,
-            elevation: 0,
-            titleSpacing: 0.0,
-            actions: [
-              if (viewModel.state is FavoritesLoadedState && 
-                  (viewModel.state as FavoritesLoadedState).favoriteProducts.isNotEmpty)
-                AppBarAction(
-                  type: AppBarActionType.more,
-                  icon: const Icon(Icons.delete_sweep, color: Colors.black),
-                  onPressed: () async {
-                    final success = await viewModel.clearAllFavorites();
-                    if (!context.mounted) return;
-                    if (success) {
-                      context.showSnackbar(
-                        message: context.resources.removedFromFavorites,
-                        type: SnackbarType.info,
-                      );
-                    }
-                  },
-                ),
-            ],
-          ),
+          coreAppBar: (context, viewModel) {
+            final configHelper = AssetConfigHelper();
+            final appBarConfig = configHelper.getObject('favorites_view.app_bar');
+            final title = appBarConfig?['title'] as String? ?? context.resources.favorites;
+            final titleWithCount = appBarConfig?['titleWithCount'] as String? ?? '${context.resources.favorites} ({count})';
+            final backgroundColor = configHelper.getColor(
+              'favorites_view.app_bar.backgroundColor',
+              OsmeaColors.white,
+            );
+            final foregroundColor = configHelper.getColor(
+              'favorites_view.app_bar.foregroundColor',
+              OsmeaColors.black,
+            );
+            final titleColor = configHelper.getColor(
+              'favorites_view.app_bar.titleColor',
+              OsmeaColors.black,
+            );
+            final iconColor = configHelper.getColor(
+              'favorites_view.app_bar.iconColor',
+              OsmeaColors.black,
+            );
+            final elevation = configHelper.getDouble(
+              'favorites_view.app_bar.elevation',
+              0.0,
+            );
+            return PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: BlocBuilder<FavoritesViewModel, FavoritesState>(
+                bloc: viewModel,
+                builder: (context, state) {
+                  final currentCount = state is FavoritesLoadedState
+                      ? state.favoriteProducts.length
+                      : 0;
+                  final currentTitle = currentCount > 0
+                      ? titleWithCount.replaceAll('{count}', currentCount.toString())
+                      : title;
+                  return OsmeaComponents.appBar(
+                    title: OsmeaComponents.text(
+                      currentTitle,
+                      color: titleColor,
+                    ),
+                    backgroundColor: backgroundColor,
+                    foregroundColor: foregroundColor,
+                    size: AppBarSize.large,
+                    elevation: elevation,
+                    titleSpacing: 0.0,
+                    actions: [
+                      if (state is FavoritesLoadedState &&
+                          state.favoriteProducts.isNotEmpty)
+                        AppBarAction(
+                          type: AppBarActionType.more,
+                          icon: Icon(Icons.delete_sweep, color: iconColor),
+                          onPressed: () async {
+                            final success = await viewModel.clearAllFavorites();
+                            if (!context.mounted) return;
+                            if (success) {
+                              final msg = configHelper.getString(
+                                'favorites_view.snackbar.all_removed_message',
+                                context.resources.removedFromFavorites,
+                              );
+                              context.snackbarSuccess(
+                                msg,
+                                duration: context.durationLong,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                            }
+                          },
+                        ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
         );
 
   @override
@@ -114,9 +160,18 @@ class FavoritesView
 
   Widget _buildTabSelector(
       BuildContext context, FavoritesViewModel viewModel, FavoritesLoadedState state) {
+    final configHelper = AssetConfigHelper();
+    final horizontal = configHelper.getDouble(
+      'favorites_view.component_spacing.horizontal',
+      16.0,
+    );
+    final vertical = configHelper.getDouble(
+      'favorites_view.component_spacing.vertical',
+      8.0,
+    );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical),
+      color: OsmeaColors.white,
       child: Row(
         children: [
           _buildTabButton(
@@ -147,14 +202,14 @@ class FavoritesView
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.grey[100],
+            color: isSelected ? OsmeaColors.black : OsmeaColors.ash,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
             child: Text(
               text,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
+                color: isSelected ? OsmeaColors.white : OsmeaColors.black,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -169,7 +224,7 @@ class FavoritesView
     return Container(
       height: 50,
       width: double.infinity,
-      color: Colors.white,
+      color: OsmeaColors.white,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -198,10 +253,10 @@ class FavoritesView
 
           // "Create Group" Button
           ActionChip(
-            label: const Icon(Icons.add, size: 18, color: Colors.black),
+            label: Icon(Icons.add, size: 18, color: OsmeaColors.black),
             onPressed: () => _showCreateGroupDialog(context, viewModel),
-            backgroundColor: Colors.white,
-            shape: const CircleBorder(side: BorderSide(color: Colors.grey)),
+            backgroundColor: OsmeaColors.white,
+            shape: CircleBorder(side: BorderSide(color: OsmeaColors.silver)),
           ),
         ],
       ),
@@ -216,15 +271,15 @@ class FavoritesView
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: Colors.white,
-      selectedColor: Colors.black,
+      backgroundColor: OsmeaColors.white,
+      selectedColor: OsmeaColors.black,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
+        color: isSelected ? OsmeaColors.white : OsmeaColors.black,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: isSelected ? Colors.transparent : Colors.grey[300]!),
+        side: BorderSide(color: isSelected ? OsmeaColors.transparent : OsmeaColors.platinum),
       ),
       showCheckmark: false,
     );
@@ -244,7 +299,7 @@ class FavoritesView
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: const Text('Cancel', style: TextStyle(color: OsmeaColors.black)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -254,8 +309,8 @@ class FavoritesView
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+backgroundColor: OsmeaColors.black,
+                  foregroundColor: OsmeaColors.white,
             ),
             child: const Text('Create'),
           ),
@@ -292,14 +347,14 @@ class FavoritesView
                 OsmeaComponents.container(
                   width: 100,
                   height: 100,
-                  color: Colors.grey[200],
+                  color: OsmeaColors.silver,
                   child: (product.imageUrl.contains('placehold.co'))
-                      ? const Center(child: Icon(Icons.image, color: Colors.grey))
+                      ? Center(child: Icon(Icons.image, color: OsmeaColors.pewter))
                       : OsmeaComponents.image(
                           imageUrl: product.imageUrl,
                           fit: BoxFit.cover,
-                          errorWidget: const Center(
-                              child: Icon(Icons.error, color: Colors.red)),
+                          errorWidget: Center(
+                              child: Icon(Icons.error, color: OsmeaColors.black)),
                         ),
                 ),
                 
@@ -326,7 +381,7 @@ class FavoritesView
                                   Localizations.localeOf(context).toString()),
                               textStyle:
                                   Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.black,
+                                        color: OsmeaColors.black,
                                         fontWeight: FontWeight.bold,
                                       ),
                             );
@@ -344,7 +399,7 @@ class FavoritesView
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       OsmeaComponents.iconButton(
-                        icon: const Icon(Icons.favorite, color: Colors.red),
+                        icon: const Icon(Icons.favorite, color: OsmeaColors.black),
                         onPressed: () async {
                           final success = await viewModel.removeFavorite(product.id);
                           if (!context.mounted) return;
@@ -352,24 +407,31 @@ class FavoritesView
                             context.showSnackbar(
                               message: resources.removedFromFavorites,
                               type: SnackbarType.info,
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
+                              duration: context.durationLong,
                             );
                           }
                         },
                       ),
                       OsmeaComponents.iconButton(
-                        icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+                        icon: const Icon(Icons.shopping_cart_outlined, color: OsmeaColors.black),
                         onPressed: () async {
                           final success = await viewModel.addToCart(product.id);
                           if (!context.mounted) return;
                           if (success) {
-                            context.showSnackbar(
-                              message: resources.productAddedToCart,
-                              type: SnackbarType.success,
+                            context.snackbarSuccess(
+                              resources.productAddedToCart,
+                              duration: context.durationLong,
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
                             );
                           } else {
-                            context.showSnackbar(
-                              message: resources.failedToAddCart,
-                              type: SnackbarType.error,
+                            context.snackbarError(
+                              resources.failedToAddCart,
+                              duration: context.durationLong,
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
                             );
                           }
                         },
@@ -411,12 +473,12 @@ class FavoritesView
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: OsmeaColors.white,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: OsmeaColors.silver),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: OsmeaColors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -453,12 +515,18 @@ class FavoritesView
                     onTap: () async {
                       await viewModel.removeFavoriteBrand(brand.id);
                       if (context.mounted) {
-                         context.showSnackbar(message: "Brand removed", type: SnackbarType.info);
+                        context.showSnackbar(
+                          message: context.resources.removedFromFavorites,
+                          type: SnackbarType.info,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                          duration: context.durationLong,
+                        );
                       }
                     },
                     child: const Padding(
                       padding: EdgeInsets.only(left: 4.0),
-                      child: Icon(Icons.favorite, size: 14, color: Colors.red),
+                      child: Icon(Icons.favorite, size: 14, color: OsmeaColors.black),
                     ),
                   )
                 ],
