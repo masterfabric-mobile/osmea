@@ -14,12 +14,36 @@ class Brand {
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) {
+    final idRaw = json['id'];
+    final id = idRaw is int
+        ? idRaw
+        : (idRaw is num
+            ? idRaw.toInt()
+            : int.tryParse(idRaw?.toString() ?? '') ?? 0);
+    final logoUrl = json['logo_url'] ?? json['logoUrl'];
+
     return Brand(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      logoUrl: json['logo_url'] as String?,
+      id: id,
+      name: json['name'] as String? ?? '',
+      slug: json['slug'] as String? ?? '',
+      logoUrl: logoUrl is String ? logoUrl : (logoUrl?.toString().isNotEmpty == true ? logoUrl.toString() : null),
       description: json['description'] as String?,
+    );
+  }
+
+  Brand copyWith({
+    int? id,
+    String? name,
+    String? slug,
+    String? logoUrl,
+    String? description,
+  }) {
+    return Brand(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      slug: slug ?? this.slug,
+      logoUrl: logoUrl ?? this.logoUrl,
+      description: description ?? this.description,
     );
   }
 

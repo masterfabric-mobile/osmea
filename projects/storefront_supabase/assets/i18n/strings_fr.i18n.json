@@ -75,6 +75,7 @@
   "shopping": "Achats",
   "general": "Général",
   "admin": "Admin",
+  "coupons": "Bons de réduction",
   "welcomeTitle": "Bienvenue sur Storefront",
   "welcomeSubtitle": "Connectez-vous ou créez un compte pour continuer",
   "dontHaveAccount": "Pas de compte ? S'inscrire",
@@ -159,7 +160,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Pas encore d'avis.",
+  },
+  "noReviewsYet": "Pas encore d'avis.",
   "emailCannotBeChanged": "* L'e-mail ne peut pas être modifié ici directement.",
   "genderMale": "Homme",
   "genderFemale": "Femme",
@@ -179,6 +181,23 @@
   "logoutSuccess": "Déconnexion réussie !",
   "addedToFavorites": "Ajouté aux favoris !",
   "removedFromFavorites": "Retiré des favoris.",
-  "wishlistUpdateFailed": "Échec de la mise à jour de la liste de souhaits. Veuillez réessayer."
+  "wishlistUpdateFailed": "Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.",
+  "filterAll": "Tous",
+  "filterVerified": "Achat vérifié",
+  "filterProductRating": "Note du produit",
+  "filterDeliveryRating": "Note de livraison",
+  "filterWithComment": "Avec commentaire",
+  "haveACoupon": "Vous avez un bon de réduction ?",
+  "enterCouponCode": "Entrez le code de réduction",
+  "applyCoupon": "Appliquer",
+  "removeCoupon": "Supprimer le bon de réduction",
+  "discount": "Remise",
+  "couponRemoved": "Bon de réduction supprimé.",
+  "couponAppliedSuccessfully": "Bon de réduction appliqué avec succès !",
+  "invalidCouponCode": "Code de bon de réduction invalide.",
+  "couponNotActive": "Le bon de réduction n'est pas actif.",
+  "couponExpired": "Le bon de réduction a expiré.",
+  "couponLimitReached": "Limite d'utilisation du bon de réduction atteinte.",
+  "minimumPurchaseRequired": "Achat minimum de {amount} requis.",
+  "confirmLogoutMessage": "Êtes-vous sûr de vouloir vous déconnecter ?"
 }
-

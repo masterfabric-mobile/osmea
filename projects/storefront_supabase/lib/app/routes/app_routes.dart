@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart'
     hide
-        SearchView,
         SplashView,
         OnboardingView,
         BuildContextTranslationsExtension,
@@ -11,6 +10,8 @@ import 'package:core/core.dart'
         TranslationProvider,
         AuthState; // Hide AuthState from core to avoid conflict with Supabase
 import 'package:storefront_supabase/app/models/product.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/admin_coupons_view.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/add_coupon_view.dart';
 import 'package:storefront_supabase/app/views/admin/dashboard/dashboard_view.dart';
 import 'package:storefront_supabase/app/views/admin/orders/orders_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/products_view.dart';
@@ -21,15 +22,15 @@ import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_supabase/app/views/view_cart/cart_view.dart';
 import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
-import 'package:storefront_supabase/app/views/view_categories/products_by_category/products_by_category_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
-import 'package:storefront_supabase/app/views/view_search/search_view.dart';
+import 'package:storefront_supabase/app/views/view_search/supabase_search_screen.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
+import 'package:storefront_supabase/app/views/view_brands/products_by_brand/products_by_brand_view.dart'; // Added
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/models/navbar_item_model.dart';
 import 'package:storefront_supabase/app/utils/navbar_icon_helper.dart';
@@ -39,6 +40,12 @@ import 'package:storefront_supabase/app/views/view_favorites/models/view_model.d
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
 import 'package:get_it/get_it.dart';
 
+import 'package:storefront_supabase/app/views/view_product_list/product_list_view.dart'; // Added
+
+/// Scaffold messenger key for user shell (core MasterScaffoldWidget).
+final GlobalKey<ScaffoldMessengerState> _userShellScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
   routes: <RouteBase>[
@@ -47,12 +54,19 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) =>
           OnboardingView(goRoute: (String path) => context.go(path)),
     ),
-    // User Shell Route with Dynamic Navbar
+    // User Shell Route: core MasterScaffoldWidget + bottom bar (navbar from config)
     ShellRoute(
-      builder: (context, state, child) {
-        return OsmeaComponents.scaffold(
+      builder: (BuildContext context, GoRouterState state, Widget child) {
+        final navbar = _getNavbarForRoute(context, state.uri.path);
+        return MasterScaffoldWidget(
+          scaffoldMessengerKey: _userShellScaffoldMessengerKey,
           body: child,
-          bottomNavigationBar: _getNavbarForRoute(context, state.uri.path),
+          bottomNavigationBar: navbar != null ? _wrapBottomBar(context, navbar) : null,
+          navbarSpacer: const SpacerVisibility.disabled(),
+          footerSpacer: const SpacerVisibility.disabled(),
+          horizontalPadding: const PaddingVisibility.disabled(),
+          verticalPadding: const PaddingVisibility.disabled(),
+          appBarPadding: const AppBarPaddingVisibility.disabled(),
         );
       },
       routes: [
@@ -60,6 +74,16 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           builder: (BuildContext context, GoRouterState state) {
             return SettingsView(goRoute: (String path) => context.go(path));
+          },
+        ),
+        GoRoute(
+          path: '/brands/:brandId',
+          builder: (BuildContext context, GoRouterState state) {
+            final brandId = state.pathParameters['brandId'];
+            return ProductsByBrandView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'brandId': brandId},
+            );
           },
         ),
         GoRoute(
@@ -81,8 +105,10 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/home',
-          builder: (BuildContext context, GoRouterState state) =>
-              SupabaseHomeView(goRoute: (String path) => context.go(path)),
+          builder: (BuildContext context, GoRouterState state) => SupabaseHomeView(
+            goRoute: (String path) => context.go(path),
+            arguments: {'home': true, ...state.uri.queryParameters},
+          ),
         ),
         GoRoute(
           path: '/categories',
@@ -93,12 +119,11 @@ final GoRouter appRouter = GoRouter(
               path: 'products/:categoryId',
               builder: (BuildContext context, GoRouterState state) {
                 final categoryId = state.pathParameters['categoryId'];
-                final categoryName = state.uri.queryParameters['name'];
-                return ProductsByCategoryView(
+                // Use ProductListView for category products
+                return ProductListView(
                   goRoute: (String path) => context.go(path),
                   arguments: {
-                    'categoryId': categoryId,
-                    'categoryName': categoryName,
+                    'category_id': categoryId,
                   },
                 );
               },
@@ -106,19 +131,37 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
         GoRoute(
+          path: '/products',
+          builder: (BuildContext context, GoRouterState state) {
+             return ProductListView(
+               goRoute: (String path) => context.go(path),
+               arguments: state.uri.queryParameters,
+             );
+          },
+        ),
+        GoRoute(
           path: '/cart',
           builder: (BuildContext context, GoRouterState state) =>
-              CartView(goRoute: (String path) => context.go(path)),
+              CartView(
+                goRoute: (String path) => context.go(path),
+                arguments: const {'cart': true},
+              ),
         ),
         GoRoute(
           path: '/favorites',
           builder: (BuildContext context, GoRouterState state) =>
-              FavoritesView(goRoute: (String path) => context.go(path)),
+              FavoritesView(
+                goRoute: (String path) => context.go(path),
+                arguments: const {'favorites': true},
+              ),
         ),
         GoRoute(
           path: '/profile',
           builder: (BuildContext context, GoRouterState state) {
-            return ProfileView(goRoute: (String path) => context.go(path));
+            return ProfileView(
+              goRoute: (String path) => context.go(path),
+              arguments: const {'profile': true},
+            );
           },
           routes: [
             GoRoute(
@@ -126,6 +169,7 @@ final GoRouter appRouter = GoRouter(
               builder: (BuildContext context, GoRouterState state) {
                 return PersonalInfoView(
                   goRoute: (String path) => context.go(path),
+                  arguments: const {'profile': true, 'info': true},
                 );
               },
             ),
@@ -134,6 +178,7 @@ final GoRouter appRouter = GoRouter(
               builder: (BuildContext context, GoRouterState state) {
                 return AddressesView(
                   goRoute: (String path) => context.go(path),
+                  arguments: const {'profile': true, 'addresses': true},
                 );
               },
             ),
@@ -142,6 +187,7 @@ final GoRouter appRouter = GoRouter(
               builder: (BuildContext context, GoRouterState state) {
                 return ChangePasswordView(
                   goRoute: (String path) => context.go(path),
+                  arguments: const {'profile': true, 'change_password': true},
                 );
               },
             ),
@@ -159,8 +205,50 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/search',
-          builder: (BuildContext context, GoRouterState state) =>
-              SearchView(goRoute: (String path) => context.go(path)),
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final query = state.uri.queryParameters['query'];
+            final fromHome = state.uri.queryParameters['fromHome'] == 'true';
+            final router = GoRouter.of(context);
+            return CustomTransitionPage(
+              child: SupabaseSearchScreen(
+                initialQuery: query,
+                fromHome: fromHome,
+                goRoute: (String path) => router.go(path),
+                searchProvider: (String q) async {
+                  try {
+                    final client = Supabase.instance.client;
+                    final sanitized = q.replaceAll(',', ' ');
+                    final brandResponse = await client
+                        .from('brand')
+                        .select('id')
+                        .ilike('name', '%$sanitized%');
+                    final brandIds = (brandResponse as List)
+                        .map((e) => e['id'] as int)
+                        .toList();
+                    String orFilter = 'name.ilike.*$sanitized*';
+                    if (brandIds.isNotEmpty) {
+                      orFilter += ',brand_id.in.(${brandIds.join(',')})';
+                    }
+                    final response = await client
+                        .from('products')
+                        .select(
+                            '*, product_images(image_url, is_primary), brand(name)')
+                        .or(orFilter);
+                    return (response as List)
+                        .map((data) => Product.fromJson(data))
+                        .toList();
+                  } catch (e) {
+                    debugPrint('Search error: $e');
+                    return [];
+                  }
+                },
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      FadeTransition(opacity: animation, child: child),
+              transitionDuration: const Duration(milliseconds: 300),
+            );
+          },
         ),
       ],
     ),
@@ -203,6 +291,30 @@ final GoRouter appRouter = GoRouter(
             return AddProductView(
               goRoute: (String path) => context.go(path),
               arguments: {'productId': productId},
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/coupons',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminCouponsView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/coupons/add',
+          builder: (BuildContext context, GoRouterState state) {
+            return AddCouponView(goRoute: (String path) => context.go(path));
+          },
+        ),
+        GoRoute(
+          path: '/admin/coupons/edit/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            final couponId = state.pathParameters['id'];
+            return AddCouponView(
+              goRoute: (String path) => context.go(path),
+              arguments: {'couponId': couponId},
             );
           },
         ),
@@ -290,10 +402,20 @@ class _AdminScreenState extends State<AdminScreen> {
         onTap: () {},
       ),
       NavbarItem(
+        text: resources.coupons,
+        icon: Icon(
+          Icons.confirmation_number_outlined,
+          color: _calculateSelectedIndex(context) == 3
+              ? activeColor
+              : inactiveColor,
+        ),
+        onTap: () {},
+      ),
+      NavbarItem(
         text: resources.orders,
         icon: Icon(
           Icons.receipt,
-          color: _calculateSelectedIndex(context) == 3
+          color: _calculateSelectedIndex(context) == 4
               ? activeColor
               : inactiveColor,
         ),
@@ -303,7 +425,7 @@ class _AdminScreenState extends State<AdminScreen> {
         text: resources.settings,
         icon: Icon(
           Icons.settings,
-          color: _calculateSelectedIndex(context) == 4
+          color: _calculateSelectedIndex(context) == 5
               ? activeColor
               : inactiveColor,
         ),
@@ -315,13 +437,13 @@ class _AdminScreenState extends State<AdminScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: navItems,
-        variant: NavbarVariant.retailMain,
+        variant: NavbarVariant.minimal,
         size: NavbarSize.medium,
-        currentIndex: _calculateSelectedIndex(context),
-        onItemTap: (int idx) => _onItemTapped(idx, context),
         backgroundColor: backgroundColor,
         activeColor: activeColor,
         inactiveColor: inactiveColor,
+        currentIndex: _calculateSelectedIndex(context),
+        onItemTap: (int idx) => _onItemTapped(idx, context),
       ),
     );
   }
@@ -330,8 +452,9 @@ class _AdminScreenState extends State<AdminScreen> {
     final String location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/admin/users')) return 1;
     if (location.startsWith('/admin/products')) return 2;
-    if (location.startsWith('/admin/orders')) return 3;
-    if (location.startsWith('/admin/settings')) return 4;
+    if (location.startsWith('/admin/coupons')) return 3;
+    if (location.startsWith('/admin/orders')) return 4;
+    if (location.startsWith('/admin/settings')) return 5;
     return 0;
   }
 
@@ -347,9 +470,12 @@ class _AdminScreenState extends State<AdminScreen> {
         context.go('/admin/products');
         break;
       case 3:
-        context.go('/admin/orders');
+        context.go('/admin/coupons');
         break;
       case 4:
+        context.go('/admin/orders');
+        break;
+      case 5:
         context.go('/admin/settings');
         break;
     }
@@ -357,11 +483,36 @@ class _AdminScreenState extends State<AdminScreen> {
 }
 
 // --- Dynamic Navbar Logic ---
+// Storefront_woo style: navbar shown on ALL user routes except onboarding/admin.
+// Colors from navbar_configuration (black/white only, no blue). OsmeaComponents.navbar().
 
-/// Get navbar for specific route
+bool _shouldShowNavbarForPath(String path) {
+  if (path == '/onboarding' || path.startsWith('/admin')) return false;
+  return true;
+}
+
+/// Wraps navbar: fixed height + clip (overflow fix), theme so tap has no blue splash (siyah bar, dokununca mavilik yok).
+Widget _wrapBottomBar(BuildContext context, Widget navbar) {
+  return SizedBox(
+    height: 64,
+    child: ClipRect(
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+        ),
+        child: navbar,
+      ),
+    ),
+  );
+}
+
 Widget? _getNavbarForRoute(BuildContext context, String location) {
-  // Load navbar config to determine if route should show navbar
   try {
+    if (!_shouldShowNavbarForPath(location)) {
+      return null;
+    }
+
     final configHelper = AssetConfigHelper();
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final isEnabled = navbarConfig?['enabled'] as bool? ?? true;
@@ -371,64 +522,26 @@ Widget? _getNavbarForRoute(BuildContext context, String location) {
 
     final itemsList = navbarConfig?['items'] as List<dynamic>?;
     if (itemsList == null || itemsList.isEmpty) {
-      // Fallback to hardcoded check if config is missing
       return _getNavbarForRouteFallback(context, location);
     }
 
-    // Parse items and find matching route
     final List<NavbarItemModel> itemModels = itemsList
         .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
         .toList();
 
-    // Check if location matches any navbar route
-    bool shouldShowNavbar = false;
     int? currentIndex;
-
     for (final model in itemModels) {
-      // Check standard route
       if (location == model.route) {
-        shouldShowNavbar = true;
         currentIndex = model.orderId;
         break;
       }
-      // Check conditional routes
-      if (model.isConditional) {
-        if (location == model.authRoute || location == model.guestRoute) {
-          shouldShowNavbar = true;
-          currentIndex = model.orderId;
-          break;
-        }
+      if (model.isConditional &&
+          (location == model.authRoute || location == model.guestRoute)) {
+        currentIndex = model.orderId;
+        break;
       }
     }
-
-    // Also check common routes for backward compatibility
-    if (!shouldShowNavbar) {
-      if (location == '/home' ||
-          location == '/categories' ||
-          location == '/search' ||
-          location == '/cart' ||
-          location == '/favorites' ||
-          location == '/profile' ||
-          location == '/auth') {
-        shouldShowNavbar = true;
-        // Find index from config or use fallback
-        for (final model in itemModels) {
-          if (location == model.route ||
-              location == model.authRoute ||
-              location == model.guestRoute) {
-            currentIndex = model.orderId;
-            break;
-          }
-        }
-        // Fallback to hardcoded if not found in config
-        currentIndex ??= _getFallbackIndex(location);
-      }
-    }
-
-    if (!shouldShowNavbar || currentIndex == null) {
-      return null;
-    }
-
+    currentIndex ??= _getFallbackIndex(location);
     final finalCurrentIndex = currentIndex;
 
     // Use StreamBuilder to listen to Supabase auth changes
@@ -539,16 +652,42 @@ Widget _buildNavbarWidget(
   final size = _getNavbarSize(configHelper);
   final position = _getNavbarPosition(configHelper);
   final elevation = _getNavbarElevation(configHelper);
+  final showLabels = _getNavbarBool(configHelper, 'showLabels', true);
+  final showIcons = _getNavbarBool(configHelper, 'showIcons', true);
+  final centerItems = _getNavbarBool(configHelper, 'centerItems', true);
+  final borderColor = _getNavbarColor(
+    configHelper,
+    'borderColor',
+    const Color(0xFFE5E5E5),
+  );
+  final borderWidth = _getNavbarDouble(configHelper, 'borderWidth');
+  final showBorder = _getNavbarBool(configHelper, 'showBorder', false);
+  final style = _getNavbarStyle(configHelper);
+  final indicatorStyle = _getNavbarIndicatorStyle(configHelper);
+  final indicatorColor = _getNavbarColor(
+    configHelper,
+    'indicatorColor',
+    activeColor,
+  );
 
   return OsmeaComponents.navbar(
     variant: variant,
     size: size,
     position: position,
+    style: style,
+    indicatorStyle: indicatorStyle,
+    indicatorColor: indicatorColor,
     currentIndex: currentIndex,
     elevation: elevation,
     backgroundColor: backgroundColor,
     activeColor: activeColor,
     inactiveColor: inactiveColor,
+    borderColor: borderColor,
+    borderWidth: borderWidth,
+    showBorder: showBorder,
+    showLabels: showLabels,
+    showIcons: showIcons,
+    centerItems: centerItems,
     items: items,
     onItemTap: (index) => _navigateToPage(context, index, itemModels, isAuthenticated),
   );
@@ -625,45 +764,47 @@ void _navigateToPage(
 }
 
 Widget? _getNavbarForRouteFallback(BuildContext context, String location) {
-  // Simple fallback with standard items if config fails
-  if (location == '/home' ||
-      location == '/categories' ||
-      location == '/cart' ||
-      location == '/favorites' ||
-      location == '/profile') {
-    
-    final currentIndex = _getFallbackIndex(location);
-    final resources = context.resources;
-    
-    return OsmeaComponents.navbar(
-      currentIndex: currentIndex,
-      items: [
-        NavbarItem(text: resources.home, icon: const Icon(Icons.home), onTap: () {}),
-        NavbarItem(text: resources.categories, icon: const Icon(Icons.category), onTap: () {}),
-        NavbarItem(text: resources.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
-        NavbarItem(text: resources.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
-        NavbarItem(text: resources.profile, icon: const Icon(Icons.person), onTap: () {}),
-      ],
-      onItemTap: (index) {
-        switch (index) {
-          case 0: context.go('/home'); break;
-          case 1: context.go('/categories'); break;
-          case 2: context.go('/cart'); break;
-          case 3: context.go('/favorites'); break;
-          case 4: context.go('/profile'); break;
-        }
-      },
-    );
-  }
-  return null;
+  // Storefront_supabase: always show navbar for any shell route (e.g. product-detail, profile/info, settings)
+  final currentIndex = _getFallbackIndex(location);
+  final resources = context.resources;
+
+  return OsmeaComponents.navbar(
+    variant: NavbarVariant.minimal,
+    size: NavbarSize.medium,
+    backgroundColor: OsmeaColors.white,
+    activeColor: OsmeaColors.black,
+    inactiveColor: OsmeaColors.black,
+    currentIndex: currentIndex,
+    items: [
+      NavbarItem(text: resources.home, icon: const Icon(Icons.home), onTap: () {}),
+      NavbarItem(text: resources.search, icon: const Icon(Icons.search), onTap: () {}),
+      NavbarItem(text: resources.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
+      NavbarItem(text: resources.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
+      NavbarItem(text: resources.profile, icon: const Icon(Icons.person), onTap: () {}),
+    ],
+    onItemTap: (index) {
+      switch (index) {
+        case 0: context.go('/home'); break;
+        case 1: context.go('/search'); break;
+        case 2: context.go('/cart'); break;
+        case 3: context.go('/favorites'); break;
+        case 4: context.go('/profile'); break;
+      }
+    },
+  );
 }
 
 int _getFallbackIndex(String location) {
   if (location == '/home') return 0;
-  if (location == '/categories') return 1;
+  if (location.startsWith('/categories')) return 0;
+  if (location == '/search') return 1;
   if (location == '/cart') return 2;
   if (location == '/favorites') return 3;
-  if (location == '/profile') return 4;
+  if (location.startsWith('/profile') || location == '/auth') return 4;
+  if (location.startsWith('/product-detail') ||
+      location.startsWith('/brands') ||
+      location == '/products' ||
+      location == '/settings') return 0;
   return 0;
 }
 
@@ -702,9 +843,10 @@ NavbarVariant _getNavbarVariant(AssetConfigHelper configHelper) {
   try {
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final variantString = navbarConfig?['variant'] as String?;
-    return NavbarVariantStringExtension.fromString(variantString) ?? NavbarVariant.retailMain;
+    // Use minimal (black/white) as default so we never show blue Osmea branding
+    return NavbarVariantStringExtension.fromString(variantString) ?? NavbarVariant.minimal;
   } catch (_) {
-    return NavbarVariant.retailMain;
+    return NavbarVariant.minimal;
   }
 }
 
@@ -727,3 +869,49 @@ NavbarPosition _getNavbarPosition(AssetConfigHelper configHelper) {
     return NavbarPosition.bottom;
   }
 }
+
+bool _getNavbarBool(AssetConfigHelper configHelper, String key, bool defaultValue) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key] as bool?;
+    if (value != null) return value;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return defaultValue;
+}
+
+double? _getNavbarDouble(AssetConfigHelper configHelper, String key) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final value = navbarConfig?[key];
+    if (value is num) return value.toDouble();
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar $key: $e');
+  }
+  return null;
+}
+
+NavbarStyle? _getNavbarStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final styleString = navbarConfig?['style'] as String?;
+    return NavbarStyleStringExtension.fromString(styleString);
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar style: $e');
+    return null;
+  }
+}
+
+NavbarIndicatorStyle _getNavbarIndicatorStyle(AssetConfigHelper configHelper) {
+  try {
+    final navbarConfig = configHelper.getObject('navbar_configuration');
+    final indicatorString = navbarConfig?['indicatorStyle'] as String?;
+    return NavbarIndicatorStyleStringExtension.fromString(indicatorString) ??
+        NavbarIndicatorStyle.none;
+  } catch (e) {
+    debugPrint('⚠️ Failed to load navbar indicator style: $e');
+    return NavbarIndicatorStyle.none;
+  }
+}
+

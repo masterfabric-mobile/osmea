@@ -112,6 +112,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => 'Alışveriş';
 	@override String get general => 'Genel';
 	@override String get admin => 'Yönetici';
+	@override String get coupons => 'Kuponlar';
 	@override String get welcomeTitle => 'Mağazaya Hoşgeldiniz';
 	@override String get welcomeSubtitle => 'Devam etmek için giriş yapın veya hesap oluşturun';
 	@override String get dontHaveAccount => 'Hesabınız yok mu? Kayıt Ol';
@@ -211,6 +212,24 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Favorilere eklendi!';
 	@override String get removedFromFavorites => 'Favorilerden çıkarıldı.';
 	@override String get wishlistUpdateFailed => 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.';
+	@override String get filterAll => 'Tümü';
+	@override String get filterVerified => 'Doğrulanmış Satın Alma';
+	@override String get filterProductRating => 'Ürün Puanı';
+	@override String get filterDeliveryRating => 'Teslimat Puanı';
+	@override String get filterWithComment => 'Yorumlu';
+	@override String get haveACoupon => 'Kuponunuz var mı?';
+	@override String get enterCouponCode => 'Kupon kodunu girin';
+	@override String get applyCoupon => 'Uygula';
+	@override String get removeCoupon => 'Kuponu Kaldır';
+	@override String get discount => 'İndirim';
+	@override String get couponRemoved => 'Kupon kaldırıldı.';
+	@override String get couponAppliedSuccessfully => 'Kupon başarıyla uygulandı!';
+	@override String get invalidCouponCode => 'Geçersiz kupon kodu.';
+	@override String get couponNotActive => 'Kupon aktif değil.';
+	@override String get couponExpired => 'Kuponun süresi doldu.';
+	@override String get couponLimitReached => 'Kupon kullanım sınırı aşıldı.';
+	@override String get minimumPurchaseRequired => 'Minimum {amount} tutarında alışveriş gerekli.';
+	@override String get confirmLogoutMessage => 'Çıkış yapmak istediğinizden emin misiniz?';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -296,6 +315,7 @@ extension on TranslationsTr {
 			'shopping' => 'Alışveriş',
 			'general' => 'Genel',
 			'admin' => 'Yönetici',
+			'coupons' => 'Kuponlar',
 			'welcomeTitle' => 'Mağazaya Hoşgeldiniz',
 			'welcomeSubtitle' => 'Devam etmek için giriş yapın veya hesap oluşturun',
 			'dontHaveAccount' => 'Hesabınız yok mu? Kayıt Ol',
@@ -395,6 +415,24 @@ extension on TranslationsTr {
 			'addedToFavorites' => 'Favorilere eklendi!',
 			'removedFromFavorites' => 'Favorilerden çıkarıldı.',
 			'wishlistUpdateFailed' => 'İstek listesi güncellenemedi. Lütfen tekrar deneyin.',
+			'filterAll' => 'Tümü',
+			'filterVerified' => 'Doğrulanmış Satın Alma',
+			'filterProductRating' => 'Ürün Puanı',
+			'filterDeliveryRating' => 'Teslimat Puanı',
+			'filterWithComment' => 'Yorumlu',
+			'haveACoupon' => 'Kuponunuz var mı?',
+			'enterCouponCode' => 'Kupon kodunu girin',
+			'applyCoupon' => 'Uygula',
+			'removeCoupon' => 'Kuponu Kaldır',
+			'discount' => 'İndirim',
+			'couponRemoved' => 'Kupon kaldırıldı.',
+			'couponAppliedSuccessfully' => 'Kupon başarıyla uygulandı!',
+			'invalidCouponCode' => 'Geçersiz kupon kodu.',
+			'couponNotActive' => 'Kupon aktif değil.',
+			'couponExpired' => 'Kuponun süresi doldu.',
+			'couponLimitReached' => 'Kupon kullanım sınırı aşıldı.',
+			'minimumPurchaseRequired' => 'Minimum {amount} tutarında alışveriş gerekli.',
+			'confirmLogoutMessage' => 'Çıkış yapmak istediğinizden emin misiniz?',
 			_ => null,
 		};
 	}

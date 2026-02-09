@@ -266,6 +266,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Admin'
 	String get admin => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Admin';
 
+	/// en: 'Coupons'
+	String get coupons => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Coupons';
+
 	/// en: 'Welcome to Storefront'
 	String get welcomeTitle => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Welcome to Storefront';
 
@@ -562,6 +565,60 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Failed to update wishlist. Please try again.'
 	String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.';
+
+	/// en: 'All'
+	String get filterAll => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'All';
+
+	/// en: 'Verified Purchase'
+	String get filterVerified => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verified Purchase';
+
+	/// en: 'Product Rating'
+	String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Product Rating';
+
+	/// en: 'Delivery Rating'
+	String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Delivery Rating';
+
+	/// en: 'With Comment'
+	String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'With Comment';
+
+	/// en: 'Have a coupon?'
+	String get haveACoupon => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Have a coupon?';
+
+	/// en: 'Enter coupon code'
+	String get enterCouponCode => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Enter coupon code';
+
+	/// en: 'Apply'
+	String get applyCoupon => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Apply';
+
+	/// en: 'Remove Coupon'
+	String get removeCoupon => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Remove Coupon';
+
+	/// en: 'Discount'
+	String get discount => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'Discount';
+
+	/// en: 'Coupon removed.'
+	String get couponRemoved => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Coupon removed.';
+
+	/// en: 'Coupon applied successfully!'
+	String get couponAppliedSuccessfully => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Coupon applied successfully!';
+
+	/// en: 'Invalid coupon code.'
+	String get invalidCouponCode => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Invalid coupon code.';
+
+	/// en: 'Coupon is not active.'
+	String get couponNotActive => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Coupon is not active.';
+
+	/// en: 'Coupon has expired.'
+	String get couponExpired => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Coupon has expired.';
+
+	/// en: 'Coupon usage limit reached.'
+	String get couponLimitReached => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Coupon usage limit reached.';
+
+	/// en: 'Minimum purchase of {amount} required.'
+	String get minimumPurchaseRequired => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum purchase of {amount} required.';
+
+	/// en: 'Are you sure you want to log out?'
+	String get confirmLogoutMessage => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Are you sure you want to log out?';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -647,6 +704,7 @@ extension on Translations {
 			'shopping' => TranslationOverrides.string(_root.$meta, 'shopping', {}) ?? 'Shopping',
 			'general' => TranslationOverrides.string(_root.$meta, 'general', {}) ?? 'General',
 			'admin' => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Admin',
+			'coupons' => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Coupons',
 			'welcomeTitle' => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Welcome to Storefront',
 			'welcomeSubtitle' => TranslationOverrides.string(_root.$meta, 'welcomeSubtitle', {}) ?? 'Sign in or create an account to continue',
 			'dontHaveAccount' => TranslationOverrides.string(_root.$meta, 'dontHaveAccount', {}) ?? 'Don\'t have an account? Sign Up',
@@ -746,6 +804,24 @@ extension on Translations {
 			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Added to favorites!',
 			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Removed from favorites.',
 			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Failed to update wishlist. Please try again.',
+			'filterAll' => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'All',
+			'filterVerified' => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verified Purchase',
+			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Product Rating',
+			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Delivery Rating',
+			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'With Comment',
+			'haveACoupon' => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Have a coupon?',
+			'enterCouponCode' => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Enter coupon code',
+			'applyCoupon' => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Apply',
+			'removeCoupon' => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Remove Coupon',
+			'discount' => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'Discount',
+			'couponRemoved' => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Coupon removed.',
+			'couponAppliedSuccessfully' => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Coupon applied successfully!',
+			'invalidCouponCode' => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Invalid coupon code.',
+			'couponNotActive' => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Coupon is not active.',
+			'couponExpired' => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Coupon has expired.',
+			'couponLimitReached' => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Coupon usage limit reached.',
+			'minimumPurchaseRequired' => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum purchase of {amount} required.',
+			'confirmLogoutMessage' => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Are you sure you want to log out?',
 			_ => null,
 		};
 	}

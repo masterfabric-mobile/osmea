@@ -266,6 +266,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Admin'
 	String get admin => 'Admin';
 
+	/// en: 'Coupons'
+	String get coupons => 'Coupons';
+
 	/// en: 'Welcome to Storefront'
 	String get welcomeTitle => 'Welcome to Storefront';
 
@@ -562,6 +565,60 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Failed to update wishlist. Please try again.'
 	String get wishlistUpdateFailed => 'Failed to update wishlist. Please try again.';
+
+	/// en: 'All'
+	String get filterAll => 'All';
+
+	/// en: 'Verified Purchase'
+	String get filterVerified => 'Verified Purchase';
+
+	/// en: 'Product Rating'
+	String get filterProductRating => 'Product Rating';
+
+	/// en: 'Delivery Rating'
+	String get filterDeliveryRating => 'Delivery Rating';
+
+	/// en: 'With Comment'
+	String get filterWithComment => 'With Comment';
+
+	/// en: 'Have a coupon?'
+	String get haveACoupon => 'Have a coupon?';
+
+	/// en: 'Enter coupon code'
+	String get enterCouponCode => 'Enter coupon code';
+
+	/// en: 'Apply'
+	String get applyCoupon => 'Apply';
+
+	/// en: 'Remove Coupon'
+	String get removeCoupon => 'Remove Coupon';
+
+	/// en: 'Discount'
+	String get discount => 'Discount';
+
+	/// en: 'Coupon removed.'
+	String get couponRemoved => 'Coupon removed.';
+
+	/// en: 'Coupon applied successfully!'
+	String get couponAppliedSuccessfully => 'Coupon applied successfully!';
+
+	/// en: 'Invalid coupon code.'
+	String get invalidCouponCode => 'Invalid coupon code.';
+
+	/// en: 'Coupon is not active.'
+	String get couponNotActive => 'Coupon is not active.';
+
+	/// en: 'Coupon has expired.'
+	String get couponExpired => 'Coupon has expired.';
+
+	/// en: 'Coupon usage limit reached.'
+	String get couponLimitReached => 'Coupon usage limit reached.';
+
+	/// en: 'Minimum purchase of {amount} required.'
+	String get minimumPurchaseRequired => 'Minimum purchase of {amount} required.';
+
+	/// en: 'Are you sure you want to log out?'
+	String get confirmLogoutMessage => 'Are you sure you want to log out?';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -647,6 +704,7 @@ extension on Translations {
 			'shopping' => 'Shopping',
 			'general' => 'General',
 			'admin' => 'Admin',
+			'coupons' => 'Coupons',
 			'welcomeTitle' => 'Welcome to Storefront',
 			'welcomeSubtitle' => 'Sign in or create an account to continue',
 			'dontHaveAccount' => 'Don\'t have an account? Sign Up',
@@ -746,6 +804,24 @@ extension on Translations {
 			'addedToFavorites' => 'Added to favorites!',
 			'removedFromFavorites' => 'Removed from favorites.',
 			'wishlistUpdateFailed' => 'Failed to update wishlist. Please try again.',
+			'filterAll' => 'All',
+			'filterVerified' => 'Verified Purchase',
+			'filterProductRating' => 'Product Rating',
+			'filterDeliveryRating' => 'Delivery Rating',
+			'filterWithComment' => 'With Comment',
+			'haveACoupon' => 'Have a coupon?',
+			'enterCouponCode' => 'Enter coupon code',
+			'applyCoupon' => 'Apply',
+			'removeCoupon' => 'Remove Coupon',
+			'discount' => 'Discount',
+			'couponRemoved' => 'Coupon removed.',
+			'couponAppliedSuccessfully' => 'Coupon applied successfully!',
+			'invalidCouponCode' => 'Invalid coupon code.',
+			'couponNotActive' => 'Coupon is not active.',
+			'couponExpired' => 'Coupon has expired.',
+			'couponLimitReached' => 'Coupon usage limit reached.',
+			'minimumPurchaseRequired' => 'Minimum purchase of {amount} required.',
+			'confirmLogoutMessage' => 'Are you sure you want to log out?',
 			_ => null,
 		};
 	}

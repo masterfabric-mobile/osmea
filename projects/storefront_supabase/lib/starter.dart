@@ -85,6 +85,7 @@ launchApp({String environment = 'dev'}) async {
   // Perform any necessary setup before the app starts with configuration management
 
   await MasterApp.runBefore(
+    hydrated: true,
     allowCollectDataTelemetry: allowTelemetry,
 
     enableRemoteConfig: enableRemoteConfig,
@@ -199,18 +200,6 @@ launchApp({String environment = 'dev'}) async {
 
       child: BlocBuilder<LanguageCubit, Locale?>(
         builder: (context, locale) {
-          // Convert Locale to AppLocale and set it in slang
-          if (locale != null) {
-            final appLocale = AppLocaleUtils.parseLocaleParts(
-              languageCode: locale.languageCode,
-              countryCode: locale.countryCode,
-            );
-            LocaleSettings.setLocaleSync(appLocale);
-          } else {
-            // Use device locale if no saved locale
-            LocaleSettings.useDeviceLocaleSync();
-          }
-
           return TranslationProvider(
             child: MasterApp(
               router: appRouter, // The router handles navigation within the app

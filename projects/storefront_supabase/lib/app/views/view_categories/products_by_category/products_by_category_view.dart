@@ -23,10 +23,10 @@ class ProductsByCategoryView
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
                 categoryName,
-                color: Colors.black,
+                color: OsmeaColors.black,
               ),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: OsmeaColors.white,
+              foregroundColor: OsmeaColors.black,
               leading: OsmeaComponents.iconButton(
                 onPressed: () {
                   if (context.canPop()) {
@@ -154,15 +154,15 @@ class ProductsByCategoryView
                                     Positioned.fill(
                                       child: (product.imageUrl
                                               .contains('placehold.co'))
-                                          ? const Center(
+                                          ? Center(
                                               child: Icon(Icons.image,
-                                                  color: Colors.grey))
+                                                  color: OsmeaColors.pewter))
                                           : OsmeaComponents.image(
                                               imageUrl: product.imageUrl,
                                               fit: BoxFit.cover,
-                                              errorWidget: const Center(
+                                              errorWidget: Center(
                                                   child: Icon(Icons.error,
-                                                      color: Colors.red)),
+                                                      color: OsmeaColors.black)),
                                             ),
                                     ),
                                     if (hasDiscount)
@@ -182,7 +182,7 @@ class ProductsByCategoryView
                                           child: OsmeaComponents.text(
                                             'SALE',
                                             textStyle: const TextStyle(
-                                              color: Colors.white,
+                                              color: OsmeaColors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -227,7 +227,7 @@ class ProductsByCategoryView
                                                     ?.copyWith(
                                                       decoration: TextDecoration
                                                           .lineThrough,
-                                                      color: Colors.grey[600],
+                                                      color: OsmeaColors.slate,
                                                     ),
                                               ),
                                               OsmeaComponents.sizedBox(

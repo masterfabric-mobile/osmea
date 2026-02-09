@@ -12,7 +12,7 @@ void main() async {
     Flavor.create(
       environment,
       name: environment.toString().split('.').last.toUpperCase(),
-      color: Colors.blue,
+      color: Colors.black,
     );
 
     debugPrint(

@@ -13,8 +13,8 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final List<Product> products;
   final List<Product> onSaleProducts;
   final List<Product> productsOfTheDay;
-  final List<Product> recommendedProducts; // Added
-  final List<Product> collectionProducts; // Added
+  final List<Product> recommendedProducts;
+  final List<Product> collectionProducts;
   final String searchQuery;
   final PriceSort priceSort;
   final DateSort dateSort;
@@ -33,13 +33,14 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
   final bool isLoading;
   final bool isListView;
   final bool showLoginSuccessSnackbar;
+  final Product? selectedProduct;
 
   SupabaseHomeLoadedState({
     required this.products,
     this.onSaleProducts = const [],
     this.productsOfTheDay = const [],
-    this.recommendedProducts = const [], // Default empty
-    this.collectionProducts = const [], // Default empty
+    this.recommendedProducts = const [],
+    this.collectionProducts = const [],
     this.searchQuery = '',
     this.priceSort = PriceSort.none,
     this.dateSort = DateSort.newestFirst,
@@ -54,14 +55,15 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     this.isLoading = false,
     this.isListView = false,
     this.showLoginSuccessSnackbar = false,
+    this.selectedProduct,
   });
 
   SupabaseHomeLoadedState copyWith({
     List<Product>? products,
     List<Product>? onSaleProducts,
     List<Product>? productsOfTheDay,
-    List<Product>? recommendedProducts, // Added
-    List<Product>? collectionProducts, // Added
+    List<Product>? recommendedProducts,
+    List<Product>? collectionProducts,
     String? searchQuery,
     PriceSort? priceSort,
     DateSort? dateSort,
@@ -76,13 +78,14 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
     bool? isLoading,
     bool? isListView,
     bool? showLoginSuccessSnackbar,
+    Product? selectedProduct,
   }) {
     return SupabaseHomeLoadedState(
       products: products ?? this.products,
       onSaleProducts: onSaleProducts ?? this.onSaleProducts,
       productsOfTheDay: productsOfTheDay ?? this.productsOfTheDay,
-      recommendedProducts: recommendedProducts ?? this.recommendedProducts, // Added
-      collectionProducts: collectionProducts ?? this.collectionProducts, // Added
+      recommendedProducts: recommendedProducts ?? this.recommendedProducts,
+      collectionProducts: collectionProducts ?? this.collectionProducts,
       searchQuery: searchQuery ?? this.searchQuery,
       priceSort: priceSort ?? this.priceSort,
       dateSort: dateSort ?? this.dateSort,
@@ -97,6 +100,7 @@ class SupabaseHomeLoadedState extends SupabaseHomeState {
       isLoading: isLoading ?? this.isLoading,
       isListView: isListView ?? this.isListView,
       showLoginSuccessSnackbar: showLoginSuccessSnackbar ?? this.showLoginSuccessSnackbar,
+      selectedProduct: selectedProduct ?? this.selectedProduct,
     );
   }
 }
@@ -105,4 +109,15 @@ class SupabaseHomeErrorState extends SupabaseHomeState {
   final String message;
 
   SupabaseHomeErrorState(this.message);
+}
+
+/// Auth required state when user needs to sign in
+class HomeAuthRequiredState extends SupabaseHomeState {
+  final String message;
+  final String? productId; // Optional: product to add to cart after auth
+
+  HomeAuthRequiredState({
+    this.message = 'Please sign in to add items to cart',
+    this.productId,
+  });
 }

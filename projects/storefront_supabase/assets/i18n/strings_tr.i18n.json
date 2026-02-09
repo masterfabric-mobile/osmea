@@ -75,6 +75,7 @@
   "shopping": "Alışveriş",
   "general": "Genel",
   "admin": "Yönetici",
+  "coupons": "Kuponlar",
   "welcomeTitle": "Mağazaya Hoşgeldiniz",
   "welcomeSubtitle": "Devam etmek için giriş yapın veya hesap oluşturun",
   "dontHaveAccount": "Hesabınız yok mu? Kayıt Ol",
@@ -159,7 +160,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Henüz yorum yok.",
+  },
+  "noReviewsYet": "Henüz yorum yok.",
   "emailCannotBeChanged": "* E-posta adresi buradan doğrudan değiştirilemez.",
   "genderMale": "Erkek",
   "genderFemale": "Kadın",
@@ -179,6 +181,23 @@
   "logoutSuccess": "Başarıyla çıkış yapıldı!",
   "addedToFavorites": "Favorilere eklendi!",
   "removedFromFavorites": "Favorilerden çıkarıldı.",
-  "wishlistUpdateFailed": "İstek listesi güncellenemedi. Lütfen tekrar deneyin."
+  "wishlistUpdateFailed": "İstek listesi güncellenemedi. Lütfen tekrar deneyin.",
+  "filterAll": "Tümü",
+  "filterVerified": "Doğrulanmış Satın Alma",
+  "filterProductRating": "Ürün Puanı",
+  "filterDeliveryRating": "Teslimat Puanı",
+  "filterWithComment": "Yorumlu",
+  "haveACoupon": "Kuponunuz var mı?",
+  "enterCouponCode": "Kupon kodunu girin",
+  "applyCoupon": "Uygula",
+  "removeCoupon": "Kuponu Kaldır",
+  "discount": "İndirim",
+  "couponRemoved": "Kupon kaldırıldı.",
+  "couponAppliedSuccessfully": "Kupon başarıyla uygulandı!",
+  "invalidCouponCode": "Geçersiz kupon kodu.",
+  "couponNotActive": "Kupon aktif değil.",
+  "couponExpired": "Kuponun süresi doldu.",
+  "couponLimitReached": "Kupon kullanım sınırı aşıldı.",
+  "minimumPurchaseRequired": "Minimum {amount} tutarında alışveriş gerekli.",
+  "confirmLogoutMessage": "Çıkış yapmak istediğinizden emin misiniz?"
 }
-

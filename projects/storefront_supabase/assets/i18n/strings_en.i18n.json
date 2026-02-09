@@ -75,6 +75,7 @@
   "shopping": "Shopping",
   "general": "General",
   "admin": "Admin",
+  "coupons": "Coupons",
   "welcomeTitle": "Welcome to Storefront",
   "welcomeSubtitle": "Sign in or create an account to continue",
   "dontHaveAccount": "Don't have an account? Sign Up",
@@ -180,6 +181,23 @@
   "logoutSuccess": "Logged out successfully!",
   "addedToFavorites": "Added to favorites!",
   "removedFromFavorites": "Removed from favorites.",
-  "wishlistUpdateFailed": "Failed to update wishlist. Please try again."
+  "wishlistUpdateFailed": "Failed to update wishlist. Please try again.",
+  "filterAll": "All",
+  "filterVerified": "Verified Purchase",
+  "filterProductRating": "Product Rating",
+  "filterDeliveryRating": "Delivery Rating",
+  "filterWithComment": "With Comment",
+  "haveACoupon": "Have a coupon?",
+  "enterCouponCode": "Enter coupon code",
+  "applyCoupon": "Apply",
+  "removeCoupon": "Remove Coupon",
+  "discount": "Discount",
+  "couponRemoved": "Coupon removed.",
+  "couponAppliedSuccessfully": "Coupon applied successfully!",
+  "invalidCouponCode": "Invalid coupon code.",
+  "couponNotActive": "Coupon is not active.",
+  "couponExpired": "Coupon has expired.",
+  "couponLimitReached": "Coupon usage limit reached.",
+  "minimumPurchaseRequired": "Minimum purchase of {amount} required.",
+  "confirmLogoutMessage": "Are you sure you want to log out?"
 }
-

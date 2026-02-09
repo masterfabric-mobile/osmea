@@ -113,6 +113,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => TranslationOverrides.string(_root.$meta, 'shopping', {}) ?? 'Einkaufen';
 	@override String get general => TranslationOverrides.string(_root.$meta, 'general', {}) ?? 'Allgemein';
 	@override String get admin => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Admin';
+	@override String get coupons => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Gutscheine';
 	@override String get welcomeTitle => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Willkommen im Storefront';
 	@override String get welcomeSubtitle => TranslationOverrides.string(_root.$meta, 'welcomeSubtitle', {}) ?? 'Melden Sie sich an oder erstellen Sie ein Konto';
 	@override String get dontHaveAccount => TranslationOverrides.string(_root.$meta, 'dontHaveAccount', {}) ?? 'Noch kein Konto? Registrieren';
@@ -212,6 +213,24 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Zu Favoriten hinzugefügt!';
 	@override String get removedFromFavorites => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Aus Favoriten entfernt.';
 	@override String get wishlistUpdateFailed => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.';
+	@override String get filterAll => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Alle';
+	@override String get filterVerified => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verifizierter Kauf';
+	@override String get filterProductRating => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Produktbewertung';
+	@override String get filterDeliveryRating => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Lieferbewertung';
+	@override String get filterWithComment => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Mit Kommentar';
+	@override String get haveACoupon => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Haben Sie einen Gutschein?';
+	@override String get enterCouponCode => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Gutscheincode eingeben';
+	@override String get applyCoupon => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Anwenden';
+	@override String get removeCoupon => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Gutschein entfernen';
+	@override String get discount => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'Rabatt';
+	@override String get couponRemoved => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Gutschein entfernt.';
+	@override String get couponAppliedSuccessfully => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Gutschein erfolgreich angewendet!';
+	@override String get invalidCouponCode => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Ungültiger Gutscheincode.';
+	@override String get couponNotActive => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Gutschein ist nicht aktiv.';
+	@override String get couponExpired => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Gutschein ist abgelaufen.';
+	@override String get couponLimitReached => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Nutzungslimit für Gutschein erreicht.';
+	@override String get minimumPurchaseRequired => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Mindestkauf von {amount} erforderlich.';
+	@override String get confirmLogoutMessage => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Möchten Sie sich wirklich abmelden?';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -297,6 +316,7 @@ extension on TranslationsDe {
 			'shopping' => TranslationOverrides.string(_root.$meta, 'shopping', {}) ?? 'Einkaufen',
 			'general' => TranslationOverrides.string(_root.$meta, 'general', {}) ?? 'Allgemein',
 			'admin' => TranslationOverrides.string(_root.$meta, 'admin', {}) ?? 'Admin',
+			'coupons' => TranslationOverrides.string(_root.$meta, 'coupons', {}) ?? 'Gutscheine',
 			'welcomeTitle' => TranslationOverrides.string(_root.$meta, 'welcomeTitle', {}) ?? 'Willkommen im Storefront',
 			'welcomeSubtitle' => TranslationOverrides.string(_root.$meta, 'welcomeSubtitle', {}) ?? 'Melden Sie sich an oder erstellen Sie ein Konto',
 			'dontHaveAccount' => TranslationOverrides.string(_root.$meta, 'dontHaveAccount', {}) ?? 'Noch kein Konto? Registrieren',
@@ -396,6 +416,24 @@ extension on TranslationsDe {
 			'addedToFavorites' => TranslationOverrides.string(_root.$meta, 'addedToFavorites', {}) ?? 'Zu Favoriten hinzugefügt!',
 			'removedFromFavorites' => TranslationOverrides.string(_root.$meta, 'removedFromFavorites', {}) ?? 'Aus Favoriten entfernt.',
 			'wishlistUpdateFailed' => TranslationOverrides.string(_root.$meta, 'wishlistUpdateFailed', {}) ?? 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.',
+			'filterAll' => TranslationOverrides.string(_root.$meta, 'filterAll', {}) ?? 'Alle',
+			'filterVerified' => TranslationOverrides.string(_root.$meta, 'filterVerified', {}) ?? 'Verifizierter Kauf',
+			'filterProductRating' => TranslationOverrides.string(_root.$meta, 'filterProductRating', {}) ?? 'Produktbewertung',
+			'filterDeliveryRating' => TranslationOverrides.string(_root.$meta, 'filterDeliveryRating', {}) ?? 'Lieferbewertung',
+			'filterWithComment' => TranslationOverrides.string(_root.$meta, 'filterWithComment', {}) ?? 'Mit Kommentar',
+			'haveACoupon' => TranslationOverrides.string(_root.$meta, 'haveACoupon', {}) ?? 'Haben Sie einen Gutschein?',
+			'enterCouponCode' => TranslationOverrides.string(_root.$meta, 'enterCouponCode', {}) ?? 'Gutscheincode eingeben',
+			'applyCoupon' => TranslationOverrides.string(_root.$meta, 'applyCoupon', {}) ?? 'Anwenden',
+			'removeCoupon' => TranslationOverrides.string(_root.$meta, 'removeCoupon', {}) ?? 'Gutschein entfernen',
+			'discount' => TranslationOverrides.string(_root.$meta, 'discount', {}) ?? 'Rabatt',
+			'couponRemoved' => TranslationOverrides.string(_root.$meta, 'couponRemoved', {}) ?? 'Gutschein entfernt.',
+			'couponAppliedSuccessfully' => TranslationOverrides.string(_root.$meta, 'couponAppliedSuccessfully', {}) ?? 'Gutschein erfolgreich angewendet!',
+			'invalidCouponCode' => TranslationOverrides.string(_root.$meta, 'invalidCouponCode', {}) ?? 'Ungültiger Gutscheincode.',
+			'couponNotActive' => TranslationOverrides.string(_root.$meta, 'couponNotActive', {}) ?? 'Gutschein ist nicht aktiv.',
+			'couponExpired' => TranslationOverrides.string(_root.$meta, 'couponExpired', {}) ?? 'Gutschein ist abgelaufen.',
+			'couponLimitReached' => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Nutzungslimit für Gutschein erreicht.',
+			'minimumPurchaseRequired' => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Mindestkauf von {amount} erforderlich.',
+			'confirmLogoutMessage' => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Möchten Sie sich wirklich abmelden?',
 			_ => null,
 		};
 	}

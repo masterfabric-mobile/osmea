@@ -62,7 +62,7 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                         _selectedCategory = null;
                       });
                     },
-                    child: OsmeaComponents.text(resources.clear, color: Colors.red),
+                    child: OsmeaComponents.text(resources.clear, color: OsmeaColors.black),
                   ),
                 ],
               ),
@@ -94,15 +94,15 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                             _selectedCategory = selected ? category : null;
                           });
                         },
-                        selectedColor: Colors.black,
-                        checkmarkColor: Colors.white,
+                        selectedColor: OsmeaColors.black,
+                        checkmarkColor: OsmeaColors.white,
                         labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
+                          color: isSelected ? OsmeaColors.white : OsmeaColors.black,
                         ),
-                        backgroundColor: Colors.white,
+                        backgroundColor: OsmeaColors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: Colors.grey[300]!),
+                          side: BorderSide(color: OsmeaColors.platinum),
                         ),
                       );
                     }).toList(),
@@ -136,15 +136,15 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                             }
                           });
                         },
-                        selectedColor: Colors.black,
-                        checkmarkColor: Colors.white,
+                        selectedColor: OsmeaColors.black,
+                        checkmarkColor: OsmeaColors.white,
                         labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
+                          color: isSelected ? OsmeaColors.white : OsmeaColors.black,
                         ),
-                        backgroundColor: Colors.white,
+                        backgroundColor: OsmeaColors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(color: Colors.grey[300]!),
+                          side: BorderSide(color: OsmeaColors.platinum),
                         ),
                       );
                     }).toList(),
@@ -157,10 +157,10 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: OsmeaColors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: OsmeaColors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -178,8 +178,8 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                   Navigator.pop(context);
                 },
                 fullWidth: true,
-                backgroundColor: Colors.black,
-                textColor: Colors.white,
+                backgroundColor: OsmeaColors.black,
+                textColor: OsmeaColors.white,
               ),
             ),
           ],

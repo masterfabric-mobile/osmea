@@ -75,6 +75,7 @@
   "shopping": "Einkaufen",
   "general": "Allgemein",
   "admin": "Admin",
+  "coupons": "Gutscheine",
   "welcomeTitle": "Willkommen im Storefront",
   "welcomeSubtitle": "Melden Sie sich an oder erstellen Sie ein Konto",
   "dontHaveAccount": "Noch kein Konto? Registrieren",
@@ -159,7 +160,8 @@
         "type": "int"
       }
     }
-  },  "noReviewsYet": "Noch keine Bewertungen.",
+  },
+  "noReviewsYet": "Noch keine Bewertungen.",
   "emailCannotBeChanged": "* E-Mail kann hier nicht direkt geändert werden.",
   "genderMale": "Männlich",
   "genderFemale": "Weiblich",
@@ -179,6 +181,23 @@
   "logoutSuccess": "Erfolgreich abgemeldet!",
   "addedToFavorites": "Zu Favoriten hinzugefügt!",
   "removedFromFavorites": "Aus Favoriten entfernt.",
-  "wishlistUpdateFailed": "Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+  "wishlistUpdateFailed": "Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+  "filterAll": "Alle",
+  "filterVerified": "Verifizierter Kauf",
+  "filterProductRating": "Produktbewertung",
+  "filterDeliveryRating": "Lieferbewertung",
+  "filterWithComment": "Mit Kommentar",
+  "haveACoupon": "Haben Sie einen Gutschein?",
+  "enterCouponCode": "Gutscheincode eingeben",
+  "applyCoupon": "Anwenden",
+  "removeCoupon": "Gutschein entfernen",
+  "discount": "Rabatt",
+  "couponRemoved": "Gutschein entfernt.",
+  "couponAppliedSuccessfully": "Gutschein erfolgreich angewendet!",
+  "invalidCouponCode": "Ungültiger Gutscheincode.",
+  "couponNotActive": "Gutschein ist nicht aktiv.",
+  "couponExpired": "Gutschein ist abgelaufen.",
+  "couponLimitReached": "Nutzungslimit für Gutschein erreicht.",
+  "minimumPurchaseRequired": "Mindestkauf von {amount} erforderlich.",
+  "confirmLogoutMessage": "Möchten Sie sich wirklich abmelden?"
 }
-

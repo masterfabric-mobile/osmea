@@ -7,6 +7,7 @@ class ProductReview {
   final String authorName;
   final int? deliveryRating;
   final String? deliveryComment;
+  final bool isVerifiedPurchase;
 
   ProductReview({
     required this.id,
@@ -17,6 +18,7 @@ class ProductReview {
     required this.authorName,
     this.deliveryRating,
     this.deliveryComment,
+    this.isVerifiedPurchase = false,
   });
 
   factory ProductReview.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class ProductReview {
       authorName: author,
       deliveryRating: json['delivery_rating'] as int?,
       deliveryComment: json['delivery_comment'] as String?,
+      isVerifiedPurchase: json['is_verified_purchase'] as bool? ?? false,
     );
   }
 }

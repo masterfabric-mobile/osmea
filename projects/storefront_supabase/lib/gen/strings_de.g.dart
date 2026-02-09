@@ -112,6 +112,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => 'Einkaufen';
 	@override String get general => 'Allgemein';
 	@override String get admin => 'Admin';
+	@override String get coupons => 'Gutscheine';
 	@override String get welcomeTitle => 'Willkommen im Storefront';
 	@override String get welcomeSubtitle => 'Melden Sie sich an oder erstellen Sie ein Konto';
 	@override String get dontHaveAccount => 'Noch kein Konto? Registrieren';
@@ -211,6 +212,24 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Zu Favoriten hinzugefügt!';
 	@override String get removedFromFavorites => 'Aus Favoriten entfernt.';
 	@override String get wishlistUpdateFailed => 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.';
+	@override String get filterAll => 'Alle';
+	@override String get filterVerified => 'Verifizierter Kauf';
+	@override String get filterProductRating => 'Produktbewertung';
+	@override String get filterDeliveryRating => 'Lieferbewertung';
+	@override String get filterWithComment => 'Mit Kommentar';
+	@override String get haveACoupon => 'Haben Sie einen Gutschein?';
+	@override String get enterCouponCode => 'Gutscheincode eingeben';
+	@override String get applyCoupon => 'Anwenden';
+	@override String get removeCoupon => 'Gutschein entfernen';
+	@override String get discount => 'Rabatt';
+	@override String get couponRemoved => 'Gutschein entfernt.';
+	@override String get couponAppliedSuccessfully => 'Gutschein erfolgreich angewendet!';
+	@override String get invalidCouponCode => 'Ungültiger Gutscheincode.';
+	@override String get couponNotActive => 'Gutschein ist nicht aktiv.';
+	@override String get couponExpired => 'Gutschein ist abgelaufen.';
+	@override String get couponLimitReached => 'Nutzungslimit für Gutschein erreicht.';
+	@override String get minimumPurchaseRequired => 'Mindestkauf von {amount} erforderlich.';
+	@override String get confirmLogoutMessage => 'Möchten Sie sich wirklich abmelden?';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -296,6 +315,7 @@ extension on TranslationsDe {
 			'shopping' => 'Einkaufen',
 			'general' => 'Allgemein',
 			'admin' => 'Admin',
+			'coupons' => 'Gutscheine',
 			'welcomeTitle' => 'Willkommen im Storefront',
 			'welcomeSubtitle' => 'Melden Sie sich an oder erstellen Sie ein Konto',
 			'dontHaveAccount' => 'Noch kein Konto? Registrieren',
@@ -395,6 +415,24 @@ extension on TranslationsDe {
 			'addedToFavorites' => 'Zu Favoriten hinzugefügt!',
 			'removedFromFavorites' => 'Aus Favoriten entfernt.',
 			'wishlistUpdateFailed' => 'Wunschliste konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.',
+			'filterAll' => 'Alle',
+			'filterVerified' => 'Verifizierter Kauf',
+			'filterProductRating' => 'Produktbewertung',
+			'filterDeliveryRating' => 'Lieferbewertung',
+			'filterWithComment' => 'Mit Kommentar',
+			'haveACoupon' => 'Haben Sie einen Gutschein?',
+			'enterCouponCode' => 'Gutscheincode eingeben',
+			'applyCoupon' => 'Anwenden',
+			'removeCoupon' => 'Gutschein entfernen',
+			'discount' => 'Rabatt',
+			'couponRemoved' => 'Gutschein entfernt.',
+			'couponAppliedSuccessfully' => 'Gutschein erfolgreich angewendet!',
+			'invalidCouponCode' => 'Ungültiger Gutscheincode.',
+			'couponNotActive' => 'Gutschein ist nicht aktiv.',
+			'couponExpired' => 'Gutschein ist abgelaufen.',
+			'couponLimitReached' => 'Nutzungslimit für Gutschein erreicht.',
+			'minimumPurchaseRequired' => 'Mindestkauf von {amount} erforderlich.',
+			'confirmLogoutMessage' => 'Möchten Sie sich wirklich abmelden?',
 			_ => null,
 		};
 	}

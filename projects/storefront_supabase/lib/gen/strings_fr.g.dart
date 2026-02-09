@@ -112,6 +112,7 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get shopping => 'Achats';
 	@override String get general => 'Général';
 	@override String get admin => 'Admin';
+	@override String get coupons => 'Bons de réduction';
 	@override String get welcomeTitle => 'Bienvenue sur Storefront';
 	@override String get welcomeSubtitle => 'Connectez-vous ou créez un compte pour continuer';
 	@override String get dontHaveAccount => 'Pas de compte ? S\'inscrire';
@@ -211,6 +212,24 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get addedToFavorites => 'Ajouté aux favoris !';
 	@override String get removedFromFavorites => 'Retiré des favoris.';
 	@override String get wishlistUpdateFailed => 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.';
+	@override String get filterAll => 'Tous';
+	@override String get filterVerified => 'Achat vérifié';
+	@override String get filterProductRating => 'Note du produit';
+	@override String get filterDeliveryRating => 'Note de livraison';
+	@override String get filterWithComment => 'Avec commentaire';
+	@override String get haveACoupon => 'Vous avez un bon de réduction ?';
+	@override String get enterCouponCode => 'Entrez le code de réduction';
+	@override String get applyCoupon => 'Appliquer';
+	@override String get removeCoupon => 'Supprimer le bon de réduction';
+	@override String get discount => 'Remise';
+	@override String get couponRemoved => 'Bon de réduction supprimé.';
+	@override String get couponAppliedSuccessfully => 'Bon de réduction appliqué avec succès !';
+	@override String get invalidCouponCode => 'Code de bon de réduction invalide.';
+	@override String get couponNotActive => 'Le bon de réduction n\'est pas actif.';
+	@override String get couponExpired => 'Le bon de réduction a expiré.';
+	@override String get couponLimitReached => 'Limite d\'utilisation du bon de réduction atteinte.';
+	@override String get minimumPurchaseRequired => 'Achat minimum de {amount} requis.';
+	@override String get confirmLogoutMessage => 'Êtes-vous sûr de vouloir vous déconnecter ?';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -296,6 +315,7 @@ extension on TranslationsFr {
 			'shopping' => 'Achats',
 			'general' => 'Général',
 			'admin' => 'Admin',
+			'coupons' => 'Bons de réduction',
 			'welcomeTitle' => 'Bienvenue sur Storefront',
 			'welcomeSubtitle' => 'Connectez-vous ou créez un compte pour continuer',
 			'dontHaveAccount' => 'Pas de compte ? S\'inscrire',
@@ -395,6 +415,24 @@ extension on TranslationsFr {
 			'addedToFavorites' => 'Ajouté aux favoris !',
 			'removedFromFavorites' => 'Retiré des favoris.',
 			'wishlistUpdateFailed' => 'Échec de la mise à jour de la liste de souhaits. Veuillez réessayer.',
+			'filterAll' => 'Tous',
+			'filterVerified' => 'Achat vérifié',
+			'filterProductRating' => 'Note du produit',
+			'filterDeliveryRating' => 'Note de livraison',
+			'filterWithComment' => 'Avec commentaire',
+			'haveACoupon' => 'Vous avez un bon de réduction ?',
+			'enterCouponCode' => 'Entrez le code de réduction',
+			'applyCoupon' => 'Appliquer',
+			'removeCoupon' => 'Supprimer le bon de réduction',
+			'discount' => 'Remise',
+			'couponRemoved' => 'Bon de réduction supprimé.',
+			'couponAppliedSuccessfully' => 'Bon de réduction appliqué avec succès !',
+			'invalidCouponCode' => 'Code de bon de réduction invalide.',
+			'couponNotActive' => 'Le bon de réduction n\'est pas actif.',
+			'couponExpired' => 'Le bon de réduction a expiré.',
+			'couponLimitReached' => 'Limite d\'utilisation du bon de réduction atteinte.',
+			'minimumPurchaseRequired' => 'Achat minimum de {amount} requis.',
+			'confirmLogoutMessage' => 'Êtes-vous sûr de vouloir vous déconnecter ?',
 			_ => null,
 		};
 	}

@@ -34,7 +34,7 @@ class SearchViewModel extends BaseViewModelCubit<SearchState> {
           .from('brand')
           .select('id')
           .ilike('name', '%$sanitizedQuery%');
-      
+
       final brandIds = (brandResponse as List)
           .map((e) => e['id'] as int)
           .toList();
@@ -42,7 +42,7 @@ class SearchViewModel extends BaseViewModelCubit<SearchState> {
       // 2. Build the OR filter string
       // Always search product name
       String orFilter = 'name.ilike.*$sanitizedQuery*';
-      
+
       // If we found matching brands, add them to the OR condition
       if (brandIds.isNotEmpty) {
         orFilter += ',brand_id.in.(${brandIds.join(',')})';
@@ -53,8 +53,9 @@ class SearchViewModel extends BaseViewModelCubit<SearchState> {
           .select('*, product_images(image_url, is_primary), brand(name)')
           .or(orFilter);
 
-      final products =
-          (response as List).map((data) => Product.fromJson(data)).toList();
+      final products = (response as List)
+          .map((data) => Product.fromJson(data))
+          .toList();
       stateChanger(SearchLoadedState(searchResults: products));
     } catch (e) {
       stateChanger(SearchErrorState('Failed to perform search: $e'));

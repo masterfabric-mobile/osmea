@@ -21,11 +21,11 @@ class AdminDashboardView
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.adminDashboard,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => goRoute('/profile'),
               icon: const Icon(Icons.arrow_back),
@@ -97,17 +97,17 @@ class AdminDashboardView
                     PriceHelper.format(state.totalRevenue, currency,
                         Localizations.localeOf(context).toString()),
                     Icons.monetization_on,
-                    Colors.green),
+                    OsmeaColors.black),
                 _buildStatCard(context, resources.totalOrders,
-                    state.orderCount.toString(), Icons.shopping_cart, Colors.orange),
+                    state.orderCount.toString(), Icons.shopping_cart, OsmeaColors.black),
                 _buildStatCard(context, resources.totalUsers,
-                    state.userCount.toString(), Icons.people, Colors.blue),
+                    state.userCount.toString(), Icons.people, OsmeaColors.black),
                 _buildStatCard(
                     context,
                     resources.totalProducts,
                     state.productCount.toString(),
                     Icons.inventory_2,
-                    Colors.purple),
+                    OsmeaColors.black),
               ],
             );
           },
@@ -118,7 +118,7 @@ class AdminDashboardView
 
   Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Card(
-      color: Colors.white,
+      color: OsmeaColors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: OsmeaComponents.padding(
@@ -162,7 +162,7 @@ class AdminDashboardView
       return OsmeaComponents.center(child: OsmeaComponents.text(resources.noRecentOrders));
     }
     return Card(
-      color: Colors.white,
+      color: OsmeaColors.white,
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
         children: orders.map((order) {
@@ -194,7 +194,7 @@ class AdminDashboardView
       return OsmeaComponents.center(child: OsmeaComponents.text(resources.noNewUsers));
     }
     return Card(
-      color: Colors.white,
+      color: OsmeaColors.white,
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
         children: users.map((user) {
@@ -219,13 +219,13 @@ class AdminDashboardView
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-        return Colors.green;
+        return OsmeaColors.black;
       case 'pending':
-        return Colors.orange;
+        return OsmeaColors.pewter;
       case 'cancelled':
-        return Colors.red;
+        return OsmeaColors.black;
       default:
-        return Colors.grey;
+        return OsmeaColors.pewter;
     }
   }
 }
