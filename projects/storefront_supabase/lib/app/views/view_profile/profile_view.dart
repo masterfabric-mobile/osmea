@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/utils/localization_helper.dart';
 import 'models/view_model.dart';
 import 'models/states.dart';
@@ -23,64 +24,81 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           coreAppBar: (context, viewModel) {
             final state = viewModel.state;
             if (state is ProfileAuthenticated) {
+              final theme = Theme.of(context);
               return OsmeaComponents.appBar(
-                title: OsmeaComponents.text(
-                  context.resources.profile,
-                  color: OsmeaColors.black,
+                title: Text(
+                  'My Profile',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
-                backgroundColor: OsmeaColors.white,
-                foregroundColor: OsmeaColors.black,
-                variant: AppBarVariant.primary,
-                size: AppBarSize.large,
+                backgroundColor: theme.colorScheme.surface,
+                foregroundColor: theme.colorScheme.onSurface,
                 elevation: 0,
-                titleSpacing: 0.0,
+                leading: OsmeaComponents.iconButton(
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/home');
+                    }
+                  },
+                  icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
+                  backgroundColor: OsmeaColors.transparent,
+                ),
                 actions: [
-                  // Language/Currency Selector
                   AppBarAction(
                     type: AppBarActionType.more,
-                    icon: const Icon(Icons.language, color: OsmeaColors.black),
+                    icon: Icon(Icons.language, color: theme.colorScheme.onSurface),
                     onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
                   ),
-                  // Settings button for both authenticated and unauthenticated
                   AppBarAction(
                     type: AppBarActionType.profile,
-                    icon: const Icon(Icons.logout, color: OsmeaColors.black),
-                    onPressed: () async {
+                    icon: Icon(Icons.logout, color: theme.colorScheme.onSurface),
+                    onPressed: () {
+                      final res = context.resources;
                       showDialog(
                         context: context,
-                        builder: (BuildContext dialogContext) {
-                          final resources = context.resources;
+                        builder: (BuildContext dc) {
+                          final dTheme = Theme.of(dc);
                           return AlertDialog(
-                            backgroundColor: OsmeaColors.white,
-                            title: OsmeaComponents.text(resources.logout),
-                            content: OsmeaComponents.text(resources.confirmLogoutMessage),
+                            backgroundColor: dTheme.colorScheme.surface,
+                            title: Text(
+                              res.logout,
+                              style: dTheme.textTheme.titleLarge?.copyWith(
+                                color: dTheme.colorScheme.onSurface,
+                              ),
+                            ),
+                            content: Text(
+                              res.confirmLogoutMessage,
+                              style: dTheme.textTheme.bodyMedium?.copyWith(
+                                color: dTheme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
                             actions: [
                               OsmeaComponents.button(
-                                text: resources.cancel,
-                                onPressed: () {
-                                  Navigator.of(dialogContext).pop();
-                                },
+                                text: res.cancel,
+                                onPressed: () => Navigator.of(dc).pop(),
                                 variant: ButtonVariant.ghost,
-                                textColor: OsmeaColors.black, // Explicitly set text color for ghost variant
+                                textColor: dTheme.colorScheme.onSurface,
                               ),
                               OsmeaComponents.button(
-                                text: resources.logout,
+                                text: res.logout,
                                 onPressed: () {
-                                  Navigator.of(dialogContext).pop();
-                                  
+                                  Navigator.of(dc).pop();
                                   if (context.mounted) {
                                     context.showSnackbar(
-                                      message: resources.logoutSuccess,
+                                      message: res.logoutSuccess,
                                       type: SnackbarType.success,
                                     );
                                     context.go('/home');
                                   }
-                                  
                                   viewModel.logout();
                                 },
                                 variant: ButtonVariant.primary,
-                                backgroundColor: OsmeaColors.black,
-                                textColor: OsmeaColors.white,
+                                backgroundColor: dTheme.colorScheme.primary,
+                                textColor: dTheme.colorScheme.onPrimary,
                               ),
                             ],
                           );
@@ -127,72 +145,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           }
 
           if (state is ProfileAuthenticated) {
-            return ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildSectionHeader(context, resources.account),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.myInformation),
-                  leading: const Icon(Icons.person_outline),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => goRoute('/profile/info'),
-                ),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.myAddresses),
-                  leading: const Icon(Icons.location_on_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => goRoute('/profile/addresses'),
-                ),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.changePassword),
-                  leading: const Icon(Icons.lock_reset_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => goRoute('/profile/change-password'),
-                ),
-                
-                _buildSectionHeader(context, resources.shopping),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.myOrders),
-                  leading: const Icon(Icons.shopping_bag_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => goRoute('/profile/orders'),
-                ),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.myReviews),
-                  leading: const Icon(Icons.star_outline),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    // Navigate to reviews
-                  },
-                ),
-
-                _buildSectionHeader(context, resources.general),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.settings),
-                  leading: const Icon(Icons.settings_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => goRoute('/settings'),
-                ),
-                OsmeaComponents.listItem(
-                  title: OsmeaComponents.text(resources.helpSupport),
-                  leading: const Icon(Icons.help_outline),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                     // Navigate to help
-                  },
-                ),
-
-                if (state.user.role == 'admin') ...[
-                  _buildSectionHeader(context, resources.admin),
-                  OsmeaComponents.listItem(
-                    title: OsmeaComponents.text(resources.adminDashboard),
-                    leading: const Icon(Icons.admin_panel_settings_outlined),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => goRoute('/admin/dashboard'),
-                  ),
-                ],
-              ],
-            );
+            return _buildProfileContent(context, state, viewModel);
           }
 
           if (state is ProfileUnauthenticated) {
@@ -240,17 +193,299 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return OsmeaComponents.padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: OsmeaComponents.text(
-        title,
-        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: OsmeaColors.pewter,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.0,
+  /// Woo-style: MY PROFILE block first, then ACCOUNT, ORDERS, GENERAL (bottom nav profile layout)
+  Widget _buildProfileContent(
+    BuildContext context,
+    ProfileAuthenticated state,
+    ProfileViewModel viewModel,
+  ) {
+    final user = state.user;
+    final resources = context.resources;
+    final theme = Theme.of(context);
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        _buildProfileHeader(context, user),
+        _buildStatisticsRow(context),
+        // Section: ACCOUNT
+        _buildSectionHeaderWoo(context, resources.account),
+        _buildMenuItem(
+          context,
+          resources.myInformation,
+          Icons.person_outline,
+          () => goRoute('/profile/info'),
+        ),
+        _buildMenuItem(
+          context,
+          resources.myAddresses,
+          Icons.location_on_outlined,
+          () => goRoute('/profile/addresses'),
+        ),
+        _buildMenuItem(
+          context,
+          resources.changePassword,
+          Icons.lock_reset_outlined,
+          () => goRoute('/profile/change-password'),
+        ),
+        // Section: ORDERS (Woo uses "Orders")
+        _buildSectionHeaderWoo(context, 'Orders'),
+        _buildMenuItem(
+          context,
+          resources.myOrders,
+          Icons.shopping_bag_outlined,
+          () => goRoute('/profile/orders'),
+          subtitle: '0 orders',
+        ),
+        _buildMenuItem(
+          context,
+          resources.myReviews,
+          Icons.star_outline,
+          () {},
+        ),
+        // Section: GENERAL
+        _buildSectionHeaderWoo(context, resources.general),
+        _buildMenuItem(
+          context,
+          resources.settings,
+          Icons.settings_outlined,
+          () => goRoute('/settings'),
+        ),
+        _buildMenuItem(
+          context,
+          resources.helpSupport,
+          Icons.help_outline,
+          () {},
+        ),
+        if (user.role == 'admin') ...[
+          _buildSectionHeaderWoo(context, resources.admin),
+          _buildMenuItem(
+            context,
+            resources.adminDashboard,
+            Icons.admin_panel_settings_outlined,
+            () => goRoute('/admin/dashboard'),
+          ),
+        ],
+        SizedBox(height: theme.textTheme.bodyLarge?.fontSize ?? 24),
+      ],
+    );
+  }
+
+  Widget _buildProfileHeader(BuildContext context, AppUser user) {
+    final theme = Theme.of(context);
+    final displayName = user.fullName ?? user.username ?? user.email ?? 'User';
+    final email = user.email ?? '';
+    final initials = _getInitials(displayName);
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing20,
+        vertical: context.spacing24,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.primary,
             ),
+            child: Center(
+              child: Text(
+                initials,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.spacing16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  displayName,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (email.isNotEmpty) ...[
+                  SizedBox(height: context.spacing6),
+                  Text(
+                    email,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildStatisticsRow(BuildContext context) {
+    final theme = Theme.of(context);
+    final borderColor = theme.colorScheme.outlineVariant;
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: context.spacing24),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: borderColor, width: 1),
+          bottom: BorderSide(color: borderColor, width: 1),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem(context, 'Orders', 0),
+          _buildStatDivider(context),
+          _buildStatItem(context, 'Addresses', 0),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatDivider(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 32,
+      color: Theme.of(context).colorScheme.outlineVariant,
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String label, int value) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            value.toString(),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(height: context.spacing6),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeaderWoo(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        context.spacing20,
+        context.spacing24,
+        context.spacing20,
+        context.spacing12,
+      ),
+      child: Text(
+        title.toUpperCase(),
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    String? subtitle,
+  }) {
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.surface,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing20,
+            vertical: context.spacing16,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.outlineVariant,
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: theme.colorScheme.onSurface, size: 22),
+              SizedBox(width: context.spacing16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    if (subtitle != null && subtitle.isNotEmpty) ...[
+                      SizedBox(height: context.spacing4),
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              SizedBox(width: context.spacing8),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getInitials(String name) {
+    final words = name.trim().split(' ');
+    if (words.isEmpty) return '';
+    if (words.length == 1) {
+      final s = words[0];
+      return s.length > 2 ? s.substring(0, 2).toUpperCase() : s.toUpperCase();
+    }
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   }
 }

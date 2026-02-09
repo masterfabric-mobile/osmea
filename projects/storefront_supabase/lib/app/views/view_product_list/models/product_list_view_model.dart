@@ -20,7 +20,7 @@ class ProductListViewModel
     _arguments
       ..clear()
       ..addAll(args);
-    
+
     // Parse category_id from arguments
     if (args.containsKey('category_id')) {
       final categoryIdValue = args['category_id'];
@@ -86,29 +86,35 @@ class ProductListViewModel
       if (refresh) {
         _currentPage = 1;
         _allProducts = [];
-        emit(ProductListLoadingState(
-          categories: state.categories,
-          tags: state.tags,
-        ));
-      } else {
-        if (state is! ProductListLoadedState) {
-          emit(ProductListLoadingState(
+        emit(
+          ProductListLoadingState(
             categories: state.categories,
             tags: state.tags,
-          ));
+          ),
+        );
+      } else {
+        if (state is! ProductListLoadedState) {
+          emit(
+            ProductListLoadingState(
+              categories: state.categories,
+              tags: state.tags,
+            ),
+          );
         }
       }
 
       // Build query (use dynamic to allow both PostgrestFilterBuilder and PostgrestTransformBuilder in chain)
       dynamic query = _supabaseClient
           .from('products')
-          .select('*, product_images(image_url, is_primary, sort_order), brand(name)'); // Join brands too if needed
+          .select(
+            '*, product_images(image_url, is_primary, sort_order), brand(name)',
+          ); // Join brands too if needed
 
       // Filters
       if (_filters.search != null && _filters.search!.isNotEmpty) {
         query = query.ilike('name', '%${_filters.search}%');
       }
-      
+
       if (_filters.categoryId != null) {
         // Need recursive category check? Or simple eq?
         // Supabase simple model: direct category_id
@@ -122,7 +128,7 @@ class ProductListViewModel
       if (_filters.minPrice != null) {
         query = query.gte('price', _filters.minPrice!);
       }
-      
+
       if (_filters.maxPrice != null) {
         query = query.lte('price', _filters.maxPrice!);
       }
@@ -131,7 +137,10 @@ class ProductListViewModel
       if (_filters.orderBy == 'price') {
         query = query.order('price', ascending: _filters.order == 'asc');
       } else {
-        query = query.order('created_at', ascending: _filters.order == 'asc'); // Default date
+        query = query.order(
+          'created_at',
+          ascending: _filters.order == 'asc',
+        ); // Default date
       }
 
       // Pagination
@@ -140,7 +149,9 @@ class ProductListViewModel
       query = query.range(from, to);
 
       final response = await query;
-      final products = (response as List).map((data) => Product.fromJson(data as Map<String, dynamic>)).toList();
+      final products = (response as List)
+          .map((data) => Product.fromJson(data as Map<String, dynamic>))
+          .toList();
 
       // Client-side filtering for tags (since tags are stored as comma-separated string or array in some models)
       // Supabase Product model has `List<String>? tags`.
@@ -161,22 +172,24 @@ class ProductListViewModel
         _allProducts.addAll(filteredProducts);
       }
 
-      
-      emit(ProductListLoadedState(
-        products: _allProducts,
-        hasMore: products.length == _perPage,
-        currentPage: _currentPage,
-        categories: state.categories,
-        tags: state.tags,
-      ));
-
+      emit(
+        ProductListLoadedState(
+          products: _allProducts,
+          hasMore: products.length == _perPage,
+          currentPage: _currentPage,
+          categories: state.categories,
+          tags: state.tags,
+        ),
+      );
     } catch (e) {
-      emit(ProductListErrorState(
-        message: 'Failed to load products: $e',
-        products: state.products,
-        categories: state.categories,
-        tags: state.tags,
-      ));
+      emit(
+        ProductListErrorState(
+          message: 'Failed to load products: $e',
+          products: state.products,
+          categories: state.categories,
+          tags: state.tags,
+        ),
+      );
     } finally {
       _isLoadingProducts = false;
     }
@@ -192,7 +205,7 @@ class ProductListViewModel
     _tempFilters = _filters;
     _minPriceController.text = _filters.minPrice?.toString() ?? '';
     _maxPriceController.text = _filters.maxPrice?.toString() ?? '';
-    
+
     // Load filter options if needed
     if (_categories.isEmpty) loadCategories();
     // Tags are hardcoded or loaded from products?
@@ -202,33 +215,44 @@ class ProductListViewModel
 
   Future<void> loadCategories() async {
     try {
-      emit(ProductListFilterOptionsLoadingState(
-        products: state.products,
-        hasMore: state.hasMore,
-        currentPage: state.currentPage,
-        categories: state.categories,
-        tags: state.tags,
-      ));
+      emit(
+        ProductListFilterOptionsLoadingState(
+          products: state.products,
+          hasMore: state.hasMore,
+          currentPage: state.currentPage,
+          categories: state.categories,
+          tags: state.tags,
+        ),
+      );
 
-      final response = await _supabaseClient.from('categories').select().order('name');
-      _categories = (response as List).map((data) => Category.fromJson(data)).toList();
+      final response = await _supabaseClient
+          .from('categories')
+          .select()
+          .order('name');
+      _categories = (response as List)
+          .map((data) => Category.fromJson(data))
+          .toList();
 
-      emit(ProductListFilterOptionsLoadedState(
-        products: state.products,
-        hasMore: state.hasMore,
-        currentPage: state.currentPage,
-        categories: _categories,
-        tags: state.tags,
-      ));
+      emit(
+        ProductListFilterOptionsLoadedState(
+          products: state.products,
+          hasMore: state.hasMore,
+          currentPage: state.currentPage,
+          categories: _categories,
+          tags: state.tags,
+        ),
+      );
     } catch (e) {
-      emit(ProductListFilterOptionsErrorState(
-        message: 'Failed to load categories: $e',
-        products: state.products,
-        hasMore: state.hasMore,
-        currentPage: state.currentPage,
-        categories: state.categories,
-        tags: state.tags,
-      ));
+      emit(
+        ProductListFilterOptionsErrorState(
+          message: 'Failed to load categories: $e',
+          products: state.products,
+          hasMore: state.hasMore,
+          currentPage: state.currentPage,
+          categories: state.categories,
+          tags: state.tags,
+        ),
+      );
     }
   }
 
@@ -242,8 +266,12 @@ class ProductListViewModel
     String? orderBy,
     String? order,
   }) {
-    double? min = minPrice != null ? double.tryParse(minPrice) : _tempFilters.minPrice;
-    double? max = maxPrice != null ? double.tryParse(maxPrice) : _tempFilters.maxPrice;
+    double? min = minPrice != null
+        ? double.tryParse(minPrice)
+        : _tempFilters.minPrice;
+    double? max = maxPrice != null
+        ? double.tryParse(maxPrice)
+        : _tempFilters.maxPrice;
 
     _tempFilters = _tempFilters.copyWith(
       search: search,
@@ -263,7 +291,7 @@ class ProductListViewModel
       clearOrderBy: orderBy == null,
       clearOrder: order == null,
     );
-    
+
     // Emit state to update UI if needed (though tempFilters is not in state, UI reads it from VM)
     // We can emit current state to force rebuild
     emit(state);

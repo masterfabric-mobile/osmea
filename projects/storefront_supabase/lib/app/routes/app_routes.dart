@@ -61,7 +61,7 @@ final GoRouter appRouter = GoRouter(
         return MasterScaffoldWidget(
           scaffoldMessengerKey: _userShellScaffoldMessengerKey,
           body: child,
-          bottomNavigationBar: navbar != null ? _wrapBottomBar(navbar) : null,
+          bottomNavigationBar: navbar != null ? _wrapBottomBar(context, navbar) : null,
           navbarSpacer: const SpacerVisibility.disabled(),
           footerSpacer: const SpacerVisibility.disabled(),
           horizontalPadding: const PaddingVisibility.disabled(),
@@ -491,12 +491,18 @@ bool _shouldShowNavbarForPath(String path) {
   return true;
 }
 
-/// Wraps navbar in fixed height + clip so overflow never shows (storefront_supabase only).
-Widget _wrapBottomBar(Widget navbar) {
+/// Wraps navbar: fixed height + clip (overflow fix), theme so tap has no blue splash (siyah bar, dokununca mavilik yok).
+Widget _wrapBottomBar(BuildContext context, Widget navbar) {
   return SizedBox(
     height: 64,
     child: ClipRect(
-      child: navbar,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+        ),
+        child: navbar,
+      ),
     ),
   );
 }
@@ -758,43 +764,34 @@ void _navigateToPage(
 }
 
 Widget? _getNavbarForRouteFallback(BuildContext context, String location) {
-  // Storefront_supabase only: black/white navbar, no core/other app theme
-  if (location == '/home' ||
-      location.startsWith('/categories') ||
-      location == '/search' ||
-      location == '/cart' ||
-      location == '/favorites' ||
-      location == '/profile' ||
-      location == '/auth') {
-    final currentIndex = _getFallbackIndex(location);
-    final resources = context.resources;
+  // Storefront_supabase: always show navbar for any shell route (e.g. product-detail, profile/info, settings)
+  final currentIndex = _getFallbackIndex(location);
+  final resources = context.resources;
 
-    return OsmeaComponents.navbar(
-      variant: NavbarVariant.minimal,
-      size: NavbarSize.medium,
-      backgroundColor: OsmeaColors.white,
-      activeColor: OsmeaColors.black,
-      inactiveColor: OsmeaColors.black,
-      currentIndex: currentIndex,
-      items: [
-        NavbarItem(text: resources.home, icon: const Icon(Icons.home), onTap: () {}),
-        NavbarItem(text: resources.search, icon: const Icon(Icons.search), onTap: () {}),
-        NavbarItem(text: resources.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
-        NavbarItem(text: resources.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
-        NavbarItem(text: resources.profile, icon: const Icon(Icons.person), onTap: () {}),
-      ],
-      onItemTap: (index) {
-        switch (index) {
-          case 0: context.go('/home'); break;
-          case 1: context.go('/search'); break;
-          case 2: context.go('/cart'); break;
-          case 3: context.go('/favorites'); break;
-          case 4: context.go('/profile'); break;
-        }
-      },
-    );
-  }
-  return null;
+  return OsmeaComponents.navbar(
+    variant: NavbarVariant.minimal,
+    size: NavbarSize.medium,
+    backgroundColor: OsmeaColors.white,
+    activeColor: OsmeaColors.black,
+    inactiveColor: OsmeaColors.black,
+    currentIndex: currentIndex,
+    items: [
+      NavbarItem(text: resources.home, icon: const Icon(Icons.home), onTap: () {}),
+      NavbarItem(text: resources.search, icon: const Icon(Icons.search), onTap: () {}),
+      NavbarItem(text: resources.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
+      NavbarItem(text: resources.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
+      NavbarItem(text: resources.profile, icon: const Icon(Icons.person), onTap: () {}),
+    ],
+    onItemTap: (index) {
+      switch (index) {
+        case 0: context.go('/home'); break;
+        case 1: context.go('/search'); break;
+        case 2: context.go('/cart'); break;
+        case 3: context.go('/favorites'); break;
+        case 4: context.go('/profile'); break;
+      }
+    },
+  );
 }
 
 int _getFallbackIndex(String location) {
@@ -803,7 +800,7 @@ int _getFallbackIndex(String location) {
   if (location == '/search') return 1;
   if (location == '/cart') return 2;
   if (location == '/favorites') return 3;
-  if (location == '/profile' || location == '/auth') return 4;
+  if (location.startsWith('/profile') || location == '/auth') return 4;
   if (location.startsWith('/product-detail') ||
       location.startsWith('/brands') ||
       location == '/products' ||

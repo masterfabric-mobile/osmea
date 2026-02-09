@@ -2,12 +2,13 @@
  * BrandsSectionWidget
  * -------------------
  * Brands section showing brand logos in a grid/carousel.
- * Loads from app config.
+ * Uses state.allBrands (logoUrl from DB) when available - Woo-style; else falls back to config.
  */
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
 
@@ -15,11 +16,14 @@ import 'package:storefront_supabase/utils/config_utils.dart';
 class BrandsSectionWidget extends StatelessWidget {
   final AssetConfigHelper configHelper;
   final SupabaseHomeViewModel viewModel;
+  /// When provided, use these brands (logoUrl from DB) - same as Woo.
+  final List<Brand>? brandsFromState;
 
   const BrandsSectionWidget({
     super.key,
     required this.configHelper,
     required this.viewModel,
+    this.brandsFromState,
   });
 
   /// Loads brands section configuration
@@ -83,8 +87,10 @@ class BrandsSectionWidget extends StatelessWidget {
 
     if (!showSection) return const SizedBox.shrink();
 
-    final brands = _getBrands();
-    if (brands.isEmpty) return const SizedBox.shrink();
+    final configBrands = _getBrands();
+    final useStateBrands = brandsFromState != null && brandsFromState!.isNotEmpty;
+    final count = useStateBrands ? brandsFromState!.length : configBrands.length;
+    if (count == 0) return const SizedBox.shrink();
 
     final horizontalPadding = _getHorizontalPadding();
 
@@ -108,7 +114,6 @@ class BrandsSectionWidget extends StatelessWidget {
                   color: OsmeaColors.thunder,
                 ),
               ),
-              // See all button
               GestureDetector(
                 onTap: () {
                   context.push('/categories/products/all');
@@ -128,20 +133,21 @@ class BrandsSectionWidget extends StatelessWidget {
           ),
         ),
         OsmeaComponents.sizedBox(height: _getTitleSpacing()),
-        // Brands grid or carousel
         if (layout == 'carousel')
           SizedBox(
             height: context.height80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              itemCount: brands.length,
+              itemCount: count,
               itemBuilder: (context, index) {
                 return Container(
                   margin: EdgeInsets.only(
-                    right: index < brands.length - 1 ? context.spacing16 : 0,
+                    right: index < count - 1 ? context.spacing16 : 0,
                   ),
-                  child: _buildBrandCard(context, brands[index]),
+                  child: useStateBrands
+                      ? _buildBrandCardFromModel(context, brandsFromState![index])
+                      : _buildBrandCard(context, configBrands[index]),
                 );
               },
             ),
@@ -149,8 +155,7 @@ class BrandsSectionWidget extends StatelessWidget {
         else
           Builder(
             builder: (context) {
-              // Determine columns based on brand count
-              final isEvenCount = brands.length % 2 == 0;
+              final isEvenCount = count % 2 == 0;
               final columns = isEvenCount ? 2 : 3;
               final totalSpacing = context.spacing16 * (columns - 1);
               final itemWidth =
@@ -162,17 +167,90 @@ class BrandsSectionWidget extends StatelessWidget {
                 child: Wrap(
                   spacing: context.spacing16,
                   runSpacing: context.height16,
-                  children: brands.map((brand) {
+                  children: List.generate(count, (index) {
                     return SizedBox(
                       width: itemWidth,
-                      child: _buildBrandCard(context, brand),
+                      child: useStateBrands
+                          ? _buildBrandCardFromModel(context, brandsFromState![index])
+                          : _buildBrandCard(context, configBrands[index]),
                     );
-                  }).toList(),
+                  }),
                 ),
               );
             },
           ),
       ],
+    );
+  }
+
+  /// Woo-style brand card from state (Brand model with logoUrl from DB)
+  Widget _buildBrandCardFromModel(BuildContext context, Brand brand) {
+    final displayImageUrl = brand.logoUrl;
+    final brandName = brand.name;
+
+    return GestureDetector(
+      onTap: () {
+        context.push('/brands/${brand.id}');
+      },
+      child: Container(
+        height: context.height80,
+        decoration: BoxDecoration(
+          color: OsmeaColors.white,
+          borderRadius: BorderRadius.circular(context.spacing12),
+          border: Border.all(
+            color: OsmeaColors.silver,
+            width: context.borderWidth,
+          ),
+        ),
+        padding: EdgeInsets.all(context.spacing20),
+        child: displayImageUrl != null && displayImageUrl.isNotEmpty
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(context.spacing8),
+                child: OsmeaComponents.image(
+                  imageUrl: displayImageUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  variant: ImageVariant.normal,
+                  cacheWidth: 400,
+                  showLoadingIndicator: true,
+                  errorWidget: OsmeaComponents.container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: OsmeaColors.grayMaterial[50],
+                    alignment: context.center,
+                    child: OsmeaComponents.text(
+                      brandName,
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                        fontSize:
+                            context.fontSizeExtraSmall *
+                            context.textScaleFactor,
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.thunder,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              )
+            : OsmeaComponents.container(
+                width: double.infinity,
+                height: double.infinity,
+                alignment: context.center,
+                child: OsmeaComponents.text(
+                  brandName,
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    fontSize:
+                        context.fontSizeExtraSmall * context.textScaleFactor,
+                    fontWeight: FontWeight.w600,
+                    color: OsmeaColors.thunder,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+      ),
     );
   }
 

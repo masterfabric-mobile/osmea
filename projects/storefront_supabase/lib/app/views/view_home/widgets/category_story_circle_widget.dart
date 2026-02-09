@@ -278,20 +278,17 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
     );
   }
 
-  /// Builds default icon when category has no image
+  /// Placeholder when category has no image (icon instead of endless spinner)
   Widget _buildDefaultIcon(BuildContext context, double size) {
     return Container(
       width: size,
       height: size,
-      color: OsmeaColors.white,
+      color: OsmeaColors.grayMaterial[50],
       child: Center(
-        child: SizedBox(
-          width: size * 0.4,
-          height: size * 0.4,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.0,
-            valueColor: AlwaysStoppedAnimation<Color>(OsmeaColors.black),
-          ),
+        child: Icon(
+          Icons.category_outlined,
+          size: size * 0.5,
+          color: OsmeaColors.grayMaterial[400],
         ),
       ),
     );

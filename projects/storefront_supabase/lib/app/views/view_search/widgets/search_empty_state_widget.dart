@@ -11,6 +11,8 @@ import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
+import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
+import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchEmptyStateWidget extends StatefulWidget {
@@ -49,6 +51,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
       final catsResponse = await client.from('categories').select().order('name');
       final categories = (catsResponse as List)
           .map((e) => Category.fromJson(e as Map<String, dynamic>))
+          .map(
+            (c) => c.copyWith(
+              imageUrl: resolveCategoryImageUrl(client, c.imageUrl),
+            ),
+          )
           .toList();
 
       List<Brand> brands = [];
@@ -56,6 +63,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         final brandsResponse = await client.from('brand').select().order('name');
         brands = (brandsResponse as List)
             .map((e) => Brand.fromJson(e as Map<String, dynamic>))
+            .map(
+              (b) => b.copyWith(
+                logoUrl: resolveBrandLogoUrl(client, b.logoUrl),
+              ),
+            )
             .toList();
       } catch (e) {
         debugPrint('⚠️ Failed to load brands: $e');

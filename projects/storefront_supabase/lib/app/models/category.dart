@@ -26,14 +26,37 @@ class Category {
        }
     }
 
+    final id = json['id'];
+    final imageUrl = json['image_url'] ?? json['imageUrl'];
+
     return Category(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
+      id: id is String ? id : id?.toString() ?? '',
+      name: json['name'] as String? ?? '',
+      slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
-      imageUrl: json['image_url'] as String?,
+      imageUrl: imageUrl is String ? imageUrl : (imageUrl?.toString().isNotEmpty == true ? imageUrl.toString() : null),
       parentId: json['parent_id'] as String?,
       count: parsedCount,
+    );
+  }
+
+  Category copyWith({
+    String? id,
+    String? name,
+    String? slug,
+    String? description,
+    String? imageUrl,
+    String? parentId,
+    int? count,
+  }) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      slug: slug ?? this.slug,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      parentId: parentId ?? this.parentId,
+      count: count ?? this.count,
     );
   }
 

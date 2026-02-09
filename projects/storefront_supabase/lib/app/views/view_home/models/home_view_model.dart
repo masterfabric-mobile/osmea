@@ -1,5 +1,11 @@
 import 'dart:async';
-import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider, AuthState;
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider,
+        AuthState;
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +13,8 @@ import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
+import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
+import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
 import 'package:get_it/get_it.dart';
@@ -19,21 +27,37 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
   // Options for sizes/ages
   final List<String> clothingSizesAndAges = [
-    'Baby (0-2)', 'Toddler (2-4)', 'Kids (4-8)', 'Pre-Teen (9-12)',
-    'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'
+    'Baby (0-2)',
+    'Toddler (2-4)',
+    'Kids (4-8)',
+    'Pre-Teen (9-12)',
+    'XXS',
+    'XS',
+    'S',
+    'M',
+    'L',
+    'XL',
+    'XXL',
+    '3XL',
   ];
-  final List<String> shoeSizes = List.generate(14, (index) => (34 + index).toString());
+  final List<String> shoeSizes = List.generate(
+    14,
+    (index) => (34 + index).toString(),
+  );
 
   final TextEditingController searchController = TextEditingController();
 
   SupabaseHomeViewModel(this._supabaseClient)
-      : super(SupabaseHomeInitialState()) {
+    : super(SupabaseHomeInitialState()) {
     // Listen for Auth Changes
     _authSubscription = _supabaseClient.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn) {
         if (state is SupabaseHomeLoadedState) {
           stateChanger(
-              (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: true));
+            (state as SupabaseHomeLoadedState).copyWith(
+              showLoginSuccessSnackbar: true,
+            ),
+          );
         }
       }
     });
@@ -42,14 +66,20 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   void resetLoginSnackbar() {
     if (state is SupabaseHomeLoadedState) {
       stateChanger(
-          (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: false));
+        (state as SupabaseHomeLoadedState).copyWith(
+          showLoginSuccessSnackbar: false,
+        ),
+      );
     }
   }
 
   void showLoginSuccess() {
     if (state is SupabaseHomeLoadedState) {
       stateChanger(
-          (state as SupabaseHomeLoadedState).copyWith(showLoginSuccessSnackbar: true));
+        (state as SupabaseHomeLoadedState).copyWith(
+          showLoginSuccessSnackbar: true,
+        ),
+      );
     }
   }
 
@@ -110,10 +140,9 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     List<String>? selectedSizesOrAges,
     bool applyFilter = false,
   }) async {
-    SupabaseHomeLoadedState currentState =
-        state is SupabaseHomeLoadedState
-            ? state as SupabaseHomeLoadedState
-            : SupabaseHomeLoadedState(products: []);
+    SupabaseHomeLoadedState currentState = state is SupabaseHomeLoadedState
+        ? state as SupabaseHomeLoadedState
+        : SupabaseHomeLoadedState(products: []);
 
     stateChanger(currentState.copyWith(isLoading: true));
 
@@ -121,25 +150,32 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       final finalQuery = searchQuery ?? currentState.searchQuery;
       final finalPriceSort = priceSort ?? currentState.priceSort;
       final finalDateSort = dateSort ?? currentState.dateSort;
-      final finalPopularitySort =
-          popularitySort ?? currentState.popularitySort;
-      
-      final activeRoot = applyFilter ? selectedRoot : (selectedRoot ?? currentState.selectedRootCategory);
-      final activeSub = applyFilter ? selectedSub : (selectedSub ?? currentState.selectedSubCategory);
-      final activeLeaf = applyFilter ? selectedLeaf : (selectedLeaf ?? currentState.selectedLeafCategory);
-      
-      final finalBrandIds = applyFilter 
-          ? (selectedBrandIds ?? const {}) 
+      final finalPopularitySort = popularitySort ?? currentState.popularitySort;
+
+      final activeRoot = applyFilter
+          ? selectedRoot
+          : (selectedRoot ?? currentState.selectedRootCategory);
+      final activeSub = applyFilter
+          ? selectedSub
+          : (selectedSub ?? currentState.selectedSubCategory);
+      final activeLeaf = applyFilter
+          ? selectedLeaf
+          : (selectedLeaf ?? currentState.selectedLeafCategory);
+
+      final finalBrandIds = applyFilter
+          ? (selectedBrandIds ?? const {})
           : (selectedBrandIds ?? currentState.selectedBrandIds);
-          
-      final finalSizes = applyFilter 
-          ? (selectedSizesOrAges ?? const []) 
+
+      final finalSizes = applyFilter
+          ? (selectedSizesOrAges ?? const [])
           : (selectedSizesOrAges ?? currentState.selectedSizesOrAges);
 
       // --- Prepare Product Query ---
       var baseQuery = _supabaseClient
           .from('products')
-          .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+          .select(
+            '*, product_images(image_url, is_primary, sort_order), brand(name)',
+          )
           .eq('is_active', true);
 
       PostgrestFilterBuilder currentFilteredQuery = baseQuery;
@@ -152,7 +188,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
             .from('brand')
             .select('id')
             .ilike('name', '%$sanitizedQuery%');
-        
+
         final brandIds = (brandResponse as List)
             .map((e) => e['id'] as int)
             .toList();
@@ -162,13 +198,16 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         if (brandIds.isNotEmpty) {
           orFilter += ',brand_id.in.(${brandIds.join(',')})';
         }
-        
+
         currentFilteredQuery = currentFilteredQuery.or(orFilter);
       }
 
       /* -------- Brand Filter -------- */
       if (finalBrandIds.isNotEmpty) {
-        currentFilteredQuery = currentFilteredQuery.inFilter('brand_id', finalBrandIds.toList());
+        currentFilteredQuery = currentFilteredQuery.inFilter(
+          'brand_id',
+          finalBrandIds.toList(),
+        );
       }
 
       /* -------- Sorting -------- */
@@ -180,7 +219,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           ascending: finalPriceSort == PriceSort.lowToHigh,
         );
       } else if (finalPopularitySort != PopularitySort.none) {
-        finalOrderedQuery = currentFilteredQuery.order('price'); 
+        finalOrderedQuery = currentFilteredQuery.order('price');
       } else {
         finalOrderedQuery = currentFilteredQuery.order(
           'created_at',
@@ -189,38 +228,49 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       }
 
       List<Product> products = [];
-      List<Product> onSaleProducts = currentState.onSaleProducts; 
+      List<Product> onSaleProducts = currentState.onSaleProducts;
       List<Product> productsOfTheDay = currentState.productsOfTheDay;
       List<Product> recommendedProducts = currentState.recommendedProducts;
       List<Product> collectionProducts = currentState.collectionProducts;
       List<Category> allCategories = currentState.allCategories;
       List<Brand> allBrands = currentState.allBrands;
 
-      if (currentState.allCategories.isEmpty || currentState.allBrands.isEmpty) {
+      if (currentState.allCategories.isEmpty ||
+          currentState.allBrands.isEmpty) {
         // Initial Fetch
         final results = await Future.wait([
-          _supabaseClient.from('categories').select(),
-          _supabaseClient.from('brand').select(),
+          _supabaseClient
+              .from('categories')
+              .select('id, name, slug, description, image_url, parent_id'),
+          _supabaseClient
+              .from('brand')
+              .select('id, name, slug, logo_url, description'),
           finalOrderedQuery,
           // On Sale
           _supabaseClient
               .from('products')
-              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .select(
+                '*, product_images(image_url, is_primary, sort_order), brand(name)',
+              )
               .eq('is_active', true)
-              .not('sale_price', 'is', null) 
-              .order('created_at', ascending: false) 
+              .not('sale_price', 'is', null)
+              .order('created_at', ascending: false)
               .limit(10),
           // Featured (for collections)
           _supabaseClient
               .from('products')
-              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .select(
+                '*, product_images(image_url, is_primary, sort_order), brand(name)',
+              )
               .eq('is_active', true)
               .eq('is_featured', true)
               .limit(10),
           // Recommended (View count)
           _supabaseClient
               .from('products')
-              .select('*, product_images(image_url, is_primary, sort_order), brand(name)')
+              .select(
+                '*, product_images(image_url, is_primary, sort_order), brand(name)',
+              )
               .eq('is_active', true)
               .order('view_count', ascending: false)
               .limit(10),
@@ -228,18 +278,28 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
         allCategories = (results[0] as List)
             .map((e) => Category.fromJson(e))
+            .map(
+              (c) => c.copyWith(
+                imageUrl: resolveCategoryImageUrl(_supabaseClient, c.imageUrl),
+              ),
+            )
             .toList();
         allBrands = (results[1] as List)
             .map((e) => Brand.fromJson(e))
+            .map(
+              (b) => b.copyWith(
+                logoUrl: resolveBrandLogoUrl(_supabaseClient, b.logoUrl),
+              ),
+            )
             .toList();
-        
+
         products = (results[2] as List)
             .map((e) => Product.fromJson(e))
             .toList();
-            
+
         onSaleProducts = (results[3] as List)
             .map((e) => Product.fromJson(e))
-            .where((p) => p.hasDiscount) 
+            .where((p) => p.hasDiscount)
             .toList();
 
         collectionProducts = (results[4] as List)
@@ -249,24 +309,21 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         recommendedProducts = (results[5] as List)
             .map((e) => Product.fromJson(e))
             .toList();
-            
+
         // Randomize products for Day
         final pool = List<Product>.from(products);
         pool.shuffle();
         productsOfTheDay = pool.take(3).toList();
-
       } else {
         // Subsequent Fetch
         final response = await finalOrderedQuery;
-        products = (response as List)
-            .map((e) => Product.fromJson(e))
-            .toList();
+        products = (response as List).map((e) => Product.fromJson(e)).toList();
       }
 
       stateChanger(
         SupabaseHomeLoadedState(
           products: products,
-          onSaleProducts: onSaleProducts, 
+          onSaleProducts: onSaleProducts,
           productsOfTheDay: productsOfTheDay,
           collectionProducts: collectionProducts,
           recommendedProducts: recommendedProducts,
@@ -295,14 +352,14 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
       // We will use FavoritesViewModel directly.
       // If FavoritesViewModel supports toggle by ID:
-      // Since it doesn't have a direct toggle method by ID in previous code, 
+      // Since it doesn't have a direct toggle method by ID in previous code,
       // we need to check if it's saved and then add/remove.
-      
+
       // Note: FavoritesViewModel uses int/String for ID?
       // Supabase uses UUID (String) for products. `Product` model has String id.
       // But `FavoritesViewModel` in `storefront_supabase` uses `Product` model which has String id.
       // So we are good with String productId.
-      
+
       // Wait, let me check `FavoritesViewModel` code from previous turns.
       // `storefront_supabase/lib/app/views/view_favorites/models/view_model.dart`
       // `removeFavorite(String productId)`
@@ -310,14 +367,14 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       // It DOES NOT have `addFavorite` exposed?
       // I will assume I need to implement `addFavorite` in `FavoritesViewModel`.
       // For now, I will simulate it here or use what's available.
-      
+
       // Actually, I can implement `toggleFavorite` here if needed, calling Supabase directly?
       // No, better to use ViewModel.
-      
+
       // Let's implement basic toggle here calling Supabase directly if ViewModel falls short,
       // but ideally we update ViewModel.
       // Since I can't update ViewModel right now (focused on Home), I'll do it here.
-      
+
       final userId = _supabaseClient.auth.currentUser?.id;
       if (userId == null) {
         // Handle unauthenticated
@@ -325,16 +382,21 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       }
 
       final isSaved = isProductSaved(productId);
-      
+
       if (isSaved) {
-        await _supabaseClient.from('favorites').delete().match({'user_id': userId, 'product_id': productId});
+        await _supabaseClient.from('favorites').delete().match({
+          'user_id': userId,
+          'product_id': productId,
+        });
       } else {
-        await _supabaseClient.from('favorites').insert({'user_id': userId, 'product_id': productId});
+        await _supabaseClient.from('favorites').insert({
+          'user_id': userId,
+          'product_id': productId,
+        });
       }
-      
+
       // Refresh favorites to update UI
       await wishlistVm.initial();
-      
     } catch (e) {
       debugPrint('Error toggling wishlist: $e');
     }
@@ -344,7 +406,9 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     try {
       final wishlistVm = GetIt.I<FavoritesViewModel>();
       if (wishlistVm.state is FavoritesLoadedState) {
-        return (wishlistVm.state as FavoritesLoadedState).favoriteProducts.any((p) => p.id == productId);
+        return (wishlistVm.state as FavoritesLoadedState).favoriteProducts.any(
+          (p) => p.id == productId,
+        );
       }
       return false;
     } catch (_) {
@@ -381,7 +445,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
           'quantity': 1,
         });
       }
-      
+
       // Emit success state? Or just reload/let user know?
       // Just return for now, UI can show snackbar if needed.
     } catch (e) {

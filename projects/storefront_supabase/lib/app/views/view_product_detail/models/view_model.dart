@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
@@ -24,10 +29,11 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       ..clear()
       ..addAll(args);
   }
+
   Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
 
   ProductDetailViewModel(this._supabaseClient)
-      : super(ProductDetailInitialState()) {
+    : super(ProductDetailInitialState()) {
     reviewTitleController = TextEditingController();
     reviewCommentController = TextEditingController();
     deliveryReviewCommentController = TextEditingController();
@@ -64,22 +70,22 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       // 3. Fetch Favorite Status
       final favoriteFuture = (userId != null)
           ? _supabaseClient
-              .from('favorites')
-              .select('id')
-              .eq('user_id', userId)
-              .eq('product_id', productId)
-              .limit(1)
-              .maybeSingle()
+                .from('favorites')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('product_id', productId)
+                .limit(1)
+                .maybeSingle()
           : Future<Map<String, dynamic>?>.value(null);
-      
+
       // 4. Check Cart Status
       final cartFuture = (userId != null)
           ? _supabaseClient
-              .from('cart')
-              .select('quantity')
-              .eq('user_id', userId)
-              .eq('product_id', productId)
-              .maybeSingle()
+                .from('cart')
+                .select('quantity')
+                .eq('user_id', userId)
+                .eq('product_id', productId)
+                .maybeSingle()
           : Future.value(null);
 
       final responses = await Future.wait(<Future<dynamic>>[
@@ -101,18 +107,23 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
       final isInWishlist = favoriteResponse != null;
       final isInCart = cartResponse != null;
-      final cartQuantity = cartResponse != null ? (cartResponse['quantity'] as int) : 1;
+      final cartQuantity = cartResponse != null
+          ? (cartResponse['quantity'] as int)
+          : 1;
 
-      stateChanger(ProductDetailLoadedState(
+      stateChanger(
+        ProductDetailLoadedState(
           product: loadedProduct,
-          reviews: reviews, 
+          reviews: reviews,
           isInWishlist: isInWishlist,
           isInCart: isInCart,
           detailPageQuantity: isInCart ? cartQuantity : 1,
-      ));
+        ),
+      );
     } catch (e) {
       stateChanger(
-          ProductDetailErrorState('Failed to load product details: $e'));
+        ProductDetailErrorState('Failed to load product details: $e'),
+      );
     }
   }
 
@@ -141,7 +152,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   void filterReviews(ReviewFilterType filter) {
     if (state is! ProductDetailLoadedState) return;
     final currentState = state as ProductDetailLoadedState;
-    
+
     List<ProductReview> filtered = currentState.allReviews;
 
     switch (filter) {
@@ -152,19 +163,22 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
         filtered = filtered.where((r) => r.rating >= 4).toList();
         break;
       case ReviewFilterType.deliveryRatingHigh:
-        filtered = filtered.where((r) => r.deliveryRating != null && r.deliveryRating! >= 4).toList();
+        filtered = filtered
+            .where((r) => r.deliveryRating != null && r.deliveryRating! >= 4)
+            .toList();
         break;
       case ReviewFilterType.withComment:
-        filtered = filtered.where((r) => r.comment != null && r.comment!.isNotEmpty).toList();
+        filtered = filtered
+            .where((r) => r.comment != null && r.comment!.isNotEmpty)
+            .toList();
         break;
       case ReviewFilterType.all:
         break;
     }
 
-    stateChanger(currentState.copyWith(
-      reviews: filtered,
-      activeFilter: filter,
-    ));
+    stateChanger(
+      currentState.copyWith(reviews: filtered, activeFilter: filter),
+    );
   }
 
   // --- Attribute Logic ---
@@ -172,33 +186,44 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   Future<void> setSelectedAttribute(String name, String value) async {
     if (state is! ProductDetailLoadedState) return;
     final currentState = state as ProductDetailLoadedState;
-    
-    final newAttributes = Map<String, String>.from(currentState.selectedAttributes);
+
+    final newAttributes = Map<String, String>.from(
+      currentState.selectedAttributes,
+    );
     newAttributes[name] = value;
-    
+
     ProductVariant? matchingVariant;
-    
+
     if (currentState.product.variants.isNotEmpty) {
-       try {
-         matchingVariant = currentState.product.variants.firstWhere(
-           (v) => v.name == name && v.value == value
-         );
-       } catch (_) {}
+      try {
+        matchingVariant = currentState.product.variants.firstWhere(
+          (v) => v.name == name && v.value == value,
+        );
+      } catch (_) {}
     }
 
-    stateChanger(currentState.copyWith(
-      selectedAttributes: newAttributes,
-      selectedVariant: matchingVariant,
-      highlightedAttributes: {},
-    ));
+    stateChanger(
+      currentState.copyWith(
+        selectedAttributes: newAttributes,
+        selectedVariant: matchingVariant,
+        highlightedAttributes: {},
+      ),
+    );
   }
 
   Future<void> clearSelectedAttribute(String name) async {
     if (state is! ProductDetailLoadedState) return;
     final currentState = state as ProductDetailLoadedState;
-    final newAttributes = Map<String, String>.from(currentState.selectedAttributes);
+    final newAttributes = Map<String, String>.from(
+      currentState.selectedAttributes,
+    );
     newAttributes.remove(name);
-    stateChanger(currentState.copyWith(selectedAttributes: newAttributes, selectedVariant: null));
+    stateChanger(
+      currentState.copyWith(
+        selectedAttributes: newAttributes,
+        selectedVariant: null,
+      ),
+    );
   }
 
   // --- Actions ---
@@ -206,10 +231,15 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   Future<void> addProductToWishlistFire(String productId) async {
     final currentState = state;
     if (currentState is! ProductDetailLoadedState) return;
-    
+
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) {
-      stateChanger(ProductDetailAuthRequiredState(message: 'Please sign in to manage favorites', previousState: currentState));
+      stateChanger(
+        ProductDetailAuthRequiredState(
+          message: 'Please sign in to manage favorites',
+          previousState: currentState,
+        ),
+      );
       return;
     }
 
@@ -218,18 +248,33 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
     try {
       if (wasInWishlist) {
-        await _supabaseClient.from('favorites').delete().match({'user_id': userId, 'product_id': productId});
+        await _supabaseClient.from('favorites').delete().match({
+          'user_id': userId,
+          'product_id': productId,
+        });
       } else {
-        await _supabaseClient.from('favorites').insert({'user_id': userId, 'product_id': productId});
+        await _supabaseClient.from('favorites').insert({
+          'user_id': userId,
+          'product_id': productId,
+        });
       }
-      
-      stateChanger(ProductDetailSuccessState(
-        message: wasInWishlist ? 'Removed from favorites' : 'Added to favorites',
-        previousState: currentState.copyWith(isInWishlist: !wasInWishlist)
-      ));
+
+      stateChanger(
+        ProductDetailSuccessState(
+          message: wasInWishlist
+              ? 'Removed from favorites'
+              : 'Added to favorites',
+          previousState: currentState.copyWith(isInWishlist: !wasInWishlist),
+        ),
+      );
     } catch (e) {
       stateChanger(currentState.copyWith(isInWishlist: wasInWishlist));
-      stateChanger(ProductDetailErrorState('Failed to update favorites: $e', previousState: currentState));
+      stateChanger(
+        ProductDetailErrorState(
+          'Failed to update favorites: $e',
+          previousState: currentState,
+        ),
+      );
     }
   }
 
@@ -238,23 +283,36 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     if (currentState is! ProductDetailLoadedState) return;
 
     if (currentState.product.variants.isNotEmpty) {
-       final attributeNames = currentState.product.variants.map((v) => v.name).toSet();
-       final missing = attributeNames.where((name) => !currentState.selectedAttributes.containsKey(name)).toSet();
-       
-       if (missing.isNotEmpty) {
-         stateChanger(currentState.copyWith(highlightedAttributes: missing));
-         Future.delayed(const Duration(seconds: 2), () {
-           if (state is ProductDetailLoadedState) {
-             stateChanger((state as ProductDetailLoadedState).copyWith(highlightedAttributes: {}));
-           }
-         });
-         return;
-       }
+      final attributeNames = currentState.product.variants
+          .map((v) => v.name)
+          .toSet();
+      final missing = attributeNames
+          .where((name) => !currentState.selectedAttributes.containsKey(name))
+          .toSet();
+
+      if (missing.isNotEmpty) {
+        stateChanger(currentState.copyWith(highlightedAttributes: missing));
+        Future.delayed(const Duration(seconds: 2), () {
+          if (state is ProductDetailLoadedState) {
+            stateChanger(
+              (state as ProductDetailLoadedState).copyWith(
+                highlightedAttributes: {},
+              ),
+            );
+          }
+        });
+        return;
+      }
     }
 
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) {
-      stateChanger(ProductDetailAuthRequiredState(message: 'Please sign in to add to cart', previousState: currentState));
+      stateChanger(
+        ProductDetailAuthRequiredState(
+          message: 'Please sign in to add to cart',
+          previousState: currentState,
+        ),
+      );
       return;
     }
 
@@ -266,7 +324,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
           .select('id, quantity')
           .eq('user_id', userId)
           .eq('product_id', productId);
-          
+
       if (variantId != null) {
         query = query.eq('variant_id', variantId);
       } else {
@@ -289,14 +347,17 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
           'quantity': quantity,
         });
       }
-      
-      stateChanger(currentState.copyWith(
-        isInCart: true,
-        shouldShowAddToCartPopup: true
-      ));
-      
+
+      stateChanger(
+        currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true),
+      );
     } catch (e) {
-      stateChanger(ProductDetailErrorState('Failed to add to cart: $e', previousState: currentState));
+      stateChanger(
+        ProductDetailErrorState(
+          'Failed to add to cart: $e',
+          previousState: currentState,
+        ),
+      );
     }
   }
 
@@ -308,7 +369,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       }
     }
   }
-  
+
   void increaseQuantity() {
     if (state is ProductDetailLoadedState) {
       final s = state as ProductDetailLoadedState;
@@ -357,7 +418,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     reviewCommentController.dispose();
     deliveryReviewCommentController.dispose();
   }
-  
+
   void setRating(double rating) {
     currentRating = rating;
   }

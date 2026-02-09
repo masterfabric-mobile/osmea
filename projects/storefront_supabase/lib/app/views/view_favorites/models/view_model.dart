@@ -96,6 +96,80 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// Returns products in the given group without changing state. Use for bottom sheet / collection detail.
+  Future<List<Product>> getCollectionProducts(String? groupId) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return [];
+
+    var query = _supabaseClient
+        .from('favorites')
+        .select('*, products:product_id(*, product_images(*))')
+        .eq('user_id', userId);
+    if (groupId != null) {
+      query = query.eq('group_id', groupId);
+    }
+    final response = await query;
+    final List<Product> products = [];
+    for (var item in response as List) {
+      if (item['products'] != null) {
+        products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
+      }
+    }
+    return products;
+  }
+
+  /// Products that are in favorites but not in this collection (for "Add to collection" list).
+  Future<List<Product>> getFavoriteProductsNotInGroup(String groupId) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return [];
+
+    final response = await _supabaseClient
+        .from('favorites')
+        .select('*, products:product_id(*, product_images(*))')
+        .eq('user_id', userId);
+    final List<Product> products = [];
+    for (var item in response as List) {
+      final itemGroupId = item['group_id'] as String?;
+      if (item['products'] != null && itemGroupId != groupId) {
+        products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
+      }
+    }
+    return products;
+  }
+
+  /// Move a favorite product into this collection (update group_id).
+  Future<bool> addProductToGroup(String productId, String groupId) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+    try {
+      await _supabaseClient
+          .from('favorites')
+          .update({'group_id': groupId})
+          .eq('user_id', userId)
+          .eq('product_id', productId);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Remove a product from this collection (set group_id to null); product stays in favorites.
+  Future<bool> removeProductFromGroup(String productId, String groupId) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+    try {
+      await _supabaseClient
+          .from('favorites')
+          .update({'group_id': null})
+          .eq('user_id', userId)
+          .eq('product_id', productId)
+          .eq('group_id', groupId);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> selectGroup(String? groupId) async {
     // If we select a group, we should probably fetch items for that group ONLY, 
     // OR filter the cached list if we mapped them.
@@ -158,10 +232,31 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
         'user_id': userId,
         'name': name,
       });
-      // Refresh to show new group
-      await initial(); 
+      await initial();
     } catch (e) {
       // Handle error
+    }
+  }
+
+  /// Delete a collection: unassign favorites from this group, then delete the group.
+  Future<bool> deleteGroup(String groupId) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+    try {
+      await _supabaseClient
+          .from('favorites')
+          .update({'group_id': null})
+          .eq('user_id', userId)
+          .eq('group_id', groupId);
+      await _supabaseClient
+          .from('favorite_groups')
+          .delete()
+          .eq('id', groupId)
+          .eq('user_id', userId);
+      await initial();
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

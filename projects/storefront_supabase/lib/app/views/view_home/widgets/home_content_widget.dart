@@ -269,7 +269,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
       );
     }
 
-    // Brands section
+    // Brands section (use state.allBrands for images from DB, Woo-style)
     if (_isEnabled(configHelper, 'brands')) {
       components.add(
         _HomeComponent(
@@ -277,6 +277,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
           widget: BrandsSectionWidget(
             configHelper: configHelper,
             viewModel: widget.viewModel,
+            brandsFromState: widget.state.allBrands,
           ),
           name: 'brands',
         ),
