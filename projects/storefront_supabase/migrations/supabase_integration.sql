@@ -90,14 +90,26 @@ CREATE TABLE public.coupons (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT coupons_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.favorite_groups (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT favorite_groups_pkey PRIMARY KEY (id),
+  CONSTRAINT favorite_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.favorites (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL DEFAULT auth.uid(),
   product_id uuid,
   created_at timestamp with time zone DEFAULT now(),
+  brand_id bigint,
+  group_id uuid,
   CONSTRAINT favorites_pkey PRIMARY KEY (id),
   CONSTRAINT favorites_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-  CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+  CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT favorites_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id),
+  CONSTRAINT favorites_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.favorite_groups(id)
 );
 CREATE TABLE public.order_items (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

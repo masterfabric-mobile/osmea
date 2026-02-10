@@ -6,6 +6,7 @@
   "cart": "Sepetim",
   "favorites": "Favorilerim",
   "profile": "Profil",
+  "myProfile": "Profilim",
   "settings": "Ayarlar",
   "search": "Ara",
   "apply": "Uygula",
@@ -212,9 +213,15 @@
   "undo": "Geri al",
   "loginToViewCart": "Sepetinizi görmek için giriş yapın.",
   "loginToAddToCart": "Sepete ürün eklemek için giriş yapın.",
+  "loginToAddToFavorites": "Favorilere eklemek için giriş yapmalısınız.",
   "categoryAddedToFavorites": "{name} favorilerinize eklendi",
   "categoryRemovedFromFavorites": "{name} favorilerinizden çıkarıldı",
   "removedFromCart": "Sepetten çıkarıldı",
   "brandAddedToFavorites": "Marka favorilere eklendi",
-  "brandRemovedFromFavorites": "Marka favorilerden çıkarıldı"
+  "brandRemovedFromFavorites": "Marka favorilerden çıkarıldı",
+  "endsIn": "Bitiş",
+  "specialOffer": "Özel Teklif",
+  "limitedTimeOffer": "Sınırlı süre teklifi",
+  "dealsOfTheDay": "Günün Fırsatları",
+  "flashSale": "Flaş İndirim"
 }

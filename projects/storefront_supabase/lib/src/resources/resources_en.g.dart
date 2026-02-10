@@ -59,6 +59,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Profile'
 	String get profile => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profile';
 
+	/// en: 'My Profile'
+	String get myProfile => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'My Profile';
+
 	/// en: 'Settings'
 	String get settings => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Settings';
 
@@ -656,6 +659,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Please log in to add items to cart.'
 	String get loginToAddToCart => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Please log in to add items to cart.';
 
+	/// en: 'You must log in to add to favorites.'
+	String get loginToAddToFavorites => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'You must log in to add to favorites.';
+
 	/// en: '{name} was added to your favorites'
 	String get categoryAddedToFavorites => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} was added to your favorites';
 
@@ -670,6 +676,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Brand removed from favorites'
 	String get brandRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Brand removed from favorites';
+
+	/// en: 'Ends in'
+	String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Ends in';
+
+	/// en: 'Special Offer'
+	String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Special Offer';
+
+	/// en: 'Limited time offer'
+	String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Limited time offer';
+
+	/// en: 'Deals of the day'
+	String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Deals of the day';
+
+	/// en: 'Flash Sale'
+	String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -686,6 +707,7 @@ extension on Translations {
 			'cart' => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Cart',
 			'favorites' => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favorites',
 			'profile' => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profile',
+			'myProfile' => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'My Profile',
 			'settings' => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Settings',
 			'search' => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Search',
 			'apply' => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Apply',
@@ -885,11 +907,17 @@ extension on Translations {
 			'undo' => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo',
 			'loginToViewCart' => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Please log in to view your cart.',
 			'loginToAddToCart' => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Please log in to add items to cart.',
+			'loginToAddToFavorites' => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'You must log in to add to favorites.',
 			'categoryAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} was added to your favorites',
 			'categoryRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} was removed from your favorites',
 			'removedFromCart' => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Removed from cart',
 			'brandAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Brand added to favorites',
 			'brandRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Brand removed from favorites',
+			'endsIn' => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Ends in',
+			'specialOffer' => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Special Offer',
+			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Limited time offer',
+			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Deals of the day',
+			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale',
 			_ => null,
 		};
 	}

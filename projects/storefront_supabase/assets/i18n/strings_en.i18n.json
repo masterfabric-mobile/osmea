@@ -6,6 +6,7 @@
   "cart": "Cart",
   "favorites": "Favorites",
   "profile": "Profile",
+  "myProfile": "My Profile",
   "settings": "Settings",
   "search": "Search",
   "apply": "Apply",
@@ -212,9 +213,15 @@
   "undo": "Undo",
   "loginToViewCart": "Please log in to view your cart.",
   "loginToAddToCart": "Please log in to add items to cart.",
+  "loginToAddToFavorites": "You must log in to add to favorites.",
   "categoryAddedToFavorites": "{name} was added to your favorites",
   "categoryRemovedFromFavorites": "{name} was removed from your favorites",
   "removedFromCart": "Removed from cart",
   "brandAddedToFavorites": "Brand added to favorites",
-  "brandRemovedFromFavorites": "Brand removed from favorites"
+  "brandRemovedFromFavorites": "Brand removed from favorites",
+  "endsIn": "Ends in",
+  "specialOffer": "Special Offer",
+  "limitedTimeOffer": "Limited time offer",
+  "dealsOfTheDay": "Deals of the day",
+  "flashSale": "Flash Sale"
 }

@@ -5,9 +5,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart' hide ImageDetailScreen;
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, ImageDetailScreen;
 import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/image_detail_screen.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Modern widget for displaying product images with carousel and overlay actions
 class ProductImagesWidget extends StatefulWidget {
@@ -218,6 +220,15 @@ class _ProductImagesWidgetState extends State<ProductImagesWidget> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
+                        if (!_localIsInWishlist && Supabase.instance.client.auth.currentUser == null) {
+                          context.snackbarWarning(
+                            context.resources.loginToAddToFavorites,
+                            duration: context.durationLong,
+                            style: SnackbarStyle.minimal,
+                            position: SnackbarPosition.bottom,
+                          );
+                          return;
+                        }
                         setState(() {
                           _localIsInWishlist = !_localIsInWishlist;
                         });

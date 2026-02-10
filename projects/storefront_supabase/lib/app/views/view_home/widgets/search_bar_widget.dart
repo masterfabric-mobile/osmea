@@ -24,6 +24,18 @@ class SearchBarWidget extends StatefulWidget {
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   final TextEditingController _controller = TextEditingController();
+  String? _cachedHint;
+  Locale? _lastLocale;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
+    if (_lastLocale != locale) {
+      _lastLocale = locale;
+      _cachedHint = context.resources.searchProductsHint;
+    }
+  }
 
   @override
   void dispose() {
@@ -59,9 +71,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
     if (!showSearch) return const SizedBox.shrink();
 
-    final placeholder =
-        configString(config?['placeholder']) ??
-        context.resources.searchProductsHint;
+    // Placeholder sabit: sadece dil değişince güncellenir, rebuild'de değişmez
+    final placeholder = _cachedHint ?? context.resources.searchProductsHint;
     final variant = configString(config?['variant']) ?? 'outlined';
 
     return OsmeaComponents.padding(

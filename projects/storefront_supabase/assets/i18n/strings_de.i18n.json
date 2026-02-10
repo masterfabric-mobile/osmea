@@ -6,6 +6,7 @@
   "cart": "Warenkorb",
   "favorites": "Favoriten",
   "profile": "Profil",
+  "myProfile": "Mein Profil",
   "settings": "Einstellungen",
   "search": "Suche",
   "apply": "Anwenden",
@@ -212,9 +213,15 @@
   "undo": "Rückgängig",
   "loginToViewCart": "Bitte melden Sie sich an, um Ihren Warenkorb zu sehen.",
   "loginToAddToCart": "Bitte melden Sie sich an, um Artikel in den Warenkorb zu legen.",
+  "loginToAddToFavorites": "Bitte melden Sie sich an, um zu Favoriten hinzuzufügen.",
   "categoryAddedToFavorites": "{name} wurde zu Ihren Favoriten hinzugefügt",
   "categoryRemovedFromFavorites": "{name} wurde aus Ihren Favoriten entfernt",
   "removedFromCart": "Aus dem Warenkorb entfernt",
   "brandAddedToFavorites": "Marke zu Favoriten hinzugefügt",
-  "brandRemovedFromFavorites": "Marke aus Favoriten entfernt"
+  "brandRemovedFromFavorites": "Marke aus Favoriten entfernt",
+  "endsIn": "Endet in",
+  "specialOffer": "Sonderangebot",
+  "limitedTimeOffer": "Zeitlich begrenztes Angebot",
+  "dealsOfTheDay": "Angebote des Tages",
+  "flashSale": "Flash-Verkauf"
 }

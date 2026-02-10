@@ -14,6 +14,7 @@ import 'package:storefront_supabase/app/views/view_favorites/models/view_model.d
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchResultsGridWidget extends StatelessWidget {
   final List<dynamic> products;
@@ -62,6 +63,16 @@ class SearchResultsGridWidget extends StatelessWidget {
                 isSaved: isSaved,
                 onWishlistTap: () async {
                   final wasSaved = isSaved;
+                  if (!wasSaved && Supabase.instance.client.auth.currentUser == null) {
+                    if (!context.mounted) return;
+                    context.snackbarWarning(
+                      context.resources.loginToAddToFavorites,
+                      duration: context.durationLong,
+                      style: SnackbarStyle.minimal,
+                      position: SnackbarPosition.bottom,
+                    );
+                    return;
+                  }
                   final success = wasSaved
                       ? await favVm.removeFavorite(productId)
                       : await favVm.addFavorite(

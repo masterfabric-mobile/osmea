@@ -44,6 +44,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get cart => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Sepetim';
 	@override String get favorites => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favorilerim';
 	@override String get profile => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profil';
+	@override String get myProfile => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'Profilim';
 	@override String get settings => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Ayarlar';
 	@override String get search => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Ara';
 	@override String get apply => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Uygula';
@@ -243,11 +244,19 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Geri al';
 	@override String get loginToViewCart => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Sepetinizi görmek için giriş yapın.';
 	@override String get loginToAddToCart => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Sepete ürün eklemek için giriş yapın.';
+	@override String get loginToAddToFavorites => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'Favorilere eklemek için giriş yapmalısınız.';
 	@override String get categoryAddedToFavorites => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} favorilerinize eklendi';
 	@override String get categoryRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} favorilerinizden çıkarıldı';
 	@override String get removedFromCart => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Sepetten çıkarıldı';
 	@override String get brandAddedToFavorites => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marka favorilere eklendi';
 	@override String get brandRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marka favorilerden çıkarıldı';
+	@override String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Bitiş';
+	@override String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Özel Teklif';
+	@override String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Sınırlı süre teklifi';
+
+	@override String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Günün Fırsatları';
+
+	@override String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flaş İndirim';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -264,6 +273,7 @@ extension on TranslationsTr {
 			'cart' => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Sepetim',
 			'favorites' => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favorilerim',
 			'profile' => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profil',
+			'myProfile' => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'Profilim',
 			'settings' => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Ayarlar',
 			'search' => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Ara',
 			'apply' => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Uygula',
@@ -463,11 +473,17 @@ extension on TranslationsTr {
 			'undo' => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Geri al',
 			'loginToViewCart' => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Sepetinizi görmek için giriş yapın.',
 			'loginToAddToCart' => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Sepete ürün eklemek için giriş yapın.',
+			'loginToAddToFavorites' => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'Favorilere eklemek için giriş yapmalısınız.',
 			'categoryAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} favorilerinize eklendi',
 			'categoryRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} favorilerinizden çıkarıldı',
 			'removedFromCart' => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Sepetten çıkarıldı',
 			'brandAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marka favorilere eklendi',
 			'brandRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marka favorilerden çıkarıldı',
+			'endsIn' => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Bitiş',
+			'specialOffer' => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Özel Teklif',
+			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Sınırlı süre teklifi',
+			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Günün Fırsatları',
+			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flaş İndirim',
 			_ => null,
 		};
 	}

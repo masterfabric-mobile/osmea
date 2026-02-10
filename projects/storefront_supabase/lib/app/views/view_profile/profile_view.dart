@@ -25,9 +25,10 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             final state = viewModel.state;
             if (state is ProfileAuthenticated) {
               final theme = Theme.of(context);
+              final res = context.resources;
               return OsmeaComponents.appBar(
                 title: Text(
-                  'My Profile',
+                  res.myProfile,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface,
@@ -96,9 +97,9 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                                   }
                                   viewModel.logout();
                                 },
-                                variant: ButtonVariant.primary,
-                                backgroundColor: dTheme.colorScheme.primary,
-                                textColor: dTheme.colorScheme.onPrimary,
+                                variant: ButtonVariant.outlined,
+                                textColor: dTheme.colorScheme.onSurface,
+                                borderColor: dTheme.colorScheme.onSurface,
                               ),
                             ],
                           );

@@ -44,6 +44,7 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get cart => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Panier';
 	@override String get favorites => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favoris';
 	@override String get profile => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profil';
+	@override String get myProfile => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'Mon profil';
 	@override String get settings => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Paramètres';
 	@override String get search => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Rechercher';
 	@override String get apply => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Appliquer';
@@ -243,11 +244,19 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Annuler';
 	@override String get loginToViewCart => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Veuillez vous connecter pour voir votre panier.';
 	@override String get loginToAddToCart => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Veuillez vous connecter pour ajouter des articles au panier.';
+	@override String get loginToAddToFavorites => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'Veuillez vous connecter pour ajouter aux favoris.';
 	@override String get categoryAddedToFavorites => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} a été ajouté à vos favoris';
 	@override String get categoryRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} a été retiré de vos favoris';
 	@override String get removedFromCart => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Retiré du panier';
 	@override String get brandAddedToFavorites => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marque ajoutée aux favoris';
 	@override String get brandRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marque retirée des favoris';
+	@override String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Se termine dans';
+	@override String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Offre spéciale';
+	@override String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Offre à durée limitée';
+
+	@override String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Vente flash';
+
+	@override String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Offres du jour';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -264,6 +273,7 @@ extension on TranslationsFr {
 			'cart' => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Panier',
 			'favorites' => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favoris',
 			'profile' => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profil',
+			'myProfile' => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'Mon profil',
 			'settings' => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Paramètres',
 			'search' => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Rechercher',
 			'apply' => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Appliquer',
@@ -463,11 +473,17 @@ extension on TranslationsFr {
 			'undo' => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Annuler',
 			'loginToViewCart' => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Veuillez vous connecter pour voir votre panier.',
 			'loginToAddToCart' => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Veuillez vous connecter pour ajouter des articles au panier.',
+			'loginToAddToFavorites' => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'Veuillez vous connecter pour ajouter aux favoris.',
 			'categoryAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} a été ajouté à vos favoris',
 			'categoryRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} a été retiré de vos favoris',
 			'removedFromCart' => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Retiré du panier',
 			'brandAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marque ajoutée aux favoris',
 			'brandRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marque retirée des favoris',
+			'endsIn' => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Se termine dans',
+			'specialOffer' => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Offre spéciale',
+			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Offre à durée limitée',
+			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Offres du jour',
+			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Vente flash',
 			_ => null,
 		};
 	}

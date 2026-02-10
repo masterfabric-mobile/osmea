@@ -117,9 +117,9 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final cfg =
         _loadDealsConfig() ??
-        {'title': 'Deals of the day', 'show_see_all': false};
+        <String, dynamic>{'show_see_all': false};
 
-    final sectionTitle = configString(cfg['title']) ?? 'Deals of the day';
+    final sectionTitle = configString(cfg['title']) ?? context.resources.dealsOfTheDay;
     final showSeeAll = cfg['show_see_all'] as bool? ?? false;
 
     final dealsProducts = _pickDealsProducts(cfg);
@@ -184,7 +184,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
                 context,
               ).copyWith(scrollbars: false),
               child: OsmeaComponents.carousel(
-                variant: CarouselVariant.standard,
+                variant: CarouselVariant.gallery,
                 size: CarouselSize.small,
                 height: bannerHeight,
                 items: bannerItems,
@@ -246,15 +246,20 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
       },
       child: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: OsmeaColors.white,
-              borderRadius: BorderRadius.circular(context.spacing16),
-              border: Border.all(
-                color: OsmeaColors.silver,
-                width: context.borderWidth,
+          Material(
+            color: Colors.transparent,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
+                color: OsmeaColors.white,
+                borderRadius: BorderRadius.circular(context.spacing16),
+                border: Border.all(
+                  color: OsmeaColors.silver,
+                  width: context.borderWidth,
+                ),
+                boxShadow: const [], // Gölge olmasın
               ),
-            ),
             padding: EdgeInsets.symmetric(
               horizontal: context.spacing16,
               vertical: context.spacing12,
@@ -379,6 +384,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               ],
             ),
           ),
+        ),
         ],
       ),
     );

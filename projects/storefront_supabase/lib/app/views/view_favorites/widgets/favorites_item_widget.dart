@@ -99,16 +99,14 @@ class FavoritesItemWidget extends StatelessWidget {
                     size: ButtonSize.extraSmall,
                     variant: ButtonVariant.ghost,
                     onPressed: () async {
-                      final success = await viewModel.removeFavorite(product.id);
                       if (!context.mounted) return;
-                      if (success) {
-                        context.snackbarWarning(
-                          resources.removedFromFavorites,
-                          style: SnackbarStyle.minimal,
-                          position: SnackbarPosition.bottom,
-                          duration: context.durationLong,
-                        );
-                      }
+                      context.snackbarWarning(
+                        resources.removedFromFavorites,
+                        style: SnackbarStyle.minimal,
+                        position: SnackbarPosition.bottom,
+                        duration: context.durationLong,
+                      );
+                      await viewModel.removeFavorite(product.id);
                     },
                   ),
                 ],

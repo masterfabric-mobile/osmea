@@ -34,7 +34,7 @@ class SupabaseHomeView
             final configHelper = AssetConfigHelper();
             
             final titleSource = configHelper.getString('home_view.app_bar.title_source', 'app_settings.app_name');
-            final fallbackTitle = configHelper.getString('home_view.app_bar.fallback_title', 'Storefront');
+            final fallbackTitle = configHelper.getString('home_view.app_bar.fallback_title', context.resources.appTitle);
             final title = configHelper.getString(titleSource, fallbackTitle);
             
             final backgroundColor = _parseColor(configHelper.getString('home_view.app_bar.backgroundColor', '#FFFFFF'));

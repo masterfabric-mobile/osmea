@@ -18,6 +18,7 @@ import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
 import 'package:get_it/get_it.dart';
 import 'states.dart';
 
@@ -418,35 +419,13 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     }
   }
 
-  /// Sepete ekler. Giriş yapılmamış olsa bile anon session (auth.uid()) ile eklenebilir.
+  /// Sepete ekler. Misafir kullanıcı da sepete ekleyebilir (yerel sepet).
   Future<void> addProductToCart(String productId) async {
     try {
-      final userId = _supabaseClient.auth.currentUser?.id;
-      if (userId != null) {
-        final existing = await _supabaseClient
-            .from('cart')
-            .select('id, quantity')
-            .match({'user_id': userId, 'product_id': productId})
-            .maybeSingle();
-
-        if (existing != null) {
-          final newQty = (existing['quantity'] as int) + 1;
-          await _supabaseClient
-              .from('cart')
-              .update({'quantity': newQty})
-              .eq('id', existing['id']);
-          final uid = _supabaseClient.auth.currentUser?.id;
-          if (uid != null) _cartCache.setInCart(uid, productId, null, true);
-          return;
-        }
-      }
-      // user_id yoksa DB DEFAULT auth.uid() kullanır (anon dahil)
-      await _supabaseClient.from('cart').insert({
-        'product_id': productId,
-        'quantity': 1,
-      });
+      final cartVm = GetIt.I<CartViewModel>();
+      await cartVm.addItemToCart(productId, quantity: 1, variantId: null);
       final uid = _supabaseClient.auth.currentUser?.id;
-      if (uid != null) _cartCache.setInCart(uid, productId, null, true);
+      _cartCache.setInCart(uid ?? 'guest', productId, null, true);
     } catch (e) {
       debugPrint('Error adding to cart: $e');
       rethrow;

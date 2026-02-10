@@ -20,6 +20,7 @@ import 'package:storefront_supabase/app/views/view_favorites/models/states.dart'
 import 'package:storefront_supabase/app/widgets/product_card_widget.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CollectionsSectionWidget extends StatefulWidget {
   final AssetConfigHelper configHelper;
@@ -250,6 +251,16 @@ class _CollectionsSectionWidgetState extends State<CollectionsSectionWidget>
                             isSaved: isSaved,
                             onWishlistTap: () async {
                               final wasSaved = isSaved;
+                              if (!wasSaved && Supabase.instance.client.auth.currentUser == null) {
+                                if (!context.mounted) return;
+                                context.snackbarWarning(
+                                  context.resources.loginToAddToFavorites,
+                                  duration: context.durationLong,
+                                  style: SnackbarStyle.minimal,
+                                  position: SnackbarPosition.bottom,
+                                );
+                                return;
+                              }
                               final success = wasSaved
                                   ? await wishlistVm.removeFavorite(productId)
                                   : await wishlistVm.addFavorite(

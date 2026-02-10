@@ -76,33 +76,48 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
             _favoriteStatus[categoryId] = wasFavorite;
           });
         }
+        if (!wasFavorite && context.mounted) {
+          context.snackbarWarning(
+            context.resources.loginToAddToFavorites,
+            duration: context.durationLong,
+            style: SnackbarStyle.minimal,
+            position: SnackbarPosition.bottom,
+          );
+        }
         return;
       }
 
       if (!context.mounted) return;
 
       final isNowFavorite = !wasFavorite;
-      
-      context.showSnackbar(
-        title: isNowFavorite ? context.resources.addedToFavoritesCategory : context.resources.removedFromFavoritesCategory,
-        message: isNowFavorite
-            ? context.resources.categoryAddedToFavorites.replaceAll('{name}', categoryName)
-            : context.resources.categoryRemovedFromFavorites.replaceAll('{name}', categoryName),
-        type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
-        style: SnackbarStyle.minimal,
-        position: SnackbarPosition.bottom,
-        animation: SnackbarAnimation.slide,
-        duration: const Duration(seconds: 2),
-        actionLabel: context.resources.undo,
-        onAction: () async {
-          await _favoriteHelper.toggleFavorite(categoryId);
-          if (mounted) {
-            setState(() {
-              _favoriteStatus[categoryId] = wasFavorite;
-            });
-          }
-        },
-      );
+      final message = isNowFavorite
+          ? context.resources.categoryAddedToFavorites.replaceAll('{name}', categoryName)
+          : context.resources.categoryRemovedFromFavorites.replaceAll('{name}', categoryName);
+      if (isNowFavorite) {
+        context.snackbarSuccess(
+          message,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 2),
+          actionLabel: context.resources.undo,
+          onAction: () async {
+            await _favoriteHelper.toggleFavorite(categoryId);
+            if (mounted) setState(() => _favoriteStatus[categoryId] = wasFavorite);
+          },
+        );
+      } else {
+        context.snackbarWarning(
+          message,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 2),
+          actionLabel: context.resources.undo,
+          onAction: () async {
+            await _favoriteHelper.toggleFavorite(categoryId);
+            if (mounted) setState(() => _favoriteStatus[categoryId] = wasFavorite);
+          },
+        );
+      }
     } catch (e) {
       // Revert on error
       if (mounted) {

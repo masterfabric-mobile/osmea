@@ -124,25 +124,30 @@ class _SummaryRowWidget extends StatelessWidget {
       mainAxisAlignment: context.spaceBetween,
       crossAxisAlignment: context.crossCenter,
       children: [
-        OsmeaComponents.text(
-          label,
-          textStyle: isPrimary
-              ? OsmeaTextStyle.titleMedium(context).copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: OsmeaColors.thunder,
-                )
-              : OsmeaTextStyle.bodyMedium(context).copyWith(
-                  fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w500,
-                  color: isDiscount
-                      ? discountColor
-                      : isSecondary
-                          ? OsmeaColors.pewter
-                          : OsmeaColors.thunder,
-                ),
+        Flexible(
+          child: OsmeaComponents.text(
+            label,
+            textStyle: isPrimary
+                ? OsmeaTextStyle.titleMedium(context).copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: OsmeaColors.thunder,
+                  )
+                : OsmeaTextStyle.bodyMedium(context).copyWith(
+                    fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w500,
+                    color: isDiscount
+                        ? discountColor
+                        : isSecondary
+                            ? OsmeaColors.pewter
+                            : OsmeaColors.thunder,
+                  ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        OsmeaComponents.text(
-          value,
-          textStyle: isPrimary
+        OsmeaComponents.sizedBox(width: context.spacing8),
+        Flexible(
+          child: OsmeaComponents.text(
+            value,
+            textStyle: isPrimary
               ? OsmeaTextStyle.titleMedium(context).copyWith(
                   fontWeight: FontWeight.w700,
                   color: totalAmountColor,
@@ -153,13 +158,15 @@ class _SummaryRowWidget extends StatelessWidget {
                       color: discountColor,
                     )
                   : OsmeaTextStyle.bodySmall(context).copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: isSecondary
-                          ? OsmeaColors.pewter
-                          : OsmeaColors.thunder,
-                      fontStyle:
-                          isSecondary ? FontStyle.italic : FontStyle.normal,
-                    ),
+                    fontWeight: FontWeight.w500,
+                    color: isSecondary
+                        ? OsmeaColors.pewter
+                        : OsmeaColors.thunder,
+                    fontStyle:
+                        isSecondary ? FontStyle.italic : FontStyle.normal,
+                  ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

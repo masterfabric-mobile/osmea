@@ -16,6 +16,7 @@ import 'package:storefront_supabase/app/views/view_favorites/models/states.dart'
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Brands section widget
 class BrandsSectionWidget extends StatelessWidget {
@@ -282,6 +283,17 @@ class BrandsSectionWidget extends StatelessWidget {
                       );
                     }
                   } else {
+                    if (Supabase.instance.client.auth.currentUser == null) {
+                      if (context.mounted) {
+                        context.snackbarWarning(
+                          context.resources.loginToAddToFavorites,
+                          duration: context.durationLong,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                        );
+                      }
+                      return;
+                    }
                     final ok = await vm.addFavoriteBrand(brand.id, brandForOptimisticUpdate: brand);
                     if (context.mounted) {
                       if (ok) {
