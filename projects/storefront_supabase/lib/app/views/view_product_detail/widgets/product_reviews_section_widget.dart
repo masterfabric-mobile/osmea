@@ -59,12 +59,9 @@ class _EmptyReviewsWidget extends StatelessWidget {
         vertical: context.spacing16,
       ),
       decoration: BoxDecoration(
-        color: OsmeaColors.grayMaterial[50],
+        color: OsmeaColors.white,
         borderRadius: context.borderRadiusNormal,
-        border: Border.all(
-          color: OsmeaColors.grayMaterial[200]!,
-          width: context.width1,
-        ),
+        border: Border.all(color: OsmeaColors.silver, width: 1),
       ),
       child: OsmeaComponents.center(
         child: OsmeaComponents.column(

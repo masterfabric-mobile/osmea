@@ -19,18 +19,23 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
          horizontalPadding: const PaddingVisibility.enabled(value: 16.0),
          appBarPadding: const AppBarPaddingVisibility.disabled(),
          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-           title: OsmeaComponents.text(
-             context.resources.myInformation,
-             color: Colors.black,
+             title: OsmeaComponents.text(
+               context.resources.myInformation,
+               textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                 fontWeight: FontWeight.w600,
+                 color: OsmeaColors.thunder,
+               ),
+             ),
+             variant: AppBarVariant.primary,
+             backgroundColor: OsmeaColors.white,
+             foregroundColor: OsmeaColors.thunder,
+             elevation: 0,
+             leading: OsmeaComponents.iconButton(
+               onPressed: () => context.pop(),
+               icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+               backgroundColor: OsmeaColors.transparent,
+             ),
            ),
-           variant: AppBarVariant.primary,
-           backgroundColor: Colors.white,
-           foregroundColor: Colors.black,
-           leading: OsmeaComponents.iconButton(
-             onPressed: () => context.pop(),
-             icon: const Icon(Icons.arrow_back),
-           ),
-         ),
        );
 
   @override
@@ -47,125 +52,93 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   ) {
     final resources = context.resources;
     if (state is ProfileLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
     }
 
     if (state is ProfileAuthenticated) {
       return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: context.spacing24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildEditableField(
-              context,
-              viewModel.usernameController,
-              resources.username,
-              Icons.person,
-            ),
-            const SizedBox(height: 16),
-            _buildEditableField(
-              context,
-              viewModel.emailController,
-              resources.email,
-              Icons.email,
-              readOnly: true,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 4.0, top: 4.0, bottom: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  resources.emailCannotBeChanged,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ),
-            ),
-
-            // Date of Birth (Age)
-            GestureDetector(
-              onTap: () => viewModel.pickBirthdate(context),
-              child: AbsorbPointer(
-                child: _buildEditableField(
-                  context,
-                  viewModel.birthdateController,
-                  resources.dateOfBirth,
-                  Icons.calendar_today,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Gender Dropdown
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: EdgeInsets.all(context.spacing12),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(
-                  4,
-                ), // Matches TextFieldVariant.outlined usually
+                color: OsmeaColors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: OsmeaColors.silver, width: 1),
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: viewModel.selectedGender,
-                  hint: Row(
-                    children: [
-                      const Icon(Icons.people_outline, color: Colors.black),
-                      const SizedBox(width: 12),
-                      Text(resources.selectGender),
-                    ],
-                  ),
-                  icon: const Icon(Icons.arrow_drop_down),
-                  items:
-                      [
-                        resources.genderMale,
-                        resources.genderFemale,
-                        resources.genderOther,
-                        resources.genderPreferNotToSay,
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                  onChanged: (newValue) {
-                    // Trigger a state update or UI refresh (handled by bloc listener/builder usually, but here handled by setGender)
-                    viewModel.setGender(newValue);
-                  },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-            OsmeaComponents.button(
-              text: resources.savePersonalInfo,
-              variant: ButtonVariant.primary,
-              fullWidth: true,
-              onPressed: () async {
-                await viewModel.updateProfile();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(resources.profileUpdated),
-                      backgroundColor: Colors.green,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildEditableField(context, viewModel.usernameController, resources.username),
+                  SizedBox(height: context.spacing16),
+                  _buildEditableField(context, viewModel.emailController, resources.email, readOnly: true),
+                  Padding(
+                    padding: EdgeInsets.only(left: context.spacing4, top: context.spacing4, bottom: context.spacing16),
+                    child: OsmeaComponents.text(
+                      resources.emailCannotBeChanged,
+                      textStyle: OsmeaTextStyle.bodySmall(context).copyWith(color: OsmeaColors.grayMaterial[400]),
                     ),
-                  );
-                }
-              },
+                  ),
+                  GestureDetector(
+                    onTap: () => viewModel.pickBirthdate(context),
+                    child: AbsorbPointer(
+                      child: _buildEditableField(context, viewModel.birthdateController, resources.dateOfBirth),
+                    ),
+                  ),
+                  SizedBox(height: context.spacing16),
+                  OsmeaComponents.dropdown<String>(
+                    items: [
+                      resources.genderMale,
+                      resources.genderFemale,
+                      resources.genderOther,
+                      resources.genderPreferNotToSay,
+                    ],
+                    value: viewModel.selectedGender,
+                    onChanged: viewModel.setGender,
+                    hint: resources.selectGender,
+                    label: resources.selectGender,
+                    variant: DropdownVariant.outlined,
+                    fullWidth: true,
+                  ),
+                  SizedBox(height: context.spacing24),
+                  OsmeaComponents.button(
+                    text: resources.savePersonalInfo,
+                    variant: ButtonVariant.primary,
+                    backgroundColor: OsmeaColors.black,
+                    textColor: OsmeaColors.white,
+                    fullWidth: true,
+                    onPressed: () async {
+                      await viewModel.updateProfile();
+                      if (context.mounted) {
+                        context.showSnackbar(
+                          message: resources.profileUpdated,
+                          type: SnackbarType.success,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 32), // Bottom padding
+            SizedBox(height: context.spacing32),
           ],
         ),
       );
     }
-    return Center(child: Text(resources.loginToViewInfo));
+    return Center(
+      child: OsmeaComponents.text(
+        resources.loginToViewInfo,
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
+      ),
+    );
   }
 
   Widget _buildEditableField(
     BuildContext context,
     TextEditingController controller,
-    String label,
-    IconData icon, {
+    String label, {
     bool readOnly = false,
     bool obscureText = false,
     TextInputType? keyboardType,
@@ -173,14 +146,11 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     return OsmeaComponents.textField(
       controller: controller,
       label: label,
-      prefixIcon: Icon(icon, color: Colors.black),
       variant: TextFieldVariant.outlined,
-      focusColor: Colors.black,
+      focusColor: OsmeaColors.black,
       readOnly: readOnly,
       obscureText: obscureText,
-      type: keyboardType == TextInputType.number
-          ? TextFieldType.number
-          : TextFieldType.text, // Simple mapping
+      type: keyboardType == TextInputType.number ? TextFieldType.number : TextFieldType.text,
     );
   }
 }

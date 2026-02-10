@@ -207,7 +207,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       padding: EdgeInsets.zero,
       children: [
         _buildProfileHeader(context, user),
-        _buildStatisticsRow(context),
+        _buildStatisticsRow(context, state),
         // Section: ACCOUNT
         _buildSectionHeaderWoo(context, resources.account),
         _buildMenuItem(
@@ -228,22 +228,20 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           Icons.lock_reset_outlined,
           () => goRoute('/profile/change-password'),
         ),
-        // Section: ORDERS (Woo uses "Orders")
-        _buildSectionHeaderWoo(context, 'Orders'),
+        _buildSectionHeaderWoo(context, resources.orders),
         _buildMenuItem(
           context,
           resources.myOrders,
           Icons.shopping_bag_outlined,
           () => goRoute('/profile/orders'),
-          subtitle: '0 orders',
+          subtitle: '${state.orderCount} ${resources.orders}',
         ),
         _buildMenuItem(
           context,
           resources.myReviews,
           Icons.star_outline,
-          () {},
+          () => goRoute('/profile/reviews'),
         ),
-        // Section: GENERAL
         _buildSectionHeaderWoo(context, resources.general),
         _buildMenuItem(
           context,
@@ -255,7 +253,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           context,
           resources.helpSupport,
           Icons.help_outline,
-          () {},
+          () => goRoute('/profile/help-support'),
         ),
         if (user.role == 'admin') ...[
           _buildSectionHeaderWoo(context, resources.admin),
@@ -336,9 +334,15 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     );
   }
 
-  Widget _buildStatisticsRow(BuildContext context) {
+  Widget _buildStatisticsRow(BuildContext context, ProfileAuthenticated state) {
     final theme = Theme.of(context);
+    final resources = context.resources;
     final borderColor = theme.colorScheme.outlineVariant;
+    final user = state.user;
+    final hasAddress = (user.address != null && user.address!.isNotEmpty) ||
+        (user.city != null && user.city!.isNotEmpty) ||
+        (user.country != null && user.country!.isNotEmpty);
+    final addressCount = hasAddress ? 1 : 0;
     return Container(
       padding: EdgeInsets.symmetric(vertical: context.spacing24),
       decoration: BoxDecoration(
@@ -350,9 +354,9 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(context, 'Orders', 0),
+          _buildStatItem(context, resources.orders, state.orderCount),
           _buildStatDivider(context),
-          _buildStatItem(context, 'Addresses', 0),
+          _buildStatItem(context, resources.myAddresses, addressCount),
         ],
       ),
     );

@@ -31,6 +31,8 @@ import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
+import 'package:storefront_supabase/app/views/view_profile/my_reviews_view.dart';
+import 'package:storefront_supabase/app/views/view_profile/help_support_view.dart';
 import 'package:storefront_supabase/app/views/view_brands/products_by_brand/products_by_brand_view.dart'; // Added
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/models/navbar_item_model.dart';
@@ -209,6 +211,24 @@ final GoRouter appRouter = GoRouter(
                   body: Center(
                     child: Text("My Orders (User View) - Coming Soon"),
                   ),
+                );
+              },
+            ),
+            GoRoute(
+              path: 'reviews',
+              builder: (BuildContext context, GoRouterState state) {
+                return MyReviewsView(
+                  goRoute: (String path) => context.go(path),
+                  arguments: state.extra is Map<String, dynamic> ? Map<String, dynamic>.from(state.extra as Map) : {'profile': true, 'reviews': true},
+                );
+              },
+            ),
+            GoRoute(
+              path: 'help-support',
+              builder: (BuildContext context, GoRouterState state) {
+                return HelpSupportView(
+                  goRoute: (String path) => context.go(path),
+                  arguments: state.extra is Map<String, dynamic> ? Map<String, dynamic>.from(state.extra as Map) : {'profile': true, 'help': true},
                 );
               },
             ),

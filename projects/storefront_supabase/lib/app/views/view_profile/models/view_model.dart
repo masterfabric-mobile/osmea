@@ -96,6 +96,13 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
           .single();
 
       final user = AppUser.fromJson(response);
+
+      // Fetch order count for this user from Supabase orders table
+      final orderRows = await _supabaseClient
+          .from('orders')
+          .select('id')
+          .eq('user_id', userId);
+      final orderCount = (orderRows as List).length;
       
       // Populate controllers immediately when data is fetched
       usernameController.text = user.username ?? '';
@@ -117,7 +124,7 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
       selectedCountry = user.country;
       selectedCity = user.city;
 
-      stateChanger(ProfileAuthenticated(user: user, shouldRedirectToHome: justLoggedIn));
+      stateChanger(ProfileAuthenticated(user: user, shouldRedirectToHome: justLoggedIn, orderCount: orderCount));
     } catch (e) {
       stateChanger(const ProfileUnauthenticated(errorMessage: "Failed to load profile"));
     }
@@ -171,7 +178,7 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   
   void _refreshState() {
      if (state is ProfileAuthenticated) {
-       stateChanger(ProfileAuthenticated(user: (state as ProfileAuthenticated).user));
+       stateChanger((state as ProfileAuthenticated).copyWith());
     }
   }
 
@@ -212,9 +219,9 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
            .single();
            
        final updatedUser = AppUser.fromJson(response);
-       stateChanger(ProfileAuthenticated(user: updatedUser));
+       stateChanger((state as ProfileAuthenticated).copyWith(user: updatedUser));
      } catch (e) {
-       stateChanger(ProfileAuthenticated(user: currentUser)); 
+       stateChanger((state as ProfileAuthenticated).copyWith(user: currentUser)); 
        // Ideally handle error
      }
   }
@@ -256,10 +263,10 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
           .single();
 
       final updatedUser = AppUser.fromJson(response);
-      stateChanger(ProfileAuthenticated(user: updatedUser));
+      stateChanger((state as ProfileAuthenticated).copyWith(user: updatedUser));
 
     } catch (e) {
-       stateChanger(ProfileAuthenticated(user: currentUser)); 
+       stateChanger((state as ProfileAuthenticated).copyWith(user: currentUser)); 
     }
   }
   

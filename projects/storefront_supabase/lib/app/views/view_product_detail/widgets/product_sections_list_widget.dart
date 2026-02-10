@@ -11,6 +11,7 @@ import 'package:storefront_supabase/app/views/view_product_detail/models/view_mo
 import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_attributes_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_reviews_widget.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_reviews_with_form_widget.dart';
 
 /// Menu items list widget for product details
 class ProductSectionsListWidget extends StatelessWidget {
@@ -111,16 +112,19 @@ class ProductSectionsListWidget extends StatelessWidget {
       ),
     );
 
-    // Reviews section
+    // Reviews section (with write-review form when logged in)
     sections.add(
       _SectionItem(
         title: 'Reviews',
         icon: Icons.star_outline,
-        widget: ProductReviewsWidget(state: state),
+        widget: ProductReviewsWithFormWidget(
+          viewModel: viewModel,
+          state: state,
+        ),
         onTap: () => _showContentBottomSheet(
           context,
           'Reviews',
-          ProductReviewsWidget(state: state),
+          ProductReviewsWithFormWidget(viewModel: viewModel, state: state),
         ),
       ),
     );

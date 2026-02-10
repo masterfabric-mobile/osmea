@@ -17,14 +17,19 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.changePassword,
-              color: OsmeaColors.black,
+              textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                fontWeight: FontWeight.w600,
+                color: OsmeaColors.thunder,
+              ),
             ),
             variant: AppBarVariant.primary,
             backgroundColor: OsmeaColors.white,
-            foregroundColor: OsmeaColors.black,
+            foregroundColor: OsmeaColors.thunder,
+            elevation: 0,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.pop(),
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              backgroundColor: OsmeaColors.transparent,
             ),
           ),
         );
@@ -39,58 +44,64 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
       BuildContext context, ChangePasswordViewModel viewModel, ChangePasswordState state) {
     final resources = context.resources;
     if (state is ChangePasswordLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
     }
 
     if (state is ChangePasswordError) {
       return buildError(state.message, onRetry: () => viewModel.initial());
     }
 
-    // Default or Loaded state (assuming view model handles clearing after success)
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: context.spacing24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildEditableField(
-            context,
-            viewModel.newPasswordController,
-            resources.newPassword,
-            Icons.lock_outline,
-            obscureText: true,
-          ),
-          const SizedBox(height: 16),
-          _buildEditableField(
-            context,
-            viewModel.confirmNewPasswordController,
-            resources.confirmNewPassword,
-            Icons.lock_outline,
-            obscureText: true,
-          ),
-          const SizedBox(height: 24),
-          OsmeaComponents.button(
-            text: resources.updatePassword,
-            variant: ButtonVariant.primary,
-            fullWidth: true,
-            onPressed: () async {
-              final success = await viewModel.changePassword();
-              if (!context.mounted) return;
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(resources.passwordChanged),
-                    backgroundColor: OsmeaColors.forestHeart,
-                  ),
-                );
-                context.pop(); // Go back to profile after success
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(resources.failedChangePassword),
-                    backgroundColor: OsmeaColors.black,
-                  ),
-                );
-              }
-            },
+          Container(
+            padding: EdgeInsets.all(context.spacing12),
+            decoration: BoxDecoration(
+              color: OsmeaColors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: OsmeaColors.silver, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildEditableField(
+                  context,
+                  viewModel.newPasswordController,
+                  resources.newPassword,
+                  obscureText: true,
+                ),
+                SizedBox(height: context.spacing16),
+                _buildEditableField(
+                  context,
+                  viewModel.confirmNewPasswordController,
+                  resources.confirmNewPassword,
+                  obscureText: true,
+                ),
+                SizedBox(height: context.spacing24),
+                OsmeaComponents.button(
+                  text: resources.updatePassword,
+                  variant: ButtonVariant.primary,
+                  backgroundColor: OsmeaColors.black,
+                  textColor: OsmeaColors.white,
+                  fullWidth: true,
+                  onPressed: () async {
+                    final success = await viewModel.changePassword();
+                    if (!context.mounted) return;
+                    if (success) {
+                      context.showSnackbar(
+                        message: resources.passwordChanged,
+                        type: SnackbarType.success,
+                      );
+                      context.pop();
+                    } else {
+                      context.snackbarWarning(resources.failedChangePassword);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -100,14 +111,12 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
   Widget _buildEditableField(
     BuildContext context,
     TextEditingController controller,
-    String label,
-    IconData icon, {
+    String label, {
     bool obscureText = false,
   }) {
     return OsmeaComponents.textField(
       controller: controller,
       label: label,
-      prefixIcon: Icon(icon, color: OsmeaColors.black),
       variant: TextFieldVariant.outlined,
       focusColor: OsmeaColors.black,
       obscureText: obscureText,

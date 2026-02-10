@@ -44,8 +44,30 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
   @override
   void initState() {
     super.initState();
-    final email = Supabase.instance.client.auth.currentUser?.email;
-    if (email != null && email.isNotEmpty) _email.text = email;
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
+    if (user?.email != null && user!.email!.isNotEmpty) _email.text = user.email!;
+    // Pre-fill address from profile (Supabase users table)
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prefillAddressFromProfile(client, user?.id));
+  }
+
+  Future<void> _prefillAddressFromProfile(SupabaseClient client, String? userId) async {
+    if (userId == null) return;
+    try {
+      final row = await client.from('users').select().eq('id', userId).maybeSingle();
+      if (row == null || !mounted) return;
+      final fullName = row['full_name'] as String? ?? row['username'] as String? ?? '';
+      final parts = fullName.split(RegExp(r'\s+'));
+      if (parts.isNotEmpty) {
+        _firstName.text = parts.first;
+        if (parts.length > 1) _lastName.text = parts.skip(1).join(' ');
+      }
+      if (row['phone'] != null) _phone.text = row['phone'].toString();
+      if (row['address'] != null) _address.text = row['address'].toString();
+      if (row['city'] != null) _city.text = row['city'].toString();
+      if (row['country'] != null) _country.text = row['country'].toString();
+      if (mounted) setState(() {});
+    } catch (_) {}
   }
 
   @override

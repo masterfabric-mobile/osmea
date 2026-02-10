@@ -16,14 +16,19 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.myAddresses,
-              color: Colors.black,
+              textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                fontWeight: FontWeight.w600,
+                color: OsmeaColors.thunder,
+              ),
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.thunder,
+            elevation: 0,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.pop(),
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+              backgroundColor: OsmeaColors.transparent,
             ),
           ),
         );
@@ -38,122 +43,104 @@ class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       BuildContext context, ProfileViewModel viewModel, ProfileState state) {
     final resources = context.resources;
     if (state is ProfileLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
     }
 
     if (state is ProfileAuthenticated) {
       return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: context.spacing24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Country Dropdown
-            _buildDropdown(
-              context: context,
-              label: resources.country,
-              value: viewModel.selectedCountry,
-              items: viewModel.countryCityMap.keys.toList(),
-              onChanged: viewModel.setCountry,
-              icon: Icons.public,
+            Padding(
+              padding: EdgeInsets.only(bottom: context.spacing12),
+              child: OsmeaComponents.text(
+                'Saved address',
+                textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.black,
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-            
-            // City Dropdown (Dependent)
-            _buildDropdown(
-              context: context,
-              label: resources.city,
-              value: viewModel.selectedCity,
-              items: viewModel.availableCities,
-              onChanged: viewModel.setCity,
-              icon: Icons.location_city,
-              hint: viewModel.selectedCountry == null ? resources.selectCountryFirst : resources.selectCity,
-            ),
-             const SizedBox(height: 16),
-             
-            _buildTextField(context, viewModel.addressController, resources.address, Icons.home),
-            const SizedBox(height: 16),
-            
-            _buildTextField(context, viewModel.postalCodeController, resources.postalCode, Icons.markunread_mailbox),
-            const SizedBox(height: 16),
-            
-            _buildTextField(context, viewModel.phoneController, resources.phoneNumber, Icons.phone, keyboardType: TextInputType.phone),
-            const SizedBox(height: 32),
-            
-            OsmeaComponents.button(
-              text: resources.saveAddress,
-              variant: ButtonVariant.primary,
-              fullWidth: true,
-              onPressed: () async {
-                await viewModel.updateAddress();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(resources.addressUpdated), 
-                      backgroundColor: Colors.green
-                    ),
-                  );
-                }
-              },
+            Container(
+              padding: EdgeInsets.all(context.spacing12),
+              decoration: BoxDecoration(
+                color: OsmeaColors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: OsmeaColors.silver, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OsmeaComponents.dropdown<String>(
+                    items: viewModel.countryCityMap.keys.toList(),
+                    value: viewModel.selectedCountry,
+                    onChanged: viewModel.setCountry,
+                    hint: viewModel.selectedCountry == null ? resources.selectCountryFirst : resources.country,
+                    label: resources.country,
+                    variant: DropdownVariant.outlined,
+                    fullWidth: true,
+                  ),
+                  SizedBox(height: context.spacing16),
+                  OsmeaComponents.dropdown<String>(
+                    items: viewModel.availableCities,
+                    value: viewModel.selectedCity,
+                    onChanged: viewModel.setCity,
+                    hint: viewModel.selectedCountry == null ? resources.selectCountryFirst : resources.selectCity,
+                    label: resources.city,
+                    variant: DropdownVariant.outlined,
+                    fullWidth: true,
+                  ),
+                  SizedBox(height: context.spacing16),
+                  _buildTextField(context, viewModel.addressController, resources.address),
+                  SizedBox(height: context.spacing16),
+                  _buildTextField(context, viewModel.postalCodeController, resources.postalCode),
+                  SizedBox(height: context.spacing16),
+                  _buildTextField(context, viewModel.phoneController, resources.phoneNumber, keyboardType: TextInputType.phone),
+                  SizedBox(height: context.spacing24),
+                  OsmeaComponents.button(
+                    text: resources.saveAddress,
+                    variant: ButtonVariant.primary,
+                    backgroundColor: OsmeaColors.black,
+                    textColor: OsmeaColors.white,
+                    fullWidth: true,
+                    onPressed: () async {
+                      await viewModel.updateAddress();
+                      if (context.mounted) {
+                        context.showSnackbar(
+                          message: resources.addressUpdated,
+                          type: SnackbarType.success,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       );
     }
-    return Center(child: Text(resources.loginToManageAddresses));
-  }
-  
-  Widget _buildDropdown({
-    required BuildContext context,
-    required String label,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    required IconData icon,
-    String? hint,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: items.contains(value) ? value : null,
-          hint: Row(
-            children: [
-              Icon(icon, color: Colors.black),
-              const SizedBox(width: 12),
-              Text(hint ?? "${context.resources.selectPrefix}$label"),
-            ],
-          ),
-          icon: const Icon(Icons.arrow_drop_down),
-          items: items.map((String val) {
-            return DropdownMenuItem<String>(
-              value: val,
-              child: Text(val),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
+    return Center(
+      child: OsmeaComponents.text(
+        resources.loginToManageAddresses,
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
       ),
     );
   }
-
+  
   Widget _buildTextField(
-      BuildContext context,
-      TextEditingController controller,
-      String label,
-      IconData icon, {
-        TextInputType? keyboardType,
-      }) {
+    BuildContext context,
+    TextEditingController controller,
+    String label, {
+    TextInputType? keyboardType,
+  }) {
     return OsmeaComponents.textField(
       controller: controller,
       label: label,
-      prefixIcon: Icon(icon, color: Colors.black),
       variant: TextFieldVariant.outlined,
-      focusColor: Colors.black,
-      type: TextFieldType.text,
+      focusColor: OsmeaColors.black,
+      type: keyboardType == TextInputType.phone ? TextFieldType.phone : TextFieldType.text,
     );
   }
 }

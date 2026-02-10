@@ -7,6 +7,7 @@ import 'package:storefront_supabase/app/models/favorite_group.dart';
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'states.dart';
@@ -42,7 +43,8 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
         if (item['products'] != null) {
           products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
         } else if (item['brand'] != null) {
-          brands.add(Brand.fromJson(item['brand'] as Map<String, dynamic>));
+          final b = Brand.fromJson(item['brand'] as Map<String, dynamic>);
+          brands.add(b.copyWith(logoUrl: resolveBrandLogoUrl(_supabaseClient, b.logoUrl)));
         } else if (item['category'] != null) {
           final catMap = item['category'] as Map<String, dynamic>;
           categories.add(Category.fromJson(catMap));
@@ -189,7 +191,8 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
         if (item['products'] != null) {
           products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
         } else if (item['brand'] != null) {
-          brands.add(Brand.fromJson(item['brand'] as Map<String, dynamic>));
+          final b = Brand.fromJson(item['brand'] as Map<String, dynamic>);
+          brands.add(b.copyWith(logoUrl: resolveBrandLogoUrl(_supabaseClient, b.logoUrl)));
         }
       }
 
@@ -318,8 +321,11 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
       if (brandForOptimisticUpdate != null && state is FavoritesLoadedState) {
         final curr = state as FavoritesLoadedState;
         if (!curr.favoriteBrands.any((b) => b.id == brandId)) {
+          final resolved = brandForOptimisticUpdate.copyWith(
+            logoUrl: resolveBrandLogoUrl(_supabaseClient, brandForOptimisticUpdate.logoUrl),
+          );
           stateChanger(curr.copyWith(
-            favoriteBrands: [...curr.favoriteBrands, brandForOptimisticUpdate],
+            favoriteBrands: [...curr.favoriteBrands, resolved],
           ));
         }
       }
