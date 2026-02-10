@@ -1,7 +1,18 @@
+import com.android.build.gradle.BaseExtension
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Ensure all Android subprojects (including Flutter plugins like app_links) have compileSdkVersion
+subprojects {
+    afterEvaluate {
+        extensions.findByType(BaseExtension::class.java)?.apply {
+            compileSdkVersion(36)
+        }
     }
 }
 
