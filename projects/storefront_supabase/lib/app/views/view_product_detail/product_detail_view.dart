@@ -138,7 +138,7 @@ class ProductDetailView
       if (isAddToCartError && state.previousState != null) {
         // Show snackbar and recover to previous state
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.snackbarError(
+          context.snackbarWarning(
             state.message,
             duration: context.durationVeryLong,
           );

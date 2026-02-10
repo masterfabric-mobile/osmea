@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart' as _i434;
 import 'package:storefront_supabase/app/core/config/register_module.dart'
     as _i1006;
 import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/view_model.dart'
@@ -61,9 +62,7 @@ extension GetItInjectableX on _i174.GetIt {
     final registerModule = _$RegisterModule();
     gh.factory<_i76.SettingsViewModel>(() => _i76.SettingsViewModel());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
-    gh.factory<_i826.CartViewModel>(
-      () => _i826.CartViewModel(gh<_i454.SupabaseClient>()),
-    );
+    gh.lazySingleton<_i434.CartCache>(() => _i434.CartCache());
     gh.factory<_i454.ProductsByBrandViewModel>(
       () => _i454.ProductsByBrandViewModel(gh<_i454.SupabaseClient>()),
     );
@@ -94,9 +93,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i319.ChangePasswordViewModel>(
       () => _i319.ChangePasswordViewModel(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i421.ProductDetailViewModel>(
-      () => _i421.ProductDetailViewModel(gh<_i454.SupabaseClient>()),
-    );
     gh.factory<_i1038.CategoriesViewModel>(
       () => _i1038.CategoriesViewModel(gh<_i454.SupabaseClient>()),
     );
@@ -106,11 +102,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i844.SearchViewModel>(
       () => _i844.SearchViewModel(gh<_i454.SupabaseClient>()),
     );
-    gh.lazySingleton<_i721.FavoritesViewModel>(
-      () => _i721.FavoritesViewModel(gh<_i454.SupabaseClient>()),
+    gh.factory<_i826.CartViewModel>(
+      () => _i826.CartViewModel(
+        gh<_i454.SupabaseClient>(),
+        gh<_i434.CartCache>(),
+      ),
+    );
+    gh.factory<_i421.ProductDetailViewModel>(
+      () => _i421.ProductDetailViewModel(
+        gh<_i454.SupabaseClient>(),
+        gh<_i434.CartCache>(),
+      ),
     );
     gh.lazySingleton<_i482.SupabaseHomeViewModel>(
-      () => _i482.SupabaseHomeViewModel(gh<_i454.SupabaseClient>()),
+      () => _i482.SupabaseHomeViewModel(
+        gh<_i454.SupabaseClient>(),
+        gh<_i434.CartCache>(),
+      ),
+    );
+    gh.lazySingleton<_i721.FavoritesViewModel>(
+      () => _i721.FavoritesViewModel(
+        gh<_i454.SupabaseClient>(),
+        gh<_i434.CartCache>(),
+      ),
     );
     return this;
   }

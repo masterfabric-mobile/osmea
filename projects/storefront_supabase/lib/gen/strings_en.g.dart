@@ -533,6 +533,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Please log in to manage addresses.'
 	String get loginToManageAddresses => 'Please log in to manage addresses.';
 
+	/// en: 'Please sign in to view your favorites.'
+	String get loginToViewFavorites => 'Please sign in to view your favorites.';
+
 	/// en: 'Select '
 	String get selectPrefix => 'Select ';
 
@@ -619,6 +622,54 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Are you sure you want to log out?'
 	String get confirmLogoutMessage => 'Are you sure you want to log out?';
+
+	/// en: 'Welcome back! You have successfully logged in.'
+	String get welcomeBackLogin => 'Welcome back! You have successfully logged in.';
+
+	/// en: 'See all'
+	String get seeAll => 'See all';
+
+	/// en: 'Recommended for you'
+	String get recommendedForYou => 'Recommended for you';
+
+	/// en: 'Shop by Brand'
+	String get shopByBrand => 'Shop by Brand';
+
+	/// en: 'Collections'
+	String get collections => 'Collections';
+
+	/// en: 'Collection'
+	String get collection => 'Collection';
+
+	/// en: 'Added to favorites'
+	String get addedToFavoritesCategory => 'Added to favorites';
+
+	/// en: 'Removed from favorites'
+	String get removedFromFavoritesCategory => 'Removed from favorites';
+
+	/// en: 'Undo'
+	String get undo => 'Undo';
+
+	/// en: 'Please log in to view your cart.'
+	String get loginToViewCart => 'Please log in to view your cart.';
+
+	/// en: 'Please log in to add items to cart.'
+	String get loginToAddToCart => 'Please log in to add items to cart.';
+
+	/// en: '{name} was added to your favorites'
+	String get categoryAddedToFavorites => '{name} was added to your favorites';
+
+	/// en: '{name} was removed from your favorites'
+	String get categoryRemovedFromFavorites => '{name} was removed from your favorites';
+
+	/// en: 'Removed from cart'
+	String get removedFromCart => 'Removed from cart';
+
+	/// en: 'Brand added to favorites'
+	String get brandAddedToFavorites => 'Brand added to favorites';
+
+	/// en: 'Brand removed from favorites'
+	String get brandRemovedFromFavorites => 'Brand removed from favorites';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -793,6 +844,7 @@ extension on Translations {
 			'selectCountryFirst' => 'Select Country First',
 			'selectCity' => 'Select City',
 			'loginToManageAddresses' => 'Please log in to manage addresses.',
+			'loginToViewFavorites' => 'Please sign in to view your favorites.',
 			'selectPrefix' => 'Select ',
 			'failedChangePassword' => 'Failed to change password. Please check your inputs.',
 			'onboarding' => 'Onboarding',
@@ -822,6 +874,22 @@ extension on Translations {
 			'couponLimitReached' => 'Coupon usage limit reached.',
 			'minimumPurchaseRequired' => 'Minimum purchase of {amount} required.',
 			'confirmLogoutMessage' => 'Are you sure you want to log out?',
+			'welcomeBackLogin' => 'Welcome back! You have successfully logged in.',
+			'seeAll' => 'See all',
+			'recommendedForYou' => 'Recommended for you',
+			'shopByBrand' => 'Shop by Brand',
+			'collections' => 'Collections',
+			'collection' => 'Collection',
+			'addedToFavoritesCategory' => 'Added to favorites',
+			'removedFromFavoritesCategory' => 'Removed from favorites',
+			'undo' => 'Undo',
+			'loginToViewCart' => 'Please log in to view your cart.',
+			'loginToAddToCart' => 'Please log in to add items to cart.',
+			'categoryAddedToFavorites' => '{name} was added to your favorites',
+			'categoryRemovedFromFavorites' => '{name} was removed from your favorites',
+			'removedFromCart' => 'Removed from cart',
+			'brandAddedToFavorites' => 'Brand added to favorites',
+			'brandRemovedFromFavorites' => 'Brand removed from favorites',
 			_ => null,
 		};
 	}

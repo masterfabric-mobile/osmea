@@ -9,12 +9,14 @@ import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product_variant.dart';
 import 'states.dart';
 
 @injectable
 class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
 
   late final TextEditingController reviewTitleController;
   late final TextEditingController reviewCommentController;
@@ -32,7 +34,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
   Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
 
-  ProductDetailViewModel(this._supabaseClient)
+  ProductDetailViewModel(this._supabaseClient, this._cartCache)
     : super(ProductDetailInitialState()) {
     reviewTitleController = TextEditingController();
     reviewCommentController = TextEditingController();
@@ -323,6 +325,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
         if (existing != null) {
           final newQty = (existing['quantity'] as int) + quantity;
           await _supabaseClient.from('cart').update({'quantity': newQty}).eq('id', existing['id']);
+          _cartCache.setInCart(userId, productId, variantId, true);
           stateChanger(currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true));
           return;
         }
@@ -332,6 +335,8 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
         if (variantId != null) 'variant_id': variantId,
         'quantity': quantity,
       });
+      final uid = _supabaseClient.auth.currentUser?.id;
+      if (uid != null) _cartCache.setInCart(uid, productId, variantId, true);
       stateChanger(
         currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true),
       );

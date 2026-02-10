@@ -193,7 +193,7 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
                         if (isFavorite) {
                           await vm.removeFavoriteBrand(brand.id);
                           if (context.mounted) {
-                            context.snackbarInfo(
+                            context.snackbarWarning(
                               context.resources.brandRemovedFromFavorites,
                               style: SnackbarStyle.minimal,
                               position: SnackbarPosition.bottom,

@@ -2,6 +2,7 @@ import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocal
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
 import 'package:storefront_supabase/app/models/favorite_group.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,8 +11,9 @@ import 'states.dart';
 @lazySingleton
 class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
 
-  FavoritesViewModel(this._supabaseClient) : super(FavoritesInitialState());
+  FavoritesViewModel(this._supabaseClient, this._cartCache) : super(FavoritesInitialState());
 
   Future<void> initial() async {
     stateChanger(FavoritesLoadingState());
@@ -277,6 +279,8 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
               .from('cart')
               .update({'quantity': newQty})
               .eq('id', existing['id']);
+          final uid = _supabaseClient.auth.currentUser?.id;
+          if (uid != null) _cartCache.setInCart(uid, productId, null, true);
           return true;
         }
       }
@@ -284,6 +288,8 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
         'product_id': productId,
         'quantity': 1,
       });
+      final uid = _supabaseClient.auth.currentUser?.id;
+      if (uid != null) _cartCache.setInCart(uid, productId, null, true);
       return true;
     } catch (e) {
       return false;

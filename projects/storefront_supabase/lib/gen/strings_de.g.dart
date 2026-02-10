@@ -201,6 +201,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get selectCountryFirst => 'Zuerst Land auswählen';
 	@override String get selectCity => 'Stadt auswählen';
 	@override String get loginToManageAddresses => 'Bitte melden Sie sich an, um Adressen zu verwalten.';
+	@override String get loginToViewFavorites => 'Bitte melden Sie sich an, um Ihre Favoriten zu sehen.';
 	@override String get selectPrefix => 'Wählen Sie ';
 	@override String get failedChangePassword => 'Passwort konnte nicht geändert werden. Bitte überprüfen Sie Ihre Eingaben.';
 	@override String get onboarding => 'Onboarding';
@@ -230,6 +231,22 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get couponLimitReached => 'Nutzungslimit für Gutschein erreicht.';
 	@override String get minimumPurchaseRequired => 'Mindestkauf von {amount} erforderlich.';
 	@override String get confirmLogoutMessage => 'Möchten Sie sich wirklich abmelden?';
+	@override String get welcomeBackLogin => 'Willkommen zurück! Sie haben sich erfolgreich angemeldet.';
+	@override String get seeAll => 'Alle anzeigen';
+	@override String get recommendedForYou => 'Empfohlen für Sie';
+	@override String get shopByBrand => 'Nach Marke einkaufen';
+	@override String get collections => 'Kollektionen';
+	@override String get collection => 'Kollektion';
+	@override String get addedToFavoritesCategory => 'Zu Favoriten hinzugefügt';
+	@override String get removedFromFavoritesCategory => 'Aus Favoriten entfernt';
+	@override String get undo => 'Rückgängig';
+	@override String get loginToViewCart => 'Bitte melden Sie sich an, um Ihren Warenkorb zu sehen.';
+	@override String get loginToAddToCart => 'Bitte melden Sie sich an, um Artikel in den Warenkorb zu legen.';
+	@override String get categoryAddedToFavorites => '{name} wurde zu Ihren Favoriten hinzugefügt';
+	@override String get categoryRemovedFromFavorites => '{name} wurde aus Ihren Favoriten entfernt';
+	@override String get removedFromCart => 'Aus dem Warenkorb entfernt';
+	@override String get brandAddedToFavorites => 'Marke zu Favoriten hinzugefügt';
+	@override String get brandRemovedFromFavorites => 'Marke aus Favoriten entfernt';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -404,6 +421,7 @@ extension on TranslationsDe {
 			'selectCountryFirst' => 'Zuerst Land auswählen',
 			'selectCity' => 'Stadt auswählen',
 			'loginToManageAddresses' => 'Bitte melden Sie sich an, um Adressen zu verwalten.',
+			'loginToViewFavorites' => 'Bitte melden Sie sich an, um Ihre Favoriten zu sehen.',
 			'selectPrefix' => 'Wählen Sie ',
 			'failedChangePassword' => 'Passwort konnte nicht geändert werden. Bitte überprüfen Sie Ihre Eingaben.',
 			'onboarding' => 'Onboarding',
@@ -433,6 +451,22 @@ extension on TranslationsDe {
 			'couponLimitReached' => 'Nutzungslimit für Gutschein erreicht.',
 			'minimumPurchaseRequired' => 'Mindestkauf von {amount} erforderlich.',
 			'confirmLogoutMessage' => 'Möchten Sie sich wirklich abmelden?',
+			'welcomeBackLogin' => 'Willkommen zurück! Sie haben sich erfolgreich angemeldet.',
+			'seeAll' => 'Alle anzeigen',
+			'recommendedForYou' => 'Empfohlen für Sie',
+			'shopByBrand' => 'Nach Marke einkaufen',
+			'collections' => 'Kollektionen',
+			'collection' => 'Kollektion',
+			'addedToFavoritesCategory' => 'Zu Favoriten hinzugefügt',
+			'removedFromFavoritesCategory' => 'Aus Favoriten entfernt',
+			'undo' => 'Rückgängig',
+			'loginToViewCart' => 'Bitte melden Sie sich an, um Ihren Warenkorb zu sehen.',
+			'loginToAddToCart' => 'Bitte melden Sie sich an, um Artikel in den Warenkorb zu legen.',
+			'categoryAddedToFavorites' => '{name} wurde zu Ihren Favoriten hinzugefügt',
+			'categoryRemovedFromFavorites' => '{name} wurde aus Ihren Favoriten entfernt',
+			'removedFromCart' => 'Aus dem Warenkorb entfernt',
+			'brandAddedToFavorites' => 'Marke zu Favoriten hinzugefügt',
+			'brandRemovedFromFavorites' => 'Marke aus Favoriten entfernt',
 			_ => null,
 		};
 	}

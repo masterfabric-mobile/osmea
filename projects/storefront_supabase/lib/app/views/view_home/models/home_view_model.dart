@@ -14,6 +14,7 @@ import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
@@ -23,6 +24,7 @@ import 'states.dart';
 @lazySingleton
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
   StreamSubscription<AuthState>? _authSubscription;
 
   // Options for sizes/ages
@@ -47,7 +49,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
   final TextEditingController searchController = TextEditingController();
 
-  SupabaseHomeViewModel(this._supabaseClient)
+  SupabaseHomeViewModel(this._supabaseClient, this._cartCache)
     : super(SupabaseHomeInitialState()) {
     // Listen for Auth Changes
     _authSubscription = _supabaseClient.auth.onAuthStateChange.listen((data) {
@@ -433,6 +435,8 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
               .from('cart')
               .update({'quantity': newQty})
               .eq('id', existing['id']);
+          final uid = _supabaseClient.auth.currentUser?.id;
+          if (uid != null) _cartCache.setInCart(uid, productId, null, true);
           return;
         }
       }
@@ -441,6 +445,8 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
         'product_id': productId,
         'quantity': 1,
       });
+      final uid = _supabaseClient.auth.currentUser?.id;
+      if (uid != null) _cartCache.setInCart(uid, productId, null, true);
     } catch (e) {
       debugPrint('Error adding to cart: $e');
       rethrow;

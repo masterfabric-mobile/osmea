@@ -3,12 +3,14 @@ import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocal
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
 
 @injectable
 class CartViewModel extends BaseViewModelCubit<CartState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
 
   // Track last loaded state to show overlay during updates
   CartLoadedState? _lastLoadedState;
@@ -22,7 +24,7 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
       ..addAll(args);
   }
 
-  CartViewModel(this._supabaseClient) : super(CartInitialState());
+  CartViewModel(this._supabaseClient, this._cartCache) : super(CartInitialState());
 
   // Public trigger functions
   Future<void> initial({String? cartToken}) async => _loadCart(); 
@@ -54,7 +56,7 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
 
       final response = await _supabaseClient
           .from('cart')
-          .select('id, quantity, products(*, product_images(*))') 
+          .select('id, quantity, variant_id, products(*, product_images(*))')
           .eq('user_id', userId);
 
       final cartItems = <CartItem>[];
@@ -65,9 +67,12 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
             id: itemData['id'] as String,
             quantity: itemData['quantity'] as int,
             product: product,
+            variantId: _variantIdFromJson(itemData['variant_id']),
           ));
         }
       }
+
+      _cartCache.setCartForUser(userId, cartItems);
 
       double totalPrice = cartItems.fold(0.0, (sum, item) => sum + item.product.effectivePrice * item.quantity);
       int totalItems = cartItems.fold(0, (sum, item) => sum + item.quantity);
@@ -145,8 +150,22 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
         totalItems: updatedTotalItems,
       ));
 
+      CartItem? removedItem;
+      for (final item in currentState.cartItems) {
+        if (item.id == cartItemId) {
+          removedItem = item;
+          break;
+        }
+      }
+
       await _supabaseClient.from('cart').delete().eq('id', cartItemId);
       await _loadCart(); // Refresh cart to get actual state
+      if (removedItem != null) {
+        final uid = _supabaseClient.auth.currentUser?.id;
+        if (uid != null) {
+          _cartCache.setInCart(uid, removedItem.product.id, removedItem.variantId, false);
+        }
+      }
       final loaded = _lastLoadedState;
       if (loaded != null) {
         emit(CartItemRemovedState(loadedState: loaded));
@@ -264,5 +283,11 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
 
   CartState? fromJson(Map<String, dynamic> json) {
     return null; 
+  }
+
+  static String? _variantIdFromJson(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    return value.toString();
   }
 }

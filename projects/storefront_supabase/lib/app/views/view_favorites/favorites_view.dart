@@ -403,7 +403,7 @@ backgroundColor: OsmeaColors.black,
                   onTap: () async {
                     await viewModel.removeFavoriteBrand(brand.id);
                     if (context.mounted) {
-                      context.snackbarInfo(
+                      context.snackbarWarning(
                         context.resources.brandRemovedFromFavorites,
                         style: SnackbarStyle.minimal,
                         position: SnackbarPosition.bottom,

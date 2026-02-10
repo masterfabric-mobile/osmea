@@ -201,6 +201,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get selectCountryFirst => 'Önce Ülke Seçin';
 	@override String get selectCity => 'Şehir Seçin';
 	@override String get loginToManageAddresses => 'Adresleri yönetmek için lütfen giriş yapın.';
+	@override String get loginToViewFavorites => 'Favorilerinizi görmek için lütfen giriş yapın.';
 	@override String get selectPrefix => 'Seçiniz: ';
 	@override String get failedChangePassword => 'Şifre değiştirilemedi. Lütfen girişlerinizi kontrol edin.';
 	@override String get onboarding => 'Karşılama';
@@ -230,6 +231,22 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get couponLimitReached => 'Kupon kullanım sınırı aşıldı.';
 	@override String get minimumPurchaseRequired => 'Minimum {amount} tutarında alışveriş gerekli.';
 	@override String get confirmLogoutMessage => 'Çıkış yapmak istediğinizden emin misiniz?';
+	@override String get welcomeBackLogin => 'Tekrar hoş geldiniz! Giriş başarılı.';
+	@override String get seeAll => 'Tümünü gör';
+	@override String get recommendedForYou => 'Sizin için önerilenler';
+	@override String get shopByBrand => 'Markaya göre alışveriş';
+	@override String get collections => 'Koleksiyonlar';
+	@override String get collection => 'Koleksiyon';
+	@override String get addedToFavoritesCategory => 'Favorilere eklendi';
+	@override String get removedFromFavoritesCategory => 'Favorilerden çıkarıldı';
+	@override String get undo => 'Geri al';
+	@override String get loginToViewCart => 'Sepetinizi görmek için giriş yapın.';
+	@override String get loginToAddToCart => 'Sepete ürün eklemek için giriş yapın.';
+	@override String get categoryAddedToFavorites => '{name} favorilerinize eklendi';
+	@override String get categoryRemovedFromFavorites => '{name} favorilerinizden çıkarıldı';
+	@override String get removedFromCart => 'Sepetten çıkarıldı';
+	@override String get brandAddedToFavorites => 'Marka favorilere eklendi';
+	@override String get brandRemovedFromFavorites => 'Marka favorilerden çıkarıldı';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -404,6 +421,7 @@ extension on TranslationsTr {
 			'selectCountryFirst' => 'Önce Ülke Seçin',
 			'selectCity' => 'Şehir Seçin',
 			'loginToManageAddresses' => 'Adresleri yönetmek için lütfen giriş yapın.',
+			'loginToViewFavorites' => 'Favorilerinizi görmek için lütfen giriş yapın.',
 			'selectPrefix' => 'Seçiniz: ',
 			'failedChangePassword' => 'Şifre değiştirilemedi. Lütfen girişlerinizi kontrol edin.',
 			'onboarding' => 'Karşılama',
@@ -433,6 +451,22 @@ extension on TranslationsTr {
 			'couponLimitReached' => 'Kupon kullanım sınırı aşıldı.',
 			'minimumPurchaseRequired' => 'Minimum {amount} tutarında alışveriş gerekli.',
 			'confirmLogoutMessage' => 'Çıkış yapmak istediğinizden emin misiniz?',
+			'welcomeBackLogin' => 'Tekrar hoş geldiniz! Giriş başarılı.',
+			'seeAll' => 'Tümünü gör',
+			'recommendedForYou' => 'Sizin için önerilenler',
+			'shopByBrand' => 'Markaya göre alışveriş',
+			'collections' => 'Koleksiyonlar',
+			'collection' => 'Koleksiyon',
+			'addedToFavoritesCategory' => 'Favorilere eklendi',
+			'removedFromFavoritesCategory' => 'Favorilerden çıkarıldı',
+			'undo' => 'Geri al',
+			'loginToViewCart' => 'Sepetinizi görmek için giriş yapın.',
+			'loginToAddToCart' => 'Sepete ürün eklemek için giriş yapın.',
+			'categoryAddedToFavorites' => '{name} favorilerinize eklendi',
+			'categoryRemovedFromFavorites' => '{name} favorilerinizden çıkarıldı',
+			'removedFromCart' => 'Sepetten çıkarıldı',
+			'brandAddedToFavorites' => 'Marka favorilere eklendi',
+			'brandRemovedFromFavorites' => 'Marka favorilerden çıkarıldı',
 			_ => null,
 		};
 	}
