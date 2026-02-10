@@ -12,6 +12,10 @@ subprojects {
     afterEvaluate {
         extensions.findByType(BaseExtension::class.java)?.apply {
             compileSdkVersion(36)
+            compileOptions {
+                sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
+                targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
+            }
         }
     }
 }

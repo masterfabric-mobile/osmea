@@ -1,4 +1,4 @@
-package com.example.storefront_supabase
+package com.masterfabric.storefrontSupabase
 
 import io.flutter.embedding.android.FlutterActivity
 
