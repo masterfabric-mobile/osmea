@@ -6,8 +6,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
@@ -161,7 +162,7 @@ class DealsOfDayCarouselWidget extends StatelessWidget {
               ),
               if (showSeeAll)
                 OsmeaComponents.text(
-                  'See all',
+                  context.resources.seeAll,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize: context.fontSizeSmall * context.textScaleFactor,
                     fontWeight: FontWeight.w500,

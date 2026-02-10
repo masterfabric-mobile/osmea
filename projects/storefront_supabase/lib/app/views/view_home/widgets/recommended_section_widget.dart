@@ -108,7 +108,7 @@ class RecommendedSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = _loadRecommendedConfig();
     final sectionTitle =
-        configString(config?['title']) ?? 'Recommended for you';
+        configString(config?['title']) ?? context.resources.recommendedForYou;
     final showSection = config?['enabled'] as bool? ?? true;
 
     if (!showSection) return const SizedBox.shrink();
@@ -144,7 +144,7 @@ class RecommendedSectionWidget extends StatelessWidget {
                   context.push('/categories/products/all'); // Adjust route
                 },
                 child: OsmeaComponents.text(
-                  'See all',
+                  context.resources.seeAll,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize:
                         context.fontSizeExtraSmallMedium *
@@ -226,7 +226,23 @@ class RecommendedSectionWidget extends StatelessWidget {
                             }
                           },
                           onAddToCart: () async {
-                            // Add to cart
+                            try {
+                              await viewModel.addProductToCart(product.id);
+                              if (!context.mounted) return;
+                              context.snackbarSuccess(
+                                context.resources.productAddedToCart,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                            } catch (_) {
+                              if (!context.mounted) return;
+                              context.showSnackbar(
+                                message: context.resources.failedToAddCart,
+                                type: SnackbarType.warning,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                            }
                           },
                           onTap: () {
                             context.push('/product-detail/$productId');

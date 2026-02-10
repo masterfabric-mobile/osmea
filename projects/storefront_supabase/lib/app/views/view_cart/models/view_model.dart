@@ -47,7 +47,8 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
 
       final userId = _supabaseClient.auth.currentUser?.id;
       if (userId == null) {
-        emit(CartAuthRequiredState(message: 'Please log in to view your cart.'));
+        _lastLoadedState = CartLoadedState(cartItems: [], totalPrice: 0, totalItems: 0, currencyCode: 'USD', currencySymbol: '\$');
+        emit(_lastLoadedState!);
         return;
       }
 
@@ -92,42 +93,31 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
     // Ideally we should be in a loaded state or initial state.
     
     final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) {
-      emit(CartAuthRequiredState(message: 'Please log in to add items to cart.'));
-      return;
-    }
-
     try {
-      // Check if item already exists
-      var query = _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-      
-      if (variantId != null) {
-        query = query.eq('variant_id', variantId);
-      } else {
-        query = query.isFilter('variant_id', null);
-      }
-
-      final existing = await query.maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + quantity;
-        await _supabaseClient
+      if (userId != null) {
+        var query = _supabaseClient
             .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'variant_id': variantId,
-          'quantity': quantity,
-        });
+            .select('id, quantity')
+            .eq('user_id', userId)
+            .eq('product_id', productId);
+        if (variantId != null) {
+          query = query.eq('variant_id', variantId);
+        } else {
+          query = query.isFilter('variant_id', null);
+        }
+        final existing = await query.maybeSingle();
+        if (existing != null) {
+          final newQty = (existing['quantity'] as int) + quantity;
+          await _supabaseClient.from('cart').update({'quantity': newQty}).eq('id', existing['id']);
+          await _loadCart();
+          return;
+        }
       }
-      
+      await _supabaseClient.from('cart').insert({
+        'product_id': productId,
+        if (variantId != null) 'variant_id': variantId,
+        'quantity': quantity,
+      });
       await _loadCart(); 
     } catch (e) {
       // If we are in loaded state, we can show error and keep state
@@ -157,6 +147,11 @@ class CartViewModel extends BaseViewModelCubit<CartState> {
 
       await _supabaseClient.from('cart').delete().eq('id', cartItemId);
       await _loadCart(); // Refresh cart to get actual state
+      final loaded = _lastLoadedState;
+      if (loaded != null) {
+        emit(CartItemRemovedState(loadedState: loaded));
+        Future.microtask(() => emit(loaded));
+      }
     } catch (e) {
       // Revert optimistic update on error
       emit(currentState);

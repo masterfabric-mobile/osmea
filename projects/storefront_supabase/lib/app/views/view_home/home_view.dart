@@ -119,7 +119,7 @@ class SupabaseHomeView
            Future.delayed(Duration.zero, () {
              if (context.mounted) {
                 context.showSnackbar(
-                  message: "Welcome back! You have successfully logged in.",
+                  message: context.resources.welcomeBackLogin,
                   type: SnackbarType.success,
                 );
                 viewModel.resetLoginSnackbar();

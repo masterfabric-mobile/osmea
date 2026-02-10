@@ -134,11 +134,11 @@ class _CollectionsSectionWidgetState extends State<CollectionsSectionWidget>
     if (rawItems.isEmpty) return const SizedBox.shrink();
 
     final horizontalPadding = _getHorizontalPadding(cfg);
-    final sectionTitle = configString(cfg?['title']) ?? 'Collections';
+    final sectionTitle = configString(cfg?['title']) ?? context.resources.collections;
 
     final items = rawItems
         .map((item) {
-          final title = (configString(item['title']))?.trim() ?? 'Collection';
+          final title = (configString(item['title']))?.trim() ?? context.resources.collection;
           final products = _pickProductsForItem(item);
           return (title: title, products: products);
         })
@@ -282,7 +282,23 @@ class _CollectionsSectionWidgetState extends State<CollectionsSectionWidget>
                               }
                             },
                             onAddToCart: () async {
-                              // Add to cart logic
+                              try {
+                                await widget.viewModel.addProductToCart(product.id);
+                                if (!context.mounted) return;
+                                context.snackbarSuccess(
+                                  context.resources.productAddedToCart,
+                                  style: SnackbarStyle.minimal,
+                                  position: SnackbarPosition.bottom,
+                                );
+                              } catch (_) {
+                                if (!context.mounted) return;
+                                context.showSnackbar(
+                                  message: context.resources.failedToAddCart,
+                                  type: SnackbarType.warning,
+                                  style: SnackbarStyle.minimal,
+                                  position: SnackbarPosition.bottom,
+                                );
+                              }
                             },
                             onTap: () {
                               context.push('/product-detail/$productId');

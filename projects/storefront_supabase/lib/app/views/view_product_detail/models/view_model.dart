@@ -306,48 +306,32 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
     }
 
     final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) {
-      stateChanger(
-        ProductDetailAuthRequiredState(
-          message: 'Please sign in to add to cart',
-          previousState: currentState,
-        ),
-      );
-      return;
-    }
-
+    final variantId = currentState.selectedVariant?.id;
     try {
-      final variantId = currentState.selectedVariant?.id;
-
-      var query = _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-
-      if (variantId != null) {
-        query = query.eq('variant_id', variantId);
-      } else {
-        query = query.isFilter('variant_id', null);
-      }
-
-      final existing = await query.maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + quantity;
-        await _supabaseClient
+      if (userId != null) {
+        var query = _supabaseClient
             .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'variant_id': variantId,
-          'quantity': quantity,
-        });
+            .select('id, quantity')
+            .eq('user_id', userId)
+            .eq('product_id', productId);
+        if (variantId != null) {
+          query = query.eq('variant_id', variantId);
+        } else {
+          query = query.isFilter('variant_id', null);
+        }
+        final existing = await query.maybeSingle();
+        if (existing != null) {
+          final newQty = (existing['quantity'] as int) + quantity;
+          await _supabaseClient.from('cart').update({'quantity': newQty}).eq('id', existing['id']);
+          stateChanger(currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true));
+          return;
+        }
       }
-
+      await _supabaseClient.from('cart').insert({
+        'product_id': productId,
+        if (variantId != null) 'variant_id': variantId,
+        'quantity': quantity,
+      });
       stateChanger(
         currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true),
       );

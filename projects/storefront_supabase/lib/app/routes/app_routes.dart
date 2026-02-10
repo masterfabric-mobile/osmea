@@ -491,17 +491,21 @@ bool _shouldShowNavbarForPath(String path) {
   return true;
 }
 
-/// Wraps navbar: fixed height + clip (overflow fix), theme so tap has no blue splash (siyah bar, dokununca mavilik yok).
+/// Wraps navbar: fixed height + clip (overflow fix), theme so tap has no blue splash.
+/// Key ensures consistent rebuild (avoids stale/cached bar on TestFlight).
 Widget _wrapBottomBar(BuildContext context, Widget navbar) {
-  return SizedBox(
-    height: 64,
-    child: ClipRect(
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          splashFactory: NoSplash.splashFactory,
-          highlightColor: Colors.transparent,
+  return KeyedSubtree(
+    key: const ValueKey<String>('storefront_bottom_navbar'),
+    child: SizedBox(
+      height: 64,
+      child: ClipRect(
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
+          ),
+          child: navbar,
         ),
-        child: navbar,
       ),
     ),
   );

@@ -260,31 +260,30 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// Giriş yapılmamış olsa bile sepete eklenebilir (anon session / DB default user_id).
   Future<bool> addToCart(String productId) async {
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) return false;
-
     try {
-      // Check existing
-      final existing = await _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .match({'user_id': userId, 'product_id': productId})
-          .maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + 1;
-        await _supabaseClient
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId != null) {
+        final existing = await _supabaseClient
             .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'quantity': 1,
-        });
+            .select('id, quantity')
+            .match({'user_id': userId, 'product_id': productId})
+            .maybeSingle();
+
+        if (existing != null) {
+          final newQty = (existing['quantity'] as int) + 1;
+          await _supabaseClient
+              .from('cart')
+              .update({'quantity': newQty})
+              .eq('id', existing['id']);
+          return true;
+        }
       }
+      await _supabaseClient.from('cart').insert({
+        'product_id': productId,
+        'quantity': 1,
+      });
       return true;
     } catch (e) {
       return false;
@@ -338,6 +337,31 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// Add brand to favorites. [brandForOptimisticUpdate] optional for immediate UI update.
+  Future<bool> addFavoriteBrand(int brandId, {Brand? brandForOptimisticUpdate}) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      await _supabaseClient.from('favorites').insert({
+        'user_id': userId,
+        'brand_id': brandId,
+      });
+      if (brandForOptimisticUpdate != null && state is FavoritesLoadedState) {
+        final curr = state as FavoritesLoadedState;
+        if (!curr.favoriteBrands.any((b) => b.id == brandId)) {
+          stateChanger(curr.copyWith(
+            favoriteBrands: [...curr.favoriteBrands, brandForOptimisticUpdate],
+          ));
+        }
+      }
+      await initial();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> removeFavoriteBrand(int brandId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) return false;
@@ -369,7 +393,7 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
           .delete()
           .eq('user_id', userId);
       
-      stateChanger(FavoritesLoadedState(favoriteProducts: []));
+      stateChanger(FavoritesLoadedState(favoriteProducts: [], favoriteBrands: []));
       return true;
     } catch (e) {
       stateChanger(FavoritesErrorState('Favoriler silinemedi: $e'));

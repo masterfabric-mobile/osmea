@@ -202,6 +202,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get selectCountryFirst => TranslationOverrides.string(_root.$meta, 'selectCountryFirst', {}) ?? 'Önce Ülke Seçin';
 	@override String get selectCity => TranslationOverrides.string(_root.$meta, 'selectCity', {}) ?? 'Şehir Seçin';
 	@override String get loginToManageAddresses => TranslationOverrides.string(_root.$meta, 'loginToManageAddresses', {}) ?? 'Adresleri yönetmek için lütfen giriş yapın.';
+	@override String get loginToViewFavorites => TranslationOverrides.string(_root.$meta, 'loginToViewFavorites', {}) ?? 'Favorilerinizi görmek için lütfen giriş yapın.';
 	@override String get selectPrefix => TranslationOverrides.string(_root.$meta, 'selectPrefix', {}) ?? 'Seçiniz: ';
 	@override String get failedChangePassword => TranslationOverrides.string(_root.$meta, 'failedChangePassword', {}) ?? 'Şifre değiştirilemedi. Lütfen girişlerinizi kontrol edin.';
 	@override String get onboarding => TranslationOverrides.string(_root.$meta, 'onboarding', {}) ?? 'Karşılama';
@@ -231,6 +232,22 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get couponLimitReached => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Kupon kullanım sınırı aşıldı.';
 	@override String get minimumPurchaseRequired => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum {amount} tutarında alışveriş gerekli.';
 	@override String get confirmLogoutMessage => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Çıkış yapmak istediğinizden emin misiniz?';
+	@override String get welcomeBackLogin => TranslationOverrides.string(_root.$meta, 'welcomeBackLogin', {}) ?? 'Tekrar hoş geldiniz! Giriş başarılı.';
+	@override String get seeAll => TranslationOverrides.string(_root.$meta, 'seeAll', {}) ?? 'Tümünü gör';
+	@override String get recommendedForYou => TranslationOverrides.string(_root.$meta, 'recommendedForYou', {}) ?? 'Sizin için önerilenler';
+	@override String get shopByBrand => TranslationOverrides.string(_root.$meta, 'shopByBrand', {}) ?? 'Markaya göre alışveriş';
+	@override String get collections => TranslationOverrides.string(_root.$meta, 'collections', {}) ?? 'Koleksiyonlar';
+	@override String get collection => TranslationOverrides.string(_root.$meta, 'collection', {}) ?? 'Koleksiyon';
+	@override String get addedToFavoritesCategory => TranslationOverrides.string(_root.$meta, 'addedToFavoritesCategory', {}) ?? 'Favorilere eklendi';
+	@override String get removedFromFavoritesCategory => TranslationOverrides.string(_root.$meta, 'removedFromFavoritesCategory', {}) ?? 'Favorilerden çıkarıldı';
+	@override String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Geri al';
+	@override String get loginToViewCart => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Sepetinizi görmek için giriş yapın.';
+	@override String get loginToAddToCart => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Sepete ürün eklemek için giriş yapın.';
+	@override String get categoryAddedToFavorites => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} favorilerinize eklendi';
+	@override String get categoryRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} favorilerinizden çıkarıldı';
+	@override String get removedFromCart => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Sepetten çıkarıldı';
+	@override String get brandAddedToFavorites => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marka favorilere eklendi';
+	@override String get brandRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marka favorilerden çıkarıldı';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -405,6 +422,7 @@ extension on TranslationsTr {
 			'selectCountryFirst' => TranslationOverrides.string(_root.$meta, 'selectCountryFirst', {}) ?? 'Önce Ülke Seçin',
 			'selectCity' => TranslationOverrides.string(_root.$meta, 'selectCity', {}) ?? 'Şehir Seçin',
 			'loginToManageAddresses' => TranslationOverrides.string(_root.$meta, 'loginToManageAddresses', {}) ?? 'Adresleri yönetmek için lütfen giriş yapın.',
+			'loginToViewFavorites' => TranslationOverrides.string(_root.$meta, 'loginToViewFavorites', {}) ?? 'Favorilerinizi görmek için lütfen giriş yapın.',
 			'selectPrefix' => TranslationOverrides.string(_root.$meta, 'selectPrefix', {}) ?? 'Seçiniz: ',
 			'failedChangePassword' => TranslationOverrides.string(_root.$meta, 'failedChangePassword', {}) ?? 'Şifre değiştirilemedi. Lütfen girişlerinizi kontrol edin.',
 			'onboarding' => TranslationOverrides.string(_root.$meta, 'onboarding', {}) ?? 'Karşılama',
@@ -434,6 +452,22 @@ extension on TranslationsTr {
 			'couponLimitReached' => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Kupon kullanım sınırı aşıldı.',
 			'minimumPurchaseRequired' => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum {amount} tutarında alışveriş gerekli.',
 			'confirmLogoutMessage' => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Çıkış yapmak istediğinizden emin misiniz?',
+			'welcomeBackLogin' => TranslationOverrides.string(_root.$meta, 'welcomeBackLogin', {}) ?? 'Tekrar hoş geldiniz! Giriş başarılı.',
+			'seeAll' => TranslationOverrides.string(_root.$meta, 'seeAll', {}) ?? 'Tümünü gör',
+			'recommendedForYou' => TranslationOverrides.string(_root.$meta, 'recommendedForYou', {}) ?? 'Sizin için önerilenler',
+			'shopByBrand' => TranslationOverrides.string(_root.$meta, 'shopByBrand', {}) ?? 'Markaya göre alışveriş',
+			'collections' => TranslationOverrides.string(_root.$meta, 'collections', {}) ?? 'Koleksiyonlar',
+			'collection' => TranslationOverrides.string(_root.$meta, 'collection', {}) ?? 'Koleksiyon',
+			'addedToFavoritesCategory' => TranslationOverrides.string(_root.$meta, 'addedToFavoritesCategory', {}) ?? 'Favorilere eklendi',
+			'removedFromFavoritesCategory' => TranslationOverrides.string(_root.$meta, 'removedFromFavoritesCategory', {}) ?? 'Favorilerden çıkarıldı',
+			'undo' => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Geri al',
+			'loginToViewCart' => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Sepetinizi görmek için giriş yapın.',
+			'loginToAddToCart' => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Sepete ürün eklemek için giriş yapın.',
+			'categoryAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} favorilerinize eklendi',
+			'categoryRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} favorilerinizden çıkarıldı',
+			'removedFromCart' => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Sepetten çıkarıldı',
+			'brandAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Marka favorilere eklendi',
+			'brandRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Marka favorilerden çıkarıldı',
 			_ => null,
 		};
 	}

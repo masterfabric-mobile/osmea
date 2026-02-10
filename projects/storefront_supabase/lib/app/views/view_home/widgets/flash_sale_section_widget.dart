@@ -8,8 +8,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:get_it/get_it.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
@@ -314,7 +315,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                     context.push('/categories/products/all?on_sale=true');
                   },
                   child: OsmeaComponents.text(
-                    'See all',
+                    context.resources.seeAll,
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                       fontSize:
                           context.fontSizeExtraSmallMedium *

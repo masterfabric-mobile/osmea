@@ -8,8 +8,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/category.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/utils/favorite_categories_helper.dart';
 
 /// Category story circle widget
@@ -83,16 +84,16 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
       final isNowFavorite = !wasFavorite;
       
       context.showSnackbar(
-        title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
+        title: isNowFavorite ? context.resources.addedToFavoritesCategory : context.resources.removedFromFavoritesCategory,
         message: isNowFavorite
-            ? '$categoryName was added to your favorites'
-            : '$categoryName was removed from your favorites',
+            ? context.resources.categoryAddedToFavorites.replaceAll('{name}', categoryName)
+            : context.resources.categoryRemovedFromFavorites.replaceAll('{name}', categoryName),
         type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
         style: SnackbarStyle.minimal,
         position: SnackbarPosition.bottom,
         animation: SnackbarAnimation.slide,
         duration: const Duration(seconds: 2),
-        actionLabel: 'Undo',
+        actionLabel: context.resources.undo,
         onAction: () async {
           await _favoriteHelper.toggleFavorite(categoryId);
           if (mounted) {

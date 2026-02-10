@@ -416,40 +416,34 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     }
   }
 
+  /// Sepete ekler. Giriş yapılmamış olsa bile anon session (auth.uid()) ile eklenebilir.
   Future<void> addProductToCart(String productId) async {
-    // Implement add to cart logic using Supabase
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) {
-      stateChanger(HomeAuthRequiredState(productId: productId));
-      return;
-    }
-
     try {
-      // Check existing
-      final existing = await _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .match({'user_id': userId, 'product_id': productId})
-          .maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + 1;
-        await _supabaseClient
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId != null) {
+        final existing = await _supabaseClient
             .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'quantity': 1,
-        });
-      }
+            .select('id, quantity')
+            .match({'user_id': userId, 'product_id': productId})
+            .maybeSingle();
 
-      // Emit success state? Or just reload/let user know?
-      // Just return for now, UI can show snackbar if needed.
+        if (existing != null) {
+          final newQty = (existing['quantity'] as int) + 1;
+          await _supabaseClient
+              .from('cart')
+              .update({'quantity': newQty})
+              .eq('id', existing['id']);
+          return;
+        }
+      }
+      // user_id yoksa DB DEFAULT auth.uid() kullanır (anon dahil)
+      await _supabaseClient.from('cart').insert({
+        'product_id': productId,
+        'quantity': 1,
+      });
     } catch (e) {
       debugPrint('Error adding to cart: $e');
+      rethrow;
     }
   }
 

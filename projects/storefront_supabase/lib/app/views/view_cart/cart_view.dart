@@ -8,8 +8,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
 import 'package:storefront_supabase/app/views/view_cart/widgets/cart_content_widget.dart';
@@ -45,12 +46,24 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
   ) {
     if (state is CartAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.snackbarWarning(state.message, duration: context.durationLong);
+        context.snackbarWarning(context.resources.loginToViewCart, duration: context.durationLong);
       });
       return _buildAuthRequiredLoading(context);
     }
 
-    return _buildBody(context, viewModel, state);
+    return BlocListener<CartViewModel, CartState>(
+      bloc: viewModel,
+      listenWhen: (_, current) => current is CartItemRemovedState,
+      listener: (context, currentState) {
+        if (currentState is CartItemRemovedState) {
+          context.snackbarWarning(
+            context.resources.removedFromCart,
+            duration: context.durationMedium,
+          );
+        }
+      },
+      child: _buildBody(context, viewModel, state),
+    );
   }
 
   Widget _buildBody(
@@ -72,8 +85,12 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
         CartLoadedState? loadedState;
         if (currentState is CartLoadedState) {
           loadedState = currentState;
+        } else if (currentState is CartItemRemovedState) {
+          loadedState = currentState.loadedState;
         } else if (state is CartLoadedState) {
           loadedState = state;
+        } else if (state is CartItemRemovedState) {
+          loadedState = state.loadedState;
         } else if (viewModel.lastLoadedState != null) {
           loadedState = viewModel.lastLoadedState;
         }
