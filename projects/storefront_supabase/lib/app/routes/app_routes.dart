@@ -21,6 +21,7 @@ import 'package:storefront_supabase/app/views/admin/users/users_view.dart';
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
 import 'package:storefront_supabase/app/views/view_cart/cart_view.dart';
+import 'package:storefront_supabase/app/views/view_checkout/checkout_view.dart';
 import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
@@ -146,6 +147,16 @@ final GoRouter appRouter = GoRouter(
                 goRoute: (String path) => context.go(path),
                 arguments: const {'cart': true},
               ),
+        ),
+        GoRoute(
+          path: '/checkout',
+          builder: (BuildContext context, GoRouterState state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            return CheckoutView(
+              goRoute: (String path) => context.go(path),
+              arguments: extra != null ? Map<String, dynamic>.from(extra) : {'checkout': true},
+            );
+          },
         ),
         GoRoute(
           path: '/favorites',

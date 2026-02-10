@@ -253,10 +253,26 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Bitiş';
 	@override String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Özel Teklif';
 	@override String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Sınırlı süre teklifi';
-
 	@override String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Günün Fırsatları';
-
 	@override String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flaş İndirim';
+	@override String get checkoutTitle => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Ödeme';
+	@override String get stepAddress => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Adres';
+	@override String get stepShipping => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Kargo';
+	@override String get stepPayment => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Ödeme';
+	@override String get stepSummary => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Özet';
+	@override String get continueButton => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Devam';
+	@override String get backButton => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Geri';
+	@override String get placeOrder => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Siparişi Ver';
+	@override String get orderPlacedTitle => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Sipariş Alındı!';
+	@override String get orderPlacedDescription => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Siparişiniz alındı.';
+	@override String get backToHome => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Ana Sayfaya Dön';
+	@override String get fillRequiredFields => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Lütfen zorunlu alanları doldurun.';
+	@override String get selectShippingMethod => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Lütfen kargo yöntemi seçin.';
+	@override String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Lütfen ödeme yöntemi seçin.';
+	@override String get firstName => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'Ad';
+	@override String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Soyad';
+	@override String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adres';
+	@override String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Fatura adresi ile aynı';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -484,6 +500,24 @@ extension on TranslationsTr {
 			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Sınırlı süre teklifi',
 			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Günün Fırsatları',
 			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flaş İndirim',
+			'checkoutTitle' => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Ödeme',
+			'stepAddress' => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Adres',
+			'stepShipping' => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Kargo',
+			'stepPayment' => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Ödeme',
+			'stepSummary' => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Özet',
+			'continueButton' => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Devam',
+			'backButton' => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Geri',
+			'placeOrder' => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Siparişi Ver',
+			'orderPlacedTitle' => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Sipariş Alındı!',
+			'orderPlacedDescription' => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Siparişiniz alındı.',
+			'backToHome' => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Ana Sayfaya Dön',
+			'fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Lütfen zorunlu alanları doldurun.',
+			'selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Lütfen kargo yöntemi seçin.',
+			'selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Lütfen ödeme yöntemi seçin.',
+			'firstName' => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'Ad',
+			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Soyad',
+			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adres',
+			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Fatura adresi ile aynı',
 			_ => null,
 		};
 	}

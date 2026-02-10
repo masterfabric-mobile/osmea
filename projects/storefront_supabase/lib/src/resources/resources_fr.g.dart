@@ -253,10 +253,26 @@ class TranslationsFr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Se termine dans';
 	@override String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Offre spéciale';
 	@override String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Offre à durée limitée';
-
-	@override String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Vente flash';
-
 	@override String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Offres du jour';
+	@override String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Vente flash';
+	@override String get checkoutTitle => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Paiement';
+	@override String get stepAddress => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Adresse';
+	@override String get stepShipping => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Livraison';
+	@override String get stepPayment => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Paiement';
+	@override String get stepSummary => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Récapitulatif';
+	@override String get continueButton => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continuer';
+	@override String get backButton => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Retour';
+	@override String get placeOrder => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Commander';
+	@override String get orderPlacedTitle => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Commande reçue !';
+	@override String get orderPlacedDescription => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Votre commande a été reçue.';
+	@override String get backToHome => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Retour à l\'accueil';
+	@override String get fillRequiredFields => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Veuillez remplir tous les champs obligatoires.';
+	@override String get selectShippingMethod => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Veuillez choisir un mode de livraison.';
+	@override String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Veuillez choisir un mode de paiement.';
+	@override String get firstName => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'Prénom';
+	@override String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Nom';
+	@override String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adresse';
+	@override String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Identique à l\'adresse de facturation';
 }
 
 /// The flat map containing all translations for locale <fr>.
@@ -484,6 +500,24 @@ extension on TranslationsFr {
 			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Offre à durée limitée',
 			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Offres du jour',
 			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Vente flash',
+			'checkoutTitle' => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Paiement',
+			'stepAddress' => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Adresse',
+			'stepShipping' => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Livraison',
+			'stepPayment' => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Paiement',
+			'stepSummary' => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Récapitulatif',
+			'continueButton' => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continuer',
+			'backButton' => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Retour',
+			'placeOrder' => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Commander',
+			'orderPlacedTitle' => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Commande reçue !',
+			'orderPlacedDescription' => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Votre commande a été reçue.',
+			'backToHome' => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Retour à l\'accueil',
+			'fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Veuillez remplir tous les champs obligatoires.',
+			'selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Veuillez choisir un mode de livraison.',
+			'selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Veuillez choisir un mode de paiement.',
+			'firstName' => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'Prénom',
+			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Nom',
+			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adresse',
+			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Identique à l\'adresse de facturation',
 			_ => null,
 		};
 	}

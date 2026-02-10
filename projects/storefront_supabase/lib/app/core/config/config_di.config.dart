@@ -29,6 +29,8 @@ import 'package:storefront_supabase/app/views/admin/settings/models/view_model.d
     as _i861;
 import 'package:storefront_supabase/app/views/view_brands/products_by_brand/view_model.dart'
     as _i454;
+import 'package:storefront_supabase/app/views/view_checkout/models/checkout_view_model.dart'
+    as _i888;
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart'
     as _i826;
 import 'package:storefront_supabase/app/views/view_categories/models/view_model.dart'
@@ -103,6 +105,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i844.SearchViewModel>(
       () => _i844.SearchViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i888.CheckoutViewModel>(
+      () => _i888.CheckoutViewModel(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i826.CartViewModel>(
       () => _i826.CartViewModel(

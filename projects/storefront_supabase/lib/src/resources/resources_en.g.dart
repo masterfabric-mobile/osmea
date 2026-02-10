@@ -691,6 +691,60 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Flash Sale'
 	String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale';
+
+	/// en: 'Checkout'
+	String get checkoutTitle => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Checkout';
+
+	/// en: 'Address'
+	String get stepAddress => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Address';
+
+	/// en: 'Shipping'
+	String get stepShipping => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Shipping';
+
+	/// en: 'Payment'
+	String get stepPayment => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Payment';
+
+	/// en: 'Summary'
+	String get stepSummary => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Summary';
+
+	/// en: 'Continue'
+	String get continueButton => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continue';
+
+	/// en: 'Back'
+	String get backButton => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Back';
+
+	/// en: 'Place Order'
+	String get placeOrder => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Place Order';
+
+	/// en: 'Order Placed!'
+	String get orderPlacedTitle => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Order Placed!';
+
+	/// en: 'Your order has been received.'
+	String get orderPlacedDescription => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Your order has been received.';
+
+	/// en: 'Back to Home'
+	String get backToHome => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Back to Home';
+
+	/// en: 'Please fill in all required fields.'
+	String get fillRequiredFields => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Please fill in all required fields.';
+
+	/// en: 'Please select a shipping method.'
+	String get selectShippingMethod => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Please select a shipping method.';
+
+	/// en: 'Please select a payment method.'
+	String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Please select a payment method.';
+
+	/// en: 'First name'
+	String get firstName => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'First name';
+
+	/// en: 'Last name'
+	String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Last name';
+
+	/// en: 'Address'
+	String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Address';
+
+	/// en: 'Same as billing address'
+	String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Same as billing address';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -918,6 +972,24 @@ extension on Translations {
 			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Limited time offer',
 			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Deals of the day',
 			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale',
+			'checkoutTitle' => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Checkout',
+			'stepAddress' => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Address',
+			'stepShipping' => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Shipping',
+			'stepPayment' => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Payment',
+			'stepSummary' => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Summary',
+			'continueButton' => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continue',
+			'backButton' => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Back',
+			'placeOrder' => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Place Order',
+			'orderPlacedTitle' => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Order Placed!',
+			'orderPlacedDescription' => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Your order has been received.',
+			'backToHome' => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Back to Home',
+			'fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Please fill in all required fields.',
+			'selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Please select a shipping method.',
+			'selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Please select a payment method.',
+			'firstName' => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'First name',
+			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Last name',
+			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Address',
+			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Same as billing address',
 			_ => null,
 		};
 	}
