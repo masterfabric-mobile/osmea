@@ -28,15 +28,15 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
               final theme = Theme.of(context);
               final res = context.resources;
               return OsmeaComponents.appBar(
-                title: Text(
+                title: OsmeaComponents.text(
                   res.myProfile,
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  textStyle: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                    color: OsmeaColors.black,
                   ),
                 ),
-                backgroundColor: theme.colorScheme.surface,
-                foregroundColor: theme.colorScheme.onSurface,
+                backgroundColor: OsmeaColors.white,
+                foregroundColor: OsmeaColors.black,
                 elevation: 0,
                 leading: OsmeaComponents.iconButton(
                   onPressed: () {
@@ -46,18 +46,18 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                       context.go('/home');
                     }
                   },
-                  icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
+                  icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
                   backgroundColor: OsmeaColors.transparent,
                 ),
                 actions: [
                   AppBarAction(
                     type: AppBarActionType.more,
-                    icon: Icon(Icons.language, color: theme.colorScheme.onSurface),
+                    icon: Icon(Icons.language, color: OsmeaColors.black),
                     onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
                   ),
                   AppBarAction(
                     type: AppBarActionType.profile,
-                    icon: Icon(Icons.logout, color: theme.colorScheme.onSurface),
+                    icon: Icon(Icons.logout, color: OsmeaColors.black),
                     onPressed: () {
                       final res = context.resources;
                       showDialog(
@@ -65,17 +65,17 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                         builder: (BuildContext dc) {
                           final dTheme = Theme.of(dc);
                           return AlertDialog(
-                            backgroundColor: dTheme.colorScheme.surface,
-                            title: Text(
+                            backgroundColor: OsmeaColors.white,
+                            title: OsmeaComponents.text(
                               res.logout,
-                              style: dTheme.textTheme.titleLarge?.copyWith(
-                                color: dTheme.colorScheme.onSurface,
+                              textStyle: dTheme.textTheme.titleLarge?.copyWith(
+                                color: OsmeaColors.black,
                               ),
                             ),
-                            content: Text(
+                            content: OsmeaComponents.text(
                               res.confirmLogoutMessage,
-                              style: dTheme.textTheme.bodyMedium?.copyWith(
-                                color: dTheme.colorScheme.onSurfaceVariant,
+                              textStyle: dTheme.textTheme.bodyMedium?.copyWith(
+                                color: OsmeaColors.black,
                               ),
                             ),
                             actions: [
@@ -83,7 +83,8 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                                 text: res.cancel,
                                 onPressed: () => Navigator.of(dc).pop(),
                                 variant: ButtonVariant.ghost,
-                                textColor: dTheme.colorScheme.onSurface,
+                                textColor: OsmeaColors.black,
+                                borderColor: OsmeaColors.silver,
                               ),
                               OsmeaComponents.button(
                                 text: res.logout,
@@ -99,8 +100,9 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                                   viewModel.logout();
                                 },
                                 variant: ButtonVariant.outlined,
-                                textColor: dTheme.colorScheme.onSurface,
-                                borderColor: dTheme.colorScheme.onSurface,
+                                textColor: OsmeaColors.black,
+                                borderColor: OsmeaColors.black,
+                                backgroundColor: OsmeaColors.white,
                               ),
                             ],
                           );
@@ -427,15 +429,15 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: theme.colorScheme.primary,
+              color: OsmeaColors.black,
             ),
             child: Center(
               child: OsmeaComponents.text(
                 initials,
                 textStyle: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onPrimary,
+                  color: OsmeaColors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -451,7 +453,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   displayName,
                   textStyle: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                    color: OsmeaColors.black,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -461,7 +463,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   OsmeaComponents.text(
                     email,
                     textStyle: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: OsmeaColors.thunder,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

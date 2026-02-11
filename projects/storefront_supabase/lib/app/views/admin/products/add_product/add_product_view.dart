@@ -15,6 +15,11 @@ class AddProductView
     super.key,
     required super.goRoute,
     super.arguments = const {'init': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
   }) : super(
           coreAppBar: (context, viewModel) {
             final resources = context.resources;
@@ -27,6 +32,10 @@ class AddProductView
               backgroundColor: OsmeaColors.white,
               foregroundColor: OsmeaColors.black,
               variant: AppBarVariant.primary,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => goRoute('/admin/products'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
+              ),
             );
           },
         );
@@ -45,7 +54,9 @@ class AddProductView
     final isEditMode = productId != null;
 
     if (state is AddProductLoading || state is AddProductInitial) {
-      return const Center(child: CircularProgressIndicator());
+      return OsmeaComponents.center(
+        child: const CircularProgressIndicator(color: OsmeaColors.black),
+      );
     }
 
     if (state is AddProductError) {
@@ -53,11 +64,16 @@ class AddProductView
         child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            OsmeaComponents.text(state.message),
+            OsmeaComponents.text(
+              state.message,
+              textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: OsmeaColors.black),
+            ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.button(
               text: resources.retry,
               onPressed: () => initialContent(viewModel, context),
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         ),
@@ -70,7 +86,10 @@ class AddProductView
           children: [
             const CircularProgressIndicator(),
             OsmeaComponents.sizedBox(height: 16),
-            OsmeaComponents.text(isEditMode ? resources.savingChanges : resources.addingProduct),
+            OsmeaComponents.text(
+              isEditMode ? resources.savingChanges : resources.addingProduct,
+              textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+            ),
           ],
         ),
       );
@@ -83,18 +102,25 @@ class AddProductView
           children: [
             Icon(Icons.check_circle, color: OsmeaColors.forestHeart, size: 50),
             OsmeaComponents.sizedBox(height: 16),
-            OsmeaComponents.text(isEditMode
-                ? resources.productUpdatedSuccess
-                : resources.productAddedSuccess),
+            OsmeaComponents.text(
+              isEditMode
+                  ? resources.productUpdatedSuccess
+                  : resources.productAddedSuccess,
+              textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: OsmeaColors.black),
+            ),
             OsmeaComponents.sizedBox(height: 16),
             if (!isEditMode)
               OsmeaComponents.button(
                 text: resources.addAnotherProduct,
                 onPressed: () => initialContent(viewModel, context),
+                backgroundColor: OsmeaColors.black,
+                textColor: OsmeaColors.white,
               ),
             OsmeaComponents.button(
               text: resources.goToProducts,
               onPressed: () => goRoute('/admin/products'),
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             )
           ],
         ),
@@ -109,7 +135,10 @@ class AddProductView
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(
-                  content: Text(listenState.errorMessage!),
+                  content: OsmeaComponents.text(
+                    listenState.errorMessage!,
+                    textStyle: const TextStyle(color: OsmeaColors.white, fontSize: 14),
+                  ),
                   backgroundColor: OsmeaColors.black));
           }
         },
@@ -168,6 +197,8 @@ class AddProductView
                   text: isEditMode ? resources.saveChanges : resources.addProduct,
                   onPressed: () => viewModel.submitProduct(productId: productId),
                   fullWidth: true,
+                  backgroundColor: OsmeaColors.black,
+                  textColor: OsmeaColors.white,
                 ),
               ],
             ),
@@ -240,7 +271,10 @@ class AddProductView
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OsmeaComponents.text(label, textStyle: Theme.of(context).textTheme.titleSmall),
+        OsmeaComponents.text(
+          label,
+          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(color: OsmeaColors.black),
+        ),
         OsmeaComponents.sizedBox(height: 8),
         Wrap(
           spacing: 8.0,
@@ -248,9 +282,14 @@ class AddProductView
           children: options.map((option) {
             final isSelected = state.selectedSizesOrAges.contains(option);
             return FilterChip(
-              label: Text(option),
+              label: OsmeaComponents.text(
+                option,
+                textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(color: OsmeaColors.black),
+              ),
               selected: isSelected,
               onSelected: (_) => viewModel.toggleSizeOrAge(option),
+              selectedColor: OsmeaColors.silver.withOpacity(0.4),
+              checkmarkColor: OsmeaColors.black,
             );
           }).toList(),
         ),
@@ -268,32 +307,42 @@ class AddProductView
     T? selectedItem,
     void Function(T?) onChanged,
   ) {
-    // Check if the selected item is actually in the list based on object identity or equality
     T? effectiveValue;
     if (selectedItem != null) {
       try {
         effectiveValue = items.firstWhere((item) => item == selectedItem);
       } catch (e) {
-        effectiveValue = null; // Item not found, reset selection
+        effectiveValue = null;
       }
     }
 
     return DropdownButtonFormField<T>(
       // ignore: deprecated_member_use
       value: effectiveValue,
+      dropdownColor: OsmeaColors.white,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
         border: const OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: OsmeaColors.silver),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: OsmeaColors.black, width: 1.5),
+        ),
       ),
       items: items.map((item) {
         return DropdownMenuItem<T>(
           value: item,
-          child: Text(itemToString(item)),
+          child: OsmeaComponents.text(
+            itemToString(item),
+            textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+          ),
         );
       }).toList(),
       onChanged: onChanged,
       validator: (value) {
-        // Only validate if items are available (meaning selection is expected)
         if (items.isNotEmpty && value == null) {
           return '${context.resources.pleaseSelectA}$label';
         }
@@ -314,10 +363,11 @@ class AddProductView
       imageWidget = Icon(Icons.image, size: 50, color: OsmeaColors.pewter);
     }
 
-    return Center(
-      child: Column(
+    return OsmeaComponents.center(
+      child: OsmeaComponents.column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          OsmeaComponents.container(
             height: 150,
             width: 150,
             decoration: BoxDecoration(
@@ -329,10 +379,14 @@ class AddProductView
               child: imageWidget,
             ),
           ),
-          const SizedBox(height: 8),
-          OsmeaComponents.textButton(
+          OsmeaComponents.sizedBox(height: 8),
+          OsmeaComponents.button(
             text: resources.pickImage,
             onPressed: viewModel.pickImage,
+            variant: ButtonVariant.outlined,
+            backgroundColor: OsmeaColors.white,
+            textColor: OsmeaColors.black,
+            borderColor: OsmeaColors.black,
           ),
         ],
       ),
@@ -348,9 +402,21 @@ class AddProductView
   }) {
     return TextFormField(
       controller: controller,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.pewter),
         border: const OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: OsmeaColors.silver),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: OsmeaColors.black, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: OsmeaColors.thunder),
+        ),
       ),
       maxLines: maxLines,
       keyboardType: keyboardType,
@@ -368,26 +434,38 @@ class AddProductView
     final brandNameController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: Text(resources.addNewBrandTitle),
-          content: TextField(
+          backgroundColor: OsmeaColors.white,
+          title: OsmeaComponents.text(
+            resources.addNewBrandTitle,
+            textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(color: OsmeaColors.black),
+          ),
+          content: OsmeaComponents.textField(
             controller: brandNameController,
-            decoration: InputDecoration(hintText: resources.enterBrandName),
+            hint: resources.enterBrandName,
+            label: resources.enterBrandName,
+            textColor: OsmeaColors.black,
+            labelColor: OsmeaColors.black,
+            hintColor: OsmeaColors.pewter,
+            borderColor: OsmeaColors.silver,
+            fullWidth: true,
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(resources.cancel),
+            OsmeaComponents.textButton(
+              text: resources.cancel,
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
-            ElevatedButton(
+            OsmeaComponents.button(
+              text: resources.save,
               onPressed: () {
                 if (brandNameController.text.isNotEmpty) {
                   viewModel.addNewBrand(brandNameController.text);
-                  Navigator.of(context).pop();
+                  Navigator.of(dialogContext).pop();
                 }
               },
-              child: Text(resources.save),
+              backgroundColor: OsmeaColors.black,
+              textColor: OsmeaColors.white,
             ),
           ],
         );

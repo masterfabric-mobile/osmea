@@ -326,6 +326,33 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Joined'
 	String get joined => TranslationOverrides.string(_root.$meta, 'joined', {}) ?? 'Joined';
 
+	/// en: 'Daily Revenue'
+	String get dailyRevenue => TranslationOverrides.string(_root.$meta, 'dailyRevenue', {}) ?? 'Daily Revenue';
+
+	/// en: 'Last 7 Days - Revenue & Orders'
+	String get last7DaysRevenueOrders => TranslationOverrides.string(_root.$meta, 'last7DaysRevenueOrders', {}) ?? 'Last 7 Days - Revenue & Orders';
+
+	/// en: 'Order Statuses'
+	String get orderStatuses => TranslationOverrides.string(_root.$meta, 'orderStatuses', {}) ?? 'Order Statuses';
+
+	/// en: 'Last 7 Days - New Users'
+	String get last7DaysNewUsers => TranslationOverrides.string(_root.$meta, 'last7DaysNewUsers', {}) ?? 'Last 7 Days - New Users';
+
+	/// en: 'Daily new users'
+	String get dailyNewUsers => TranslationOverrides.string(_root.$meta, 'dailyNewUsers', {}) ?? 'Daily new users';
+
+	/// en: 'Last 7 Days - New Products'
+	String get last7DaysNewProducts => TranslationOverrides.string(_root.$meta, 'last7DaysNewProducts', {}) ?? 'Last 7 Days - New Products';
+
+	/// en: 'Daily new products'
+	String get dailyNewProducts => TranslationOverrides.string(_root.$meta, 'dailyNewProducts', {}) ?? 'Daily new products';
+
+	/// en: 'orders'
+	String get ordersShort => TranslationOverrides.string(_root.$meta, 'ordersShort', {}) ?? 'orders';
+
+	/// en: 'Day'
+	String get dayAbbr => TranslationOverrides.string(_root.$meta, 'dayAbbr', {}) ?? 'Day';
+
 	/// en: 'An unexpected error occurred.'
 	String get unexpectedError => TranslationOverrides.string(_root.$meta, 'unexpectedError', {}) ?? 'An unexpected error occurred.';
 
@@ -904,6 +931,15 @@ extension on Translations {
 			'unnamed' => TranslationOverrides.string(_root.$meta, 'unnamed', {}) ?? 'Unnamed',
 			'unnamedUser' => TranslationOverrides.string(_root.$meta, 'unnamedUser', {}) ?? 'Unnamed User',
 			'joined' => TranslationOverrides.string(_root.$meta, 'joined', {}) ?? 'Joined',
+			'dailyRevenue' => TranslationOverrides.string(_root.$meta, 'dailyRevenue', {}) ?? 'Daily Revenue',
+			'last7DaysRevenueOrders' => TranslationOverrides.string(_root.$meta, 'last7DaysRevenueOrders', {}) ?? 'Last 7 Days - Revenue & Orders',
+			'orderStatuses' => TranslationOverrides.string(_root.$meta, 'orderStatuses', {}) ?? 'Order Statuses',
+			'last7DaysNewUsers' => TranslationOverrides.string(_root.$meta, 'last7DaysNewUsers', {}) ?? 'Last 7 Days - New Users',
+			'dailyNewUsers' => TranslationOverrides.string(_root.$meta, 'dailyNewUsers', {}) ?? 'Daily new users',
+			'last7DaysNewProducts' => TranslationOverrides.string(_root.$meta, 'last7DaysNewProducts', {}) ?? 'Last 7 Days - New Products',
+			'dailyNewProducts' => TranslationOverrides.string(_root.$meta, 'dailyNewProducts', {}) ?? 'Daily new products',
+			'ordersShort' => TranslationOverrides.string(_root.$meta, 'ordersShort', {}) ?? 'orders',
+			'dayAbbr' => TranslationOverrides.string(_root.$meta, 'dayAbbr', {}) ?? 'Day',
 			'unexpectedError' => TranslationOverrides.string(_root.$meta, 'unexpectedError', {}) ?? 'An unexpected error occurred.',
 			'errorPrefix' => TranslationOverrides.string(_root.$meta, 'errorPrefix', {}) ?? 'Error: ',
 			'noUsersFound' => TranslationOverrides.string(_root.$meta, 'noUsersFound', {}) ?? 'No users found.',

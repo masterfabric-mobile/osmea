@@ -16,18 +16,23 @@ class AdminProductsView
     super.key,
     required super.goRoute,
     super.arguments = const {'init': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.products,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.go('/profile'),
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
             ),
           ),
         );
@@ -52,6 +57,8 @@ class AdminProductsView
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.go('/admin/products/add'),
+        backgroundColor: OsmeaColors.black,
+        foregroundColor: OsmeaColors.white,
         child: const Icon(Icons.add),
       ),
     );
@@ -66,7 +73,7 @@ class AdminProductsView
     if (state is! AdminProductsLoaded) return const SizedBox.shrink();
 
     return OsmeaComponents.container(
-      color: Colors.white,
+      color: OsmeaColors.white,
       child: OsmeaComponents.padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: OsmeaComponents.row(
@@ -81,12 +88,12 @@ class AdminProductsView
               ),
             ),
             OsmeaComponents.iconButton(
-              icon: const Icon(Icons.sort, color: Colors.black),
+              icon: Icon(Icons.sort, color: OsmeaColors.black),
               tooltip: resources.sort,
               onPressed: () => _showSortSheet(context, viewModel, state),
             ),
             OsmeaComponents.iconButton(
-              icon: const Icon(Icons.filter_list, color: Colors.black),
+              icon: Icon(Icons.filter_list, color: OsmeaColors.black),
               tooltip: resources.filter,
               onPressed: () => _showFilterSheet(context, viewModel, state),
             ),
@@ -109,7 +116,7 @@ class AdminProductsView
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: OsmeaColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -213,10 +220,10 @@ class AdminProductsView
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                foregroundColor: Colors.black,
-                                side: const BorderSide(color: Colors.black),
+                                foregroundColor: OsmeaColors.black,
+                                side: const BorderSide(color: OsmeaColors.black),
                               ),
-                              child: OsmeaComponents.text(resources.clear, color: Colors.black),
+                              child: OsmeaComponents.text(resources.clear, color: OsmeaColors.black),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -231,14 +238,14 @@ class AdminProductsView
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
+                                backgroundColor: OsmeaColors.black,
+                                foregroundColor: OsmeaColors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: OsmeaComponents.text(resources.apply, color: Colors.white),
+                              child: OsmeaComponents.text(resources.apply, color: OsmeaColors.white),
                             ),
                           ),
                         ],
@@ -270,7 +277,7 @@ class AdminProductsView
             title,
             textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: OsmeaColors.thunder,
             ),
           ),
         ),
@@ -286,16 +293,16 @@ class AdminProductsView
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.grey[100],
+                  color: isSelected ? OsmeaColors.black : OsmeaColors.ash,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? Colors.black : Colors.grey[300]!,
+                    color: isSelected ? OsmeaColors.black : OsmeaColors.silver,
                   ),
                 ),
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? OsmeaColors.white : OsmeaColors.black,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 14,
                   ),
@@ -324,7 +331,7 @@ class AdminProductsView
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: OsmeaColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -395,13 +402,13 @@ class AdminProductsView
                                      tempSizes.clear();
                                    });
                                  },
-                                 selectedColor: Colors.black,
-                                 checkmarkColor: Colors.white,
-                                 labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                                 backgroundColor: Colors.white,
+                                 selectedColor: OsmeaColors.black,
+                                 checkmarkColor: OsmeaColors.white,
+                                 labelStyle: TextStyle(color: isSelected ? OsmeaColors.white : OsmeaColors.black),
+                                 backgroundColor: OsmeaColors.white,
                                  shape: RoundedRectangleBorder(
                                    borderRadius: BorderRadius.circular(20),
-                                   side: BorderSide(color: Colors.grey[300]!),
+                                   side: BorderSide(color: OsmeaColors.silver),
                                  ),
                                );
                              }).toList(),
@@ -427,13 +434,13 @@ class AdminProductsView
                                        tempSizes.clear();
                                      });
                                    },
-                                   selectedColor: Colors.black,
-                                   checkmarkColor: Colors.white,
-                                   labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                                   backgroundColor: Colors.white,
+                                   selectedColor: OsmeaColors.black,
+                                   checkmarkColor: OsmeaColors.white,
+                                   labelStyle: TextStyle(color: isSelected ? OsmeaColors.white : OsmeaColors.black),
+                                   backgroundColor: OsmeaColors.white,
                                    shape: RoundedRectangleBorder(
                                      borderRadius: BorderRadius.circular(20),
-                                     side: BorderSide(color: Colors.grey[300]!),
+                                     side: BorderSide(color: OsmeaColors.silver),
                                    ),
                                  );
                                }).toList(),
@@ -462,13 +469,13 @@ class AdminProductsView
                                       selected ? tempSizes.add(opt) : tempSizes.remove(opt);
                                     });
                                   },
-                                  selectedColor: Colors.black,
-                                  checkmarkColor: Colors.white,
-                                  labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                                  backgroundColor: Colors.white,
+                                  selectedColor: OsmeaColors.black,
+                                  checkmarkColor: OsmeaColors.white,
+                                  labelStyle: TextStyle(color: isSelected ? OsmeaColors.white : OsmeaColors.black),
+                                  backgroundColor: OsmeaColors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8), // Square-ish for sizes
-                                    side: BorderSide(color: Colors.grey[300]!),
+                                    side: BorderSide(color: OsmeaColors.silver),
                                   ),
                                 );
                               }).toList(),
@@ -492,13 +499,13 @@ class AdminProductsView
                                     selected ? tempBrandIds.add(brand.id) : tempBrandIds.remove(brand.id);
                                   });
                                 },
-                                selectedColor: Colors.black,
-                                checkmarkColor: Colors.white,
-                                labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                                backgroundColor: Colors.white,
+                                selectedColor: OsmeaColors.black,
+                                checkmarkColor: OsmeaColors.white,
+                                labelStyle: TextStyle(color: isSelected ? OsmeaColors.white : OsmeaColors.black),
+                                backgroundColor: OsmeaColors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
-                                  side: BorderSide(color: Colors.grey[300]!),
+                                  side: BorderSide(color: OsmeaColors.silver),
                                 ),
                               );
                             }).toList(),
@@ -511,10 +518,10 @@ class AdminProductsView
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: OsmeaColors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: OsmeaColors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, -5),
                           ),
@@ -536,10 +543,10 @@ class AdminProductsView
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                foregroundColor: Colors.black,
-                                side: const BorderSide(color: Colors.black),
+                                foregroundColor: OsmeaColors.black,
+                                side: const BorderSide(color: OsmeaColors.black),
                               ),
-                              child: OsmeaComponents.text(resources.clear, color: Colors.black),
+                              child: OsmeaComponents.text(resources.clear, color: OsmeaColors.black),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -556,12 +563,12 @@ class AdminProductsView
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
+                                backgroundColor: OsmeaColors.black,
+                                foregroundColor: OsmeaColors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                              child: OsmeaComponents.text(resources.apply, color: Colors.white),
+                              child: OsmeaComponents.text(resources.apply, color: OsmeaColors.white),
                             ),
                           ),
                         ],

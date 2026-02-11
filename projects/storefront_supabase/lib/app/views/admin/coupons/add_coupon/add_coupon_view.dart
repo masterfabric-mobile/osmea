@@ -10,6 +10,11 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
     super.key,
     required super.goRoute,
     super.arguments = const {'init': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(

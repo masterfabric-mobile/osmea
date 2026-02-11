@@ -382,24 +382,10 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
-    final configHelper = AssetConfigHelper();
-
-    // Get colors from config
-    final backgroundColor = _getNavbarColor(
-      configHelper,
-      'backgroundColor',
-      const Color(0xFFFFFFFF),
-    );
-    final activeColor = _getNavbarColor(
-      configHelper,
-      'selectedIconColor',
-      const Color(0xFF000000),
-    );
-    final inactiveColor = _getNavbarColor(
-      configHelper,
-      'unselectedIconColor',
-      const Color(0xFF000000),
-    );
+    // Admin: always black/white, no blue (rules)
+    const backgroundColor = Color(0xFFFFFFFF);
+    const activeColor = Color(0xFF000000);
+    const inactiveColor = Color(0xFF000000);
 
     final List<NavbarItem> navItems = [
       NavbarItem(
@@ -433,20 +419,10 @@ class _AdminScreenState extends State<AdminScreen> {
         onTap: () {},
       ),
       NavbarItem(
-        text: resources.coupons,
-        icon: Icon(
-          Icons.confirmation_number_outlined,
-          color: _calculateSelectedIndex(context) == 3
-              ? activeColor
-              : inactiveColor,
-        ),
-        onTap: () {},
-      ),
-      NavbarItem(
         text: resources.orders,
         icon: Icon(
           Icons.receipt,
-          color: _calculateSelectedIndex(context) == 4
+          color: _calculateSelectedIndex(context) == 3
               ? activeColor
               : inactiveColor,
         ),
@@ -456,7 +432,7 @@ class _AdminScreenState extends State<AdminScreen> {
         text: resources.settings,
         icon: Icon(
           Icons.settings,
-          color: _calculateSelectedIndex(context) == 5
+          color: _calculateSelectedIndex(context) == 4
               ? activeColor
               : inactiveColor,
         ),
@@ -466,15 +442,21 @@ class _AdminScreenState extends State<AdminScreen> {
 
     return OsmeaComponents.scaffold(
       body: widget.child,
-      bottomNavigationBar: OsmeaComponents.navbar(
-        items: navItems,
-        variant: NavbarVariant.minimal,
-        size: NavbarSize.medium,
-        backgroundColor: backgroundColor,
-        activeColor: activeColor,
-        inactiveColor: inactiveColor,
-        currentIndex: _calculateSelectedIndex(context),
-        onItemTap: (int idx) => _onItemTapped(idx, context),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+        ),
+        child: OsmeaComponents.navbar(
+          items: navItems,
+          variant: NavbarVariant.minimal,
+          size: NavbarSize.medium,
+          backgroundColor: backgroundColor,
+          activeColor: activeColor,
+          inactiveColor: inactiveColor,
+          currentIndex: _calculateSelectedIndex(context),
+          onItemTap: (int idx) => _onItemTapped(idx, context),
+        ),
       ),
     );
   }
@@ -483,9 +465,8 @@ class _AdminScreenState extends State<AdminScreen> {
     final String location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/admin/users')) return 1;
     if (location.startsWith('/admin/products')) return 2;
-    if (location.startsWith('/admin/coupons')) return 3;
-    if (location.startsWith('/admin/orders')) return 4;
-    if (location.startsWith('/admin/settings')) return 5;
+    if (location.startsWith('/admin/orders')) return 3;
+    if (location.startsWith('/admin/settings') || location.startsWith('/admin/coupons')) return 4;
     return 0;
   }
 
@@ -501,12 +482,9 @@ class _AdminScreenState extends State<AdminScreen> {
         context.go('/admin/products');
         break;
       case 3:
-        context.go('/admin/coupons');
-        break;
-      case 4:
         context.go('/admin/orders');
         break;
-      case 5:
+      case 4:
         context.go('/admin/settings');
         break;
     }

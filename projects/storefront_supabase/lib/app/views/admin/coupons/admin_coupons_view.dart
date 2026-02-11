@@ -10,6 +10,11 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
     super.key,
     required super.goRoute,
     super.arguments = const {'init': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
@@ -21,7 +26,7 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
             foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => context.go('/admin/dashboard'),
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
             ),
           ),
         );
@@ -35,7 +40,9 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
   Widget viewContent(
       BuildContext context, AdminCouponsViewModel viewModel, AdminCouponsState state) {
     if (state is AdminCouponsLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return OsmeaComponents.center(
+        child: const CircularProgressIndicator(color: OsmeaColors.black),
+      );
     }
 
     if (state is AdminCouponsError) {

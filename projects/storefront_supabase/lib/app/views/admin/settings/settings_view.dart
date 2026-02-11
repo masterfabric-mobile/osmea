@@ -11,15 +11,20 @@ class AdminSettingsView
     super.key,
     required super.goRoute,
     super.arguments = const {'init': true},
+    super.appBarPadding = const AppBarPaddingVisibility.disabled(),
+    super.navbarSpacer = const SpacerVisibility.disabled(),
+    super.footerSpacer = const SpacerVisibility.disabled(),
+    super.verticalPadding = const PaddingVisibility.disabled(),
+    super.horizontalPadding = const PaddingVisibility.disabled(),
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.adminSettings,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
               onPressed: () => goRoute('/profile'),
               icon: const Icon(Icons.arrow_back),
@@ -51,13 +56,28 @@ class AdminSettingsView
         child: OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OsmeaComponents.text(resources.adminInformation, textStyle: Theme.of(context).textTheme.titleLarge),
+            OsmeaComponents.text(
+              resources.adminInformation,
+              textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(color: OsmeaColors.black),
+            ),
             OsmeaComponents.sizedBox(height: 16),
             _buildInfoRow(resources.emailLabel, adminUser.email ?? 'N/A'),
             _buildInfoRow(resources.fullNameLabel, adminUser.fullName ?? 'N/A'),
             _buildInfoRow(resources.roleLabel, adminUser.role ?? 'N/A'),
             _buildInfoRow(resources.memberSinceLabel, adminUser.createdAt.toLocal().toString().split(' ')[0]),
-            // Add more admin-specific settings or information here
+            OsmeaComponents.sizedBox(height: 24),
+            OsmeaComponents.text(
+              resources.coupons,
+              textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(color: OsmeaColors.black),
+            ),
+            OsmeaComponents.sizedBox(height: 8),
+            _buildSettingsTile(
+              context,
+              icon: Icons.confirmation_number_outlined,
+              title: resources.coupons,
+              subtitle: 'Kupon listesi ve kupon ekleme',
+              onTap: () => goRoute('/admin/coupons'),
+            ),
           ],
         ),
       );
@@ -73,11 +93,61 @@ class AdminSettingsView
         children: [
           OsmeaComponents.text(
             label,
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+            textStyle: TextStyle(fontWeight: FontWeight.bold, color: OsmeaColors.black),
           ),
           OsmeaComponents.sizedBox(width: 8),
-          OsmeaComponents.expanded(child: OsmeaComponents.text(value)),
+          OsmeaComponents.expanded(
+            child: OsmeaComponents.text(value, textStyle: TextStyle(color: OsmeaColors.black)),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: OsmeaColors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: OsmeaComponents.padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          child: OsmeaComponents.row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: OsmeaColors.black, size: 24),
+              OsmeaComponents.sizedBox(width: 16),
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OsmeaComponents.text(
+                      title,
+                      textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.black,
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: 2),
+                    OsmeaComponents.text(
+                      subtitle,
+                      textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: OsmeaColors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: OsmeaColors.black, size: 20),
+            ],
+          ),
+        ),
       ),
     );
   }
