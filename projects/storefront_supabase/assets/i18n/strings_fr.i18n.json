@@ -241,5 +241,31 @@
   "firstName": "Prénom",
   "lastName": "Nom",
   "addressLine1": "Adresse",
-  "sameAsBilling": "Identique à l'adresse de facturation"
+  "sameAsBilling": "Identique à l'adresse de facturation",
+  "deleteAccount": "Supprimer le compte",
+  "deleteAccountTitle": "Supprimer le compte ?",
+  "deleteAccountMessage30Days": "Votre compte sera programmé pour suppression. Il sera définitivement supprimé sous 30 jours. Vous pouvez vous reconnecter avant pour annuler.",
+  "deleteAccountWhatWillBeDeleted": "Seront définitivement supprimés :",
+  "deleteAccountItemProfile": "Votre profil et informations personnelles",
+  "deleteAccountItemOrders": "Toutes vos commandes et historique",
+  "deleteAccountItemAddresses": "Vos adresses enregistrées",
+  "deleteAccountItemReviews": "Tous vos avis et notes",
+  "deleteAccountCannotUndo": "Après 30 jours, cette action est irréversible. Vous pouvez annuler sous 30 jours en vous connectant.",
+  "deleteAccountContinue": "Continuer",
+  "deleteAccountGoBack": "Retour",
+  "deleteAccountFinalConfirm": "Confirmation finale",
+  "deleteAccountSure": "Voulez-vous vraiment programmer la suppression du compte ?",
+  "deleteAccountEmailLabel": "Compte : {email}",
+  "@deleteAccountEmailLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountUnderstandPermanent": "Je comprends que mon compte sera supprimé sous 30 jours et que je peux annuler en me connectant avant",
+  "deleteMyAccount": "Supprimer mon compte",
+  "deleteAccountSuccess": "La suppression du compte a été programmée. Votre compte sera supprimé sous 30 jours. Vous pouvez vous connecter avant pour annuler.",
+  "deleteAccountFailed": "Échec de la programmation. Veuillez réessayer ou contacter le support.",
+  "retry": "Réessayer"
 }

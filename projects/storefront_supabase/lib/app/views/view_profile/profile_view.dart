@@ -11,6 +11,7 @@ import 'models/states.dart';
 import 'widgets/logo_header_widget.dart';
 import 'widgets/login_form_widget.dart';
 import 'widgets/signup_form_widget.dart';
+import 'widgets/delete_account_dialog.dart';
 
 class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   ProfileView({
@@ -202,7 +203,6 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   ) {
     final user = state.user;
     final resources = context.resources;
-    final theme = Theme.of(context);
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -264,8 +264,149 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             () => goRoute('/admin/dashboard'),
           ),
         ],
-        SizedBox(height: theme.textTheme.bodyLarge?.fontSize ?? 24),
+        OsmeaComponents.sizedBox(height: context.spacing24),
+        _buildDeleteMenuItem(
+          context,
+          resources.deleteAccount,
+          Icons.delete_outline,
+          () => _handleDeleteAccount(context, state, viewModel),
+        ),
+        OsmeaComponents.sizedBox(height: context.spacing32),
       ],
+    );
+  }
+
+  void _handleDeleteAccount(
+    BuildContext context,
+    ProfileAuthenticated state,
+    ProfileViewModel viewModel,
+  ) {
+    final resources = context.resources;
+    final theme = Theme.of(context);
+    DeleteAccountDialog.show(
+      context: context,
+      userEmail: state.user.email ?? '',
+      onConfirmDelete: () async {
+        final router = GoRouter.of(context);
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          useRootNavigator: true,
+          barrierColor: OsmeaColors.black.withOpacity(0.5),
+          builder: (loadingContext) => PopScope(
+            canPop: false,
+            child: Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: loadingContext.spacing32),
+                padding: EdgeInsets.all(loadingContext.spacing32),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: OsmeaColors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: OsmeaComponents.column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: loadingContext.spacing24),
+                    OsmeaComponents.text(
+                      resources.deleteAccount,
+                      textStyle: OsmeaTextStyle.titleMedium(loadingContext).copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    OsmeaComponents.sizedBox(height: loadingContext.spacing8),
+                    OsmeaComponents.text(
+                      '...',
+                      textStyle: OsmeaTextStyle.bodySmall(loadingContext).copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final success = await viewModel.scheduleAccountDeletion();
+
+        try {
+          Navigator.of(context, rootNavigator: true).pop();
+        } catch (_) {}
+
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        if (success) {
+          router.go('/home');
+          Future.delayed(const Duration(milliseconds: 800), () {
+            try {
+              final ctx = router.routerDelegate.navigatorKey.currentContext;
+              if (ctx != null && ctx.mounted) {
+                ctx.showSnackbar(
+                  message: resources.deleteAccountSuccess,
+                  type: SnackbarType.success,
+                );
+              }
+            } catch (_) {}
+          });
+        } else {
+          if (context.mounted) {
+            context.showSnackbar(
+              message: resources.deleteAccountFailed,
+              type: SnackbarType.error,
+            );
+          }
+        }
+      },
+    );
+  }
+
+  Widget _buildDeleteMenuItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    final theme = Theme.of(context);
+    final deleteColor = theme.colorScheme.error;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing20,
+          vertical: context.spacing16,
+        ),
+        child: OsmeaComponents.row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, color: deleteColor, size: 22),
+            OsmeaComponents.sizedBox(width: context.spacing16),
+            OsmeaComponents.text(
+              title,
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                fontWeight: FontWeight.w500,
+                color: deleteColor,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -280,7 +421,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
         horizontal: context.spacing20,
         vertical: context.spacing24,
       ),
-      child: Row(
+      child: OsmeaComponents.row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
@@ -291,24 +432,24 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
               color: theme.colorScheme.primary,
             ),
             child: Center(
-              child: Text(
+              child: OsmeaComponents.text(
                 initials,
-                style: theme.textTheme.titleMedium?.copyWith(
+                textStyle: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-          SizedBox(width: context.spacing16),
+          OsmeaComponents.sizedBox(width: context.spacing16),
           Expanded(
-            child: Column(
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                OsmeaComponents.text(
                   displayName,
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  textStyle: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface,
                   ),
@@ -316,10 +457,10 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (email.isNotEmpty) ...[
-                  SizedBox(height: context.spacing6),
-                  Text(
+                  OsmeaComponents.sizedBox(height: context.spacing6),
+                  OsmeaComponents.text(
                     email,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    textStyle: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                     maxLines: 1,
@@ -351,7 +492,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
           bottom: BorderSide(color: borderColor, width: 1),
         ),
       ),
-      child: Row(
+      child: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(context, resources.orders, state.orderCount),
@@ -373,21 +514,21 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   Widget _buildStatItem(BuildContext context, String label, int value) {
     final theme = Theme.of(context);
     return Expanded(
-      child: Column(
+      child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
+          OsmeaComponents.text(
             value.toString(),
-            style: theme.textTheme.titleLarge?.copyWith(
+            textStyle: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: context.spacing6),
-          Text(
+          OsmeaComponents.sizedBox(height: context.spacing6),
+          OsmeaComponents.text(
             label,
-            style: theme.textTheme.bodySmall?.copyWith(
+            textStyle: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
@@ -406,9 +547,9 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
         context.spacing20,
         context.spacing12,
       ),
-      child: Text(
+      child: OsmeaComponents.text(
         title.toUpperCase(),
-        style: theme.textTheme.bodySmall?.copyWith(
+        textStyle: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
@@ -442,28 +583,28 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
               ),
             ),
           ),
-          child: Row(
+          child: OsmeaComponents.row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(icon, color: theme.colorScheme.onSurface, size: 22),
-              SizedBox(width: context.spacing16),
+              OsmeaComponents.sizedBox(width: context.spacing16),
               Expanded(
-                child: Column(
+                child: OsmeaComponents.column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    OsmeaComponents.text(
                       title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      textStyle: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
                     if (subtitle != null && subtitle.isNotEmpty) ...[
-                      SizedBox(height: context.spacing4),
-                      Text(
+                      OsmeaComponents.sizedBox(height: context.spacing4),
+                      OsmeaComponents.text(
                         subtitle,
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        textStyle: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -471,7 +612,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   ],
                 ),
               ),
-              SizedBox(width: context.spacing8),
+              OsmeaComponents.sizedBox(width: context.spacing8),
               Icon(
                 Icons.chevron_right,
                 color: theme.colorScheme.onSurfaceVariant,

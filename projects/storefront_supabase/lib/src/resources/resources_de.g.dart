@@ -151,7 +151,7 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get brands => TranslationOverrides.string(_root.$meta, 'brands', {}) ?? 'Marken';
 	@override String get addNewProduct => TranslationOverrides.string(_root.$meta, 'addNewProduct', {}) ?? 'Neues Produkt hinzufügen';
 	@override String get editProduct => TranslationOverrides.string(_root.$meta, 'editProduct', {}) ?? 'Produkt bearbeiten';
-	@override String get retry => TranslationOverrides.string(_root.$meta, 'retry', {}) ?? 'Wiederholen';
+	@override String get retry => TranslationOverrides.string(_root.$meta, 'retry', {}) ?? 'Erneut versuchen';
 	@override String get savingChanges => TranslationOverrides.string(_root.$meta, 'savingChanges', {}) ?? 'Änderungen werden gespeichert...';
 	@override String get addingProduct => TranslationOverrides.string(_root.$meta, 'addingProduct', {}) ?? 'Produkt wird hinzugefügt...';
 	@override String get productUpdatedSuccess => TranslationOverrides.string(_root.$meta, 'productUpdatedSuccess', {}) ?? 'Produkt erfolgreich aktualisiert!';
@@ -273,6 +273,24 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Nachname';
 	@override String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adresse';
 	@override String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Wie Rechnungsadresse';
+	@override String get deleteAccount => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Konto löschen';
+	@override String get deleteAccountTitle => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Konto löschen?';
+	@override String get deleteAccountMessage30Days => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Ihr Konto wird zur Löschung vorgemerkt. Es wird innerhalb von 30 Tagen dauerhaft gelöscht. Bis dahin können Sie sich erneut anmelden, um die Löschung abzubrechen.';
+	@override String get deleteAccountWhatWillBeDeleted => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'Folgendes wird dauerhaft gelöscht:';
+	@override String get deleteAccountItemProfile => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Ihr Profil und Ihre persönlichen Daten';
+	@override String get deleteAccountItemOrders => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'Alle Bestellungen und Bestellverlauf';
+	@override String get deleteAccountItemAddresses => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Ihre gespeicherten Adressen';
+	@override String get deleteAccountItemReviews => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'Alle Ihre Bewertungen';
+	@override String get deleteAccountCannotUndo => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? 'Nach 30 Tagen kann dies nicht rückgängig gemacht werden. Sie können innerhalb von 30 Tagen durch Anmeldung abbrechen.';
+	@override String get deleteAccountContinue => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Weiter';
+	@override String get deleteAccountGoBack => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Zurück';
+	@override String get deleteAccountFinalConfirm => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Bestätigung';
+	@override String get deleteAccountSure => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Sind Sie sicher, dass Sie die Kontolöschung planen möchten?';
+	@override String get deleteAccountEmailLabel => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Konto: {email}';
+	@override String get deleteAccountUnderstandPermanent => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'Ich verstehe, dass mein Konto in 30 Tagen gelöscht wird und ich mich vorher anmelden kann, um abzubrechen';
+	@override String get deleteMyAccount => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Mein Konto löschen';
+	@override String get deleteAccountSuccess => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Kontolöschung wurde geplant. Ihr Konto wird in 30 Tagen entfernt. Sie können sich vorher anmelden, um abzubrechen.';
+	@override String get deleteAccountFailed => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Kontolöschung konnte nicht geplant werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -396,7 +414,7 @@ extension on TranslationsDe {
 			'brands' => TranslationOverrides.string(_root.$meta, 'brands', {}) ?? 'Marken',
 			'addNewProduct' => TranslationOverrides.string(_root.$meta, 'addNewProduct', {}) ?? 'Neues Produkt hinzufügen',
 			'editProduct' => TranslationOverrides.string(_root.$meta, 'editProduct', {}) ?? 'Produkt bearbeiten',
-			'retry' => TranslationOverrides.string(_root.$meta, 'retry', {}) ?? 'Wiederholen',
+			'retry' => TranslationOverrides.string(_root.$meta, 'retry', {}) ?? 'Erneut versuchen',
 			'savingChanges' => TranslationOverrides.string(_root.$meta, 'savingChanges', {}) ?? 'Änderungen werden gespeichert...',
 			'addingProduct' => TranslationOverrides.string(_root.$meta, 'addingProduct', {}) ?? 'Produkt wird hinzugefügt...',
 			'productUpdatedSuccess' => TranslationOverrides.string(_root.$meta, 'productUpdatedSuccess', {}) ?? 'Produkt erfolgreich aktualisiert!',
@@ -518,6 +536,24 @@ extension on TranslationsDe {
 			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Nachname',
 			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adresse',
 			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Wie Rechnungsadresse',
+			'deleteAccount' => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Konto löschen',
+			'deleteAccountTitle' => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Konto löschen?',
+			'deleteAccountMessage30Days' => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Ihr Konto wird zur Löschung vorgemerkt. Es wird innerhalb von 30 Tagen dauerhaft gelöscht. Bis dahin können Sie sich erneut anmelden, um die Löschung abzubrechen.',
+			'deleteAccountWhatWillBeDeleted' => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'Folgendes wird dauerhaft gelöscht:',
+			'deleteAccountItemProfile' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Ihr Profil und Ihre persönlichen Daten',
+			'deleteAccountItemOrders' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'Alle Bestellungen und Bestellverlauf',
+			'deleteAccountItemAddresses' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Ihre gespeicherten Adressen',
+			'deleteAccountItemReviews' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'Alle Ihre Bewertungen',
+			'deleteAccountCannotUndo' => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? 'Nach 30 Tagen kann dies nicht rückgängig gemacht werden. Sie können innerhalb von 30 Tagen durch Anmeldung abbrechen.',
+			'deleteAccountContinue' => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Weiter',
+			'deleteAccountGoBack' => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Zurück',
+			'deleteAccountFinalConfirm' => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Bestätigung',
+			'deleteAccountSure' => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Sind Sie sicher, dass Sie die Kontolöschung planen möchten?',
+			'deleteAccountEmailLabel' => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Konto: {email}',
+			'deleteAccountUnderstandPermanent' => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'Ich verstehe, dass mein Konto in 30 Tagen gelöscht wird und ich mich vorher anmelden kann, um abzubrechen',
+			'deleteMyAccount' => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Mein Konto löschen',
+			'deleteAccountSuccess' => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Kontolöschung wurde geplant. Ihr Konto wird in 30 Tagen entfernt. Sie können sich vorher anmelden, um abzubrechen.',
+			'deleteAccountFailed' => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Kontolöschung konnte nicht geplant werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.',
 			_ => null,
 		};
 	}

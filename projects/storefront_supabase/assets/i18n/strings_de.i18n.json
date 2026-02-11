@@ -241,5 +241,31 @@
   "firstName": "Vorname",
   "lastName": "Nachname",
   "addressLine1": "Adresse",
-  "sameAsBilling": "Wie Rechnungsadresse"
+  "sameAsBilling": "Wie Rechnungsadresse",
+  "deleteAccount": "Konto löschen",
+  "deleteAccountTitle": "Konto löschen?",
+  "deleteAccountMessage30Days": "Ihr Konto wird zur Löschung vorgemerkt. Es wird innerhalb von 30 Tagen dauerhaft gelöscht. Bis dahin können Sie sich erneut anmelden, um die Löschung abzubrechen.",
+  "deleteAccountWhatWillBeDeleted": "Folgendes wird dauerhaft gelöscht:",
+  "deleteAccountItemProfile": "Ihr Profil und Ihre persönlichen Daten",
+  "deleteAccountItemOrders": "Alle Bestellungen und Bestellverlauf",
+  "deleteAccountItemAddresses": "Ihre gespeicherten Adressen",
+  "deleteAccountItemReviews": "Alle Ihre Bewertungen",
+  "deleteAccountCannotUndo": "Nach 30 Tagen kann dies nicht rückgängig gemacht werden. Sie können innerhalb von 30 Tagen durch Anmeldung abbrechen.",
+  "deleteAccountContinue": "Weiter",
+  "deleteAccountGoBack": "Zurück",
+  "deleteAccountFinalConfirm": "Bestätigung",
+  "deleteAccountSure": "Sind Sie sicher, dass Sie die Kontolöschung planen möchten?",
+  "deleteAccountEmailLabel": "Konto: {email}",
+  "@deleteAccountEmailLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountUnderstandPermanent": "Ich verstehe, dass mein Konto in 30 Tagen gelöscht wird und ich mich vorher anmelden kann, um abzubrechen",
+  "deleteMyAccount": "Mein Konto löschen",
+  "deleteAccountSuccess": "Kontolöschung wurde geplant. Ihr Konto wird in 30 Tagen entfernt. Sie können sich vorher anmelden, um abzubrechen.",
+  "deleteAccountFailed": "Kontolöschung konnte nicht geplant werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
+  "retry": "Erneut versuchen"
 }

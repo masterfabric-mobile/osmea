@@ -273,6 +273,24 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Soyad';
 	@override String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adres';
 	@override String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Fatura adresi ile aynı';
+	@override String get deleteAccount => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Hesabı Sil';
+	@override String get deleteAccountTitle => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Hesabı Sil?';
+	@override String get deleteAccountMessage30Days => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Hesabınız silinmek üzere planlanacaktır. 30 gün içinde kalıcı olarak silinecektir. Bu süre içinde tekrar giriş yaparak iptal edebilirsiniz.';
+	@override String get deleteAccountWhatWillBeDeleted => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'Kalıcı olarak silinecekler:';
+	@override String get deleteAccountItemProfile => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Profiliniz ve kişisel bilgileriniz';
+	@override String get deleteAccountItemOrders => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'Tüm siparişleriniz ve sipariş geçmişiniz';
+	@override String get deleteAccountItemAddresses => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Kayıtlı adresleriniz';
+	@override String get deleteAccountItemReviews => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'Tüm yorumlarınız ve puanlarınız';
+	@override String get deleteAccountCannotUndo => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? '30 gün sonra bu işlem geri alınamaz. 30 gün içinde giriş yaparak iptal edebilirsiniz.';
+	@override String get deleteAccountContinue => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Devam';
+	@override String get deleteAccountGoBack => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Geri';
+	@override String get deleteAccountFinalConfirm => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Son Onay';
+	@override String get deleteAccountSure => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Hesap silme işlemini planlamak istediğinize emin misiniz?';
+	@override String get deleteAccountEmailLabel => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Hesap: {email}';
+	@override String get deleteAccountUnderstandPermanent => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'Hesabımın 30 gün içinde silineceğini ve bu süre içinde giriş yaparak iptal edebileceğimi anlıyorum';
+	@override String get deleteMyAccount => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Hesabımı Sil';
+	@override String get deleteAccountSuccess => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Hesap silme planlandı. Hesabınız 30 gün içinde kaldırılacaktır. İptal etmek için bu süre içinde giriş yapabilirsiniz.';
+	@override String get deleteAccountFailed => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Hesap silme planlanamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -518,6 +536,24 @@ extension on TranslationsTr {
 			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Soyad',
 			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Adres',
 			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Fatura adresi ile aynı',
+			'deleteAccount' => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Hesabı Sil',
+			'deleteAccountTitle' => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Hesabı Sil?',
+			'deleteAccountMessage30Days' => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Hesabınız silinmek üzere planlanacaktır. 30 gün içinde kalıcı olarak silinecektir. Bu süre içinde tekrar giriş yaparak iptal edebilirsiniz.',
+			'deleteAccountWhatWillBeDeleted' => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'Kalıcı olarak silinecekler:',
+			'deleteAccountItemProfile' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Profiliniz ve kişisel bilgileriniz',
+			'deleteAccountItemOrders' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'Tüm siparişleriniz ve sipariş geçmişiniz',
+			'deleteAccountItemAddresses' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Kayıtlı adresleriniz',
+			'deleteAccountItemReviews' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'Tüm yorumlarınız ve puanlarınız',
+			'deleteAccountCannotUndo' => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? '30 gün sonra bu işlem geri alınamaz. 30 gün içinde giriş yaparak iptal edebilirsiniz.',
+			'deleteAccountContinue' => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Devam',
+			'deleteAccountGoBack' => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Geri',
+			'deleteAccountFinalConfirm' => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Son Onay',
+			'deleteAccountSure' => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Hesap silme işlemini planlamak istediğinize emin misiniz?',
+			'deleteAccountEmailLabel' => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Hesap: {email}',
+			'deleteAccountUnderstandPermanent' => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'Hesabımın 30 gün içinde silineceğini ve bu süre içinde giriş yaparak iptal edebileceğimi anlıyorum',
+			'deleteMyAccount' => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Hesabımı Sil',
+			'deleteAccountSuccess' => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Hesap silme planlandı. Hesabınız 30 gün içinde kaldırılacaktır. İptal etmek için bu süre içinde giriş yapabilirsiniz.',
+			'deleteAccountFailed' => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Hesap silme planlanamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.',
 			_ => null,
 		};
 	}

@@ -95,7 +95,36 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
           .eq('id', userId)
           .single();
 
-      final user = AppUser.fromJson(response);
+      var user = AppUser.fromJson(response);
+
+      // 30 gün içinde giriş yaptıysa silme planını iptal et (hesap tekrar açılmış sayılır)
+      if (user.accountDeletionScheduledAt != null) {
+        await _supabaseClient
+            .from('users')
+            .update({
+              'account_deletion_scheduled_at': null,
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('id', userId);
+        user = AppUser(
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          username: user.username,
+          createdAt: user.createdAt,
+          avatarUrl: user.avatarUrl,
+          role: user.role,
+          gender: user.gender,
+          age: user.age,
+          birthdate: user.birthdate,
+          phone: user.phone,
+          address: user.address,
+          city: user.city,
+          postalCode: user.postalCode,
+          country: user.country,
+          accountDeletionScheduledAt: null,
+        );
+      }
 
       // Fetch order count for this user from Supabase orders table
       final orderRows = await _supabaseClient
@@ -353,6 +382,30 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     stateChanger(ProfileLoading());
     await _supabaseClient.auth.signOut();
     _clearFieldsAndErrors();
+  }
+
+  /// Schedules the current user's account for deletion in 30 days.
+  /// Sets account_deletion_scheduled_at in public.users, then signs out.
+  /// Returns true on success, false on failure.
+  Future<bool> scheduleAccountDeletion() async {
+    if (state is! ProfileAuthenticated) return false;
+    final currentUser = (state as ProfileAuthenticated).user;
+
+    try {
+      await _supabaseClient
+          .from('users')
+          .update({
+            'account_deletion_scheduled_at': DateTime.now().toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', currentUser.id);
+
+      await _supabaseClient.auth.signOut();
+      _clearFieldsAndErrors();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   void _clearFieldsAndErrors() {

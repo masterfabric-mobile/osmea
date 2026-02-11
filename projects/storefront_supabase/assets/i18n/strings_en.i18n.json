@@ -241,5 +241,30 @@
   "firstName": "First name",
   "lastName": "Last name",
   "addressLine1": "Address",
-  "sameAsBilling": "Same as billing address"
+  "sameAsBilling": "Same as billing address",
+  "deleteAccount": "Delete Account",
+  "deleteAccountTitle": "Delete Account?",
+  "deleteAccountMessage30Days": "Your account will be scheduled for deletion. It will be permanently deleted within 30 days. Until then you can log in again to cancel the deletion.",
+  "deleteAccountWhatWillBeDeleted": "This will permanently delete:",
+  "deleteAccountItemProfile": "Your profile and personal information",
+  "deleteAccountItemOrders": "All your orders and order history",
+  "deleteAccountItemAddresses": "Your saved addresses",
+  "deleteAccountItemReviews": "All your reviews and ratings",
+  "deleteAccountCannotUndo": "After 30 days this cannot be undone. You can cancel within 30 days by logging in.",
+  "deleteAccountContinue": "Continue",
+  "deleteAccountGoBack": "Go Back",
+  "deleteAccountFinalConfirm": "Final Confirmation",
+  "deleteAccountSure": "Are you sure you want to schedule account deletion?",
+  "deleteAccountEmailLabel": "Account: {email}",
+  "@deleteAccountEmailLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountUnderstandPermanent": "I understand my account will be deleted in 30 days and I can cancel by logging in before then",
+  "deleteMyAccount": "Delete My Account",
+  "deleteAccountSuccess": "Account deletion has been scheduled. Your account will be removed in 30 days. You can log in before then to cancel.",
+  "deleteAccountFailed": "Failed to schedule account deletion. Please try again or contact support."
 }

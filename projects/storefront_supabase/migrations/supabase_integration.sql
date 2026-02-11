@@ -105,11 +105,13 @@ CREATE TABLE public.favorites (
   created_at timestamp with time zone DEFAULT now(),
   brand_id bigint,
   group_id uuid,
+  category_id uuid,
   CONSTRAINT favorites_pkey PRIMARY KEY (id),
   CONSTRAINT favorites_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
   CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
   CONSTRAINT favorites_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id),
-  CONSTRAINT favorites_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.favorite_groups(id)
+  CONSTRAINT favorites_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.favorite_groups(id),
+  CONSTRAINT favorites_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id)
 );
 CREATE TABLE public.order_items (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -255,5 +257,6 @@ CREATE TABLE public.users (
   gender text,
   age integer,
   birthdate date,
+  account_deletion_scheduled_at timestamp with time zone,
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );

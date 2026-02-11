@@ -241,5 +241,31 @@
   "firstName": "Ad",
   "lastName": "Soyad",
   "addressLine1": "Adres",
-  "sameAsBilling": "Fatura adresi ile aynı"
+  "sameAsBilling": "Fatura adresi ile aynı",
+  "deleteAccount": "Hesabı Sil",
+  "deleteAccountTitle": "Hesabı Sil?",
+  "deleteAccountMessage30Days": "Hesabınız silinmek üzere planlanacaktır. 30 gün içinde kalıcı olarak silinecektir. Bu süre içinde tekrar giriş yaparak iptal edebilirsiniz.",
+  "deleteAccountWhatWillBeDeleted": "Kalıcı olarak silinecekler:",
+  "deleteAccountItemProfile": "Profiliniz ve kişisel bilgileriniz",
+  "deleteAccountItemOrders": "Tüm siparişleriniz ve sipariş geçmişiniz",
+  "deleteAccountItemAddresses": "Kayıtlı adresleriniz",
+  "deleteAccountItemReviews": "Tüm yorumlarınız ve puanlarınız",
+  "deleteAccountCannotUndo": "30 gün sonra bu işlem geri alınamaz. 30 gün içinde giriş yaparak iptal edebilirsiniz.",
+  "deleteAccountContinue": "Devam",
+  "deleteAccountGoBack": "Geri",
+  "deleteAccountFinalConfirm": "Son Onay",
+  "deleteAccountSure": "Hesap silme işlemini planlamak istediğinize emin misiniz?",
+  "deleteAccountEmailLabel": "Hesap: {email}",
+  "@deleteAccountEmailLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountUnderstandPermanent": "Hesabımın 30 gün içinde silineceğini ve bu süre içinde giriş yaparak iptal edebileceğimi anlıyorum",
+  "deleteMyAccount": "Hesabımı Sil",
+  "deleteAccountSuccess": "Hesap silme planlandı. Hesabınız 30 gün içinde kaldırılacaktır. İptal etmek için bu süre içinde giriş yapabilirsiniz.",
+  "deleteAccountFailed": "Hesap silme planlanamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.",
+  "retry": "Tekrar Dene"
 }
