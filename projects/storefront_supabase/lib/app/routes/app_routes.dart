@@ -28,6 +28,7 @@ import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
 import 'package:storefront_supabase/app/views/view_search/supabase_search_screen.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
+import 'package:storefront_supabase/app/views/view_profile/orders_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
@@ -207,10 +208,8 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'orders',
               builder: (BuildContext context, GoRouterState state) {
-                return const Scaffold(
-                  body: Center(
-                    child: Text("My Orders (User View) - Coming Soon"),
-                  ),
+                return OrdersView(
+                  goRoute: (String path) => context.go(path),
                 );
               },
             ),

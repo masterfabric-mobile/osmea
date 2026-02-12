@@ -29,19 +29,19 @@ class CheckoutView extends MasterViewCubit<CheckoutViewModel, CheckoutState> {
         );
 
   static PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
+    return OsmeaComponents.appBar(
       backgroundColor: OsmeaColors.white,
       foregroundColor: OsmeaColors.black,
       elevation: 0,
-      leading: IconButton(
+      leading: OsmeaComponents.iconButton(
         icon: const Icon(Icons.arrow_back, color: OsmeaColors.black),
+        backgroundColor: OsmeaColors.transparent,
         onPressed: () => context.go('/cart'),
       ),
-      title: Text(
+      title: OsmeaComponents.text(
         context.resources.checkoutTitle,
-        style: const TextStyle(
+        textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
           color: OsmeaColors.black,
-          fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -62,10 +62,10 @@ class CheckoutView extends MasterViewCubit<CheckoutViewModel, CheckoutState> {
     CheckoutState state,
   ) {
     if (state is CheckoutErrorState) {
-      return Center(
-        child: Padding(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.padding(
           padding: EdgeInsets.all(context.spacing20),
-          child: Column(
+          child: OsmeaComponents.column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OsmeaComponents.text(
@@ -98,11 +98,15 @@ class CheckoutView extends MasterViewCubit<CheckoutViewModel, CheckoutState> {
     }
 
     if (state is CheckoutProcessingOrderState) {
-      return Center(
-        child: Column(
+      return OsmeaComponents.center(
+        child: OsmeaComponents.column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(color: OsmeaColors.black),
+            OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 48,
+              color: OsmeaColors.black,
+            ),
             OsmeaComponents.sizedBox(height: context.spacing16),
             OsmeaComponents.text(
               'Processing order...',
@@ -135,13 +139,13 @@ class CheckoutView extends MasterViewCubit<CheckoutViewModel, CheckoutState> {
     final locale = Localizations.localeOf(context).toString();
     final totalStr = PriceHelper.format(state.totalAmount, state.currencyCode ?? 'USD', locale);
 
-    return SingleChildScrollView(
+    return OsmeaComponents.singleChildScrollView(
       padding: EdgeInsets.all(context.spacing20),
-      child: Column(
+      child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           OsmeaComponents.sizedBox(height: context.spacing24),
-          Icon(Icons.check_circle_rounded, color: const Color(0xFF2E7D32), size: 64),
+          Icon(Icons.check_circle_rounded, color: OsmeaColors.green, size: 64),
           OsmeaComponents.sizedBox(height: context.spacing16),
           OsmeaComponents.text(
             context.resources.orderPlacedTitle,
@@ -155,14 +159,14 @@ class CheckoutView extends MasterViewCubit<CheckoutViewModel, CheckoutState> {
             textAlign: TextAlign.center,
           ),
           OsmeaComponents.sizedBox(height: context.spacing24),
-          Container(
+          OsmeaComponents.container(
             padding: EdgeInsets.all(context.spacing16),
             decoration: BoxDecoration(
               color: OsmeaColors.paperWhite,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: OsmeaColors.pewter.withValues(alpha: 0.3)),
             ),
-            child: Row(
+            child: OsmeaComponents.row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 OsmeaComponents.text(

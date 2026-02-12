@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:core/core.dart'
+    hide
+        BuildContextTranslationsExtension,
+        AppLocaleUtils,
+        LocaleSettings,
+        TranslationProvider;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
@@ -24,20 +29,20 @@ class AdminDashboardView
     super.horizontalPadding = const PaddingVisibility.disabled(),
     required super.goRoute,
   }) : super(
-          coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
-            title: OsmeaComponents.text(
-              context.resources.adminDashboard,
-              color: OsmeaColors.black,
-            ),
-            variant: AppBarVariant.primary,
-            backgroundColor: OsmeaColors.white,
-            foregroundColor: OsmeaColors.black,
-            leading: OsmeaComponents.iconButton(
-              onPressed: () => goRoute('/profile'),
-              icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
-            ),
-          ),
-        );
+         coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
+           title: OsmeaComponents.text(
+             context.resources.adminDashboard,
+             color: OsmeaColors.black,
+           ),
+           variant: AppBarVariant.primary,
+           backgroundColor: OsmeaColors.white,
+           foregroundColor: OsmeaColors.black,
+           leading: OsmeaComponents.iconButton(
+             onPressed: () => goRoute('/profile'),
+             icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
+           ),
+         ),
+       );
 
   @override
   void initialContent(AdminDashboardViewModel viewModel, BuildContext context) {
@@ -45,9 +50,14 @@ class AdminDashboardView
   }
 
   @override
-  Widget viewContent(BuildContext context, AdminDashboardViewModel viewModel, AdminDashboardState state) {
+  Widget viewContent(
+    BuildContext context,
+    AdminDashboardViewModel viewModel,
+    AdminDashboardState state,
+  ) {
     final resources = context.resources;
-    if (state is AdminDashboardLoadingState || state is AdminDashboardInitialState) {
+    if (state is AdminDashboardLoadingState ||
+        state is AdminDashboardInitialState) {
       return OsmeaComponents.center(
         child: const CircularProgressIndicator(color: OsmeaColors.black),
       );
@@ -57,7 +67,9 @@ class AdminDashboardView
       return OsmeaComponents.center(
         child: OsmeaComponents.text(
           state.message,
-          textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+          textStyle: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
         ),
       );
     }
@@ -77,7 +89,7 @@ class AdminDashboardView
               _buildScrollableChart(
                 context,
                 minWidth: 480,
-                minHeight: 440,
+                minHeight: 360,
                 child: _buildDailyChart(context, state),
               ),
               OsmeaComponents.sizedBox(height: 24),
@@ -99,11 +111,15 @@ class AdminDashboardView
               _buildScrollableChart(
                 context,
                 minWidth: 300,
+                minHeight: 220,
                 child: _buildMiniBarChart(
                   context,
                   title: resources.dailyNewUsers,
                   values: state.dailyUserCounts,
-                  maxValue: state.dailyUserCounts.fold(0, (a, b) => a > b ? a : b),
+                  maxValue: state.dailyUserCounts.fold(
+                    0,
+                    (a, b) => a > b ? a : b,
+                  ),
                 ),
               ),
               OsmeaComponents.sizedBox(height: 24),
@@ -114,11 +130,15 @@ class AdminDashboardView
               _buildScrollableChart(
                 context,
                 minWidth: 300,
+                minHeight: 220,
                 child: _buildMiniBarChart(
                   context,
                   title: resources.dailyNewProducts,
                   values: state.dailyProductCounts,
-                  maxValue: state.dailyProductCounts.fold(0, (a, b) => a > b ? a : b),
+                  maxValue: state.dailyProductCounts.fold(
+                    0,
+                    (a, b) => a > b ? a : b,
+                  ),
                 ),
               ),
               OsmeaComponents.sizedBox(height: 24),
@@ -138,12 +158,17 @@ class AdminDashboardView
     return OsmeaComponents.center(
       child: OsmeaComponents.text(
         resources.unexpectedError,
-        textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+        textStyle: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
       ),
     );
   }
 
-  Widget _buildStatsGrid(BuildContext context, AdminDashboardLoadedState state) {
+  Widget _buildStatsGrid(
+    BuildContext context,
+    AdminDashboardLoadedState state,
+  ) {
     final resources = context.resources;
     return BlocBuilder<CurrencyCubit, String>(
       builder: (context, currency) {
@@ -156,11 +181,16 @@ class AdminDashboardView
                   child: _buildStatCardWithChart(
                     context,
                     title: resources.totalRevenue,
-                    value: PriceHelper.format(state.totalRevenue, currency,
-                        Localizations.localeOf(context).toString()),
+                    value: PriceHelper.format(
+                      state.totalRevenue,
+                      currency,
+                      Localizations.localeOf(context).toString(),
+                    ),
                     icon: Icons.monetization_on,
                     color: OsmeaColors.black,
-                    chartValues: state.dailyChartData.map((e) => e.revenue).toList(),
+                    chartValues: state.dailyChartData
+                        .map((e) => e.revenue)
+                        .toList(),
                   ),
                 ),
                 OsmeaComponents.sizedBox(width: 12),
@@ -171,7 +201,9 @@ class AdminDashboardView
                     value: state.orderCount.toString(),
                     icon: Icons.shopping_cart,
                     color: OsmeaColors.black,
-                    chartValues: state.dailyChartData.map((e) => e.orderCount.toDouble()).toList(),
+                    chartValues: state.dailyChartData
+                        .map((e) => e.orderCount.toDouble())
+                        .toList(),
                   ),
                 ),
               ],
@@ -186,7 +218,9 @@ class AdminDashboardView
                     value: state.userCount.toString(),
                     icon: Icons.people,
                     color: OsmeaColors.black,
-                    chartValues: state.dailyUserCounts.map((e) => e.toDouble()).toList(),
+                    chartValues: state.dailyUserCounts
+                        .map((e) => e.toDouble())
+                        .toList(),
                   ),
                 ),
                 OsmeaComponents.sizedBox(width: 12),
@@ -197,7 +231,9 @@ class AdminDashboardView
                     value: state.productCount.toString(),
                     icon: Icons.inventory_2,
                     color: OsmeaColors.black,
-                    chartValues: state.dailyProductCounts.map((e) => e.toDouble()).toList(),
+                    chartValues: state.dailyProductCounts
+                        .map((e) => e.toDouble())
+                        .toList(),
                   ),
                 ),
               ],
@@ -235,9 +271,9 @@ class AdminDashboardView
               Expanded(
                 child: OsmeaComponents.text(
                   title,
-                  textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: OsmeaColors.black,
-                  ),
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -283,7 +319,9 @@ class AdminDashboardView
                             toY: e.value,
                             color: color,
                             width: 6,
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(2),
+                            ),
                           ),
                         ],
                         showingTooltipIndicators: [],
@@ -307,67 +345,67 @@ class AdminDashboardView
     return value.toInt().toString();
   }
 
-  /// Wraps a chart so it has at least [minWidth]/[minHeight]. Shows horizontal/vertical scrollbar when needed.
-  /// ListView gives unbounded height, so we give a max height when [minHeight] is set so vertical scroll can appear.
+  /// Wraps a chart so it has at least [minWidth]. On narrow screens, the chart can be scrolled horizontally with a visible scrollbar.
   Widget _buildScrollableChart(
     BuildContext context, {
     required double minWidth,
     double? minHeight,
     required Widget child,
   }) {
-    final viewportHeight = MediaQuery.sizeOf(context).height;
-    // ListView gives unbounded height; cap chart area so vertical scrollbar can show (max < minHeight).
-    final maxHeightForVertical = minHeight != null
-        ? (viewportHeight * 0.5).clamp(200.0, minHeight * 0.92)
-        : null;
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: maxHeightForVertical ?? double.infinity,
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth > minWidth ? constraints.maxWidth : minWidth;
-          final needHorizontal = constraints.maxWidth.isFinite && constraints.maxWidth < minWidth;
-          final needVertical = minHeight != null &&
-              constraints.maxHeight.isFinite &&
-              constraints.maxHeight < minHeight;
-          Widget content = child;
-          if (needVertical) {
-            content = SizedBox(
-              height: constraints.maxHeight,
-              child: _ChartScrollbar(
-                scrollDirection: Axis.vertical,
-                minExtent: minHeight,
-                child: content,
-              ),
-            );
-          }
-          if (needHorizontal) {
-            content = _ChartScrollbar(
-              scrollDirection: Axis.horizontal,
-              minExtent: width,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth > minWidth
+            ? constraints.maxWidth
+            : minWidth;
+        final needHorizontal =
+            constraints.maxWidth.isFinite && constraints.maxWidth < minWidth;
+        final needVertical =
+            minHeight != null &&
+            constraints.maxHeight.isFinite &&
+            constraints.maxHeight < minHeight;
+        Widget content = child;
+        if (needVertical) {
+          content = SizedBox(
+            height: constraints.maxHeight,
+            child: _ChartScrollbar(
+              scrollDirection: Axis.vertical,
+              minExtent: minHeight!,
               child: content,
-            );
-          }
-          return content;
-        },
-      ),
+            ),
+          );
+        }
+        if (needHorizontal) {
+          content = _ChartScrollbar(
+            scrollDirection: Axis.horizontal,
+            minExtent: width,
+            child: content,
+          );
+        }
+        return content;
+      },
     );
   }
 
-  Widget _buildDailyChart(BuildContext context, AdminDashboardLoadedState state) {
+  Widget _buildDailyChart(
+    BuildContext context,
+    AdminDashboardLoadedState state,
+  ) {
     final list = state.dailyChartData;
     if (list.isEmpty) return const SizedBox.shrink();
-    final maxRevenue = list.map((e) => e.revenue).fold(0.0, (a, b) => a > b ? a : b);
-    final maxY = (maxRevenue > 0 ? maxRevenue * 1.15 : 10.0).clamp(10.0, double.infinity);
+    final maxRevenue = list
+        .map((e) => e.revenue)
+        .fold(0.0, (a, b) => a > b ? a : b);
+    final maxY = (maxRevenue > 0 ? maxRevenue * 1.15 : 10.0).clamp(
+      10.0,
+      double.infinity,
+    );
 
     return BlocBuilder<CurrencyCubit, String>(
       builder: (context, currency) {
         const chartHeight = 220.0;
-        const bottomReserved = 56.0;
-        const topPadding = 32.0;
-        const leftReserved = 60.0;
+        const bottomReserved = 52.0;
+        const topPadding = 24.0;
+        const leftReserved = 56.0;
         final totalChartHeight = chartHeight + bottomReserved + topPadding;
 
         return OsmeaComponents.container(
@@ -377,7 +415,9 @@ class AdminDashboardView
             border: Border.all(color: OsmeaColors.silver.withOpacity(0.4)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-          child: OsmeaComponents.column(
+          child: ClipRect(
+            clipBehavior: Clip.hardEdge,
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -391,7 +431,9 @@ class AdminDashboardView
                 OsmeaComponents.sizedBox(height: 20),
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final chartWidth = (constraints.maxWidth.isFinite && constraints.maxWidth > 0)
+                    final chartWidth =
+                        (constraints.maxWidth.isFinite &&
+                            constraints.maxWidth > 0)
                         ? constraints.maxWidth
                         : 480.0;
                     return ConstrainedBox(
@@ -409,137 +451,212 @@ class AdminDashboardView
                             width: chartWidth,
                             height: totalChartHeight,
                             child: Padding(
-                              padding: EdgeInsets.only(top: topPadding),
-                              child: BarChart(
-                            BarChartData(
-                              minY: 0,
-                              maxY: maxY,
-                              alignment: BarChartAlignment.spaceAround,
-                              barTouchData: BarTouchData(
-                                enabled: true,
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipColor: (group) => OsmeaColors.black,
-                                  fitInsideHorizontally: true,
-                                  fitInsideVertically: true,
-                                  tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                  tooltipMargin: 10,
-                                  maxContentWidth: 130,
-                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                    final p = list[group.x];
-                                    return BarTooltipItem(
-                                      '${PriceHelper.format(p.revenue, currency, Localizations.localeOf(context).toString())}\n${p.orderCount} ${context.resources.ordersShort}',
-                                      Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: OsmeaColors.white,
-                                        fontSize: 12,
-                                      ) ?? const TextStyle(color: OsmeaColors.white, fontSize: 12),
-                                    );
-                                  },
-                                ),
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: bottomReserved,
-                                    getTitlesWidget: (value, meta) {
-                                      final i = value.toInt();
-                                      if (i >= 0 && i < list.length) {
-                                        final p = list[i];
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 8),
-                                          child: OsmeaComponents.column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              OsmeaComponents.text(
-                                                DateFormat('d/M').format(p.day),
-                                                textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: OsmeaColors.black,
-                                                  fontSize: 11,
-                                                ),
-                                              ),
-                                              OsmeaComponents.sizedBox(height: 2),
-                                              OsmeaComponents.text(
-                                                '${p.orderCount} ${context.resources.ordersShort}',
-                                                textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: OsmeaColors.thunder,
-                                                  fontSize: 10,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
-                                    interval: 1,
-                                  ),
-                                ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: leftReserved,
-                                    getTitlesWidget: (value, meta) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(right: 8),
-                                        child: OsmeaComponents.text(
-                                          _formatAxisValue(value),
-                                          textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: OsmeaColors.black,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              ),
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: false,
-                                horizontalInterval: maxY > 0 ? (maxY / 4).clamp(1.0, double.infinity) : 1,
-                                getDrawingHorizontalLine: (value) => FlLine(
-                                  color: OsmeaColors.silver.withOpacity(0.2),
-                                  strokeWidth: 1,
-                                ),
-                              ),
-                              borderData: FlBorderData(
-                                show: true,
-                                border: Border(
-                                  left: BorderSide(color: OsmeaColors.silver.withOpacity(0.6), width: 1),
-                                  bottom: BorderSide(color: OsmeaColors.silver.withOpacity(0.6), width: 1),
-                                ),
-                              ),
-                              barGroups: List.generate(list.length, (i) {
-                                final p = list[i];
-                                return BarChartGroupData(
-                                  x: i,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: p.revenue.clamp(0.0, maxY),
-                                      color: OsmeaColors.black,
-                                      width: (chartWidth / list.length * 0.42).clamp(12.0, 26.0),
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                              padding: const EdgeInsets.only(top: 24.0),
+                              child: ClipRect(
+                                clipBehavior: Clip.hardEdge,
+                                child: BarChart(
+                                  BarChartData(
+                                    minY: 0,
+                                    maxY: maxY,
+                                    alignment: BarChartAlignment.spaceAround,
+                                    barTouchData: BarTouchData(
+                                      enabled: true,
+                                      touchTooltipData: BarTouchTooltipData(
+                                        getTooltipColor: (group) =>
+                                            OsmeaColors.black,
+                                        fitInsideHorizontally: true,
+                                        fitInsideVertically: true,
+                                        tooltipPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 8,
+                                            ),
+                                        tooltipMargin: 10,
+                                        maxContentWidth: 130,
+                                        getTooltipItem:
+                                            (group, groupIndex, rod, rodIndex) {
+                                              final p = list[group.x];
+                                              return BarTooltipItem(
+                                                '${PriceHelper.format(p.revenue, currency, Localizations.localeOf(context).toString())}\n${p.orderCount} ${context.resources.ordersShort}',
+                                                Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color:
+                                                              OsmeaColors.white,
+                                                          fontSize: 12,
+                                                        ) ??
+                                                    const TextStyle(
+                                                      color: OsmeaColors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                              );
+                                            },
+                                      ),
                                     ),
-                                  ],
-                                  showingTooltipIndicators: [0],
-                                );
-                              }),
+                                    titlesData: FlTitlesData(
+                                      show: true,
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          reservedSize: bottomReserved,
+                                          getTitlesWidget: (value, meta) {
+                                            final i = value.toInt();
+                                            if (i >= 0 && i < list.length) {
+                                              final p = list[i];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 8,
+                                                ),
+                                                child: OsmeaComponents.column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    OsmeaComponents.text(
+                                                      DateFormat(
+                                                        'd/M',
+                                                      ).format(p.day),
+                                                      textStyle:
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .bodySmall
+                                                              ?.copyWith(
+                                                                color:
+                                                                    OsmeaColors
+                                                                        .black,
+                                                                fontSize: 11,
+                                                              ),
+                                                    ),
+                                                    OsmeaComponents.sizedBox(
+                                                      height: 2,
+                                                    ),
+                                                    OsmeaComponents.text(
+                                                      '${p.orderCount} ${context.resources.ordersShort}',
+                                                      textStyle:
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .bodySmall
+                                                              ?.copyWith(
+                                                                color:
+                                                                    OsmeaColors
+                                                                        .thunder,
+                                                                fontSize: 10,
+                                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                            return const SizedBox.shrink();
+                                          },
+                                          interval: 1,
+                                        ),
+                                      ),
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          reservedSize: leftReserved,
+                                          getTitlesWidget: (value, meta) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                right: 8,
+                                              ),
+                                              child: OsmeaComponents.text(
+                                                _formatAxisValue(value),
+                                                textStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: OsmeaColors.black,
+                                                      fontSize: 10,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      topTitles: const AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: false,
+                                        ),
+                                      ),
+                                      rightTitles: const AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: false,
+                                        ),
+                                      ),
+                                    ),
+                                    gridData: FlGridData(
+                                      show: true,
+                                      drawVerticalLine: false,
+                                      horizontalInterval: maxY > 0
+                                          ? (maxY / 4).clamp(
+                                              1.0,
+                                              double.infinity,
+                                            )
+                                          : 1,
+                                      getDrawingHorizontalLine: (value) =>
+                                          FlLine(
+                                            color: OsmeaColors.silver
+                                                .withOpacity(0.2),
+                                            strokeWidth: 1,
+                                          ),
+                                    ),
+                                    borderData: FlBorderData(
+                                      show: true,
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: OsmeaColors.silver.withOpacity(
+                                            0.6,
+                                          ),
+                                          width: 1,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: OsmeaColors.silver.withOpacity(
+                                            0.6,
+                                          ),
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    barGroups: List.generate(list.length, (i) {
+                                      final p = list[i];
+                                      return BarChartGroupData(
+                                        x: i,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: p.revenue.clamp(0.0, maxY),
+                                            color: OsmeaColors.black,
+                                            width:
+                                                (chartWidth /
+                                                        list.length *
+                                                        0.42)
+                                                    .clamp(12.0, 26.0),
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                  top: Radius.circular(4),
+                                                ),
+                                          ),
+                                        ],
+                                        showingTooltipIndicators: [0],
+                                      );
+                                    }),
+                                  ),
+                                  duration: const Duration(milliseconds: 300),
+                                ),
+                              ),
                             ),
-                            duration: const Duration(milliseconds: 300),
                           ),
                         ),
                       ),
-                    ),
-                    ),
-                  );
+                    );
                   },
                 ),
               ],
             ),
+          ),
         );
       },
     );
@@ -594,10 +711,11 @@ class AdminDashboardView
                             padding: const EdgeInsets.only(top: 6),
                             child: OsmeaComponents.text(
                               '${i + 1}. ${context.resources.dayAbbr}',
-                              textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: OsmeaColors.black,
-                                fontSize: 10,
-                              ),
+                              textStyle: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: OsmeaColors.black,
+                                    fontSize: 10,
+                                  ),
                             ),
                           );
                         }
@@ -612,15 +730,17 @@ class AdminDashboardView
                       reservedSize: 28,
                       getTitlesWidget: (value, meta) => OsmeaComponents.text(
                         value.toInt().toString(),
-                        textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: OsmeaColors.black,
-                          fontSize: 10,
-                        ),
+                        textStyle: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: OsmeaColors.black, fontSize: 10),
                       ),
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
                 gridData: FlGridData(
                   show: true,
@@ -631,18 +751,26 @@ class AdminDashboardView
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                barGroups: values.asMap().entries.map((e) => BarChartGroupData(
-                  x: e.key,
-                  barRods: [
-                    BarChartRodData(
-                      toY: e.value.toDouble(),
-                      color: OsmeaColors.black,
-                      width: 18,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                    ),
-                  ],
-                  showingTooltipIndicators: [],
-                )).toList(),
+                barGroups: values
+                    .asMap()
+                    .entries
+                    .map(
+                      (e) => BarChartGroupData(
+                        x: e.key,
+                        barRods: [
+                          BarChartRodData(
+                            toY: e.value.toDouble(),
+                            color: OsmeaColors.black,
+                            width: 18,
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(3),
+                            ),
+                          ),
+                        ],
+                        showingTooltipIndicators: [],
+                      ),
+                    )
+                    .toList(),
               ),
               duration: const Duration(milliseconds: 300),
             ),
@@ -666,15 +794,18 @@ class AdminDashboardView
         OsmeaComponents.sizedBox(width: 6),
         OsmeaComponents.text(
           label,
-          textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: OsmeaColors.black,
-          ),
+          textStyle: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
         ),
       ],
     );
   }
 
-  Widget _buildOrdersByStatusChart(BuildContext context, AdminDashboardLoadedState state) {
+  Widget _buildOrdersByStatusChart(
+    BuildContext context,
+    AdminDashboardLoadedState state,
+  ) {
     final list = state.ordersByStatus;
     if (list.isEmpty) return const SizedBox.shrink();
 
@@ -714,11 +845,12 @@ class AdminDashboardView
                         title: '${p.count}',
                         color: colors[i % colors.length],
                         radius: 52,
-                        titleStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: OsmeaColors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        titleStyle: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(
+                              color: OsmeaColors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
                       );
                     }),
                   ),
@@ -767,7 +899,9 @@ class AdminDashboardView
       return OsmeaComponents.center(
         child: OsmeaComponents.text(
           resources.noRecentOrders,
-          textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+          textStyle: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
         ),
       );
     }
@@ -783,11 +917,15 @@ class AdminDashboardView
           return OsmeaComponents.listItem(
             title: OsmeaComponents.text(
               '${resources.orderNumber}${order.orderNumber}',
-              textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+              textStyle: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
             ),
             subtitle: OsmeaComponents.text(
               order.user?.username ?? order.user?.fullName ?? resources.guest,
-              textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
+              textStyle: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
             ),
             trailing: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -796,14 +934,21 @@ class AdminDashboardView
                 BlocBuilder<CurrencyCubit, String>(
                   builder: (context, currency) {
                     return OsmeaComponents.text(
-                      PriceHelper.format(order.total, currency, Localizations.localeOf(context).toString()),
-                      textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+                      PriceHelper.format(
+                        order.total,
+                        currency,
+                        Localizations.localeOf(context).toString(),
+                      ),
+                      textStyle: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: OsmeaColors.black),
                     );
                   },
                 ),
                 OsmeaComponents.text(
                   order.status,
-                  textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
                 ),
               ],
             ),
@@ -819,7 +964,9 @@ class AdminDashboardView
       return OsmeaComponents.center(
         child: OsmeaComponents.text(
           resources.noNewUsers,
-          textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+          textStyle: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
         ),
       );
     }
@@ -832,14 +979,24 @@ class AdminDashboardView
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
         children: users.map((user) {
-          final displayName = user.username ?? user.fullName ?? user.email ?? 'User';
-          final initial = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
+          final displayName =
+              user.username ?? user.fullName ?? user.email ?? 'User';
+          final initial = displayName.isNotEmpty
+              ? displayName.substring(0, 1).toUpperCase()
+              : '?';
           return OsmeaComponents.listItem(
             leading: OsmeaComponents.avatar(
               size: ComponentSize.medium,
-              imageUrl: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) ? user.avatarUrl : null,
-              text: (user.avatarUrl == null || user.avatarUrl!.isEmpty) ? initial : null,
-              backgroundColor: (user.avatarUrl == null || user.avatarUrl!.isEmpty) ? OsmeaColors.black : null,
+              imageUrl: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
+                  ? user.avatarUrl
+                  : null,
+              text: (user.avatarUrl == null || user.avatarUrl!.isEmpty)
+                  ? initial
+                  : null,
+              backgroundColor:
+                  (user.avatarUrl == null || user.avatarUrl!.isEmpty)
+                  ? OsmeaColors.black
+                  : null,
             ),
             title: OsmeaComponents.text(
               displayName,
@@ -850,14 +1007,15 @@ class AdminDashboardView
             ),
             subtitle: OsmeaComponents.text(
               '${resources.joined} ${DateFormat.yMMMd().format(user.createdAt)}',
-              textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
+              textStyle: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: OsmeaColors.black),
             ),
           );
         }).toList(),
       ),
     );
   }
-
 }
 
 /// Horizontal scroll with a visible scrollbar (rules: OsmeaColors).
@@ -900,8 +1058,12 @@ class _ChartScrollbarState extends State<_ChartScrollbar> {
           thumbVisibility: MaterialStateProperty.all(true),
           thickness: MaterialStateProperty.all(8),
           radius: const Radius.circular(4),
-          thumbColor: MaterialStateProperty.all(OsmeaColors.black.withOpacity(0.5)),
-          trackColor: MaterialStateProperty.all(OsmeaColors.silver.withOpacity(0.2)),
+          thumbColor: MaterialStateProperty.all(
+            OsmeaColors.black.withOpacity(0.5),
+          ),
+          trackColor: MaterialStateProperty.all(
+            OsmeaColors.silver.withOpacity(0.2),
+          ),
         ),
       ),
       child: Scrollbar(

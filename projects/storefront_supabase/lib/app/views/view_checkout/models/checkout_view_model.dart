@@ -10,6 +10,7 @@ import 'package:core/core.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/models/product.dart';
+import 'package:storefront_supabase/app/models/user_address.dart';
 import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
 
 @injectable
@@ -37,6 +38,9 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
         shippingAddress: shippingAddress,
         sameAsBilling: sameAsBilling,
       );
+  
+  void selectBillingAddress(String? addressId) => _selectBillingAddress(addressId);
+  void selectShippingAddress(String? addressId) => _selectShippingAddress(addressId);
   void selectShippingMethod(String methodId) => _selectShippingMethod(methodId);
   void proceedToPayment() => _proceedToPayment();
   void selectPaymentMethod(String methodId) => _selectPaymentMethod(methodId);
@@ -90,6 +94,23 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
       final shippingMethods = _getDefaultShippingMethods();
       final paymentMethods = _getDefaultPaymentMethods();
 
+      // Load user addresses
+      List<UserAddress>? userAddresses;
+      try {
+        final addressesResponse = await _supabaseClient
+            .from('user_addresses')
+            .select()
+            .eq('user_id', userId)
+            .order('is_default', ascending: false)
+            .order('created_at', ascending: false);
+        
+        userAddresses = (addressesResponse as List)
+            .map((json) => UserAddress.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } catch (e) {
+        debugPrint('Error loading user addresses: $e');
+      }
+
       emit(CheckoutLoadedState(
         currentStep: CheckoutStep.address,
         subtotalAmount: totalAmount,
@@ -98,6 +119,7 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
         currencySymbol: currencySymbol,
         currencyCode: currencyCode,
         lineItems: lineItems,
+        userAddresses: userAddresses,
         shippingMethods: shippingMethods,
         paymentMethods: paymentMethods,
         isAddressStepValid: false,
@@ -142,6 +164,85 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
       PaymentMethod(id: 'cod', title: 'Cash on Delivery', description: 'Pay when you receive', icon: 'payments', enabled: true),
       PaymentMethod(id: 'card', title: 'Credit Card', description: 'Pay with card', icon: 'credit_card', enabled: false),
     ];
+  }
+
+  void _selectBillingAddress(String? addressId) {
+    final s = state;
+    if (s is! CheckoutLoadedState) return;
+    
+    // If addressId is null, clear selection
+    if (addressId == null) {
+      emit(s.copyWith(
+        selectedBillingAddressId: null,
+        billingAddress: null,
+      ));
+      return;
+    }
+    
+    // If clicking the same address, deselect it
+    if (s.selectedBillingAddressId == addressId) {
+      emit(s.copyWith(
+        selectedBillingAddressId: null,
+        billingAddress: null,
+      ));
+      return;
+    }
+    
+    // Select new address
+    if (s.userAddresses == null) return;
+    
+    UserAddress? selectedAddress;
+    try {
+      selectedAddress = s.userAddresses!.firstWhere((a) => a.id == addressId);
+    } catch (_) {
+      // Address not found, return without changing state
+      return;
+    }
+    
+    emit(s.copyWith(
+      selectedBillingAddressId: addressId,
+      billingAddress: selectedAddress.toCheckoutMap(),
+      billingEmail: _supabaseClient.auth.currentUser?.email,
+    ));
+  }
+
+  void _selectShippingAddress(String? addressId) {
+    final s = state;
+    if (s is! CheckoutLoadedState) return;
+    
+    // If addressId is null, clear selection
+    if (addressId == null) {
+      emit(s.copyWith(
+        selectedShippingAddressId: null,
+        shippingAddress: null,
+      ));
+      return;
+    }
+    
+    // If clicking the same address, deselect it
+    if (s.selectedShippingAddressId == addressId) {
+      emit(s.copyWith(
+        selectedShippingAddressId: null,
+        shippingAddress: null,
+      ));
+      return;
+    }
+    
+    // Select new address
+    if (s.userAddresses == null) return;
+    
+    UserAddress? selectedAddress;
+    try {
+      selectedAddress = s.userAddresses!.firstWhere((a) => a.id == addressId);
+    } catch (_) {
+      // Address not found, return without changing state
+      return;
+    }
+    
+    emit(s.copyWith(
+      selectedShippingAddressId: addressId,
+      shippingAddress: selectedAddress.toCheckoutMap(),
+    ));
   }
 
   void _updateAddressAndProceed({
