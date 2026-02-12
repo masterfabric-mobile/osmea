@@ -66,7 +66,7 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
     // Get splash config from storefront_supabase config only
     final logoUrl = configHelper.getString(
       'splash_configuration.logo_url',
-      'https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/mf_logo.png',
+      'https://github.com/masterfabric-mobile/osmea/blob/dev/projects/components_app/assets/images/mf_logo.png?raw=true',
     );
     final backgroundColor = _parseColor(
       configHelper.getString('splash_configuration.background_color', '#FFFFFF'),
