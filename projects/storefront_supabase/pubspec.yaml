@@ -2,7 +2,7 @@ name: storefront_supabase
 description: "Ecommerce Storefront App - Modern Flutter-based storefront application for Supabase with BLoC state management, localization support, and responsive design"
 publish_to: 'none' 
 
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: ^3.9.2
@@ -17,9 +17,10 @@ dependencies:
   # ────────────────────────────────
 
   core:
-    path: ../../packages/core
-  osmea_components:
-    path: ../../packages/components
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
 
   # ────────────────────────────────
   # ICONS
