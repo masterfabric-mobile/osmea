@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
@@ -83,6 +84,7 @@ class _AddressesContentState extends State<_AddressesContent> {
   bool _showAddForm = false;
   UserAddress? _editingAddress;
   List<UserAddress> _cachedAddresses = [];
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -346,6 +348,7 @@ class _AddressesContentState extends State<_AddressesContent> {
   Widget _buildAddressForm(BuildContext context) {
     final resources = context.resources;
     final viewModel = widget.viewModel;
+    final configHelper = AssetConfigHelper();
 
     return OsmeaComponents.container(
       padding: EdgeInsets.all(context.spacing16),
@@ -354,71 +357,341 @@ class _AddressesContentState extends State<_AddressesContent> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: OsmeaColors.silver, width: 1),
       ),
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          OsmeaComponents.textField(
-            controller: viewModel.addressLabelController,
-            label: 'Label (Optional)',
-            variant: TextFieldVariant.outlined,
-            hint: 'e.g., Home, Office',
-            focusColor: OsmeaColors.black,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.dropdown<String>(
-            items: viewModel.countryCityMap.keys.toList(),
-            value: viewModel.addressFormSelectedCountry,
-            onChanged: viewModel.setAddressFormCountry,
-            hint: viewModel.addressFormSelectedCountry == null ? resources.selectCountryFirst : resources.country,
-            label: resources.country,
-            variant: DropdownVariant.outlined,
-            fullWidth: true,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.dropdown<String>(
-            items: viewModel.addressFormSelectedCountry != null
-                ? (viewModel.countryCityMap[viewModel.addressFormSelectedCountry] ?? [])
-                : [],
-            value: viewModel.addressFormSelectedCity,
-            onChanged: viewModel.setAddressFormCity,
-            hint: viewModel.addressFormSelectedCountry == null
-                ? resources.selectCountryFirst
-                : (viewModel.addressFormSelectedCity == null ? resources.selectCity : resources.city),
-            label: resources.city,
-            variant: DropdownVariant.outlined,
-            fullWidth: true,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.textField(
-            controller: viewModel.addressFormAddressController,
-            label: resources.addressLine1,
-            variant: TextFieldVariant.outlined,
-            focusColor: OsmeaColors.black,
-            maxLines: 2,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.textField(
-            controller: viewModel.addressFormPostalCodeController,
-            label: resources.postalCode,
-            variant: TextFieldVariant.outlined,
-            focusColor: OsmeaColors.black,
-          ),
-          OsmeaComponents.sizedBox(height: context.spacing16),
-          OsmeaComponents.textField(
-            controller: viewModel.addressFormPhoneController,
-            label: resources.phoneNumber,
-            variant: TextFieldVariant.outlined,
-            type: TextFieldType.phone,
-            focusColor: OsmeaColors.black,
-          ),
-        ],
+      child: Form(
+        key: _formKey,
+        child: OsmeaComponents.column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Label (Optional)
+            _buildCompactTextField(
+              context,
+              configHelper,
+              controller: viewModel.addressLabelController,
+              hint: 'Label (Optional)',
+              icon: Icons.label_outline,
+            ),
+            SizedBox(height: context.spacing8),
+            
+            // Country & City row
+            Row(
+              children: [
+                Expanded(
+                  child: _buildCompactDropdown<String>(
+                    context,
+                    configHelper,
+                    items: viewModel.countryCityMap.keys.toList(),
+                    value: viewModel.addressFormSelectedCountry,
+                    onChanged: (value) {
+                      viewModel.setAddressFormCountry(value);
+                      // Clear city when country changes
+                      if (value != viewModel.addressFormSelectedCountry) {
+                        viewModel.setAddressFormCity(null);
+                      }
+                    },
+                    hint: viewModel.addressFormSelectedCountry == null 
+                        ? resources.selectCountryFirst 
+                        : resources.country,
+                    icon: Icons.public,
+                    validator: (v) => v == null ? resources.selectCountryFirst : null,
+                  ),
+                ),
+                SizedBox(width: context.spacing8),
+                Expanded(
+                  child: _buildCompactDropdown<String>(
+                    context,
+                    configHelper,
+                    items: viewModel.addressFormSelectedCountry != null
+                        ? (viewModel.countryCityMap[viewModel.addressFormSelectedCountry] ?? [])
+                        : [],
+                    value: viewModel.addressFormSelectedCity,
+                    onChanged: viewModel.setAddressFormCity,
+                    hint: viewModel.addressFormSelectedCountry == null
+                        ? resources.selectCountryFirst
+                        : (viewModel.addressFormSelectedCity == null ? resources.selectCity : resources.city),
+                    icon: Icons.location_city_outlined,
+                    validator: (v) => v == null ? resources.selectCity : null,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.spacing8),
+            
+            // Address
+            _buildCompactTextField(
+              context,
+              configHelper,
+              controller: viewModel.addressFormAddressController,
+              hint: resources.addressLine1,
+              icon: Icons.home_outlined,
+              validator: (v) => v?.isEmpty ?? true ? resources.fillRequiredFields : null,
+              maxLines: 2,
+            ),
+            SizedBox(height: context.spacing8),
+            
+            // Postal Code & Phone row
+            Row(
+              children: [
+                Expanded(
+                  child: _buildCompactTextField(
+                    context,
+                    configHelper,
+                    controller: viewModel.addressFormPostalCodeController,
+                    hint: resources.postalCode,
+                    icon: Icons.markunread_mailbox_outlined,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: context.spacing8),
+                Expanded(
+                  child: _buildCompactTextField(
+                    context,
+                    configHelper,
+                    controller: viewModel.addressFormPhoneController,
+                    hint: resources.phoneNumber,
+                    icon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildCompactTextField(
+    BuildContext context,
+    AssetConfigHelper configHelper, {
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
+    int maxLines = 1,
+  }) {
+    final bgColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_background_color',
+      OsmeaColors.white,
+    );
+    final borderColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_border_color',
+      OsmeaColors.silver,
+    );
+    final focusedBorderColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_focused_border_color',
+      OsmeaColors.black,
+    );
+    final hintColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_hint_color',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final iconColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.prefix_icon_color',
+      OsmeaColors.black,
+    );
+
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: validator,
+      inputFormatters: inputFormatters,
+      maxLines: maxLines,
+      style: OsmeaTextStyle.bodySmall(context),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: OsmeaTextStyle.bodySmall(context).copyWith(color: hintColor),
+        prefixIcon: Icon(icon, color: iconColor, size: 18),
+        filled: true,
+        fillColor: bgColor,
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: context.spacing12,
+          vertical: context.spacing10,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: focusedBorderColor, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
+        ),
+        errorStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+          color: OsmeaColors.red[400],
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactDropdown<T>(
+    BuildContext context,
+    AssetConfigHelper configHelper, {
+    required List<T> items,
+    required T? value,
+    required ValueChanged<T?> onChanged,
+    required String hint,
+    required IconData icon,
+    String? Function(T?)? validator,
+  }) {
+    final bgColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_background_color',
+      OsmeaColors.white,
+    );
+    final borderColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_border_color',
+      OsmeaColors.silver,
+    );
+    final focusedBorderColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_focused_border_color',
+      OsmeaColors.black,
+    );
+    final hintColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.input_hint_color',
+      OsmeaColors.grayMaterial[400]!,
+    );
+    final iconColor = _getColorFromConfig(
+      configHelper,
+      'form_fields.prefix_icon_color',
+      OsmeaColors.black,
+    );
+
+    return FormField<T>(
+      initialValue: value,
+      validator: validator,
+      builder: (FormFieldState<T> field) {
+        // Sync field value with current value
+        if (field.value != value) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              field.didChange(value);
+            }
+          });
+        }
+        
+        return InputDecorator(
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: OsmeaTextStyle.bodySmall(context).copyWith(color: hintColor),
+            prefixIcon: Icon(icon, color: iconColor, size: 18),
+            filled: true,
+            fillColor: bgColor,
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: context.spacing12,
+              vertical: context.spacing10,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: focusedBorderColor, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
+            ),
+            errorText: field.errorText,
+            errorStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+              color: OsmeaColors.red[400],
+              fontSize: 10,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<T>(
+              value: value ?? field.value,
+              isDense: true,
+              isExpanded: true,
+              items: items.map((T item) {
+                return DropdownMenuItem<T>(
+                  value: item,
+                  child: Text(
+                    item.toString(),
+                    style: OsmeaTextStyle.bodySmall(context),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              onChanged: (T? newValue) {
+                field.didChange(newValue);
+                onChanged(newValue);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getColorFromConfig(
+    AssetConfigHelper configHelper,
+    String key,
+    Color defaultValue,
+  ) {
+    try {
+      final checkoutConfig = configHelper.getObject('checkout_view_configuration');
+      final colorString = checkoutConfig?[key] as String?;
+      if (colorString != null && colorString.isNotEmpty) {
+        if (colorString.startsWith('#')) {
+          final hexString = colorString.substring(1);
+          if (hexString.length == 6) {
+            return Color(int.parse('FF$hexString', radix: 16));
+          } else if (hexString.length == 8) {
+            return Color(int.parse(hexString, radix: 16));
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to load color $key: $e');
+    }
+    return defaultValue;
   }
 
   Future<void> _handleSaveAddress(BuildContext context) async {
     final resources = context.resources;
     final viewModel = widget.viewModel;
+
+    // Validate form
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      context.showSnackbar(
+        message: resources.fillRequiredFields,
+        type: SnackbarType.error,
+      );
+      return;
+    }
 
     if (viewModel.addressFormAddressController.text.trim().isEmpty ||
         viewModel.addressFormSelectedCity == null ||
