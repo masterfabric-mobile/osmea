@@ -64,7 +64,7 @@
       "style": "enterprise",
       "duration_milliseconds": 3000,
       "min_duration_milliseconds": 1500,
-      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true",
+      "logo_url": "https://github.com/masterfabric-mobile/osmea/blob/dev/projects/components_app/assets/images/mf_logo.png?raw=true",
       "background_color": "#FFFFFF",
       "logo_color": "#000000",
       "show_loading_indicator": true,
