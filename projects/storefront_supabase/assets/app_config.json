@@ -360,9 +360,27 @@
         "horizontal": 20,
         "title_to_content": 16
       },
-      "search": {
+      "scrolling_banner": {
         "enabled": true,
         "order_id": 0,
+        "text": "Storefront Supabase is an open source project • Explore our code and contribute on GitHub",
+        "link": "https://github.com/masterfabric-mobile/osmea",
+        "background_color": "#000000",
+        "text_color": "#FFFFFF",
+        "height": 40,
+        "font_size": 14,
+        "animation_duration": 15,
+        "animation_direction": "left",
+        "show_separator": true,
+        "separator": "•",
+        "padding": {
+          "vertical": 8,
+          "horizontal": 0
+        }
+      },
+      "search": {
+        "enabled": true,
+        "order_id": 1,
         "placeholder": "Search products, brands, categories...",
         "style": "minimal",
         "variant": "outlined"

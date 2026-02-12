@@ -101,7 +101,7 @@ class _ScrollingBannerWidgetState extends State<ScrollingBannerWidget>
 
     if (!enabled) return const SizedBox.shrink();
 
-    final text = configString(config?['text']) ?? 'Storefront Supabase Project';
+    final text = configString(config?['text']) ?? 'Storefront Supabase is an open source project';
     final link = configString(config?['link']);
     final backgroundColor = configString(config?['background_color']) ?? '#000000';
     final textColor = configString(config?['text_color']) ?? '#FFFFFF';

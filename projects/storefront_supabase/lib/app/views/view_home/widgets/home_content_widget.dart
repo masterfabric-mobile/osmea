@@ -308,11 +308,13 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     // Sort by orderID
     components.sort((a, b) => a.orderId.compareTo(b.orderId));
 
-    // Convert to widgets list with spacing between components
+    // Convert to widgets list with spacing between components (same structure as storefront_woo)
     final List<Widget> widgets = [];
-    // Kategorileri biraz aşağı: ilk bileşen üstünde boşluk (deals ile yakın görünsün)
+    // Top padding only when first component is not scrolling_banner (so kayan yazı is at very top like woo)
     const double topPaddingFirst = 14.0;
-    if (components.isNotEmpty) {
+    final bool firstIsScrollingBanner =
+        components.isNotEmpty && components.first.name == 'scrolling_banner';
+    if (components.isNotEmpty && !firstIsScrollingBanner) {
       widgets.add(OsmeaComponents.sizedBox(height: topPaddingFirst));
     }
     for (int i = 0; i < components.length; i++) {
