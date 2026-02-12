@@ -923,7 +923,7 @@ NavbarItem _buildNavbarItemFromModel(
         break;
       case 'saved':
       case 'favorites':
-        text = resources.favorites;
+        text = 'Saved';
         break;
       case 'profile':
         text = resources.profile;
