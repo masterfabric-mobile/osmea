@@ -128,7 +128,15 @@ launchApp({String environment = 'dev'}) async {
       supabaseAnonKey.isNotEmpty &&
       supabaseUrl != 'YOUR_SUPABASE_URL') {
     await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
-
+    // Giriş yapmadan sepete ekleyebilmek için anonim oturum aç (auth.uid() her zaman dolu olur)
+    try {
+      if (Supabase.instance.client.auth.currentUser == null) {
+        await Supabase.instance.client.auth.signInAnonymously();
+        debugPrint('✅ Anonymous session started (guest cart enabled)');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Anonymous sign-in skipped (enable in Supabase Auth if needed): $e');
+    }
     debugPrint('✅ Supabase initialized');
   } else {
     debugPrint(

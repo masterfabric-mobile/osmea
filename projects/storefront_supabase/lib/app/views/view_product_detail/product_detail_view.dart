@@ -6,8 +6,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:go_router/go_router.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_detail_content_widget.dart';
@@ -81,10 +82,15 @@ class ProductDetailView
                                  !isFromWishlist;
       
       if (shouldShowSnackbar) {
+        final displayMessage = state.message == 'Added to favorites'
+            ? context.resources.addedToFavoritesCategory
+            : (state.message == 'Removed from favorites'
+                ? context.resources.removedFromFavoritesCategory
+                : state.message);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(displayMessage),
               backgroundColor: OsmeaColors.green,
             ),
           );
@@ -101,7 +107,7 @@ class ProductDetailView
     if (state is ProductDetailAuthRequiredState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         debugPrint('🔒 Auth required, navigating to auth screen');
-        context.snackbarWarning(state.message, duration: context.durationLong);
+        context.snackbarWarning(context.resources.loginToAddToCart, duration: context.durationLong);
         // Reset to previous state to prevent infinite loop
         viewModel.loadProduct(productId);
         // Navigate to auth
@@ -132,7 +138,7 @@ class ProductDetailView
       if (isAddToCartError && state.previousState != null) {
         // Show snackbar and recover to previous state
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.snackbarError(
+          context.snackbarWarning(
             state.message,
             duration: context.durationVeryLong,
           );

@@ -370,7 +370,6 @@
       "recommended": {
         "enabled": true,
         "order_id": 10,
-        "title": "Recommended for you",
         "limit": 4,
         "product_ids": [],
         "padding": {

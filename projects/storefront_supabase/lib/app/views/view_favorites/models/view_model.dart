@@ -1,8 +1,13 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/brand.dart';
+import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/favorite_group.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'states.dart';
@@ -10,8 +15,9 @@ import 'states.dart';
 @lazySingleton
 class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
 
-  FavoritesViewModel(this._supabaseClient) : super(FavoritesInitialState());
+  FavoritesViewModel(this._supabaseClient, this._cartCache) : super(FavoritesInitialState());
 
   Future<void> initial() async {
     stateChanger(FavoritesLoadingState());
@@ -24,55 +30,33 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
 
     try {
-      // 1. Fetch Favorite Products & Brands
-      // We fetch all rows and separate them based on product_id or brand_id presence
       final favoritesResponse = await _supabaseClient
           .from('favorites')
-          .select('*, products:product_id(*, product_images(*)), brand:brand_id(*)')
+          .select('*, products:product_id(*, product_images(*)), brand:brand_id(*), category:category_id(*)')
           .eq('user_id', userId);
 
       final List<Product> products = [];
       final List<Brand> brands = [];
+      final List<Category> categories = [];
 
       for (var item in favoritesResponse as List) {
         if (item['products'] != null) {
-          // It's a product
-          // Attach group_id to product if we had a wrapper, but for now we filter list by query or local filtering
-          // To implement "Group Filtering", we need to know which item belongs to which group.
-          // The cleanest way is to map them to a wrapper, but to minimize breaking changes, 
-          // we'll filter locally or fetch by group. 
-          // For now, let's just fetch all and separate.
-          // Wait, if I filter by group, I need the group_id from the 'favorites' table row.
-          // Product model doesn't have group_id. 
-          // I will store the raw favorite rows or a map for filtering?
-          // Let's assume for this fetch we just want the lists. 
-          
-          // Actually, 'products' variable here is just the Product data.
-          // I need to filter them later.
-          // Better approach: Fetch ALL, then in the State, we might need a Map<String, String> for productId -> groupId?
-          // Or simpler: Re-fetch when group changes? No, bad UX.
-          
-          // Let's keep it simple: fetch all.
-          // For filtering, we might need a custom model `FavoriteItem` but I want to avoid refactoring everything.
-          // I will add `group_id` to the local cache logic if needed, but let's stick to the list first.
-          
-          // Actually, if I filter locally in the view/viewmodel, I need the group association.
-          // I'll skip complex local mapping for a second and just get the lists.
-          
           products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
         } else if (item['brand'] != null) {
-          // It's a brand
-          brands.add(Brand.fromJson(item['brand'] as Map<String, dynamic>));
+          final b = Brand.fromJson(item['brand'] as Map<String, dynamic>);
+          brands.add(b.copyWith(logoUrl: resolveBrandLogoUrl(_supabaseClient, b.logoUrl)));
+        } else if (item['category'] != null) {
+          final catMap = item['category'] as Map<String, dynamic>;
+          categories.add(Category.fromJson(catMap));
         }
       }
 
-      // 2. Fetch Groups
       final groupsResponse = await _supabaseClient
           .from('favorite_groups')
           .select()
           .eq('user_id', userId)
           .order('created_at');
-      
+
       final groups = (groupsResponse as List)
           .map((data) => FavoriteGroup.fromJson(data))
           .toList();
@@ -80,6 +64,7 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
       stateChanger(FavoritesLoadedState(
         favoriteProducts: products,
         favoriteBrands: brands,
+        favoriteCategories: categories,
         groups: groups,
       ));
     } catch (e) {
@@ -206,7 +191,8 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
         if (item['products'] != null) {
           products.add(Product.fromJson(item['products'] as Map<String, dynamic>));
         } else if (item['brand'] != null) {
-          brands.add(Brand.fromJson(item['brand'] as Map<String, dynamic>));
+          final b = Brand.fromJson(item['brand'] as Map<String, dynamic>);
+          brands.add(b.copyWith(logoUrl: resolveBrandLogoUrl(_supabaseClient, b.logoUrl)));
         }
       }
 
@@ -260,32 +246,16 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// Giriş yapılmamış olsa bile sepete eklenebilir (misafir sepeti yerel saklanır).
   Future<bool> addToCart(String productId) async {
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) return false;
-
     try {
-      // Check existing
-      final existing = await _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .match({'user_id': userId, 'product_id': productId})
-          .maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + 1;
-        await _supabaseClient
-            .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'quantity': 1,
-        });
+      final cartVm = GetIt.I<CartViewModel>();
+      final ok = await cartVm.addItemToCart(productId, quantity: 1, variantId: null);
+      if (ok) {
+        final uid = _supabaseClient.auth.currentUser?.id;
+        _cartCache.setInCart(uid ?? 'guest', productId, null, true);
       }
-      return true;
+      return ok;
     } catch (e) {
       return false;
     }
@@ -338,6 +308,34 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
+  /// Add brand to favorites. [brandForOptimisticUpdate] optional for immediate UI update.
+  Future<bool> addFavoriteBrand(int brandId, {Brand? brandForOptimisticUpdate}) async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      await _supabaseClient.from('favorites').insert({
+        'user_id': userId,
+        'brand_id': brandId,
+      });
+      if (brandForOptimisticUpdate != null && state is FavoritesLoadedState) {
+        final curr = state as FavoritesLoadedState;
+        if (!curr.favoriteBrands.any((b) => b.id == brandId)) {
+          final resolved = brandForOptimisticUpdate.copyWith(
+            logoUrl: resolveBrandLogoUrl(_supabaseClient, brandForOptimisticUpdate.logoUrl),
+          );
+          stateChanger(curr.copyWith(
+            favoriteBrands: [...curr.favoriteBrands, resolved],
+          ));
+        }
+      }
+      await initial();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> removeFavoriteBrand(int brandId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) return false;
@@ -359,17 +357,45 @@ class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {
     }
   }
 
-  Future<bool> clearAllFavorites() async {
+  Future<bool> removeFavoriteCategory(String categoryId) async {
     final userId = _supabaseClient.auth.currentUser?.id;
     if (userId == null) return false;
-
     try {
       await _supabaseClient
           .from('favorites')
           .delete()
-          .eq('user_id', userId);
-      
-      stateChanger(FavoritesLoadedState(favoriteProducts: []));
+          .match({'user_id': userId, 'category_id': categoryId});
+      if (state is FavoritesLoadedState) {
+        final curr = state as FavoritesLoadedState;
+        final updated = curr.favoriteCategories.where((c) => c.id != categoryId).toList();
+        stateChanger(curr.copyWith(favoriteCategories: updated));
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> clearAllFavorites() async {
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+    try {
+      await _supabaseClient.from('favorites').delete().eq('user_id', userId);
+      if (state is FavoritesLoadedState) {
+        final curr = state as FavoritesLoadedState;
+        stateChanger(curr.copyWith(
+          favoriteProducts: [],
+          favoriteBrands: [],
+          favoriteCategories: [],
+        ));
+      } else {
+        stateChanger(FavoritesLoadedState(
+          favoriteProducts: [],
+          favoriteBrands: [],
+          favoriteCategories: [],
+          groups: state is FavoritesLoadedState ? (state as FavoritesLoadedState).groups : [],
+        ));
+      }
       return true;
     } catch (e) {
       stateChanger(FavoritesErrorState('Favoriler silinemedi: $e'));

@@ -7,6 +7,8 @@ import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/app/models/brand.dart';
+import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/favorite_group.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
@@ -133,12 +135,14 @@ class FavoritesView
           child: OsmeaComponents.column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OsmeaComponents.text(state.message, textAlign: TextAlign.center),
+              OsmeaComponents.text(resources.loginToViewFavorites, textAlign: TextAlign.center),
               OsmeaComponents.sizedBox(height: 20),
               OsmeaComponents.button(
                 text: resources.loginSignup,
                 onPressed: () => goRoute('/profile'),
-                variant: ButtonVariant.primary,
+                variant: ButtonVariant.outlined,
+                textColor: OsmeaColors.black,
+                borderColor: OsmeaColors.black,
               ),
             ],
           ),
@@ -195,8 +199,9 @@ backgroundColor: OsmeaColors.black,
     final resources = context.resources;
     final hasProducts = state.favoriteProducts.isNotEmpty;
     final hasGroups = state.groups.isNotEmpty;
-
-    if (!hasProducts && !hasGroups) {
+    final hasBrands = state.favoriteBrands.isNotEmpty;
+    final hasCategories = state.favoriteCategories.isNotEmpty;
+    if (!hasProducts && !hasGroups && !hasBrands && !hasCategories) {
       return OsmeaComponents.center(
         child: OsmeaComponents.text(resources.noFavorites),
       );
@@ -210,16 +215,16 @@ backgroundColor: OsmeaColors.black,
       }
     }
 
-    // Woo-style: Collections block exactly like Woo - title + fixed-height horizontal list (no Expanded)
-    Widget? topSection;
-    if (hasGroups) {
-      topSection = Column(
+    // Woo-style: Favorite brands row (if any), then collections, then products
+    Widget? brandsSection;
+    if (hasBrands) {
+      brandsSection = Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Collections',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          OsmeaComponents.text(
+            resources.brands,
+            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.onSurface,
             ),
@@ -229,12 +234,92 @@ backgroundColor: OsmeaColors.black,
             height: 100,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: state.groups.length,
+              itemCount: state.favoriteBrands.length,
               itemBuilder: (context, index) {
-                return _buildCollectionCard(context, state.groups[index], viewModel, state);
+                final brand = state.favoriteBrands[index];
+                return _FavoriteBrandCard(
+                  brand: brand,
+                  viewModel: viewModel,
+                );
               },
             ),
           ),
+        ],
+      );
+    }
+
+    Widget? categoriesSection;
+    if (hasCategories) {
+      categoriesSection = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OsmeaComponents.text(
+            context.resources.categories,
+            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(height: context.spacing12),
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: state.favoriteCategories.length,
+              itemBuilder: (context, index) {
+                final category = state.favoriteCategories[index];
+                return _FavoriteCategoryCard(
+                  category: category,
+                  viewModel: viewModel,
+                  goRoute: goRoute,
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget? topSection;
+    if (hasGroups || hasBrands || hasCategories) {
+      topSection = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (categoriesSection != null) ...[
+            categoriesSection,
+            SizedBox(height: context.spacing16),
+          ],
+          if (brandsSection != null) ...[
+            brandsSection,
+            SizedBox(height: context.spacing16),
+          ],
+          if (hasGroups)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.resources.collections,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: context.spacing12),
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: state.groups.length,
+                    itemBuilder: (context, index) {
+                      return _buildCollectionCard(context, state.groups[index], viewModel, state);
+                    },
+                  ),
+                ),
+              ],
+            ),
         ],
       );
     }
@@ -290,6 +375,183 @@ backgroundColor: OsmeaColors.black,
           ],
         ),
       ),
+    );
+  }
+
+  static Widget _FavoriteCategoryCard({
+    required Category category,
+    required FavoritesViewModel viewModel,
+    required void Function(String) goRoute,
+  }) {
+    return Builder(
+      builder: (context) {
+        const circleSize = 64.0;
+        return Container(
+          margin: EdgeInsets.only(right: context.spacing12),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GestureDetector(
+                onTap: () => goRoute('/categories/products/${category.id}'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: circleSize,
+                      height: circleSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: OsmeaColors.silver, width: 1),
+                        color: OsmeaColors.grayMaterial[100],
+                      ),
+                      child: ClipOval(
+                        child: category.imageUrl != null && category.imageUrl!.isNotEmpty
+                            ? OsmeaComponents.image(
+                                imageUrl: category.imageUrl!,
+                                width: circleSize,
+                                height: circleSize,
+                                fit: BoxFit.cover,
+                                variant: ImageVariant.normal,
+                                errorWidget: Icon(Icons.category, size: circleSize * 0.5, color: OsmeaColors.pewter),
+                              )
+                            : Icon(Icons.category, size: circleSize * 0.5, color: OsmeaColors.pewter),
+                      ),
+                    ),
+                    SizedBox(height: context.spacing8),
+                    SizedBox(
+                      width: circleSize + context.spacing12,
+                      child: OsmeaComponents.text(
+                        category.name,
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: -4,
+                right: -4,
+                child: GestureDetector(
+                  onTap: () async {
+                    await viewModel.removeFavoriteCategory(category.id);
+                    if (context.mounted) {
+                      context.snackbarWarning(
+                        context.resources.removedFromFavoritesCategory,
+                        style: SnackbarStyle.minimal,
+                        position: SnackbarPosition.bottom,
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(context.spacing4),
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: OsmeaColors.silver),
+                    ),
+                    child: Icon(Icons.favorite, size: 18, color: OsmeaColors.thunder),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static Widget _FavoriteBrandCard({
+    required Brand brand,
+    required FavoritesViewModel viewModel,
+  }) {
+    return Builder(
+      builder: (context) {
+        const circleSize = 64.0;
+        return Container(
+          margin: EdgeInsets.only(right: context.spacing12),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GestureDetector(
+                onTap: () => context.push('/brands/${brand.id}'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: circleSize,
+                      height: circleSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: OsmeaColors.silver, width: 1),
+                        color: OsmeaColors.grayMaterial[100],
+                      ),
+                      child: ClipOval(
+                        child: brand.logoUrl != null && brand.logoUrl!.isNotEmpty
+                            ? OsmeaComponents.image(
+                                imageUrl: brand.logoUrl!,
+                                width: circleSize,
+                                height: circleSize,
+                                fit: BoxFit.cover,
+                                variant: ImageVariant.normal,
+                                errorWidget: Icon(Icons.branding_watermark, size: circleSize * 0.5, color: OsmeaColors.pewter),
+                              )
+                            : Icon(Icons.branding_watermark, size: circleSize * 0.5, color: OsmeaColors.pewter),
+                      ),
+                    ),
+                    SizedBox(height: context.spacing8),
+                    SizedBox(
+                      width: circleSize + context.spacing12,
+                      child: OsmeaComponents.text(
+                        brand.name,
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: OsmeaColors.thunder,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: -4,
+                right: -4,
+                child: GestureDetector(
+                  onTap: () async {
+                    await viewModel.removeFavoriteBrand(brand.id);
+                    if (context.mounted) {
+                      context.snackbarWarning(
+                        context.resources.brandRemovedFromFavorites,
+                        style: SnackbarStyle.minimal,
+                        position: SnackbarPosition.bottom,
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(context.spacing4),
+                    decoration: BoxDecoration(
+                      color: OsmeaColors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: OsmeaColors.silver),
+                    ),
+                    child: Icon(Icons.favorite, size: 18, color: OsmeaColors.thunder),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -19,6 +19,7 @@ import 'package:storefront_supabase/app/views/view_favorites/models/states.dart'
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_list/widgets/product_list_filters_widget.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
 
 class ProductListContentWidget extends StatefulWidget {
@@ -197,6 +198,16 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
                       isSaved: isSaved,
                       onWishlistTap: () async {
                         final wasSaved = isSaved;
+                        if (!wasSaved && Supabase.instance.client.auth.currentUser == null) {
+                          if (!context.mounted) return;
+                          context.snackbarWarning(
+                            context.resources.loginToAddToFavorites,
+                            duration: context.durationLong,
+                            style: SnackbarStyle.minimal,
+                            position: SnackbarPosition.bottom,
+                          );
+                          return;
+                        }
                         final success = wasSaved
                             ? await favVm.removeFavorite(productId)
                             : await favVm.addFavorite(

@@ -99,18 +99,14 @@ class FavoritesItemWidget extends StatelessWidget {
                     size: ButtonSize.extraSmall,
                     variant: ButtonVariant.ghost,
                     onPressed: () async {
-                      final success = await viewModel.removeFavorite(product.id);
                       if (!context.mounted) return;
-                      if (success) {
-                        context.showSnackbar(
-                          title: resources.removedFromFavorites,
-                          message: '',
-                          type: SnackbarType.info,
-                          style: SnackbarStyle.minimal,
-                          position: SnackbarPosition.bottom,
-                          duration: context.durationLong,
-                        );
-                      }
+                      context.snackbarWarning(
+                        resources.removedFromFavorites,
+                        style: SnackbarStyle.minimal,
+                        position: SnackbarPosition.bottom,
+                        duration: context.durationLong,
+                      );
+                      await viewModel.removeFavorite(product.id);
                     },
                   ),
                 ],
@@ -175,7 +171,7 @@ class FavoritesItemWidget extends StatelessWidget {
       if (success) {
         context.snackbarSuccess(resources.productAddedToCart);
       } else {
-        context.snackbarError(resources.failedToAddCart);
+        context.snackbarWarning(resources.failedToAddCart);
       }
     } else if (result == 'add_remove') {
       final cartSuccess = await viewModel.addToCart(product.id);
@@ -186,7 +182,7 @@ class FavoritesItemWidget extends StatelessWidget {
           context.snackbarSuccess(resources.productAddedToCart);
         }
       } else {
-        context.snackbarError(resources.failedToAddCart);
+        context.snackbarWarning(resources.failedToAddCart);
       }
     }
   }

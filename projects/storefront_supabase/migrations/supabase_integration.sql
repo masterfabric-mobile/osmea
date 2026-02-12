@@ -90,14 +90,28 @@ CREATE TABLE public.coupons (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT coupons_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.favorite_groups (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  name text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT favorite_groups_pkey PRIMARY KEY (id),
+  CONSTRAINT favorite_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.favorites (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL DEFAULT auth.uid(),
   product_id uuid,
   created_at timestamp with time zone DEFAULT now(),
+  brand_id bigint,
+  group_id uuid,
+  category_id uuid,
   CONSTRAINT favorites_pkey PRIMARY KEY (id),
   CONSTRAINT favorites_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-  CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+  CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT favorites_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id),
+  CONSTRAINT favorites_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.favorite_groups(id),
+  CONSTRAINT favorites_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id)
 );
 CREATE TABLE public.order_items (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -225,6 +239,21 @@ CREATE TABLE public.products (
   CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id),
   CONSTRAINT products_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id)
 );
+CREATE TABLE public.user_addresses (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  label character varying,
+  address text,
+  city character varying,
+  postal_code character varying,
+  country character varying,
+  phone character varying,
+  is_default boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_addresses_pkey PRIMARY KEY (id),
+  CONSTRAINT user_addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.users (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   email character varying NOT NULL UNIQUE,
@@ -243,5 +272,6 @@ CREATE TABLE public.users (
   gender text,
   age integer,
   birthdate date,
+  account_deletion_scheduled_at timestamp with time zone,
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );

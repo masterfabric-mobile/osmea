@@ -32,52 +32,70 @@ class _AdminUsersViewState extends State<AdminUsersView> {
   Widget build(BuildContext context) {
     final resources = context.resources;
     return OsmeaComponents.scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: OsmeaColors.white,
       appBar: OsmeaComponents.appBar(
         title: OsmeaComponents.text(
           resources.users,
-          color: Colors.black,
+          color: OsmeaColors.black,
         ),
         variant: AppBarVariant.primary,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: OsmeaColors.white,
+        foregroundColor: OsmeaColors.black,
         leading: OsmeaComponents.iconButton(
           onPressed: () => context.go('/profile'),
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
         ),
       ),
       body: FutureBuilder<List<AppUser>>(
         future: _users,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return OsmeaComponents.center(
+              child: const CircularProgressIndicator(color: OsmeaColors.black),
+            );
           }
           if (snapshot.hasError) {
-            return OsmeaComponents.center(child: OsmeaComponents.text('${resources.errorPrefix}${snapshot.error}'));
+            return OsmeaComponents.center(
+              child: OsmeaComponents.text(
+                '${resources.errorPrefix}${snapshot.error}',
+                textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+              ),
+            );
           }
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return OsmeaComponents.center(child: OsmeaComponents.text(resources.noUsersFound));
+            return OsmeaComponents.center(
+              child: OsmeaComponents.text(
+                resources.noUsersFound,
+                textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+              ),
+            );
           }
           final users = snapshot.data!;
           return ListView.builder(
             itemCount: users.length,
             itemBuilder: (context, index) {
               final user = users[index];
+              final hasAvatar = user.avatarUrl != null && user.avatarUrl!.isNotEmpty;
+              final initial = (user.fullName?.substring(0, 1) ??
+                  user.email?.substring(0, 1) ??
+                  '?').toUpperCase();
               return OsmeaComponents.listItem(
                 leading: OsmeaComponents.avatar(
                   size: ComponentSize.medium,
-                  imageUrl: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) ? user.avatarUrl : null,
-                  text: (user.avatarUrl == null || user.avatarUrl!.isEmpty)
-                      ? (user.fullName?.substring(0, 1) ??
-                          user.email?.substring(0, 1) ??
-                          '?')
-                      : null,
+                  imageUrl: hasAvatar ? user.avatarUrl : null,
+                  text: hasAvatar ? null : initial,
+                  backgroundColor: hasAvatar ? null : OsmeaColors.black,
                 ),
-                title: OsmeaComponents.text(user.username != null
-                    ? '${user.fullName ?? resources.unnamed} (@${user.username})'
-                    : user.fullName ?? user.email ?? resources.unnamedUser),
+                title: OsmeaComponents.text(
+                  user.username != null
+                      ? '${user.fullName ?? resources.unnamed} (@${user.username})'
+                      : user.fullName ?? user.email ?? resources.unnamedUser,
+                  textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: OsmeaColors.black),
+                ),
                 subtitle: OsmeaComponents.text(
-                    '${user.email ?? resources.noEmail} - ${resources.rolePrefix}${user.role ?? 'N/A'}'),
+                  '${user.email ?? resources.noEmail} - ${resources.rolePrefix}${user.role ?? 'N/A'}',
+                  textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.thunder),
+                ),
               );
             },
           );

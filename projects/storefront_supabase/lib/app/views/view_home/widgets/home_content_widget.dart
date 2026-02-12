@@ -127,8 +127,9 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
   /// Returns spacing value in pixels (not EdgeInsets)
   double _getComponentBottomSpacing(
     AssetConfigHelper configHelper,
-    String componentName,
-  ) {
+    String componentName, {
+    String? nextComponentName,
+  }) {
     try {
       final config = configHelper.getObject('home_view.$componentName');
       final paddingConfig = config?['padding'] as Map<String, dynamic>?;
@@ -141,8 +142,15 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
     } catch (e) {
       debugPrint('⚠️ Failed to load spacing for $componentName: $e');
     }
-    // Default spacing from component_spacing
-    return configHelper.getDouble('home_view.component_spacing.bottom', 16.0);
+    // Deals of the day yukarı: kategori ile arası iyice az
+    if (nextComponentName == 'deals_of_day') {
+      return 2.0;
+    }
+    // Kategorilerden sonra kısa boşluk
+    if (componentName == 'circle_categories') {
+      return 6.0;
+    }
+    return configHelper.getDouble('home_view.component_spacing.bottom', 12.0);
   }
 
   /// Builds all components sorted by orderID
@@ -302,17 +310,22 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
 
     // Convert to widgets list with spacing between components
     final List<Widget> widgets = [];
+    // Kategorileri biraz aşağı: ilk bileşen üstünde boşluk (deals ile yakın görünsün)
+    const double topPaddingFirst = 14.0;
+    if (components.isNotEmpty) {
+      widgets.add(OsmeaComponents.sizedBox(height: topPaddingFirst));
+    }
     for (int i = 0; i < components.length; i++) {
       final component = components[i];
+      final nextName = i + 1 < components.length ? components[i + 1].name : null;
 
-      // Add the component widget
       widgets.add(component.widget);
 
-      // Add spacing after component (except for the last one)
       if (i < components.length - 1) {
         final bottomSpacing = _getComponentBottomSpacing(
           configHelper,
           component.name,
+          nextComponentName: nextName,
         );
         if (bottomSpacing > 0) {
           widgets.add(OsmeaComponents.sizedBox(height: bottomSpacing));

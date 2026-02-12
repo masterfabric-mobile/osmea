@@ -9,7 +9,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
 
 /// Campaign alert widget with countdown timer
@@ -47,7 +48,7 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
         final endTime = DateTime.parse(endTimeStr);
         _updateTimeRemaining(endTime);
 
-        _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
           if (mounted) {
             _updateTimeRemaining(endTime);
           } else {
@@ -118,25 +119,19 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
   }
 
   String _formatDuration(Duration duration) {
-    final days = duration.inDays;
-    final hours = duration.inHours.remainder(24);
-    final minutes = duration.inMinutes.remainder(60);
-
-    if (days > 0) {
-      return '${days}d ${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
-    } else if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
-    } else {
-      return '${minutes.toString().padLeft(2, '0')}m';
-    }
+    final totalSeconds = duration.inSeconds;
+    final hours = totalSeconds ~/ 3600;
+    final minutes = (totalSeconds % 3600) ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
     final config = _loadCampaignConfig();
     final showAlert = config?['enabled'] as bool? ?? true;
-    final title = configString(config?['title']) ?? 'Special Offer';
-    final message = configString(config?['message']) ?? 'Limited time offer';
+    final title = configString(config?['title']) ?? context.resources.specialOffer;
+    final message = configString(config?['message']) ?? context.resources.limitedTimeOffer;
     final backgroundColor =
         configString(config?['background_color']) ?? '#000000';
     final textColor = configString(config?['text_color']) ?? '#FFFFFF';
@@ -216,7 +211,7 @@ class _CampaignAlertWidgetState extends State<CampaignAlertWidget> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     OsmeaComponents.text(
-                      'ENDS IN',
+                      context.resources.endsIn,
                       textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                         fontSize:
                             context.fontSizeExtraSmall *

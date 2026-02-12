@@ -59,6 +59,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Profile'
 	String get profile => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profile';
 
+	/// en: 'My Profile'
+	String get myProfile => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'My Profile';
+
 	/// en: 'Settings'
 	String get settings => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Settings';
 
@@ -323,6 +326,33 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Joined'
 	String get joined => TranslationOverrides.string(_root.$meta, 'joined', {}) ?? 'Joined';
 
+	/// en: 'Daily Revenue'
+	String get dailyRevenue => TranslationOverrides.string(_root.$meta, 'dailyRevenue', {}) ?? 'Daily Revenue';
+
+	/// en: 'Last 7 Days - Revenue & Orders'
+	String get last7DaysRevenueOrders => TranslationOverrides.string(_root.$meta, 'last7DaysRevenueOrders', {}) ?? 'Last 7 Days - Revenue & Orders';
+
+	/// en: 'Order Statuses'
+	String get orderStatuses => TranslationOverrides.string(_root.$meta, 'orderStatuses', {}) ?? 'Order Statuses';
+
+	/// en: 'Last 7 Days - New Users'
+	String get last7DaysNewUsers => TranslationOverrides.string(_root.$meta, 'last7DaysNewUsers', {}) ?? 'Last 7 Days - New Users';
+
+	/// en: 'Daily new users'
+	String get dailyNewUsers => TranslationOverrides.string(_root.$meta, 'dailyNewUsers', {}) ?? 'Daily new users';
+
+	/// en: 'Last 7 Days - New Products'
+	String get last7DaysNewProducts => TranslationOverrides.string(_root.$meta, 'last7DaysNewProducts', {}) ?? 'Last 7 Days - New Products';
+
+	/// en: 'Daily new products'
+	String get dailyNewProducts => TranslationOverrides.string(_root.$meta, 'dailyNewProducts', {}) ?? 'Daily new products';
+
+	/// en: 'orders'
+	String get ordersShort => TranslationOverrides.string(_root.$meta, 'ordersShort', {}) ?? 'orders';
+
+	/// en: 'Day'
+	String get dayAbbr => TranslationOverrides.string(_root.$meta, 'dayAbbr', {}) ?? 'Day';
+
 	/// en: 'An unexpected error occurred.'
 	String get unexpectedError => TranslationOverrides.string(_root.$meta, 'unexpectedError', {}) ?? 'An unexpected error occurred.';
 
@@ -533,6 +563,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Please log in to manage addresses.'
 	String get loginToManageAddresses => TranslationOverrides.string(_root.$meta, 'loginToManageAddresses', {}) ?? 'Please log in to manage addresses.';
 
+	/// en: 'Please sign in to view your favorites.'
+	String get loginToViewFavorites => TranslationOverrides.string(_root.$meta, 'loginToViewFavorites', {}) ?? 'Please sign in to view your favorites.';
+
 	/// en: 'Select '
 	String get selectPrefix => TranslationOverrides.string(_root.$meta, 'selectPrefix', {}) ?? 'Select ';
 
@@ -619,6 +652,180 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Are you sure you want to log out?'
 	String get confirmLogoutMessage => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Are you sure you want to log out?';
+
+	/// en: 'Welcome back! You have successfully logged in.'
+	String get welcomeBackLogin => TranslationOverrides.string(_root.$meta, 'welcomeBackLogin', {}) ?? 'Welcome back! You have successfully logged in.';
+
+	/// en: 'See all'
+	String get seeAll => TranslationOverrides.string(_root.$meta, 'seeAll', {}) ?? 'See all';
+
+	/// en: 'Recommended for you'
+	String get recommendedForYou => TranslationOverrides.string(_root.$meta, 'recommendedForYou', {}) ?? 'Recommended for you';
+
+	/// en: 'Shop by Brand'
+	String get shopByBrand => TranslationOverrides.string(_root.$meta, 'shopByBrand', {}) ?? 'Shop by Brand';
+
+	/// en: 'Collections'
+	String get collections => TranslationOverrides.string(_root.$meta, 'collections', {}) ?? 'Collections';
+
+	/// en: 'Collection'
+	String get collection => TranslationOverrides.string(_root.$meta, 'collection', {}) ?? 'Collection';
+
+	/// en: 'Added to favorites'
+	String get addedToFavoritesCategory => TranslationOverrides.string(_root.$meta, 'addedToFavoritesCategory', {}) ?? 'Added to favorites';
+
+	/// en: 'Removed from favorites'
+	String get removedFromFavoritesCategory => TranslationOverrides.string(_root.$meta, 'removedFromFavoritesCategory', {}) ?? 'Removed from favorites';
+
+	/// en: 'Undo'
+	String get undo => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo';
+
+	/// en: 'Please log in to view your cart.'
+	String get loginToViewCart => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Please log in to view your cart.';
+
+	/// en: 'Please log in to add items to cart.'
+	String get loginToAddToCart => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Please log in to add items to cart.';
+
+	/// en: 'You must log in to add to favorites.'
+	String get loginToAddToFavorites => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'You must log in to add to favorites.';
+
+	/// en: '{name} was added to your favorites'
+	String get categoryAddedToFavorites => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} was added to your favorites';
+
+	/// en: '{name} was removed from your favorites'
+	String get categoryRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} was removed from your favorites';
+
+	/// en: 'Removed from cart'
+	String get removedFromCart => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Removed from cart';
+
+	/// en: 'Brand added to favorites'
+	String get brandAddedToFavorites => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Brand added to favorites';
+
+	/// en: 'Brand removed from favorites'
+	String get brandRemovedFromFavorites => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Brand removed from favorites';
+
+	/// en: 'Ends in'
+	String get endsIn => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Ends in';
+
+	/// en: 'Special Offer'
+	String get specialOffer => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Special Offer';
+
+	/// en: 'Limited time offer'
+	String get limitedTimeOffer => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Limited time offer';
+
+	/// en: 'Deals of the day'
+	String get dealsOfTheDay => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Deals of the day';
+
+	/// en: 'Flash Sale'
+	String get flashSale => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale';
+
+	/// en: 'Checkout'
+	String get checkoutTitle => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Checkout';
+
+	/// en: 'Address'
+	String get stepAddress => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Address';
+
+	/// en: 'Shipping'
+	String get stepShipping => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Shipping';
+
+	/// en: 'Payment'
+	String get stepPayment => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Payment';
+
+	/// en: 'Summary'
+	String get stepSummary => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Summary';
+
+	/// en: 'Continue'
+	String get continueButton => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continue';
+
+	/// en: 'Back'
+	String get backButton => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Back';
+
+	/// en: 'Place Order'
+	String get placeOrder => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Place Order';
+
+	/// en: 'Order Placed!'
+	String get orderPlacedTitle => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Order Placed!';
+
+	/// en: 'Your order has been received.'
+	String get orderPlacedDescription => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Your order has been received.';
+
+	/// en: 'Back to Home'
+	String get backToHome => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Back to Home';
+
+	/// en: 'Please fill in all required fields.'
+	String get fillRequiredFields => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Please fill in all required fields.';
+
+	/// en: 'Please select a shipping method.'
+	String get selectShippingMethod => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Please select a shipping method.';
+
+	/// en: 'Please select a payment method.'
+	String get selectPaymentMethod => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Please select a payment method.';
+
+	/// en: 'First name'
+	String get firstName => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'First name';
+
+	/// en: 'Last name'
+	String get lastName => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Last name';
+
+	/// en: 'Address'
+	String get addressLine1 => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Address';
+
+	/// en: 'Same as billing address'
+	String get sameAsBilling => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Same as billing address';
+
+	/// en: 'Delete Account'
+	String get deleteAccount => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Delete Account';
+
+	/// en: 'Delete Account?'
+	String get deleteAccountTitle => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Delete Account?';
+
+	/// en: 'Your account will be scheduled for deletion. It will be permanently deleted within 30 days. Until then you can log in again to cancel the deletion.'
+	String get deleteAccountMessage30Days => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Your account will be scheduled for deletion. It will be permanently deleted within 30 days. Until then you can log in again to cancel the deletion.';
+
+	/// en: 'This will permanently delete:'
+	String get deleteAccountWhatWillBeDeleted => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'This will permanently delete:';
+
+	/// en: 'Your profile and personal information'
+	String get deleteAccountItemProfile => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Your profile and personal information';
+
+	/// en: 'All your orders and order history'
+	String get deleteAccountItemOrders => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'All your orders and order history';
+
+	/// en: 'Your saved addresses'
+	String get deleteAccountItemAddresses => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Your saved addresses';
+
+	/// en: 'All your reviews and ratings'
+	String get deleteAccountItemReviews => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'All your reviews and ratings';
+
+	/// en: 'After 30 days this cannot be undone. You can cancel within 30 days by logging in.'
+	String get deleteAccountCannotUndo => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? 'After 30 days this cannot be undone. You can cancel within 30 days by logging in.';
+
+	/// en: 'Continue'
+	String get deleteAccountContinue => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Continue';
+
+	/// en: 'Go Back'
+	String get deleteAccountGoBack => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Go Back';
+
+	/// en: 'Final Confirmation'
+	String get deleteAccountFinalConfirm => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Final Confirmation';
+
+	/// en: 'Are you sure you want to schedule account deletion?'
+	String get deleteAccountSure => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Are you sure you want to schedule account deletion?';
+
+	/// en: 'Account: {email}'
+	String get deleteAccountEmailLabel => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Account: {email}';
+
+	/// en: 'I understand my account will be deleted in 30 days and I can cancel by logging in before then'
+	String get deleteAccountUnderstandPermanent => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'I understand my account will be deleted in 30 days and I can cancel by logging in before then';
+
+	/// en: 'Delete My Account'
+	String get deleteMyAccount => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Delete My Account';
+
+	/// en: 'Account deletion has been scheduled. Your account will be removed in 30 days. You can log in before then to cancel.'
+	String get deleteAccountSuccess => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Account deletion has been scheduled. Your account will be removed in 30 days. You can log in before then to cancel.';
+
+	/// en: 'Failed to schedule account deletion. Please try again or contact support.'
+	String get deleteAccountFailed => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Failed to schedule account deletion. Please try again or contact support.';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -635,6 +842,7 @@ extension on Translations {
 			'cart' => TranslationOverrides.string(_root.$meta, 'cart', {}) ?? 'Cart',
 			'favorites' => TranslationOverrides.string(_root.$meta, 'favorites', {}) ?? 'Favorites',
 			'profile' => TranslationOverrides.string(_root.$meta, 'profile', {}) ?? 'Profile',
+			'myProfile' => TranslationOverrides.string(_root.$meta, 'myProfile', {}) ?? 'My Profile',
 			'settings' => TranslationOverrides.string(_root.$meta, 'settings', {}) ?? 'Settings',
 			'search' => TranslationOverrides.string(_root.$meta, 'search', {}) ?? 'Search',
 			'apply' => TranslationOverrides.string(_root.$meta, 'apply', {}) ?? 'Apply',
@@ -723,6 +931,15 @@ extension on Translations {
 			'unnamed' => TranslationOverrides.string(_root.$meta, 'unnamed', {}) ?? 'Unnamed',
 			'unnamedUser' => TranslationOverrides.string(_root.$meta, 'unnamedUser', {}) ?? 'Unnamed User',
 			'joined' => TranslationOverrides.string(_root.$meta, 'joined', {}) ?? 'Joined',
+			'dailyRevenue' => TranslationOverrides.string(_root.$meta, 'dailyRevenue', {}) ?? 'Daily Revenue',
+			'last7DaysRevenueOrders' => TranslationOverrides.string(_root.$meta, 'last7DaysRevenueOrders', {}) ?? 'Last 7 Days - Revenue & Orders',
+			'orderStatuses' => TranslationOverrides.string(_root.$meta, 'orderStatuses', {}) ?? 'Order Statuses',
+			'last7DaysNewUsers' => TranslationOverrides.string(_root.$meta, 'last7DaysNewUsers', {}) ?? 'Last 7 Days - New Users',
+			'dailyNewUsers' => TranslationOverrides.string(_root.$meta, 'dailyNewUsers', {}) ?? 'Daily new users',
+			'last7DaysNewProducts' => TranslationOverrides.string(_root.$meta, 'last7DaysNewProducts', {}) ?? 'Last 7 Days - New Products',
+			'dailyNewProducts' => TranslationOverrides.string(_root.$meta, 'dailyNewProducts', {}) ?? 'Daily new products',
+			'ordersShort' => TranslationOverrides.string(_root.$meta, 'ordersShort', {}) ?? 'orders',
+			'dayAbbr' => TranslationOverrides.string(_root.$meta, 'dayAbbr', {}) ?? 'Day',
 			'unexpectedError' => TranslationOverrides.string(_root.$meta, 'unexpectedError', {}) ?? 'An unexpected error occurred.',
 			'errorPrefix' => TranslationOverrides.string(_root.$meta, 'errorPrefix', {}) ?? 'Error: ',
 			'noUsersFound' => TranslationOverrides.string(_root.$meta, 'noUsersFound', {}) ?? 'No users found.',
@@ -793,6 +1010,7 @@ extension on Translations {
 			'selectCountryFirst' => TranslationOverrides.string(_root.$meta, 'selectCountryFirst', {}) ?? 'Select Country First',
 			'selectCity' => TranslationOverrides.string(_root.$meta, 'selectCity', {}) ?? 'Select City',
 			'loginToManageAddresses' => TranslationOverrides.string(_root.$meta, 'loginToManageAddresses', {}) ?? 'Please log in to manage addresses.',
+			'loginToViewFavorites' => TranslationOverrides.string(_root.$meta, 'loginToViewFavorites', {}) ?? 'Please sign in to view your favorites.',
 			'selectPrefix' => TranslationOverrides.string(_root.$meta, 'selectPrefix', {}) ?? 'Select ',
 			'failedChangePassword' => TranslationOverrides.string(_root.$meta, 'failedChangePassword', {}) ?? 'Failed to change password. Please check your inputs.',
 			'onboarding' => TranslationOverrides.string(_root.$meta, 'onboarding', {}) ?? 'Onboarding',
@@ -822,6 +1040,64 @@ extension on Translations {
 			'couponLimitReached' => TranslationOverrides.string(_root.$meta, 'couponLimitReached', {}) ?? 'Coupon usage limit reached.',
 			'minimumPurchaseRequired' => TranslationOverrides.string(_root.$meta, 'minimumPurchaseRequired', {}) ?? 'Minimum purchase of {amount} required.',
 			'confirmLogoutMessage' => TranslationOverrides.string(_root.$meta, 'confirmLogoutMessage', {}) ?? 'Are you sure you want to log out?',
+			'welcomeBackLogin' => TranslationOverrides.string(_root.$meta, 'welcomeBackLogin', {}) ?? 'Welcome back! You have successfully logged in.',
+			'seeAll' => TranslationOverrides.string(_root.$meta, 'seeAll', {}) ?? 'See all',
+			'recommendedForYou' => TranslationOverrides.string(_root.$meta, 'recommendedForYou', {}) ?? 'Recommended for you',
+			'shopByBrand' => TranslationOverrides.string(_root.$meta, 'shopByBrand', {}) ?? 'Shop by Brand',
+			'collections' => TranslationOverrides.string(_root.$meta, 'collections', {}) ?? 'Collections',
+			'collection' => TranslationOverrides.string(_root.$meta, 'collection', {}) ?? 'Collection',
+			'addedToFavoritesCategory' => TranslationOverrides.string(_root.$meta, 'addedToFavoritesCategory', {}) ?? 'Added to favorites',
+			'removedFromFavoritesCategory' => TranslationOverrides.string(_root.$meta, 'removedFromFavoritesCategory', {}) ?? 'Removed from favorites',
+			'undo' => TranslationOverrides.string(_root.$meta, 'undo', {}) ?? 'Undo',
+			'loginToViewCart' => TranslationOverrides.string(_root.$meta, 'loginToViewCart', {}) ?? 'Please log in to view your cart.',
+			'loginToAddToCart' => TranslationOverrides.string(_root.$meta, 'loginToAddToCart', {}) ?? 'Please log in to add items to cart.',
+			'loginToAddToFavorites' => TranslationOverrides.string(_root.$meta, 'loginToAddToFavorites', {}) ?? 'You must log in to add to favorites.',
+			'categoryAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'categoryAddedToFavorites', {}) ?? '{name} was added to your favorites',
+			'categoryRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'categoryRemovedFromFavorites', {}) ?? '{name} was removed from your favorites',
+			'removedFromCart' => TranslationOverrides.string(_root.$meta, 'removedFromCart', {}) ?? 'Removed from cart',
+			'brandAddedToFavorites' => TranslationOverrides.string(_root.$meta, 'brandAddedToFavorites', {}) ?? 'Brand added to favorites',
+			'brandRemovedFromFavorites' => TranslationOverrides.string(_root.$meta, 'brandRemovedFromFavorites', {}) ?? 'Brand removed from favorites',
+			'endsIn' => TranslationOverrides.string(_root.$meta, 'endsIn', {}) ?? 'Ends in',
+			'specialOffer' => TranslationOverrides.string(_root.$meta, 'specialOffer', {}) ?? 'Special Offer',
+			'limitedTimeOffer' => TranslationOverrides.string(_root.$meta, 'limitedTimeOffer', {}) ?? 'Limited time offer',
+			'dealsOfTheDay' => TranslationOverrides.string(_root.$meta, 'dealsOfTheDay', {}) ?? 'Deals of the day',
+			'flashSale' => TranslationOverrides.string(_root.$meta, 'flashSale', {}) ?? 'Flash Sale',
+			'checkoutTitle' => TranslationOverrides.string(_root.$meta, 'checkoutTitle', {}) ?? 'Checkout',
+			'stepAddress' => TranslationOverrides.string(_root.$meta, 'stepAddress', {}) ?? 'Address',
+			'stepShipping' => TranslationOverrides.string(_root.$meta, 'stepShipping', {}) ?? 'Shipping',
+			'stepPayment' => TranslationOverrides.string(_root.$meta, 'stepPayment', {}) ?? 'Payment',
+			'stepSummary' => TranslationOverrides.string(_root.$meta, 'stepSummary', {}) ?? 'Summary',
+			'continueButton' => TranslationOverrides.string(_root.$meta, 'continueButton', {}) ?? 'Continue',
+			'backButton' => TranslationOverrides.string(_root.$meta, 'backButton', {}) ?? 'Back',
+			'placeOrder' => TranslationOverrides.string(_root.$meta, 'placeOrder', {}) ?? 'Place Order',
+			'orderPlacedTitle' => TranslationOverrides.string(_root.$meta, 'orderPlacedTitle', {}) ?? 'Order Placed!',
+			'orderPlacedDescription' => TranslationOverrides.string(_root.$meta, 'orderPlacedDescription', {}) ?? 'Your order has been received.',
+			'backToHome' => TranslationOverrides.string(_root.$meta, 'backToHome', {}) ?? 'Back to Home',
+			'fillRequiredFields' => TranslationOverrides.string(_root.$meta, 'fillRequiredFields', {}) ?? 'Please fill in all required fields.',
+			'selectShippingMethod' => TranslationOverrides.string(_root.$meta, 'selectShippingMethod', {}) ?? 'Please select a shipping method.',
+			'selectPaymentMethod' => TranslationOverrides.string(_root.$meta, 'selectPaymentMethod', {}) ?? 'Please select a payment method.',
+			'firstName' => TranslationOverrides.string(_root.$meta, 'firstName', {}) ?? 'First name',
+			'lastName' => TranslationOverrides.string(_root.$meta, 'lastName', {}) ?? 'Last name',
+			'addressLine1' => TranslationOverrides.string(_root.$meta, 'addressLine1', {}) ?? 'Address',
+			'sameAsBilling' => TranslationOverrides.string(_root.$meta, 'sameAsBilling', {}) ?? 'Same as billing address',
+			'deleteAccount' => TranslationOverrides.string(_root.$meta, 'deleteAccount', {}) ?? 'Delete Account',
+			'deleteAccountTitle' => TranslationOverrides.string(_root.$meta, 'deleteAccountTitle', {}) ?? 'Delete Account?',
+			'deleteAccountMessage30Days' => TranslationOverrides.string(_root.$meta, 'deleteAccountMessage30Days', {}) ?? 'Your account will be scheduled for deletion. It will be permanently deleted within 30 days. Until then you can log in again to cancel the deletion.',
+			'deleteAccountWhatWillBeDeleted' => TranslationOverrides.string(_root.$meta, 'deleteAccountWhatWillBeDeleted', {}) ?? 'This will permanently delete:',
+			'deleteAccountItemProfile' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemProfile', {}) ?? 'Your profile and personal information',
+			'deleteAccountItemOrders' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemOrders', {}) ?? 'All your orders and order history',
+			'deleteAccountItemAddresses' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemAddresses', {}) ?? 'Your saved addresses',
+			'deleteAccountItemReviews' => TranslationOverrides.string(_root.$meta, 'deleteAccountItemReviews', {}) ?? 'All your reviews and ratings',
+			'deleteAccountCannotUndo' => TranslationOverrides.string(_root.$meta, 'deleteAccountCannotUndo', {}) ?? 'After 30 days this cannot be undone. You can cancel within 30 days by logging in.',
+			'deleteAccountContinue' => TranslationOverrides.string(_root.$meta, 'deleteAccountContinue', {}) ?? 'Continue',
+			'deleteAccountGoBack' => TranslationOverrides.string(_root.$meta, 'deleteAccountGoBack', {}) ?? 'Go Back',
+			'deleteAccountFinalConfirm' => TranslationOverrides.string(_root.$meta, 'deleteAccountFinalConfirm', {}) ?? 'Final Confirmation',
+			'deleteAccountSure' => TranslationOverrides.string(_root.$meta, 'deleteAccountSure', {}) ?? 'Are you sure you want to schedule account deletion?',
+			'deleteAccountEmailLabel' => TranslationOverrides.string(_root.$meta, 'deleteAccountEmailLabel', {}) ?? 'Account: {email}',
+			'deleteAccountUnderstandPermanent' => TranslationOverrides.string(_root.$meta, 'deleteAccountUnderstandPermanent', {}) ?? 'I understand my account will be deleted in 30 days and I can cancel by logging in before then',
+			'deleteMyAccount' => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Delete My Account',
+			'deleteAccountSuccess' => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Account deletion has been scheduled. Your account will be removed in 30 days. You can log in before then to cancel.',
+			'deleteAccountFailed' => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Failed to schedule account deletion. Please try again or contact support.',
 			_ => null,
 		};
 	}

@@ -5,16 +5,22 @@ import 'package:core/core.dart'
         AppLocaleUtils,
         LocaleSettings,
         TranslationProvider;
+import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
+import 'package:storefront_supabase/app/core/cart/guest_cart_storage.dart';
 import 'package:storefront_supabase/app/models/product_variant.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
 import 'states.dart';
 
 @injectable
 class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
+  final GuestCartStorage _guestCartStorage;
 
   late final TextEditingController reviewTitleController;
   late final TextEditingController reviewCommentController;
@@ -32,7 +38,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
 
   Map<String, dynamic> get arguments => Map.unmodifiable(_arguments);
 
-  ProductDetailViewModel(this._supabaseClient)
+  ProductDetailViewModel(this._supabaseClient, this._cartCache, this._guestCartStorage)
     : super(ProductDetailInitialState()) {
     reviewTitleController = TextEditingController();
     reviewCommentController = TextEditingController();
@@ -78,7 +84,7 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
                 .maybeSingle()
           : Future<Map<String, dynamic>?>.value(null);
 
-      // 4. Check Cart Status
+      // 4. Check Cart Status (logged-in: Supabase; guest: local storage)
       final cartFuture = (userId != null)
           ? _supabaseClient
                 .from('cart')
@@ -86,7 +92,11 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
                 .eq('user_id', userId)
                 .eq('product_id', productId)
                 .maybeSingle()
-          : Future.value(null);
+          : _guestCartStorage.getItems().then((entries) {
+              final match = entries.where((e) => e.productId == productId).toList();
+              if (match.isEmpty) return null;
+              return <String, dynamic>{'quantity': match.first.quantity};
+            });
 
       final responses = await Future.wait(<Future<dynamic>>[
         productFuture as Future<dynamic>,
@@ -305,52 +315,22 @@ class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {
       }
     }
 
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) {
-      stateChanger(
-        ProductDetailAuthRequiredState(
-          message: 'Please sign in to add to cart',
-          previousState: currentState,
-        ),
-      );
-      return;
-    }
-
+    final variantId = currentState.selectedVariant?.id;
     try {
-      final variantId = currentState.selectedVariant?.id;
-
-      var query = _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-
-      if (variantId != null) {
-        query = query.eq('variant_id', variantId);
+      final cartVm = GetIt.I<CartViewModel>();
+      final ok = await cartVm.addItemToCart(productId, quantity: quantity, variantId: variantId);
+      if (ok) {
+        final uid = _supabaseClient.auth.currentUser?.id;
+        _cartCache.setInCart(uid ?? 'guest', productId, variantId, true);
+        stateChanger(currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true));
       } else {
-        query = query.isFilter('variant_id', null);
+        stateChanger(
+          ProductDetailErrorState(
+            'Failed to add to cart',
+            previousState: currentState,
+          ),
+        );
       }
-
-      final existing = await query.maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + quantity;
-        await _supabaseClient
-            .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'variant_id': variantId,
-          'quantity': quantity,
-        });
-      }
-
-      stateChanger(
-        currentState.copyWith(isInCart: true, shouldShowAddToCartPopup: true),
-      );
     } catch (e) {
       stateChanger(
         ProductDetailErrorState(

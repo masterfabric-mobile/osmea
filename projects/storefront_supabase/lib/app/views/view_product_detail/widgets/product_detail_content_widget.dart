@@ -6,7 +6,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:get_it/get_it.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
@@ -18,6 +18,8 @@ import 'package:storefront_supabase/app/views/view_product_detail/widgets/attrib
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/related_products_widget.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Component model with orderID
 class _ProductDetailComponent {
@@ -104,6 +106,15 @@ class ProductDetailContentWidget extends StatelessWidget {
                 child: ActionSection(
                     isInWishlist: isInWishlist,
                     onToggleWishlist: () {
+                      if (!isInWishlist && Supabase.instance.client.auth.currentUser == null) {
+                        context.snackbarWarning(
+                          context.resources.loginToAddToFavorites,
+                          duration: context.durationLong,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                        );
+                        return;
+                      }
                       viewModel.addProductToWishlistFire(productId);
                     },
                     isInCart: state.isInCart,

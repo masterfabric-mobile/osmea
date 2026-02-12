@@ -81,8 +81,8 @@ class _SupabaseSearchScreenState extends State<SupabaseSearchScreen> {
   @override
   Widget build(BuildContext context) {
     final config = _loadSearchConfig();
-    final placeholder = configString(config?['placeholder']) ??
-        context.resources.searchProductsHint;
+    // Ana sayfadaki search bar ile aynı metin (i18n)
+    final placeholder = context.resources.searchProductsHint;
     final variant = configString(config?['variant']) ?? 'outlined';
 
     return BlocProvider<SearchCubit>.value(

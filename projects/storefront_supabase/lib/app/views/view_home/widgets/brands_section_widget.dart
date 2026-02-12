@@ -6,11 +6,17 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/brand.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/utils/config_utils.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Brands section widget
 class BrandsSectionWidget extends StatelessWidget {
@@ -80,7 +86,7 @@ class BrandsSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _loadBrandsConfig();
-    final sectionTitle = configString(config?['title']) ?? 'Shop by Brand';
+    final sectionTitle = configString(config?['title']) ?? context.resources.shopByBrand;
     final showSection = config?['enabled'] as bool? ?? true;
     final layout =
         configString(config?['layout']) ?? 'grid'; // 'grid' or 'carousel'
@@ -119,7 +125,7 @@ class BrandsSectionWidget extends StatelessWidget {
                   context.push('/categories/products/all');
                 },
                 child: OsmeaComponents.text(
-                  'See all',
+                  context.resources.seeAll,
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     fontSize:
                         context.fontSizeExtraSmallMedium *
@@ -183,27 +189,36 @@ class BrandsSectionWidget extends StatelessWidget {
     );
   }
 
-  /// Woo-style brand card from state (Brand model with logoUrl from DB)
+  /// Woo-style brand card from state (Brand model with logoUrl from DB); includes favorite heart.
   Widget _buildBrandCardFromModel(BuildContext context, Brand brand) {
     final displayImageUrl = brand.logoUrl;
     final brandName = brand.name;
 
-    return GestureDetector(
-      onTap: () {
-        context.push('/brands/${brand.id}');
-      },
-      child: Container(
-        height: context.height80,
-        decoration: BoxDecoration(
-          color: OsmeaColors.white,
-          borderRadius: BorderRadius.circular(context.spacing12),
-          border: Border.all(
-            color: OsmeaColors.silver,
-            width: context.borderWidth,
-          ),
-        ),
-        padding: EdgeInsets.all(context.spacing20),
-        child: displayImageUrl != null && displayImageUrl.isNotEmpty
+    return BlocBuilder<FavoritesViewModel, FavoritesState>(
+      bloc: GetIt.I<FavoritesViewModel>(),
+      buildWhen: (prev, curr) => curr is FavoritesLoadedState,
+      builder: (context, favState) {
+        final isFavorite = favState is FavoritesLoadedState &&
+            favState.favoriteBrands.any((b) => b.id == brand.id);
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            GestureDetector(
+              onTap: () {
+                context.push('/brands/${brand.id}');
+              },
+              child: Container(
+                height: context.height80,
+                decoration: BoxDecoration(
+                  color: OsmeaColors.white,
+                  borderRadius: BorderRadius.circular(context.spacing12),
+                  border: Border.all(
+                    color: OsmeaColors.silver,
+                    width: context.borderWidth,
+                  ),
+                ),
+                padding: EdgeInsets.all(context.spacing20),
+                child: displayImageUrl != null && displayImageUrl.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(context.spacing8),
                 child: OsmeaComponents.image(
@@ -250,7 +265,72 @@ class BrandsSectionWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-      ),
+            ),
+            ),
+            Positioned(
+              top: context.spacing8,
+              right: context.spacing8,
+              child: GestureDetector(
+                onTap: () async {
+                  final vm = GetIt.I<FavoritesViewModel>();
+                  if (isFavorite) {
+                    await vm.removeFavoriteBrand(brand.id);
+                    if (context.mounted) {
+                      context.snackbarWarning(
+                        context.resources.brandRemovedFromFavorites,
+                        style: SnackbarStyle.minimal,
+                        position: SnackbarPosition.bottom,
+                      );
+                    }
+                  } else {
+                    if (Supabase.instance.client.auth.currentUser == null) {
+                      if (context.mounted) {
+                        context.snackbarWarning(
+                          context.resources.loginToAddToFavorites,
+                          duration: context.durationLong,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                        );
+                      }
+                      return;
+                    }
+                    final ok = await vm.addFavoriteBrand(brand.id, brandForOptimisticUpdate: brand);
+                    if (context.mounted) {
+                      if (ok) {
+                        context.snackbarSuccess(
+                          context.resources.brandAddedToFavorites,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                        );
+                      } else {
+                        context.showSnackbar(
+                          message: context.resources.wishlistUpdateFailed,
+                          type: SnackbarType.warning,
+                          style: SnackbarStyle.minimal,
+                          position: SnackbarPosition.bottom,
+                        );
+                      }
+                    }
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.all(context.spacing4),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: OsmeaColors.silver),
+                  ),
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    size: 20,
+                    color: isFavorite ? OsmeaColors.thunder : OsmeaColors.pewter,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -90,136 +90,146 @@ class ProductsByBrandView
     }
 
     if (state is ProductsByBrandLoaded) {
-      if (state.products.isEmpty) {
-        return OsmeaComponents.center(child: OsmeaComponents.text(resources.noProductsForSelection));
-      }
-
-      return GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: 0.75,
-        ),
-        itemCount: state.products.length,
-        itemBuilder: (context, index) {
-          final product = state.products[index];
-          final hasDiscount = product.hasDiscount;
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: () => goRoute('/product-detail/${product.id}'),
-              child: OsmeaComponents.column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  OsmeaComponents.expanded(
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: (product.imageUrl.contains('placehold.co'))
-                              ? Center(
-                                  child: Icon(Icons.image, color: OsmeaColors.pewter))
-                              : OsmeaComponents.image(
-                                  imageUrl: product.imageUrl,
-                                  fit: BoxFit.cover,
-                                  errorWidget: Center(
-                                      child: Icon(Icons.error,
-                                          color: OsmeaColors.black)),
-                                ),
-                        ),
-                        if (hasDiscount)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: OsmeaComponents.container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF000000),
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(4)),
-                              ),
-                              child: OsmeaComponents.text(
-                                'SALE',
-                                textStyle: const TextStyle(
-                                  color: OsmeaColors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+      return OsmeaComponents.column(
+        children: [
+          OsmeaComponents.expanded(
+            child: state.products.isEmpty
+                ? OsmeaComponents.center(child: OsmeaComponents.text(resources.noProductsForSelection))
+                : GridView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16.0,
+                      mainAxisSpacing: 16.0,
+                      childAspectRatio: 0.75,
                     ),
-                  ),
-                  OsmeaComponents.padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: OsmeaComponents.column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        OsmeaComponents.text(
-                          product.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                    itemCount: state.products.length,
+                    itemBuilder: (context, index) {
+                      final product = state.products[index];
+                      final hasDiscount = product.hasDiscount;
+                      return Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Theme.of(context).dividerColor),
                         ),
-                        OsmeaComponents.sizedBox(height: 4),
-                        BlocBuilder<CurrencyCubit, String>(
-                          builder: (context, currency) {
-                            return OsmeaComponents.row(
-                              children: [
-                                if (hasDiscount) ...[
-                                  OsmeaComponents.text(
-                                    PriceHelper.format(
-                                        product.price,
-                                        currency,
-                                        Localizations.localeOf(context)
-                                            .toString()),
-                                    textStyle: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          color: OsmeaColors.slate,
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () => goRoute('/product-detail/${product.id}'),
+                          child: OsmeaComponents.column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              OsmeaComponents.expanded(
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: (product.imageUrl.contains('placehold.co'))
+                                          ? Center(
+                                              child: Icon(Icons.image, color: OsmeaColors.pewter))
+                                          : OsmeaComponents.image(
+                                              imageUrl: product.imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorWidget: Center(
+                                                  child: Icon(Icons.error,
+                                                      color: OsmeaColors.black)),
+                                            ),
+                                    ),
+                                    if (hasDiscount)
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: OsmeaComponents.container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 4,
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF000000),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4)),
+                                          ),
+                                          child: OsmeaComponents.text(
+                                            'SALE',
+                                            textStyle: const TextStyle(
+                                              color: OsmeaColors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
-                                  ),
-                                  OsmeaComponents.sizedBox(width: 4),
-                                ],
-                                OsmeaComponents.text(
-                                  PriceHelper.format(
-                                      product.effectivePrice,
-                                      currency,
-                                      Localizations.localeOf(context)
-                                          .toString()),
-                                  textStyle: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: const Color(0xFF000000),
-                                        fontWeight: FontWeight.bold,
                                       ),
+                                  ],
                                 ),
-                              ],
-                            );
-                          },
+                              ),
+                              OsmeaComponents.padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: OsmeaComponents.column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    OsmeaComponents.text(
+                                      product.name,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    OsmeaComponents.sizedBox(height: 4),
+                                    BlocBuilder<CurrencyCubit, String>(
+                                      builder: (context, currency) {
+                                        return OsmeaComponents.row(
+                                          children: [
+                                            if (hasDiscount) ...[
+                                              OsmeaComponents.text(
+                                                PriceHelper.format(
+                                                    product.price,
+                                                    currency,
+                                                    Localizations.localeOf(context)
+                                                        .toString()),
+                                                textStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      decoration:
+                                                          TextDecoration.lineThrough,
+                                                      color: OsmeaColors.slate,
+                                                    ),
+                                              ),
+                                              OsmeaComponents.sizedBox(width: 4),
+                                            ],
+                                            OsmeaComponents.text(
+                                              PriceHelper.format(
+                                                  product.effectivePrice,
+                                                  currency,
+                                                  Localizations.localeOf(context)
+                                                      .toString()),
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: const Color(0xFF000000),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                ],
-              ),
-            ),
-          );
-        },
+          ),
+        ],
       );
     }
 

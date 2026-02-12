@@ -8,8 +8,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:get_it/get_it.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
@@ -18,6 +19,7 @@ import 'package:storefront_supabase/utils/config_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Flash sale section widget with countdown timer
 class FlashSaleSectionWidget extends StatefulWidget {
@@ -215,7 +217,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
   @override
   Widget build(BuildContext context) {
     final config = _loadFlashSaleConfig();
-    final sectionTitle = configString(config?['title']) ?? 'Flash Sale';
+    final sectionTitle = configString(config?['title']) ?? context.resources.flashSale;
     final showSection = config?['enabled'] as bool? ?? true;
 
     if (!showSection) return const SizedBox.shrink();
@@ -314,7 +316,7 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
                     context.push('/categories/products/all?on_sale=true');
                   },
                   child: OsmeaComponents.text(
-                    'See all',
+                    context.resources.seeAll,
                     textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                       fontSize:
                           context.fontSizeExtraSmallMedium *
@@ -457,23 +459,25 @@ class _FlashSaleSectionWidgetState extends State<FlashSaleSectionWidget> {
 
                       return GestureDetector(
                         onTap: () async {
-                          // Store previous state
                           final wasSaved = localIsSaved;
-
-                          // Immediately update local state
+                          if (!wasSaved && Supabase.instance.client.auth.currentUser == null) {
+                            if (!context.mounted) return;
+                            context.snackbarWarning(
+                              context.resources.loginToAddToFavorites,
+                              duration: context.durationLong,
+                              style: SnackbarStyle.minimal,
+                              position: SnackbarPosition.bottom,
+                            );
+                            return;
+                          }
                           setState(() {
                             _productWishlistStates[productId] = !wasSaved;
                           });
-
-                          // Call view model
-                          // Note: Need to implement toggle logic in FavoritesViewModel
                           final wishlistVm = GetIt.I<FavoritesViewModel>();
                           if (wasSaved) {
-                             await wishlistVm.removeFavorite(productId);
+                            await wishlistVm.removeFavorite(productId);
                           } else {
-                             await wishlistVm.addToCart(productId); // FIXME: This is add to cart, need add to wishlist method
-                             // Since FavoritesViewModel lacks proper toggle method currently, UI updates locally.
-                             // Assuming addFavorite exists or will be added.
+                            await wishlistVm.addFavorite(productId, productForOptimisticUpdate: product);
                           }
                         },
                         child: Container(

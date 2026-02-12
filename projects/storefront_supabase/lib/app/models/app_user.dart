@@ -14,6 +14,8 @@ class AppUser {
   final String? city;
   final String? postalCode;
   final String? country;
+  /// When set, account is scheduled for deletion (30-day grace period). Null = active.
+  final DateTime? accountDeletionScheduledAt;
 
   AppUser({
     required this.id,
@@ -31,6 +33,7 @@ class AppUser {
     this.city,
     this.postalCode,
     this.country,
+    this.accountDeletionScheduledAt,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -50,6 +53,9 @@ class AppUser {
       city: json['city'] as String?,
       postalCode: json['postal_code'] as String?,
       country: json['country'] as String?,
+      accountDeletionScheduledAt: json['account_deletion_scheduled_at'] != null
+          ? DateTime.parse(json['account_deletion_scheduled_at'] as String)
+          : null,
     );
   }
 }

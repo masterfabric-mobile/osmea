@@ -152,6 +152,16 @@ class _RelatedProductsWidgetState extends State<RelatedProductsWidget> {
                           isSaved: isSaved,
                           onWishlistTap: () async {
                             final wasSaved = isSaved;
+                            if (!wasSaved && Supabase.instance.client.auth.currentUser == null) {
+                              if (!context.mounted) return;
+                              context.snackbarWarning(
+                                context.resources.loginToAddToFavorites,
+                                duration: context.durationLong,
+                                style: SnackbarStyle.minimal,
+                                position: SnackbarPosition.bottom,
+                              );
+                              return;
+                            }
                             final success = wasSaved
                                 ? await wishlistVm.removeFavorite(productId)
                                 : await wishlistVm.addFavorite(

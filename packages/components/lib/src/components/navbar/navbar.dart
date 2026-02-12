@@ -2988,7 +2988,8 @@ class OsmeaNavbar extends CoreContainer {
         return _NavbarColors(
           background: backgroundColor ?? OsmeaColors.nordicBlue,
           active: activeColor ?? OsmeaColors.crystalBay,
-          inactive: inactiveColor ?? OsmeaColors.white.withValues(alpha: context.alpha80),
+          inactive: inactiveColor ??
+              OsmeaColors.white.withValues(alpha: context.alpha80),
           border: borderColor ?? OsmeaColors.deepSea,
         );
 

@@ -137,3 +137,10 @@ class CartSuccessState extends CartState {
 
   CartSuccessState({required this.message, required this.previousState});
 }
+
+/// Transient state: item was removed from cart; show snackbar then treat as [loadedState].
+class CartItemRemovedState extends CartState {
+  final CartLoadedState loadedState;
+
+  CartItemRemovedState({required this.loadedState});
+}

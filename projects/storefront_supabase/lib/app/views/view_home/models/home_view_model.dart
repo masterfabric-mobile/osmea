@@ -14,15 +14,18 @@ import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
+import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
 import 'package:get_it/get_it.dart';
 import 'states.dart';
 
 @lazySingleton
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
   final SupabaseClient _supabaseClient;
+  final CartCache _cartCache;
   StreamSubscription<AuthState>? _authSubscription;
 
   // Options for sizes/ages
@@ -47,7 +50,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
 
   final TextEditingController searchController = TextEditingController();
 
-  SupabaseHomeViewModel(this._supabaseClient)
+  SupabaseHomeViewModel(this._supabaseClient, this._cartCache)
     : super(SupabaseHomeInitialState()) {
     // Listen for Auth Changes
     _authSubscription = _supabaseClient.auth.onAuthStateChange.listen((data) {
@@ -416,40 +419,16 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
     }
   }
 
+  /// Sepete ekler. Misafir kullanıcı da sepete ekleyebilir (yerel sepet).
   Future<void> addProductToCart(String productId) async {
-    // Implement add to cart logic using Supabase
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) {
-      stateChanger(HomeAuthRequiredState(productId: productId));
-      return;
-    }
-
     try {
-      // Check existing
-      final existing = await _supabaseClient
-          .from('cart')
-          .select('id, quantity')
-          .match({'user_id': userId, 'product_id': productId})
-          .maybeSingle();
-
-      if (existing != null) {
-        final newQty = (existing['quantity'] as int) + 1;
-        await _supabaseClient
-            .from('cart')
-            .update({'quantity': newQty})
-            .eq('id', existing['id']);
-      } else {
-        await _supabaseClient.from('cart').insert({
-          'user_id': userId,
-          'product_id': productId,
-          'quantity': 1,
-        });
-      }
-
-      // Emit success state? Or just reload/let user know?
-      // Just return for now, UI can show snackbar if needed.
+      final cartVm = GetIt.I<CartViewModel>();
+      await cartVm.addItemToCart(productId, quantity: 1, variantId: null);
+      final uid = _supabaseClient.auth.currentUser?.id;
+      _cartCache.setInCart(uid ?? 'guest', productId, null, true);
     } catch (e) {
       debugPrint('Error adding to cart: $e');
+      rethrow;
     }
   }
 

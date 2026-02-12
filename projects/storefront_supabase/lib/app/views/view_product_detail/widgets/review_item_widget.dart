@@ -132,25 +132,31 @@ class ReviewItemWidget extends StatelessWidget {
             ).copyWith(color: OsmeaColors.grayMaterial[400]!),
           ),
           
-          // Delivery Review
+          // Delivery Review (black/white, no shadow)
           if (review.deliveryRating != null) ...[
-             OsmeaComponents.sizedBox(height: context.spacing8),
-             const Divider(),
-             OsmeaComponents.sizedBox(height: context.spacing8),
-             OsmeaComponents.row(
-               children: [
-                 Icon(Icons.local_shipping, size: 16, color: OsmeaColors.grayMaterial[600]),
-                 OsmeaComponents.sizedBox(width: context.spacing8),
-                 OsmeaComponents.text(
+            OsmeaComponents.sizedBox(height: context.spacing8),
+            Divider(height: 1, color: OsmeaColors.silver),
+            OsmeaComponents.sizedBox(height: context.spacing8),
+            OsmeaComponents.row(
+              children: [
+                Icon(Icons.local_shipping, size: 16, color: OsmeaColors.black),
+                OsmeaComponents.sizedBox(width: context.spacing8),
+                OsmeaComponents.text(
                   'Delivery: ${review.deliveryRating}/5',
-                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(fontWeight: FontWeight.w600),
+                  textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: OsmeaColors.black,
+                  ),
                 ),
-               ],
-             ),
-             if (review.deliveryComment != null && review.deliveryComment!.isNotEmpty) ...[
-                OsmeaComponents.sizedBox(height: context.spacing4),
-                OsmeaComponents.text(review.deliveryComment!),
-             ],
+              ],
+            ),
+            if (review.deliveryComment != null && review.deliveryComment!.isNotEmpty) ...[
+              OsmeaComponents.sizedBox(height: context.spacing4),
+              OsmeaComponents.text(
+                review.deliveryComment!,
+                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(color: OsmeaColors.pewter),
+              ),
+            ],
           ],
         ],
       ),

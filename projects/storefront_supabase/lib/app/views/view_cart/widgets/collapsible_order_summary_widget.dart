@@ -5,11 +5,14 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:go_router/go_router.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
 import 'package:storefront_supabase/app/views/view_cart/widgets/order_summary_widget.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Collapsible order summary widget for bottom of cart
 class CollapsibleOrderSummaryWidget extends StatefulWidget {
@@ -125,7 +128,7 @@ class _CollapsibleOrderSummaryWidgetState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             OsmeaComponents.text(
-                              'Total',
+                              context.resources.total,
                               textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                                 color: OsmeaColors.pewter,
                               ),
@@ -202,7 +205,7 @@ class _CollapsibleOrderSummaryWidgetState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 OsmeaComponents.text(
-                  'Checkout',
+                  context.resources.proceedToCheckout,
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     color: _parseColor(
                       configHelper.getString(
@@ -256,10 +259,33 @@ class _CollapsibleOrderSummaryWidgetState
     }
   }
 
-  void _handleCheckout(BuildContext context) {
-    // For now, Supabase doesn't have a checkout flow implemented yet.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Checkout flow not yet implemented for Supabase')),
-    );
+  void _handleCheckout(BuildContext context) async {
+    final isAuthenticated =
+        Supabase.instance.client.auth.currentUser != null;
+
+    if (!isAuthenticated) {
+      if (context.mounted) {
+        context.snackbarWarning(
+          context.resources.loginToViewCart,
+          duration: const Duration(seconds: 3),
+        );
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (context.mounted) context.go('/auth');
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+    final currentState = widget.viewModel.state;
+    if (currentState is CartLoadedState) {
+      context.go(
+        '/checkout',
+        extra: {
+          'totalAmount': currentState.discountedTotal,
+          'currencySymbol': currentState.currencySymbol ?? '\$',
+          'currencyCode': currentState.currencyCode ?? 'USD',
+        },
+      );
+    }
   }
 }

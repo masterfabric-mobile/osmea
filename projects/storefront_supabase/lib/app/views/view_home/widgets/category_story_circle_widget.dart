@@ -8,8 +8,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/category.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/utils/favorite_categories_helper.dart';
 
 /// Category story circle widget
@@ -75,33 +76,48 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
             _favoriteStatus[categoryId] = wasFavorite;
           });
         }
+        if (!wasFavorite && context.mounted) {
+          context.snackbarWarning(
+            context.resources.loginToAddToFavorites,
+            duration: context.durationLong,
+            style: SnackbarStyle.minimal,
+            position: SnackbarPosition.bottom,
+          );
+        }
         return;
       }
 
       if (!context.mounted) return;
 
       final isNowFavorite = !wasFavorite;
-      
-      context.showSnackbar(
-        title: isNowFavorite ? 'Added to favorites' : 'Removed from favorites',
-        message: isNowFavorite
-            ? '$categoryName was added to your favorites'
-            : '$categoryName was removed from your favorites',
-        type: isNowFavorite ? SnackbarType.success : SnackbarType.info,
-        style: SnackbarStyle.minimal,
-        position: SnackbarPosition.bottom,
-        animation: SnackbarAnimation.slide,
-        duration: const Duration(seconds: 2),
-        actionLabel: 'Undo',
-        onAction: () async {
-          await _favoriteHelper.toggleFavorite(categoryId);
-          if (mounted) {
-            setState(() {
-              _favoriteStatus[categoryId] = wasFavorite;
-            });
-          }
-        },
-      );
+      final message = isNowFavorite
+          ? context.resources.categoryAddedToFavorites.replaceAll('{name}', categoryName)
+          : context.resources.categoryRemovedFromFavorites.replaceAll('{name}', categoryName);
+      if (isNowFavorite) {
+        context.snackbarSuccess(
+          message,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 2),
+          actionLabel: context.resources.undo,
+          onAction: () async {
+            await _favoriteHelper.toggleFavorite(categoryId);
+            if (mounted) setState(() => _favoriteStatus[categoryId] = wasFavorite);
+          },
+        );
+      } else {
+        context.snackbarWarning(
+          message,
+          style: SnackbarStyle.minimal,
+          position: SnackbarPosition.bottom,
+          duration: const Duration(seconds: 2),
+          actionLabel: context.resources.undo,
+          onAction: () async {
+            await _favoriteHelper.toggleFavorite(categoryId);
+            if (mounted) setState(() => _favoriteStatus[categoryId] = wasFavorite);
+          },
+        );
+      }
     } catch (e) {
       // Revert on error
       if (mounted) {

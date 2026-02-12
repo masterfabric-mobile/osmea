@@ -401,34 +401,40 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                               OsmeaComponents.expanded(
                                 child: OsmeaComponents.row(
                                   children: [
-                                    OsmeaComponents.text(
-                                      PriceHelper.format(
-                                          product.salePrice!,
-                                          currency,
-                                          Localizations.localeOf(context).toString()),
-                                      textStyle: OsmeaTextStyle.titleSmall(context)
-                                          .copyWith(
-                                            fontSize:
-                                                context.fontSizeExtraSmallMedium *
-                                                context.textScaleFactor,
-                                            fontWeight: FontWeight.w800,
-                                            color: _getSalePriceColor(context),
-                                          ),
+                                    Flexible(
+                                      child: OsmeaComponents.text(
+                                        PriceHelper.format(
+                                            product.salePrice!,
+                                            currency,
+                                            Localizations.localeOf(context).toString()),
+                                        textStyle: OsmeaTextStyle.titleSmall(context)
+                                            .copyWith(
+                                              fontSize:
+                                                  context.fontSizeExtraSmallMedium *
+                                                  context.textScaleFactor,
+                                              fontWeight: FontWeight.w800,
+                                              color: _getSalePriceColor(context),
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                     OsmeaComponents.sizedBox(width: context.spacing6),
-                                    OsmeaComponents.text(
-                                      PriceHelper.format(
-                                          product.price,
-                                          currency,
-                                          Localizations.localeOf(context).toString()),
-                                      textStyle: OsmeaTextStyle.bodySmall(context)
-                                          .copyWith(
-                                            fontSize:
-                                                context.fontSizeSmall *
-                                                context.textScaleFactor,
-                                            color: OsmeaColors.pewter,
-                                            decoration: TextDecoration.lineThrough,
-                                          ),
+                                    Flexible(
+                                      child: OsmeaComponents.text(
+                                        PriceHelper.format(
+                                            product.price,
+                                            currency,
+                                            Localizations.localeOf(context).toString()),
+                                        textStyle: OsmeaTextStyle.bodySmall(context)
+                                            .copyWith(
+                                              fontSize:
+                                                  context.fontSizeSmall *
+                                                  context.textScaleFactor,
+                                              color: OsmeaColors.pewter,
+                                              decoration: TextDecoration.lineThrough,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -456,6 +462,7 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
                                         fontWeight: FontWeight.w800,
                                         color: _getRegularPriceColor(context),
                                       ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               if (widget.onAddToCart != null) ...[
