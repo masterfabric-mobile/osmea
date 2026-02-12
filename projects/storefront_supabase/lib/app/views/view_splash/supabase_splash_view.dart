@@ -85,15 +85,18 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
+                // Logo 
                 if (logoUrl.isNotEmpty)
-                  OsmeaComponents.image(
-                    imageUrl: logoUrl,
-                    width: 130,
-                    height: 130,
+                  SizedBox(
+                    width: MediaQuery.sizeOf(context).width * 0.35,
+                    height: MediaQuery.sizeOf(context).width * 0.35,
+                    child: OsmeaComponents.image(
+                      imageUrl: logoUrl,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 
-                const SizedBox(height:50),
+                const SizedBox(height: 40),
                 
                 // App Name
                 OsmeaComponents.text(
