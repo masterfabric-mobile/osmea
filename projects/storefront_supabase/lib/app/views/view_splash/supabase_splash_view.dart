@@ -66,7 +66,7 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
     // Get splash config from storefront_supabase config only
     final logoUrl = configHelper.getString(
       'splash_configuration.logo_url',
-      'https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/osmea_logo_black.png?raw=true',
+      'https://github.com/masterfabric-mobile/osmea/blob/dev/projects/api_explorer/assets/images/mf_logo.png',
     );
     final backgroundColor = _parseColor(
       configHelper.getString('splash_configuration.background_color', '#FFFFFF'),
@@ -89,11 +89,11 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
                 if (logoUrl.isNotEmpty)
                   OsmeaComponents.image(
                     imageUrl: logoUrl,
-                    width: 120,
-                    height: 120,
+                    width: 130,
+                    height: 130,
                   ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height:50),
                 
                 // App Name
                 OsmeaComponents.text(
