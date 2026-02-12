@@ -54,27 +54,27 @@ class CheckoutStepIndicator extends StatelessWidget {
       (CheckoutStep.payment, context.resources.stepPayment, Icons.payment_outlined),
       (CheckoutStep.summary, context.resources.stepSummary, Icons.receipt_long_outlined),
     ];
-    return Container(
+    return OsmeaComponents.container(
       padding: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: context.spacing12),
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         border: Border(bottom: BorderSide(color: OsmeaColors.pewter.withValues(alpha: 0.3))),
       ),
-      child: Row(
+      child: OsmeaComponents.row(
         children: [
           for (var i = 0; i < steps.length; i++) ...[
             if (i > 0)
-              Padding(
+              OsmeaComponents.padding(
                 padding: EdgeInsets.only(bottom: context.spacing16),
-                child: SizedBox(
+                child: OsmeaComponents.sizedBox(
                   width: 16,
                   height: 2,
-                  child: Container(
+                  child: OsmeaComponents.container(
                     color: _completed(steps[i - 1].$1) ? OsmeaColors.black : OsmeaColors.pewter.withValues(alpha: 0.3),
                   ),
                 ),
               ),
-            Expanded(
+            OsmeaComponents.expanded(
               child: _StepChip(
                 label: steps[i].$2,
                 icon: steps[i].$3,
@@ -114,28 +114,28 @@ class _StepChip extends StatelessWidget {
         : isActive
             ? OsmeaColors.black
             : OsmeaColors.pewter;
-    return GestureDetector(
+    return OsmeaComponents.container(
       onTap: onTap,
-      child: Column(
+      child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          OsmeaComponents.container(
             width: 36,
             height: 36,
             decoration: BoxDecoration(
               color: isCompleted || isActive ? color : color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: Center(
+            child: OsmeaComponents.center(
               child: isCompleted
                   ? Icon(Icons.check_rounded, color: OsmeaColors.white, size: 18)
                   : Icon(icon, color: isActive || isCompleted ? OsmeaColors.white : color, size: 18),
             ),
           ),
-          SizedBox(height: context.spacing4),
-          Text(
+          OsmeaComponents.sizedBox(height: context.spacing4),
+          OsmeaComponents.text(
             label,
-            style: OsmeaTextStyle.bodySmall(context).copyWith(
+            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
               color: color,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),

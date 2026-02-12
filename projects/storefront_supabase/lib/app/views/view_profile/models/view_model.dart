@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart'; // Add this import
 import 'package:storefront_supabase/app/models/app_user.dart';
+import 'package:storefront_supabase/app/models/user_address.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'states.dart';
 
@@ -22,17 +23,29 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   DateTime? selectedBirthdate;
   String? selectedGender;
   
-  // Address Fields
+  // Address Fields (for editing single address - legacy)
   late final TextEditingController phoneController;
   late final TextEditingController addressController;
   late final TextEditingController postalCodeController;
   
   String? selectedCountry;
   String? selectedCity;
+
+  // Multiple Addresses Management
+  List<UserAddress> _userAddresses = [];
+  List<UserAddress> get userAddresses => _userAddresses;
+  
+  // Address form controllers (for add/edit)
+  late final TextEditingController addressLabelController;
+  late final TextEditingController addressFormAddressController;
+  late final TextEditingController addressFormPostalCodeController;
+  late final TextEditingController addressFormPhoneController;
+  String? addressFormSelectedCountry;
+  String? addressFormSelectedCity;
   
   // Simple Data for Country/City Selection
   final Map<String, List<String>> countryCityMap = {
-    'Turkey': ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya'],
+    'Türkiye': ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya'],
     'USA': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
     'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt'],
     'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice'],
@@ -56,6 +69,12 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     phoneController = TextEditingController();
     addressController = TextEditingController();
     postalCodeController = TextEditingController();
+    
+    // Multiple addresses form
+    addressLabelController = TextEditingController();
+    addressFormAddressController = TextEditingController();
+    addressFormPostalCodeController = TextEditingController();
+    addressFormPhoneController = TextEditingController();
     
 
 
@@ -133,6 +152,13 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
           .eq('user_id', userId);
       final orderCount = (orderRows as List).length;
       
+      // Fetch address count for this user from Supabase user_addresses table
+      final addressRows = await _supabaseClient
+          .from('user_addresses')
+          .select('id')
+          .eq('user_id', userId);
+      final addressCount = (addressRows as List).length;
+      
       // Populate controllers immediately when data is fetched
       usernameController.text = user.username ?? '';
       emailController.text = user.email ?? '';
@@ -153,7 +179,12 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
       selectedCountry = user.country;
       selectedCity = user.city;
 
-      stateChanger(ProfileAuthenticated(user: user, shouldRedirectToHome: justLoggedIn, orderCount: orderCount));
+      stateChanger(ProfileAuthenticated(
+        user: user, 
+        shouldRedirectToHome: justLoggedIn, 
+        orderCount: orderCount,
+        addressCount: addressCount,
+      ));
     } catch (e) {
       stateChanger(const ProfileUnauthenticated(errorMessage: "Failed to load profile"));
     }
@@ -207,7 +238,14 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   
   void _refreshState() {
      if (state is ProfileAuthenticated) {
-       stateChanger((state as ProfileAuthenticated).copyWith());
+       // Force state update by creating a new instance
+       final currentState = state as ProfileAuthenticated;
+       stateChanger(ProfileAuthenticated(
+         user: currentState.user,
+         shouldRedirectToHome: currentState.shouldRedirectToHome,
+         orderCount: currentState.orderCount,
+         addressCount: currentState.addressCount,
+       ));
     }
   }
 
@@ -253,6 +291,190 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
        stateChanger((state as ProfileAuthenticated).copyWith(user: currentUser)); 
        // Ideally handle error
      }
+  }
+
+  // Multiple Addresses Management Methods
+  Future<void> loadUserAddresses() async {
+    if (state is! ProfileAuthenticated) return;
+    final currentState = state as ProfileAuthenticated;
+    final userId = currentState.user.id;
+    
+    try {
+      final response = await _supabaseClient
+          .from('user_addresses')
+          .select()
+          .eq('user_id', userId)
+          .order('is_default', ascending: false)
+          .order('created_at', ascending: false);
+      
+      _userAddresses = (response as List)
+          .map((json) => UserAddress.fromJson(json as Map<String, dynamic>))
+          .toList();
+      
+      debugPrint('loadUserAddresses: Loaded ${_userAddresses.length} addresses');
+      
+      // Update address count in state
+      final addressCount = _userAddresses.length;
+      
+      // Force state update to trigger BlocBuilder rebuild
+      // Create a new instance with copyWith - this ensures Cubit detects the change
+      // Even though values are the same, new instance will trigger rebuild
+      stateChanger(currentState.copyWith(
+        user: currentState.user,
+        shouldRedirectToHome: currentState.shouldRedirectToHome,
+        orderCount: currentState.orderCount,
+        addressCount: addressCount,
+      ));
+    } catch (e) {
+      debugPrint('Error loading user addresses: $e');
+    }
+  }
+
+  Future<bool> addAddress({
+    String? label,
+    required String address,
+    required String city,
+    String? postalCode,
+    String? country,
+    String? phone,
+    bool setAsDefault = false,
+  }) async {
+    if (state is! ProfileAuthenticated) return false;
+    final userId = (state as ProfileAuthenticated).user.id;
+    
+    try {
+      final newAddress = {
+        'user_id': userId,
+        'label': label?.trim(),
+        'address': address.trim(),
+        'city': city.trim(),
+        'postal_code': postalCode?.trim(),
+        'country': country?.trim(),
+        'phone': phone?.trim(),
+        'is_default': setAsDefault,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      };
+      
+      await _supabaseClient.from('user_addresses').insert(newAddress);
+      await loadUserAddresses();
+      // Update address count in state after adding
+      if (state is ProfileAuthenticated) {
+        final currentState = state as ProfileAuthenticated;
+        stateChanger(currentState.copyWith(addressCount: _userAddresses.length));
+      }
+      return true;
+    } catch (e) {
+      debugPrint('Error adding address: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateUserAddress({
+    required String addressId,
+    String? label,
+    String? address,
+    String? city,
+    String? postalCode,
+    String? country,
+    String? phone,
+    bool? setAsDefault,
+  }) async {
+    if (state is! ProfileAuthenticated) return false;
+    
+    try {
+      final updates = <String, dynamic>{
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      };
+      
+      if (label != null) updates['label'] = label.trim();
+      if (address != null) updates['address'] = address.trim();
+      if (city != null) updates['city'] = city.trim();
+      if (postalCode != null) updates['postal_code'] = postalCode.trim();
+      if (country != null) updates['country'] = country.trim();
+      if (phone != null) updates['phone'] = phone.trim();
+      if (setAsDefault != null) updates['is_default'] = setAsDefault;
+      
+      await _supabaseClient
+          .from('user_addresses')
+          .update(updates)
+          .eq('id', addressId);
+      
+      await loadUserAddresses();
+      return true;
+    } catch (e) {
+      debugPrint('Error updating address: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteAddress(String addressId) async {
+    if (state is! ProfileAuthenticated) return false;
+    
+    try {
+      await _supabaseClient
+          .from('user_addresses')
+          .delete()
+          .eq('id', addressId);
+      
+      await loadUserAddresses();
+      // Update address count in state after deleting
+      if (state is ProfileAuthenticated) {
+        final currentState = state as ProfileAuthenticated;
+        stateChanger(currentState.copyWith(addressCount: _userAddresses.length));
+      }
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting address: $e');
+      return false;
+    }
+  }
+
+  Future<bool> setDefaultAddress(String addressId) async {
+    if (state is! ProfileAuthenticated) return false;
+    
+    try {
+      // The trigger will handle unsetting other defaults
+      await _supabaseClient
+          .from('user_addresses')
+          .update({'is_default': true, 'updated_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', addressId);
+      
+      await loadUserAddresses();
+      return true;
+    } catch (e) {
+      debugPrint('Error setting default address: $e');
+      return false;
+    }
+  }
+
+  void setAddressFormCountry(String? country) {
+    addressFormSelectedCountry = country;
+    addressFormSelectedCity = null; // Reset city when country changes
+    _refreshState();
+  }
+
+  void setAddressFormCity(String? city) {
+    addressFormSelectedCity = city;
+    _refreshState();
+  }
+
+  void clearAddressForm() {
+    addressLabelController.clear();
+    addressFormAddressController.clear();
+    addressFormPostalCodeController.clear();
+    addressFormPhoneController.clear();
+    addressFormSelectedCountry = null;
+    addressFormSelectedCity = null;
+  }
+
+  void populateAddressForm(UserAddress address) {
+    addressLabelController.text = address.label ?? '';
+    addressFormAddressController.text = address.address ?? '';
+    addressFormPostalCodeController.text = address.postalCode ?? '';
+    addressFormPhoneController.text = address.phone ?? '';
+    addressFormSelectedCountry = address.country;
+    addressFormSelectedCity = address.city;
   }
 
   Future<void> updateProfile() async {
@@ -427,6 +649,10 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
     phoneController.dispose();
     addressController.dispose();
     postalCodeController.dispose();
+    addressLabelController.dispose();
+    addressFormAddressController.dispose();
+    addressFormPostalCodeController.dispose();
+    addressFormPhoneController.dispose();
     return super.close();
   }
 }

@@ -239,6 +239,21 @@ CREATE TABLE public.products (
   CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id),
   CONSTRAINT products_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brand(id)
 );
+CREATE TABLE public.user_addresses (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  label character varying,
+  address text,
+  city character varying,
+  postal_code character varying,
+  country character varying,
+  phone character varying,
+  is_default boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_addresses_pkey PRIMARY KEY (id),
+  CONSTRAINT user_addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.users (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   email character varying NOT NULL UNIQUE,

@@ -116,7 +116,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return OsmeaComponents.column(
       children: [
         CheckoutStepIndicator(
           currentStep: widget.state.currentStep,
@@ -127,7 +127,7 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
             if (step.index < widget.state.currentStep.index) widget.viewModel.goToStep(step);
           },
         ),
-        Expanded(child: _buildStep()),
+        OsmeaComponents.expanded(child: _buildStep()),
       ],
     );
   }
@@ -148,6 +148,8 @@ class _CheckoutContentWidgetState extends State<CheckoutContentWidget> {
           sameAsBilling: _sameAsBilling,
           onSameAsBillingChanged: (v) => setState(() => _sameAsBilling = v),
           onContinue: _onAddressContinue,
+          viewModel: widget.viewModel,
+          state: s,
         );
       case CheckoutStep.shipping:
         return ShippingStepWidget(

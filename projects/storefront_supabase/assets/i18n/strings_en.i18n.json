@@ -275,5 +275,21 @@
   "deleteAccountUnderstandPermanent": "I understand my account will be deleted in 30 days and I can cancel by logging in before then",
   "deleteMyAccount": "Delete My Account",
   "deleteAccountSuccess": "Account deletion has been scheduled. Your account will be removed in 30 days. You can log in before then to cancel.",
-  "deleteAccountFailed": "Failed to schedule account deletion. Please try again or contact support."
+  "deleteAccountFailed": "Failed to schedule account deletion. Please try again or contact support.",
+  "selectAddress": "Select Address",
+  "addNewAddress": "Add New Address",
+  "billingAddress": "Billing Address",
+  "newAddress": "New Address",
+  "defaultAddress": "Default",
+  "addressAdded": "Address added successfully!",
+  "addressDeleted": "Address deleted successfully!",
+  "defaultAddressSet": "Default address set successfully!",
+  "addressLabelHint": "e.g., Home, Office",
+  "confirmDeleteAddress": "Are you sure you want to delete this address?",
+  "optional": "Optional",
+  "setAsDefault": "Set as Default",
+  "editAddress": "Edit Address",
+  "addAddress": "Add Address",
+  "errorOccurred": "An error occurred. Please try again.",
+  "delete": "Delete"
 }

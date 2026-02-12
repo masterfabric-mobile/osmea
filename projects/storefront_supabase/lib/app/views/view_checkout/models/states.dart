@@ -4,6 +4,8 @@
  * States for the checkout view. 4 steps: Address -> Shipping -> Payment -> Summary
  */
 
+import 'package:storefront_supabase/app/models/user_address.dart';
+
 /// Line item for checkout/order summary
 class CheckoutLineItem {
   final String? key;
@@ -82,6 +84,9 @@ class CheckoutLoadedState extends CheckoutState {
   final Map<String, dynamic>? shippingAddress;
   final String? billingEmail;
   final bool sameAsBilling;
+  final List<UserAddress>? userAddresses;
+  final String? selectedBillingAddressId;
+  final String? selectedShippingAddressId;
   final List<ShippingMethod> shippingMethods;
   final String? selectedShippingMethodId;
   final List<PaymentMethod> paymentMethods;
@@ -102,6 +107,9 @@ class CheckoutLoadedState extends CheckoutState {
     this.shippingAddress,
     this.billingEmail,
     this.sameAsBilling = true,
+    this.userAddresses,
+    this.selectedBillingAddressId,
+    this.selectedShippingAddressId,
     this.shippingMethods = const [],
     this.selectedShippingMethodId,
     this.paymentMethods = const [],
@@ -143,6 +151,9 @@ class CheckoutLoadedState extends CheckoutState {
     Map<String, dynamic>? shippingAddress,
     String? billingEmail,
     bool? sameAsBilling,
+    List<UserAddress>? userAddresses,
+    String? selectedBillingAddressId,
+    String? selectedShippingAddressId,
     List<ShippingMethod>? shippingMethods,
     String? selectedShippingMethodId,
     List<PaymentMethod>? paymentMethods,
@@ -165,6 +176,9 @@ class CheckoutLoadedState extends CheckoutState {
       shippingAddress: shippingAddress ?? this.shippingAddress,
       billingEmail: billingEmail ?? this.billingEmail,
       sameAsBilling: sameAsBilling ?? this.sameAsBilling,
+      userAddresses: userAddresses ?? this.userAddresses,
+      selectedBillingAddressId: selectedBillingAddressId ?? this.selectedBillingAddressId,
+      selectedShippingAddressId: selectedShippingAddressId ?? this.selectedShippingAddressId,
       shippingMethods: shippingMethods ?? this.shippingMethods,
       selectedShippingMethodId:
           clearSelectedShipping ? null : (selectedShippingMethodId ?? this.selectedShippingMethodId),

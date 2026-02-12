@@ -46,13 +46,13 @@ class SummaryStepWidget extends StatelessWidget {
     final total = subtotal + shippingCost;
     final code = currencyCode ?? 'USD';
 
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: SingleChildScrollView(
+        OsmeaComponents.expanded(
+          child: OsmeaComponents.singleChildScrollView(
             padding: EdgeInsets.all(context.spacing16),
-            child: Column(
+            child: OsmeaComponents.column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (billingAddress != null) _Section(title: context.resources.stepAddress, content: _formatAddress(billingAddress!), context: context),
@@ -73,12 +73,12 @@ class SummaryStepWidget extends StatelessWidget {
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing8),
                 for (final item in lineItems)
-                  Padding(
+                  OsmeaComponents.padding(
                     padding: EdgeInsets.only(bottom: context.spacing8),
-                    child: Row(
+                    child: OsmeaComponents.row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
+                        OsmeaComponents.expanded(
                           child: OsmeaComponents.text(
                             '${item.name ?? "Product"} x ${item.quantity}',
                             textStyle: OsmeaTextStyle.bodySmall(context),
@@ -92,7 +92,7 @@ class SummaryStepWidget extends StatelessWidget {
                     ),
                   ),
                 OsmeaComponents.sizedBox(height: context.spacing12),
-                Row(
+                OsmeaComponents.row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OsmeaComponents.text(context.resources.total, textStyle: OsmeaTextStyle.titleMedium(context).copyWith(fontWeight: FontWeight.w700)),
@@ -106,11 +106,11 @@ class SummaryStepWidget extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
+        OsmeaComponents.padding(
           padding: EdgeInsets.all(context.spacing16),
-          child: Row(
+          child: OsmeaComponents.row(
             children: [
-              Expanded(
+              OsmeaComponents.expanded(
                 child: OsmeaComponents.button(
                   onPressed: isProcessing ? null : onBack,
                   backgroundColor: OsmeaColors.white,
@@ -121,7 +121,7 @@ class SummaryStepWidget extends StatelessWidget {
                 ),
               ),
               OsmeaComponents.sizedBox(width: context.spacing12),
-              Expanded(
+              OsmeaComponents.expanded(
                 flex: 2,
                 child: OsmeaComponents.button(
                   onPressed: isProcessing ? null : onPlaceOrder,
@@ -163,7 +163,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
