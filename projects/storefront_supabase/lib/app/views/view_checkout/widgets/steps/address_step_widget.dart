@@ -300,16 +300,24 @@ class AddressStepWidget extends StatelessWidget {
       padding: EdgeInsets.all(context.spacing16),
       onTap: () {
         // Toggle: if already selected, deselect; otherwise select
-        if (isBillingSelected) {
-          // Deselect
+        final currentState = viewModel.state;
+        if (currentState is! CheckoutLoadedState) return;
+        
+        final isCurrentlySelected = currentState.selectedBillingAddressId == address.id;
+        final stateSameAsBilling = currentState.sameAsBilling;
+        
+        if (isCurrentlySelected) {
+          // Currently selected - deselect it
           viewModel.selectBillingAddress(null);
-          if (sameAsBilling) {
+          // If sameAsBilling is true, also deselect shipping
+          if (stateSameAsBilling) {
             viewModel.selectShippingAddress(null);
           }
         } else {
-          // Select
+          // Not selected - select it
           viewModel.selectBillingAddress(address.id);
-          if (sameAsBilling) {
+          // If sameAsBilling is true, also select shipping
+          if (stateSameAsBilling) {
             viewModel.selectShippingAddress(address.id);
           }
         }
@@ -317,64 +325,64 @@ class AddressStepWidget extends StatelessWidget {
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-            OsmeaComponents.row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OsmeaComponents.expanded(
-                  child: OsmeaComponents.column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (address.label != null && address.label!.isNotEmpty) ...[
-                        OsmeaComponents.text(
-                          address.label!,
-                          textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: OsmeaColors.black,
-                          ),
-                        ),
-                        OsmeaComponents.sizedBox(height: context.spacing4),
-                      ],
-                      if (address.isDefault) ...[
-                        OsmeaComponents.container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: OsmeaColors.black,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: OsmeaComponents.text(
-                            'Default',
-                            textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                              color: OsmeaColors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        OsmeaComponents.sizedBox(height: context.spacing8),
-                      ],
+          OsmeaComponents.row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OsmeaComponents.expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (address.label != null && address.label!.isNotEmpty) ...[
                       OsmeaComponents.text(
-                        _formatAddress(address),
-                        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                          color: OsmeaColors.thunder,
+                        address.label!,
+                        textStyle: OsmeaTextStyle.titleSmall(context).copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: OsmeaColors.black,
                         ),
                       ),
-                      if (address.phone != null && address.phone!.isNotEmpty) ...[
-                        OsmeaComponents.sizedBox(height: context.spacing4),
-                        OsmeaComponents.text(
-                          '${resources.phoneNumber}: ${address.phone}',
+                      OsmeaComponents.sizedBox(height: context.spacing4),
+                    ],
+                    if (address.isDefault) ...[
+                      OsmeaComponents.container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: OsmeaColors.black,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: OsmeaComponents.text(
+                          'Default',
                           textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-                            color: OsmeaColors.pewter,
+                            color: OsmeaColors.white,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ],
+                      ),
+                      OsmeaComponents.sizedBox(height: context.spacing8),
                     ],
-                  ),
+                    OsmeaComponents.text(
+                      _formatAddress(address),
+                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                        color: OsmeaColors.thunder,
+                      ),
+                    ),
+                    if (address.phone != null && address.phone!.isNotEmpty) ...[
+                      OsmeaComponents.sizedBox(height: context.spacing4),
+                      OsmeaComponents.text(
+                        '${resources.phoneNumber}: ${address.phone}',
+                        textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                          color: OsmeaColors.pewter,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                if (isBillingSelected || isShippingSelected)
-                  Icon(Icons.check_circle, color: OsmeaColors.black, size: 24),
-              ],
-            ),
-          ],
-        ),
+              ),
+              if (isBillingSelected || isShippingSelected)
+                Icon(Icons.check_circle, color: OsmeaColors.black, size: 24),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

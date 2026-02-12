@@ -163,6 +163,8 @@ class CheckoutLoadedState extends CheckoutState {
     bool? isPaymentStepValid,
     bool clearSelectedShipping = false,
     bool clearSelectedPayment = false,
+    bool clearSelectedBilling = false,
+    bool clearSelectedShippingAddress = false,
   }) {
     return CheckoutLoadedState(
       currentStep: currentStep ?? this.currentStep,
@@ -177,8 +179,8 @@ class CheckoutLoadedState extends CheckoutState {
       billingEmail: billingEmail ?? this.billingEmail,
       sameAsBilling: sameAsBilling ?? this.sameAsBilling,
       userAddresses: userAddresses ?? this.userAddresses,
-      selectedBillingAddressId: selectedBillingAddressId ?? this.selectedBillingAddressId,
-      selectedShippingAddressId: selectedShippingAddressId ?? this.selectedShippingAddressId,
+      selectedBillingAddressId: clearSelectedBilling ? null : (selectedBillingAddressId ?? this.selectedBillingAddressId),
+      selectedShippingAddressId: clearSelectedShippingAddress ? null : (selectedShippingAddressId ?? this.selectedShippingAddressId),
       shippingMethods: shippingMethods ?? this.shippingMethods,
       selectedShippingMethodId:
           clearSelectedShipping ? null : (selectedShippingMethodId ?? this.selectedShippingMethodId),

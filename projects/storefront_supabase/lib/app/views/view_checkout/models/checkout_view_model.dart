@@ -172,21 +172,27 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
     
     // If addressId is null, clear selection
     if (addressId == null) {
+      debugPrint('🔄 Clearing billing address selection');
       emit(s.copyWith(
         selectedBillingAddressId: null,
         billingAddress: null,
+        clearSelectedBilling: true,
       ));
       return;
     }
     
-    // If clicking the same address, deselect it
+    // If clicking the same address that's already selected, deselect it (toggle)
     if (s.selectedBillingAddressId == addressId) {
+      debugPrint('🔄 Toggling billing address: DESELECTING $addressId');
       emit(s.copyWith(
         selectedBillingAddressId: null,
         billingAddress: null,
+        clearSelectedBilling: true,
       ));
       return;
     }
+    
+    debugPrint('✅ Selecting billing address: $addressId (was: ${s.selectedBillingAddressId})');
     
     // Select new address
     if (s.userAddresses == null) return;
@@ -212,18 +218,22 @@ class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {
     
     // If addressId is null, clear selection
     if (addressId == null) {
+      debugPrint('🔄 Clearing shipping address selection');
       emit(s.copyWith(
         selectedShippingAddressId: null,
         shippingAddress: null,
+        clearSelectedShippingAddress: true,
       ));
       return;
     }
     
     // If clicking the same address, deselect it
     if (s.selectedShippingAddressId == addressId) {
+      debugPrint('🔄 Toggling shipping address: DESELECTING $addressId');
       emit(s.copyWith(
         selectedShippingAddressId: null,
         shippingAddress: null,
+        clearSelectedShippingAddress: true,
       ));
       return;
     }
