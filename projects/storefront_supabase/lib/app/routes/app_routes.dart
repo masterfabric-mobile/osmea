@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart'
     hide
-        SplashView,
-        OnboardingView,
         BuildContextTranslationsExtension,
         AppLocaleUtils,
         LocaleSettings,
@@ -29,7 +27,6 @@ import 'package:storefront_supabase/app/views/view_search/supabase_search_screen
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/orders_view.dart';
-import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/personal_info_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/change_password/change_password_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/my_reviews_view.dart';
@@ -45,27 +42,117 @@ import 'package:storefront_supabase/app/views/view_favorites/models/states.dart'
 import 'package:get_it/get_it.dart';
 
 import 'package:storefront_supabase/app/views/view_product_list/product_list_view.dart'; // Added
+import 'package:storefront_supabase/app/views/view_splash/supabase_splash_view.dart';
+import 'package:storefront_supabase/app/views/view_onboarding/supabase_onboarding_view.dart';
 
 /// Scaffold messenger key for user shell (core MasterScaffoldWidget).
 final GlobalKey<ScaffoldMessengerState> _userShellScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
+// Helper function to handle navigation after splash
+Future<void> _handleSplashNavigation(BuildContext context) async {
+  try {
+    // Check onboarding status
+    final onboardingHelper = OnboardingStorageHelper();
+    final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
+
+    // Check if onboarding is enabled in config
+    final configHelper = AssetConfigHelper();
+    final onboardingEnabled = configHelper.getBool(
+      'feature_flags.onboarding_enabled',
+      true,
+    );
+
+    if (!context.mounted) return;
+
+    if (onboardingEnabled && !hasSeenOnboarding) {
+      // First-time user, show onboarding
+      debugPrint('📚 First-time user, navigating to onboarding');
+      context.go('/onboarding');
+    } else {
+      // User has seen onboarding or onboarding is disabled, go to home
+      debugPrint(
+        '🏠 User has seen onboarding or onboarding disabled, navigating to home',
+      );
+      context.go('/home');
+    }
+  } catch (e) {
+    debugPrint('⚠️ Error checking onboarding state: $e');
+    // Fallback: go to home
+    if (context.mounted) {
+      context.go('/home');
+    }
+  }
+}
+
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: <RouteBase>[
+    // Splash Screen Route - Outside ShellRoute so no bottom bar
+    // Using custom SupabaseSplashView instead of core SplashView to avoid config conflicts
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return SupabaseSplashView(
+          goRoute: (String path) {
+            // After splash, check onboarding and navigate accordingly
+            debugPrint('🎯 Splash completed, checking onboarding status');
+            _handleSplashNavigation(context);
+          },
+        );
+      },
+    ),
+
+    // Onboarding Route - Outside ShellRoute so no bottom bar
+    // Using custom SupabaseOnboardingView instead of core OnboardingView to avoid config conflicts
     GoRoute(
       path: '/onboarding',
-      builder: (BuildContext context, GoRouterState state) =>
-          OnboardingView(goRoute: (String path) => context.go(path)),
+      builder: (BuildContext context, GoRouterState state) {
+        return SupabaseOnboardingView(
+          goRoute: (String path) {
+            if (path.contains('/home')) {
+              context.go('/home');
+            } else {
+              context.go('/home'); // Default to home
+            }
+          },
+          onCompleted: () {
+            debugPrint('🎉 Onboarding completed! Going to home');
+            // Mark onboarding as seen
+            OnboardingStorageHelper().markOnboardingSeen();
+            context.go('/home');
+          },
+          onSkipped: () {
+            debugPrint('⏭️ Onboarding skipped! Going to home');
+            // Mark onboarding as seen even if skipped
+            OnboardingStorageHelper().markOnboardingSeen();
+            context.go('/home');
+          },
+        );
+      },
     ),
+
     // User Shell Route: core MasterScaffoldWidget + bottom bar (navbar from config)
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        final navbar = _getNavbarForRoute(context, state.uri.path);
+        // Use location path for navbar determination
+        final location = state.uri.path;
+        
+        // CRITICAL: Double-check that we're not in splash/onboarding routes
+        // ShellRoute should only be called for routes inside it, but be extra safe
+        if (location == '/' || location == '/onboarding') {
+          debugPrint('⚠️ ShellRoute builder called for non-shell route: $location, returning child only');
+          return child; // Return child without scaffold for splash/onboarding
+        }
+        
+        debugPrint('🏗️ Building ShellRoute scaffold for: $location');
+        final navbar = _getNavbarForRoute(context, location);
+        
         return MasterScaffoldWidget(
+          key: ValueKey('master_scaffold_$location'), // Key ensures scaffold rebuilds on route change
           scaffoldMessengerKey: _userShellScaffoldMessengerKey,
           body: child,
-          bottomNavigationBar: navbar != null ? _wrapBottomBar(context, navbar) : null,
+          bottomNavigationBar: navbar != null ? _wrapBottomBar(context, navbar, location) : null,
           navbarSpacer: const SpacerVisibility.disabled(),
           footerSpacer: const SpacerVisibility.disabled(),
           horizontalPadding: const PaddingVisibility.disabled(),
@@ -495,15 +582,39 @@ class _AdminScreenState extends State<AdminScreen> {
 // Colors from navbar_configuration (black/white only, no blue). OsmeaComponents.navbar().
 
 bool _shouldShowNavbarForPath(String path) {
-  if (path == '/onboarding' || path.startsWith('/admin')) return false;
+  // Routes that should NOT show navbar (only special pages like auth, onboarding, splash, etc.)
+  final hideNavbarRoutes = [
+    '/auth', // Authentication pages
+    '/onboarding', // Onboarding flow
+    '/', // Root/splash route
+    '/empty', // Empty state pages
+    '/loading', // Loading pages
+  ];
+
+  // Check if path matches exactly or starts with any hide navbar route
+  for (final route in hideNavbarRoutes) {
+    if (path == route || path.startsWith('$route/')) {
+      debugPrint('🚫 Navbar hidden for route: $path (matches: $route)');
+      return false;
+    }
+  }
+
+  // Admin routes should not show navbar
+  if (path.startsWith('/admin')) {
+    debugPrint('🚫 Navbar hidden for admin route: $path');
+    return false;
+  }
+
+  // Default: show navbar for all other routes
+  debugPrint('✅ Navbar shown for route: $path');
   return true;
 }
 
 /// Wraps navbar: fixed height + clip (overflow fix), theme so tap has no blue splash.
-/// Key ensures consistent rebuild (avoids stale/cached bar on TestFlight).
-Widget _wrapBottomBar(BuildContext context, Widget navbar) {
+/// Key ensures consistent rebuild per route (avoids stale/cached bar).
+Widget _wrapBottomBar(BuildContext context, Widget navbar, String location) {
   return KeyedSubtree(
-    key: const ValueKey<String>('storefront_bottom_navbar'),
+    key: ValueKey<String>('storefront_bottom_navbar_$location'), // Location-specific key prevents cache issues
     child: SizedBox(
       height: 64,
       child: ClipRect(
@@ -521,22 +632,61 @@ Widget _wrapBottomBar(BuildContext context, Widget navbar) {
 
 Widget? _getNavbarForRoute(BuildContext context, String location) {
   try {
+    debugPrint('🔍 Getting navbar for route: $location');
+    
     if (!_shouldShowNavbarForPath(location)) {
+      debugPrint('🚫 Navbar hidden for route: $location');
       return null;
     }
 
     final configHelper = AssetConfigHelper();
+    
+    // CRITICAL: Ensure we're using storefront_supabase config, not storefront_woo
+    // Check if config is loaded and validate it's the correct one
+    final currentConfigPath = configHelper.getCurrentConfigPath();
+    final allConfig = configHelper.getAllConfig();
+    
+    debugPrint('📂 Current config path: $currentConfigPath');
+    
+    // Validate config is from storefront_supabase by checking for supabase_configuration key
+    bool isSupabaseConfig = allConfig != null && allConfig.containsKey('supabase_configuration');
+    bool isWooConfig = allConfig != null && allConfig.containsKey('woocommerce_configuration');
+    
+    if (isWooConfig && !isSupabaseConfig) {
+      debugPrint('⚠️ WRONG CONFIG DETECTED! WooCommerce config loaded instead of Supabase config!');
+      debugPrint('🔄 Clearing cache and forcing reload of storefront_supabase config...');
+      
+      // Clear cache and force reload
+      configHelper.clearCache();
+      // Load config asynchronously - but we can't await here, so we'll validate in builder
+      configHelper.loadConfig('assets/app_config.json', false).then((loaded) {
+        if (loaded) {
+          debugPrint('✅ Successfully reloaded storefront_supabase config');
+        } else {
+          debugPrint('❌ Failed to reload storefront_supabase config');
+        }
+      });
+      
+      // For now, use fallback navbar until config reloads
+      debugPrint('⚠️ Using fallback navbar until config reloads');
+      return _getNavbarForRouteFallback(context, location);
+    }
+    
     final navbarConfig = configHelper.getObject('navbar_configuration');
     final isEnabled = navbarConfig?['enabled'] as bool? ?? true;
     if (!isEnabled) {
+      debugPrint('🚫 Navbar disabled in config');
       return null;
     }
 
     final itemsList = navbarConfig?['items'] as List<dynamic>?;
     if (itemsList == null || itemsList.isEmpty) {
+      debugPrint('⚠️ No navbar items in config, using fallback');
       return _getNavbarForRouteFallback(context, location);
     }
 
+    debugPrint('✅ Found ${itemsList.length} navbar items in config');
+    
     final List<NavbarItemModel> itemModels = itemsList
         .map((item) => NavbarItemModel.fromConfig(item as Map<String, dynamic>))
         .toList();
@@ -545,24 +695,30 @@ Widget? _getNavbarForRoute(BuildContext context, String location) {
     for (final model in itemModels) {
       if (location == model.route) {
         currentIndex = model.orderId;
+        debugPrint('✅ Found matching route in config: ${model.route} -> index $currentIndex');
         break;
       }
       if (model.isConditional &&
           (location == model.authRoute || location == model.guestRoute)) {
         currentIndex = model.orderId;
+        debugPrint('✅ Found matching conditional route: ${model.authRoute}/${model.guestRoute} -> index $currentIndex');
         break;
       }
     }
     currentIndex ??= _getFallbackIndex(location);
     final finalCurrentIndex = currentIndex;
+    
+    debugPrint('📍 Using navbar index: $finalCurrentIndex for route: $location');
 
-    // Use StreamBuilder to listen to Supabase auth changes
-    return StreamBuilder<AuthState>(
-      stream: Supabase.instance.client.auth.onAuthStateChange,
-      builder: (context, snapshot) {
-        final isAuthenticated =
-            snapshot.hasData && snapshot.data?.session != null ||
-            Supabase.instance.client.auth.currentUser != null;
+    // Return a Builder widget to access context and check auth state synchronously
+    // This prevents StreamBuilder rebuild issues that cause navbar to show wrong content
+    // Key the Builder with location to prevent Flutter from caching wrong navbar content
+    return Builder(
+      key: ValueKey('navbar_builder_$location'),
+      builder: (context) {
+        // Check auth state synchronously
+        final isAuthenticated = Supabase.instance.client.auth.currentUser != null;
+        debugPrint('🔐 Auth state for navbar: $isAuthenticated');
 
         return _buildNavbarWithWishlistCount(
           context,
@@ -572,8 +728,9 @@ Widget? _getNavbarForRoute(BuildContext context, String location) {
         );
       },
     );
-  } catch (e) {
-    debugPrint('⚠️ Error loading navbar config for route: $e');
+  } catch (e, stackTrace) {
+    debugPrint('⚠️ Error loading navbar config for route $location: $e');
+    debugPrint('Stack trace: $stackTrace');
     return _getNavbarForRouteFallback(context, location);
   }
 }
@@ -633,7 +790,7 @@ Widget _buildNavbarWidget(
   // Sort by order_id
   itemModels.sort((a, b) => a.orderId.compareTo(b.orderId));
 
-  // Build items
+  // Build items - ALWAYS use resources, never trust config text
   final items = itemModels.map((model) {
     return _buildNavbarItemFromModel(
       context,
@@ -682,7 +839,45 @@ Widget _buildNavbarWidget(
     activeColor,
   );
 
+  // Validate items before building navbar
+  if (items.isEmpty) {
+    debugPrint('⚠️ No valid navbar items, building minimal fallback');
+    // Build minimal fallback navbar
+    final resources = context.resources;
+    return OsmeaComponents.navbar(
+      key: ValueKey('navbar_fallback_minimal'),
+      variant: NavbarVariant.minimal,
+      size: NavbarSize.medium,
+      backgroundColor: OsmeaColors.white,
+      activeColor: OsmeaColors.black,
+      inactiveColor: OsmeaColors.black,
+      currentIndex: currentIndex,
+      items: [
+        NavbarItem(text: resources.home, icon: const Icon(Icons.home), onTap: () {}),
+        NavbarItem(text: resources.search, icon: const Icon(Icons.search), onTap: () {}),
+        NavbarItem(text: resources.cart, icon: const Icon(Icons.shopping_cart), onTap: () {}),
+        NavbarItem(text: resources.favorites, icon: const Icon(Icons.favorite), onTap: () {}),
+        NavbarItem(text: resources.profile, icon: const Icon(Icons.person), onTap: () {}),
+      ],
+      onItemTap: (index) {
+        switch (index) {
+          case 0: context.go('/home'); break;
+          case 1: context.go('/search'); break;
+          case 2: context.go('/cart'); break;
+          case 3: context.go('/favorites'); break;
+          case 4: context.go('/profile'); break;
+        }
+      },
+    );
+  }
+  
+  debugPrint('✅ Building navbar with ${items.length} items, currentIndex: $currentIndex');
+  for (var i = 0; i < items.length; i++) {
+    debugPrint('  Item $i: "${items[i].text}"');
+  }
+
   return OsmeaComponents.navbar(
+    key: ValueKey('navbar_widget_${currentIndex}_${items.length}'), // Key ensures proper rebuild
     variant: variant,
     size: size,
     position: position,
@@ -715,24 +910,40 @@ NavbarItem _buildNavbarItemFromModel(
   String text;
   final resources = context.resources;
   
-  switch (model.id) {
-    case 'home':
-      text = resources.home;
-      break;
-    case 'search':
-      text = resources.search;
-      break;
-    case 'cart':
-      text = resources.cart;
-      break;
-    case 'saved':
-      text = resources.favorites;
-      break;
-    case 'profile':
-      text = resources.profile;
-      break;
-    default:
-      text = model.getText(isAuthenticated);
+  try {
+    switch (model.id) {
+      case 'home':
+        text = resources.home;
+        break;
+      case 'search':
+        text = resources.search;
+        break;
+      case 'cart':
+        text = resources.cart;
+        break;
+      case 'saved':
+      case 'favorites':
+        text = resources.favorites;
+        break;
+      case 'profile':
+        text = resources.profile;
+        break;
+      default:
+        text = model.getText(isAuthenticated);
+        // If text is still empty or looks wrong, use model.id as fallback
+        if (text.isEmpty || text.toLowerCase().contains('osmea') || text.toLowerCase().contains('mobile')) {
+          debugPrint('⚠️ Suspicious navbar text detected: "$text" for model.id: ${model.id}, using fallback');
+          text = model.id.toUpperCase();
+        }
+    }
+    
+    debugPrint('📝 Building navbar item: id=${model.id}, text="$text", route=${model.route}');
+  } catch (e) {
+    debugPrint('⚠️ Error building navbar item text for ${model.id}: $e');
+    text = model.getText(isAuthenticated);
+    if (text.isEmpty) {
+      text = model.id.toUpperCase();
+    }
   }
 
   final iconName = model.getIconName(isAuthenticated);
@@ -776,11 +987,17 @@ void _navigateToPage(
 }
 
 Widget? _getNavbarForRouteFallback(BuildContext context, String location) {
+  // Check if route should show navbar
+  if (!_shouldShowNavbarForPath(location)) {
+    return null;
+  }
+
   // Storefront_supabase: always show navbar for any shell route (e.g. product-detail, profile/info, settings)
   final currentIndex = _getFallbackIndex(location);
   final resources = context.resources;
 
   return OsmeaComponents.navbar(
+    key: ValueKey('navbar_fallback_$location'), // Location-specific key for fallback navbar
     variant: NavbarVariant.minimal,
     size: NavbarSize.medium,
     backgroundColor: OsmeaColors.white,
