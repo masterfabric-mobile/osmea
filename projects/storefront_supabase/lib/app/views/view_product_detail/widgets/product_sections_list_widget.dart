@@ -7,8 +7,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_attributes_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_reviews_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_reviews_with_form_widget.dart';

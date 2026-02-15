@@ -13,8 +13,8 @@ import 'package:storefront_supabase/app/models/favorite_group.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 
-import 'models/view_model.dart';
-import 'models/states.dart';
+import 'models/favorites_view_model.dart';
+import 'models/module/states.dart';
 import 'widgets/favorites_list_widget.dart';
 
 class FavoritesView

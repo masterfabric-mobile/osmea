@@ -15,8 +15,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
 import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/module/states.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchEmptyStateWidget extends StatefulWidget {

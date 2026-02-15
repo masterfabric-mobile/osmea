@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
-import 'models/view_model.dart';
-import 'models/states.dart';
+import 'models/search_view_model.dart';
+import 'models/module/states.dart';
 
 class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
   SearchView({

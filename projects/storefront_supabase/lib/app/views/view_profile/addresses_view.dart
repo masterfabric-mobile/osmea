@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/models/user_address.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {

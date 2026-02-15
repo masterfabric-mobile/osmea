@@ -6,8 +6,8 @@ import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocal
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/utils/localization_helper.dart';
-import 'models/view_model.dart';
-import 'models/states.dart';
+import 'models/profile_view_model.dart';
+import 'models/module/states.dart';
 import 'widgets/logo_header_widget.dart';
 import 'widgets/login_form_widget.dart';
 import 'widgets/signup_form_widget.dart';

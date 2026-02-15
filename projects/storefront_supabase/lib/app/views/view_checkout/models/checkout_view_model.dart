@@ -11,7 +11,7 @@ import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/user_address.dart';
-import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
+import 'package:storefront_supabase/app/views/view_checkout/models/module/states.dart';
 
 @injectable
 class CheckoutViewModel extends BaseViewModelCubit<CheckoutState> {

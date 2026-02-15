@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 
 /// Widget displaying product count
 class ProductCountWidget extends StatelessWidget {

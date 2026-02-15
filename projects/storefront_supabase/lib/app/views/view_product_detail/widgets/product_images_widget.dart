@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, ImageDetailScreen;
-import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/image_detail_screen.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

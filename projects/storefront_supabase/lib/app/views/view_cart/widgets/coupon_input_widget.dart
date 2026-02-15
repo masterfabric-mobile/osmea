@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
 
 /// Widget for coupon code input
 class CouponInputWidget extends StatelessWidget {

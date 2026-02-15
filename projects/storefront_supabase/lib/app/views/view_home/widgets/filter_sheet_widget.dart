@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
-import 'package:storefront_supabase/app/views/view_home/models/states.dart';
+import 'package:storefront_supabase/app/views/view_home/models/module/states.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class FilterSheetWidget extends StatefulWidget {

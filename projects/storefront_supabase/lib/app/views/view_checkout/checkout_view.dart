@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/views/view_checkout/models/checkout_view_model.dart';
-import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
+import 'package:storefront_supabase/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_checkout/widgets/checkout_content_widget.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/utils/unified_loading_widget.dart';

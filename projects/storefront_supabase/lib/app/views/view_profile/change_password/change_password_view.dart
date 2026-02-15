@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
-import 'package:storefront_supabase/app/views/view_profile/change_password/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/change_password/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/change_password/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/change_password/models/change_password_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 

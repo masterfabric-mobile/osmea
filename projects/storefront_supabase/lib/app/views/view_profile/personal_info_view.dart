@@ -6,8 +6,8 @@ import 'package:core/core.dart'
         LocaleSettings,
         TranslationProvider;
 import 'package:go_router/go_router.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {

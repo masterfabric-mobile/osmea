@@ -1,8 +1,8 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
-import 'package:storefront_supabase/app/views/admin/settings/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/settings/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/settings/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/settings/models/admin_settings_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminSettingsView

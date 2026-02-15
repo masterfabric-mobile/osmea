@@ -6,8 +6,8 @@ import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/products/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/products/models/products_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminProductsView

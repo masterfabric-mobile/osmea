@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/add_coupon_view_model.dart';
 
 class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> {
   AddCouponView({
