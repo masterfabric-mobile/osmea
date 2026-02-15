@@ -145,7 +145,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
               child: OsmeaComponents.loading(
                 type: LoadingType.circularFade,
                 size: context.iconSizeLarge,
-                color: const Color(0xFF1976D2),
+                color: OsmeaColors.black,
               ),
             ),
           );
