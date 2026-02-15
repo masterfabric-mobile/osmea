@@ -41,7 +41,11 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
       BuildContext context, AdminCouponsViewModel viewModel, AdminCouponsState state) {
     if (state is AdminCouponsLoading) {
       return OsmeaComponents.center(
-        child: const CircularProgressIndicator(color: OsmeaColors.black),
+        child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
       );
     }
 
@@ -60,26 +64,38 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
           itemCount: state.coupons.length,
           itemBuilder: (context, index) {
             final coupon = state.coupons[index];
-            return Card(
+            return OsmeaComponents.basicCard(
               margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                title: Text(coupon.code, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Column(
+              customContent: OsmeaComponents.listItem(
+                onTap: () => context.go('/admin/coupons/edit/${coupon.id}'),
+                title: OsmeaComponents.text(
+                  coupon.code,
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: OsmeaComponents.column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${coupon.discountType == 'percentage' ? '%' : '\$'}${coupon.discountValue} Off'),
+                    OsmeaComponents.text(
+                      '${coupon.discountType == 'percentage' ? '%' : '\$'}${coupon.discountValue} Off',
+                    ),
                     if (coupon.expiryDate != null)
-                      Text('Expires: ${DateFormat.yMMMd().format(coupon.expiryDate!)}',
-                          style: TextStyle(color: OsmeaColors.slate, fontSize: 12)),
-                    Text('Status: ${coupon.isActive ? "Active" : "Inactive"}',
-                        style: TextStyle(color: coupon.isActive ? OsmeaColors.black : OsmeaColors.pewter, fontSize: 12)),
+                      OsmeaComponents.text(
+                        'Expires: ${DateFormat.yMMMd().format(coupon.expiryDate!)}',
+                        textStyle: TextStyle(color: OsmeaColors.slate, fontSize: 12),
+                      ),
+                    OsmeaComponents.text(
+                      'Status: ${coupon.isActive ? "Active" : "Inactive"}',
+                      textStyle: TextStyle(
+                        color: coupon.isActive ? OsmeaColors.black : OsmeaColors.pewter,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
-                trailing: IconButton(
+                trailing: OsmeaComponents.iconButton(
                   icon: const Icon(Icons.delete_outline, color: OsmeaColors.black),
                   onPressed: () => _confirmDelete(context, viewModel, coupon.id),
                 ),
-                onTap: () => context.go('/admin/coupons/edit/${coupon.id}'),
               ),
             );
           },
@@ -119,22 +135,26 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
   }
 
   void _confirmDelete(BuildContext context, AdminCouponsViewModel viewModel, String id) {
-    showDialog(
+    OsmeaComponents.showPopup(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Coupon'),
-        content: const Text('Are you sure you want to delete this coupon?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: OsmeaColors.black)),
+      title: 'Delete Coupon',
+      child: OsmeaComponents.text('Are you sure you want to delete this coupon?'),
+      footer: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OsmeaComponents.textButton(
+            text: 'Cancel',
+            onPressed: () => Navigator.pop(context),
+            variant: ButtonVariant.ghost,
           ),
-          TextButton(
+          OsmeaComponents.sizedBox(width: 12),
+          OsmeaComponents.textButton(
+            text: 'Delete',
             onPressed: () {
-              Navigator.pop(ctx);
+              Navigator.pop(context);
               viewModel.deleteCoupon(id);
             },
-            child: const Text('Delete', style: TextStyle(color: OsmeaColors.black)),
+            variant: ButtonVariant.danger,
           ),
         ],
       ),

@@ -59,7 +59,11 @@ class AdminDashboardView
     if (state is AdminDashboardLoadingState ||
         state is AdminDashboardInitialState) {
       return OsmeaComponents.center(
-        child: const CircularProgressIndicator(color: OsmeaColors.black),
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
       );
     }
 
