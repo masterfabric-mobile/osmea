@@ -125,7 +125,13 @@ class FavoritesView
     final resources = context.resources;
 
     if (state is FavoritesLoadingState || state is FavoritesInitialState) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
     }
 
     if (state is FavoritesErrorState) {
@@ -154,37 +160,46 @@ class FavoritesView
       return _buildWooStyleContent(context, viewModel, state);
     }
 
-    return const Center(child: CircularProgressIndicator());
+    return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
   }
 
   static void _showCreateGroupDialogImpl(BuildContext context, FavoritesViewModel viewModel) {
     final controller = TextEditingController();
-    showDialog(
+    OsmeaComponents.showPopup(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Create New Group'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Group Name'),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: OsmeaColors.black)),
+      title: 'Create New Group',
+      child: OsmeaComponents.textField(
+        controller: controller,
+        hint: 'Group Name',
+        variant: TextFieldVariant.outlined,
+        autofocus: true,
+      ),
+      footer: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OsmeaComponents.textButton(
+            text: 'Cancel',
+            onPressed: () => Navigator.pop(context),
+            variant: ButtonVariant.ghost,
           ),
-          ElevatedButton(
+          OsmeaComponents.sizedBox(width: 12),
+          OsmeaComponents.button(
+            text: 'Create',
             onPressed: () {
               if (controller.text.isNotEmpty) {
                 viewModel.createGroup(controller.text);
-                Navigator.pop(ctx);
+                Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(
-backgroundColor: OsmeaColors.black,
-                  foregroundColor: OsmeaColors.white,
-            ),
-            child: const Text('Create'),
+            variant: ButtonVariant.primary,
+            backgroundColor: OsmeaColors.black,
+            textColor: OsmeaColors.white,
           ),
         ],
       ),
@@ -224,14 +239,14 @@ backgroundColor: OsmeaColors.black,
         children: [
           OsmeaComponents.text(
             resources.brands,
-            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: OsmeaColors.black,
             ),
           ),
           SizedBox(height: context.spacing12),
-          SizedBox(
-            height: 100,
+            SizedBox(
+            height: 108,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: state.favoriteBrands.length,
@@ -256,14 +271,14 @@ backgroundColor: OsmeaColors.black,
         children: [
           OsmeaComponents.text(
             context.resources.categories,
-            textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: OsmeaColors.black,
             ),
           ),
           SizedBox(height: context.spacing12),
-          SizedBox(
-            height: 100,
+            SizedBox(
+            height: 108,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: state.favoriteCategories.length,
@@ -300,16 +315,16 @@ backgroundColor: OsmeaColors.black,
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                OsmeaComponents.text(
                   context.resources.collections,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: OsmeaColors.black,
                   ),
                 ),
                 SizedBox(height: context.spacing12),
                 SizedBox(
-                  height: 100,
+                  height: 108,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: state.groups.length,
@@ -362,11 +377,11 @@ backgroundColor: OsmeaColors.black,
               ),
             ),
             SizedBox(height: context.spacing4),
-            Text(
+            OsmeaComponents.text(
               group.name,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                 fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: OsmeaColors.grayMaterial[600],
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -425,7 +440,7 @@ backgroundColor: OsmeaColors.black,
                         category.name,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: OsmeaColors.grayMaterial[600],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -679,7 +694,11 @@ class _CollectionSheetDeleteButtonState extends State<_CollectionSheetDeleteButt
       return SizedBox(
         width: 24,
         height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 24,
+          color: OsmeaColors.black,
+        ),
       );
     }
     return IconButton(
@@ -698,7 +717,9 @@ class _CollectionSheetDeleteButtonState extends State<_CollectionSheetDeleteButt
               Expanded(
                 child: OsmeaComponents.button(
                   text: 'Cancel',
-                  variant: ButtonVariant.outlined,
+                  variant: ButtonVariant.ghost,
+                  textColor: OsmeaColors.black,
+                  borderColor: OsmeaColors.silver,
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
               ),
@@ -706,9 +727,10 @@ class _CollectionSheetDeleteButtonState extends State<_CollectionSheetDeleteButt
               Expanded(
                 child: OsmeaComponents.button(
                   text: 'Delete',
-                  variant: ButtonVariant.primary,
-                  backgroundColor: OsmeaColors.red,
-                  textColor: OsmeaColors.white,
+                  variant: ButtonVariant.outlined,
+                  textColor: OsmeaColors.black,
+                  borderColor: OsmeaColors.black,
+                  backgroundColor: OsmeaColors.white,
                   onPressed: () => Navigator.of(context).pop(true),
                 ),
               ),
@@ -725,7 +747,7 @@ class _CollectionSheetDeleteButtonState extends State<_CollectionSheetDeleteButt
               context.showSnackbar(
                 title: 'Deleted',
                 message: 'Collection deleted successfully',
-                type: SnackbarType.success,
+                type: SnackbarType.warning,
                 style: SnackbarStyle.minimal,
                 position: SnackbarPosition.bottom,
               );
@@ -788,10 +810,15 @@ class _CollectionDetailContentState extends State<_CollectionDetailContent> {
     if (_loading) {
       return Padding(
         padding: EdgeInsets.all(context.spacing24),
-        child: const Center(child: CircularProgressIndicator()),
+        child: Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      ),
       );
     }
-    final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -799,20 +826,20 @@ class _CollectionDetailContentState extends State<_CollectionDetailContent> {
           // Items in this collection
           Padding(
             padding: EdgeInsets.symmetric(horizontal: context.spacing20, vertical: context.spacing8),
-            child: Text(
+            child: OsmeaComponents.text(
               'Items in this collection: ${_inCollection!.length}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                color: OsmeaColors.grayMaterial[600],
               ),
             ),
           ),
           if (_inCollection!.isEmpty)
             Padding(
               padding: EdgeInsets.all(context.spacing16),
-              child: Text(
+              child: OsmeaComponents.text(
                 'No items in this collection yet',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  color: OsmeaColors.grayMaterial[600],
                 ),
               ),
             )
@@ -829,21 +856,21 @@ class _CollectionDetailContentState extends State<_CollectionDetailContent> {
           // Add products to this collection
           Padding(
             padding: EdgeInsets.symmetric(horizontal: context.spacing20, vertical: context.spacing8),
-            child: Text(
+            child: OsmeaComponents.text(
               'Add products to this collection:',
-              style: theme.textTheme.bodyMedium?.copyWith(
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: OsmeaColors.black,
               ),
             ),
           ),
           if (_notInCollection!.isEmpty)
             Padding(
               padding: EdgeInsets.all(context.spacing16),
-              child: Text(
+              child: OsmeaComponents.text(
                 'No other products to add',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                  color: OsmeaColors.grayMaterial[600],
                 ),
               ),
             )
@@ -884,7 +911,6 @@ class _CollectionItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.spacing12,
@@ -903,7 +929,7 @@ class _CollectionItemRow extends StatelessWidget {
               errorWidget: SizedBox(
                 width: 50,
                 height: 50,
-                child: Icon(Icons.image_outlined, size: 24, color: theme.colorScheme.onSurfaceVariant),
+                child: Icon(Icons.image_outlined, size: 24, color: OsmeaColors.grayMaterial[600]),
               ),
             ),
           ),
@@ -915,11 +941,11 @@ class _CollectionItemRow extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () => goRoute('/product-detail/${product.id}'),
-                  child: Text(
+                  child: OsmeaComponents.text(
                     product.name,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
+                      color: OsmeaColors.black,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -927,14 +953,14 @@ class _CollectionItemRow extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: context.spacing2),
-                  child: Text(
+                  child: OsmeaComponents.text(
                     PriceHelper.format(
                       product.effectivePrice,
                       context.watch<CurrencyCubit>().state,
                       Localizations.localeOf(context).toString(),
                     ),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                      color: OsmeaColors.grayMaterial[600],
                     ),
                   ),
                 ),
@@ -944,7 +970,7 @@ class _CollectionItemRow extends StatelessWidget {
           IconButton(
             icon: Icon(
               isInCollection ? Icons.remove_circle_outline : Icons.add_circle_outline,
-              color: theme.colorScheme.primary,
+              color: OsmeaColors.black,
               size: 24,
             ),
             onPressed: () async {
