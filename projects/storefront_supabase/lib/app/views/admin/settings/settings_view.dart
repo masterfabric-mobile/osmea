@@ -42,7 +42,13 @@ class AdminSettingsView
       BuildContext context, AdminSettingsViewModel viewModel, AdminSettingsState state) {
     final resources = context.resources;
     if (state is AdminSettingsLoading || state is AdminSettingsInitial) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is AdminSettingsError) {

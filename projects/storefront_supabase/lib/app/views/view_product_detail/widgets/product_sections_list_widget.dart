@@ -255,8 +255,9 @@ class ProductSectionsListWidget extends StatelessWidget {
                         placeholder: OsmeaComponents.container(
                           color: OsmeaColors.grayMaterial[50],
                           child: OsmeaComponents.center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                            child: OsmeaComponents.loading(
+                              type: LoadingType.circularFade,
+                              size: 24,
                               color: OsmeaColors.black,
                             ),
                           ),

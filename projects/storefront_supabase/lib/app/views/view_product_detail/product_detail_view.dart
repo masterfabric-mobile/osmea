@@ -88,12 +88,7 @@ class ProductDetailView
                 ? context.resources.removedFromFavoritesCategory
                 : state.message);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(displayMessage),
-              backgroundColor: OsmeaColors.green,
-            ),
-          );
+          context.snackbarSuccess(displayMessage);
         });
       }
       

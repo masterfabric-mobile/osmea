@@ -86,7 +86,13 @@ class ProductsByBrandView
     }
 
     if (state is ProductsByBrandLoading || state is ProductsByBrandInitial) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
     }
 
     if (state is ProductsByBrandLoaded) {
@@ -108,16 +114,12 @@ class ProductsByBrandView
                     itemBuilder: (context, index) {
                       final product = state.products[index];
                       final hasDiscount = product.hasDiscount;
-                      return Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(color: Theme.of(context).dividerColor),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () => goRoute('/product-detail/${product.id}'),
-                          child: OsmeaComponents.column(
+                      return OsmeaComponents.basicCard(
+                        onTap: () => goRoute('/product-detail/${product.id}'),
+                        variant: ComponentAppearance.outlined,
+                        borderColor: OsmeaColors.grayMaterial[200],
+                        borderRadius: BorderRadius.circular(8),
+                        customContent: OsmeaComponents.column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               OsmeaComponents.expanded(
@@ -145,13 +147,13 @@ class ProductsByBrandView
                                             vertical: 4,
                                           ),
                                           decoration: const BoxDecoration(
-                                            color: Color(0xFF000000),
+                                            color: OsmeaColors.black,
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(4)),
                                           ),
                                           child: OsmeaComponents.text(
                                             'SALE',
-                                            textStyle: const TextStyle(
+                                            textStyle: OsmeaTextStyle.labelSmall(context).copyWith(
                                               color: OsmeaColors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
@@ -171,10 +173,7 @@ class ProductsByBrandView
                                       product.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      textStyle: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
+                                      textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
@@ -190,10 +189,7 @@ class ProductsByBrandView
                                                     currency,
                                                     Localizations.localeOf(context)
                                                         .toString()),
-                                                textStyle: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall
-                                                    ?.copyWith(
+                                                textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                                                       decoration:
                                                           TextDecoration.lineThrough,
                                                       color: OsmeaColors.slate,
@@ -207,11 +203,8 @@ class ProductsByBrandView
                                                   currency,
                                                   Localizations.localeOf(context)
                                                       .toString()),
-                                              textStyle: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: const Color(0xFF000000),
+                                              textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
+                                                    color: OsmeaColors.black,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                             ),
@@ -224,8 +217,7 @@ class ProductsByBrandView
                               ),
                             ],
                           ),
-                        ),
-                      );
+                        );
                     },
                   ),
           ),
@@ -233,8 +225,12 @@ class ProductsByBrandView
       );
     }
 
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
     );
   }
 }

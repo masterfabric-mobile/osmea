@@ -44,7 +44,13 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
       BuildContext context, ChangePasswordViewModel viewModel, ChangePasswordState state) {
     final resources = context.resources;
     if (state is ChangePasswordLoading) {
-      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is ChangePasswordError) {

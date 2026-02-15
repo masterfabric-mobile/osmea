@@ -85,7 +85,7 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
               children: [
                 // Logo 
                 if (logoUrl.isNotEmpty)
-                  SizedBox(
+                  OsmeaComponents.sizedBox(
                     width: MediaQuery.sizeOf(context).width * 0.35,
                     height: MediaQuery.sizeOf(context).width * 0.35,
                     child: OsmeaComponents.image(
@@ -94,7 +94,7 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
                     ),
                   ),
                 
-                const SizedBox(height: 40),
+                OsmeaComponents.sizedBox(height: 40),
                 
                 // App Name
                 OsmeaComponents.text(
@@ -105,14 +105,16 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
                   textAlign: TextAlign.center,
                 ),
                 
-                const SizedBox(height: 16),
+                OsmeaComponents.sizedBox(height: 16),
                 
                 // Loading indicator
-                const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                OsmeaComponents.loading(
+                  type: LoadingType.circularFade,
+                  size: 36,
+                  color: OsmeaColors.black,
                 ),
                 
-                const SizedBox(height: 24),
+                OsmeaComponents.sizedBox(height: 24),
                 
                 // Version
                 OsmeaComponents.text(

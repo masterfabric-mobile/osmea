@@ -203,7 +203,7 @@ class _CollectionsSectionWidgetState extends State<CollectionsSectionWidget>
                 indicatorPadding: EdgeInsets.zero,
                 tabs: items.map((e) => Tab(text: e.title)).toList(),
               ),
-              Divider(
+              OsmeaComponents.divider(
                 height: 1,
                 thickness: 1,
                 color: OsmeaColors.silver.withValues(alpha: 0.6),

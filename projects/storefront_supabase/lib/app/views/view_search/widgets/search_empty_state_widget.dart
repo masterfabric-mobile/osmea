@@ -119,7 +119,11 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(),
+            OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 36,
+              color: OsmeaColors.black,
+            ),
             SizedBox(height: context.spacing16),
             Text('Loading...'),
           ],
@@ -156,7 +160,13 @@ class _SearchEmptyStateWidgetState extends State<SearchEmptyStateWidget> {
     }
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
     }
 
     return ListView(

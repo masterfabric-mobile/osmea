@@ -178,7 +178,13 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               itemCount: widget.state.products.length + (widget.state.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= widget.state.products.length) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                child: OsmeaComponents.loading(
+                  type: LoadingType.circularFade,
+                  size: 36,
+                  color: OsmeaColors.black,
+                ),
+              );
                 }
 
                 final product = widget.state.products[index];

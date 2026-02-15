@@ -38,8 +38,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   bool _isConfirmed = false;
 
   static Color _getDeleteColor(BuildContext context) {
-    final theme = Theme.of(context);
-    return theme.colorScheme.error;
+    return OsmeaColors.red[400]!;
   }
 
   @override
@@ -53,10 +52,9 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   Widget _buildInitialWarningDialog(BuildContext context) {
     final res = context.resources;
     final deleteColor = _getDeleteColor(context);
-    final theme = Theme.of(context);
 
     return AlertDialog(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: OsmeaColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -73,7 +71,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
               res.deleteAccountTitle,
               textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: OsmeaColors.black,
               ),
             ),
           ),
@@ -86,14 +84,14 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           OsmeaComponents.text(
             res.deleteAccountMessage30Days,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurface,
+              color: OsmeaColors.black,
             ),
           ),
           OsmeaComponents.sizedBox(height: context.spacing16),
           OsmeaComponents.text(
             res.deleteAccountWhatWillBeDeleted,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurface,
+              color: OsmeaColors.black,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -133,7 +131,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           child: OsmeaComponents.text(
             res.cancel,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: OsmeaColors.grayMaterial[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -150,7 +148,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           child: OsmeaComponents.text(
             res.deleteAccountContinue,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onError,
+                color: OsmeaColors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -162,10 +160,9 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   Widget _buildFinalConfirmationDialog(BuildContext context) {
     final res = context.resources;
     final deleteColor = _getDeleteColor(context);
-    final theme = Theme.of(context);
 
     return AlertDialog(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: OsmeaColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -173,7 +170,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
         res.deleteAccountFinalConfirm,
         textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
           fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onSurface,
+          color: OsmeaColors.black,
         ),
       ),
       content: OsmeaComponents.column(
@@ -183,14 +180,14 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           OsmeaComponents.text(
             res.deleteAccountSure,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurface,
+              color: OsmeaColors.black,
             ),
           ),
           OsmeaComponents.sizedBox(height: context.spacing12),
           OsmeaComponents.text(
             res.deleteAccountEmailLabel.replaceAll('{email}', widget.userEmail),
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: OsmeaColors.grayMaterial[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -223,7 +220,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                     child: OsmeaComponents.text(
                       res.deleteAccountUnderstandPermanent,
                       textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                        color: theme.colorScheme.onSurface,
+                        color: OsmeaColors.black,
                       ),
                     ),
                   ),
@@ -244,7 +241,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           child: OsmeaComponents.text(
             res.deleteAccountGoBack,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: OsmeaColors.grayMaterial[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -257,12 +254,12 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _isConfirmed ? deleteColor : theme.colorScheme.surfaceContainerHighest,
+            backgroundColor: _isConfirmed ? deleteColor : OsmeaColors.grayMaterial[200],
           ),
           child: OsmeaComponents.text(
             res.deleteMyAccount,
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-              color: _isConfirmed ? theme.colorScheme.onError : theme.colorScheme.onSurfaceVariant,
+              color: _isConfirmed ? OsmeaColors.white : OsmeaColors.grayMaterial[600],
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -273,7 +270,6 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
 
   Widget _buildDeleteItem(BuildContext context, String text) {
     final deleteColor = _getDeleteColor(context);
-    final theme = Theme.of(context);
 
     return Padding(
       padding: EdgeInsets.only(bottom: context.spacing8),
@@ -286,7 +282,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
             child: OsmeaComponents.text(
               text,
               textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
-                color: theme.colorScheme.onSurface,
+                color: OsmeaColors.black,
               ),
             ),
           ),

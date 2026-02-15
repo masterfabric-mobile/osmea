@@ -69,7 +69,13 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
       BuildContext context, SearchViewModel viewModel, SearchState state) {
     final resources = context.resources;
     if (state is SearchLoadingState) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
     } else if (state is SearchErrorState) {
       return buildError(
         state.message,
@@ -93,9 +99,9 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
         itemBuilder: (context, index) {
           final product = state.searchResults[index];
           final hasDiscount = product.hasDiscount;
-          return Card(
+          return OsmeaComponents.basicCard(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: OsmeaComponents.listItem(
+            customContent: OsmeaComponents.listItem(
               leading: SizedBox(
                 width: 50,
                 height: 50,
@@ -173,8 +179,12 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
         },
       );
     }
-    return const Center(
+    return Center(
         child:
-            CircularProgressIndicator()); // Should not happen in normal flow
+            OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 36,
+              color: OsmeaColors.black,
+            )); // Should not happen in normal flow
   }
 }

@@ -135,7 +135,7 @@ class ReviewItemWidget extends StatelessWidget {
           // Delivery Review (black/white, no shadow)
           if (review.deliveryRating != null) ...[
             OsmeaComponents.sizedBox(height: context.spacing8),
-            Divider(height: 1, color: OsmeaColors.silver),
+            OsmeaComponents.divider(height: 1, color: OsmeaColors.silver),
             OsmeaComponents.sizedBox(height: context.spacing8),
             OsmeaComponents.row(
               children: [

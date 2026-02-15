@@ -52,7 +52,13 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   ) {
     final resources = context.resources;
     if (state is ProfileLoading) {
-      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is ProfileAuthenticated) {

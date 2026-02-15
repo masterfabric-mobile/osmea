@@ -123,7 +123,13 @@ class _MyReviewsViewState extends State<MyReviewsView> {
         ),
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: OsmeaColors.black))
+          ? Center(
+          child: OsmeaComponents.loading(
+            type: LoadingType.circularFade,
+            size: 36,
+            color: OsmeaColors.black,
+          ),
+        )
           : _error != null
               ? Center(
                   child: Padding(

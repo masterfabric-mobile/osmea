@@ -93,14 +93,9 @@ class _SearchScreenState extends State<SearchScreen> {
           backgroundColor: OsmeaColors.white,
           foregroundColor: OsmeaColors.black,
           elevation: 0,
-          leading: IconButton(
+          leading: OsmeaComponents.iconButton(
             icon: const Icon(Icons.arrow_back, color: OsmeaColors.black),
             onPressed: () => widget.goRoute('/home'),
-            padding: EdgeInsets.symmetric(horizontal: context.spacing8),
-            style: IconButton.styleFrom(
-              minimumSize: const Size(48, 48),
-              maximumSize: const Size(48, 48),
-            ),
           ),
           title: Text(
             context.resources.searchProducts,
@@ -178,7 +173,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 bloc: _searchCubit,
                 builder: (context, state) {
                   if (state.isLoading && state.results.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: OsmeaComponents.loading(
+                        type: LoadingType.circularFade,
+                        size: 36,
+                        color: OsmeaColors.black,
+                      ),
+                    );
                   }
                   if (state.hasResults) {
                     return SearchResultsGridWidget(products: state.results);

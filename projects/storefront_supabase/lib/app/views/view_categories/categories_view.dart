@@ -51,8 +51,12 @@ class CategoriesView
     }
 
     if (state is CategoriesLoadingState || state is CategoriesInitialState) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
       );
     }
 
@@ -76,8 +80,12 @@ class CategoriesView
       );
     }
 
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
     );
   }
 }

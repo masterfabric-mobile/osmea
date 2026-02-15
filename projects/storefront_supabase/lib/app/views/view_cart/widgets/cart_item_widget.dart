@@ -196,11 +196,12 @@ class CartItemWidget extends StatelessWidget {
           OsmeaComponents.padding(
             padding: context.horizontalPaddingLow,
             child: isUpdating
-                ? SizedBox(
+                ? OsmeaComponents.sizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
+                    child: OsmeaComponents.loading(
+                      type: LoadingType.circularFade,
+                      size: 20,
                       color: OsmeaColors.thunder,
                     ),
                   )
