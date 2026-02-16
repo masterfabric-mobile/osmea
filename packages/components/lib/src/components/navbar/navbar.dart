@@ -2995,156 +2995,156 @@ class OsmeaNavbar extends CoreContainer {
 
       case NavbarVariant.dottedOutline:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.nordicBlue,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.nordicBlue,
         );
 
       case NavbarVariant.healthcareMinimal:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.outlinedMinimal:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.mediaOverlay:
         return _NavbarColors(
-          background: OsmeaColors.transparent,
+          background: backgroundColor ?? OsmeaColors.transparent,
           active: activeColor ?? OsmeaColors.nordicBlue,
           inactive: inactiveColor ?? OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.socialGlass:
         return _NavbarColors(
-          background: OsmeaColors.white.withValues(alpha: context.alpha10),
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver.withValues(alpha: context.alpha30),
+          background: backgroundColor ?? OsmeaColors.white.withValues(alpha: context.alpha10),
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver.withValues(alpha: context.alpha30),
         );
 
       case NavbarVariant.enterpriseMain:
         return _NavbarColors(
-          background: OsmeaColors.nordicBlue,
-          active: OsmeaColors.crystalBay,
-          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
-          border: OsmeaColors.deepSea,
+          background: backgroundColor ?? OsmeaColors.nordicBlue,
+          active: activeColor ?? OsmeaColors.crystalBay,
+          inactive: inactiveColor ?? OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: borderColor ?? OsmeaColors.deepSea,
         );
 
       case NavbarVariant.iconGrid:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.floatingCards:
         return _NavbarColors(
-          background: Colors.transparent,
-          active: Colors.grey.shade800,
-          inactive: Colors.grey.shade500,
-          border: Colors.transparent,
+          background: backgroundColor ?? Colors.transparent,
+          active: activeColor ?? Colors.grey.shade800,
+          inactive: inactiveColor ?? Colors.grey.shade500,
+          border: borderColor ?? Colors.transparent,
         );
 
       case NavbarVariant.pillShaped:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.minimal:
       case NavbarVariant.solidOutlined:
       case NavbarVariant.minimalDot:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.brutalist:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.black,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.black,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.black,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.black,
         );
 
       case NavbarVariant.badgeIndicator:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.neumorphic:
         return _NavbarColors(
-          background: OsmeaColors.ash,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.ash,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.cardFloating:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.bubble:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.glassyBlur:
         return _NavbarColors(
-          background: OsmeaColors.white.withValues(alpha: context.alpha15),
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.white.withValues(alpha: context.alpha50),
+          background: backgroundColor ?? OsmeaColors.white.withValues(alpha: context.alpha15),
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.white.withValues(alpha: context.alpha50),
         );
 
       case NavbarVariant.markerTab:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.stepped:
         return _NavbarColors(
-          background: OsmeaColors.white,
-          active: OsmeaColors.nordicBlue,
-          inactive: OsmeaColors.pewter,
-          border: OsmeaColors.silver,
+          background: backgroundColor ?? OsmeaColors.white,
+          active: activeColor ?? OsmeaColors.nordicBlue,
+          inactive: inactiveColor ?? OsmeaColors.pewter,
+          border: borderColor ?? OsmeaColors.silver,
         );
 
       case NavbarVariant.ribbon:
         return _NavbarColors(
-          background: OsmeaColors.nordicBlue,
-          active: OsmeaColors.crystalBay,
-          inactive: OsmeaColors.white.withValues(alpha: context.alpha80),
-          border: OsmeaColors.deepSea,
+          background: backgroundColor ?? OsmeaColors.nordicBlue,
+          active: activeColor ?? OsmeaColors.crystalBay,
+          inactive: inactiveColor ?? OsmeaColors.white.withValues(alpha: context.alpha80),
+          border: borderColor ?? OsmeaColors.deepSea,
         );
     }
   }

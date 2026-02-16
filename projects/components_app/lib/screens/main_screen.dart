@@ -25,11 +25,11 @@ class _MainScreenState extends State<MainScreen> {
       icon: const Icon(Icons.widgets_outlined),
       onTap: () {},
     ),
-    NavbarItem(
-      text: 'Helpers',
-      icon: const Icon(Icons.build_outlined),
-      onTap: () {},
-    ),
+    // NavbarItem(
+    //   text: 'Helpers',
+    //   icon: const Icon(Icons.build_outlined),
+    //   onTap: () {},
+    // ),
     NavbarItem(
       text: 'Info',
       icon: const Icon(Icons.info_outline),
@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: _navItems,
-        variant: NavbarVariant.outlinedMinimal,
+        variant: NavbarVariant.pillShaped,
         size: NavbarSize.small,
         currentIndex: _currentIndex,
         centerItems: true,
@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           _navigateToPage(index);
         },
-        activeColor: OsmeaColors.nordicBlue,
+        activeColor: OsmeaColors.black,
         inactiveColor: OsmeaColors.pewter,
         backgroundColor: OsmeaColors.white,
       ),
@@ -70,10 +70,10 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         AppRoutes.goToComponents(context); // Navigate to components
         break;
+      // case 2:
+      //   AppRoutes.goToHelpers(context); // Navigate to helpers
+      //   break;
       case 2:
-        AppRoutes.goToHelpers(context); // Navigate to helpers
-        break;
-      case 3:
         AppRoutes.goToInfo(context); // Navigate to info
         break;
     }
