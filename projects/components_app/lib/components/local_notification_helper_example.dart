@@ -577,7 +577,7 @@ class _LocalNotificationHelperExampleState
       id: _notificationCounter++,
       title: 'Article Update',
       body: 'New article published...',
-      bigText: 'This is a very long notification content that demonstrates the big text '
+      bigText: 'This is a very long notification content that shows the big text '
           'notification feature. When the user expands this notification, they will be able '
           'to read this entire message. This is perfect for articles, detailed messages, '
           'or any content that needs more space than a regular notification can provide. '

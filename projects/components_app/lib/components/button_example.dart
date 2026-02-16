@@ -51,16 +51,16 @@ class _ButtonExampleState extends State<ButtonExample> {
             _buildSectionTitle('🔄 Button States'),
             _buildStatesSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🎭 Interactive Examples'),
+            _buildSectionTitle('🎭 Interactive'),
             _buildInteractiveSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('📐 Layout Examples'),
+            _buildSectionTitle('📐 Layout'),
             _buildLayoutSection(),
             OsmeaComponents.sizedBox(height: 32),
             _buildSectionTitle('🎨 Custom Styling'),
             _buildCustomStylingSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🎯 Icon Button Examples'),
+            _buildSectionTitle('🎯 Icon Button'),
             _buildIconButtonSection(),
           ],
         ),
@@ -298,7 +298,7 @@ class _ButtonExampleState extends State<ButtonExample> {
     return OsmeaComponents.column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSubsectionTitle('Interactive Examples'),
+        _buildSubsectionTitle('Interactive'),
         OsmeaComponents.column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

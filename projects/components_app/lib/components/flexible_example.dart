@@ -72,7 +72,7 @@ class FlexibleExample extends StatelessWidget {
 
             // Section title for practical examples
             OsmeaComponents.text(
-              '💡 Practical Examples',
+              '💡 Practical Use Cases',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),

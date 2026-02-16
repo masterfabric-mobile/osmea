@@ -72,7 +72,7 @@ class _TextFieldExampleState extends State<TextFieldExample> {
             _buildSectionTitle('🎯 Advanced Features'),
             _buildAdvancedFeaturesSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🔢 OTP TextField Examples'),
+            _buildSectionTitle('🔢 OTP TextField'),
             _buildOTPSection(),
             OsmeaComponents.sizedBox(height: 32),
             _buildSectionTitle('⚙️ Interactive Section'),

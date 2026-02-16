@@ -208,7 +208,7 @@ class _TextExampleState extends State<TextExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'UPPERCASE EXAMPLE',
+                  'UPPERCASE',
                   variant: OsmeaTextVariant.labelLarge,
                   isUppercase: true,
                   letterSpacing: 1.2,
@@ -247,24 +247,24 @@ class _TextExampleState extends State<TextExample> {
 
             // Text Styling Examples
             _buildSection(
-              'Text Styling Examples',
+              'Text Styling',
               [
                 OsmeaComponents.text(
-                  'Bold Text Example',
+                  'Bold Text',
                   variant: OsmeaTextVariant.bodyLarge,
                   fontWeight: FontWeight.bold,
                   color: OsmeaColors.eclipse,
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'Italic Text Example',
+                  'Italic Text',
                   variant: OsmeaTextVariant.bodyLarge,
                   fontStyle: FontStyle.italic,
                   color: OsmeaColors.pewter,
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'Underlined Text Example',
+                  'Underlined Text',
                   variant: OsmeaTextVariant.bodyLarge,
                   decoration: TextDecoration.underline,
                   decorationColor: OsmeaColors.nordicBlue,
@@ -272,7 +272,7 @@ class _TextExampleState extends State<TextExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'Strikethrough Text Example',
+                  'Strikethrough Text',
                   variant: OsmeaTextVariant.bodyLarge,
                   decoration: TextDecoration.lineThrough,
                   decorationColor: OsmeaColors.amberFlame,
@@ -283,7 +283,7 @@ class _TextExampleState extends State<TextExample> {
 
             // Color Examples
             _buildSection(
-              'Color Examples',
+              'Colors',
               [
                 OsmeaComponents.row(
                   children: [

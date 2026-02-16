@@ -365,7 +365,7 @@ class _CollapseExampleState extends State<CollapseExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'This collapse panel demonstrates custom header content with icons and rich formatting.',
+                  'This collapse panel shows custom header content with icons and rich formatting.',
                   variant: OsmeaTextVariant.bodyMedium,
                 ),
                 OsmeaComponents.sizedBox(height: 16),

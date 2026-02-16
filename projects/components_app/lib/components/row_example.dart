@@ -106,7 +106,7 @@ class RowExample extends StatelessWidget {
 
             // Section title for advanced examples
             OsmeaComponents.text(
-              '🚀 Advanced Examples (Using Composition)',
+              '🚀 Advanced (Using Composition)',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),

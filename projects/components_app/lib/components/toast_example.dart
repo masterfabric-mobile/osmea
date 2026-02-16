@@ -61,11 +61,11 @@ class _ToastExampleState extends State<ToastExample> {
   ];
   static const List<String> _randomMessages = [
     'This is a random toast message.',
-    'Another example message.',
+    'Another sample message.',
     'Toast close order verification.',
     'Stacking enabled status.',
     'Stacking disabled status.',
-    'Toast notification example.',
+    'Toast notification sample.',
     'A different notification.',
     'Animation verification.',
     'Close order observation.',

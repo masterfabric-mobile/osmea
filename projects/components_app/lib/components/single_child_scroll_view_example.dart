@@ -137,13 +137,13 @@ class SingleChildScrollViewExample extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OsmeaComponents.text(
-              'Vertical Scrolling Example',
+              'Vertical Scrolling',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.text(
-              'This is a basic example of vertical scrolling with SingleChildScrollView. Scroll down to see more content.',
+              'Vertical scrolling with SingleChildScrollView. Scroll down to see more content.',
             ),
             OsmeaComponents.sizedBox(height: 16),
             for (int i = 1; i <= 10; i++)
@@ -205,13 +205,13 @@ class SingleChildScrollViewExample extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OsmeaComponents.text(
-              'Nested Scrolling Example',
+              'Nested Scrolling',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.text(
-              'This example shows a vertical scroll view containing horizontal scroll views.',
+              'A vertical scroll view containing horizontal scroll views.',
             ),
             OsmeaComponents.sizedBox(height: 16),
             for (int section = 1; section <= 3; section++) ...[
@@ -270,7 +270,7 @@ class SingleChildScrollViewExample extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OsmeaComponents.text(
-              'Custom Physics Example',
+              'Custom Physics',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -317,7 +317,7 @@ class SingleChildScrollViewExample extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OsmeaComponents.text(
-              'Styled Scroll Example',
+              'Styled Scroll',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),

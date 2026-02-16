@@ -220,7 +220,7 @@ class _AppBarSearchBarExampleState extends State<AppBarSearchBarExample> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome to AppBar with SearchBar Demo',
+                            'Welcome to AppBar with SearchBar',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
@@ -230,7 +230,7 @@ class _AppBarSearchBarExampleState extends State<AppBarSearchBarExample> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'This example demonstrates the OsmeaAppBarWithSearchBar component with integrated search functionality.',
+                            'This shows the OsmeaAppBarWithSearchBar component with integrated search functionality.',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
@@ -242,7 +242,7 @@ class _AppBarSearchBarExampleState extends State<AppBarSearchBarExample> {
 
                   // Features Section
                   Text(
-                    'Features Demonstrated:',
+                    'Features:',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

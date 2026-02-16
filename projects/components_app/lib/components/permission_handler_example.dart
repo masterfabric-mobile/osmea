@@ -240,7 +240,7 @@ class _PermissionHandlerExampleState extends State<PermissionHandlerExample> {
   Widget build(BuildContext context) {
     return OsmeaComponents.scaffold(
       appBar: AppBar(
-        title: const Text('Permissions Helper Example'),
+        title: const Text('Permissions Helper'),
       ),
       backgroundColor: OsmeaColors.white,
       body: SafeArea(

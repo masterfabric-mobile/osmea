@@ -30,8 +30,8 @@ class QuickActionsWidget extends StatelessWidget {
             _launchURL('https://github.com/masterfabric-mobile/osmea/issues'),
       },
       {
-        'title': 'Examples',
-        'subtitle': 'View Examples',
+        'title': 'Showcase',
+        'subtitle': 'View Showcase',
         'icon': Icons.auto_awesome,
         'onTap': () => _launchURL(
             'https://github.com/masterfabric-mobile/osmea/tree/dev/packages/components/example_mobile'),

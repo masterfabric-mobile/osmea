@@ -864,7 +864,7 @@ class ColumnExample extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            OsmeaComponents.text('Nested Layout Example',
+            OsmeaComponents.text('Nested Layout',
                 textStyle: OsmeaTextStyle.bodyLarge(context)
                     .copyWith(fontSize: 18, fontWeight: FontWeight.bold)),
             OsmeaComponents.sizedBox(height: 16),
@@ -973,7 +973,7 @@ class ColumnExample extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: OsmeaComponents.text(
-                'This example demonstrates nesting columns and rows to create complex layouts.',
+                'This shows nesting columns and rows to create complex layouts.',
                 textAlign: TextAlign.center,
               ),
             ),

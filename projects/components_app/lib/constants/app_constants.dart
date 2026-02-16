@@ -21,5 +21,5 @@ class AppConstants {
 
   static const String appTitle = 'OSMEA Components';
   static const String appSubtitle =
-      'Explore our Flutter components and examples';
+      'Explore our Flutter components and showcase';
 }

@@ -72,7 +72,7 @@ class _ChipsExampleState extends State<ChipsExample> {
             _buildStyleShowcase(),
             OsmeaComponents.divider(height: 32),
             OsmeaComponents.text(
-              '4. Interactive Examples',
+              '4. Interactive',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -518,7 +518,7 @@ class _ChipsExampleState extends State<ChipsExample> {
         OsmeaComponents.sizedBox(height: 20),
 
         // Pill-style chips showcase
-        OsmeaComponents.text('● Pill Style Examples:',
+        OsmeaComponents.text('● Pill Style:',
             fontWeight: FontWeight.w500),
         OsmeaComponents.sizedBox(height: 8),
         OsmeaComponents.text(
@@ -617,7 +617,7 @@ class _ChipsExampleState extends State<ChipsExample> {
               style: ChipsStyle.normal,
             ),
             OsmeaComponents.sizedBox(height: 12),
-            OsmeaComponents.text('Multiple End Examples:',
+            OsmeaComponents.text('Multiple End:',
                 fontWeight: FontWeight.w500, fontSize: 14),
             OsmeaComponents.sizedBox(height: 4),
             OsmeaComponents.wrap(

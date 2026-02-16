@@ -75,7 +75,7 @@ class _PopupExampleState extends State<PopupExample> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            '📱 Popup Component Examples',
+            '📱 Popup Component',
             textAlign: TextAlign.start,
             color: OsmeaColors.nordicBlue,
           ),
@@ -186,7 +186,7 @@ class _PopupExampleState extends State<PopupExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          '🚀 Quick Examples',
+          '🚀 Quick',
           color: OsmeaColors.slate,
         ),
         OsmeaComponents.sizedBox(height: 16),
