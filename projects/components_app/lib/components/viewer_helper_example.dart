@@ -2,10 +2,10 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_appbar.dart';
 
-/// 🌐 WebViewerHelper Examples
+/// 🌐 WebViewerHelper
 ///
-/// Demonstrates the unified WebViewerHelper with OSMEA Components integration
-/// featuring TabBar navigation between Raw Data and WebView examples
+/// Unified WebViewerHelper with OSMEA Components integration,
+/// featuring TabBar navigation between Raw Data and WebView.
 class ViewerHelperExample extends StatefulWidget {
   const ViewerHelperExample({Key? key}) : super(key: key);
 

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:core/core.dart';
 
-/// 🔔 **Local Notification Helper Example**
+/// 🔔 **Local Notification Helper**
 ///
-/// Demonstrates the usage of OSMEA Local Notification Helper with various
+/// Usage of OSMEA Local Notification Helper with various
 /// notification types including instant, scheduled, repeating, and rich notifications.
 class LocalNotificationHelperExample extends StatefulWidget {
   const LocalNotificationHelperExample({super.key});

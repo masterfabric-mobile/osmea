@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 
-/// 📤 Application Share Helper Example
+/// 📤 Application Share Helper
 ///
-/// A demo page to test and showcase sharing text, URLs, a single file,
+/// Test and showcase sharing text, URLs, a single file,
 /// and multiple files using `ApplicationShareHelper`.
 class ApplicationShareHelperExample extends StatefulWidget {
   const ApplicationShareHelperExample({super.key});

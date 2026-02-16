@@ -10,7 +10,7 @@ import '../components/local_notification_helper_example.dart';
 /// 🔧 **Helpers Screen**
 ///
 /// This screen displays a list of utility helpers available in the OSMEA framework.
-/// Each helper provides specific functionality that can be tested and demonstrated.
+/// Each helper provides specific functionality that can be tested and used.
 class HelpersScreen extends StatelessWidget {
   const HelpersScreen({super.key});
 

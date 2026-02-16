@@ -15,10 +15,10 @@ import 'package:core/core.dart';
 /// - Phone, email, and SMS functionality
 /// - Music and video platform integration
 /// - Custom configuration testing
-/// - Error handling demonstration
+/// - Error handling
 ///
 /// ## Usage
-/// This component is designed for testing and demonstration purposes.
+/// This component is designed for testing and showcasing.
 /// It showcases all the capabilities of the UrlLauncher helper class.
 class UrlLauncherExample extends StatefulWidget {
   const UrlLauncherExample({super.key});
