@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import '../widgets/logo_header_widget.dart';
-import '../widgets/login_form_widget.dart';
+import '../widgets/home_content_widget.dart';
 
 class ModernLoginScreen extends StatefulWidget {
   const ModernLoginScreen({super.key});
@@ -15,17 +15,16 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> {
   Widget build(BuildContext context) {
     return OsmeaComponents.container(
       color: OsmeaColors.white,
-      child: OsmeaComponents.padding(
-        padding: context.paddingNormal,
-        child: OsmeaComponents.column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo Header
-            const LogoHeaderWidget(),
-
-            // Login Form
-            const LoginFormWidget(),
-          ],
+      child: SafeArea(
+        child: OsmeaComponents.singleChildScrollView(
+          padding: context.paddingNormal,
+          child: OsmeaComponents.column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const LogoHeaderWidget(),
+              const HomeContentWidget(),
+            ],
+          ),
         ),
       ),
     );
