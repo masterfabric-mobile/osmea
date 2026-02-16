@@ -184,7 +184,7 @@ class _PermissionHandlerExampleState extends State<PermissionHandlerExample> {
       }
       await _notifChannel.invokeMethod('showNotification', {
         'title': 'OSMEA',
-        'body': 'Test notification from Permissions Helper',
+        'body': 'Notification from Permissions Helper',
       });
     } on PlatformException catch (e) {
       if (!mounted) return;

@@ -294,7 +294,7 @@ class _LocalNotificationHelperExampleState
         ),
         _buildActionButton(
           title: 'Schedule in 1 Minute',
-          description: 'Test scheduling functionality',
+          description: 'Verify scheduling functionality',
           icon: Icons.timer,
           onPressed: _scheduleNotificationIn1Minute,
         ),

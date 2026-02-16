@@ -86,21 +86,21 @@ class HelpersScreen extends StatelessWidget {
         'title': 'URL Launcher',
         'icon': Icons.launch,
         'description':
-            'Test URL launching functionality with various protocols and platforms',
+            'Validate URL launching with various protocols and platforms',
         'route': () => const UrlLauncherExample(),
         'isComingSoon': false,
       },
       {
         'title': 'File Download',
         'icon': Icons.file_download,
-        'description': 'Test file download functionality',
+        'description': 'Validate file download functionality',
         'route': () => const FileDownloadHelperExample(),
         'isComingSoon': false,
       },
       {
         'title': 'Application Share',
         'icon': Icons.share,
-        'description': 'Test sharing text, URLs, and files',
+        'description': 'Share text, URLs, and files',
         'route': () => const ApplicationShareHelperExample(),
         'isComingSoon': false,
       },
@@ -116,7 +116,7 @@ class HelpersScreen extends StatelessWidget {
       {
         'title': 'Local Notifications',
         'icon': Icons.notifications,
-        'description': 'Test local notification functionality with scheduling and rich features',
+        'description': 'Local notifications with scheduling and rich features',
         'route': () => const LocalNotificationHelperExample(),
         'isComingSoon': false,
       },

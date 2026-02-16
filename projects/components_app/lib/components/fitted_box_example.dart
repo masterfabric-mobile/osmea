@@ -5,7 +5,7 @@ import '../widgets/common_appbar.dart';
 /// 📏 **OSMEA FittedBox Examples**
 ///
 /// This file demonstrates various ways to use the OSMEA FittedBox component.
-/// Interactive example with dropdown selection for different fit modes.
+/// Interactive dropdown selection for different fit modes.
 ///
 class FittedBoxExample extends StatefulWidget {
   const FittedBoxExample({Key? key}) : super(key: key);
@@ -232,7 +232,7 @@ class _FittedBoxExampleState extends State<FittedBoxExample> {
       ),
       child: OsmeaComponents.center(
         child: OsmeaComponents.text(
-          'TEXT EXAMPLE',
+          'TEXT',
           textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
             color: OsmeaColors.white,
             fontSize: 16,

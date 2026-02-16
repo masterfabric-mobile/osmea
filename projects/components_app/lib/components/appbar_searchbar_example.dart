@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-/// 🎯 **AppBar with SearchBar Example**
+/// 🎯 **AppBar with SearchBar**
 ///
 /// Demonstrates the usage of OsmeaAppBarWithSearchBar component
 /// with various configurations and features.

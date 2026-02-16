@@ -4,7 +4,7 @@ import 'package:core/core.dart';
 
 /// 📤 Application Share Helper
 ///
-/// Test and showcase sharing text, URLs, a single file,
+/// Validate and showcase sharing text, URLs, a single file,
 /// and multiple files using `ApplicationShareHelper`.
 class ApplicationShareHelperExample extends StatefulWidget {
   const ApplicationShareHelperExample({super.key});
@@ -15,7 +15,7 @@ class ApplicationShareHelperExample extends StatefulWidget {
 
 class _ApplicationShareHelperExampleState extends State<ApplicationShareHelperExample> {
   final TextEditingController _textController = TextEditingController(text: 'Hello from OSMEA!');
-  final TextEditingController _subjectController = TextEditingController(text: 'OSMEA Share Test');
+  final TextEditingController _subjectController = TextEditingController(text: 'OSMEA Share');
   final TextEditingController _urlController = TextEditingController(text: 'https://flutter.dev');
   final TextEditingController _filePathController = TextEditingController();
   final TextEditingController _multiFilePathsController = TextEditingController();
@@ -81,7 +81,7 @@ class _ApplicationShareHelperExampleState extends State<ApplicationShareHelperEx
                       children: [
                         const Icon(Icons.info_outline, color: Colors.blue),
                         const SizedBox(width: 8),
-                        const Text('Test Results', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text('Results', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const Spacer(),
                         if (_isSharing)
                           const SizedBox(

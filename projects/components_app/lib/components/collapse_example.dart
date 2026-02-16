@@ -2,9 +2,9 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_appbar.dart';
 
-/// 📋 **OSMEA Collapse Example**
+/// 📋 **OSMEA Collapse**
 ///
-/// Comprehensive example demonstrating all collapse component features.
+/// Comprehensive collapse component features.
 /// Shows different variants, sizes, modes, and customization options.
 ///
 /// {@category Examples}
@@ -156,7 +156,7 @@ class _CollapseExampleState extends State<CollapseExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 8),
                 OsmeaComponents.text(
-                  'This is a sample product with detailed information including specifications, features, and usage instructions.',
+                  'This product includes detailed information: specifications, features, and usage instructions.',
                   variant: OsmeaTextVariant.bodyMedium,
                 ),
               ],
