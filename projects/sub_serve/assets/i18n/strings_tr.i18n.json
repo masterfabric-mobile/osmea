@@ -1,0 +1,12 @@
+{
+  "@@locale": "tr",
+  "localLanguageCode": "tr_TR",
+  "appTitle": "MasterFabric SubServe",
+  "home": "Ana Sayfa",
+  "settings": "Ayarlar",
+  "save": "Kaydet",
+  "cancel": "İptal",
+  "loading": "Yükleniyor...",
+  "error": "Hata",
+  "retry": "Tekrar Dene"
+}
