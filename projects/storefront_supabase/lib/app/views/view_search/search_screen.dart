@@ -1,5 +1,5 @@
 /*
- * SupabaseSearchScreen
+ * SearchScreen
  * --------------------
  * Search screen built entirely in storefront_supabase.
  * Uses the same OsmeaComponents.searchbar as home (home_view.search config).
@@ -13,13 +13,13 @@ import 'package:storefront_supabase/utils/config_utils.dart';
 import 'package:storefront_supabase/app/views/view_search/widgets/search_empty_state_widget.dart';
 import 'package:storefront_supabase/app/views/view_search/widgets/search_results_grid_widget.dart';
 
-class SupabaseSearchScreen extends StatefulWidget {
+class SearchScreen extends StatefulWidget {
   final String? initialQuery;
   final bool fromHome;
   final void Function(String path) goRoute;
   final Future<List<dynamic>> Function(String query) searchProvider;
 
-  const SupabaseSearchScreen({
+  const SearchScreen({
     super.key,
     this.initialQuery,
     this.fromHome = false,
@@ -28,10 +28,10 @@ class SupabaseSearchScreen extends StatefulWidget {
   });
 
   @override
-  State<SupabaseSearchScreen> createState() => _SupabaseSearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SupabaseSearchScreenState extends State<SupabaseSearchScreen> {
+class _SearchScreenState extends State<SearchScreen> {
   late final TextEditingController _searchController;
   late final FocusNode _focusNode;
   late final SearchCubit _searchCubit;
@@ -93,14 +93,9 @@ class _SupabaseSearchScreenState extends State<SupabaseSearchScreen> {
           backgroundColor: OsmeaColors.white,
           foregroundColor: OsmeaColors.black,
           elevation: 0,
-          leading: IconButton(
+          leading: OsmeaComponents.iconButton(
             icon: const Icon(Icons.arrow_back, color: OsmeaColors.black),
             onPressed: () => widget.goRoute('/home'),
-            padding: EdgeInsets.symmetric(horizontal: context.spacing8),
-            style: IconButton.styleFrom(
-              minimumSize: const Size(48, 48),
-              maximumSize: const Size(48, 48),
-            ),
           ),
           title: Text(
             context.resources.searchProducts,
@@ -178,7 +173,13 @@ class _SupabaseSearchScreenState extends State<SupabaseSearchScreen> {
                 bloc: _searchCubit,
                 builder: (context, state) {
                   if (state.isLoading && state.results.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: OsmeaComponents.loading(
+                        type: LoadingType.circularFade,
+                        size: 36,
+                        color: OsmeaColors.black,
+                      ),
+                    );
                   }
                   if (state.hasResults) {
                     return SearchResultsGridWidget(products: state.results);

@@ -14,8 +14,8 @@ import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/views/view_product_list/models/product_list_view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_list/models/module/states.dart';
 import 'package:storefront_supabase/app/widgets/product_card_widget.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/add_to_cart_popup.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_list/widgets/product_list_filters_widget.dart';
@@ -178,7 +178,13 @@ class _ProductListContentWidgetState extends State<ProductListContentWidget> {
               itemCount: widget.state.products.length + (widget.state.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= widget.state.products.length) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                child: OsmeaComponents.loading(
+                  type: LoadingType.circularFade,
+                  size: 36,
+                  color: OsmeaColors.black,
+                ),
+              );
                 }
 
                 final product = widget.state.products[index];

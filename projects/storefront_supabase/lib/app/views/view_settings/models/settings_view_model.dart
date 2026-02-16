@@ -1,7 +1,7 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:injectable/injectable.dart';
 
-import 'states.dart';
+import 'module/states.dart';
 
 @injectable
 class SettingsViewModel extends BaseViewModelCubit<SettingsState> {

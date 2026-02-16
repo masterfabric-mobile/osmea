@@ -13,8 +13,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/core/cart/guest_cart_storage.dart';
 import 'package:storefront_supabase/app/models/product_variant.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
-import 'states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
+import 'module/states.dart';
 
 @injectable
 class ProductDetailViewModel extends BaseViewModelCubit<ProductDetailState> {

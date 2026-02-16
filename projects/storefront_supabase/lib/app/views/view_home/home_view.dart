@@ -8,7 +8,7 @@ import 'package:core/core.dart'
         TranslationProvider;
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
-import 'package:storefront_supabase/app/views/view_home/models/states.dart';
+import 'package:storefront_supabase/app/views/view_home/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_content_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_error_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/home_skeleton_widget.dart';

@@ -23,7 +23,7 @@ import 'package:storefront_supabase/app/views/view_checkout/checkout_view.dart';
 import 'package:storefront_supabase/app/views/view_categories/categories_view.dart';
 import 'package:storefront_supabase/app/views/view_favorites/favorites_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/profile_view.dart';
-import 'package:storefront_supabase/app/views/view_search/supabase_search_screen.dart';
+import 'package:storefront_supabase/app/views/view_search/search_screen.dart';
 import 'package:storefront_supabase/app/views/view_settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/addresses_view.dart';
 import 'package:storefront_supabase/app/views/view_profile/orders_view.dart';
@@ -37,13 +37,13 @@ import 'package:storefront_supabase/app/models/navbar_item_model.dart';
 import 'package:storefront_supabase/app/utils/navbar_icon_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/module/states.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:storefront_supabase/app/views/view_product_list/product_list_view.dart'; // Added
-import 'package:storefront_supabase/app/views/view_splash/supabase_splash_view.dart';
-import 'package:storefront_supabase/app/views/view_onboarding/supabase_onboarding_view.dart';
+import 'package:storefront_supabase/app/views/view_splash/splash_view.dart';
+import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
 
 /// Scaffold messenger key for user shell (core MasterScaffoldWidget).
 final GlobalKey<ScaffoldMessengerState> _userShellScaffoldMessengerKey =
@@ -89,7 +89,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   routes: <RouteBase>[
     // Splash Screen Route - Outside ShellRoute so no bottom bar
-    // Using custom SupabaseSplashView instead of core SplashView to avoid config conflicts
+    // Custom splash view for storefront
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
@@ -104,7 +104,7 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // Onboarding Route - Outside ShellRoute so no bottom bar
-    // Using custom SupabaseOnboardingView instead of core OnboardingView to avoid config conflicts
+    // Custom onboarding view for storefront
     GoRoute(
       path: '/onboarding',
       builder: (BuildContext context, GoRouterState state) {
@@ -327,7 +327,7 @@ final GoRouter appRouter = GoRouter(
             final fromHome = state.uri.queryParameters['fromHome'] == 'true';
             final router = GoRouter.of(context);
             return CustomTransitionPage(
-              child: SupabaseSearchScreen(
+              child: SearchScreen(
                 initialQuery: query,
                 fromHome: fromHome,
                 goRoute: (String path) => router.go(path),

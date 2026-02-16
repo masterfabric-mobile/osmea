@@ -6,11 +6,11 @@ import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/favorite_group.dart';
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/models/product.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'states.dart';
+import 'module/states.dart';
 
 @lazySingleton
 class FavoritesViewModel extends BaseViewModelCubit<FavoritesState> {

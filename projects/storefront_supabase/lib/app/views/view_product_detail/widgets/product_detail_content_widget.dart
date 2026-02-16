@@ -8,16 +8,16 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:get_it/get_it.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/action_section.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_images_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_name_price_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_sections_list_widget.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/attribute_selection_modal.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/related_products_widget.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/module/states.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

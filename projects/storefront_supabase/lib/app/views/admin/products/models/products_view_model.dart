@@ -7,7 +7,7 @@ import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'states.dart';
+import 'module/states.dart';
 
 @injectable
 class AdminProductsViewModel

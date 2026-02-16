@@ -8,8 +8,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 
 /// Widget for displaying product attributes with chip selection
 class ProductAttributesWidget extends StatelessWidget {

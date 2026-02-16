@@ -538,15 +538,13 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
         ),
         child: _isAddingToCart
             ? OsmeaComponents.center(
-                child: SizedBox(
+                child: OsmeaComponents.sizedBox(
                   width: context.iconSizeExtraSmall,
                   height: context.iconSizeExtraSmall,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(
-                          OsmeaColors.white,
-                        ),
+                  child: OsmeaComponents.loading(
+                    type: LoadingType.circularFade,
+                    size: 24,
+                    color: OsmeaColors.white,
                   ),
                 ),
               )
@@ -611,11 +609,10 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
             height: context.height160 + context.spacing10,
             color: OsmeaColors.grayMaterial[50],
             alignment: Alignment.center,
-            child: CircularProgressIndicator(
-              strokeWidth: context.width2,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getLoadingIndicatorColor(context),
-              ),
+            child: OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 36,
+              color: _getLoadingIndicatorColor(context),
             ),
           );
         },

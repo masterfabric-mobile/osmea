@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/core/cart/guest_cart_storage.dart';
 import 'package:storefront_supabase/app/models/product.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 
 const String _kGuestCartItemIdPrefix = 'guest_';
 

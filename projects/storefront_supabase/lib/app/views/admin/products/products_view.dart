@@ -6,8 +6,8 @@ import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/models/product_filters.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/products/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/products/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/products/models/products_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminProductsView
@@ -149,7 +149,7 @@ class AdminProductsView
                         ],
                       ),
                     ),
-                    const Divider(height: 1),
+                    OsmeaComponents.divider(height: 1),
                     
                     // Content
                     Expanded(
@@ -201,7 +201,7 @@ class AdminProductsView
                     ),
                     
                     // Footer
-                    const Divider(height: 1),
+                    OsmeaComponents.divider(height: 1),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -368,7 +368,7 @@ class AdminProductsView
                         ],
                       ),
                     ),
-                    const Divider(height: 1),
+                    OsmeaComponents.divider(height: 1),
 
                     Expanded(
                       child: ListView(
@@ -447,7 +447,7 @@ class AdminProductsView
                              ),
                            ],
 
-                          const Divider(height: 32),
+                          OsmeaComponents.divider(height: 32),
 
                           // --- Size / Age Filter ---
                           if (isShoe || isFashion) ...[
@@ -480,7 +480,7 @@ class AdminProductsView
                                 );
                               }).toList(),
                             ),
-                            const Divider(height: 32),
+                            OsmeaComponents.divider(height: 32),
                           ],
 
                           // --- Brand Filter ---
@@ -593,7 +593,13 @@ class AdminProductsView
   ) {
     final resources = context.resources;
     if (state is AdminProductsLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is AdminProductsError) {
@@ -607,7 +613,12 @@ class AdminProductsView
 
       return OsmeaComponents.column(
         children: [
-          if (state.isLoading) const LinearProgressIndicator(),
+          if (state.isLoading)
+            OsmeaComponents.progress(
+              type: ProgressType.linear,
+              value: 0,
+              isAutoProgressEnabled: true,
+            ),
           OsmeaComponents.expanded(
             child: RefreshIndicator(
               onRefresh: viewModel.fetchProducts,

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/add_coupon_view_model.dart';
 
 class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> {
   AddCouponView({
@@ -42,7 +42,13 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
       BuildContext context, AddCouponViewModel viewModel, AddCouponState state) {
     
     if (state is AddCouponLoading) {
-      return const Center(child: CircularProgressIndicator(color: OsmeaColors.black));
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is AddCouponSuccess) {
@@ -100,7 +106,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.only(bottom: 16),
                 color: OsmeaColors.silver,
-                child: Text(state.errorMessage!, style: TextStyle(color: OsmeaColors.black)),
+                child: OsmeaComponents.text(state.errorMessage!, textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black)),
               ),
 
             _buildTextField(viewModel.codeController, 'Coupon Code', Icons.confirmation_number),
@@ -215,19 +221,15 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
   }
 
   Widget _buildTextField(TextEditingController controller, String label, IconData icon, {TextInputType? keyboardType}) {
-    return TextField(
+    return OsmeaComponents.textField(
       controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        prefixIcon: Icon(icon, color: OsmeaColors.black),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: OsmeaColors.black, width: 2),
-        ),
-        labelStyle: const TextStyle(color: OsmeaColors.black),
-      ),
-      cursorColor: OsmeaColors.black,
+      label: label,
+      hint: label,
+      keyboardType: keyboardType ?? TextInputType.text,
+      variant: TextFieldVariant.outlined,
+      prefixIcon: Icon(icon, color: OsmeaColors.black),
+      focusColor: OsmeaColors.black,
+      borderColor: OsmeaColors.black,
     );
   }
 }

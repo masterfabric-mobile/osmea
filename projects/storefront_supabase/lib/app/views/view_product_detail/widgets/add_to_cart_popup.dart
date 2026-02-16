@@ -11,8 +11,8 @@ import 'package:core/core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 
@@ -145,7 +145,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
               child: OsmeaComponents.loading(
                 type: LoadingType.circularFade,
                 size: context.iconSizeLarge,
-                color: const Color(0xFF1976D2),
+                color: OsmeaColors.black,
               ),
             ),
           );

@@ -5,8 +5,8 @@ import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
-import 'models/view_model.dart';
-import 'models/states.dart';
+import 'models/settings_view_model.dart';
+import 'models/module/states.dart';
 
 class SettingsView
     extends MasterViewCubit<SettingsViewModel, SettingsState> {
@@ -78,8 +78,12 @@ class SettingsView
       );
     }
 
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
     );
   }
 

@@ -14,8 +14,8 @@ import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/models/order.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
-import 'models/states.dart';
-import 'models/view_model.dart';
+import 'models/module/states.dart';
+import 'models/dashboard_view_model.dart';
 
 class AdminDashboardView
     extends MasterViewCubit<AdminDashboardViewModel, AdminDashboardState> {
@@ -59,7 +59,11 @@ class AdminDashboardView
     if (state is AdminDashboardLoadingState ||
         state is AdminDashboardInitialState) {
       return OsmeaComponents.center(
-        child: const CircularProgressIndicator(color: OsmeaColors.black),
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
       );
     }
 

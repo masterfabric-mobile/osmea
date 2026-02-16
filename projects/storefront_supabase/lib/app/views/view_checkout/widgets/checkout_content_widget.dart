@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storefront_supabase/app/views/view_checkout/models/checkout_view_model.dart';
-import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
+import 'package:storefront_supabase/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_checkout/widgets/checkout_step_indicator.dart';
 import 'package:storefront_supabase/app/views/view_checkout/widgets/steps/address_step_widget.dart';
 import 'package:storefront_supabase/app/views/view_checkout/widgets/steps/shipping_step_widget.dart';

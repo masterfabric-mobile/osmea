@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'states.dart';
+import 'module/states.dart';
 
 @injectable
 class SearchViewModel extends BaseViewModelCubit<SearchState> {

@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/models/user_address.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AddressesView extends MasterViewCubit<ProfileViewModel, ProfileState> {
@@ -497,49 +497,19 @@ class _AddressesContentState extends State<_AddressesContent> {
       OsmeaColors.black,
     );
 
-    return TextFormField(
+    return OsmeaComponents.textField(
       controller: controller,
-      keyboardType: keyboardType,
+      hint: hint,
+      keyboardType: keyboardType ?? TextInputType.text,
       validator: validator,
       inputFormatters: inputFormatters,
       maxLines: maxLines,
-      style: OsmeaTextStyle.bodySmall(context),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: OsmeaTextStyle.bodySmall(context).copyWith(color: hintColor),
-        prefixIcon: Icon(icon, color: iconColor, size: 18),
-        filled: true,
-        fillColor: bgColor,
-        isDense: true,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: context.spacing12,
-          vertical: context.spacing10,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: borderColor.withOpacity(0.3)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: focusedBorderColor, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: OsmeaColors.red[400]!, width: 1.5),
-        ),
-        errorStyle: OsmeaTextStyle.bodySmall(context).copyWith(
-          color: OsmeaColors.red[400],
-          fontSize: 10,
-        ),
-      ),
+      variant: TextFieldVariant.outlined,
+      prefixIcon: Icon(icon, color: iconColor, size: 18),
+      focusColor: focusedBorderColor,
+      borderColor: borderColor,
+      backgroundColor: bgColor,
+      hintColor: hintColor,
     );
   }
 
@@ -772,39 +742,34 @@ class _AddressesContentState extends State<_AddressesContent> {
 
   Future<void> _handleDeleteAddress(BuildContext context, UserAddress address) async {
     final resources = context.resources;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await OsmeaComponents.showPopup<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: OsmeaColors.white,
-        title: OsmeaComponents.text(
-          'Delete Address',
-          textStyle: OsmeaTextStyle.titleLarge(dialogContext).copyWith(
-            color: OsmeaColors.black,
-            fontWeight: FontWeight.w600,
-          ),
+      title: 'Delete Address',
+      child: OsmeaComponents.text(
+        'Are you sure you want to delete this address?',
+        textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+          color: OsmeaColors.black,
         ),
-        content: OsmeaComponents.text(
-          'Are you sure you want to delete this address?',
-          textStyle: OsmeaTextStyle.bodyMedium(dialogContext).copyWith(
-            color: OsmeaColors.black,
-          ),
-        ),
-        actions: [
+      ),
+      footer: OsmeaComponents.row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
           OsmeaComponents.button(
             text: resources.cancel,
             variant: ButtonVariant.ghost,
             backgroundColor: OsmeaColors.white,
             textColor: OsmeaColors.black,
             borderColor: OsmeaColors.silver,
-            onPressed: () => Navigator.of(dialogContext).pop(false),
+            onPressed: () => Navigator.of(context).pop(false),
           ),
+          OsmeaComponents.sizedBox(width: 12),
           OsmeaComponents.button(
             text: 'Delete',
             variant: ButtonVariant.outlined,
             backgroundColor: OsmeaColors.white,
             textColor: OsmeaColors.black,
             borderColor: OsmeaColors.black,
-            onPressed: () => Navigator.of(dialogContext).pop(true),
+            onPressed: () => Navigator.of(context).pop(true),
           ),
         ],
       ),

@@ -87,14 +87,12 @@ class _SupabaseOnboardingViewState extends State<SupabaseOnboardingView> {
             // Skip button
             Align(
               alignment: Alignment.topRight,
-              child: Padding(
+              child: OsmeaComponents.padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextButton(
+                child: OsmeaComponents.textButton(
+                  text: 'Skip',
                   onPressed: _onSkip,
-                  child: const Text(
-                    'Skip',
-                    style: TextStyle(color: Colors.black87),
-                  ),
+                  variant: ButtonVariant.ghost,
                 ),
               ),
             ),
@@ -120,31 +118,23 @@ class _SupabaseOnboardingViewState extends State<SupabaseOnboardingView> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            OsmeaComponents.sizedBox(height: 32),
 
             // Next/Get Started button
-            Padding(
+            OsmeaComponents.padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text(
-                    _currentPage == _pages.length - 1
-                        ? 'Get Started'
-                        : 'Next',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              child: OsmeaComponents.button(
+                text: _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
+                onPressed: _onNext,
+                variant: ButtonVariant.primary,
+                backgroundColor: OsmeaColors.black,
+                textColor: OsmeaColors.white,
+                fullWidth: true,
+                size: ButtonSize.large,
               ),
             ),
 
-            const SizedBox(height: 32),
+            OsmeaComponents.sizedBox(height: 32),
           ],
         ),
       ),
@@ -152,32 +142,33 @@ class _SupabaseOnboardingViewState extends State<SupabaseOnboardingView> {
   }
 
   Widget _buildPage(OnboardingPage page) {
-    return Padding(
+    return OsmeaComponents.padding(
       padding: const EdgeInsets.all(32.0),
-      child: Column(
+      child: OsmeaComponents.column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             page.icon,
             size: 120,
-            color: Colors.black,
+            color: OsmeaColors.black,
           ),
-          const SizedBox(height: 48),
-          Text(
+          OsmeaComponents.sizedBox(height: 48),
+          OsmeaComponents.text(
             page.title,
-            style: const TextStyle(
+            textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          Text(
+          OsmeaComponents.sizedBox(height: 16),
+          OsmeaComponents.text(
             page.description,
-            style: const TextStyle(
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
               fontSize: 16,
-              color: Colors.black87,
+              color: OsmeaColors.grayMaterial[600],
             ),
             textAlign: TextAlign.center,
           ),
@@ -192,7 +183,7 @@ class _SupabaseOnboardingViewState extends State<SupabaseOnboardingView> {
       width: isActive ? 24 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: isActive ? Colors.black : Colors.grey,
+        color: isActive ? OsmeaColors.black : OsmeaColors.grayMaterial[300],
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -207,9 +198,9 @@ class _SupabaseOnboardingViewState extends State<SupabaseOnboardingView> {
       if (hex.length == 6) {
         return Color(int.parse('FF$hex', radix: 16));
       }
-      return Colors.white;
+      return OsmeaColors.white;
     } catch (e) {
-      return Colors.white;
+      return OsmeaColors.white;
     }
   }
 }

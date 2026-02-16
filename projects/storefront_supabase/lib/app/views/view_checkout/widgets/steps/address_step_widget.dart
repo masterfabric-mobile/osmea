@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/user_address.dart';
 import 'package:storefront_supabase/app/views/view_checkout/models/checkout_view_model.dart';
-import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
+import 'package:storefront_supabase/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AddressStepWidget extends StatelessWidget {

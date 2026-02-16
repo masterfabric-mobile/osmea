@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'states.dart';
+import 'module/states.dart';
 
 @injectable
 class CategoriesViewModel extends BaseViewModelCubit<CategoriesState> {

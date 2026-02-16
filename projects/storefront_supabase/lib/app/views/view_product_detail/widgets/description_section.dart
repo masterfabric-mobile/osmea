@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 
 class DescriptionSection extends StatelessWidget {
   final String description;

@@ -55,7 +55,11 @@ class AddProductView
 
     if (state is AddProductLoading || state is AddProductInitial) {
       return OsmeaComponents.center(
-        child: const CircularProgressIndicator(color: OsmeaColors.black),
+        child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
       );
     }
 
@@ -66,7 +70,7 @@ class AddProductView
           children: [
             OsmeaComponents.text(
               state.message,
-              textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: OsmeaColors.black),
+              textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(color: OsmeaColors.black),
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.button(
@@ -84,11 +88,15 @@ class AddProductView
         child: OsmeaComponents.column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(),
+            OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 36,
+              color: OsmeaColors.black,
+            ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.text(
               isEditMode ? resources.savingChanges : resources.addingProduct,
-              textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+              textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
             ),
           ],
         ),
@@ -106,7 +114,7 @@ class AddProductView
               isEditMode
                   ? resources.productUpdatedSuccess
                   : resources.productAddedSuccess,
-              textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: OsmeaColors.black),
+              textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(color: OsmeaColors.black),
             ),
             OsmeaComponents.sizedBox(height: 16),
             if (!isEditMode)
@@ -132,14 +140,7 @@ class AddProductView
         listener: (context, listenState) {
           if (listenState is AddProductLoaded &&
               listenState.errorMessage != null) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                  content: OsmeaComponents.text(
-                    listenState.errorMessage!,
-                    textStyle: const TextStyle(color: OsmeaColors.white, fontSize: 14),
-                  ),
-                  backgroundColor: OsmeaColors.black));
+            context.snackbarError(listenState.errorMessage!);
           }
         },
         child: SingleChildScrollView(
@@ -273,7 +274,7 @@ class AddProductView
       children: [
         OsmeaComponents.text(
           label,
-          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(color: OsmeaColors.black),
+          textStyle: OsmeaTextStyle.titleSmall(context).copyWith(color: OsmeaColors.black),
         ),
         OsmeaComponents.sizedBox(height: 8),
         Wrap(
@@ -284,7 +285,7 @@ class AddProductView
             return FilterChip(
               label: OsmeaComponents.text(
                 option,
-                textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(color: OsmeaColors.black),
+                textStyle: OsmeaTextStyle.labelLarge(context).copyWith(color: OsmeaColors.black),
               ),
               selected: isSelected,
               onSelected: (_) => viewModel.toggleSizeOrAge(option),
@@ -320,10 +321,10 @@ class AddProductView
       // ignore: deprecated_member_use
       value: effectiveValue,
       dropdownColor: OsmeaColors.white,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+      style: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+        labelStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: OsmeaColors.silver),
@@ -337,7 +338,7 @@ class AddProductView
           value: item,
           child: OsmeaComponents.text(
             itemToString(item),
-            textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+            textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black),
           ),
         );
       }).toList(),
@@ -400,32 +401,22 @@ class AddProductView
     int maxLines = 1,
     TextInputType? keyboardType,
   }) {
-    return TextFormField(
+    return OsmeaComponents.textField(
       controller: controller,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
-        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.pewter),
-        border: const OutlineInputBorder(),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: OsmeaColors.silver),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: OsmeaColors.black, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: OsmeaColors.thunder),
-        ),
-      ),
+      label: label,
+      hint: label,
       maxLines: maxLines,
-      keyboardType: keyboardType,
+      keyboardType: keyboardType ?? TextInputType.text,
+      variant: TextFieldVariant.outlined,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return '${context.resources.pleaseEnterA}$label';
         }
         return null;
       },
+      focusColor: OsmeaColors.black,
+      borderColor: OsmeaColors.silver,
+      textColor: OsmeaColors.black,
     );
   }
 
@@ -439,7 +430,7 @@ class AddProductView
           backgroundColor: OsmeaColors.white,
           title: OsmeaComponents.text(
             resources.addNewBrandTitle,
-            textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(color: OsmeaColors.black),
+            textStyle: OsmeaTextStyle.titleLarge(context).copyWith(color: OsmeaColors.black),
           ),
           content: OsmeaComponents.textField(
             controller: brandNameController,

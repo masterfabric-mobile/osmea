@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_supabase/app/models/coupon.dart';
 
 /// Widget for displaying applied coupon

@@ -6,8 +6,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_cart/widgets/cart_item_widget.dart';
 
 /// Cart item with swipe-to-delete functionality

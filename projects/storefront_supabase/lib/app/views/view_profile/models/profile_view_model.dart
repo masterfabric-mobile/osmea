@@ -6,7 +6,7 @@ import 'package:intl/intl.dart'; // Add this import
 import 'package:storefront_supabase/app/models/app_user.dart';
 import 'package:storefront_supabase/app/models/user_address.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'states.dart';
+import 'module/states.dart';
 
 @injectable
 class ProfileViewModel extends BaseViewModelCubit<ProfileState> {

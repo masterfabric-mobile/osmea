@@ -76,8 +76,12 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
                 fit: BoxFit.contain,
                 width: double.infinity,
                 height: double.infinity,
-                placeholder: const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                placeholder: Center(
+                  child: OsmeaComponents.loading(
+                    type: LoadingType.circularFade,
+                    size: 36,
+                    color: Colors.white,
+                  ),
                 ),
                 errorWidget: const Center(
                   child: Icon(Icons.broken_image, color: Colors.white, size: 50),

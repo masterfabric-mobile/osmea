@@ -1,8 +1,8 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
-import 'package:storefront_supabase/app/views/admin/settings/models/states.dart';
-import 'package:storefront_supabase/app/views/admin/settings/models/view_model.dart';
+import 'package:storefront_supabase/app/views/admin/settings/models/module/states.dart';
+import 'package:storefront_supabase/app/views/admin/settings/models/admin_settings_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminSettingsView
@@ -42,7 +42,13 @@ class AdminSettingsView
       BuildContext context, AdminSettingsViewModel viewModel, AdminSettingsState state) {
     final resources = context.resources;
     if (state is AdminSettingsLoading || state is AdminSettingsInitial) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is AdminSettingsError) {
