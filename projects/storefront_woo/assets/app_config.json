@@ -14,9 +14,9 @@
         "enable_logging": true
     },
     "woocommerce_configuration": {
-        "store_url": "http://example.com",
-        "brand_name": "example",
-        "auth_key": "exampleAUthCodE123",
+        "store_url": "https://masterfabric.store",
+        "brand_name": "masterfabric",
+        "auth_key": "THISISMySpeCiaLAUthCodeMasterFabric",
         "version": "v1",
         "store_api_version": "v1",
         "admin_api_version": "v3",
