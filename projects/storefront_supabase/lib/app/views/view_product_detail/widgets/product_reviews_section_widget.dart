@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import 'package:storefront_supabase/app/views/view_product_detail/models/states.dart';
+import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/review_item_widget.dart';
 
 /// Widget for displaying product reviews section

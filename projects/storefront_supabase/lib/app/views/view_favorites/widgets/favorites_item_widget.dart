@@ -1,7 +1,7 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:flutter/material.dart';
 import 'package:storefront_supabase/app/models/product.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
 import 'package:storefront_supabase/app/views/view_favorites/widgets/favorites_item_price_widget.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 

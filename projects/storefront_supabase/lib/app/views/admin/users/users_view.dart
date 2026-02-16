@@ -51,7 +51,11 @@ class _AdminUsersViewState extends State<AdminUsersView> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return OsmeaComponents.center(
-              child: const CircularProgressIndicator(color: OsmeaColors.black),
+              child: OsmeaComponents.loading(
+              type: LoadingType.circularFade,
+              size: 36,
+              color: OsmeaColors.black,
+            ),
             );
           }
           if (snapshot.hasError) {

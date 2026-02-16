@@ -16,11 +16,11 @@ import 'package:storefront_supabase/app/models/product_filters.dart';
 import 'package:storefront_supabase/app/utils/brand_logo_url_helper.dart';
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart';
 import 'package:storefront_supabase/app/utils/category_image_url_helper.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/view_model.dart';
-import 'package:storefront_supabase/app/views/view_favorites/models/states.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/favorites_view_model.dart';
+import 'package:storefront_supabase/app/views/view_favorites/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
 import 'package:get_it/get_it.dart';
-import 'states.dart';
+import 'module/states.dart';
 
 @lazySingleton
 class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
@@ -364,7 +364,7 @@ class SupabaseHomeViewModel extends BaseViewModelCubit<SupabaseHomeState> {
       // So we are good with String productId.
 
       // Wait, let me check `FavoritesViewModel` code from previous turns.
-      // `storefront_supabase/lib/app/views/view_favorites/models/view_model.dart`
+      // `storefront_supabase/lib/app/views/view_favorites/models/favorites_view_model.dart`
       // `removeFavorite(String productId)`
       // `addToCart(String productId)`
       // It DOES NOT have `addFavorite` exposed?

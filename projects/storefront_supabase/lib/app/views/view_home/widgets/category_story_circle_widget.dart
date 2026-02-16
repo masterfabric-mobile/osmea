@@ -231,11 +231,10 @@ class _CategoryStoryCircleWidgetState extends State<CategoryStoryCircleWidget> {
                                 child: SizedBox(
                                   width: circleSize * 0.4,
                                   height: circleSize * 0.4,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      OsmeaColors.black,
-                                    ),
+                                  child: OsmeaComponents.loading(
+                                    type: LoadingType.circularFade,
+                                    size: 24,
+                                    color: OsmeaColors.black,
                                   ),
                                 ),
                               ),

@@ -610,7 +610,7 @@ class _AvatarExampleState extends State<AvatarExample> {
         OsmeaComponents.sizedBox(height: 16),
         _buildResponsiveDemo(),
         OsmeaComponents.sizedBox(height: 24),
-        _buildSubsectionTitle('Configuration Examples'),
+        _buildSubsectionTitle('Configuration'),
         OsmeaComponents.sizedBox(height: 16),
         _buildConfigurationDemo(),
         OsmeaComponents.sizedBox(height: 24),
@@ -677,7 +677,7 @@ class _AvatarExampleState extends State<AvatarExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Responsive Size Demonstration',
+          'Responsive Size',
           variant: OsmeaTextVariant.bodyMedium,
           color: OsmeaColors.nordicBlue,
         ),
@@ -731,7 +731,7 @@ class _AvatarExampleState extends State<AvatarExample> {
         ),
         OsmeaComponents.sizedBox(height: 12),
         OsmeaComponents.text(
-          'These avatars demonstrate different size categories without requiring responsive calculations.',
+          'These avatars show different size categories without requiring responsive calculations.',
           variant: OsmeaTextVariant.bodySmall,
           color: OsmeaColors.pewter,
         ),
@@ -744,7 +744,7 @@ class _AvatarExampleState extends State<AvatarExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Avatar Configuration Examples',
+          'Avatar Configuration',
           variant: OsmeaTextVariant.bodyMedium,
           color: OsmeaColors.nordicBlue,
         ),
@@ -839,7 +839,7 @@ class _AvatarExampleState extends State<AvatarExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'Content Type Examples',
+          'Content Type',
           variant: OsmeaTextVariant.bodyMedium,
           color: OsmeaColors.nordicBlue,
         ),
@@ -908,7 +908,7 @@ class _AvatarExampleState extends State<AvatarExample> {
         ),
         OsmeaComponents.sizedBox(height: 12),
         OsmeaComponents.text(
-          'These examples show different content types supported by avatar components.',
+          'These show different content types supported by avatar components.',
           variant: OsmeaTextVariant.bodySmall,
           color: OsmeaColors.pewter,
         ),

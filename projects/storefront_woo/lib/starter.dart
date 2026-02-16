@@ -70,7 +70,7 @@ launchApp({String environment = 'dev'}) async {
     debugPrint('📡 Attempting to load configuration from WordPress...');
 
     wordPressService = WordPressConfigService(
-      baseUrl: 'https://example.com', // WordPress site URL
+      baseUrl: 'https://masterfabric.store', // WordPress site URL
     );
 
     wordPressConfigIntegration = WordPressConfigIntegration(

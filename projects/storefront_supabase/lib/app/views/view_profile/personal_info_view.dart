@@ -6,8 +6,8 @@ import 'package:core/core.dart'
         LocaleSettings,
         TranslationProvider;
 import 'package:go_router/go_router.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
@@ -52,7 +52,13 @@ class PersonalInfoView extends MasterViewCubit<ProfileViewModel, ProfileState> {
   ) {
     final resources = context.resources;
     if (state is ProfileLoading) {
-      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is ProfileAuthenticated) {

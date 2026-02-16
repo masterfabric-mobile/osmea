@@ -57,7 +57,7 @@ class _RadioButtonExampleState extends State<RadioButtonExample> {
             _buildSectionTitle('📦 Subscription Plans'),
             _buildPlansSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🔄 State Examples'),
+            _buildSectionTitle('🔄 State'),
             _buildStateSection(),
             OsmeaComponents.sizedBox(height: 32),
             _buildSectionTitle('🎭 Radio Styles'),

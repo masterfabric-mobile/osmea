@@ -58,7 +58,7 @@ class SpacerExample extends StatelessWidget {
 
             // Section title for practical examples
             OsmeaComponents.text(
-              '💡 Practical Examples',
+              '💡 Practical Use Cases',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -176,7 +176,7 @@ class SpacerExample extends StatelessWidget {
             ),
             OsmeaComponents.sizedBox(height: 8),
             OsmeaComponents.text(
-              'This is the content of the card that demonstrates using spacers to layout buttons.',
+              'This is the content of the card showing how to use spacers to layout buttons.',
             ),
             OsmeaComponents.sizedBox(height: 16),
             OsmeaComponents.row(

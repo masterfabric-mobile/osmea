@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
-import 'package:storefront_supabase/app/views/view_profile/change_password/models/states.dart';
-import 'package:storefront_supabase/app/views/view_profile/change_password/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/change_password/models/module/states.dart';
+import 'package:storefront_supabase/app/views/view_profile/change_password/models/change_password_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 
@@ -44,7 +44,13 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
       BuildContext context, ChangePasswordViewModel viewModel, ChangePasswordState state) {
     final resources = context.resources;
     if (state is ChangePasswordLoading) {
-      return Center(child: CircularProgressIndicator(color: OsmeaColors.black));
+      return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
+    );
     }
 
     if (state is ChangePasswordError) {

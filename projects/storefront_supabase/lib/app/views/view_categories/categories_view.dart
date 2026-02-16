@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
-import 'models/view_model.dart';
-import 'models/states.dart';
+import 'models/categories_view_model.dart';
+import 'models/module/states.dart';
 
 class CategoriesView
     extends MasterViewCubit<CategoriesViewModel, CategoriesState> {
@@ -51,8 +51,12 @@ class CategoriesView
     }
 
     if (state is CategoriesLoadingState || state is CategoriesInitialState) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
       );
     }
 
@@ -76,8 +80,12 @@ class CategoriesView
       );
     }
 
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.circularFade,
+        size: 36,
+        color: OsmeaColors.black,
+      ),
     );
   }
 }

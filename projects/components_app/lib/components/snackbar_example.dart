@@ -128,7 +128,7 @@ class SnackbarExample extends StatelessWidget {
             ),
             SizedBox(height: context.spacing12),
             OsmeaComponents.button(
-              text: 'Quick Stack Example (5 snackbars)',
+              text: 'Quick Stack (5 snackbars)',
               onPressed: () {
                 for (int i = 1; i <= 5; i++) {
                   Future.delayed(Duration(milliseconds: i * 200), () {
@@ -144,7 +144,7 @@ class SnackbarExample extends StatelessWidget {
             ),
             SizedBox(height: context.spacing12),
             OsmeaComponents.button(
-              text: 'Top Position Stack Example',
+              text: 'Top Position Stack',
               onPressed: () {
                 for (int i = 1; i <= 3; i++) {
                   Future.delayed(Duration(milliseconds: i * 300), () {

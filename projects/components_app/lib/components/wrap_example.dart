@@ -24,7 +24,7 @@ class WrapExample extends StatelessWidget {
           children: [
             // Section title
             OsmeaComponents.text(
-              '🧩 Basic Wrap Examples',
+              '🧩 Basic Wrap',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -48,7 +48,7 @@ class WrapExample extends StatelessWidget {
 
             // Alignment examples
             OsmeaComponents.text(
-              '📏 Alignment Examples',
+              '📏 Alignment',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -80,7 +80,7 @@ class WrapExample extends StatelessWidget {
 
             // Advanced examples
             OsmeaComponents.text(
-              '🎨 Styled Wrap Examples',
+              '🎨 Styled Wrap',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -98,7 +98,7 @@ class WrapExample extends StatelessWidget {
             _buildExampleSection(
                 context,
                 'Tag Cloud',
-                'A practical example using Wrap for a tag/chip cloud',
+                'A practical use of Wrap for a tag/chip cloud',
                 _buildTagCloud(context)),
             OsmeaComponents.sizedBox(height: 24),
 

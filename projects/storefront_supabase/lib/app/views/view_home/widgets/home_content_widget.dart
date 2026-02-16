@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
-import 'package:storefront_supabase/app/views/view_home/models/states.dart';
+import 'package:storefront_supabase/app/views/view_home/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/banner_carousel_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/deals_of_day_carousel_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/recommended_section_widget.dart';

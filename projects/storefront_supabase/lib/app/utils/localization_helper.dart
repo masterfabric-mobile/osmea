@@ -31,7 +31,7 @@ class LocalizationHelper {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: OsmeaColors.grayMaterial[300],
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -40,7 +40,7 @@ class LocalizationHelper {
                   // --- Language Section ---
                   OsmeaComponents.text(
                     context.resources.language,
-                    textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   _buildLanguageItem(context, '🇺🇸', 'English', const Locale('en')),
@@ -49,13 +49,13 @@ class LocalizationHelper {
                   _buildLanguageItem(context, '🇫🇷', 'Français', const Locale('fr')),
                   
                   const SizedBox(height: 32),
-                  const Divider(),
+                  OsmeaComponents.divider(),
                   const SizedBox(height: 32),
 
                   // --- Currency Section ---
                   OsmeaComponents.text(
                     'Currency', // You might want to add this to strings.json later
-                    textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   _buildCurrencyItem(context, '🇺🇸', 'USD'),
@@ -77,9 +77,9 @@ class LocalizationHelper {
       builder: (context, currentLocale) {
         final isSelected = currentLocale?.languageCode == locale.languageCode;
         return ListTile(
-          leading: Text(flag, style: const TextStyle(fontSize: 24)),
-          title: Text(name),
-          trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.black) : null,
+          leading: OsmeaComponents.text(flag, textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(fontSize: 24)),
+          title: OsmeaComponents.text(name, textStyle: OsmeaTextStyle.bodyMedium(context)),
+          trailing: isSelected ? Icon(Icons.check_circle, color: OsmeaColors.black) : null,
           onTap: () {
             context.read<LanguageCubit>().changeLanguage(locale);
             Navigator.pop(context);
@@ -95,9 +95,9 @@ class LocalizationHelper {
       builder: (context, currentCurrency) {
         final isSelected = currentCurrency == code;
         return ListTile(
-          leading: Text(flag, style: const TextStyle(fontSize: 24)),
-          title: Text(code),
-          trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.black) : null,
+          leading: OsmeaComponents.text(flag, textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(fontSize: 24)),
+          title: OsmeaComponents.text(code, textStyle: OsmeaTextStyle.bodyMedium(context)),
+          trailing: isSelected ? Icon(Icons.check_circle, color: OsmeaColors.black) : null,
           onTap: () {
             context.read<CurrencyCubit>().changeCurrency(code);
             Navigator.pop(context);

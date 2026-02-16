@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
-import 'package:storefront_supabase/app/views/view_checkout/models/states.dart';
+import 'package:storefront_supabase/app/views/view_checkout/models/module/states.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class PaymentStepWidget extends StatelessWidget {

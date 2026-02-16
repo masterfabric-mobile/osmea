@@ -158,7 +158,7 @@ class _CounterExampleState extends State<CounterExample>
                   ),
                   OsmeaComponents.sizedBox(height: 12),
                   OsmeaComponents.text(
-                    'Explore different styles, sizes, and behaviors of the OSMEA Counter component with live examples and smooth animations.',
+                    'Explore different styles, sizes, and behaviors of the OSMEA Counter component with smooth animations.',
                     variant: OsmeaTextVariant.bodyLarge,
                     textAlign: TextAlign.center,
                     color: OsmeaColors.slate,
@@ -629,7 +629,7 @@ class _CounterExampleState extends State<CounterExample>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildModernSectionHeader(
-            '🌍 Real-World Examples',
+            '🌍 Real-World Use Cases',
             'Common use cases in modern apps',
           ),
           OsmeaComponents.sizedBox(height: 20),

@@ -139,7 +139,7 @@ class ContainerExample extends StatelessWidget {
 
             // Section title for advanced examples
             OsmeaComponents.text(
-              '🚀 Advanced Examples',
+              '🚀 Advanced',
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
@@ -519,7 +519,7 @@ class ContainerExample extends StatelessWidget {
           ),
           OsmeaComponents.sizedBox(height: 8),
           OsmeaComponents.text(
-            'This card demonstrates multiple container properties combined',
+            'This card shows multiple container properties combined',
             color: OsmeaColors.white
                 .withValues(red: 255, green: 255, blue: 255, alpha: 0.7),
           ),
@@ -575,7 +575,7 @@ class ContainerExample extends StatelessWidget {
 // Main entry point for the container examples
 void main() {
   runApp(const MaterialApp(
-    title: 'OSMEA Container Examples',
+    title: 'OSMEA Container',
     home: ContainerExample(),
   ));
 }

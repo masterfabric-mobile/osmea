@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension;
 import 'package:storefront_supabase/app/models/category.dart';
 import 'package:storefront_supabase/app/views/view_home/models/home_view_model.dart';
-import 'package:storefront_supabase/app/views/view_home/models/states.dart';
+import 'package:storefront_supabase/app/views/view_home/models/module/states.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class FilterSheetWidget extends StatefulWidget {
@@ -53,21 +53,22 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                 children: [
                   OsmeaComponents.text(
                     resources.filter,
-                    textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
                   ),
-                  TextButton(
+                  OsmeaComponents.textButton(
+                    text: resources.clear,
                     onPressed: () {
                       setState(() {
                         _selectedBrandIds.clear();
                         _selectedCategory = null;
                       });
                     },
-                    child: OsmeaComponents.text(resources.clear, color: OsmeaColors.black),
+                    variant: ButtonVariant.ghost,
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1),
+            OsmeaComponents.divider(height: 1),
             
             // Content
             Expanded(
@@ -78,7 +79,7 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                   // --- Categories ---
                   OsmeaComponents.text(
                     resources.categories,
-                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    textStyle: OsmeaTextStyle.titleMedium(context).copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -109,13 +110,13 @@ class _FilterSheetWidgetState extends State<FilterSheetWidget> {
                   ),
                   
                   const SizedBox(height: 24),
-                  const Divider(),
+                  OsmeaComponents.divider(),
                   const SizedBox(height: 24),
 
                   // --- Brands ---
                   OsmeaComponents.text(
                     resources.brands,
-                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    textStyle: OsmeaTextStyle.titleMedium(context).copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   // Using a more compact grid/wrap layout for brands instead of long list

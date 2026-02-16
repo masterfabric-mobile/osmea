@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:storefront_supabase/app/views/view_cart/models/states.dart';
+import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 
 /// Kullanıcı bazlı sepet önbelleği: hangi ürünlerin sepette olduğu (giriş yapmış veya anon).
 /// Sepet yüklendiğinde / sepete eklenip çıkarıldığında güncellenir.

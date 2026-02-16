@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:core/core.dart';
 
-/// 🔔 **Local Notification Helper Example**
+/// 🔔 **Local Notification Helper**
 ///
-/// Demonstrates the usage of OSMEA Local Notification Helper with various
+/// Usage of OSMEA Local Notification Helper with various
 /// notification types including instant, scheduled, repeating, and rich notifications.
 class LocalNotificationHelperExample extends StatefulWidget {
   const LocalNotificationHelperExample({super.key});
@@ -577,7 +577,7 @@ class _LocalNotificationHelperExampleState
       id: _notificationCounter++,
       title: 'Article Update',
       body: 'New article published...',
-      bigText: 'This is a very long notification content that demonstrates the big text '
+      bigText: 'This is a very long notification content that shows the big text '
           'notification feature. When the user expands this notification, they will be able '
           'to read this entire message. This is perfect for articles, detailed messages, '
           'or any content that needs more space than a regular notification can provide. '

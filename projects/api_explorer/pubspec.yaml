@@ -2,7 +2,7 @@ name: api_explorer
 description: "Modern API explorer application with wizard-based configuration system for Shopify and WooCommerce integrations. Features SQLite database storage and interactive setup wizard."
 
 publish_to: 'none' 
-version: 1.1.0+1
+version: 1.1.0+5
 
 environment:
   sdk: ">=3.6.1 <4.0.0"
@@ -13,13 +13,19 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   
-  # Core Package
+  # Core Package (git - same source as apis to avoid version conflict)
   core:
-    path: ../../packages/core
-  
-  # API Package
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/core
+
+  # API Package (git)
   apis:
-    path: ../../packages/apis
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      ref: dev
+      path: packages/apis
   
   # Dependency Injection
   injectable: ^2.5.1

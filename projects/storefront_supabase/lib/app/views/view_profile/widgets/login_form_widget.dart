@@ -1,6 +1,6 @@
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter/material.dart';
-import 'package:storefront_supabase/app/views/view_profile/models/view_model.dart';
+import 'package:storefront_supabase/app/views/view_profile/models/profile_view_model.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class LoginFormWidget extends StatelessWidget {
