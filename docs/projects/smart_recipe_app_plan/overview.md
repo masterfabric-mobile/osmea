@@ -45,42 +45,42 @@ This project aims to build a mobile application that generates recipes for child
 
 6.  **Strict Architecture**: All Views MUST extend `MasterViewHydratedCubit`. All ViewModels MUST extend `BaseViewModelHydratedCubit`. This ensures consistent state persistence and lifecycle management across the entire app.
 
-## Kullanıcı Deneyimi (UX) Stratejisi ve Ana Akışlar (Rev. 2)
-Uygulamanın temel amacı, ebeveynler için hem pratik bir "kurtarıcı" hem de proaktif bir "dijital diyetisyen" olmaktır. Bu iki rol, hibrit bir modelde birleşir.
+## User Experience (UX) Strategy and Main Flows (Rev. 2)
+The main goal of the application is to be both a practical "savior" and a proactive "digital dietitian" for parents. These two roles combine in a hybrid model.
 
-### Ana Senaryo 1: "Dolabımda Ne Var?" (Kurtarıcı Asistan)
-- **Problem:** Ebeveynin kısıtlı zamanda, evdeki mevcut malzemelerle ne yapacağını bilememesi.
-- **Çözüm:** Kullanıcı, elindeki malzemeleri seçer. AI, bu malzemelere, çocuğun profiline (yaş, alerji vb.) ve güvenlik kurallarına (`Safety Guardrail`) uygun bir tarif üretir.
-- **Uygulama Rolü:** Anlık ihtiyacı pratik bir şekilde çözen asistan. Bu, en sık kullanılacak özelliktir.
+### Main Scenario 1: "What's in My Cupboard?" (Savior Assistant)
+- **Problem:** The parent doesn't know what to make with the available ingredients at home in a limited time.
+- **Solution:** The user selects the ingredients they have. The AI generates a recipe suitable for these ingredients, the child's profile (age, allergies, etc.), and safety rules (`Safety Guardrail`).
+- **Application Role:** An assistant that practically solves immediate needs. This will be the most frequently used feature.
 
-### Ana Senaryo 2: "Bugün Ne Yemeli?" (Dijital Diyetisyen)
-- **Problem:** Çocuğun günlük besin ihtiyaçlarının (kalori, protein, vitamin vb.) dengeli bir şekilde karşılandığından emin olmak.
-- **Çözüm:** Sistem, gün içinde girilen verilere dayanarak çocuğun besin eksikliklerini tespit eder (Örn: "Bugün hiç protein almadı ve C vitamini eksik"). Bu eksiklikleri giderecek ideal malzemelerle proaktif olarak bir tarif önerir.
-- **Uygulama Rolü:** Ebeveyne yol gösteren, çocuğun gelişimini destekleyen uzman. Bu, uygulamanın "akıllı" ve prestijli yönüdür.
+### Main Scenario 2: "What Should They Eat Today?" (Digital Dietitian)
+- **Problem:** Ensuring the child's daily nutritional needs (calories, protein, vitamins, etc.) are met in a balanced way.
+- **Solution:** Based on the data entered during the day, the system identifies the child's nutritional deficiencies (e.g., "Didn't get any protein today and is deficient in Vitamin C"). It then proactively suggests a recipe with ideal ingredients to address these deficiencies.
+- **Application Role:** An expert guiding the parent and supporting the child's development. This is the "smart" and prestigious aspect of the application.
 
-### Hibrit Model Akışı
-1.  **Öneri Ekranı (Varsayılan):** Uygulama açıldığında, kullanıcıyı proaktif öneri ekranı (`Senaryo 2`) karşılar.
-2.  **Malzeme Kontrolü:** Eğer kullanıcı önerilen tarifi yapmak için yeterli malzemeye sahip değilse, tek bir dokunuşla malzeme seçme ekranına (`Senaryo 1`) geçer.
-3.  **Akıllı Eşleşme:** Kullanıcı malzeme seçimi yaparken, sistem seçilen malzemelerin besin değerleri hakkında anlık geri bildirimler sunar (Örn: "Bu malzeme günlük demir ihtiyacının %50'sini karşılar.").
+### Hybrid Model Flow
+1.  **Suggestion Screen (Default):** When the application opens, the user is greeted by the proactive suggestion screen (`Scenario 2`).
+2.  **Ingredient Check:** If the user does not have enough ingredients to make the suggested recipe, they can switch to the ingredient selection screen (`Scenario 1`) with a single tap.
+3.  **Smart Matching:** As the user selects ingredients, the system provides instant feedback on the nutritional values of the selected ingredients (e.g., "This ingredient meets 50% of the daily iron requirement.").
 
-## Geliştirme Notları ve İyileştirme Alanları (Rev. 1)
+## Development Notes and Improvement Areas (Rev. 1)
 
-Aşağıdaki maddeler, mevcut plana ek olarak projenin güvenliğini ve işlevselliğini artırmak için eklenecektir.
+The following items will be added to the current plan to increase the security and functionality of the project.
 
-### 1. "3 Gün Kuralı" İzleme Mantığı
-- **Gereksinim:** Ek gıdaya geçiş dönemindeki (6+ ay) bebekler için "yeni gıda tanıştırma protokolü" uygulanmalıdır.
-- **Detay:** Kullanıcı bir gıdayı "yeni" olarak işaretlediğinde, sistem bu gıdayı 3 gün boyunca "takip moduna" almalıdır.
-- **Kısıtlama:** Bu 3 günlük takip süresince, sistem başka **yeni** bir gıda içeren tarif önermemelidir. Bu özellik, potansiyel alerjik reaksiyonların kaynağını net bir şekilde belirlemeye yardımcı olur.
-- **Entegrasyon:** Bu mantık, `Ingredient Management` ve `AI-Powered Recipe Engine` modüllerine entegre edilmelidir.
+### 1. "3-Day Rule" Monitoring Logic
+- **Requirement:** A "new food introduction protocol" must be applied for babies in the complementary feeding period (6+ months).
+- **Detail:** When the user marks a food as "new", the system should put this food into "tracking mode" for 3 days.
+- **Constraint:** During this 3-day tracking period, the system should not suggest another **new** food-containing recipe. This feature helps to clearly identify the source of potential allergic reactions.
+- **Integration:** This logic should be integrated into the `Ingredient Management` and `AI-Powered Recipe Engine` modules.
 
-### 2. AI "Safety Guardrail" (Güvenlik Katmanı)
-- **Gereksinim:** AI tarafından üretilen tariflerin bebek sağlığı için risk oluşturmadığından emin olunmalıdır. AI halüsinasyonları hayati riskler taşıyabilir (Örn: 1 yaşından küçük bebeğe bal önermesi).
-- **Detay:** AI'dan bir tarif yanıtı alındığında, bu tarif kullanıcıya gösterilmeden hemen önce **Hard-coded bir Validation Layer (Doğrulama Katmanı)** tarafından kontrol edilmelidir.
-- **Kısıtlama:** Bu katman, çocuğun yaşına göre kesinlikle yasak olan gıdaların bir listesini içermelidir (Örn: Bal, tuz, şeker, işlenmiş gıdalar, boğulma riski taşıyan kuruyemişler vb.). Yasaklı bir içerik tespit edilirse, tarif kullanıcıya gösterilmemeli ve alternatif bir tarif sunulmalıdır.
-- **Entegrasyon:** Bu kontrol, `AI-Powered Recipe Engine Logic` ve `Recipe Feed UI` arasındaki akışa eklenmelidir.
+### 2. AI "Safety Guardrail" (Security Layer)
+- **Requirement:** It must be ensured that AI-generated recipes do not pose a risk to infant health. AI hallucinations can carry vital risks (e.g., suggesting honey to a baby younger than 1 year old).
+- **Detail:** When a recipe response is received from the AI, it must be checked by a **Hard-coded Validation Layer** immediately before being shown to the user.
+- **Constraint:** This layer should contain a list of foods absolutely forbidden according to the child's age (e.g., honey, salt, sugar, processed foods, choking hazard nuts, etc.). If a forbidden content is detected, the recipe should not be shown to the user, and an alternative recipe should be presented.
+- **Integration:** This control should be added to the flow between the `AI-Powered Recipe Engine Logic` and `Recipe Feed UI`.
 
-### 3. Veri Senkronizasyonu ve "Partial Intake" (Kısmi Alım)
-- **Gereksinim:** Kalori ve besin takibinin doğruluğu için, çocuğun bir öğünün ne kadarını tükettiği bilgisi kaydedilebilmelidir.
-- **Detay:** Kullanıcı, hazırlanan bir tarifin "tamamını", "yarısını", "çeyreğini" yediği gibi seçenekleri işaretleyebilmelidir.
-- **Kısıtlama:** Sistem, girilen bu orana göre kalori ve makro/mikro besin değerlerini otomatik olarak hesaplayıp günlüğe kaydetmelidir.
-- **Entegrasyon:** Bu özellik, `Calorie & Nutrient Tracking Logic` ve `Calorie & Nutrient Tracker UI` modüllerine eklenmelidir.
+### 3. Data Synchronization and "Partial Intake"
+- **Requirement:** For the accuracy of calorie and nutrient tracking, information about how much of a meal the child consumed should be recordable.
+- **Detail:** The user should be able to mark options like "all," "half," or "quarter" of a prepared recipe was eaten.
+- **Constraint:** The system should automatically calculate and log calorie and macro/micro nutrient values based on this entered ratio.
+- **Integration:** This feature should be added to the `Calorie & Nutrient Tracking Logic` and `Calorie & Nutrient Tracker UI` modules.
