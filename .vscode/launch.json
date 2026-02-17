@@ -191,7 +191,8 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
-      "cwd": "${workspaceFolder}/projects/components_app"
+      "cwd": "${workspaceFolder}/projects/components_app",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "🧩 Components App - Debug",
@@ -199,7 +200,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
       "cwd": "${workspaceFolder}/projects/components_app",
-      "flutterMode": "debug"
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "🧩 Components App - Release",
@@ -207,7 +209,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
       "cwd": "${workspaceFolder}/projects/components_app",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "📚 Storybook - Run",
