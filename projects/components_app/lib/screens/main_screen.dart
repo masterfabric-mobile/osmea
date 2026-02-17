@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       body: widget.child,
       bottomNavigationBar: OsmeaComponents.navbar(
         items: _navItems,
-        variant: NavbarVariant.socialGlass,
+      //  variant: NavbarVariant.floatingCards,
         size: NavbarSize.small,
         currentIndex: _currentIndex,
         centerItems: true,
@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           _navigateToPage(index);
         },
-        activeColor: OsmeaColors.black,
+        activeColor: OsmeaColors.nordicBlue,
         inactiveColor: OsmeaColors.pewter,
         backgroundColor: OsmeaColors.white,
       ),
