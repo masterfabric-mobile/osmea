@@ -12,25 +12,20 @@
 class $AssetsI18nGen {
   const $AssetsI18nGen();
 
-  /// File path: assets/i18n/strings_de.i18n.json
-  String get stringsDeI18n => 'assets/i18n/strings_de.i18n.json';
+  /// File path: assets/i18n/de.i18n.json
+  String get deI18n => 'assets/i18n/de.i18n.json';
 
-  /// File path: assets/i18n/strings_en.i18n.json
-  String get stringsEnI18n => 'assets/i18n/strings_en.i18n.json';
+  /// File path: assets/i18n/en.i18n.json
+  String get enI18n => 'assets/i18n/en.i18n.json';
 
-  /// File path: assets/i18n/strings_fr.i18n.json
-  String get stringsFrI18n => 'assets/i18n/strings_fr.i18n.json';
+  /// File path: assets/i18n/fr.i18n.json
+  String get frI18n => 'assets/i18n/fr.i18n.json';
 
-  /// File path: assets/i18n/strings_tr.i18n.json
-  String get stringsTrI18n => 'assets/i18n/strings_tr.i18n.json';
+  /// File path: assets/i18n/tr.i18n.json
+  String get trI18n => 'assets/i18n/tr.i18n.json';
 
   /// List of all assets
-  List<String> get values => [
-    stringsDeI18n,
-    stringsEnI18n,
-    stringsFrI18n,
-    stringsTrI18n,
-  ];
+  List<String> get values => [deI18n, enI18n, frI18n, trI18n];
 }
 
 class Assets {

@@ -1,3 +1,4 @@
+# Generate: dart run slang (do NOT use build_runner for slang; only one output: lib/src/resources)
 base_locale: en
 input_directory: assets/i18n
 output_directory: lib/src/resources

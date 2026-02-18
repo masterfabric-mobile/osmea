@@ -82,7 +82,7 @@ dev_dependencies:
   injectable_generator: ^2.6.2     # Generates code for injectable (DI)
   build_runner: ^2.5.4            # Core tool for running code generation
   flutter_gen_runner: any         # Generator for flutter_gen (assets, colors, fonts, etc.)
-  slang_build_runner: ^4.8.0      # Slang code generator
+  # Slang: use "dart run slang" (reads slang.yaml → lib/src/resources). Do NOT use slang_build_runner to avoid double output (lib/gen).
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # APP ICON
