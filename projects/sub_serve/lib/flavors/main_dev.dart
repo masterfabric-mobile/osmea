@@ -10,7 +10,7 @@ void main() async {
     Flavor.create(
       environment,
       name: environment.toString().split('.').last.toUpperCase(),
-      color: Colors.green,
+      color: Colors.grey,
       properties: {'apiUrl': 'https://api-dev.example.com'},
     );
 

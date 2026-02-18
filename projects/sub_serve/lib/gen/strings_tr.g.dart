@@ -40,12 +40,19 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get localLanguageCode => 'tr_TR';
 	@override String get appTitle => 'MasterFabric SubServe';
 	@override String get home => 'Ana Sayfa';
+	@override String get homeTitle => 'MasterFabric SubServe';
 	@override String get settings => 'Ayarlar';
 	@override String get save => 'Kaydet';
 	@override String get cancel => 'İptal';
 	@override String get loading => 'Yükleniyor...';
 	@override String get error => 'Hata';
 	@override String get retry => 'Tekrar Dene';
+	@override String get onboardingSkip => 'Atla';
+	@override String get onboardingPrevious => 'Önceki';
+	@override String get onboardingNext => 'İleri';
+	@override String get onboardingGetStarted => 'Başla';
+	@override String get onboardingNoPages => 'Onboarding sayfası yok';
+	@override String get onboardingLoadFailed => 'Yüklenemedi';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -59,12 +66,19 @@ extension on TranslationsTr {
 			'localLanguageCode' => 'tr_TR',
 			'appTitle' => 'MasterFabric SubServe',
 			'home' => 'Ana Sayfa',
+			'homeTitle' => 'MasterFabric SubServe',
 			'settings' => 'Ayarlar',
 			'save' => 'Kaydet',
 			'cancel' => 'İptal',
 			'loading' => 'Yükleniyor...',
 			'error' => 'Hata',
 			'retry' => 'Tekrar Dene',
+			'onboardingSkip' => 'Atla',
+			'onboardingPrevious' => 'Önceki',
+			'onboardingNext' => 'İleri',
+			'onboardingGetStarted' => 'Başla',
+			'onboardingNoPages' => 'Onboarding sayfası yok',
+			'onboardingLoadFailed' => 'Yüklenemedi',
 			_ => null,
 		};
 	}

@@ -50,6 +50,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Home'
 	String get home => 'Home';
 
+	/// en: 'MasterFabric SubServe'
+	String get homeTitle => 'MasterFabric SubServe';
+
 	/// en: 'Settings'
 	String get settings => 'Settings';
 
@@ -67,6 +70,24 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Retry'
 	String get retry => 'Retry';
+
+	/// en: 'Skip'
+	String get onboardingSkip => 'Skip';
+
+	/// en: 'Previous'
+	String get onboardingPrevious => 'Previous';
+
+	/// en: 'Next'
+	String get onboardingNext => 'Next';
+
+	/// en: 'Get started'
+	String get onboardingGetStarted => 'Get started';
+
+	/// en: 'No onboarding pages'
+	String get onboardingNoPages => 'No onboarding pages';
+
+	/// en: 'Load failed'
+	String get onboardingLoadFailed => 'Load failed';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -80,12 +101,19 @@ extension on Translations {
 			'localLanguageCode' => 'en_US',
 			'appTitle' => 'MasterFabric SubServe',
 			'home' => 'Home',
+			'homeTitle' => 'MasterFabric SubServe',
 			'settings' => 'Settings',
 			'save' => 'Save',
 			'cancel' => 'Cancel',
 			'loading' => 'Loading...',
 			'error' => 'Error',
 			'retry' => 'Retry',
+			'onboardingSkip' => 'Skip',
+			'onboardingPrevious' => 'Previous',
+			'onboardingNext' => 'Next',
+			'onboardingGetStarted' => 'Get started',
+			'onboardingNoPages' => 'No onboarding pages',
+			'onboardingLoadFailed' => 'Load failed',
 			_ => null,
 		};
 	}

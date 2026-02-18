@@ -21,6 +21,15 @@ dependencies:
   masterfabric_core: ^0.0.15
 
   # ────────────────────────────────
+  # OSMEA COMPONENTS (UI Kit)
+  # ────────────────────────────────
+  osmea_components:
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      path: packages/components
+      ref: dev
+
+  # ────────────────────────────────
   # ICONS
   # ────────────────────────────────
   cupertino_icons: ^1.0.8
@@ -60,6 +69,7 @@ dependencies:
   slang: ^4.11.1            # Slang for translations
   slang_flutter: ^4.11.0   # Slang Flutter integration
   url_launcher: ^6.3.2
+  http: ^1.2.2
 
   # ────────────────────────────────
   # CHARTS (Admin dashboard)
