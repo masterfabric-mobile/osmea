@@ -52,7 +52,7 @@ class HelpSupportView extends StatelessWidget {
               context,
               theme,
               'Contact us',
-              'Email: support@example.com\nPhone: +90 212 000 00 00',
+              'Email: support@masterfabric.co\nPhone: +90 212 000 00 00',
               Icons.email_outlined,
             ),
             SizedBox(height: context.spacing16),

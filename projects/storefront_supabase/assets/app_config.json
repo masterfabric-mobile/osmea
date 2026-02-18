@@ -55,7 +55,7 @@
       "onboarding_enabled": true,
       "dark_mode_available": true,
       "offline_mode_enabled": true,
-      "beta_features_enabled": false,
+      "advanced_features_enabled": false,
       "analytics_opt_out_available": true
 
     },
