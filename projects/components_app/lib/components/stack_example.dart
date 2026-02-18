@@ -29,7 +29,7 @@ class StackExample extends StatelessWidget {
             _buildSectionTitle(context, 'Positioned Children'),
             _buildPositionedChildrenExamples(context),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle(context, 'Practical Examples'),
+            _buildSectionTitle(context, 'Practical Use Cases'),
             _buildPracticalExamples(context),
           ],
         ),

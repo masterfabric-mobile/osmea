@@ -32,7 +32,7 @@ class _ScaffoldExampleState extends State<ScaffoldExample> {
           children: [
             // Section title
             OsmeaComponents.text(
-              '🏗️ Basic Scaffold Examples',
+              '🏗️ Basic Scaffold',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -80,7 +80,7 @@ class _ScaffoldExampleState extends State<ScaffoldExample> {
 
             // Advanced Scaffold
             OsmeaComponents.text(
-              '🧰 Advanced Scaffold Examples',
+              '🧰 Advanced Scaffold',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),

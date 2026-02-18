@@ -2,10 +2,10 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_appbar.dart';
 
-/// 🌐 WebViewerHelper Examples
+/// 🌐 WebViewerHelper
 ///
-/// Demonstrates the unified WebViewerHelper with OSMEA Components integration
-/// featuring TabBar navigation between Raw Data and WebView examples
+/// Unified WebViewerHelper with OSMEA Components integration,
+/// featuring TabBar navigation between Raw Data and WebView.
 class ViewerHelperExample extends StatefulWidget {
   const ViewerHelperExample({Key? key}) : super(key: key);
 
@@ -18,7 +18,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
   String _autoDetectContent = '';
   bool _showAutoDetectResult = false;
 
-  // Sample HTML content for Raw Data viewer
+  // HTML content for Raw Data viewer
   final String _sampleHtml = '''
     <div style="padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <h1 style="color: #2D3748; margin-bottom: 20px; font-size: 28px;">🌐 OSMEA WebViewerHelper</h1>
@@ -42,7 +42,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
         <li style="margin-bottom: 12px;">🔒 <strong>Secure:</strong> Safe HTML sanitization</li>
       </ul>
 
-      <h2 style="color: #4A5568; margin-top: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">💻 Usage Examples</h2>
+      <h2 style="color: #4A5568; margin-top: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">💻 Usage</h2>
       
       <div style="background: #F7FAFC; padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #667eea;">
         <h3 style="color: #2D3748; margin-top: 0; font-size: 18px;">📄 HTML Content Rendering</h3>
@@ -110,7 +110,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
     </div>
   ''';
 
-  // Sample URLs for WebView
+  // URLs for WebView
   final List<String> _sampleUrls = [
     'https://flutter.dev',
     'https://dart.dev',
@@ -399,7 +399,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.text(
-                  '📝 Test Auto Detection',
+                  '📝 Verify Auto Detection',
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     fontWeight: FontWeight.w600,
                     color: OsmeaColors.nordicBlue,
@@ -407,7 +407,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 12),
                 OsmeaComponents.text(
-                  'Enter HTML content or a URL to test auto-detection:',
+                  'Enter HTML content or a URL to verify auto-detection:',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     color: OsmeaColors.grey,
                   ),

@@ -191,8 +191,8 @@ class _ListItemExampleState extends State<ListItemExample> {
                 title: OsmeaComponents.text(
                     t('Multi-line Item', 'Mehrzeiliges Element')),
                 subtitle: OsmeaComponents.text(t(
-                    'This is a longer subtitle that wraps onto multiple lines for demonstration purposes.',
-                    'Dies ist ein längerer Untertitel, der zu Demonstrationszwecken in mehrere Zeilen umbricht.')),
+                    'This is a longer subtitle that wraps onto multiple lines.',
+                    'Dies ist ein längerer Untertitel, der in mehrere Zeilen umbricht.')),
                 leading: const Icon(Icons.notes),
                 maxLines: 3,
               ),

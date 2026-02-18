@@ -51,10 +51,10 @@ class _CardExampleState extends State<CardExample> {
             _buildSectionTitle('📏 Card Sizes'),
             _buildSizesSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🎭 Interactive Examples'),
+            _buildSectionTitle('🎭 Interactive'),
             _buildInteractiveSection(),
             OsmeaComponents.sizedBox(height: 32),
-            _buildSectionTitle('🚀 Advanced Examples'),
+            _buildSectionTitle('🚀 Advanced'),
             _buildAdvancedSection(),
             OsmeaComponents.sizedBox(height: 32),
           ],
@@ -151,7 +151,7 @@ class _CardExampleState extends State<CardExample> {
               ),
               OsmeaComponents.sizedBox(height: 16),
               OsmeaComponents.text(
-                'This card demonstrates how to use custom content with the OSMEA card component.',
+                'This card shows how to use custom content with the OSMEA card component.',
                 variant: OsmeaTextVariant.bodyMedium,
               ),
             ],
@@ -298,7 +298,7 @@ class _CardExampleState extends State<CardExample> {
           onTap: () => _showSnackBar('Rose Pastel Set - 33% discount!'),
         ),
         // 🎯 Text Overflow Comparison Cards
-        _buildSubsectionTitle('📏 Text Overflow Control Examples'),
+        _buildSubsectionTitle('📏 Text Overflow Control'),
         OsmeaComponents.sizedBox(height: 12),
 
         OsmeaComponents.row(
@@ -310,7 +310,7 @@ class _CardExampleState extends State<CardExample> {
                 subtitle:
                     'This is a very long subtitle that might cause layout issues',
                 content:
-                    'This card demonstrates what happens when you have very long text content that exceeds the normal display area. Without proper text overflow control, this can cause inconsistent card heights and poor visual alignment in grid layouts.',
+                    'This shows what happens when you have very long text content that exceeds the normal display area. Without proper text overflow control, this can cause inconsistent card heights and poor visual alignment in grid layouts.',
                 imageWidget: OsmeaComponents.container(
                   width: double.infinity,
                   height: 120,
@@ -875,9 +875,9 @@ class _CardExampleState extends State<CardExample> {
           subtitle: '\$29.99/month • First 7 days free',
           content:
               '✨ Premium components\n🚀 Priority support\n📊 Advanced analytics\n🎨 Custom themes\n📱 Multi-platform access',
-          primaryAction: 'Start Free Trial',
+          primaryAction: 'Get Started',
           secondaryAction: 'Learn More',
-          onPrimaryPressed: () => _showSnackBar('🎉 Free trial started!'),
+          onPrimaryPressed: () => _showSnackBar('🎉 Started!'),
           onSecondaryPressed: () => _showSnackBar('More info requested'),
           primaryVariant: ButtonVariant.primary,
           secondaryVariant: ButtonVariant.ghost,
@@ -1309,7 +1309,7 @@ class _CardExampleState extends State<CardExample> {
           ],
         ),
         OsmeaComponents.sizedBox(height: 16),
-        _buildSubsectionTitle('Profile Card Example'),
+        _buildSubsectionTitle('Profile Card'),
         OsmeaComponents.sizedBox(height: 16),
         OsmeaComponents.basicCard(
           variant: ComponentAppearance.elevated,

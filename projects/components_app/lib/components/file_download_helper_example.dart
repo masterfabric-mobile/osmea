@@ -2,11 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 
-/// File Download Helper Example
-/// 
-/// This example demonstrates the comprehensive usage of FileDownloadHelper
-/// with all available methods including public storage downloads, file operations,
-/// and permission management.
+/// File Download Helper
+///
+/// Comprehensive usage of FileDownloadHelper with all available methods
+/// including public storage downloads, file operations, and permission management.
 class FileDownloadHelperExample extends StatefulWidget {
   const FileDownloadHelperExample({super.key});
 

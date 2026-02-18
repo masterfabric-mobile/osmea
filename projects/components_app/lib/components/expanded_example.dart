@@ -25,7 +25,7 @@ class ExpandedExample extends StatelessWidget {
                 OsmeaComponents.sizedBox(height: 24),
 
                 // Flex Factor Section
-                _buildSectionTitle('Flex Factor Examples'),
+                _buildSectionTitle('Flex Factor'),
                 OsmeaComponents.sizedBox(height: 16),
                 _buildFlexFactorExample(),
                 OsmeaComponents.sizedBox(height: 24),
@@ -43,7 +43,7 @@ class ExpandedExample extends StatelessWidget {
                 OsmeaComponents.sizedBox(height: 24),
 
                 // Real-world Layout Section
-                _buildSectionTitle('Real-world Layout Example'),
+                _buildSectionTitle('Real-world Layout'),
                 OsmeaComponents.sizedBox(height: 16),
                 _buildRealWorldExample(context),
                 OsmeaComponents.sizedBox(height: 24),
@@ -83,7 +83,7 @@ class ExpandedExample extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Basic Expanded Example',
+            'Basic Expanded',
             variant: OsmeaTextVariant.titleMedium,
           ),
           OsmeaComponents.sizedBox(height: 8),
@@ -147,7 +147,7 @@ class ExpandedExample extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Flex Factor Example',
+            'Flex Factor',
             variant: OsmeaTextVariant.titleMedium,
           ),
           OsmeaComponents.sizedBox(height: 8),
@@ -228,7 +228,7 @@ class ExpandedExample extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Multiple Expanded Example',
+            'Multiple Expanded',
             variant: OsmeaTextVariant.titleMedium,
           ),
           OsmeaComponents.sizedBox(height: 8),
@@ -306,7 +306,7 @@ class ExpandedExample extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Static Methods Example',
+            'Static Methods',
             variant: OsmeaTextVariant.titleMedium,
           ),
           OsmeaComponents.sizedBox(height: 8),
@@ -401,7 +401,7 @@ class ExpandedExample extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            'Real-world Layout Example',
+            'Real-world Layout',
             variant: OsmeaTextVariant.titleMedium,
           ),
           OsmeaComponents.sizedBox(height: 8),

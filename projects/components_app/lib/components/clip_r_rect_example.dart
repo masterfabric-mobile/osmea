@@ -64,7 +64,7 @@ class _ClipRRectExampleState extends State<ClipRRectExample> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               OsmeaComponents.text(
-                '✂️ Interactive ClipRRect Demo',
+                '✂️ Interactive ClipRRect',
                 textStyle: OsmeaTextStyle.titleLarge(context)
                     .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -366,7 +366,7 @@ class _ClipRRectExampleState extends State<ClipRRectExample> {
         child: OsmeaComponents.column(
           children: [
             OsmeaComponents.text(
-              '🎬 Live Examples',
+              '🎬 Live Showcase',
               textStyle: OsmeaTextStyle.titleMedium(context)
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -577,7 +577,7 @@ class _ClipRRectExampleState extends State<ClipRRectExample> {
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.text(
-          'Large Interactive Example:',
+          'Large Interactive:',
           textStyle: OsmeaTextStyle.bodyLarge(context)
               .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
         ),

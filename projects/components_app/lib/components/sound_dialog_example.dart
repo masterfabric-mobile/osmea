@@ -121,7 +121,7 @@ class SoundDialogExample extends StatelessWidget {
       {
         'label': 'Expandable (Branded Theme)',
         'desc':
-            'Demonstrates changing the primary action color (affecting waves & buttons) and icons.',
+            'Shows changing the primary action color (affecting waves & buttons) and icons.',
         'icon': Icons.color_lens,
         'color': OsmeaColors.sunsetGlow,
         'onPressed': () {
@@ -191,7 +191,7 @@ class SoundDialogExample extends StatelessWidget {
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.white,
       appBar: OsmeaComponents.appBar(
-        title: const Text('Sound Dialog Examples'),
+        title: const Text('Sound Dialog'),
       ),
       body: OsmeaComponents.padding(
         padding: const EdgeInsets.all(20),
@@ -206,7 +206,7 @@ class SoundDialogExample extends StatelessWidget {
               ),
               OsmeaComponents.sizedBox(height: 12),
               OsmeaComponents.text(
-                'Examples showcasing the default variants and customization capabilities of the sound dialog component.',
+                'Default variants and customization capabilities of the sound dialog component.',
                 fontSize: 16,
                 color: OsmeaColors.grey,
               ),
@@ -232,7 +232,7 @@ class SoundDialogExample extends StatelessWidget {
 
               // --- Section 2: Customized Examples ---
               OsmeaComponents.text(
-                'Customized Examples',
+                'Customized',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -302,7 +302,7 @@ class _ExampleCard extends StatelessWidget {
             OsmeaComponents.sizedBox(height: 20),
             Center(
               child: OsmeaComponents.button(
-                text: 'Open Example',
+                text: 'Open',
                 size: ButtonSize.medium,
                 variant: ButtonVariant.primary,
                 icon: Icon(icon, size: 18),

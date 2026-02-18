@@ -20,7 +20,7 @@ class _AudioRecorderDemoScreenState extends State<AudioRecorderDemoScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_recording ? 'Recording started (demo UI)' : 'Recording stopped (demo UI)'),
+        content: Text(_recording ? 'Recording started' : 'Recording stopped'),
       ),
     );
   }
@@ -28,7 +28,7 @@ class _AudioRecorderDemoScreenState extends State<AudioRecorderDemoScreen> {
   @override
   Widget build(BuildContext context) {
     return OsmeaComponents.scaffold(
-      appBar: AppBar(title: const Text('Audio Recorder (Demo)')),
+      appBar: AppBar(title: const Text('Audio Recorder')),
       backgroundColor: OsmeaColors.white,
       body: Center(
         child: OsmeaComponents.column(
@@ -43,7 +43,7 @@ class _AudioRecorderDemoScreenState extends State<AudioRecorderDemoScreen> {
             OsmeaComponents.text(
               _recording
                   ? 'Recording...\nStarted at: ${_startedAt?.toLocal().toIso8601String().substring(11, 19)}'
-                  : 'Press Start to begin recording (Demo UI)',
+                  : 'Press Start to begin recording',
               variant: OsmeaTextVariant.bodyMedium,
               color: OsmeaColors.black,
               textAlign: TextAlign.center,

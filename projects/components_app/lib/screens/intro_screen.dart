@@ -38,7 +38,7 @@ class _IntroScreenState extends State<IntroScreen>
       title: 'Developer Experience',
       subtitle: 'Built for Developers',
       description:
-          'Comprehensive documentation, examples, and easy-to-use APIs that make development a breeze.',
+          'Comprehensive documentation, showcase, and easy-to-use APIs that make development a breeze.',
       icon: Icons.code_outlined,
       color: OsmeaColors.orange,
     ),

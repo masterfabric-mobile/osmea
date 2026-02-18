@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SubServe - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "SubServe - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "SubServe - Staging (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_staging.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "debug",
+      "args": ["--flavor", "staging"]
+    },
+    {
+      "name": "SubServe - Staging (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_staging.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "release",
+      "args": ["--flavor", "staging"]
+    },
+    {
+      "name": "SubServe - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "SubServe - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    }
+  ]
+}

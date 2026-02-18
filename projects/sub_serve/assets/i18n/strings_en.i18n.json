@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "localLanguageCode": "en_US",
+  "appTitle": "MasterFabric SubServe",
+  "home": "Home",
+  "settings": "Settings",
+  "save": "Save",
+  "cancel": "Cancel",
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry"
+}

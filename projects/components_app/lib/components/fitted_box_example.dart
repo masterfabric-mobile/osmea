@@ -5,7 +5,7 @@ import '../widgets/common_appbar.dart';
 /// 📏 **OSMEA FittedBox Examples**
 ///
 /// This file demonstrates various ways to use the OSMEA FittedBox component.
-/// Interactive example with dropdown selection for different fit modes.
+/// Interactive dropdown selection for different fit modes.
 ///
 class FittedBoxExample extends StatefulWidget {
   const FittedBoxExample({Key? key}) : super(key: key);
@@ -61,13 +61,13 @@ class _FittedBoxExampleState extends State<FittedBoxExample> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               OsmeaComponents.text(
-                '📏 Interactive FittedBox Demo',
+                '📏 Interactive FittedBox',
                 textStyle: OsmeaTextStyle.titleLarge(context)
                     .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               OsmeaComponents.sizedBox(height: 16),
               OsmeaComponents.text(
-                'Select a BoxFit option to see how it affects the FittedBox examples.',
+                'Select a BoxFit option to see how it affects the FittedBox.',
                 textStyle:
                     OsmeaTextStyle.bodySmall(context).copyWith(fontSize: 14),
                 color: OsmeaColors.pewter,
@@ -169,7 +169,7 @@ class _FittedBoxExampleState extends State<FittedBoxExample> {
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.text(
-          'FittedBox Examples:',
+          'FittedBox:',
           textStyle: OsmeaTextStyle.bodyLarge(context)
               .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -232,7 +232,7 @@ class _FittedBoxExampleState extends State<FittedBoxExample> {
       ),
       child: OsmeaComponents.center(
         child: OsmeaComponents.text(
-          'TEXT EXAMPLE',
+          'TEXT',
           textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(
             color: OsmeaColors.white,
             fontSize: 16,
@@ -287,7 +287,7 @@ class _FittedBoxExampleState extends State<FittedBoxExample> {
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.text(
-          'Large Example Container:',
+          'Large Container:',
           textStyle: OsmeaTextStyle.bodyLarge(context)
               .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
         ),

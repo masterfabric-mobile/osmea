@@ -260,7 +260,7 @@ class _PhonePickerExampleState extends State<PhonePickerExample> {
                   ),
                   OsmeaComponents.sizedBox(height: 8),
                   OsmeaComponents.text(
-                    '• Integrated country flag and dial code dropdown\n• Modal bottom sheet country selection\n• CoreTextField foundation with full OSMEA design compliance\n• Embedded dropdown display (like Nigeria 🇳🇬 +234 example)\n• Custom country list support\n• Search functionality for countries\n• Numeric keyboard only (no foreign characters)\n• Maximum 9 digits input limit\n• Automatic 3-3-3 number grouping (123 456 789)\n• Real-time input validation and formatting',
+                    '• Integrated country flag and dial code dropdown\n• Modal bottom sheet country selection\n• CoreTextField foundation with full OSMEA design compliance\n• Embedded dropdown display (e.g. Nigeria 🇳🇬 +234)\n• Custom country list support\n• Search functionality for countries\n• Numeric keyboard only (no foreign characters)\n• Maximum 9 digits input limit\n• Automatic 3-3-3 number grouping (123 456 789)\n• Real-time input validation and formatting',
                     fontSize: 13,
                     color: OsmeaColors.slate,
                   ),

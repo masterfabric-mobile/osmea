@@ -86,7 +86,7 @@ class RichTextExample extends StatelessWidget {
 
             // Section title for advanced examples
             OsmeaComponents.text(
-              '🚀 Advanced Examples',
+              '🚀 Advanced',
               textStyle: OsmeaTextStyle.titleLarge(context)
                   .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -246,7 +246,7 @@ class RichTextExample extends StatelessWidget {
                   ),
                   OsmeaTextSpan(
                     text:
-                        ' with more text to demonstrate the larger body style.',
+                        ' with more text showing the larger body style.',
                   ),
                 ],
               ),
