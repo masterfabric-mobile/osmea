@@ -1,14 +1,12 @@
+---
+description: Next.js website - App Router, TypeScript, SSG, accessibility, SEO
+globs: "website/**/*.ts", "website/**/*.tsx"
+alwaysApply: false
+---
+
 # OSMEA Website (Next.js) — Cursor Rules
 
-This file defines development rules for the `website/` app (Next.js + TypeScript). These guidelines align with the shared rule sets under `rules/` and are tailored for the web site context.
-
-## Referenced Rule Sets (under `rules/`)
-- `osmea-packages-general.cursorrules` — Documentation, testing, and release hygiene
-- `osmea-components-ui.cursorrules` — UI/UX and accessibility principles (adapted for web)
-- `osmea-core-foundation.cursorrules` — Architecture and utilities (apply where relevant on web)
-- `osmea-apis-network.cursorrules` — API guidance (prefer static/SSG for website content)
-
-Note: Flutter/Dart-specific guidance does not apply directly to the website; cross-cutting principles such as documentation, testing, performance, and security still do.
+This file defines development rules for the `website/` app (Next.js + TypeScript). These guidelines align with the shared rule sets and are tailored for the web site context.
 
 ## Scope
 - Framework: Next.js (App Router) + TypeScript
@@ -37,7 +35,7 @@ Note: Flutter/Dart-specific guidance does not apply directly to the website; cro
 - Configuration: Keep secrets server-only; surface only safe values to the client when needed
 
 ## Style & UI
-- Follow `osmea-components-ui.cursorrules` for accessibility, consistency, and responsive behavior
+- Follow accessibility, consistency, and responsive behavior
 - Components should be small, composable, and reusable; avoid unnecessary global state
 
 ## Quality, Tests, and Lint
@@ -61,9 +59,3 @@ npm run lint   # Lint checks
 - [ ] Clean import order and consistent file layout
 - [ ] No stray console logs; no oversized dependencies
 - [ ] Lint and type checks are clean
-
----
-
-These rules are aligned with the shared `rules/` guidelines and narrowed to the website context. Consult the referenced files for deeper guidance when needed.
-
-

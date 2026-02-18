@@ -1,3 +1,9 @@
+---
+description: OSMEA sizer extensions - responsive, spacing, duration, padding, alignment
+globs: "**/*.dart"
+alwaysApply: false
+---
+
 # OSMEA Sizer Extensions - Cursor Rules
 
 ## 📦 Package Overview

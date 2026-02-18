@@ -1,3 +1,9 @@
+---
+description: OSMEA text extensions - font, alignment, spacing, decoration with context
+globs: "**/*.dart"
+alwaysApply: false
+---
+
 # OSMEA Text Extensions - Cursor Rules
 
 ## 📦 Package Overview

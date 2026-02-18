@@ -1,3 +1,9 @@
+---
+description: OSMEA UI components - 50+ components, structure, naming, responsive and accessibility
+globs: "packages/components/**/*.dart"
+alwaysApply: false
+---
+
 # OSMEA Components - Cursor Rules
 
 ## 📦 Package Overview
@@ -187,7 +193,3 @@ static const double desktopBreakpoint = 1024.0;
 - [Material Design Guidelines](https://material.io/design)
 - [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
 - [OSMEA Design System](https://github.com/masterfabric-mobile/osmea/tree/dev/docs)
-
----
-
-**Author:** [@gurkanfikretgunak](https://github.com/gurkanfikretgunak) | **OSMEA Components** - UI component library development rules 

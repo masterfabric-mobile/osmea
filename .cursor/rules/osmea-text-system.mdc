@@ -1,3 +1,9 @@
+---
+description: OSMEA text system - OsmeaComponents.text, OsmeaTextStyle, typography
+globs: "**/*.dart"
+alwaysApply: false
+---
+
 # OSMEA Text System - Cursor Rules
 
 ## 📦 Package Overview

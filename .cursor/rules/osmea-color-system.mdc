@@ -1,7 +1,38 @@
+---
+description: OSMEA color system - palette, semantic colors, theming and usage for Flutter
+globs: "**/*.dart"
+alwaysApply: false
+---
+
 # OSMEA Color System - Cursor Rules
 
 ## 📦 Package Overview
 OSMEA Color System provides a comprehensive color palette with semantic naming, Material Design integration, and consistent theming across Flutter applications. This system includes 50+ predefined colors organized into logical categories for maintainable design.
+
+## 🎯 Workspace-wide conventions
+
+### Primary style: black and white
+Applications in this workspace should **prioritize a black-and-white (grayscale) style**. Use the gray palette (`OsmeaColors.paperWhite` through `OsmeaColors.void_`) for backgrounds, text, borders, and primary UI. Add color sparingly for emphasis, status, or primary actions.
+
+### Orange instead of red (errors, warnings, accents)
+Across **all apps**, use **orange tones** instead of red for error, warning, and accent colors.
+
+- **Why orange:** Brand consistency; the UI uses an orange-heavy palette. This is a workspace-wide convention; apply it in every app.
+- **Colors to use (OsmeaColors):**
+  - **OsmeaColors.amberFlame** – error text, warning emphasis (strongest orange)
+  - **OsmeaColors.sunsetGlow** – primary orange, buttons and accents
+  - **OsmeaColors.goldenHour** – softer accent
+  - **OsmeaColors.desertSand** – background or light accent
+- **Do:** Use **OsmeaColors.amberFlame** or **OsmeaColors.sunsetGlow** for error messages, warning labels, and destructive action emphasis. Prefer the same orange palette in new components.
+- **Don't:** Do **not** use **OsmeaColors.red** for error messages, warning labels, or destructive accents.
+
+```dart
+// Don't
+color: OsmeaColors.red,
+
+// Do
+color: OsmeaColors.amberFlame,
+```
 
 ## 🎯 Development Guidelines
 
@@ -686,8 +717,3 @@ Container(
 - [Web Accessibility Guidelines - Color](https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html)
 - [Flutter Color Documentation](https://api.flutter.dev/flutter/dart-ui/Color-class.html)
 - [OSMEA Design System](https://github.com/masterfabric-mobile/osmea/tree/dev/docs)
-
----
-
-
-

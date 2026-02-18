@@ -1,0 +1,144 @@
+---
+description: Use OsmeaComponents instead of standard Flutter widgets in apps
+globs: "projects/**/*.dart"
+alwaysApply: false
+---
+
+# OsmeaComponents Usage Rules for Flutter App
+
+## Overview
+This project uses OsmeaComponents instead of standard Flutter widgets. OsmeaComponents provides a comprehensive set of pre-styled, consistent UI components that should be used throughout the application.
+
+## Import Statement
+Always import OsmeaComponents at the top of your files:
+```dart
+import 'package:osmea_components/osmea_components.dart';
+```
+
+## Available OsmeaComponents
+
+### 🏗️ Layout Components
+- `OsmeaComponents.scaffold()` - Main scaffold wrapper
+- `OsmeaComponents.center()` - Center alignment wrapper
+- `OsmeaComponents.container()` - Container wrapper
+- `OsmeaComponents.column()` - Column layout
+- `OsmeaComponents.row()` - Row layout
+- `OsmeaComponents.stack()` - Stack layout
+- `OsmeaComponents.wrap()` - Wrap layout
+- `OsmeaComponents.expanded()` - Expanded widget
+- `OsmeaComponents.flexible()` - Flexible widget
+- `OsmeaComponents.sizedBox()` - SizedBox wrapper
+- `OsmeaComponents.padding()` - Padding wrapper
+- `OsmeaComponents.positioned()` - Positioned widget
+- `OsmeaComponents.singleChildScrollView()` - Scrollable content
+- `OsmeaComponents.responsiveLayout()` - Responsive layout wrapper
+
+### 🎨 UI Components
+- `OsmeaComponents.text()` - Text widget with consistent styling
+- `OsmeaComponents.image()` - Image widget with consistent styling
+- `OsmeaComponents.richText()` - Rich text widget
+- `OsmeaComponents.divider()` - Divider component
+- `OsmeaComponents.spacer()` - Spacer component
+- `OsmeaComponents.clipRRect()` - ClipRRect wrapper
+
+### 🔘 Interactive Components
+- `OsmeaComponents.button()` - Button component
+- `OsmeaComponents.loginButton()` - Specialized login button
+- `OsmeaComponents.checkbox()` - Checkbox component
+- `OsmeaComponents.radioButton()` - Radio button component
+- `OsmeaComponents.switchButton()` - Switch component
+- `OsmeaComponents.dropdown()` - Dropdown component
+- `OsmeaComponents.textField()` - Text field component
+- `OsmeaComponents.searchbar()` - Search bar component
+
+### 🎯 Navigation Components
+- `OsmeaComponents.appbar()` - App bar component
+- `OsmeaComponents.navbar()` - Navigation bar
+- `OsmeaComponents.tabbar()` - Tab bar component
+- `OsmeaComponents.stepper()` - Stepper component
+
+### 📋 List Components
+- `OsmeaComponents.listItem()` - List item component
+- `OsmeaComponents.cards()` - Card components
+- `OsmeaComponents.carousel()` - Carousel component
+
+### 🎪 Feedback Components
+- `OsmeaComponents.loading()` - Loading indicator
+- `OsmeaComponents.progress()` - Progress indicator
+- `OsmeaComponents.toast()` - Toast notification
+- `OsmeaComponents.snackbar()` - Snackbar component
+- `OsmeaComponents.popup()` - Popup component
+
+## Usage Rules
+
+### ✅ ALWAYS Use OsmeaComponents For:
+1. **All UI Components** - Text, buttons, inputs, containers, layout, navigation, feedback
+2. **Consistent Styling** - Colors, fonts, spacing, border radius, shadows, animations
+3. **Theme Integration** - Dark/light mode, brand colors, typography, spacing
+
+### ❌ NEVER Use Standard Flutter Widgets For:
+1. **UI Components** - Use OsmeaComponents instead
+2. **Layout Components** - Use OsmeaComponents wrappers
+3. **Styling** - Use OsmeaComponents styling system
+4. **Colors** - Use OsmeaColors instead of Colors
+5. **Text Styling** - Use OsmeaComponents.text() instead of Text()
+
+## Code Examples
+
+### Basic Layout
+```dart
+// ✅ Correct - using OsmeaComponents
+OsmeaComponents.scaffold(
+  body: OsmeaComponents.container(
+    padding: context.paddingNormal,
+    child: OsmeaComponents.column(
+      children: [
+        OsmeaComponents.text('Title'),
+        OsmeaComponents.sizedBox(height: context.height16),
+        OsmeaComponents.button(
+          onPressed: () {},
+          child: OsmeaComponents.text('Button'),
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+### Text and Buttons
+```dart
+// ✅ Use OsmeaComponents.text with OsmeaColors
+OsmeaComponents.text(
+  'Hello World',
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+  color: OsmeaColors.nordicBlue,
+)
+
+OsmeaComponents.button(
+  onPressed: () {},
+  backgroundColor: OsmeaColors.nordicBlue,
+  padding: context.horizontalPaddingHigh + context.verticalPaddingMedium,
+  child: OsmeaComponents.text('Click Me'),
+)
+```
+
+### AppBar
+```dart
+// ✅ DO use OsmeaComponents.appbar
+OsmeaComponents.appbar(
+  title: 'My App',
+  backgroundColor: OsmeaColors.nordicBlue,
+  titleColor: OsmeaColors.paperWhite,
+)
+```
+
+## Migration Guidelines
+1. **Replace Scaffold** → `OsmeaComponents.scaffold`
+2. **Replace Container** → `OsmeaComponents.container`
+3. **Replace Text** → `OsmeaComponents.text`
+4. **Replace ElevatedButton** → `OsmeaComponents.button`
+5. **Replace TextField** → `OsmeaComponents.textField`
+6. **Replace Card** → `OsmeaComponents.cards`
+7. **Replace ListView** → `OsmeaComponents.listView`
+8. **Replace Colors** → `OsmeaColors`

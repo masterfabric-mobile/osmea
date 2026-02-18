@@ -1,0 +1,73 @@
+---
+description: OSMEA Core - base classes, DI, i18n, config, routing, logging
+globs: "**/core/**/*.dart", "projects/**/lib/**/*.dart"
+alwaysApply: false
+---
+
+# OSMEA Core - Cursor Rules
+
+## 📦 Package Overview
+OSMEA Core is the foundation package providing essential utilities, base classes, and shared logic for OSMEA applications.
+
+## 🎯 Development Guidelines
+
+### 📁 File Structure
+```
+lib/
+├── src/
+│   ├── base/               # Base classes and interfaces
+│   ├── config/             # Configuration management
+│   ├── di/                 # Dependency injection
+│   ├── helper/             # Helper utilities
+│   ├── layout/             # Layout utilities
+│   └── resources/          # Resources and assets
+├── gen/                    # Generated files (strings, etc.)
+└── assets/
+    └── i18n/               # Internationalization
+```
+
+### 🏗️ Core Development Rules
+
+#### 1. Base Classes Structure
+- Use abstract BaseBloc, BaseCubit, BaseRepository, BaseService
+- Log events and errors in base classes
+
+#### 2. Configuration Management
+- Use environment-based configuration
+- Support multiple flavors (dev, staging, prod)
+- Use dependency injection for configuration
+
+#### 3. Dependency Injection
+- Use `injectable` package
+- Follow service locator pattern
+- Implement proper lifecycle management
+
+### 🌐 Internationalization Rules
+- Use i18n JSON structure; use `context.strings.*` instead of hard-coded strings
+- Use pluralization helpers where applicable
+
+### 💾 Data Management Rules
+- Use SharedPreferences for simple data; encryption for sensitive data
+- Use SQLite for complex data with proper migrations
+- Implement memory and disk caching with invalidation
+
+### 📊 Analytics Rules
+- Track events and screen views with parameters
+
+### 🛣️ Routing Rules
+- Use named routes; implement route guards; handle deep linking
+- Use GoRouter with injectable
+
+### 📝 Logging Rules
+- Use appropriate levels (debug, info, warning, error)
+- Include context; avoid logging sensitive data
+
+### 🔍 Code Review Checklist
+- [ ] Base classes follow established patterns
+- [ ] Configuration is environment-aware
+- [ ] Dependency injection is properly implemented
+- [ ] Internationalization is complete
+- [ ] Data management is secure
+- [ ] Routing is properly configured
+- [ ] Logging is appropriate
+- [ ] Tests and documentation are complete
