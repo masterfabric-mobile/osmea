@@ -272,6 +272,8 @@
       },
       "sign_in": {
         "app_name": "MasterFabric S Store",
+        "app_bar_title": "Sign In",
+        "welcome_title": "Welcome to Masterfabric S Store",
         "tab_sign_in": "Sign In",
         "tab_sign_up": "Sign Up",
         "email_label": "Email",
@@ -288,6 +290,8 @@
       },
       "sign_up": {
         "app_name": "MasterFabric S Store",
+        "app_bar_title": "Sign Up",
+        "welcome_title": "Welcome to Masterfabric S Store",
         "tab_sign_in": "Sign In",
         "tab_sign_up": "Sign Up",
         "email_label": "Email",
