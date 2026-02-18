@@ -582,9 +582,8 @@ class _AdminScreenState extends State<AdminScreen> {
 // Colors from navbar_configuration (black/white only, no blue). OsmeaComponents.navbar().
 
 bool _shouldShowNavbarForPath(String path) {
-  // Routes that should NOT show navbar (only special pages like auth, onboarding, splash, etc.)
+  // Routes that should NOT show navbar (only special pages like onboarding, splash, etc.)
   final hideNavbarRoutes = [
-    '/auth', // Authentication pages
     '/onboarding', // Onboarding flow
     '/', // Root/splash route
     '/empty', // Empty state pages
