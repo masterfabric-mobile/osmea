@@ -1,0 +1,19 @@
+{
+  "@@locale": "tr",
+  "localLanguageCode": "tr_TR",
+  "appTitle": "MasterFabric SubServe",
+  "home": "Ana Sayfa",
+  "homeTitle": "MasterFabric SubServe",
+  "settings": "Ayarlar",
+  "save": "Kaydet",
+  "cancel": "İptal",
+  "loading": "Yükleniyor...",
+  "error": "Hata",
+  "retry": "Tekrar Dene",
+  "onboardingSkip": "Atla",
+  "onboardingPrevious": "Önceki",
+  "onboardingNext": "İleri",
+  "onboardingGetStarted": "Başla",
+  "onboardingNoPages": "Onboarding sayfası yok",
+  "onboardingLoadFailed": "Yüklenemedi"
+}
