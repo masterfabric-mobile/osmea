@@ -1,0 +1,11 @@
+{
+  "app_settings": {
+    "app_name": "Done Together",
+    "environment": "production",
+    "debug_mode": false
+  },
+  "supabase_configuration": {
+    "url": "YOUR_SUPABASE_URL",
+    "anon_key": "YOUR_SUPABASE_ANON_KEY"
+  }
+}
