@@ -17,9 +17,13 @@
 
 ## 📲 Download (App Store)
 
-This app (**MF S Store** / Masterfabric S Store) is available on the App Store.
+This app (**MF S Store** / Masterfabric S Store) is available on the App Store. [Announcement on LinkedIn](https://www.linkedin.com/posts/masterfabric_appstore-flutter-woocommerce-activity-7430347085553487873-5l9a).
 
-**App Store link:** [Download on the App Store](https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857)
+<div align="center">
+
+[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="50" />](https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857)
+
+</div>
 
 ---
 
