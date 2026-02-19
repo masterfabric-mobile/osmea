@@ -96,7 +96,7 @@ dev_dependencies:
 # APP ICON
 # ═══════════════════════════════════════════════════════════════════════════════
 flutter_launcher_icons:
-  image_path: assets/images/app_icon.png
+  image_path: assets/images/app_icons.png
   android: true
   ios: true
   remove_alpha_ios: true
