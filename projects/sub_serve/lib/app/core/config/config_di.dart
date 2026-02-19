@@ -8,8 +8,8 @@ GetIt getIt = GetIt.instance;
 
 /// Dependency injection setup. Same structure as storefront_woo.
 /// - Generated config (config_di.config.dart): HomeViewModel etc. via @injectable.
-/// - Core views (SplashView, OnboardingView) need their Cubits registered here
-///   so MasterViewCubit can resolve them with GetIt.I<V>().
+/// - Core views (SplashView) need their Cubits registered here.
+/// - Onboarding: only sub_serve view_onboarding (OnboardingViewModel from generated config).
 @InjectableInit(preferRelativeImports: false)
 Future<GetIt> configureDependencies({String? environment}) async {
   try {
@@ -34,9 +34,5 @@ void _registerMasterFabricCoreCubits() {
   if (!getIt.isRegistered<SplashCubit>()) {
     getIt.registerFactory<SplashCubit>(() => SplashCubit());
     debugPrint('✅ SplashCubit registered');
-  }
-  if (!getIt.isRegistered<OnboardingCubit>()) {
-    getIt.registerFactory<OnboardingCubit>(() => OnboardingCubit());
-    debugPrint('✅ OnboardingCubit registered');
   }
 }

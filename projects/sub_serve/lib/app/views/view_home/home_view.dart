@@ -3,13 +3,15 @@
  * -----------------------------
  * Same file style as storefront_woo view_home.
  * Uses MasterViewHydratedCubit pattern with HydratedBloc state management.
+ * No static UI: all from OsmeaComponents, sizer/text extensions, slang (context.t).
  */
 
 import 'package:flutter/material.dart';
-import 'package:masterfabric_core/masterfabric_core.dart';
+import 'package:masterfabric_core/masterfabric_core.dart' hide LoadingType;
+import 'package:osmea_components/osmea_components.dart';
 import 'package:sub_serve/app/views/view_home/models/home_view_model.dart';
 import 'package:sub_serve/app/views/view_home/models/module/states.dart';
-import 'package:sub_serve/app/views/view_home/widgets/home_content_widget.dart';
+import 'package:sub_serve/gen/strings.g.dart';
 
 class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
   HomeView({
@@ -38,16 +40,31 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
     HomeState state,
   ) {
     if (state is HomeLoadingState || state is HomeInitialState) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state is HomeLoadedState) {
-      return HomeContentWidget(
-        state: state,
-        viewModel: viewModel,
+      return OsmeaComponents.center(
+        child: OsmeaComponents.loading(
+          type: LoadingType.rotatingDots,
+          size: context.iconSizeHigh,
+        ),
       );
     }
 
-    return const Center(child: CircularProgressIndicator());
+    if (state is HomeLoadedState) {
+      final t = context.t;
+      return OsmeaComponents.center(
+        child: OsmeaComponents.text(
+          t.homeTitle,
+          fontSize: context.fontSizeExtraLarge,
+          fontWeight: context.bold,
+          color: OsmeaColors.thunder,
+        ),
+      );
+    }
+
+    return OsmeaComponents.center(
+      child: OsmeaComponents.loading(
+        type: LoadingType.rotatingDots,
+        size: context.iconSizeHigh,
+      ),
+    );
   }
 }

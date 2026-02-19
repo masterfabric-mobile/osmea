@@ -1,0 +1,61 @@
+---
+description: Next.js website - App Router, TypeScript, SSG, accessibility, SEO
+globs: "website/**/*.ts", "website/**/*.tsx"
+alwaysApply: false
+---
+
+# OSMEA Website (Next.js) — Cursor Rules
+
+This file defines development rules for the `website/` app (Next.js + TypeScript). These guidelines align with the shared rule sets and are tailored for the web site context.
+
+## Scope
+- Framework: Next.js (App Router) + TypeScript
+- Purpose: Mostly static/SSG marketing and documentation site
+- Goals: Core Web Vitals, accessibility, SEO, simple and reliable content loading
+
+## Directory & Module Layout
+- `src/app/` — Pages, `layout.tsx`, app-level metadata
+- `src/components/` — Prefer Server Components; opt into Client Components only if interaction is required
+- `src/components/ui/` — Low-level, reusable UI primitives
+- `src/lib/` — Helpers (`data-loader.ts`, `utils.ts`), framework-agnostic logic
+- `src/config/env.ts` — Environment variables (do not leak secrets to the client)
+- `public/` — Static assets (SVG, favicon, images)
+
+## Coding Guidelines
+- Type safety: Avoid `any`; keep types explicit and narrow
+- Import order: stdlib → third-party → local modules
+- Server-first: Default to Server Components; add `"use client"` only when interaction is necessary
+- Accessibility: Correct roles, labels, focus order, and contrast; links vs. buttons used appropriately
+- SEO/Metadata: Prefer Next.js App Router `metadata`; use `next/link` and `next/image`
+- Performance: Avoid unnecessary `use client`; minimize bundle size; prefer image optimization
+
+## Data Loading & Content
+- Static data: Use `src/data/*.json` and `src/lib/data-loader.ts` for build-time loading
+- Networking: Avoid runtime `fetch` unless content must be dynamic; prefer SSG/ISR for stable content
+- Configuration: Keep secrets server-only; surface only safe values to the client when needed
+
+## Style & UI
+- Follow accessibility, consistency, and responsive behavior
+- Components should be small, composable, and reusable; avoid unnecessary global state
+
+## Quality, Tests, and Lint
+- Lint: Conform to `eslint.config.mjs`; `npm run lint` must pass cleanly
+- Type check: `tsc --noEmit` must pass cleanly
+- Tests: Optional for this site; add integration/E2E for critical flows if needed
+
+## Commands
+```bash
+npm run dev    # Development
+npm run build  # Production build
+npm run lint   # Lint checks
+```
+
+## Review Checklist
+- [ ] Server Components by default; `"use client"` only when required
+- [ ] Proper usage of `next/link`, `next/image`, and App Router `metadata`
+- [ ] Accessibility: labels, focus, contrast, and keyboard navigation
+- [ ] Strong typing; no `any`; minimal side effects
+- [ ] Static data / SSG preferred; no unnecessary runtime fetches
+- [ ] Clean import order and consistent file layout
+- [ ] No stray console logs; no oversized dependencies
+- [ ] Lint and type checks are clean

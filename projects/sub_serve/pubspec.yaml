@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.10.0
 
 
 dependencies:
@@ -19,6 +19,15 @@ dependencies:
   # https://pub.dev/packages/masterfabric_core
   # Includes MasterViewHydratedCubit, BaseViewModelHydratedCubit, HydratedBloc
   masterfabric_core: ^0.0.15
+
+  # ────────────────────────────────
+  # OSMEA COMPONENTS (UI Kit)
+  # ────────────────────────────────
+  osmea_components:
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      path: packages/components
+      ref: dev
 
   # ────────────────────────────────
   # ICONS
@@ -60,6 +69,7 @@ dependencies:
   slang: ^4.11.1            # Slang for translations
   slang_flutter: ^4.11.0   # Slang Flutter integration
   url_launcher: ^6.3.2
+  http: ^1.2.2
 
   # ────────────────────────────────
   # CHARTS (Admin dashboard)

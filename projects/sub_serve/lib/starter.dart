@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:masterfabric_core/masterfabric_core.dart';
+import 'package:masterfabric_core/masterfabric_core.dart' hide LocaleSettings, TranslationProvider;
 import 'package:sub_serve/app/routes/app_routes.dart';
 import 'package:sub_serve/app/core/config/config_di.dart' as di;
+import 'package:sub_serve/gen/strings.g.dart';
 
-/// Launches MasterFabric SubServe. Same structure as storefront_woo (no lib/flavor).
+/// Launches MasterFabric SubServe.
 /// Loads config, GoRouter (splash → onboarding → home), runs [MasterApp].
 ///
-/// [environment]: 'dev' | 'staging' | 'prod'
+/// [environment]: 'dev' | 'prod'
 Future<void> launchApp({String environment = 'dev'}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -22,11 +23,15 @@ Future<void> launchApp({String environment = 'dev'}) async {
 
   await di.configureDependencies(environment: environment);
 
+  await LocaleSettings.useDeviceLocale();
+
   runApp(
-    MasterApp(
-      router: appRouter,
-      themeMode: ThemeMode.light,
-      fontScale: 1.0,
+    TranslationProvider(
+      child: MasterApp(
+        router: appRouter,
+        themeMode: ThemeMode.light,
+        fontScale: 1.0,
+      ),
     ),
   );
 }

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:masterfabric_core/masterfabric_core.dart';
 import 'package:sub_serve/app/views/view_home/home_view.dart';
+import 'package:sub_serve/app/views/view_onboarding/onboarding_view.dart';
 
-/// Splash ve Onboarding sayfaları masterfabric_core ^0.0.15 paketinden gelir
-/// (SplashView, OnboardingView, OnboardingStorageHelper, AssetConfigHelper).
-
+/// Splash from masterfabric_core. Onboarding only from sub_serve view_onboarding.
 /// After splash, check onboarding and navigate to /onboarding or /home.
 Future<void> _handleSplashNavigation(BuildContext context) async {
   try {
@@ -52,12 +51,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/onboarding',
       builder: (BuildContext context, GoRouterState state) {
-        return OnboardingView(
+        return SubServeOnboardingView(
           goRoute: (String path) {
             debugPrint('🎯 Onboarding navigate: $path');
-            OnboardingStorageHelper().markOnboardingSeen();
-            context.go('/home');
+            context.go(path);
           },
+          arguments: const {'onboarding': true},
         );
       },
     ),

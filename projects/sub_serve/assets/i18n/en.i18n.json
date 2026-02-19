@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "localLanguageCode": "en_US",
+  "appTitle": "MasterFabric SubServe",
+  "home": "Home",
+  "homeTitle": "MasterFabric SubServe",
+  "settings": "Settings",
+  "save": "Save",
+  "cancel": "Cancel",
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry",
+  "onboardingSkip": "Skip",
+  "onboardingPrevious": "Previous",
+  "onboardingNext": "Next",
+  "onboardingGetStarted": "Get started",
+  "onboardingNoPages": "No onboarding pages",
+  "onboardingLoadFailed": "Load failed"
+}
