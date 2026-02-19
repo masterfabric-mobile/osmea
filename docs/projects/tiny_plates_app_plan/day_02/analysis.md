@@ -9,11 +9,17 @@ Implement the minimalist Black & White theme using `osmea_components`, driven by
   - Use `AppConfigService` to inject theme values into the app.
   - Ensure `masterfabric_core` views adapt to these config values.
 
+### Backend Endpoints
+- **None**: Day 02 focuses on local UI/UX theming and component styling, relying on `AppConfig` as a local asset. Dynamic theme fetching from a backend could be considered in later stages for greater flexibility, but is not part of this initial setup.
+
 ## Tasks
 1. **AppConfig Expansion**:
    - Update `assets/app_config.json` to include detailed style tokens:
      - `buttonStyle`: { `primary`: { `bg`: "#000000", `text`: "#FFFFFF" }, ... }
      - `typography`: { `fontFamily`: "Roboto", ... }
+     - `sensoryUI`: { `textureMetaphors`: { "smooth": "circle", "lumpy": "dots" } } // New: Example for Layer 4, can be extended to include colors, fonts, haptic feedback settings based on sensory needs.
+   - Create a `ThemeFactory` that reads `AppConfig` and generates `ThemeData`.
+   - Apply this `ThemeData` to `MaterialApp`.
 2. **Theme Factory**:
    - Create a `ThemeFactory` that reads `AppConfig` and generates `ThemeData`.
    - Apply this `ThemeData` to `MaterialApp`.

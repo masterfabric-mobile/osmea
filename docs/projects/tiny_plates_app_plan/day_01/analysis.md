@@ -11,6 +11,9 @@ Initialize the Flutter project, integrate `masterfabric_core` (v0.0.13), and est
   - `Localization` (setup `slang` & `slang_flutter`)
   - `Configuration` (AppConfig Service)
 
+### Backend Endpoints
+- **None**: Day 01 focuses on local project setup and infrastructure. Dynamic `AppConfig` fetching from a backend could be considered in later stages, but is not part of this initial setup.
+
 ## Tasks
 1. **Initialize Project**: Create a new Flutter project.
 2. **Dependency Setup**:
@@ -25,6 +28,7 @@ Initialize the Flutter project, integrate `masterfabric_core` (v0.0.13), and est
    - Create `assets/app_config.json` with initial keys:
      - `theme`: { `primaryColor`: "#000000", `backgroundColor`: "#FFFFFF" }
      - `features`: { `calorieTracking`: true }
+     - `apiEndpoints`: { `aiRecipeGeneration`: "https://api.smartrecipe.com/generate", `nutrientDatabase`: "https://api.smartrecipe.com/nutrients" } // New: Example AI/LLM and external API endpoints
    - Create `AppConfigService` to load this JSON.
    - Register `AppConfigService` in DI.
 5. **Core Configuration**:
