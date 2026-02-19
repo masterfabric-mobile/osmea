@@ -6,24 +6,13 @@
 [![Version](https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C)](pubspec.yaml)
 [![Platform](https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-2D3748?style=for-the-badge&logo=supabase&logoColor=white&labelColor=1A202C)](https://supabase.com)
+[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="28" alt="Download on the App Store" />](https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857)
 
 **"Modern Supabase-powered Storefront App for Mobile"**
 
 [Overview](#-overview) • [Features](#-features) • [Tech Stack](#-technology-stack) • [Getting Started](#-getting-started) • [Configuration](#-configuration) • [Project Structure](#-project-structure) • [Documentation](#-documentation)
 
 
-
----
-
-## 📲 Download (App Store)
-
-This app (**MF S Store** / Masterfabric S Store) is available on the App Store. [Announcement on LinkedIn](https://www.linkedin.com/posts/masterfabric_appstore-flutter-woocommerce-activity-7430347085553487873-5l9a).
-
-<div align="center">
-
-[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="50" />](https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857)
-
-</div>
 
 ---
 
