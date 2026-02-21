@@ -38,7 +38,7 @@ class HomeContentWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OsmeaComponents.text(
-          'OSMEA Components is a Flutter UI library for building consistent, accessible apps. Explore the live showcase and Storybook below.',
+          'MasterFabric Components is a Flutter UI library for building consistent, accessible apps. Explore the live showcase and Storybook below.',
           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
             color: OsmeaColors.slate,
             height: 1.5,
