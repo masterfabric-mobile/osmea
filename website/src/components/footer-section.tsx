@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Github, ExternalLink, MessageCircle } from "lucide-react";
+import DocumentationModal from "@/components/documentation-modal";
+import projectsData from "@/data/projects.json";
 
 interface FooterLink {
   text: string;
@@ -48,6 +51,7 @@ interface FooterSectionProps {
 }
 
 export default function FooterSection({ data }: FooterSectionProps) {
+  const [showDocsModal, setShowDocsModal] = useState(false);
   return (
     <footer className="py-12 px-4 bg-gray-900 text-white">
       <div className="container mx-auto max-w-6xl">
@@ -100,13 +104,22 @@ export default function FooterSection({ data }: FooterSectionProps) {
             <ul className="space-y-2 text-gray-400">
               {data.resources.links.map((link, index) => (
                 <li key={index}>
-                  <Link 
-                    href={link.url} 
-                    className="hover:text-white transition-colors" 
-                    target={link.external ? "_blank" : undefined}
-                  >
-                    {link.text}
-                  </Link>
+                  {link.text === "Documentation" ? (
+                    <button
+                      onClick={() => setShowDocsModal(true)}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      {link.text}
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.url}
+                      className="hover:text-white transition-colors"
+                      target={link.external ? "_blank" : undefined}
+                    >
+                      {link.text}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -134,6 +147,16 @@ export default function FooterSection({ data }: FooterSectionProps) {
           </div>
         </div>
         
+        <DocumentationModal
+          isOpen={showDocsModal}
+          onClose={() => setShowDocsModal(false)}
+          projects={projectsData.items.map((p) => ({
+            id: p.id,
+            title: p.title,
+            emoji: p.emoji,
+          }))}
+        />
+
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
           <p>
             © {data.copyright.year}{' '}
