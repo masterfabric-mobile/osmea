@@ -1,13 +1,14 @@
 import heroData from '@/data/hero.json';
 import featuresData from '@/data/features.json';
 import progressData from '@/data/progress.json';
+import projectsData from '@/data/projects.json';
 import footerData from '@/data/footer.json';
 import siteConfig from '@/data/site-config.json';
 
 export const data = {
   hero: heroData,
   features: featuresData,
-  progress: progressData,
+  progress: { ...progressData, projects: projectsData },
   footer: footerData,
   siteConfig: siteConfig,
 };
