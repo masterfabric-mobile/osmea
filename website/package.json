@@ -35,10 +35,11 @@
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/generate-projects.js && next dev",
+    "build": "node scripts/generate-projects.js && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-projects": "node scripts/generate-projects.js"
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.7",
