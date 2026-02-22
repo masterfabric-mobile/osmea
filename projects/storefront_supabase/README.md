@@ -349,8 +349,6 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
 </details>
 
 
-## 📷 Screenshots
-
 <table>
   <tr>
     <td align="center"><img width="200" alt="23:15:21" src="https://github.com/user-attachments/assets/60fd2237-3f86-46a5-8534-e281c86d1900" /></td>
