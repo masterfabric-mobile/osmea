@@ -1,5 +1,9 @@
 # 🔍 API Explorer
 
+<p align="center">
+  <a href="https://apps.apple.com/tr/app/mf-api-explorer/id6752110806?l=tr&mt=12"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40" alt="Download on the App Store" style="vertical-align: middle" /></a>
+  &nbsp;
+
 <div align="center">
   <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/API%20Explorer-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="API Explorer" /></a>
   <a href="pubspec.yaml"><img src="https://img.shields.io/badge/Version-1.1.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C" alt="Version" /></a>
@@ -10,13 +14,14 @@
 
 <div style="margin-top: 1.5em; margin-bottom: 1.5em;"></div>
 
+<br>
+
 > **"The Ultimate Interactive API Testing & Exploration Tool"**
 
 <div style="margin-bottom: 1.5em;"></div>
 
 [Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing) • [License](#-license)
 
----
 
 <details>
 <summary>🌟 Overview</summary>
@@ -59,8 +64,6 @@
 </div>
 
 </details>
-
----
 
 <details>
 <summary>✨ Features</summary>
@@ -140,7 +143,6 @@ Wizard-based store setup, 110+ endpoint explorer, dynamic parameter forms, synta
 
 </details>
 
----
 
 <details>
 <summary>🛠️ Technology Stack</summary>
@@ -232,8 +234,6 @@ graph TB
 `lib/di/` (DI config), `lib/routes/` (GoRouter), `lib/services/` (handlers, registry, persistence). Handlers under `lib/services/handlers/shopify/` and `woocommerce/`. See repo for full tree.
 
 </details>
-
----
 
 <details>
 <summary>🚀 Getting Started</summary>
@@ -374,7 +374,6 @@ Clean: `flutter clean && dart run build_runner build --delete-conflicting-output
 
 </details>
 
----
 
 <details>
 <summary>📚 Documentation</summary>
@@ -387,7 +386,6 @@ Clean: `flutter clean && dart run build_runner build --delete-conflicting-output
 
 </details>
 
----
 
 <details>
 <summary>🤝 Contributing</summary>
