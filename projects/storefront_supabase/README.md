@@ -1,12 +1,15 @@
 # 🧪 OSMEA Storefront Supabase
 
-
+<p align="center">
+  <a href="https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40" alt="Download on the App Store" style="vertical-align: middle" /></a>
+  &nbsp;
+  <a href="https://play.google.com/store/apps/details?id=com.masterfabric.storefrontSupabase"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="59" alt="Get it on Google Play" style="vertical-align: middle" /></a>
+</p>
 
 [![Storefront Supabase](https://img.shields.io/badge/Storefront%20Supabase-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
 [![Version](https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C)](pubspec.yaml)
 [![Platform](https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-2D3748?style=for-the-badge&logo=supabase&logoColor=white&labelColor=1A202C)](https://supabase.com)
-[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="28" alt="Download on the App Store" />](https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857)
 
 **"Modern Supabase-powered Storefront App for Mobile"**
 
@@ -16,7 +19,8 @@
 
 ---
 
-## 🌟 Overview
+<details>
+<summary>🌟 Overview</summary>
 
 **OSMEA Storefront Supabase** is a modern Flutter storefront application built on top of **Supabase**.  
 It provides a fast, responsive, and extensible shopping experience targeting iOS, Android and Web with a shared codebase.
@@ -35,9 +39,12 @@ It provides a fast, responsive, and extensible shopping experience targeting iOS
 - **Agencies** building white-label e-commerce apps
 - **Developers** looking for a clean Flutter + Supabase + BLoC reference
 
+</details>
+
 ---
 
-## ✨ Features
+<details>
+<summary>✨ Features</summary>
 
 ### 🛒 **Storefront Features**
 
@@ -90,9 +97,12 @@ Access: available when the logged-in user has `role == 'admin'` (Profile → Adm
 - **Localization**: Slang (generated in `lib/src/resources/`); locales: tr, en, de, fr
 - **Assets**: `flutter_gen` for typed asset references
 
+</details>
+
 ---
 
-## 🛠️ Technology Stack
+<details>
+<summary>🛠️ Technology Stack</summary>
 
 | Layer | Technology |
 |-------|------------|
@@ -105,9 +115,12 @@ Access: available when the logged-in user has `role == 'admin'` (Profile → Adm
 | **Env** | flavor (dev / prod) |
 | **Charts** | fl_chart (admin dashboard) |
 
+</details>
+
 ---
 
-## 📁 Project Structure
+<details>
+<summary>📁 Project Structure</summary>
 
 ```
 projects/storefront_supabase/
@@ -152,9 +165,12 @@ projects/storefront_supabase/
 └── README.md
 ```
 
+</details>
+
 ---
 
-## 🚀 Getting Started
+<details>
+<summary>🚀 Getting Started</summary>
 
 ### Prerequisites
 
@@ -200,9 +216,12 @@ flutter run --flavor prod -t lib/flavors/main_prod.dart
 4. Enable Auth (email/password) and any Storage buckets your app uses.
 5. Configure RLS policies so that `auth.uid()` and your `users` table are aligned.
 
+</details>
+
 ---
 
-## ⚙️ Configuration
+<details>
+<summary>⚙️ Configuration</summary>
 
 All main configuration lives in **`assets/app_config.json`**. The app reads it via `AssetConfigHelper()` from the core package.
 
@@ -237,9 +256,12 @@ All main configuration lives in **`assets/app_config.json`**. The app reads it v
 - Profile item can be auth-aware: `authRoute` (e.g. `/profile`) and `guestRoute` (e.g. `/auth`).
 - Navbar is hidden only on `/`, `/onboarding`, and `/admin/*`; it is shown on `/auth`, `/home`, `/profile`, etc.
 
+</details>
+
 ---
 
-## 🗂 Routes Overview
+<details>
+<summary>🗂 Routes Overview</summary>
 
 | Path | Description |
 |------|-------------|
@@ -273,9 +295,12 @@ All main configuration lives in **`assets/app_config.json`**. The app reads it v
 
 User routes (except splash/onboarding) sit in a **ShellRoute** that provides the bottom navigation bar. Admin routes use a separate shell with admin bottom nav.
 
+</details>
+
 ---
 
-## 🌐 Localization
+<details>
+<summary>🌐 Localization</summary>
 
 - **Tool**: Slang
 - **Locales**: `tr`, `en`, `de`, `fr`
@@ -284,9 +309,12 @@ User routes (except splash/onboarding) sit in a **ShellRoute** that provides the
 - **Usage**: `context.resources.xxx` (e.g. `context.resources.signIn`, `context.resources.myProfile`)
 - **Settings**: User can change language (and currency) from Profile or Settings; language is applied app-wide.
 
+</details>
+
 ---
 
-## 🗄 Database (Supabase)
+<details>
+<summary>🗄 Database (Supabase)</summary>
 
 The app expects Supabase (PostgreSQL) tables and RLS policies as in the migration files. Main entities include:
 
@@ -302,9 +330,12 @@ The app expects Supabase (PostgreSQL) tables and RLS policies as in the migratio
 
 See `migrations/supabase_integration.sql` and `migrations/favorites_enhancement_v2.sql` for the full schema. Apply and adjust for your project.
 
+</details>
+
 ---
 
-## 📦 Build & Release
+<details>
+<summary>📦 Build & Release</summary>
 
 ### Android
 
@@ -328,17 +359,23 @@ flutter build apk --flavor prod -t lib/flavors/main_prod.dart
 flutter build ios --flavor prod -t lib/flavors/main_prod.dart
 ```
 
+</details>
+
 ---
 
-## 📚 Documentation
+<details>
+<summary>📚 Documentation</summary>
 
 - **Monorepo**: [github.com/masterfabric-mobile/osmea](https://github.com/masterfabric-mobile/osmea)
 - **Supabase**: [supabase.com/docs](https://supabase.com/docs)
 - **WooCommerce storefront (same monorepo)**: `projects/storefront_woo/README.md`
 
+</details>
+
 ---
 
-## 🤝 Contributing
+<details>
+<summary>🤝 Contributing</summary>
 
 1. Fork the repository.
 2. Create a feature branch (e.g. `feature/my-feature`).
@@ -347,15 +384,20 @@ flutter build ios --flavor prod -t lib/flavors/main_prod.dart
 
 Please follow Dart/Flutter style guidelines and update this README when adding or changing features.
 
+</details>
+
 ---
 
-## 📄 License
+<details>
+<summary>📄 License</summary>
 
 This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
 
+</details>
+
 ---
 
-## 📷 Screenshots
+<summary>📷 Screenshots</summary>
 
 <table>
   <tr>
