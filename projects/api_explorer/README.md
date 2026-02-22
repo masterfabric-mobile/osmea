@@ -499,6 +499,25 @@ For detailed development setup, see [Getting Started](#-getting-started) section
 </div>
 </details>
 
+
+<table>
+  <tr>
+    <td align="center"><img width="200" alt="1" src="https://github.com/user-attachments/assets/ca526aa6-fc6c-45b5-bd33-a3358a2fde67" /></td>
+    <td align="center"><img width="200" alt="2" src="https://github.com/user-attachments/assets/8eb73bf4-3a3e-49ea-9d54-845cba87192b" /></td>
+    <td align="center"><img width="200" alt="3" src="https://github.com/user-attachments/assets/0b857820-6da0-4b08-be09-429e27797a1d" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="4" src="https://github.com/user-attachments/assets/37f77546-b957-42c2-add6-f337d1810cfc" /></td>
+    <td align="center"><img width="200" alt="5" src="https://github.com/user-attachments/assets/59c746f0-0b20-473e-b703-f373f58cfdfc" /></td>
+  </tr>
+</table>
+
 ## 📄 License
 
 This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
+
+
+
+
+
+
