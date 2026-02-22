@@ -13,7 +13,7 @@
 
 **"Modern Supabase-powered Storefront App for Mobile"**
 
-[Overview](#-overview) • [Features](#-features) • [Tech Stack](#-technology-stack) • [Getting Started](#-getting-started) • [Configuration](#-configuration) • [Project Structure](#-project-structure) • [Documentation](#-documentation)
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
 
 
 
@@ -41,7 +41,6 @@ It provides a fast, responsive, and extensible shopping experience targeting iOS
 
 </details>
 
----
 
 <details>
 <summary>✨ Features</summary>
@@ -94,12 +93,53 @@ Access: available when the logged-in user has `role == 'admin'` (Profile → Adm
 - **Routing**: `go_router` with shell routes (user shell with bottom bar, admin shell)
 - **UI**: Shared `core` and `components` packages (OSMEA design system)
 - **Config**: Single `assets/app_config.json`; read via `AssetConfigHelper` from core
-- **Localization**: Slang (generated in `lib/src/resources/`); locales: tr, en, de, fr
 - **Assets**: `flutter_gen` for typed asset references
+
+### 🗂 Routes Overview
+
+| Path | Description |
+|------|-------------|
+| `/` | Splash |
+| `/onboarding` | Onboarding (optional first run) |
+| `/home` | Home |
+| `/search` | Search |
+| `/products` | Product list (with optional query params) |
+| `/product-detail/:id` | Product detail |
+| `/categories` | Categories |
+| `/categories/products/:categoryId` | Products by category |
+| `/brands/:brandId` | Products by brand |
+| `/cart` | Cart |
+| `/checkout` | Checkout |
+| `/favorites` | Favorites |
+| `/profile` | Profile (when authenticated) |
+| `/auth` | Login / Sign up (when not authenticated) |
+| `/profile/info` | Personal info |
+| `/profile/addresses` | Addresses |
+| `/profile/change-password` | Change password |
+| `/profile/orders` | Orders |
+| `/profile/reviews` | My reviews |
+| `/profile/help-support` | Help & support |
+| `/settings` | App settings |
+| `/admin/dashboard` | Admin dashboard |
+| `/admin/users` | Admin users |
+| `/admin/products` | Admin products |
+| `/admin/orders` | Admin orders |
+| `/admin/coupons` | Admin coupons |
+| `/admin/settings` | Admin settings |
+
+User routes (except splash/onboarding) sit in a **ShellRoute** that provides the bottom navigation bar. Admin routes use a separate shell with admin bottom nav.
+
+### 🌐 Localization
+
+- **Tool**: Slang
+- **Locales**: `tr`, `en`, `de`, `fr`
+- **Sources**: `assets/i18n/*.i18n.json` (or similar under `assets/i18n/`)
+- **Generated**: `lib/src/resources/resources.g.dart` and `resources_<locale>.g.dart`
+- **Usage**: `context.resources.xxx` (e.g. `context.resources.signIn`, `context.resources.myProfile`)
+- **Settings**: User can change language (and currency) from Profile or Settings; language is applied app-wide.
 
 </details>
 
----
 
 <details>
 <summary>🛠️ Technology Stack</summary>
@@ -115,12 +155,7 @@ Access: available when the logged-in user has `role == 'admin'` (Profile → Adm
 | **Env** | flavor (dev / prod) |
 | **Charts** | fl_chart (admin dashboard) |
 
-</details>
-
----
-
-<details>
-<summary>📁 Project Structure</summary>
+### 📁 Project Structure
 
 ```
 projects/storefront_supabase/
@@ -165,9 +200,24 @@ projects/storefront_supabase/
 └── README.md
 ```
 
+### 🗄 Database (Supabase)
+
+The app expects Supabase (PostgreSQL) tables and RLS policies as in the migration files. Main entities include:
+
+- **users** (extends Supabase Auth or links to `auth.uid()`)
+- **products**, **product_variants**, **product_images**
+- **categories**, **brand**
+- **cart**, **order**, **order_items**
+- **favorites**, **favorite_groups**
+- **user_addresses**
+- **product_reviews**
+- **coupons**
+- **admin_users**, **admin_settings**, **admin_activity_log**, etc.
+
+See `migrations/supabase_integration.sql` and `migrations/favorites_enhancement_v2.sql` for the full schema. Apply and adjust for your project.
+
 </details>
 
----
 
 <details>
 <summary>🚀 Getting Started</summary>
@@ -216,16 +266,11 @@ flutter run --flavor prod -t lib/flavors/main_prod.dart
 4. Enable Auth (email/password) and any Storage buckets your app uses.
 5. Configure RLS policies so that `auth.uid()` and your `users` table are aligned.
 
-</details>
-
----
-
-<details>
-<summary>⚙️ Configuration</summary>
+### ⚙️ Configuration
 
 All main configuration lives in **`assets/app_config.json`**. The app reads it via `AssetConfigHelper()` from the core package.
 
-### Main sections
+#### Main sections
 
 | Section | Purpose |
 |--------|---------|
@@ -243,108 +288,29 @@ All main configuration lives in **`assets/app_config.json`**. The app reads it v
 | **product_list_configuration** | Grid, filters, sort options |
 | **checkout** | Steps, labels, validation |
 
-### Auth and welcome text
+#### Auth and welcome text
 
 - **App bar title** (Sign In / Sign Up):  
   `auth_configuration.sign_in.app_bar_title`, `auth_configuration.sign_up.app_bar_title`
 - **Welcome title** (e.g. "Welcome to Masterfabric S Store"):  
   `auth_configuration.sign_in.welcome_title`, `auth_configuration.sign_up.welcome_title`
 
-### Navbar
+#### Navbar
 
 - `navbar_configuration.enabled`, `navbar_configuration.items` (route, text, icon, order_id).
 - Profile item can be auth-aware: `authRoute` (e.g. `/profile`) and `guestRoute` (e.g. `/auth`).
 - Navbar is hidden only on `/`, `/onboarding`, and `/admin/*`; it is shown on `/auth`, `/home`, `/profile`, etc.
 
-</details>
+### 📦 Build & Release
 
----
-
-<details>
-<summary>🗂 Routes Overview</summary>
-
-| Path | Description |
-|------|-------------|
-| `/` | Splash |
-| `/onboarding` | Onboarding (optional first run) |
-| `/home` | Home |
-| `/search` | Search |
-| `/products` | Product list (with optional query params) |
-| `/product-detail/:id` | Product detail |
-| `/categories` | Categories |
-| `/categories/products/:categoryId` | Products by category |
-| `/brands/:brandId` | Products by brand |
-| `/cart` | Cart |
-| `/checkout` | Checkout |
-| `/favorites` | Favorites |
-| `/profile` | Profile (when authenticated) |
-| `/auth` | Login / Sign up (when not authenticated) |
-| `/profile/info` | Personal info |
-| `/profile/addresses` | Addresses |
-| `/profile/change-password` | Change password |
-| `/profile/orders` | Orders |
-| `/profile/reviews` | My reviews |
-| `/profile/help-support` | Help & support |
-| `/settings` | App settings |
-| `/admin/dashboard` | Admin dashboard |
-| `/admin/users` | Admin users |
-| `/admin/products` | Admin products |
-| `/admin/orders` | Admin orders |
-| `/admin/coupons` | Admin coupons |
-| `/admin/settings` | Admin settings |
-
-User routes (except splash/onboarding) sit in a **ShellRoute** that provides the bottom navigation bar. Admin routes use a separate shell with admin bottom nav.
-
-</details>
-
----
-
-<details>
-<summary>🌐 Localization</summary>
-
-- **Tool**: Slang
-- **Locales**: `tr`, `en`, `de`, `fr`
-- **Sources**: `assets/i18n/*.i18n.json` (or similar under `assets/i18n/`)
-- **Generated**: `lib/src/resources/resources.g.dart` and `resources_<locale>.g.dart`
-- **Usage**: `context.resources.xxx` (e.g. `context.resources.signIn`, `context.resources.myProfile`)
-- **Settings**: User can change language (and currency) from Profile or Settings; language is applied app-wide.
-
-</details>
-
----
-
-<details>
-<summary>🗄 Database (Supabase)</summary>
-
-The app expects Supabase (PostgreSQL) tables and RLS policies as in the migration files. Main entities include:
-
-- **users** (extends Supabase Auth or links to `auth.uid()`)
-- **products**, **product_variants**, **product_images**
-- **categories**, **brand**
-- **cart**, **order**, **order_items**
-- **favorites**, **favorite_groups**
-- **user_addresses**
-- **product_reviews**
-- **coupons**
-- **admin_users**, **admin_settings**, **admin_activity_log**, etc.
-
-See `migrations/supabase_integration.sql` and `migrations/favorites_enhancement_v2.sql` for the full schema. Apply and adjust for your project.
-
-</details>
-
----
-
-<details>
-<summary>📦 Build & Release</summary>
-
-### Android
+#### Android
 
 - **Bundle ID (prod)**: `com.masterfabric.storefrontSupabase`
 - **Bundle ID (dev)**: `com.masterfabric.storefrontSupabase.dev`
 - **App label**: Set in `android/app/src/main/AndroidManifest.xml` (`android:label`).
 - **Signing**: Configure `android/app/build.gradle.kts` signing configs and (e.g.) `masterfabric_store.properties` for release.
 
-### iOS
+#### iOS
 
 - **Bundle ID (prod)**: `com.masterfabric.storefrontSupabase`
 - **Bundle ID (dev)**: `com.masterfabric.storefrontSupabase.dev`
@@ -361,7 +327,6 @@ flutter build ios --flavor prod -t lib/flavors/main_prod.dart
 
 </details>
 
----
 
 <details>
 <summary>📚 Documentation</summary>
@@ -372,7 +337,6 @@ flutter build ios --flavor prod -t lib/flavors/main_prod.dart
 
 </details>
 
----
 
 <details>
 <summary>🤝 Contributing</summary>
@@ -388,16 +352,7 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
 
 ---
 
-<details>
-<summary>📄 License</summary>
-
-This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
-
-</details>
-
----
-
-<summary>📷 Screenshots</summary>
+## 📷 Screenshots
 
 <table>
   <tr>
@@ -446,3 +401,9 @@ This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in
     <td align="center"><img width="200" alt="23:20:48" src="https://github.com/user-attachments/assets/bdc39595-431e-45f5-985d-c7262104fa18" /></td>
   </tr>
 </table>
+
+---
+
+## 📄 License
+
+This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
