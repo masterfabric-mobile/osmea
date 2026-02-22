@@ -15,12 +15,17 @@
 
 <div style="margin-top: 1.5em; margin-bottom: 1.5em;"></div>
 
+<br>
+
 > **Complete E-commerce Mobile Application for WooCommerce**
+
+<br>
 
 <div style="margin-bottom: 1.5em;"></div>
 
 [Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing) • [Development & Help](#-development-deployment--help) • [License](#-license)
 
+<br>
 
 <details>
 <summary>🌟 Overview</summary>
@@ -2140,24 +2145,6 @@ if (order.status == 'refunded') {
 
 </details>
 
----
-
-## 📜 License
-
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-
-### **Key Points:**
-
-- ✅ **Commercial use** - You can use this for commercial projects
-- ✅ **Modification** - You can modify the code
-- ✅ **Distribution** - You can distribute the code
-- ✅ **Patent use** - Express grant of patent rights from contributors
-- ❗ **Disclose source** - Source code must be made available when distributing
-- ❗ **License and copyright notice** - Must include license and copyright notice
-- ❗ **Network use is distribution** - Users who interact with licensed software over a network are entitled to receive a copy of the source code
-- ❗ **Same license** - Modifications must be released under the same license
-
-See the [LICENSE](LICENSE) file for full details.
 
 ---
 
@@ -2194,12 +2181,53 @@ Thank you to all contributors who have helped build and improve this project! �
 - **Documentation:** [OSMEA Docs](https://osmea-docs.vercel.app)
 - **Email:** support@osmea.dev
 
----
+</details>
 
-<div align="center">
+<table>
+  <tr>
+    <td align="center"><img width="200" alt="1" src="https://github.com/user-attachments/assets/72711a2b-8364-4dbd-9be8-2fa704f72175" /></td>
+    <td align="center"><img width="200" alt="2" src="https://github.com/user-attachments/assets/3b08bf97-68c7-475d-8f02-e1600352e661" /></td>
+    <td align="center"><img width="200" alt="3" src="https://github.com/user-attachments/assets/d23e893a-2f59-4773-80a3-e463e8042c15" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="4" src="https://github.com/user-attachments/assets/13d523a5-e7c4-44a7-b817-273929f67ff8" /></td>
+    <td align="center"><img width="200" alt="5" src="https://github.com/user-attachments/assets/2416e970-d83f-4b87-a584-651d79e3ac55" /></td>
+    <td align="center"><img width="200" alt="6" src="https://github.com/user-attachments/assets/cea32eb4-31fa-46c1-8b17-aff61546b52b" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="7" src="https://github.com/user-attachments/assets/b5f1c523-2cda-4706-87e5-c91036d83c6b" /></td>
+    <td align="center"><img width="200" alt="8" src="https://github.com/user-attachments/assets/db86bb62-4058-42a5-8db9-0d2940d5aa12" /></td>
+    <td align="center"><img width="200" alt="9" src="https://github.com/user-attachments/assets/e1c569bf-539d-4226-8e0e-7c8680a17f21" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="10" src="https://github.com/user-attachments/assets/c057b8fa-d062-4036-84db-f96a28e705be" /></td>
+    <td align="center"><img width="200" alt="11" src="https://github.com/user-attachments/assets/2e9cb8a0-4a6e-4eac-87fb-382a1d43c92b" /></td>
+    <td align="center"><img width="200" alt="12" src="https://github.com/user-attachments/assets/5a24a7a3-8c3e-4f32-9932-21b379ac1d60" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="13" src="https://github.com/user-attachments/assets/68745189-7220-47c9-8e93-222a4e63312e" /></td>
+    <td align="center"><img width="200" alt="14" src="https://github.com/user-attachments/assets/367a5a60-a39d-4edc-9f30-196f07bc0379" /></td>
+    <td align="center"><img width="200" alt="15" src="https://github.com/user-attachments/assets/2745731c-884c-4037-ab42-173e2cb114b1" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="16" src="https://github.com/user-attachments/assets/74a9446a-6f6f-456a-8be2-6e28b5515164" /></td>
+    <td align="center"><img width="200" alt="17" src="https://github.com/user-attachments/assets/2926902b-61bd-4716-b46f-12a61351321d" /></td>
+    <td align="center"><img width="200" alt="18" src="https://github.com/user-attachments/assets/3e5866a9-d582-459b-9e9a-dd835f2b14b9" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="19" src="https://github.com/user-attachments/assets/0d09cd3e-355b-4fdf-b8b4-d19d23475e2e" /></td>
+    <td align="center"><img width="200" alt="20" src="https://github.com/user-attachments/assets/9627fee5-04c7-4b88-9e6b-ac32bcccbd67" /></td>
+    <td align="center"><img width="200" alt="21" src="https://github.com/user-attachments/assets/a60364da-b793-4a75-9b71-ce3e2fe79c44" /></td>
+  </tr>
+</table>
 
-**Made with ❤️ by the OSMEA Team**
 
-[⬆ Back to Top](#-osmea-storefront-woocommerce)
+## 📄 License
 
-</div>
+This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
+
+
+
+
+
+
