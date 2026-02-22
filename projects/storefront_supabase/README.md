@@ -3,8 +3,9 @@
 <p align="center">
   <a href="https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40" alt="Download on the App Store" style="vertical-align: middle" /></a>
   &nbsp;
-  <a href="https://play.google.com/store/apps/details?id=com.masterfabric.storefrontSupabase"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="59" alt="Get it on Google Play" style="vertical-align: middle" /></a>
+  <a href="https://play.google.com/store/apps/details?id=com.masterfabric.storefrontSupabase"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/960px-Google_Play_Store_badge_EN.svg.png" height="40" alt="Get it on Google Play" style="vertical-align: middle" /></a>
 </p>
+
 
 [![Storefront Supabase](https://img.shields.io/badge/Storefront%20Supabase-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
 [![Version](https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C)](pubspec.yaml)
@@ -15,9 +16,6 @@
 
 [Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
 
-
-
----
 
 <details>
 <summary>🌟 Overview</summary>
@@ -350,7 +348,6 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
 
 </details>
 
----
 
 ## 📷 Screenshots
 
@@ -402,7 +399,6 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
   </tr>
 </table>
 
----
 
 ## 📄 License
 
