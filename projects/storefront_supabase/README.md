@@ -7,12 +7,17 @@
 </p>
 
 
-[![Storefront Supabase](https://img.shields.io/badge/Storefront%20Supabase-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
-[![Version](https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C)](pubspec.yaml)
-[![Platform](https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-2D3748?style=for-the-badge&logo=supabase&logoColor=white&labelColor=1A202C)](https://supabase.com)
+<div align="center">
+  <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/Storefront%20Supabase-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Storefront Supabase" /></a>
+  <a href="pubspec.yaml"><img src="https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C" alt="Version" /></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Platform" /></a>
+  <a href="https://supabase.com"><img src="https://img.shields.io/badge/Supabase-2D3748?style=for-the-badge&logo=supabase&logoColor=white&labelColor=1A202C" alt="Supabase" /></a>
+</div>
 
-**"Modern Supabase-powered Storefront App for Mobile"**
+<br>
+
+> *Modern Supabase-powered Storefront App for Mobil*
+
 
 [Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
 
@@ -348,6 +353,7 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
 
 </details>
 
+<br>
 
 <table>
   <tr>
