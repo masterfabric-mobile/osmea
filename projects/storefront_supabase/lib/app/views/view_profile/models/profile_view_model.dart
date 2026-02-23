@@ -534,16 +534,23 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   }
 
   Future<void> login() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    if (email.isEmpty || password.isEmpty) {
       stateChanger(const ProfileUnauthenticated(
           errorMessage: 'Please enter email and password.'));
+      return;
+    }
+    if (!email.contains('@')) {
+      stateChanger(const ProfileUnauthenticated(
+          errorMessage: 'Please enter a valid email address.'));
       return;
     }
     stateChanger(ProfileLoading());
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: email,
+        password: password,
       );
       if (response.user == null) {
         stateChanger(const ProfileUnauthenticated(

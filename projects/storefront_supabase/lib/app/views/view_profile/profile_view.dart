@@ -158,13 +158,17 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
       bloc: viewModel,
       listener: (context, state) {
         if (state is ProfileAuthenticated && state.shouldRedirectToHome) {
-          // Trigger navigation to home and then reset the flag
           Future.delayed(Duration.zero, () {
             if (context.mounted) {
               context.go('/home?loginSuccess=true');
               viewModel.resetRedirectFlag();
             }
           });
+        }
+        if (state is ProfileUnauthenticated &&
+            state.errorMessage != null &&
+            state.showLoginView) {
+          context.snackbarWarning(state.errorMessage!);
         }
       },
       child: Builder(
@@ -192,7 +196,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     LogoHeaderWidget(isSignUp: !state.showLoginView),
-                    if (state.errorMessage != null) ...[
+                    if (state.errorMessage != null && !state.showLoginView) ...[
                       OsmeaComponents.text(
                         state.errorMessage!,
                         color: state.errorMessage!.startsWith('Success')
