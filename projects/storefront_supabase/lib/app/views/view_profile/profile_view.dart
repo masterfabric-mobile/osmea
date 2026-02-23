@@ -165,9 +165,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
             }
           });
         }
-        if (state is ProfileUnauthenticated &&
-            state.errorMessage != null &&
-            state.showLoginView) {
+        if (state is ProfileUnauthenticated && state.errorMessage != null) {
           context.snackbarWarning(state.errorMessage!);
         }
       },
@@ -196,16 +194,6 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     LogoHeaderWidget(isSignUp: !state.showLoginView),
-                    if (state.errorMessage != null && !state.showLoginView) ...[
-                      OsmeaComponents.text(
-                        state.errorMessage!,
-                        color: state.errorMessage!.startsWith('Success')
-                            ? OsmeaColors.black
-                            : OsmeaColors.black,
-                        textAlign: TextAlign.center,
-                      ),
-                      OsmeaComponents.sizedBox(height: 16),
-                    ],
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: state.showLoginView
