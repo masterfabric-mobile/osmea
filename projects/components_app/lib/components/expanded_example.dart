@@ -427,7 +427,7 @@ class ExpandedExample extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         OsmeaComponents.text(
-                          'OSMEA Dashboard',
+                          'MasterFabric Dashboard',
                           color: OsmeaColors.white,
                           variant: OsmeaTextVariant.headlineSmall,
                         ),
@@ -571,7 +571,7 @@ class ExpandedExample extends StatelessWidget {
                                               '• User "John Smith" placed a new order'),
                                           OsmeaComponents.sizedBox(height: 4),
                                           OsmeaComponents.text(
-                                              '• 3 new comments on blog post "OSMEA Components"'),
+                                              '• 3 new comments on blog post "MasterFabric Components"'),
                                           OsmeaComponents.sizedBox(height: 4),
                                           OsmeaComponents.text(
                                               '• New feature released: OsmeaComponents.expanded component'),
@@ -599,7 +599,7 @@ class ExpandedExample extends StatelessWidget {
                     child: OsmeaComponents.row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        OsmeaComponents.text('© 2025 OSMEA Team',
+                        OsmeaComponents.text('© 2025 MasterFabric Team',
                             variant: OsmeaTextVariant.bodySmall),
                         OsmeaComponents.row(
                           children: [

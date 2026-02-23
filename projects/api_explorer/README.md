@@ -1,326 +1,523 @@
-# API Explorer 🔍
+# 🔍 API Explorer
+
+<p align="center">
+  <a href="https://apps.apple.com/tr/app/mf-api-explorer/id6752110806?l=tr&mt=12"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40" alt="Download on the App Store" style="vertical-align: middle" /></a>
+  &nbsp;
 
 <div align="center">
-
-[![Version](https://img.shields.io/badge/version-1.1.0-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
-[![Platform](https://img.shields.io/badge/platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://dart.dev)
-[![Web](https://img.shields.io/badge/Web-2D3748?style=for-the-badge&logo=web&logoColor=white&labelColor=1A202C)](https://web.dev)
-
+  <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/API%20Explorer-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="API Explorer" /></a>
+  <a href="pubspec.yaml"><img src="https://img.shields.io/badge/Version-1.1.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C" alt="Version" /></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Platform" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.6+-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Dart" /></a>
+  <a href="https://web.dev"><img src="https://img.shields.io/badge/Web_First-2D3748?style=for-the-badge&logo=web&logoColor=white&labelColor=1A202C" alt="Web First" /></a>
 </div>
 
-<div align="center">
+<div style="margin-top: 1.5em; margin-bottom: 1.5em;"></div>
 
-**"Interactive API Testing & Exploration Tool"**
+<br>
 
-[📚 Documentation](https://github.com/masterfabric-mobile/osmea/tree/dev/projects/api_explorer) • [🐛 Report Issues](https://github.com/masterfabric-mobile/osmea/issues) • [💬 Discussions](https://github.com/masterfabric-mobile/osmea/discussions)
+> **"The Ultimate Interactive API Testing & Exploration Tool"**
 
-</div>
+<div style="margin-bottom: 1.5em;"></div>
 
----
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing) • [License](#-license)
+
+
+<details>
+<summary>🌟 Overview</summary>
 
 ## 🌟 What is API Explorer?
 
-**API Explorer** is a modern, interactive web application designed for testing and exploring APIs with a focus on e-commerce platforms. It provides a comprehensive interface for developers to interact with Shopify and WooCommerce APIs through an intuitive wizard-based configuration system.
-
-### ✨ **Key Features**
-
-- **🔌 Universal API Testing** - Test any REST or GraphQL API endpoint
-- **🧙‍♂️ Wizard-Based Setup** - Interactive configuration for Shopify and WooCommerce
-- **📊 Real-time Response** - Live API testing with formatted JSON responses
-- **🎨 Modern UI** - Clean, responsive design with dark/light mode
-- **📱 Cross-Platform** - Works on web, mobile, and desktop
-- **💾 Persistent Storage** - Save configurations and test results
-
----
-
-## 🚀 Quick Start
-
-### 📋 Prerequisites
-
-- **Flutter SDK** (3.6.1 or higher)
-- **Dart SDK** (3.6.1 or higher)
-- **Web Browser** (Chrome, Firefox, Safari, Edge)
-
-### 📦 Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/masterfabric-mobile/osmea.git
-   cd osmea/projects/api_explorer
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Generate code:**
-   ```bash
-   flutter packages pub run build_runner build
-   ```
-
-4. **Run the application:**
-   ```bash
-   flutter run -d chrome
-   ```
-
-### 🌐 **Web Deployment**
-
-For production deployment:
-
-```bash
-# Build for web
-flutter build web --release
-
-# Deploy to your hosting service
-# The build/web directory contains all static files
-```
-
----
-
-## 🛠️ Technology Stack
-
-- **Flutter 3.6+** - Cross-platform UI framework
-- **Dart 3.6+** - Type-safe programming language
-- **GoRouter** - Declarative routing for Flutter
-- **GetIt + Injectable** - Dependency injection
-- **Dio** - HTTP client for API calls
-- **Flutter Highlight** - Syntax highlighting for JSON
-- **SharedPreferences** - Local storage
-
----
-
-## 📦 Core Features
-
-### 🌐 **API Testing Interface**
-- **HTTP Method Selection** - GET, POST, PUT, DELETE, PATCH
-- **Request Parameters** - Query parameters, headers, body
-- **Response Visualization** - Formatted JSON with syntax highlighting
-- **Error Handling** - Detailed error messages and status codes
-- **Request History** - Save and replay previous requests
-
-### 🧙‍♂️ **Wizard Configuration**
-- **Store Setup** - Interactive store configuration wizard
-- **Platform Selection** - Choose between Shopify and WooCommerce
-- **Authentication** - Secure credential management
-- **API Versioning** - Support for different API versions
-- **Environment Switching** - Development and production environments
-
-### 🎨 **User Interface**
-- **Responsive Design** - Works on all screen sizes
-- **Dark/Light Mode** - Theme switching capability
-- **Modern Layout** - Clean, intuitive interface
-- **Mobile Support** - Touch-friendly mobile interface
-- **Desktop Optimization** - Full desktop experience
-
-### 📊 **Data Management**
-- **Local Storage** - Persistent configuration storage
-- **Session Management** - Maintain user sessions
-- **Data Export** - Export test results and configurations
-- **Import/Export** - Share configurations between users
-
----
-
-## 📁 Project Structure
-
-```bash
-projects/api_explorer/
-├── 📦 lib/                          # Source code
-│   ├── main.dart                    # Application entry point
-│   ├── di/                          # Dependency injection
-│   │   └── config/                  # DI configuration
-│   ├── routes/                      # Application routing
-│   │   └── app_router.dart          # Route definitions
-│   ├── services/                    # Business logic
-│   │   ├── api_request_handler.dart # API request handling
-│   │   ├── api_service_registry.dart # Service registry
-│   │   ├── app_state_persistence.dart # State persistence
-│   │   └── handlers/                # API handlers
-│   │       ├── shopify/             # Shopify API handlers
-│   │       │   ├── graphql_handlers/ # GraphQL operations
-│   │       │   └── rest_handlers/   # REST API operations
-│   │       └── woocommerce/         # WooCommerce API handlers
-│   │           └── *_handlers/      # Various API modules
-│   ├── views/                       # UI screens
-│   │   ├── api_explorer_view.dart   # Main API explorer
-│   │   ├── home_view.dart           # Home screen
-│   │   └── splash_view.dart         # Splash screen
-│   ├── widgets/                     # Reusable UI components
-│   │   ├── api_explorer_view/       # API explorer components
-│   │   ├── home/                    # Home screen components
-│   │   ├── layout/                  # Layout components
-│   │   ├── responsive_layout/       # Responsive design
-│   │   └── store_management/        # Store management UI
-│   └── styles/                      # Theme and styling
-│       └── app_theme.dart           # Application theme
-├── 🧪 test/                         # Unit and integration tests
-├── 🌐 web/                          # Web-specific files
-├── 📱 macos/                        # macOS-specific files
-├── 📄 pubspec.yaml                  # Package dependencies
-└── 📋 analysis_options.yaml         # Linting configuration
-```
-
----
-
-## 🎯 Supported APIs
-
-### 🛍️ **Shopify APIs**
-
-#### **REST API Endpoints**
-- **Access Management** - Store access tokens and scopes
-- **Billing** - Application charges and billing
-- **Customers** - Customer management and data
-- **Products** - Product catalog and inventory
-- **Orders** - Order processing and management
-- **Webhooks** - Event notifications
-- **Discounts** - Coupon and discount management
-- **Inventory** - Stock management
-- **Marketing** - Marketing events and campaigns
-- **Online Store** - Blog, pages, and themes
-
-#### **GraphQL Operations**
-- **Customer Queries** - Customer data retrieval
-- **Product Queries** - Product information
-- **Webhook Mutations** - Webhook management
-- **Real-time Data** - Live data synchronization
-
-### 🛒 **WooCommerce APIs**
-
-#### **REST API Endpoints**
-- **Authentication** - User login and JWT tokens
-- **Products** - Product management
-- **Orders** - Order processing
-- **Customers** - Customer data
-- **Coupons** - Discount management
-- **Reports** - Sales analytics
-- **Settings** - Store configuration
-- **Webhooks** - Event handling
-- **Wishlist** - Customer wishlists
-- **Shipping** - Shipping management
-- **Taxes** - Tax calculations
-
----
-
-## 🚀 Getting Started
-
-### 1. **Launch the Application**
-```bash
-flutter run -d chrome
-```
-
-### 2. **Configure Your Store**
-- Click on "Setup Wizard" to configure your store
-- Choose between Shopify or WooCommerce
-- Enter your store credentials
-- Select API version and endpoints
-
-### 3. **Test APIs**
-- Select an API endpoint from the sidebar
-- Choose HTTP method (GET, POST, PUT, DELETE)
-- Add parameters and headers as needed
-- Click "Send Request" to test the API
-- View formatted response in the results panel
-
-### 4. **Explore Features**
-- Switch between different API modules
-- Save frequently used requests
-- Export test results
-- Switch between light and dark themes
-
----
-
-## 🛠️ Development
-
-### **Code Generation**
-```bash
-# Generate dependency injection code
-flutter packages pub run build_runner build
-
-# Watch for changes during development
-flutter packages pub run build_runner watch
-```
-
-
-### **Building**
-```bash
-# Build for web
-flutter build web --release
-
-# Build for macOS
-flutter build macos --release
-```
-
----
-
-## 🎨 Customization
-
-### **Themes**
-The application supports both light and dark themes. You can customize the theme by modifying `lib/styles/app_theme.dart`.
-
-### **API Handlers**
-Add new API handlers by creating new files in the `lib/services/handlers/` directory and registering them in the service registry.
-
-### **UI Components**
-All UI components are modular and can be customized in the `lib/widgets/` directory.
-
----
-
-## 🎯 Use Cases
-
-### 👨‍💻 **Developers**
-- **API Testing** - Test API endpoints during development
-- **Debugging** - Debug API responses and errors
-- **Documentation** - Explore API capabilities and parameters
-- **Integration** - Understand API structure for integration
-
-### 🏢 **Business Users**
-- **Store Management** - Manage products, orders, and customers
-- **Data Export** - Export store data for analysis
-- **Configuration** - Configure store settings and integrations
-- **Monitoring** - Monitor API performance and usage
-
-### 🎓 **Students & Learners**
-- **API Learning** - Learn how APIs work through hands-on experience
-- **E-commerce** - Understand e-commerce platform APIs
-- **Flutter Development** - Learn Flutter web development
-- **Best Practices** - See modern web application architecture
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help:
-
-### **Development Guidelines**
-- **Code Style**: Follow Dart/Flutter conventions
-- **Testing**: Write tests for new features
-- **Documentation**: Update docs for API changes
-- **Commit Messages**: Use conventional commits
-
-### **How to Contribute**
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-3. **Make Your Changes**
-4. **Submit a Pull Request**
-
----
-
-## 📄 License
-
-> 🔐 **License:** GNU AGPL v3.0  
-> 📜 This project is protected under the **GNU Affero General Public License v3.0**.
-
-📎 Full details available in the [`LICENSE`](LICENSE) file.
-
----
+**API Explorer** is a **comprehensive, interactive web application** designed specifically for testing and exploring e-commerce APIs. Built with Flutter for web, it provides an enterprise-grade interface for developers to interact with Shopify and WooCommerce APIs through an intuitive wizard-based setup system.
+
+### ⚡ **Key Highlights**
+
+- 🧙‍♂️ **Wizard-Based Setup** - Interactive store configuration with guided flow
+- 🔌 **Dual Platform Support** - Complete Shopify & WooCommerce integration (110+ endpoints)
+- 📊 **Real-Time Testing** - Live API testing with formatted JSON responses
+- 💾 **Persistent Storage** - SharedPreferences for configuration & history
+- 🎨 **Modern UI** - Clean, responsive design with syntax highlighting
+- 🔐 **Secure Authentication** - JWT tokens, OAuth 2.0, API keys support
+- 📱 **Cross-Platform** - Web-first with macOS support
+- 🏗️ **Clean Architecture** - Dependency injection with Injectable + GetIt
+- 🎯 **Developer-Friendly** - 500+ API handlers with auto-generated forms
+
+### 🎯 **Perfect For**
+
+- **E-commerce Developers** - Test API integrations before implementation
+- **API Integration Teams** - Explore available endpoints and parameters
+- **QA Engineers** - Validate API responses and error handling
+- **Product Managers** - Understand API capabilities and limitations
+- **Students & Learners** - Hands-on API learning environment
+
+### 📊 Project Statistics
 
 <div align="center">
 
-**Built with ❤️ by the OSMEA Team**
-
-© 2025 MasterFabric Mobile • Maintained by the OSMEA Engineering Team
-
-[⬆ Back to Top](#api-explorer-)
+| Metric | Value | Metric | Value |
+|--------|-------|--------|-------|
+| 🔌 **Total Endpoints** | 110+ | 🛍️ **Shopify APIs** | 50+ |
+| 🛒 **WooCommerce APIs** | 60+ | 📦 **API Handlers** | 500+ |
+| 🎯 **Platforms** | Web, macOS | 🔧 **Handler Categories** | 30+ |
+| 📚 **Dependencies** | 12 Core | 🏗️ **Architecture** | Clean + DI |
 
 </div>
+
+</details>
+
+<details>
+<summary>✨ Features</summary>
+
+## 🛍️ Comprehensive API Support
+
+API Explorer supports **110+ e-commerce API endpoints** across Shopify and WooCommerce platforms with dedicated handlers for each endpoint.
+
+### 🏪 **Shopify APIs** (50+ Endpoints)
+
+#### 🔐 **REST API Categories**
+
+| Category | Endpoints | Key Features |
+|----------|-----------|--------------|
+| **Access Management** | 2 | Access Scope • Storefront Tokens |
+| **Billing System** | 8 | Application Charges • Recurring Billing • Usage Charges • Credits |
+| **Customer Management** | 8 | CRUD Operations • Address Management • Search • Count • Invites • Activation URLs |
+| **Discounts & Promotions** | 12 | Discount Codes • Price Rules • Free Shipping • Free Items • Order Discounts |
+| **Events & Analytics** | 3 | Event History • Count • Details |
+| **Inventory Management** | 8 | Items • Levels • Locations • Stock Control • SKU Updates |
+| **Order Processing** | 10 | Draft Orders • Abandoned Checkouts • Invoicing • Reopen • Complete |
+| **Marketing Tools** | 6 | Marketing Events • Engagements • Campaigns • List • Create • Update |
+| **Gift Cards** | 9 | Create • Disable • Update • Search • Custom Codes • Auto-generation |
+| **Metafields** | 7 | CRUD Operations • Query Parameters • Multiple Resources |
+| **Online Store** | 5 | Articles • Blogs • Themes • Metafield Management |
+| **Products** | 8 | CRUD Operations • Tags • Variants • Collections • Smart Collections |
+| **Webhooks** | 4 | CRUD Operations • Event Subscriptions • JSON/XML Format Support |
+
+#### 🚀 **GraphQL API Categories**
+
+| Category | Operations | Features |
+|----------|------------|----------|
+| **Products & Collections** | Queries • Mutations | Product Info • Collection Data • Product Updates • Collection Management |
+| **Customers** | Queries • Mutations | Customer Retrieval • Create • Update • Disable • Count |
+| **Webhooks** | Queries • Mutations | Webhook Info • Subscription Management • Create • Update • Delete |
+
+### 🛒 **WooCommerce APIs** (60+ Endpoints)
+
+#### 🔧 **Admin API Categories**
+
+| Category | Count | Key Features |
+|----------|-------|--------------|
+| **Authentication** | 9 | Login • Signup • Logout • JWT Management • Password Reset • Delete Account • Auth Status |
+| **Products** | 15+ | CRUD Operations • Categories • Tags • Reviews • Attributes • Terms • Brands • Variations |
+| **Orders** | 8 | CRUD Operations • Status Updates • Refunds • Order Notes |
+| **Customers** | 5 | CRUD Operations • Customer Management • Data Export |
+| **Inventory & Catalog** | 12 | Coupons • Shipping Methods • Shipping Zones • Payment Gateways • Tax Classes |
+| **Store Configuration** | 8 | Settings • System Status • Data Management • Currencies • Countries • Continents |
+| **Analytics & Reports** | 6 | Sales Reports • Customer Reports • Product Reports • Top Sellers |
+| **Webhooks** | 4 | CRUD Operations • Event Management • Subscriptions |
+
+#### 🏪 **Store API Categories**
+
+| Category | Count | Features |
+|----------|-------|----------|
+| **Cart Management** | 12+ | Cart Items (Add • Edit • Remove • List) • Cart Coupons • Token Management |
+| **Checkout Process** | 5 | Checkout Data • Process Payment • Order Creation • Update Checkout |
+| **Customer Features** | 7 | Wishlist (Create • Update • Delete • List Groups) • Add/Remove Items |
+| **Product Browsing** | 10+ | Product Listings • Search • Categories • Tags • Attributes • Brands • Reviews |
+
+### 🔗 **Authentication Methods**
+
+**Shopify:**
+- 🔑 Private Apps (API Key + Password)
+- 🔐 Custom Apps (Access Token)
+- 🎫 Storefront Access Tokens
+
+**WooCommerce:**
+- 🔑 Consumer Key/Secret
+- 🎫 JWT Tokens
+- 🔐 OAuth 2.0
+- 🍪 Cookie-based Sessions
+
+### ✨ Core Features
+
+Wizard-based store setup, 110+ endpoint explorer, dynamic parameter forms, syntax-highlighted JSON responses, request history & persistence, secure token storage. Material Design 3, split view, response time tracking.
+
+</details>
+
+
+<details>
+<summary>🛠️ Technology Stack</summary>
+
+## 🛠️ Technology Stack
+
+### **Frontend Framework**
+- **Flutter 3.6+** - Cross-platform UI with web optimization
+- **Dart 3.6+** - Type-safe, modern programming language
+- **Material Design 3** - Modern, accessible design system
+- **Responsive Design** - Mobile, tablet, desktop optimization
+
+### **State Management & Architecture**
+- **Dependency Injection** - Injectable ^2.5.1 + GetIt 7.7.0 for clean architecture
+- **GoRouter ^15.1.1** - Declarative routing for SPA-like navigation
+- **Clean Architecture** - Separation of concerns with handlers pattern
+- **Service Locator Pattern** - Centralized dependency management
+
+### **API Integration**
+- **OSMEA APIs Package** - Internal API abstraction layer (../../packages/apis)
+- **OSMEA Core Package** - Foundation utilities (../../packages/core)
+- **HTTP Client** - Built-in Dio integration with interceptors
+- **JSON Serialization** - Type-safe models with code generation
+
+### **Development & Quality**
+- **Build Runner 2.4.13** - Code generation for DI and models
+- **Injectable Generator 2.6.2** - Automatic DI code generation
+- **Flutter Lints ^5.0.0** - Strict linting for code quality
+- **Flutter Highlight ^0.7.0** - Syntax highlighting for JSON responses
+- **SharedPreferences ^2.5.3** - Persistent local storage
+- **URL Launcher ^6.2.4** - External link handling
+
+### **Platform Support**
+- **Web (Primary)** - PWA-ready with modern web features
+- **macOS Desktop** - Native desktop application support
+- **Responsive Design** - Works seamlessly across all screen sizes
+
+### 🏗️ Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "API Explorer Architecture"
+        subgraph "Presentation Layer"
+            A[📱 Views] --> B[🧩 Widgets]
+            B --> C[🎨 Styles/Themes]
+        end
+        
+        subgraph "Business Logic Layer"
+            D[🔧 Services]
+            E[📋 API Registry]
+            F[🔌 Request Handlers]
+        end
+        
+        subgraph "Data Layer"
+            G[💾 Persistence]
+            H[🌐 API Clients]
+            I[📊 Core Package]
+            J[🔗 APIs Package]
+        end
+        
+        subgraph "Infrastructure"
+            K[⚙️ Dependency Injection]
+            L[📍 Routing]
+        end
+    end
+    
+    A --> D
+    D --> E
+    E --> F
+    F --> H
+    H --> I
+    H --> J
+    G --> I
+    K --> D
+    L --> A
+```
+
+### **Architecture Principles**
+
+- **Clean Architecture** - Clear separation between layers
+- **SOLID Principles** - Maintainable and extensible code
+- **Handler Pattern** - Each API endpoint has dedicated handler
+- **Service Registry** - Centralized API service management
+- **Dependency Injection** - Loose coupling with Injectable
+- **State Persistence** - Session and configuration management
+
+### 📁 Project Structure
+
+`lib/di/` (DI config), `lib/routes/` (GoRouter), `lib/services/` (handlers, registry, persistence). Handlers under `lib/services/handlers/shopify/` and `woocommerce/`. See repo for full tree.
+
+</details>
+
+<details>
+<summary>🚀 Getting Started</summary>
+
+## 🚀 Getting Started
+
+### 📋 **Prerequisites**
+
+```bash
+# Required Software
+Flutter SDK:  >=3.6.1
+Dart SDK: >=3.6.1  
+Git: Latest version
+Code Editor: VS Code (recommended) or Android Studio
+
+# Optional for macOS development
+Xcode: Latest version (macOS users only)
+```
+
+### ⚡ **Quick Installation**
+
+#### **Option 1: Clone Full OSMEA Ecosystem** (Recommended)
+
+```bash
+# Clone the main repository
+git clone https://github.com/masterfabric-mobile/osmea.git
+cd osmea
+
+# Navigate to API Explorer
+cd projects/api_explorer
+
+# Install dependencies
+flutter pub get
+
+# Generate dependency injection code
+dart run build_runner build --delete-conflicting-outputs
+
+# Run on web
+flutter run -d chrome
+
+# Or run on macOS (if available)
+flutter run -d macos
+```
+
+#### **Option 2: Standalone Setup**
+
+```bash
+# Clone repository
+git clone https://github.com/masterfabric-mobile/osmea.git
+cd osmea/projects/api_explorer
+
+# Install dependencies (includes core packages)
+flutter pub get
+
+# Generate code
+flutter packages pub run build_runner build
+
+# Launch application
+flutter run -d chrome
+```
+
+#### **Option 3: Development Mode**
+
+```bash
+# For active development with hot reload
+flutter run -d chrome --hot
+
+# Watch for code generation changes (in separate terminal)
+dart run build_runner watch
+```
+
+### 🎮 **First-Time Setup Wizard**
+
+1. **🚀 Launch Application**
+   ```bash
+   flutter run -d chrome
+   ```
+   - Application opens in browser (typically `localhost:port`)
+   - You'll see the API Explorer home screen
+
+2. **🧙‍♂️ Configure Your Store**
+   - Click **"Setup Wizard"** or **"Add New Store"** button
+   - Choose platform: **Shopify** or **WooCommerce**
+   - Follow guided configuration steps
+
+3. **🔐 Authentication Setup**
+   - **For Shopify**: 
+     - Enter store URL (e.g., `mystore.myshopify.com`)
+     - Provide access token or app credentials
+     - Select API version
+   - **For WooCommerce**: 
+     - Enter site URL (e.g., `https://mystore.com`)
+     - Provide consumer key/secret or JWT token
+     - Configure authentication method
+
+4. **✅ Test Connection**
+   - Wizard automatically validates credentials
+   - Shows available API endpoints
+   - Configuration saved for future use
+
+### 🏗️ **Building for Production**
+
+#### **Web Build**
+
+```bash
+# Build optimized web version (HTML renderer)
+flutter build web --release --web-renderer html
+
+# Build with CanvasKit renderer (better performance, larger bundle)
+flutter build web --release --web-renderer canvaskit
+
+# Output located in: build/web/
+# Deploy build/web directory to your hosting service
+# (Vercel, Netlify, Firebase Hosting, AWS S3, etc.)
+```
+
+#### **macOS Build**
+
+```bash
+# Build macOS application
+flutter build macos --release
+
+# Find built app in:
+# build/macos/Build/Products/Release/api_explorer.app
+```
+
+### 👨‍💻 Development Guide
+
+Add handlers in `lib/services/handlers/`, implement `ApiRequestHandler`, register in `ApiServiceRegistry`. Run `dart run build_runner build`. See repo for full guide.
+
+### 🚀 Deployment
+
+Web: `flutter build web --release`. Deploy `build/web/` to Vercel, Netlify, Firebase Hosting, or GitHub Pages. macOS: `flutter build macos --release`.
+
+### 🔧 Troubleshooting
+
+Clean: `flutter clean && dart run build_runner build --delete-conflicting-outputs`. Use HTML renderer if CanvasKit fails. Update deps: `flutter pub upgrade`.
+
+</details>
+
+
+<details>
+<summary>📚 Documentation</summary>
+
+- **Monorepo:** [github.com/masterfabric-mobile/osmea](https://github.com/masterfabric-mobile/osmea)
+- **Docs:** [OSMEA Documentation](https://github.com/masterfabric-mobile/osmea/tree/dev/docs)
+- **Report issues:** [GitHub Issues](https://github.com/masterfabric-mobile/osmea/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/masterfabric-mobile/osmea/discussions)
+- **OSMEA Home:** [README](../../README.md)
+
+</details>
+
+
+<details>
+<summary>🤝 Contributing</summary>
+
+## 🤝 Contributing
+
+We welcome contributions from the community! API Explorer is part of the **OSMEA ecosystem**, and we're always looking for talented developers to help improve it.
+
+### **Ways to Contribute**
+
+- 🐛 **Bug Fixes** - Help improve stability and reliability
+- ✨ **New Features** - Add exciting functionality
+- 🔌 **API Handlers** - Add support for new endpoints
+- 📚 **Documentation** - Improve guides and examples
+- 🧪 **Testing** - Increase test coverage
+- 🎨 **UI/UX** - Enhance user interface and experience
+- 🌍 **Localization** - Add language support
+- ♿ **Accessibility** - Improve accessibility features
+
+### **Development Workflow**
+
+1. **Fork & Clone**
+   ```bash
+   git clone https://github.com/your-username/osmea.git
+   cd osmea/projects/api_explorer
+   ```
+
+2. **Create Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   # or
+   git checkout -b fix/bug-description
+   ```
+
+3. **Make Changes**
+   - Follow existing code patterns
+   - Add tests for new features
+   - Update documentation
+   - Follow commit message conventions
+
+4. **Test Changes**
+   ```bash
+   flutter test
+   flutter analyze
+   dart run build_runner build --delete-conflicting-outputs
+   flutter run -d chrome
+   ```
+
+5. **Commit & Push**
+   ```bash
+   git add .
+   git commit -m "feat: add new API handler for Shopify products"
+   git push origin feature/your-feature-name
+   ```
+
+6. **Submit Pull Request**
+   - Use the PR template
+   - Provide clear description
+   - Link related issues
+   - Request reviews
+
+### **Commit Message Convention**
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+# Feature
+feat: add WooCommerce product variations handler
+
+# Bug fix
+fix: resolve CORS issue with JWT authentication
+
+# Documentation
+docs: update API Explorer README with deployment guide
+
+# Refactoring
+refactor: simplify API handler registration logic
+
+# Testing
+test: add unit tests for Shopify webhook handlers
+
+# Chore
+chore: update dependencies to latest versions
+```
+
+### **Code Review Process**
+
+- All PRs require at least one review
+- CI/CD checks must pass
+- Code coverage should not decrease
+- Follow Dart/Flutter style guidelines
+- Update documentation for user-facing changes
+
+### **Development Setup**
+
+For detailed development setup, see [Getting Started](#-getting-started) section.
+
+### **Community Guidelines**
+
+- **[Code of Conduct](../../CODE_OF_CONDUCT.md)** - Community standards
+- **[Contributing Guide](../../CONTRIBUTING.md)** - Detailed guidelines
+- **[Security Policy](../../SECURITY.md)** - Security reporting
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/masterfabric-mobile/osmea?style=social)](https://github.com/masterfabric-mobile/osmea/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/masterfabric-mobile/osmea?style=social)](https://github.com/masterfabric-mobile/osmea/network/members)
+[![Follow on GitHub](https://img.shields.io/github/followers/masterfabric-mobile?style=social)](https://github.com/masterfabric-mobile)
+
+
+</div>
+</details>
+
+
+<table>
+  <tr>
+    <td align="center"><img width="200" alt="1" src="https://github.com/user-attachments/assets/ca526aa6-fc6c-45b5-bd33-a3358a2fde67" /></td>
+    <td align="center"><img width="200" alt="2" src="https://github.com/user-attachments/assets/8eb73bf4-3a3e-49ea-9d54-845cba87192b" /></td>
+    <td align="center"><img width="200" alt="3" src="https://github.com/user-attachments/assets/0b857820-6da0-4b08-be09-429e27797a1d" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="4" src="https://github.com/user-attachments/assets/37f77546-b957-42c2-add6-f337d1810cfc" /></td>
+    <td align="center"><img width="200" alt="5" src="https://github.com/user-attachments/assets/59c746f0-0b20-473e-b703-f373f58cfdfc" /></td>
+  </tr>
+</table>
+
+## 📄 License
+
+This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
+
+
+
+
+
+

@@ -85,7 +85,7 @@ class _BottomSheetExampleState extends State<BottomSheetExample> {
               // Custom Widget Example
               _buildExampleButton(
                 title: 'Components App',
-                description: 'Using OSMEA Components',
+                description: 'Using MasterFabric Components',
                 onPressed: () => _showWithOsmeaComponents(context),
                 color: OsmeaColors.purple,
               ),
@@ -408,7 +408,7 @@ class _BottomSheetExampleState extends State<BottomSheetExample> {
 
             // Title with OSMEA Text
             OsmeaComponents.text(
-              'OSMEA Components',
+              'MasterFabric Components',
               variant: OsmeaTextVariant.headlineMedium,
               color: OsmeaColors.nordicBlue,
             ),
@@ -417,7 +417,7 @@ class _BottomSheetExampleState extends State<BottomSheetExample> {
 
             // Subtitle
             OsmeaComponents.text(
-              'Created using OSMEA components',
+              'Created using MasterFabric components',
               variant: OsmeaTextVariant.bodyMedium,
               color: const Color(0xFF757575),
             ),

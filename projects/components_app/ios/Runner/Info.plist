@@ -87,8 +87,6 @@
 	<string>This app needs photo library access to save and share images from camera components.</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>This app needs reminders access to test reminder-related components and features.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This app needs tracking access to provide personalized experiences.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

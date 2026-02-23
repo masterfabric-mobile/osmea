@@ -59,7 +59,6 @@ post_install do |installer|
           'PERMISSION_CALENDAR=1',
           'PERMISSION_REMINDERS=1',
           'PERMISSION_NOTIFICATIONS=1',
-          'PERMISSION_USER_TRACKING=1',
           'PERMISSION_FACE_ID=1',
           'PERMISSION_MOTION=1',
           'PERMISSION_SPEECH_RECOGNIZER=1',

@@ -3,7 +3,7 @@ description: OSMEA Components App - A comprehensive Flutter showcase for OSMEA U
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: ">=2.17.0 <3.0.0"

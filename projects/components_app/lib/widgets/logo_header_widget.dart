@@ -49,7 +49,7 @@ class LogoHeaderWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: 8),
         OsmeaComponents.text(
-          'Access the complete OSMEA Components library',
+          'Access the complete MasterFabric Components library',
           textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
             color: OsmeaColors.slate,
           ),

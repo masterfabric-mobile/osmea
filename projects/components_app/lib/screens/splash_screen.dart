@@ -158,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: OsmeaComponents.column(
                   children: [
                     OsmeaComponents.text(
-                      'OSMEA',
+                      'MasterFabric Components',
                       variant: OsmeaTextVariant.headlineLarge,
                       color: OsmeaColors.black,
                       fontWeight: FontWeight.bold,

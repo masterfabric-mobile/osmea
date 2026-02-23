@@ -90,7 +90,7 @@ export default function RulesClaimsSection() {
           >
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-4">
               <img 
-                src="https://code.visualstudio.com/assets/images/code-stable.png" 
+                src="https://code.visualstudio.com/assets/branding/code-stable.png" 
                 alt="Visual Studio Code Logo" 
                 className="w-8 h-8"
               />
