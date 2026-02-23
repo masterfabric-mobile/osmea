@@ -263,9 +263,25 @@ Please follow Dart/Flutter style guidelines and update this README when adding o
 
 </details>
 
-
 <br>
+
+<table>
+  <tr>
+    <td align="center"><img width="200" alt="1" src="https://github.com/user-attachments/assets/163668b9-7261-41ef-a7d0-aab79f6e3a09" /></td>
+    <td align="center"><img width="200" alt="2" src="https://github.com/user-attachments/assets/3b6031bd-e196-44cd-a368-cb7d933540a7" /></td>
+    <td align="center"><img width="200" alt="3" src="https://github.com/user-attachments/assets/82b96acc-ab17-4003-93aa-d4be674d8412" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="200" alt="4" src="https://github.com/user-attachments/assets/8b1bb44b-b90c-4638-8603-0ebd75df529e" /></td>
+    <td align="center"><img width="200" alt="5" src="https://github.com/user-attachments/assets/7d49df2e-2488-4128-aa62-98e951b5bd60" /></td>
+    <td align="center"><img width="200" alt="6" src="https://github.com/user-attachments/assets/7d040f11-39cb-43d2-8fbd-1ce2ccba84cf" /></td>
+  </tr>
+</table>
+
 
 ## 📄 License
 
 This project is licensed under **GNU AGPL v3.0**. See the root `LICENSE` file in the repository.
+
+
+
