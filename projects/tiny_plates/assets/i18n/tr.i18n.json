@@ -1,0 +1,19 @@
+{
+  "@@locale": "tr",
+  "localLanguageCode": "tr_TR",
+  "appTitle": "Tiny Plates",
+  "home": "Ana Sayfa",
+  "homeTitle": "Tiny Plates",
+  "settings": "Ayarlar",
+  "save": "Kaydet",
+  "cancel": "İptal",
+  "loading": "Yükleniyor...",
+  "error": "Hata",
+  "retry": "Tekrar Dene",
+  "onboardingSkip": "Atla",
+  "onboardingPrevious": "Önceki",
+  "onboardingNext": "İleri",
+  "onboardingGetStarted": "Başla",
+  "onboardingNoPages": "Onboarding sayfası yok",
+  "onboardingLoadFailed": "Yüklenemedi"
+}

@@ -1,0 +1,14 @@
+base_locale: en
+fallback_strategy: base_locale
+
+input_directory: assets/i18n
+input_file_pattern: .i18n.json
+
+output_directory: lib/gen
+output_file_name: strings.g.dart
+
+translate_var: t
+enum_name: AppLocale
+class_name: Translations
+
+lazy: true

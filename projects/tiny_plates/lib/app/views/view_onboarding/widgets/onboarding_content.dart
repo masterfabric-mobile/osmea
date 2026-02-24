@@ -26,7 +26,7 @@ class OnboardingContent extends StatelessWidget {
     final primaryColor = colorFromHex(state.primaryColorHex, fallback: OsmeaColors.shark);
     final textColor = colorFromHex(state.textColorHex, fallback: OsmeaColors.shark);
     final loadingBgColor = colorFromHex(state.loadingBackgroundColorHex, fallback: OsmeaColors.white);
-    final descriptionColor = textColor.withOpacity(0.7);
+    final descriptionColor = textColor.withValues(alpha: 0.7);
 
     if (state.status == OnboardingStatus.loading) {
       return OsmeaComponents.container(
@@ -120,7 +120,7 @@ class OnboardingContent extends StatelessWidget {
             child: OsmeaComponents.text(
               t.onboardingSkip,
               variant: OsmeaTextVariant.bodySmall,
-              color: textColor.withOpacity(0.6),
+              color: textColor.withValues(alpha: 0.6),
               fontWeight: context.normal,
             ),
           ),
@@ -150,7 +150,7 @@ class OnboardingContent extends StatelessWidget {
           OsmeaComponents.text(
             '${state.currentPage + 1} of $pageCount',
             variant: OsmeaTextVariant.bodySmall,
-            color: textColor.withOpacity(0.5),
+            color: textColor.withValues(alpha: 0.5),
             fontWeight: context.medium,
           ),
         ],

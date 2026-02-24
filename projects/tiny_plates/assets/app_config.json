@@ -169,5 +169,16 @@
     "supported_languages": ["en", "tr"],
     "rtl_support": false,
     "auto_detect_language": true
+  },
+  "theme": {
+    "primaryColor": "#000000",
+    "backgroundColor": "#FFFFFF"
+  },
+  "features": {
+    "calorieTracking": true
+  },
+  "apiEndpoints": {
+    "aiRecipeGeneration": "https://api.smartrecipe.com/generate",
+    "nutrientDatabase": "https://api.smartrecipe.com/nutrients"
   }
 }

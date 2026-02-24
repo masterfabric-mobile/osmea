@@ -27,15 +27,12 @@ class $AssetsI18nGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
-  /// File path: assets/images/.gitkeep
-  String get aGitkeep => 'assets/images/.gitkeep';
-
-  /// File path: assets/images/app_icon.png
-  AssetGenImage get appIcon =>
-      const AssetGenImage('assets/images/app_icon.png');
+  /// File path: assets/images/app_icons.png
+  AssetGenImage get appIcons =>
+      const AssetGenImage('assets/images/app_icons.png');
 
   /// List of all assets
-  List<dynamic> get values => [aGitkeep, appIcon];
+  List<AssetGenImage> get values => [appIcons];
 }
 
 class Assets {
