@@ -7,5 +7,34 @@
   "supabase_configuration": {
     "url": "YOUR_SUPABASE_URL",
     "anon_key": "YOUR_SUPABASE_ANON_KEY"
+  },
+  "onboarding_configuration": {
+    "style": "basic",
+    "show_skip_button": true,
+    "show_page_indicator": true,
+    "animation_duration": 300,
+    "pages": [
+      {
+        "title": "Shared tasks, together",
+        "description": "Create groups, assign tasks, and get things done with family, roommates, or your team.",
+        "button_text": "Next",
+        "skip_text": "Skip",
+        "next_text": "Next"
+      },
+      {
+        "title": "Groups & leaderboard",
+        "description": "See who's contributing and celebrate progress with a simple leaderboard.",
+        "button_text": "Next",
+        "skip_text": "Skip",
+        "next_text": "Next"
+      },
+      {
+        "title": "Get started",
+        "description": "You're all set. Start by creating your first group or joining an existing one.",
+        "button_text": "Get started",
+        "skip_text": "Skip",
+        "next_text": "Next"
+      }
+    ]
   }
 }
