@@ -294,7 +294,7 @@ class _LocalNotificationHelperExampleState
         ),
         _buildActionButton(
           title: 'Schedule in 1 Minute',
-          description: 'Test scheduling functionality',
+          description: 'Verify scheduling functionality',
           icon: Icons.timer,
           onPressed: _scheduleNotificationIn1Minute,
         ),
@@ -564,7 +564,7 @@ class _LocalNotificationHelperExampleState
     await NotificationHelper.scheduleRepeatingNotification(
       id: _notificationCounter++,
       title: 'Daily Reminder',
-      body: 'This is your daily reminder from OSMEA Components App',
+      body: 'This is your daily reminder from MasterFabric Components App',
       repeatInterval: RepeatInterval.daily,
       payload: 'daily_reminder',
       importance: NotificationImportance.defaultImportance,
@@ -581,7 +581,7 @@ class _LocalNotificationHelperExampleState
           'notification feature. When the user expands this notification, they will be able '
           'to read this entire message. This is perfect for articles, detailed messages, '
           'or any content that needs more space than a regular notification can provide. '
-          'The OSMEA notification helper makes it easy to create these rich experiences.',
+          'The MasterFabrica notification helper makes it easy to create these rich experiences.',
       payload: 'big_text',
       checkPermissions: true, // Check permissions before showing big text notification
     );

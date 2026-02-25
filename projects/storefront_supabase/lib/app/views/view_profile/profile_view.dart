@@ -116,7 +116,30 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                 ],
               );
             }
-            return AppBar(toolbarHeight: 0);
+            // Unauthenticated: app bar title from config
+            final theme = Theme.of(context);
+            final configHelper = AssetConfigHelper();
+            final showLogin = state is ProfileUnauthenticated && state.showLoginView;
+            final title = showLogin
+                ? configHelper.getString('auth_configuration.sign_in.app_bar_title', 'Sign In')
+                : configHelper.getString('auth_configuration.sign_up.app_bar_title', 'Sign Up');
+            return OsmeaComponents.appBar(
+              title: OsmeaComponents.text(
+                title,
+                textStyle: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.black,
+                ),
+              ),
+              backgroundColor: OsmeaColors.white,
+              foregroundColor: OsmeaColors.black,
+              elevation: 0,
+              leading: OsmeaComponents.iconButton(
+                onPressed: () => context.go('/home'),
+                icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
+                backgroundColor: OsmeaColors.transparent,
+              ),
+            );
           },
         );
 
@@ -168,7 +191,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
                 child: OsmeaComponents.column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const LogoHeaderWidget(),
+                    LogoHeaderWidget(isSignUp: !state.showLoginView),
                     if (state.errorMessage != null) ...[
                       OsmeaComponents.text(
                         state.errorMessage!,

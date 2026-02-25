@@ -13,10 +13,12 @@ val keystorePropertiesFile = rootProject.file("masterfabric_store.properties")
 val hasKeystore = keystorePropertiesFile.exists().also {
     if (it) keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
-val hasReleaseSigning = hasKeystore &&
-    keystoreProperties.getProperty("keyAlias") != null &&
-    keystoreProperties.getProperty("keyPassword") != null &&
-    keystoreProperties.getProperty("storePassword") != null
+val isReleaseBuildRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName.contains("release", ignoreCase = true)
+}
+if (isReleaseBuildRequested && !keystorePropertiesFile.exists()) {
+    throw GradleException("Missing masterfabric_store.properties (required for Play Store / release signing).")
+}
 
 android {
     namespace = "com.masterfabric.storefrontSupabase"
@@ -45,13 +47,13 @@ android {
         multiDexEnabled = true
     }
 
-    if (hasReleaseSigning) {
-        signingConfigs {
-            create("release") {
-                keyAlias = keystoreProperties.getProperty("keyAlias")!!
-                keyPassword = keystoreProperties.getProperty("keyPassword")!!
-                storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
-                storePassword = keystoreProperties.getProperty("storePassword")!!
+    signingConfigs {
+        create("release"){
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"] as String
             }
         }
     }
@@ -62,10 +64,12 @@ android {
             dimension = "env"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Storefront Supabase Dev")
         }
         create("prod") {
             dimension = "env"
-            versionNameSuffix = "-prod"
+            // Play Store should not ship a "-prod" suffix
+            resValue("string", "app_name", "Storefront Supabase")
         }
     }
 

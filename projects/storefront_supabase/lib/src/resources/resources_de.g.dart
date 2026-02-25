@@ -300,6 +300,22 @@ class TranslationsDe with BaseTranslations<AppLocale, Translations> implements T
 	@override String get deleteMyAccount => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Mein Konto löschen';
 	@override String get deleteAccountSuccess => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Kontolöschung wurde geplant. Ihr Konto wird in 30 Tagen entfernt. Sie können sich vorher anmelden, um abzubrechen.';
 	@override String get deleteAccountFailed => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Kontolöschung konnte nicht geplant werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.';
+	@override String get selectAddress => TranslationOverrides.string(_root.$meta, 'selectAddress', {}) ?? 'Adresse auswählen';
+	@override String get addNewAddress => TranslationOverrides.string(_root.$meta, 'addNewAddress', {}) ?? 'Neue Adresse hinzufügen';
+	@override String get billingAddress => TranslationOverrides.string(_root.$meta, 'billingAddress', {}) ?? 'Rechnungsadresse';
+	@override String get newAddress => TranslationOverrides.string(_root.$meta, 'newAddress', {}) ?? 'Neue Adresse';
+	@override String get defaultAddress => TranslationOverrides.string(_root.$meta, 'defaultAddress', {}) ?? 'Standard';
+	@override String get addressAdded => TranslationOverrides.string(_root.$meta, 'addressAdded', {}) ?? 'Adresse erfolgreich hinzugefügt!';
+	@override String get addressDeleted => TranslationOverrides.string(_root.$meta, 'addressDeleted', {}) ?? 'Adresse erfolgreich gelöscht!';
+	@override String get defaultAddressSet => TranslationOverrides.string(_root.$meta, 'defaultAddressSet', {}) ?? 'Standardadresse erfolgreich gesetzt!';
+	@override String get addressLabelHint => TranslationOverrides.string(_root.$meta, 'addressLabelHint', {}) ?? 'z. B. Zuhause, Büro';
+	@override String get confirmDeleteAddress => TranslationOverrides.string(_root.$meta, 'confirmDeleteAddress', {}) ?? 'Möchten Sie diese Adresse wirklich löschen?';
+	@override String get optional => TranslationOverrides.string(_root.$meta, 'optional', {}) ?? 'Optional';
+	@override String get setAsDefault => TranslationOverrides.string(_root.$meta, 'setAsDefault', {}) ?? 'Als Standard festlegen';
+	@override String get editAddress => TranslationOverrides.string(_root.$meta, 'editAddress', {}) ?? 'Adresse bearbeiten';
+	@override String get addAddress => TranslationOverrides.string(_root.$meta, 'addAddress', {}) ?? 'Adresse hinzufügen';
+	@override String get errorOccurred => TranslationOverrides.string(_root.$meta, 'errorOccurred', {}) ?? 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+	@override String get delete => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Löschen';
 }
 
 /// The flat map containing all translations for locale <de>.
@@ -572,6 +588,22 @@ extension on TranslationsDe {
 			'deleteMyAccount' => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Mein Konto löschen',
 			'deleteAccountSuccess' => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Kontolöschung wurde geplant. Ihr Konto wird in 30 Tagen entfernt. Sie können sich vorher anmelden, um abzubrechen.',
 			'deleteAccountFailed' => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Kontolöschung konnte nicht geplant werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.',
+			'selectAddress' => TranslationOverrides.string(_root.$meta, 'selectAddress', {}) ?? 'Adresse auswählen',
+			'addNewAddress' => TranslationOverrides.string(_root.$meta, 'addNewAddress', {}) ?? 'Neue Adresse hinzufügen',
+			'billingAddress' => TranslationOverrides.string(_root.$meta, 'billingAddress', {}) ?? 'Rechnungsadresse',
+			'newAddress' => TranslationOverrides.string(_root.$meta, 'newAddress', {}) ?? 'Neue Adresse',
+			'defaultAddress' => TranslationOverrides.string(_root.$meta, 'defaultAddress', {}) ?? 'Standard',
+			'addressAdded' => TranslationOverrides.string(_root.$meta, 'addressAdded', {}) ?? 'Adresse erfolgreich hinzugefügt!',
+			'addressDeleted' => TranslationOverrides.string(_root.$meta, 'addressDeleted', {}) ?? 'Adresse erfolgreich gelöscht!',
+			'defaultAddressSet' => TranslationOverrides.string(_root.$meta, 'defaultAddressSet', {}) ?? 'Standardadresse erfolgreich gesetzt!',
+			'addressLabelHint' => TranslationOverrides.string(_root.$meta, 'addressLabelHint', {}) ?? 'z. B. Zuhause, Büro',
+			'confirmDeleteAddress' => TranslationOverrides.string(_root.$meta, 'confirmDeleteAddress', {}) ?? 'Möchten Sie diese Adresse wirklich löschen?',
+			'optional' => TranslationOverrides.string(_root.$meta, 'optional', {}) ?? 'Optional',
+			'setAsDefault' => TranslationOverrides.string(_root.$meta, 'setAsDefault', {}) ?? 'Als Standard festlegen',
+			'editAddress' => TranslationOverrides.string(_root.$meta, 'editAddress', {}) ?? 'Adresse bearbeiten',
+			'addAddress' => TranslationOverrides.string(_root.$meta, 'addAddress', {}) ?? 'Adresse hinzufügen',
+			'errorOccurred' => TranslationOverrides.string(_root.$meta, 'errorOccurred', {}) ?? 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
+			'delete' => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Löschen',
 			_ => null,
 		};
 	}

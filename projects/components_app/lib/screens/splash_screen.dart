@@ -87,36 +87,33 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 500));
     _fadeController.forward();
 
-    // Check onboarding status and navigate accordingly
+    // Onboarding disabled for now: always go to main screen
     await Future.delayed(const Duration(milliseconds: 2000));
-    await _checkOnboardingAndNavigate();
+    if (mounted) context.go('/');
+
+    // --- Onboarding (commented out for now) ---
+    // await _checkOnboardingAndNavigate();
   }
 
+  // ignore: unused_element
   Future<void> _checkOnboardingAndNavigate() async {
-    try {
-      final onboardingHelper = OnboardingStorageHelper();
-      final hasSeenOnboarding = await onboardingHelper.hasSeenOnboarding();
-      
-      debugPrint('📱 Onboarding status: ${hasSeenOnboarding ? "Seen" : "Not seen"}');
-      
-      if (mounted) {
-        if (hasSeenOnboarding) {
-          // User has seen onboarding before, go directly to main screen
-          debugPrint('🚀 Navigating to main screen (onboarding already seen)');
-          context.go('/');
-        } else {
-          // User hasn't seen onboarding, show onboarding screen
-          debugPrint('📚 Navigating to onboarding screen');
-          context.go('/intro');
-        }
-      }
-    } catch (e) {
-      debugPrint('❌ Error checking onboarding status: $e');
-      // Fallback to onboarding screen if there's an error
-      if (mounted) {
-        context.go('/intro');
-      }
-    }
+    // try {
+    //   final prefs = await OnboardingPrefs.instance;
+    //   final hasSeenOnboarding = await prefs.hasSeenOnboarding();
+    //   debugPrint('📱 Onboarding status: ${hasSeenOnboarding ? "Seen" : "Not seen"}');
+    //   if (mounted) {
+    //     if (hasSeenOnboarding) {
+    //       debugPrint('🚀 Navigating to main screen (onboarding already seen)');
+    //       context.go('/');
+    //     } else {
+    //       debugPrint('📚 Navigating to onboarding screen');
+    //       context.go('/intro');
+    //     }
+    //   }
+    // } catch (e) {
+    //   debugPrint('❌ Error checking onboarding status: $e');
+    //   if (mounted) context.go('/intro');
+    // }
   }
 
   @override
@@ -161,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: OsmeaComponents.column(
                   children: [
                     OsmeaComponents.text(
-                      'OSMEA',
+                      'MasterFabric Components',
                       variant: OsmeaTextVariant.headlineLarge,
                       color: OsmeaColors.black,
                       fontWeight: FontWeight.bold,

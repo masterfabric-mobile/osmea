@@ -1,0 +1,6 @@
+base_locale: en
+input_directory: assets/i18n
+output_directory: lib/core/resources
+translate_var: resource
+output_file_name: resources.g.dart
+translation_overrides: true

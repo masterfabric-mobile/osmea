@@ -1,0 +1,173 @@
+{
+  "app_settings": {
+    "app_name": "MasterFabric SubServe",
+    "app_version": "1.0.0",
+    "build_number": "1",
+    "environment": "production",
+    "debug_mode": false,
+    "maintenance_mode": false
+  },
+  "appSettings": {
+    "appName": "MasterFabric SubServe",
+    "environment": "dev",
+    "debugMode": false,
+    "maintenanceMode": false
+  },
+  "api_configuration": {
+    "base_url": "https://api.example.com/subserve",
+    "timeout_seconds": 30,
+    "retry_count": 3,
+    "enable_logging": true
+  },
+  "supabase_configuration": {
+    "url": "",
+    "anon_key": ""
+  },
+  "ui_configuration": {
+    "theme_mode": "light",
+    "primary_color": "#000000",
+    "accent_color": "#FFFFFF",
+    "font_scale": 1,
+    "enable_haptic_feedback": true
+  },
+  "uiConfiguration": {
+    "themeMode": "light",
+    "fontScale": 1,
+    "showPerformanceOverlay": false,
+    "devModeGrid": false,
+    "devModeSpacer": false
+  },
+  "storage_configuration": {
+    "localStorageType": "sharedPreferences",
+    "enable_encryption": false,
+    "cache_duration_days": 7,
+    "max_cache_size_mb": 50
+  },
+  "storageConfiguration": {
+    "localStorageType": "sharedPreferences",
+    "enableEncryption": false,
+    "cacheDurationDays": 7,
+    "maxCacheSizeMb": 50
+  },
+  "feature_flags": {
+    "onboarding_enabled": true,
+    "dark_mode_available": true,
+    "analytics_opt_out_available": true
+  },
+  "featureFlags": {
+    "onboardingEnabled": true
+  },
+  "onboarding_config_url": "",
+  "splash_configuration": {
+    "style": "space",
+    "enabled": true,
+    "duration_seconds": 2,
+    "duration_milliseconds": 2000,
+    "min_duration_milliseconds": 1000,
+    "logo_url": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-21.55.23.jpeg",
+    "logo_width": 200,
+    "logo_height": 200,
+    "background_color": "#FFFFFF",
+    "text_color": "#000000",
+    "primary_color": "#000000",
+    "show_loading_indicator": true,
+    "loading_indicator_color": "#000000",
+    "loading_text": "Loading...",
+    "show_version_info": true,
+    "show_app_version": true,
+    "app_name": "MasterFabric SubServe",
+    "app_version": "1.0.0",
+    "show_copyright": true,
+    "copyright_text": "© 2025 MasterFabric",
+    "navigation_target": "/home",
+    "fallback_navigation_target": "/home",
+    "auto_navigate": true,
+    "animation_duration": 300
+  },
+  "splashConfiguration": {
+    "style": "startup",
+    "enabled": true,
+    "duration": 2000,
+    "durationMilliseconds": 2000,
+    "minDurationMilliseconds": 1000,
+    "logoUrl": "https://masterfabric.store/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-16-at-21.55.23.jpeg",
+    "logoWidth": 200,
+    "logoHeight": 200,
+    "backgroundColor": "#FFFFFF",
+    "textColor": "#000000",
+    "primaryColor": "#000000",
+    "showLoadingIndicator": true,
+    "loadingIndicatorColor": "#000000",
+    "loadingText": "Loading...",
+    "loadingIndicatorSize": 40,
+    "showVersionInfo": true,
+    "showAppVersion": true,
+    "appVersion": "1.0.0",
+    "showCopyright": true,
+    "copyrightText": "© 2025 MasterFabric",
+    "navigationTarget": "/home",
+    "fallbackNavigationTarget": "/home",
+    "autoNavigate": true
+  },
+  "onboarding_configuration": {
+    "style": "space",
+    "auto_advance_seconds": null,
+    "show_skip_button": true,
+    "show_page_indicator": true,
+    "animation_duration": 400,
+    "primary_color": "#000000",
+    "secondary_color": "#FFFFFF",
+    "loading_background_color": "#FFFFFF",
+    "text_color": "#000000",
+    "padding_horizontal": 20,
+    "padding_vertical": 24,
+    "pages": [
+      {
+        "title": "Welcome to SubServe",
+        "description": "Manage your subscriptions and services in one place.",
+        "text_color": "#000000"
+      },
+      {
+        "title": "Stay in control",
+        "description": "Track renewals, get reminders and never miss a payment.",
+        "text_color": "#000000"
+      },
+      {
+        "title": "You're all set",
+        "description": "Start exploring and manage your subscriptions with ease.",
+        "text_color": "#000000"
+      }
+    ]
+  },
+  "onboardingConfiguration": {
+    "style": "space",
+    "showSkipButton": true,
+    "showPageIndicator": true,
+    "animationDuration": 400,
+    "primaryColor": "#000000",
+    "secondaryColor": "#FFFFFF",
+    "pages": [
+      {
+        "title": "Welcome to SubServe",
+        "description": "Manage your subscriptions and services in one place.",
+        "text_color": "#000000"
+      },
+      {
+        "title": "Stay in control",
+        "description": "Track renewals, get reminders and never miss a payment.",
+        "text_color": "#000000"
+      },
+      {
+        "title": "You're all set",
+        "description": "Start exploring and manage your subscriptions with ease.",
+        "text_color": "#000000"
+      }
+    ]
+  },
+  "localization_configuration": {
+    "default_language": "en",
+    "supported_languages": ["en", "tr"],
+    "rtl_support": false,
+    "auto_detect_language": true
+  }
+}

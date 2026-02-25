@@ -1,6 +1,6 @@
 {
     "app_settings": {
-      "app_name": "Storefront Supabase",
+      "app_name": "MasterFabric S Store",
       "app_version": "1.0.0",
       "build_number": "1",
       "environment": "production",
@@ -55,7 +55,7 @@
       "onboarding_enabled": true,
       "dark_mode_available": true,
       "offline_mode_enabled": true,
-      "beta_features_enabled": false,
+      "advanced_features_enabled": false,
       "analytics_opt_out_available": true
 
     },
@@ -110,8 +110,8 @@
       "secondary_color": "#FFFFFF",
       "pages": [
         {
-          "title": "Storefront Supabase",
-          "description": "Stay updated with the latest Storefront Supabase security news and alerts.",
+          "title": "MasterFabric S Store",
+          "description": "Stay updated with the latest Masterfabric S Store security news and alerts.",
           "icon_path": null,
           "image_path": null,
           "background_color": "#FFFFFF",
@@ -121,7 +121,7 @@
           "next_text": "Next"
         },
         {
-          "title": "Real-time Storefront Supabase Monitoring",
+          "title": "Real-time Masterfabric S Store Monitoring",
           "description": "Get instant notifications about new storefront supabase and security threats as they are discovered.",
           "icon_path": null,
           "image_path": null,
@@ -271,7 +271,9 @@
         }
       },
       "sign_in": {
-        "app_name": "Storefront",
+        "app_name": "MasterFabric S Store",
+        "app_bar_title": "Sign In",
+        "welcome_title": "Welcome to Masterfabric S Store",
         "tab_sign_in": "Sign In",
         "tab_sign_up": "Sign Up",
         "email_label": "Email",
@@ -287,7 +289,9 @@
         "logo_height": 120
       },
       "sign_up": {
-        "app_name": "Storefront",
+        "app_name": "MasterFabric S Store",
+        "app_bar_title": "Sign Up",
+        "welcome_title": "Welcome to Masterfabric S Store",
         "tab_sign_in": "Sign In",
         "tab_sign_up": "Sign Up",
         "email_label": "Email",
@@ -345,7 +349,7 @@
     "home_view": {
       "app_bar": {
         "title_source": "app_settings.app_name",
-        "fallback_title": "Storefront Supabase",
+        "fallback_title": "MasterFabric S Store",
         "backgroundColor": "#FFFFFF",
         "foregroundColor": "#000000",
         "titleColor": "#000000",
@@ -363,7 +367,7 @@
       "scrolling_banner": {
         "enabled": true,
         "order_id": 0,
-        "text": "Storefront Supabase is an open source project • Explore our code and contribute on GitHub",
+        "text": "MasterFabric S Store • Explore our code and contribute on GitHub",
         "link": "https://github.com/masterfabric-mobile/osmea",
         "background_color": "#000000",
         "text_color": "#FFFFFF",

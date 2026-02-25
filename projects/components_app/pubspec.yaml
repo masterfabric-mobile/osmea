@@ -3,7 +3,7 @@ description: OSMEA Components App - A comprehensive Flutter showcase for OSMEA U
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -24,14 +24,7 @@ dependencies:
   http: ^1.1.0                     # HTTP client for API calls
   go_router: ^15.1.3               # Declarative routing solution
   device_frame: ^1.2.0             # Device frame for web preview
-  share_plus: ^10.1.4              # Sharing utilities used by ApplicationShareHelper via core
 
-  # Device features (camera/files)
-  camera: ^0.10.5+2 # for testing only
-  path_provider: ^2.0.15 # for testing only
-  google_maps_flutter: ^2.6.1
-  geolocator: ^12.0.0
-  geocoding: ^2.0.6    
   # ────────────────────────────────
   # LOCAL OSMEA PACKAGES
   # ────────────────────────────────
@@ -49,20 +42,17 @@ dev_dependencies:
   flutter_lints: ^2.0.0            # Code quality and linting rules
   flutter_launcher_icons: "^0.14.4" # App icon generation
 
-# ────────────────────────────────
-# DEPENDENCY OVERRIDES
-# ────────────────────────────────
-dependency_overrides:
-  osmea_components:
-    path: ../../packages/components # Override git dependency with local path
 
 # ────────────────────────────────
 # FLUTTER LAUNCHER ICONS CONFIG
 # ────────────────────────────────
 flutter_launcher_icons:
+  android: true                    # Generate Android app icons
   ios: true                        # Generate iOS app icons
   image_path: "assets/images/app_icon.png"  # Source icon path
   remove_alpha_ios: true           # Remove alpha channel for iOS
+  adaptive_icon_background: "#FFFFFF"  # Android adaptive icon background
+  adaptive_icon_foreground: "assets/images/app_icon.png"  # Android adaptive icon foreground
 
 # ────────────────────────────────
 # FLUTTER CONFIGURATION

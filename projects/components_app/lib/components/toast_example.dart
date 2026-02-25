@@ -4,7 +4,7 @@ import 'dart:math';
 
 import '../widgets/common_appbar.dart';
 
-// Modern Toast Example Page
+// Toast Component Page
 class ToastExample extends StatefulWidget {
   const ToastExample({super.key});
 
@@ -61,15 +61,15 @@ class _ToastExampleState extends State<ToastExample> {
   ];
   static const List<String> _randomMessages = [
     'This is a random toast message.',
-    'Another sample message.',
+    'Another message.',
     'Toast close order verification.',
     'Stacking enabled status.',
     'Stacking disabled status.',
-    'Toast notification sample.',
+    'Toast notification.',
     'A different notification.',
     'Animation verification.',
     'Close order observation.',
-    'Sample notification message.',
+    'Notification message.',
   ];
   final Random _random = Random();
 

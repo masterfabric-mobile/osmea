@@ -1,0 +1,68 @@
+---
+description: OSMEA APIs - Dio, Shopify, WooCommerce, error handling, retry, auth
+globs: "packages/apis/**/*.dart", "**/dio_config/**/*.dart", "**/network/**/*.dart"
+alwaysApply: false
+---
+
+# OSMEA APIs - Cursor Rules
+
+## 📦 Package Overview
+OSMEA APIs is a robust network layer for handling RESTful API requests and responses with Shopify integration.
+
+## 🎯 Development Guidelines
+
+### 📁 File Structure
+```
+lib/
+├── src/
+│   ├── di/config/
+│   ├── dio_config/         # ApiDioClient, interceptors, logger
+│   ├── helpers/
+│   └── network/remote/
+│       ├── shopify/storefront/ & admin/
+│       └── woocommerce/
+```
+
+### 🌐 API Development Rules
+
+#### 1. Service Structure
+- Use `@injectable` for services
+- Inject ApiDioClient and logger
+- Return `ApiResponse<T>` with success/error
+
+#### 2. Response Handling
+- Use ApiResponse.success(data) and ApiResponse.error(ApiException)
+- Factory fromJson with proper error handling
+
+#### 3. Error Handling
+- ApiException with message, statusCode, errorCode, details
+- Factory ApiException.fromError for DioException
+
+### 🔧 Dio Configuration Rules
+- BaseOptions: baseUrl, timeouts, headers
+- Add interceptors: ApiInterceptorDefault, LogInterceptor
+- Implement auth header and request ID in interceptor
+
+### 🛒 Shopify Integration Rules
+- Storefront API: GraphQL queries for products, cart, checkout, etc.
+- Admin API: REST for orders, products, inventory
+
+### 🌐 WooCommerce Integration Rules
+- REST API with consumer key/secret
+- Use query parameters for pagination and filters
+
+### 🔄 Retry Logic Rules
+- Retry on connection/receive timeout, 5xx status
+- Configurable maxRetries and retryDelay
+
+### 🔐 Authentication Rules
+- TokenManager for access/refresh tokens; save in SharedPreferences
+- Clear tokens on logout; implement refresh flow
+
+### 🔍 Code Review Checklist
+- [ ] API services follow established patterns
+- [ ] Error handling is comprehensive
+- [ ] Retry logic is implemented
+- [ ] Authentication is secure
+- [ ] Logging is appropriate
+- [ ] Tests and documentation are complete

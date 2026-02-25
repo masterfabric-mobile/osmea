@@ -110,6 +110,96 @@
       "args": ["--flavor", "prod"]
     },
     {
+      "name": "📦 SubServe - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "📦 SubServe - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "📦 SubServe - Staging (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_staging.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "debug",
+      "args": ["--flavor", "staging"]
+    },
+    {
+      "name": "📦 SubServe - Staging (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_staging.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "release",
+      "args": ["--flavor", "staging"]
+    },
+    {
+      "name": "📦 SubServe - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "📦 SubServe - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/sub_serve/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/sub_serve",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🍽️ Tiny Plates - Dev (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/tiny_plates/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/tiny_plates",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🍽️ Tiny Plates - Dev (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/tiny_plates/lib/flavors/main_dev.dart",
+      "cwd": "${workspaceFolder}/projects/tiny_plates",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "🍽️ Tiny Plates - Prod (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/tiny_plates/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/tiny_plates",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "🍽️ Tiny Plates - Prod (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/projects/tiny_plates/lib/flavors/main_prod.dart",
+      "cwd": "${workspaceFolder}/projects/tiny_plates",
+      "flutterMode": "release",
+      "args": ["--flavor", "prod"]
+    },
+    {
       "name": "🔍 API Explorer - Run",
       "type": "dart",
       "request": "launch",
@@ -137,7 +227,8 @@
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
-      "cwd": "${workspaceFolder}/projects/components_app"
+      "cwd": "${workspaceFolder}/projects/components_app",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "🧩 Components App - Debug",
@@ -145,7 +236,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
       "cwd": "${workspaceFolder}/projects/components_app",
-      "flutterMode": "debug"
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "🧩 Components App - Release",
@@ -153,7 +245,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/projects/components_app/lib/main.dart",
       "cwd": "${workspaceFolder}/projects/components_app",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "📚 Storybook - Run",

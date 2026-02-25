@@ -84,7 +84,7 @@ class _BadgeExampleState extends State<BadgeExample> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OsmeaComponents.text(
-            '🏷️ OSMEA Badge Component',
+            '🏷️ MasterFabric Badge Component',
             textStyle: OsmeaTextStyle.headlineMedium(context).copyWith(
               fontSize: 24,
               fontWeight: FontWeight.bold,

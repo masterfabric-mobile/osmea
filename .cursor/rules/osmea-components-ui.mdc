@@ -1,0 +1,195 @@
+---
+description: OSMEA UI components - 50+ components, structure, naming, responsive and accessibility
+globs: "packages/components/**/*.dart"
+alwaysApply: false
+---
+
+# OSMEA Components - Cursor Rules
+
+## 📦 Package Overview
+OSMEA Components is a comprehensive UI component library for building beautiful Flutter applications with 50+ components.
+
+## 🎯 Development Guidelines
+
+### 📁 File Structure
+```
+lib/
+├── src/
+│   ├── components/          # UI Components
+│   │   ├── align/          # Alignment components
+│   │   ├── appbar/         # App bar components
+│   │   ├── avatar/         # Avatar components
+│   │   ├── badge/          # Badge components
+│   │   ├── button/         # Button components
+│   │   ├── card/           # Card components
+│   │   ├── chip/           # Chip components
+│   │   ├── container/      # Container components
+│   │   ├── divider/        # Divider components
+│   │   ├── dropdown/       # Dropdown components
+│   │   ├── form/           # Form components
+│   │   ├── grid/           # Grid components
+│   │   ├── icon/           # Icon components
+│   │   ├── image/          # Image components
+│   │   ├── input/          # Input components
+│   │   ├── list/           # List components
+│   │   ├── loading/        # Loading components
+│   │   ├── modal/          # Modal components
+│   │   ├── navigation/     # Navigation components
+│   │   ├── progress/       # Progress components
+│   │   ├── search/         # Search components
+│   │   ├── select/         # Select components
+│   │   ├── slider/         # Slider components
+│   │   ├── switch/         # Switch components
+│   │   ├── table/          # Table components
+│   │   ├── text/           # Text components
+│   │   ├── toast/          # Toast components
+│   │   └── tooltip/        # Tooltip components
+│   ├── core/               # Core utilities
+│   ├── enums/              # Enumerations
+│   ├── styles/             # Styling utilities
+│   ├── theme/              # Theme configuration
+│   └── utils/              # Utility functions
+```
+
+### 🎨 Component Development Rules
+
+#### 1. Component Structure
+- Every component must have a dedicated folder in `lib/src/components/`
+- Component folder should contain:
+  - `component_name.dart` - Main component file
+  - `component_name_theme.dart` - Theme configuration (if needed)
+  - `component_name_types.dart` - Type definitions (if needed)
+
+#### 2. Naming Conventions
+- **Files**: Use snake_case (e.g., `beautiful_button.dart`)
+- **Classes**: Use PascalCase (e.g., `BeautifulButton`)
+- **Variables**: Use camelCase (e.g., `buttonText`)
+- **Constants**: Use SCREAMING_SNAKE_CASE (e.g., `DEFAULT_BUTTON_HEIGHT`)
+
+#### 3. Component Implementation
+```dart
+// ✅ Good Example
+class BeautifulButton extends StatelessWidget {
+  const BeautifulButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.variant = ButtonVariant.primary,
+    this.size = ButtonSize.medium,
+    this.isLoading = false,
+  });
+
+  final String text;
+  final VoidCallback? onPressed;
+  final ButtonVariant variant;
+  final ButtonSize size;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    // Implementation
+  }
+}
+```
+
+#### 4. Responsive Design
+- All components must be responsive
+- Use `Sizer` extensions for responsive sizing
+- Support iPhone SE (375px) and smaller screens
+- Implement mobile-first approach
+
+#### 5. Accessibility
+- Include semantic labels
+- Support screen readers
+- Provide keyboard navigation
+- Use proper contrast ratios
+
+#### 6. Theming
+- Support light and dark themes
+- Use OSMEA design tokens
+- Implement consistent spacing and typography
+- Follow brand color guidelines
+
+### 🔧 Code Quality Standards
+
+#### 1. Documentation
+- Every public class must have documentation
+- Include usage examples
+- Document all parameters
+- Add code examples
+
+#### 2. Testing
+- Write unit tests for all components
+- Include widget tests
+- Test different variants and states
+- Test accessibility features
+
+#### 3. Performance
+- Use const constructors where possible
+- Implement proper widget keys
+- Optimize rebuilds
+- Use efficient animations
+
+### 📱 Mobile-First Approach
+
+#### 1. Responsive Breakpoints
+```dart
+// Use these breakpoints consistently
+static const double mobileBreakpoint = 375.0;  // iPhone SE
+static const double tabletBreakpoint = 768.0;
+static const double desktopBreakpoint = 1024.0;
+```
+
+#### 2. Touch Targets
+- Minimum 44x44 points for touch targets
+- Adequate spacing between interactive elements
+- Support for different screen densities
+
+### 🎯 Component Categories
+
+#### Basic Components
+- Buttons, Text, Badges, Avatars, Cards, Chips
+- Focus on simplicity and reusability
+
+#### Form Components
+- Input fields, Checkboxes, Radio buttons, Switches, Dropdowns
+- Include validation states and error handling
+
+#### Layout Components
+- Containers, Grid system, Spacing, Alignment
+- Support flexible layouts and responsive design
+
+#### Navigation Components
+- App bars, Navigation bars, Tab bars, Bottom sheets
+- Follow platform-specific guidelines
+
+#### Dynamic Components
+- Loading indicators, Toast notifications, Progress bars
+- Include smooth animations and transitions
+
+### 🚀 Best Practices
+
+1. **Consistency**: Follow established patterns and conventions
+2. **Reusability**: Design components to be flexible and reusable
+3. **Performance**: Optimize for smooth animations and fast rendering
+4. **Documentation**: Provide clear documentation and examples
+5. **Testing**: Write comprehensive tests for all components
+
+### 🔍 Code Review Checklist
+
+- [ ] Component follows naming conventions
+- [ ] Responsive design implemented
+- [ ] Accessibility features included
+- [ ] Documentation is complete
+- [ ] Tests are written
+- [ ] Performance is optimized
+- [ ] Theme support is implemented
+- [ ] Error handling is proper
+- [ ] Code is clean and readable
+
+### 📚 Resources
+
+- [Flutter Widget Catalog](https://docs.flutter.dev/development/ui/widgets)
+- [Material Design Guidelines](https://material.io/design)
+- [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
+- [OSMEA Design System](https://github.com/masterfabric-mobile/osmea/tree/dev/docs)

@@ -875,9 +875,9 @@ class _CardExampleState extends State<CardExample> {
           subtitle: '\$29.99/month • First 7 days free',
           content:
               '✨ Premium components\n🚀 Priority support\n📊 Advanced analytics\n🎨 Custom themes\n📱 Multi-platform access',
-          primaryAction: 'Start Free Trial',
+          primaryAction: 'Get Started',
           secondaryAction: 'Learn More',
-          onPrimaryPressed: () => _showSnackBar('🎉 Free trial started!'),
+          onPrimaryPressed: () => _showSnackBar('🎉 Started!'),
           onSecondaryPressed: () => _showSnackBar('More info requested'),
           primaryVariant: ButtonVariant.primary,
           secondaryVariant: ButtonVariant.ghost,

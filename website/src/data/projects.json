@@ -1,0 +1,85 @@
+{
+  "title": "OSMEA Projects",
+  "description": "Live projects from the workspace – production-ready Flutter applications",
+  "items": [
+    {
+      "id": "admin-dashboard",
+      "emoji": "📊",
+      "title": "Admin Dashboard",
+      "description": "Ecommerce Admin Dashboard App - A modern Flutter application for managing products, orders, and analytics with modular architecture.",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/admin_dashboard"
+    },
+    {
+      "id": "api-explorer",
+      "emoji": "🔌",
+      "title": "Api Explorer",
+      "description": "Modern API explorer application with wizard-based configuration system for Shopify and WooCommerce integrations. Features SQLite database storage and interactive setup wizard.",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/api_explorer",
+      "appStoreMacUrl": "https://apps.apple.com/tr/app/mf-api-explorer/id6752110806?l=tr&mt=12"
+    },
+    {
+      "id": "components-app",
+      "emoji": "🎨",
+      "title": "Components App",
+      "description": "OSMEA Components App - A comprehensive Flutter showcase for OSMEA UI components",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/components_app"
+    },
+    {
+      "id": "storefront-supabase",
+      "emoji": "🛍️",
+      "title": "Storefront Supabase",
+      "description": "Ecommerce Storefront App - Modern Flutter-based storefront application for Supabase with BLoC state management, localization support, and responsive design",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/storefront_supabase",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.masterfabric.storefrontSupabase",
+      "appStoreUrl": "https://apps.apple.com/tr/app/masterfabric-s-store/id6758958857?l=tr"
+    },
+    {
+      "id": "storefront-woo",
+      "emoji": "🛒",
+      "title": "Storefront WooCommerce",
+      "description": "Ecommerce Storefront App - Modern Flutter-based storefront application for WooCommerce with BLoC state management, localization support, and responsive design",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/storefront_woo",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.masterfabric.storefront",
+      "appStoreUrl": "https://apps.apple.com/tr/app/masterfabric-store/id6757819630?l=tr"
+    },
+    {
+      "id": "storybook",
+      "emoji": "📖",
+      "title": "Storybook",
+      "description": "Interactive storybook for OSMEA Components UI Kit - showcasing all components with device previews and documentation.",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/storybook"
+    },
+    {
+      "id": "sub-serve",
+      "emoji": "⚡",
+      "title": "Sub Serve",
+      "description": "A new Flutter project.",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/sub_serve",
+      "isNew": true
+    },
+    {
+      "id": "tiny-plates",
+      "emoji": "🍽️",
+      "title": "Tiny Plates",
+      "description": "A new Flutter project.",
+      "status": "Completed",
+      "badgeVariant": "success",
+      "path": "projects/tiny_plates",
+      "isNew": true
+    }
+  ]
+}

@@ -210,6 +210,7 @@ class _TabBarExampleState extends State<TabBarExample> {
       ),
       child: OsmeaComponents.column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           OsmeaComponents.text(
             title,
@@ -221,6 +222,8 @@ class _TabBarExampleState extends State<TabBarExample> {
           ),
           OsmeaComponents.sizedBox(height: 12),
           child,
+          // Prevents "BOTTOM OVERFLOWED BY 1.00 PIXELS" for Primary/Outlined/Glass TabBar variants
+          OsmeaComponents.sizedBox(height: 2),
         ],
       ),
     );

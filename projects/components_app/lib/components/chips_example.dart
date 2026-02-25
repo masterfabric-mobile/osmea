@@ -581,12 +581,12 @@ class _ChipsExampleState extends State<ChipsExample> {
 
         OsmeaComponents.sizedBox(height: 20),
 
-        // Icon Position Test
-        OsmeaComponents.text('● Icon Position Debug Test:',
+        // Icon position
+        OsmeaComponents.text('● Icon Position:',
             fontWeight: FontWeight.w500),
         OsmeaComponents.sizedBox(height: 8),
         OsmeaComponents.text(
-          'Testing explicit icon positioning to debug the issue:',
+          'Explicit icon positioning for layout:',
           fontSize: 12,
           color: OsmeaColors.pewter,
         ),

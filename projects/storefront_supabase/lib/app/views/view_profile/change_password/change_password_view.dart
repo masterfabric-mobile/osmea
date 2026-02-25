@@ -42,15 +42,14 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
   @override
   Widget viewContent(
       BuildContext context, ChangePasswordViewModel viewModel, ChangePasswordState state) {
-    final resources = context.resources;
     if (state is ChangePasswordLoading) {
       return Center(
-      child: OsmeaComponents.loading(
-        type: LoadingType.circularFade,
-        size: 36,
-        color: OsmeaColors.black,
-      ),
-    );
+        child: OsmeaComponents.loading(
+          type: LoadingType.circularFade,
+          size: 36,
+          color: OsmeaColors.black,
+        ),
+      );
     }
 
     if (state is ChangePasswordError) {
@@ -59,74 +58,96 @@ class ChangePasswordView extends MasterViewCubit<ChangePasswordViewModel, Change
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: context.spacing16, vertical: context.spacing24),
+      child: _ChangePasswordForm(viewModel: viewModel),
+    );
+  }
+}
+
+class _ChangePasswordForm extends StatefulWidget {
+  final ChangePasswordViewModel viewModel;
+
+  const _ChangePasswordForm({
+    required this.viewModel,
+  });
+
+  @override
+  State<_ChangePasswordForm> createState() => _ChangePasswordFormState();
+}
+
+class _ChangePasswordFormState extends State<_ChangePasswordForm> {
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final resources = context.resources;
+    final viewModel = widget.viewModel;
+    return Container(
+      padding: EdgeInsets.all(context.spacing12),
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: OsmeaColors.silver, width: 1),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            padding: EdgeInsets.all(context.spacing12),
-            decoration: BoxDecoration(
-              color: OsmeaColors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: OsmeaColors.silver, width: 1),
+          OsmeaComponents.textField(
+            controller: viewModel.newPasswordController,
+            label: resources.newPassword,
+            variant: TextFieldVariant.outlined,
+            focusColor: OsmeaColors.black,
+            obscureText: _obscureNewPassword,
+            type: TextFieldType.text,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: OsmeaColors.black,
+                size: context.iconSizeSmall,
+              ),
+              onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildEditableField(
-                  context,
-                  viewModel.newPasswordController,
-                  resources.newPassword,
-                  obscureText: true,
-                ),
-                SizedBox(height: context.spacing16),
-                _buildEditableField(
-                  context,
-                  viewModel.confirmNewPasswordController,
-                  resources.confirmNewPassword,
-                  obscureText: true,
-                ),
-                SizedBox(height: context.spacing24),
-                OsmeaComponents.button(
-                  text: resources.updatePassword,
-                  variant: ButtonVariant.primary,
-                  backgroundColor: OsmeaColors.black,
-                  textColor: OsmeaColors.white,
-                  fullWidth: true,
-                  onPressed: () async {
-                    final success = await viewModel.changePassword();
-                    if (!context.mounted) return;
-                    if (success) {
-                      context.showSnackbar(
-                        message: resources.passwordChanged,
-                        type: SnackbarType.success,
-                      );
-                      context.pop();
-                    } else {
-                      context.snackbarWarning(resources.failedChangePassword);
-                    }
-                  },
-                ),
-              ],
+          ),
+          SizedBox(height: context.spacing16),
+          OsmeaComponents.textField(
+            controller: viewModel.confirmNewPasswordController,
+            label: resources.confirmNewPassword,
+            variant: TextFieldVariant.outlined,
+            focusColor: OsmeaColors.black,
+            obscureText: _obscureConfirmPassword,
+            type: TextFieldType.text,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: OsmeaColors.black,
+                size: context.iconSizeSmall,
+              ),
+              onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
             ),
+          ),
+          SizedBox(height: context.spacing24),
+          OsmeaComponents.button(
+            text: resources.updatePassword,
+            variant: ButtonVariant.primary,
+            backgroundColor: OsmeaColors.black,
+            textColor: OsmeaColors.white,
+            fullWidth: true,
+            onPressed: () async {
+              final success = await viewModel.changePassword();
+              if (!context.mounted) return;
+              if (success) {
+                context.showSnackbar(
+                  message: resources.passwordChanged,
+                  type: SnackbarType.success,
+                );
+                context.pop();
+              } else {
+                context.snackbarWarning(resources.failedChangePassword);
+              }
+            },
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildEditableField(
-    BuildContext context,
-    TextEditingController controller,
-    String label, {
-    bool obscureText = false,
-  }) {
-    return OsmeaComponents.textField(
-      controller: controller,
-      label: label,
-      variant: TextFieldVariant.outlined,
-      focusColor: OsmeaColors.black,
-      obscureText: obscureText,
-      type: TextFieldType.text,
     );
   }
 }

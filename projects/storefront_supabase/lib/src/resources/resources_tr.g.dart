@@ -300,6 +300,22 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get deleteMyAccount => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Hesabımı Sil';
 	@override String get deleteAccountSuccess => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Hesap silme planlandı. Hesabınız 30 gün içinde kaldırılacaktır. İptal etmek için bu süre içinde giriş yapabilirsiniz.';
 	@override String get deleteAccountFailed => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Hesap silme planlanamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.';
+	@override String get selectAddress => TranslationOverrides.string(_root.$meta, 'selectAddress', {}) ?? 'Adres Seçin';
+	@override String get addNewAddress => TranslationOverrides.string(_root.$meta, 'addNewAddress', {}) ?? 'Yeni Adres Ekle';
+	@override String get billingAddress => TranslationOverrides.string(_root.$meta, 'billingAddress', {}) ?? 'Fatura Adresi';
+	@override String get newAddress => TranslationOverrides.string(_root.$meta, 'newAddress', {}) ?? 'Yeni Adres';
+	@override String get defaultAddress => TranslationOverrides.string(_root.$meta, 'defaultAddress', {}) ?? 'Varsayılan';
+	@override String get addressAdded => TranslationOverrides.string(_root.$meta, 'addressAdded', {}) ?? 'Adres başarıyla eklendi!';
+	@override String get addressDeleted => TranslationOverrides.string(_root.$meta, 'addressDeleted', {}) ?? 'Adres başarıyla silindi!';
+	@override String get defaultAddressSet => TranslationOverrides.string(_root.$meta, 'defaultAddressSet', {}) ?? 'Varsayılan adres başarıyla ayarlandı!';
+	@override String get addressLabelHint => TranslationOverrides.string(_root.$meta, 'addressLabelHint', {}) ?? 'örn. Ev, Ofis';
+	@override String get confirmDeleteAddress => TranslationOverrides.string(_root.$meta, 'confirmDeleteAddress', {}) ?? 'Bu adresi silmek istediğinize emin misiniz?';
+	@override String get optional => TranslationOverrides.string(_root.$meta, 'optional', {}) ?? 'İsteğe bağlı';
+	@override String get setAsDefault => TranslationOverrides.string(_root.$meta, 'setAsDefault', {}) ?? 'Varsayılan Yap';
+	@override String get editAddress => TranslationOverrides.string(_root.$meta, 'editAddress', {}) ?? 'Adresi Düzenle';
+	@override String get addAddress => TranslationOverrides.string(_root.$meta, 'addAddress', {}) ?? 'Adres Ekle';
+	@override String get errorOccurred => TranslationOverrides.string(_root.$meta, 'errorOccurred', {}) ?? 'Bir hata oluştu. Lütfen tekrar deneyin.';
+	@override String get delete => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Sil';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -572,6 +588,22 @@ extension on TranslationsTr {
 			'deleteMyAccount' => TranslationOverrides.string(_root.$meta, 'deleteMyAccount', {}) ?? 'Hesabımı Sil',
 			'deleteAccountSuccess' => TranslationOverrides.string(_root.$meta, 'deleteAccountSuccess', {}) ?? 'Hesap silme planlandı. Hesabınız 30 gün içinde kaldırılacaktır. İptal etmek için bu süre içinde giriş yapabilirsiniz.',
 			'deleteAccountFailed' => TranslationOverrides.string(_root.$meta, 'deleteAccountFailed', {}) ?? 'Hesap silme planlanamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.',
+			'selectAddress' => TranslationOverrides.string(_root.$meta, 'selectAddress', {}) ?? 'Adres Seçin',
+			'addNewAddress' => TranslationOverrides.string(_root.$meta, 'addNewAddress', {}) ?? 'Yeni Adres Ekle',
+			'billingAddress' => TranslationOverrides.string(_root.$meta, 'billingAddress', {}) ?? 'Fatura Adresi',
+			'newAddress' => TranslationOverrides.string(_root.$meta, 'newAddress', {}) ?? 'Yeni Adres',
+			'defaultAddress' => TranslationOverrides.string(_root.$meta, 'defaultAddress', {}) ?? 'Varsayılan',
+			'addressAdded' => TranslationOverrides.string(_root.$meta, 'addressAdded', {}) ?? 'Adres başarıyla eklendi!',
+			'addressDeleted' => TranslationOverrides.string(_root.$meta, 'addressDeleted', {}) ?? 'Adres başarıyla silindi!',
+			'defaultAddressSet' => TranslationOverrides.string(_root.$meta, 'defaultAddressSet', {}) ?? 'Varsayılan adres başarıyla ayarlandı!',
+			'addressLabelHint' => TranslationOverrides.string(_root.$meta, 'addressLabelHint', {}) ?? 'örn. Ev, Ofis',
+			'confirmDeleteAddress' => TranslationOverrides.string(_root.$meta, 'confirmDeleteAddress', {}) ?? 'Bu adresi silmek istediğinize emin misiniz?',
+			'optional' => TranslationOverrides.string(_root.$meta, 'optional', {}) ?? 'İsteğe bağlı',
+			'setAsDefault' => TranslationOverrides.string(_root.$meta, 'setAsDefault', {}) ?? 'Varsayılan Yap',
+			'editAddress' => TranslationOverrides.string(_root.$meta, 'editAddress', {}) ?? 'Adresi Düzenle',
+			'addAddress' => TranslationOverrides.string(_root.$meta, 'addAddress', {}) ?? 'Adres Ekle',
+			'errorOccurred' => TranslationOverrides.string(_root.$meta, 'errorOccurred', {}) ?? 'Bir hata oluştu. Lütfen tekrar deneyin.',
+			'delete' => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Sil',
 			_ => null,
 		};
 	}

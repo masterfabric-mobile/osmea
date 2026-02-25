@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class LogoHeaderWidget extends StatelessWidget {
-  const LogoHeaderWidget({super.key});
+  final bool isSignUp;
+
+  const LogoHeaderWidget({super.key, this.isSignUp = false});
 
   @override
   Widget build(BuildContext context) {
+    final configHelper = AssetConfigHelper();
+    final welcomeTitle = isSignUp
+        ? configHelper.getString('auth_configuration.sign_up.welcome_title', 'Welcome to Masterfabric S Store')
+        : configHelper.getString('auth_configuration.sign_in.welcome_title', 'Welcome to Masterfabric S Store');
     return OsmeaComponents.column(
       children: [
         OsmeaComponents.sizedBox(height: 60),
@@ -30,7 +36,7 @@ class LogoHeaderWidget extends StatelessWidget {
         ),
         OsmeaComponents.sizedBox(height: 24),
         OsmeaComponents.text(
-          context.resources.welcomeTitle,
+          welcomeTitle,
           textStyle: OsmeaTextStyle.headlineMedium(context).copyWith(
             fontWeight: FontWeight.w700,
             color: OsmeaColors.black,

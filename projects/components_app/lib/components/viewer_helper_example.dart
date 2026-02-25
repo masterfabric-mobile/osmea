@@ -18,23 +18,23 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
   String _autoDetectContent = '';
   bool _showAutoDetectResult = false;
 
-  // Sample HTML content for Raw Data viewer
+  // HTML content for Raw Data viewer
   final String _sampleHtml = '''
     <div style="padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-      <h1 style="color: #2D3748; margin-bottom: 20px; font-size: 28px;">🌐 OSMEA WebViewerHelper</h1>
+      <h1 style="color: #2D3748; margin-bottom: 20px; font-size: 28px;">🌐 MasterFabric WebViewerHelper</h1>
       
       <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; color: white; margin-bottom: 30px;">
         <h2 style="margin-top: 0; color: white;">✨ Unified HTML & WebView Solution</h2>
         <p style="margin-bottom: 0; line-height: 1.6;">
           A single, powerful helper that handles both HTML content rendering and web page viewing 
-          with seamless OSMEA Components integration.
+          with seamless MasterFabric Components integration.
         </p>
       </div>
       
       <h2 style="color: #4A5568; margin-top: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">🚀 Key Features</h2>
       <ul style="line-height: 1.8; list-style: none; padding-left: 0;">
         <li style="margin-bottom: 12px;">🎯 <strong>Unified Interface:</strong> Single helper for both HTML and WebView</li>
-        <li style="margin-bottom: 12px;">🎨 <strong>OSMEA Integration:</strong> Built-in OSMEA Components styling</li>
+        <li style="margin-bottom: 12px;">🎨 <strong>MasterFabric Integration:</strong> Built-in MasterFabric Components styling</li>
         <li style="margin-bottom: 12px;">⚡ <strong>Tilde Syntax:</strong> Easy URL calling with ~ operator</li>
         <li style="margin-bottom: 12px;">🔍 <strong>Auto-detection:</strong> Automatically detects content type</li>
         <li style="margin-bottom: 12px;">🛠️ <strong>Custom Widgets:</strong> Accepts custom loading and error widgets</li>
@@ -50,7 +50,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
           <code>WebViewerHelper.html('&lt;p&gt;Hello &lt;strong&gt;World&lt;/strong&gt;!&lt;/p&gt;')</code>
         </div>
         <p style="margin-bottom: 0; color: #4A5568; font-size: 14px;">
-          Renders HTML strings using flutter_html with OSMEA styling
+          Renders HTML strings using flutter_html with MasterFabric styling
         </p>
       </div>
 
@@ -84,16 +84,16 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
         </p>
       </div>
 
-      <h2 style="color: #4A5568; margin-top: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">🎨 OSMEA Integration</h2>
+      <h2 style="color: #4A5568; margin-top: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">🎨 MasterFabric Integration</h2>
       <div style="background: #F0FFF4; padding: 20px; border-radius: 12px; border: 1px solid #9AE6B4;">
         <p style="line-height: 1.6; margin-bottom: 15px; color: #22543D;">
-          The WebViewerHelper seamlessly integrates with OSMEA Components, providing:
+          The WebViewerHelper seamlessly integrates with MasterFabric Components, providing:
         </p>
         <ul style="line-height: 1.8; color: #22543D;">
-          <li>🎨 Consistent styling with OSMEA design tokens</li>
-          <li>🌈 OSMEA Colors for error states and loading indicators</li>
-          <li>🧩 OSMEA Components for UI elements (buttons, containers, text)</li>
-          <li>📱 Responsive design with OSMEA sizing extensions</li>
+          <li>🎨 Consistent styling with MasterFabric design tokens</li>
+          <li>🌈 MasterFabric Colors for error states and loading indicators</li>
+          <li>🧩 MasterFabric Components for UI elements (buttons, containers, text)</li>
+          <li>📱 Responsive design with MasterFabric sizing extensions</li>
           <li>♿ Built-in accessibility support</li>
           <li>🌙 Dark/light theme compatibility</li>
         </ul>
@@ -102,7 +102,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
       <div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; color: white; text-align: center;">
         <h3 style="margin-top: 0; color: white; font-size: 24px;">🎯 Production Ready!</h3>
         <p style="margin-bottom: 0; line-height: 1.6; font-size: 16px;">
-          The WebViewerHelper is battle-tested and follows OSMEA best practices for 
+          The WebViewerHelper is battle-tested and follows MasterFabric best practices for 
           consistent, maintainable, and beautiful user interfaces. Perfect for 
           e-commerce, content management, and hybrid app development.
         </p>
@@ -110,7 +110,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
     </div>
   ''';
 
-  // Sample URLs for WebView
+  // URLs for WebView
   final List<String> _sampleUrls = [
     'https://flutter.dev',
     'https://dart.dev',
@@ -232,7 +232,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
           ),
           OsmeaComponents.sizedBox(height: 8),
           OsmeaComponents.text(
-            'Renders HTML content using flutter_html with OSMEA Components integration',
+            'Renders HTML content using flutter_html with MasterFabric Components integration',
             textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
               color: OsmeaColors.grey,
             ),
@@ -399,7 +399,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.text(
-                  '📝 Test Auto Detection',
+                  '📝 Verify Auto Detection',
                   textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
                     fontWeight: FontWeight.w600,
                     color: OsmeaColors.nordicBlue,
@@ -407,7 +407,7 @@ class _ViewerHelperExampleState extends State<ViewerHelperExample> {
                 ),
                 OsmeaComponents.sizedBox(height: 12),
                 OsmeaComponents.text(
-                  'Enter HTML content or a URL to test auto-detection:',
+                  'Enter HTML content or a URL to verify auto-detection:',
                   textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                     color: OsmeaColors.grey,
                   ),

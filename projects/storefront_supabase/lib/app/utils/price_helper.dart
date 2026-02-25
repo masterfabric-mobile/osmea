@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 class PriceHelper {
-  // Hardcoded rates for demo purposes. Base is USD.
+  // Hardcoded rates for reference. Base is USD.
   static const Map<String, double> _rates = {
     'USD': 1.0,
     'EUR': 0.92,

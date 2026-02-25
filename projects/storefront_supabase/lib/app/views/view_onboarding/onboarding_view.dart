@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
 
-/// 🎯 Storefront Supabase Onboarding View
+/// 🎯 Masterfabric S Store Onboarding View
 /// Simple onboarding screen that doesn't use core package's OnboardingView
 /// to avoid config conflicts with storefront_woo
 class SupabaseOnboardingView extends StatefulWidget {

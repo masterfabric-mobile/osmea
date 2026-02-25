@@ -1,0 +1,97 @@
+---
+description: OSMEA packages - structure, dependencies, docs, testing, publishing
+globs: "packages/**/*.dart", "packages/**/pubspec.yaml"
+alwaysApply: false
+---
+
+# OSMEA Packages - Cursor Rules
+
+## 📦 Overview
+OSMEA Packages is a modular Flutter ecosystem designed to provide developers with a complete toolkit for building modern, scalable applications.
+
+## 🎯 Development Guidelines
+
+### 📁 Package Structure
+```
+packages/
+├── components/          # UI Component Library
+├── core/               # Foundation & Utilities
+├── apis/               # Network Layer & API Integration
+└── README.md           # Package Documentation
+```
+
+### 🏗️ Package Development Rules
+
+#### 1. Package Naming
+- **Package Name**: Use descriptive, lowercase names with underscores
+- **Example**: `osmea_components`, `osmea_core`, `osmea_apis`
+- **Version**: Follow semantic versioning (MAJOR.MINOR.PATCH)
+
+#### 2. Dependencies Management
+```yaml
+# ✅ Good Example - pubspec.yaml
+name: osmea_components
+description: A comprehensive UI component library for Flutter applications
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    git:
+      url: https://github.com/masterfabric-mobile/osmea.git
+      path: packages/core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+```
+
+#### 3. Export Structure
+- Core exports: components, core, enums, styles, theme, utils
+- Component-specific exports in main library file
+
+### 🔄 Package Integration Rules
+- **Core Package**: Foundation for all other packages
+- **Components Package**: Depends on Core
+- **APIs Package**: Depends on Core
+- **Applications**: Can depend on any combination of packages
+
+### 📚 Documentation Rules
+- README: Overview, Features, Installation, Usage, API Reference
+- Code: Document all public classes with examples and parameters
+
+### 🧪 Testing Rules
+- Test structure: unit/, widget/, integration/, mocks/
+- Coverage target: Minimum 80%
+- Write unit tests, widget tests, integration tests
+
+### 📦 Publishing Rules
+- Use semantic versioning; update CHANGELOG.md; tag releases
+- Run all tests and check coverage before publishing
+
+### 🔍 Code Quality Standards
+- Use `flutter_lints`; prefer_const_constructors; prefer_final_fields
+- Optimize widget rebuilds; use const constructors
+
+### 🚀 Best Practices
+1. **Modularity**: Keep packages focused and single-purpose
+2. **Reusability**: Design for reuse across different applications
+3. **Performance**: Optimize for speed and efficiency
+4. **Documentation**: Provide comprehensive documentation
+5. **Testing**: Ensure high test coverage
+6. **Maintainability**: Write clean, readable code
+
+### 🔍 Code Review Checklist
+- [ ] Package follows naming conventions
+- [ ] Dependencies are properly managed
+- [ ] Documentation is complete
+- [ ] Tests are comprehensive
+- [ ] Code quality standards are met
+- [ ] Version is properly updated
+- [ ] CHANGELOG is updated
