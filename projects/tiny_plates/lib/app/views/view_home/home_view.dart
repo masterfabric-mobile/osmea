@@ -49,12 +49,25 @@ class HomeView extends MasterViewHydratedCubit<HomeViewModel, HomeState> {
 
     if (state is HomeLoadedState) {
       final t = context.t;
+      final theme = Theme.of(context);
       return OsmeaComponents.center(
-        child: OsmeaComponents.text(
-          t.homeTitle,
-          fontSize: context.fontSizeExtraLarge,
-          fontWeight: context.bold,
-          color: OsmeaColors.thunder,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OsmeaComponents.text(
+              t.homeTitle,
+              fontSize: context.fontSizeExtraLarge,
+              fontWeight: context.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+            SizedBox(height: context.spacingMedium),
+            OsmeaComponents.button(
+              text: t.onboardingGetStarted,
+              onPressed: () {},
+              backgroundColor: theme.colorScheme.primary,
+              textColor: theme.colorScheme.onPrimary,
+            ),
+          ],
         ),
       );
     }

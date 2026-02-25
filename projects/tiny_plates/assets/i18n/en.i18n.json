@@ -15,5 +15,6 @@
   "onboardingNext": "Next",
   "onboardingGetStarted": "Get started",
   "onboardingNoPages": "No onboarding pages",
-  "onboardingLoadFailed": "Load failed"
+  "onboardingLoadFailed": "Load failed",
+  "diary": "Diary"
 }

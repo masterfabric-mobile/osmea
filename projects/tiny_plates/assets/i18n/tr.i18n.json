@@ -15,5 +15,6 @@
   "onboardingNext": "İleri",
   "onboardingGetStarted": "Başla",
   "onboardingNoPages": "Onboarding sayfası yok",
-  "onboardingLoadFailed": "Yüklenemedi"
+  "onboardingLoadFailed": "Yüklenemedi",
+  "diary": "Günlük"
 }

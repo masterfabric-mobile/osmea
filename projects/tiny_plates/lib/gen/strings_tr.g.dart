@@ -53,6 +53,7 @@ class TranslationsTr with BaseTranslations<AppLocale, Translations> implements T
 	@override String get onboardingGetStarted => 'Başla';
 	@override String get onboardingNoPages => 'Onboarding sayfası yok';
 	@override String get onboardingLoadFailed => 'Yüklenemedi';
+	@override String get diary => 'Günlük';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -79,6 +80,7 @@ extension on TranslationsTr {
 			'onboardingGetStarted' => 'Başla',
 			'onboardingNoPages' => 'Onboarding sayfası yok',
 			'onboardingLoadFailed' => 'Yüklenemedi',
+			'diary' => 'Günlük',
 			_ => null,
 		};
 	}

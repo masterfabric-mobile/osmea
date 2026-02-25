@@ -88,6 +88,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Load failed'
 	String get onboardingLoadFailed => 'Load failed';
+
+	/// en: 'Diary'
+	String get diary => 'Diary';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -114,6 +117,7 @@ extension on Translations {
 			'onboardingGetStarted' => 'Get started',
 			'onboardingNoPages' => 'No onboarding pages',
 			'onboardingLoadFailed' => 'Load failed',
+			'diary' => 'Diary',
 			_ => null,
 		};
 	}
