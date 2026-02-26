@@ -1,12 +1,18 @@
 import 'package:core/core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import './bootstrap_web.dart';
 import './routes/app_routes.dart';
 import './widgets/device_frame_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MasterApp.runBefore(allowCollectDataTelemetry: true);
+  if (kIsWeb) {
+    await runBeforeWeb();
+  } else {
+    await MasterApp.runBefore(allowCollectDataTelemetry: true);
+  }
   await Core().init(GetIt.instance);
   runApp(const MyApp());
 }
