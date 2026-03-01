@@ -534,16 +534,23 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   }
 
   Future<void> login() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    if (email.isEmpty || password.isEmpty) {
       stateChanger(const ProfileUnauthenticated(
           errorMessage: 'Please enter email and password.'));
+      return;
+    }
+    if (!email.contains('@')) {
+      stateChanger(const ProfileUnauthenticated(
+          errorMessage: 'Please enter a valid email address.'));
       return;
     }
     stateChanger(ProfileLoading());
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: email,
+        password: password,
       );
       if (response.user == null) {
         stateChanger(const ProfileUnauthenticated(
@@ -561,24 +568,31 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
   }
 
   Future<void> signup() async {
+    final email = emailController.text.trim();
     if (emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty ||
         usernameController.text.isEmpty) {
-      stateChanger(
-          const ProfileUnauthenticated(errorMessage: 'Please fill all fields.'));
+      stateChanger(const ProfileUnauthenticated(
+          showLoginView: false, errorMessage: 'Please fill all fields.'));
+      return;
+    }
+    if (!email.contains('@')) {
+      stateChanger(const ProfileUnauthenticated(
+          showLoginView: false,
+          errorMessage: 'Please enter a valid email address.'));
       return;
     }
     if (passwordController.text != confirmPasswordController.text) {
-      stateChanger(
-          const ProfileUnauthenticated(errorMessage: 'Passwords do not match.'));
+      stateChanger(const ProfileUnauthenticated(
+          showLoginView: false, errorMessage: 'Passwords do not match.'));
       return;
     }
     stateChanger(ProfileLoading());
 
     try {
       final response = await _supabaseClient.auth.signUp(
-        email: emailController.text.trim(),
+        email: email,
         password: passwordController.text.trim(),
         data: {'username': usernameController.text.trim()},
       );
@@ -590,12 +604,15 @@ class ProfileViewModel extends BaseViewModelCubit<ProfileState> {
                 'Success! Please check your email to confirm your registration.'));
       } else {
         stateChanger(const ProfileUnauthenticated(
+            showLoginView: false,
             errorMessage: 'Signup failed. Please try again.'));
       }
     } on AuthException catch (e) {
-      stateChanger(ProfileUnauthenticated(errorMessage: e.message));
+      stateChanger(ProfileUnauthenticated(
+          showLoginView: false, errorMessage: e.message));
     } catch (e) {
       stateChanger(const ProfileUnauthenticated(
+          showLoginView: false,
           errorMessage: 'An unexpected error occurred.'));
     }
   }
