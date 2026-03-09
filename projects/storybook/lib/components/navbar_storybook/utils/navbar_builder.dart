@@ -13,7 +13,7 @@ class NavbarBuilder {
     required int currentIndex,
     required ValueChanged<int> onItemTap,
     NavbarSize size = NavbarSize.medium,
-    NavbarVariant variant = NavbarVariant.primary,
+    NavbarVariant variant = NavbarVariant.retailMain,
     NavbarPosition position = NavbarPosition.bottom,
     double elevation = 4.0,
     bool showLabels = true,
@@ -59,7 +59,7 @@ class NavbarBuilder {
       currentIndex: currentIndex,
       onItemTap: onItemTap,
       size: size,
-      variant: NavbarVariant.primary,
+      variant: NavbarVariant.retailMain,
       elevation: elevation,
       showLabels: showLabels,
       showIcons: showIcons,
@@ -68,7 +68,7 @@ class NavbarBuilder {
     );
   }
 
-  /// Creates a secondary navbar with neutral styling
+  /// Creates a minimal navbar with neutral styling
   static Widget buildSecondaryNavbar({
     required List<NavbarItem> items,
     required int currentIndex,
@@ -83,7 +83,7 @@ class NavbarBuilder {
       currentIndex: currentIndex,
       onItemTap: onItemTap,
       size: size,
-      variant: NavbarVariant.secondary,
+      variant: NavbarVariant.minimal,
       elevation: elevation,
       showLabels: showLabels,
       showIcons: showIcons,
@@ -106,7 +106,7 @@ class NavbarBuilder {
       currentIndex: currentIndex,
       onItemTap: onItemTap,
       size: size,
-      variant: NavbarVariant.transparent,
+      variant: NavbarVariant.mediaOverlay,
       elevation: 0.0,
       showLabels: showLabels,
       showIcons: showIcons,
@@ -130,7 +130,7 @@ class NavbarBuilder {
       currentIndex: currentIndex,
       onItemTap: onItemTap,
       size: size,
-      variant: NavbarVariant.glass,
+      variant: NavbarVariant.socialGlass,
       elevation: elevation,
       showLabels: showLabels,
       showIcons: showIcons,
@@ -154,7 +154,7 @@ class NavbarBuilder {
       currentIndex: currentIndex,
       onItemTap: onItemTap,
       size: size,
-      variant: NavbarVariant.outlined,
+      variant: NavbarVariant.outlinedMinimal,
       elevation: 0.0,
       showLabels: showLabels,
       showIcons: showIcons,
@@ -167,7 +167,7 @@ class NavbarBuilder {
   static Widget buildDemoNavbar({
     required int currentIndex,
     required ValueChanged<int> onItemTap,
-    NavbarVariant variant = NavbarVariant.primary,
+    NavbarVariant variant = NavbarVariant.retailMain,
     NavbarSize size = NavbarSize.medium,
     int itemCount = 4,
     bool showBadges = false,
