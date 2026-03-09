@@ -83,7 +83,7 @@ class AdminDashboardView
         onRefresh: viewModel.initial,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
+          padding: context.paddingNormal,
           children: [
             _buildStatsGrid(context, state),
             OsmeaComponents.sizedBox(height: 24),
