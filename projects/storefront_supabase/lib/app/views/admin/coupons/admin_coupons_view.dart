@@ -60,12 +60,12 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
 
       return OsmeaComponents.scaffold(
         body: ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: context.paddingNormal,
           itemCount: state.coupons.length,
           itemBuilder: (context, index) {
             final coupon = state.coupons[index];
             return OsmeaComponents.basicCard(
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: EdgeInsets.only(bottom: context.spacing12),
               customContent: OsmeaComponents.listItem(
                 onTap: () => context.go('/admin/coupons/edit/${coupon.id}'),
                 title: OsmeaComponents.text(
