@@ -100,7 +100,7 @@ class OrdersHistoryView
       final emptyIconColor = _getColorFromConfig(
         'orders_history_view.empty_state.icon_color',
         OsmeaColors.pewter,
-      )!;
+      );
       final emptyIconSize = configHelper.getDouble(
         'orders_history_view.empty_state.icon_size',
         64.0,
@@ -108,11 +108,11 @@ class OrdersHistoryView
       final emptyTitleColor = _getColorFromConfig(
         'orders_history_view.empty_state.title_color',
         OsmeaColors.thunder,
-      )!;
+      );
       final emptySubtitleColor = _getColorFromConfig(
         'orders_history_view.empty_state.subtitle_color',
         OsmeaColors.pewter,
-      )!;
+      );
 
       return Center(
         child: Padding(
@@ -408,7 +408,7 @@ class OrdersHistoryView
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               // Show count indicator if there are more than 3 items (4th circle)
               if (remainingCount > 0)
                 Positioned(
@@ -653,9 +653,9 @@ class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
                           end: Alignment.centerRight,
                           colors: [
                             Colors.transparent,
-                            Colors.white.withOpacity(0.3),
-                            Colors.white.withOpacity(0.5),
-                            Colors.white.withOpacity(0.3),
+                            Colors.white.withValues(alpha: 0.3),
+                            Colors.white.withValues(alpha: 0.5),
+                            Colors.white.withValues(alpha: 0.3),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.3, 0.5, 0.7, 1.0],

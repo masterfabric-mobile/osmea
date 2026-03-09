@@ -207,10 +207,10 @@ class CheckoutView
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Success Icon - Smaller
+                // Success Icon - size from config
                 OsmeaComponents.container(
-                  width: 48,
-                  height: 48,
+                  width: iconSize,
+                  height: iconSize,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -223,7 +223,7 @@ class CheckoutView
                   child: Icon(
                     Icons.check_circle_rounded,
                     color: iconColor,
-                    size: 32,
+                    size: iconSize * 0.625,
                   ),
                 ),
                 OsmeaComponents.sizedBox(width: 12),
@@ -352,62 +352,6 @@ class CheckoutView
             ),
           ),
           OsmeaComponents.sizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrderDetailRow(
-    BuildContext context,
-    String label,
-    String value, {
-    bool isStatus = false,
-  }) {
-    final detailLabelColor = _getColorFromConfig('order_success.detail_label_color', OsmeaColors.grayMaterial[400]!);
-    final detailValueColor = _getColorFromConfig('order_success.detail_value_color', OsmeaColors.black);
-    final statusBgColor = _getColorFromConfig('order_success.status_background_color', OsmeaColors.black);
-    final statusBorderColor = _getColorFromConfig('order_success.status_border_color', OsmeaColors.black);
-    final statusTextColor = _getColorFromConfig('order_success.status_text_color', OsmeaColors.black);
-    
-    return OsmeaComponents.container(
-      margin: EdgeInsets.only(bottom: 14),
-      child: OsmeaComponents.column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OsmeaComponents.text(
-            label,
-            textStyle: OsmeaTextStyle.bodySmall(context),
-            color: detailLabelColor,
-          ),
-          OsmeaComponents.sizedBox(height: 6),
-          isStatus
-              ? OsmeaComponents.container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: statusBgColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: statusBorderColor.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: OsmeaComponents.text(
-                    value,
-                    textStyle: OsmeaTextStyle.bodySmall(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.w600),
-                    color: statusTextColor,
-                  ),
-                )
-              : OsmeaComponents.text(
-                  value,
-                  textStyle: OsmeaTextStyle.bodyMedium(
-                    context,
-                  ).copyWith(fontWeight: FontWeight.w600),
-                  color: detailValueColor,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
         ],
       ),
     );

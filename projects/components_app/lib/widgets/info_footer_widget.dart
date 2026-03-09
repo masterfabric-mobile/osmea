@@ -1,6 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import '../utils/asset_paths.dart';
 
 class InfoFooterWidget extends StatelessWidget {
   const InfoFooterWidget({super.key});

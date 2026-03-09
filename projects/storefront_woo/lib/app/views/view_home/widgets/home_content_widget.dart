@@ -7,7 +7,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:core/core.dart';
 import 'package:storefront_woo/app/views/view_home/models/home_view_model.dart';
 import 'package:storefront_woo/app/views/view_home/models/module/states.dart';
@@ -377,7 +376,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget>
               child: OsmeaComponents.singleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: OsmeaComponents.column(
-                  children: _buildOrderedComponents(context),
+                  children: [
+                    ..._buildOrderedComponents(context),
+                    OsmeaComponents.sizedBox(height: scrollBottomPadding),
+                  ],
                 ),
               ),
             ),

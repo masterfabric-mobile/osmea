@@ -261,7 +261,7 @@ class AdminDashboardView
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+        border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.5)),
       ),
       padding: const EdgeInsets.all(12.0),
       child: OsmeaComponents.column(
@@ -373,7 +373,7 @@ class AdminDashboardView
             height: constraints.maxHeight,
             child: _ChartScrollbar(
               scrollDirection: Axis.vertical,
-              minExtent: minHeight!,
+              minExtent: minHeight,
               child: content,
             ),
           );
@@ -416,7 +416,7 @@ class AdminDashboardView
           decoration: BoxDecoration(
             color: OsmeaColors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: OsmeaColors.silver.withOpacity(0.4)),
+            border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.4)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
           child: ClipRect(
@@ -604,7 +604,7 @@ class AdminDashboardView
                                       getDrawingHorizontalLine: (value) =>
                                           FlLine(
                                             color: OsmeaColors.silver
-                                                .withOpacity(0.2),
+                                                .withValues(alpha: 0.2),
                                             strokeWidth: 1,
                                           ),
                                     ),
@@ -612,15 +612,11 @@ class AdminDashboardView
                                       show: true,
                                       border: Border(
                                         left: BorderSide(
-                                          color: OsmeaColors.silver.withOpacity(
-                                            0.6,
-                                          ),
+                                          color: OsmeaColors.silver.withValues(alpha: 0.6),
                                           width: 1,
                                         ),
                                         bottom: BorderSide(
-                                          color: OsmeaColors.silver.withOpacity(
-                                            0.6,
-                                          ),
+                                          color: OsmeaColors.silver.withValues(alpha: 0.6),
                                           width: 1,
                                         ),
                                       ),
@@ -678,7 +674,7 @@ class AdminDashboardView
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: OsmeaColors.silver.withOpacity(0.4)),
+        border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.4)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       child: OsmeaComponents.column(
@@ -750,7 +746,7 @@ class AdminDashboardView
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: OsmeaColors.silver.withOpacity(0.2),
+                    color: OsmeaColors.silver.withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                 ),
@@ -825,7 +821,7 @@ class AdminDashboardView
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: OsmeaColors.silver.withOpacity(0.4)),
+        border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.4)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
       child: OsmeaComponents.row(
@@ -913,7 +909,7 @@ class AdminDashboardView
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+        border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.5)),
       ),
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
@@ -978,7 +974,7 @@ class AdminDashboardView
       decoration: BoxDecoration(
         color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+        border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.5)),
       ),
       clipBehavior: Clip.antiAlias,
       child: OsmeaComponents.column(
@@ -1059,14 +1055,14 @@ class _ChartScrollbarState extends State<_ChartScrollbar> {
     return Theme(
       data: Theme.of(context).copyWith(
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(true),
-          thickness: MaterialStateProperty.all(8),
+          thumbVisibility: WidgetStateProperty.all(true),
+          thickness: WidgetStateProperty.all(8),
           radius: const Radius.circular(4),
-          thumbColor: MaterialStateProperty.all(
-            OsmeaColors.black.withOpacity(0.5),
+          thumbColor: WidgetStateProperty.all(
+            OsmeaColors.black.withValues(alpha: 0.5),
           ),
-          trackColor: MaterialStateProperty.all(
-            OsmeaColors.silver.withOpacity(0.2),
+          trackColor: WidgetStateProperty.all(
+            OsmeaColors.silver.withValues(alpha: 0.2),
           ),
         ),
       ),
