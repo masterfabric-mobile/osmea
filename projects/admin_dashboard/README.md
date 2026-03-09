@@ -1,409 +1,303 @@
 # 🎛️ OSMEA Admin Dashboard
 
 <div align="center">
-
-[![Admin Dashboard](https://img.shields.io/badge/Admin%20Dashboard-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
-[![Version](https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logo=package&logoColor=white&labelColor=1A202C)](pubspec.yaml)
-[![Platform](https://img.shields.io/badge/Platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
-[![Core](https://img.shields.io/badge/Core-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](../../packages/core)
-[![APIs](https://img.shields.io/badge/APIs-2D3748?style=for-the-badge&logo=network&logoColor=white&labelColor=1A202C)](../../packages/apis)
-
+  <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/Admin%20Dashboard-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Admin Dashboard" /></a>
+  <a href="pubspec.yaml"><img src="https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C" alt="Version" /></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter%203.7+-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Flutter" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart%203.7+-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Dart" /></a>
+  <a href="https://bloclibrary.dev"><img src="https://img.shields.io/badge/BLoC%209.1-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="BLoC" /></a>
 </div>
 
-<div align="center">
+<br>
 
-**"A Modern E-commerce Admin Dashboard for Managing Products, Orders, and Analytics"**
+> *Modern e-commerce admin dashboard for managing products, orders, and analytics*
 
-[🚀 Get Started](#-getting-started) • [📚 Documentation](#-documentation) • [🐛 Report Issues](https://github.com/masterfabric-mobile/osmea/issues) • [💬 Discussions](https://github.com/masterfabric-mobile/osmea/discussions)
 
-</div>
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure)
 
----
 
-## 📋 Table of Contents
+<details>
+<summary>🌟 Overview</summary>
 
-- [🌟 Overview](#-overview)
-- [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [🛠️ Technology Stack](#️-technology-stack)
-- [🚀 Getting Started](#-getting-started)
-- [📱 Screenshots](#-screenshots)
-- [🔧 Development](#-development)
-- [📚 Documentation](#-documentation)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+**OSMEA Admin Dashboard** is a Flutter application designed for e-commerce administrators to manage products, orders, customers, and analytics. Built on the shared `core` and `apis` packages, it provides a scalable, modular admin experience for iOS, Android, and Web.
 
----
+### 🎯 **Use Cases**
 
-## 🌟 Overview
+- **Product management** — Add, edit, delete, categorize products
+- **Order processing** — View, track, and fulfill orders
+- **Analytics dashboard** — Real-time metrics and KPIs
+- **Customer management** — Customer profiles and order history
+- **Multi-environment** — `dev` and `prod` flavors with separate bundle IDs
 
-The **OSMEA Admin Dashboard** is a comprehensive Flutter application designed for e-commerce administrators to manage products, orders, customers, and analytics. Built with modern Flutter architecture and OSMEA packages, it provides a powerful, scalable, and user-friendly interface for business management.
+### Target Users
 
-### 🎯 **Project Vision**
-> *"To provide a complete admin solution that empowers e-commerce businesses with powerful management tools, real-time analytics, and seamless integration with multiple platforms."*
+- **E-commerce operators** managing an OSMEA-powered storefront
+- **Business admins** who need a mobile-friendly back-office app
+- **Developers** looking for a clean Flutter + BLoC admin reference
 
-### 🚀 **Why This Dashboard?**
+</details>
 
-Managing an e-commerce business requires multiple tools and constant monitoring. This dashboard eliminates complexity by providing:
 
-- **📊 Real-time Analytics** - Live business metrics and performance tracking
-- **🛒 Product Management** - Complete product lifecycle management
-- **📦 Order Processing** - Streamlined order fulfillment and tracking
-- **👥 Customer Management** - Customer insights and relationship management
-- **🔧 Multi-platform Integration** - Shopify, WooCommerce, BigCommerce support
-- **📱 Responsive Design** - Works on desktop, tablet, and mobile devices
+<details>
+<summary>✨ Features</summary>
 
----
+### 🎛️ **Dashboard**
 
-## ✨ Features
+| Feature | Description |
+|---------|-------------|
+| **Analytics overview** | Key metrics, charts, revenue, orders, customers |
+| **Real-time data** | Live updates from WooCommerce / Shopify via `apis` |
+| **Quick actions** | Shortcuts to recent orders, low-stock products |
 
-### 🎛️ **Core Dashboard Features**
+### 📦 **Product Management**
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **📊 Analytics Dashboard** | Real-time business metrics and KPIs | ✅ Ready |
-| **🛒 Product Management** | Add, edit, delete, and categorize products | ✅ Ready |
-| **📦 Order Management** | Process, track, and fulfill orders | ✅ Ready |
-| **👥 Customer Management** | Customer profiles and relationship management | ✅ Ready |
-| **💰 Revenue Tracking** | Sales reports and financial analytics | ✅ Ready |
-| **📈 Performance Metrics** | Business performance and growth tracking | ✅ Ready |
+| Feature | Description |
+|---------|-------------|
+| **Product list** | Paginated grid/list with search and filters |
+| **Add / Edit product** | Title, description, images, variants, categories, brands |
+| **Inventory** | Stock levels, low-stock alerts |
+| **Categories & brands** | CRUD for taxonomies |
 
-### 🔧 **Administrative Features**
+### 🛒 **Order Management**
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **🔐 User Authentication** | Secure admin login and session management | ✅ Ready |
-| **👤 Role Management** | Multi-level admin access control | ✅ Ready |
-| **🌐 Multi-language Support** | Internationalization with slang | ✅ Ready |
-| **📱 Responsive Design** | Adaptive layouts for all screen sizes | ✅ Ready |
-| **🔔 Notifications** | Real-time alerts and system notifications | ✅ Ready |
-| **📊 Data Export** | Export reports and data in multiple formats | ✅ Ready |
+| Feature | Description |
+|---------|-------------|
+| **Order list** | Status filters (pending, processing, shipped, completed) |
+| **Order detail** | Line items, shipping, payment, customer info |
+| **Fulfillment** | Update status, add tracking, print packing slip |
+| **Refunds** | Process partial or full refunds |
 
-### 🛠️ **Technical Features**
+### 👥 **Customer Management**
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **🏗️ Modular Architecture** | Clean, maintainable code structure | ✅ Ready |
-| **🔄 State Management** | BLoC pattern for predictable state | ✅ Ready |
-| **💉 Dependency Injection** | Injectable-based service management | ✅ Ready |
-| **🌐 API Integration** | RESTful API communication | ✅ Ready |
-| **💾 Local Storage** | Offline data persistence | ✅ Ready |
-| **🧪 Testing** | Comprehensive test coverage | ✅ Ready |
+| Feature | Description |
+|---------|-------------|
+| **Customer list** | Search, filter by spend, orders |
+| **Customer profile** | Order history, addresses, notes |
 
----
+### ⚙️ **Settings & Auth**
 
-## 🏗️ Architecture
+| Feature | Description |
+|---------|-------------|
+| **Admin auth** | Secure login with JWT via `apis` |
+| **Role-based access** | Admin vs editor permissions |
+| **Multi-language** | English (base) via Slang i18n |
+| **Theme** | Light / dark mode support |
 
-### 📊 **Project Structure**
+</details>
+
+
+<details>
+<summary>🛠️ Technology Stack</summary>
+
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Flutter 3.7+ / Dart 3.7+ |
+| **State Management** | flutter_bloc 9.1 |
+| **DI** | get_it 7.7 + injectable 2.5 |
+| **Routing** | go_router 15.1 |
+| **Localization** | slang 4.7 + slang_flutter 4.7 |
+| **Environment** | flavor 2.0 (`dev` / `prod`) |
+| **Assets** | flutter_gen 5.10 (typed asset refs) |
+| **Local Packages** | `core` (shared foundation) + `apis` (network layer) |
+
+### 📁 Project Structure
 
 ```
 projects/admin_dashboard/
-├── 📦 lib/                          # Source code
-│   ├── app/                         # Application layer
-│   │   ├── routes/                  # Navigation routes
-│   │   └── views/                   # UI views and screens
-│   │       ├── view_splash/         # Splash screen
-│   │       ├── view_onboarding/     # Onboarding flow
-│   │       └── view_welcome/        # Welcome screen
-│   ├── core/                        # Core utilities
-│   │   ├── config/                  # Configuration files
-│   │   ├── constants/               # App constants
-│   │   └── resources/               # Generated resources
-│   ├── flavors/                     # Environment flavors
-│   │   ├── main_dev.dart           # Development environment
-│   │   └── main_prod.dart          # Production environment
-│   └── gen/                         # Generated files
-│       ├── assets.gen.dart         # Asset references
-│       └── strings.g.dart          # Localization strings
-├── 📁 assets/                       # Static assets
-│   ├── i18n/                        # Localization files
-│   └── images/                      # Image assets
-└── 📄 pubspec.yaml                  # Dependencies and configuration
+├── lib/
+│   ├── starter.dart                     # App entry widget
+│   ├── app/
+│   │   ├── routes/
+│   │   │   └── app_routes.dart          # GoRouter config
+│   │   └── views/
+│   │       ├── view_splash/             # Splash screen
+│   │       ├── view_onboarding/         # Onboarding flow
+│   │       └── view_welcome/            # Welcome / home screen
+│   ├── core/
+│   │   ├── config/
+│   │   │   ├── config_di.dart           # Injectable setup
+│   │   │   └── config_di.config.dart    # Generated DI
+│   │   ├── constants/
+│   │   │   └── text_constants.dart
+│   │   └── resources/
+│   │       ├── resources.g.dart         # Slang generated (all locales)
+│   │       └── resources_en.g.dart      # Slang generated (English)
+│   ├── flavors/
+│   │   ├── main_dev.dart                # Dev entry point
+│   │   └── main_prod.dart               # Prod entry point
+│   └── gen/
+│       ├── assets.gen.dart              # flutter_gen assets
+│       ├── strings.g.dart               # Slang strings
+│       └── strings_en.g.dart
+├── assets/
+│   ├── i18n/
+│   │   └── resources_en.i18n.json       # English translations
+│   └── images/
+├── android/                             # Android platform
+├── ios/                                 # iOS platform
+├── slang.yaml                           # Slang config
+└── pubspec.yaml
 ```
 
-### 🔄 **Architecture Pattern**
+</details>
 
-```mermaid
-graph TD
-    A[UI Layer] --> B[BLoC Layer]
-    B --> C[Service Layer]
-    C --> D[Data Layer]
-    
-    A --> E[OSMEA Core]
-    A --> F[OSMEA APIs]
-    
-    B --> G[State Management]
-    C --> H[Dependency Injection]
-    D --> I[Local Storage]
-    D --> J[API Services]
-```
 
----
+<details>
+<summary>🚀 Getting Started</summary>
 
-## 🛠️ Technology Stack
+### Prerequisites
 
-### **Core Technologies**
-- **Flutter 3.19+** - Latest Flutter framework
-- **Dart 3.7+** - Type-safe programming language
-- **BLoC Pattern** - State management with flutter_bloc
-- **GetIt & Injectable** - Dependency injection and service location
+- **Flutter SDK** 3.7.0+
+- **Dart SDK** 3.7.0+
+- Completed setup of `packages/core` and `packages/apis`
 
-### **OSMEA Packages**
-- **OSMEA Core** - Foundation utilities and helpers
-- **OSMEA APIs** - Network layer and API integration
+### Install Dependencies
 
-### **Additional Dependencies**
-- **GoRouter** - Declarative navigation with deep linking
-- **Slang** - JSON-based internationalization
-- **Flutter Gen** - Strongly typed asset references
-- **Flavor** - Environment configuration management
-
-### **Development Tools**
-- **Flutter Lints** - Code analysis and linting
-- **Build Runner** - Code generation automation
-- **Injectable Generator** - DI code generation
-- **Slang Build Runner** - Localization code generation
-
----
-
-## 🚀 Getting Started
-
-### 📋 **Prerequisites**
-
-- **Flutter SDK** (3.19.0 or higher)
-- **Dart SDK** (3.7.0 or higher)
-- **Git** for version control
-- **VS Code** or **Android Studio** for development
-- **OSMEA Packages** - Core and APIs packages
-
-### 🔧 **Installation**
-
-#### **1. Clone the Repository**
 ```bash
-git clone https://github.com/masterfabric-mobile/osmea.git
-cd osmea/projects/admin_dashboard
-```
-
-#### **2. Install Dependencies**
-```bash
+cd projects/admin_dashboard
 flutter pub get
 ```
 
-#### **3. Generate Code**
+### Code Generation
+
 ```bash
-# Generate dependency injection code
-flutter packages pub run build_runner build --delete-conflicting-outputs
-
-# Generate localization code
-flutter packages pub run slang_build_runner build --delete-conflicting-outputs
-
-# Generate asset references
-flutter packages pub run flutter_gen_runner
+# DI + Slang + flutter_gen
+dart run build_runner build --delete-conflicting-outputs
 ```
 
-#### **4. Run the Application**
-```bash
-# Development environment
-flutter run --flavor dev
+### Run the App
 
-# Production environment
-flutter run --flavor prod
+```bash
+# Development flavor
+flutter run --flavor dev -t lib/flavors/main_dev.dart
+
+# Production flavor
+flutter run --flavor prod -t lib/flavors/main_prod.dart
 ```
 
-### 🎯 **Quick Start Examples**
+### Initialize in `main_dev.dart`
 
-#### **Basic App Structure**
 ```dart
-// main_dev.dart
 import 'package:flutter/material.dart';
 import 'package:admin_dashboard/core/config/config_di.dart';
 import 'package:admin_dashboard/starter.dart';
+import 'package:flavor/flavor.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Configure dependency injection
+
+  // Set flavor
+  Flavor.init(Environment.dev);
+
+  // DI
   await configureDependencies();
-  
-  // Start the app
-  runApp(AdminDashboardApp());
+
+  runApp(const AdminDashboardApp());
 }
 ```
 
-#### **Using OSMEA Packages**
+</details>
+
+
+<details>
+<summary>💡 Usage Examples</summary>
+
+### Routes (go_router)
+
+```dart
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => SplashView(
+        arguments: {"title": "Splash"},
+        currentView: MasterViewTypes.content,
+      ),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => OnboardingView(
+        arguments: {"title": "Onboarding"},
+        currentView: MasterViewTypes.content,
+      ),
+    ),
+    GoRoute(
+      path: '/welcome',
+      builder: (context, state) => WelcomeView(
+        arguments: {"title": "Welcome"},
+        currentView: MasterViewTypes.content,
+      ),
+    ),
+  ],
+);
+```
+
+### Using core & apis
+
 ```dart
 import 'package:core/core.dart';
 import 'package:apis/apis.dart';
 
-class DashboardService {
-  final AnalyticsService _analytics = getIt<AnalyticsService>();
-  final ShopifyApiService _shopifyApi = getIt<ShopifyApiService>();
-  
-  Future<void> loadDashboardData() async {
-    // Track analytics
-    _analytics.trackEvent('dashboard_loaded');
-    
-    // Load data from API
-    final products = await _shopifyApi.getProducts();
-    final orders = await _shopifyApi.getOrders();
-    
-    // Process data
-    _processDashboardData(products, orders);
+class DashboardCubit extends Cubit<DashboardState> {
+  final WooAdminOrdersRepository _ordersRepo;
+
+  DashboardCubit(this._ordersRepo) : super(DashboardLoading());
+
+  Future<void> loadMetrics() async {
+    final orders = await _ordersRepo.getOrders(page: 1, perPage: 50);
+    final revenue = orders.fold<double>(0, (sum, o) => sum + o.total);
+    emit(DashboardLoaded(orderCount: orders.length, revenue: revenue));
   }
 }
 ```
 
----
+### Localization (Slang)
 
-## 📱 Screenshots
+```dart
+// assets/i18n/resources_en.i18n.json
+{
+  "dashboard": "Dashboard",
+  "products": "Products",
+  "orders": "Orders"
+}
 
-### 🎛️ **Dashboard Overview**
-- **Analytics Dashboard** - Real-time business metrics
-- **Product Management** - Product catalog and inventory
-- **Order Processing** - Order fulfillment and tracking
-- **Customer Insights** - Customer analytics and profiles
-
-### 📊 **Key Screens**
-- **Splash Screen** - App initialization and branding
-- **Onboarding Flow** - User setup and configuration
-- **Welcome Screen** - Dashboard introduction
-- **Main Dashboard** - Core admin functionality
-
----
-
-## 🔧 Development
-
-### 📦 **Local Development**
-
-#### **Environment Setup**
-```bash
-# Development environment
-flutter run --flavor dev --dart-define=ENVIRONMENT=development
-
-# Production environment
-flutter run --flavor prod --dart-define=ENVIRONMENT=production
+// In widget
+Text(context.resource.dashboard)
 ```
 
-#### **Code Generation**
-```bash
-# Watch mode for continuous generation
-flutter packages pub run build_runner watch --delete-conflicting-outputs
+</details>
 
-# Generate all code at once
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
 
-#### **Testing**
-```bash
-# Run unit tests
-flutter test
-
-# Run integration tests
-flutter test integration_test/
-
-# Run with coverage
-flutter test --coverage
-```
-
-### 📝 **Code Generation**
-
-#### **Dependency Injection**
-```bash
-# Generate DI code
-flutter packages pub run injectable_generator:build
-```
-
-#### **Localization**
-```bash
-# Generate translation code
-flutter packages pub run slang_build_runner build
-```
-
-#### **Assets**
-```bash
-# Generate asset references
-flutter packages pub run flutter_gen_runner
-```
-
----
-
-## 📚 Documentation
-
-### 📖 **Project Documentation**
-
-- **[📋 Architecture Guide](docs/architecture.md)** - Detailed architecture overview
-- **[🔧 Development Guide](docs/development.md)** - Development setup and guidelines
-- **[📱 UI/UX Guide](docs/ui-ux.md)** - Design system and component usage
-- **[🌐 API Integration](docs/api-integration.md)** - API usage and integration patterns
-
-### 🎓 **Tutorials & Examples**
-
-- **[🚀 Getting Started](docs/getting-started.md)** - Step-by-step setup guide
-- **[📊 Dashboard Features](docs/dashboard-features.md)** - Feature usage examples
-- **[🔧 Customization](docs/customization.md)** - Customization and theming
-- **[🧪 Testing](docs/testing.md)** - Testing strategies and examples
-
-### 🛠️ **Development Resources**
-
-- **[📋 Contributing Guide](../../CONTRIBUTING.md)** - How to contribute
-- **[🐛 Issue Tracker](https://github.com/masterfabric-mobile/osmea/issues)** - Report bugs and request features
-- **[📄 License](../../LICENSE)** - Project license information
-
----
-
-## 🤝 Contributing
+<details>
+<summary>🤝 Contributing</summary>
 
 We welcome contributions! Here's how you can help:
 
-### 🐛 **Reporting Issues**
-1. Check existing issues first
-2. Create a new issue with detailed information
-3. Include steps to reproduce
-4. Add screenshots if applicable
+1. **Fork** the repository
+2. **Create a feature branch** (`git checkout -b feature/admin-charts`)
+3. Add your views under `lib/app/views/`
+4. Register routes in `app_routes.dart`
+5. Run `build_runner` if you add `@injectable` classes
+6. **Open a Pull Request**
 
-### 💡 **Suggesting Features**
-1. Open a feature request issue
-2. Describe the use case
-3. Provide mockups if possible
-4. Discuss implementation approach
+### Guidelines
 
-### 🔧 **Code Contributions**
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+- Views extend `MasterView` from `core`
+- BLoC classes extend `BaseViewModelCubit` or `BaseViewBloc`
+- Use Slang for all user-facing strings
+- Use Conventional Commits
+- Run `flutter analyze` before submitting
 
-### 📋 **Contribution Guidelines**
-- Follow Dart/Flutter style guidelines
-- Write clear commit messages
-- Add documentation for new features
-- Ensure all tests pass
-- Update examples if needed
+</details>
+
 
 ---
 
 ## 📄 License
 
-<div align="center">
-
 > 🔐 **License:** GNU AGPL v3.0  
-> 📜 This project is protected under the **GNU Affero General Public License v3.0**.  
-> If you modify and deploy this project publicly, you must also **publish your changes** under the same license.
-
-📎 Full details available in the [`LICENSE`](LICENSE) file.
-
-</div>
-
----
-
-## 🙏 Acknowledgments
-
-- **Flutter Team** - For the amazing framework
-- **Dart Team** - For the powerful language
-- **OSMEA Team** - For the comprehensive packages
-- **E-commerce Community** - For inspiration and feedback
-- **Open Source Community** - For continuous support
+> 📜 This project is protected under the **GNU Affero General Public License v3.0**.
 
 ---
 
