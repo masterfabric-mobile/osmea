@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_orders_service.dart';
+import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/models/order.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
@@ -13,25 +14,19 @@ class AdminOrdersView extends StatefulWidget {
 }
 
 class _AdminOrdersViewState extends State<AdminOrdersView> {
-  late final Future<List<Order>> _orders;
+  late Future<List<Order>> _orders;
+
+  AdminOrdersService get _ordersService => getIt<AdminOrdersService>();
 
   @override
   void initState() {
     super.initState();
-    _orders = _fetchOrders();
+    _orders = _ordersService.listOrders(includeUser: true);
   }
 
-  Future<List<Order>> _fetchOrders() async {
-    final response =
-        await Supabase.instance.client.from('orders').select('*, users(*)');
-    return (response as List)
-        .map((e) => Order.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
-
-  void _refresh() {
+  Future<void> _refresh() async {
     setState(() {
-      _orders = _fetchOrders();
+      _orders = _ordersService.listOrders(includeUser: true);
     });
   }
 
