@@ -1,5 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format width=80
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -11,6 +11,30 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_categories_service.dart'
+    as _i969;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_coupons_service.dart'
+    as _i526;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_orders_service.dart'
+    as _i925;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_products_service.dart'
+    as _i421;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_reports_service.dart'
+    as _i357;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_users_service.dart'
+    as _i398;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_categories_service.dart'
+    as _i586;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_coupons_service.dart'
+    as _i180;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_orders_service.dart'
+    as _i158;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_products_service.dart'
+    as _i728;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_reports_service.dart'
+    as _i700;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_users_service.dart'
+    as _i504;
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart' as _i434;
 import 'package:storefront_supabase/app/core/cart/guest_cart_storage.dart'
     as _i867;
@@ -64,21 +88,79 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
+    gh.factory<_i437.AdminDashboardViewModel>(
+      () => _i437.AdminDashboardViewModel(),
+    );
+    gh.factory<_i392.AddCouponViewModel>(() => _i392.AddCouponViewModel());
+    gh.factory<_i247.AdminCouponsViewModel>(
+      () => _i247.AdminCouponsViewModel(),
+    );
     gh.factory<_i555.SettingsViewModel>(() => _i555.SettingsViewModel());
-    gh.lazySingleton<_i434.CartCache>(() => _i434.CartCache());
-    gh.lazySingleton<_i867.GuestCartStorage>(() => _i867.GuestCartStorage());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
-    gh.lazySingleton<_i303.FavoritesViewModel>(
-      () => _i303.FavoritesViewModel(
-        gh<_i454.SupabaseClient>(),
-        gh<_i434.CartCache>(),
-      ),
+    gh.lazySingleton<_i867.GuestCartStorage>(() => _i867.GuestCartStorage());
+    gh.lazySingleton<_i434.CartCache>(() => _i434.CartCache());
+    gh.factory<_i526.AdminCouponsService>(
+      () => _i180.SupabaseAdminCouponsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i421.AdminProductsService>(
+      () => _i728.SupabaseAdminProductsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i454.ProductsByBrandViewModel>(
+      () => _i454.ProductsByBrandViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i384.ProductListViewModel>(
+      () => _i384.ProductListViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i348.AdminSettingsViewModel>(
+      () => _i348.AdminSettingsViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i156.AddProductViewModel>(
+      () => _i156.AddProductViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i147.AdminProductsViewModel>(
+      () => _i147.AdminProductsViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i67.ProfileViewModel>(
+      () => _i67.ProfileViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i265.ChangePasswordViewModel>(
+      () => _i265.ChangePasswordViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i1011.CategoriesViewModel>(
+      () => _i1011.CategoriesViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i793.ProductsByCategoryViewModel>(
+      () => _i793.ProductsByCategoryViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i915.SearchViewModel>(
+      () => _i915.SearchViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i1047.CheckoutViewModel>(
+      () => _i1047.CheckoutViewModel(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i925.AdminOrdersService>(
+      () => _i158.SupabaseAdminOrdersService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i398.AdminUsersService>(
+      () => _i504.SupabaseAdminUsersService(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i482.SupabaseHomeViewModel>(
       () => _i482.SupabaseHomeViewModel(
         gh<_i454.SupabaseClient>(),
         gh<_i434.CartCache>(),
       ),
+    );
+    gh.lazySingleton<_i303.FavoritesViewModel>(
+      () => _i303.FavoritesViewModel(
+        gh<_i454.SupabaseClient>(),
+        gh<_i434.CartCache>(),
+      ),
+    );
+    gh.factory<_i969.AdminCategoriesService>(
+      () => _i586.SupabaseAdminCategoriesService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i357.AdminReportsService>(
+      () => _i700.SupabaseAdminReportsService(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i149.CartViewModel>(
       () => _i149.CartViewModel(
@@ -93,48 +175,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i434.CartCache>(),
         gh<_i867.GuestCartStorage>(),
       ),
-    );
-    gh.factory<_i392.AddCouponViewModel>(
-      () => _i392.AddCouponViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i247.AdminCouponsViewModel>(
-      () => _i247.AdminCouponsViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i437.AdminDashboardViewModel>(
-      () => _i437.AdminDashboardViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i156.AddProductViewModel>(
-      () => _i156.AddProductViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i147.AdminProductsViewModel>(
-      () => _i147.AdminProductsViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i348.AdminSettingsViewModel>(
-      () => _i348.AdminSettingsViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i454.ProductsByBrandViewModel>(
-      () => _i454.ProductsByBrandViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i1011.CategoriesViewModel>(
-      () => _i1011.CategoriesViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i793.ProductsByCategoryViewModel>(
-      () => _i793.ProductsByCategoryViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i1047.CheckoutViewModel>(
-      () => _i1047.CheckoutViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i384.ProductListViewModel>(
-      () => _i384.ProductListViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i265.ChangePasswordViewModel>(
-      () => _i265.ChangePasswordViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i67.ProfileViewModel>(
-      () => _i67.ProfileViewModel(gh<_i454.SupabaseClient>()),
-    );
-    gh.factory<_i915.SearchViewModel>(
-      () => _i915.SearchViewModel(gh<_i454.SupabaseClient>()),
     );
     return this;
   }
