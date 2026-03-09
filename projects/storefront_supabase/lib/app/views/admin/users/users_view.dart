@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_users_service.dart';
+import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/models/app_user.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
@@ -15,20 +16,17 @@ class AdminUsersView extends StatefulWidget {
 class _AdminUsersViewState extends State<AdminUsersView> {
   late Future<List<AppUser>> _users;
 
+  AdminUsersService get _usersService => getIt<AdminUsersService>();
+
   @override
   void initState() {
     super.initState();
-    _users = _fetchUsers();
-  }
-
-  Future<List<AppUser>> _fetchUsers() async {
-    final response = await Supabase.instance.client.from('users').select();
-    return (response as List).map((e) => AppUser.fromJson(e)).toList();
+    _users = _usersService.listUsers();
   }
 
   Future<void> _refresh() async {
     setState(() {
-      _users = _fetchUsers();
+      _users = _usersService.listUsers();
     });
   }
 
