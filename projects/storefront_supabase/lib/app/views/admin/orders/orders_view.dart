@@ -29,56 +29,99 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
         .toList();
   }
 
+  void _refresh() {
+    setState(() {
+      _orders = _fetchOrders();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final resources = context.resources;
     return OsmeaComponents.scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: OsmeaColors.paperWhite,
       appBar: OsmeaComponents.appBar(
         title: OsmeaComponents.text(
           resources.orders,
-          color: Colors.black,
+          color: OsmeaColors.black,
         ),
         variant: AppBarVariant.primary,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: OsmeaColors.white,
+        foregroundColor: OsmeaColors.black,
         leading: OsmeaComponents.iconButton(
           onPressed: () => context.go('/profile'),
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
         ),
       ),
-      body: FutureBuilder<List<Order>>(
-        future: _orders,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-            child: OsmeaComponents.loading(
-              type: LoadingType.circularFade,
-              size: 36,
-              color: OsmeaColors.black,
-            ),
-          );
-          }
-          if (snapshot.hasError) {
-            return OsmeaComponents.center(child: OsmeaComponents.text('${resources.errorPrefix}${snapshot.error}'));
-          }
-          if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return OsmeaComponents.center(child: OsmeaComponents.text(resources.noOrdersFound));
-          }
-          final orders = snapshot.data!;
-          return ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return OsmeaComponents.listItem(
-                title: OsmeaComponents.text('${resources.orderNumber}${order.orderNumber}'),
-                subtitle: OsmeaComponents.text(
-                    '${resources.userPrefix}${order.user?.username != null ? '@${order.user!.username}' : (order.user?.fullName ?? 'N/A')} - ${resources.totalPrefix}\$${order.total.toStringAsFixed(2)}'),
-                trailing: OsmeaComponents.text(order.status),
+      body: RefreshIndicator(
+        onRefresh: () async => _refresh(),
+        child: FutureBuilder<List<Order>>(
+          future: _orders,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return OsmeaComponents.center(
+                child: OsmeaComponents.loading(
+                  type: LoadingType.circularFade,
+                  size: 36,
+                  color: OsmeaColors.black,
+                ),
               );
-            },
-          );
-        },
+            }
+            if (snapshot.hasError) {
+              return OsmeaComponents.center(
+                child: OsmeaComponents.text(
+                  '${resources.errorPrefix}${snapshot.error}',
+                  textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.thunder),
+                ),
+              );
+            }
+            if (snapshot.data == null || snapshot.data!.isEmpty) {
+              return OsmeaComponents.center(
+                child: OsmeaComponents.text(
+                  resources.noOrdersFound,
+                  textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.thunder),
+                ),
+              );
+            }
+            final orders = snapshot.data!;
+            return ListView.builder(
+              padding: context.paddingNormal,
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                final order = orders[index];
+                return OsmeaComponents.container(
+                  margin: EdgeInsets.only(bottom: context.spacing12),
+                  decoration: BoxDecoration(
+                    color: OsmeaColors.white,
+                    borderRadius: context.borderRadiusNormal,
+                    border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: OsmeaComponents.listItem(
+                    title: OsmeaComponents.text(
+                      '${resources.orderNumber}${order.orderNumber}',
+                      textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: OsmeaColors.black,
+                          ),
+                    ),
+                    subtitle: OsmeaComponents.text(
+                      '${resources.userPrefix}${order.user?.username != null ? '@${order.user!.username}' : (order.user?.fullName ?? 'N/A')} - ${resources.totalPrefix}\$${order.total.toStringAsFixed(2)}',
+                      textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
+                    ),
+                    trailing: OsmeaComponents.text(
+                      order.status,
+                      textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: OsmeaColors.thunder,
+                          ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
