@@ -5,7 +5,9 @@ class AdminRoutes {
 
   static const String dashboard = '/admin/dashboard';
   static const String users = '/admin/users';
+  static const String brands = '/admin/brands';
   static const String categories = '/admin/categories';
+  static const String reports = '/admin/reports';
   static const String products = '/admin/products';
   static const String productAdd = '/admin/products/add';
   static String productEdit(String id) => '/admin/products/edit/$id';
