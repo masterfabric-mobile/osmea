@@ -16,6 +16,7 @@ import 'package:storefront_supabase/app/utils/localization_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:storefront_supabase/app/utils/unified_loading_widget.dart';
 import 'package:storefront_supabase/app/views/view_home/widgets/search_bar_widget.dart';
+import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 
 class SupabaseHomeView
     extends MasterViewCubit<SupabaseHomeViewModel, SupabaseHomeState> {
@@ -59,38 +60,54 @@ class SupabaseHomeView
             // I'll put it in `HomeContentWidget` list of components (it was removed from there in Woo logic? No, Woo `_buildOrderedComponents` commented out search bar).
             // Woo uses `_buildHomeAppBar` which returns `OsmeaComponents.appBarWithSearchBar`.
             
-            return OsmeaComponents.appBar(
-              title: OsmeaComponents.text(
-                title,
-                color: titleColor,
-                textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
-              ),
-              backgroundColor: backgroundColor,
-              foregroundColor: foregroundColor,
-              size: AppBarSize.large,
-              elevation: elevation,
-              titleSpacing: 0.0,
-              actions: [
-                AppBarAction(
-                  type: AppBarActionType.more,
-                  icon: Icon(
-                    Icons.language,
-                    color: iconColor,
-                  ),
-                  onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
-                ),
-                AppBarAction(
-                  type: AppBarActionType.more,
-                  icon: Icon(
-                    Icons.shopping_cart_outlined,
-                    color: iconColor,
-                  ),
-                  onPressed: () => goRoute('/cart'),
-                ),
-              ],
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(60),
-                child: SearchBarWidget(configHelper: configHelper),
+            return PreferredSize(
+              preferredSize: const Size.fromHeight(116),
+              child: BlocBuilder<CurrencyCubit, String>(
+                buildWhen: (prev, next) => prev != next,
+                builder: (context, currency) {
+                  return OsmeaComponents.appBar(
+                    title: OsmeaComponents.text(
+                      title,
+                      color: titleColor,
+                      textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    backgroundColor: backgroundColor,
+                    foregroundColor: foregroundColor,
+                    size: AppBarSize.large,
+                    elevation: elevation,
+                    titleSpacing: 0.0,
+                    actions: [
+                      AppBarAction(
+                        type: AppBarActionType.more,
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: OsmeaComponents.text(
+                            currency,
+                            textStyle: OsmeaTextStyle.labelLarge(context).copyWith(
+                              color: iconColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
+                      ),
+                      AppBarAction(
+                        type: AppBarActionType.more,
+                        icon: Icon(Icons.language, color: iconColor),
+                        onPressed: () => LocalizationHelper.showLanguageCurrencySheet(context),
+                      ),
+                      AppBarAction(
+                        type: AppBarActionType.more,
+                        icon: Icon(Icons.shopping_cart_outlined, color: iconColor),
+                        onPressed: () => goRoute('/cart'),
+                      ),
+                    ],
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(60),
+                      child: SearchBarWidget(configHelper: configHelper),
+                    ),
+                  );
+                },
               ),
             );
           },
