@@ -191,7 +191,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
                     icon: Icons.monetization_on,
                   ),
                 ),
-                const SizedBox(width: 12),
+                OsmeaComponents.sizedBox(width: context.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     context,
@@ -202,7 +202,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            OsmeaComponents.sizedBox(height: context.spacing12),
             Row(
               children: [
                 Expanded(
@@ -213,7 +213,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
                     icon: Icons.people,
                   ),
                 ),
-                const SizedBox(width: 12),
+                OsmeaComponents.sizedBox(width: context.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     context,
@@ -239,10 +239,10 @@ class _AdminReportsViewState extends State<AdminReportsView> {
     return OsmeaComponents.container(
       decoration: BoxDecoration(
         color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.borderRadiusNormal,
         border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
       ),
-      padding: const EdgeInsets.all(12),
+      padding: context.paddingNormal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -250,7 +250,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
           Row(
             children: [
               Icon(icon, color: OsmeaColors.black, size: 20),
-              const SizedBox(width: 8),
+              OsmeaComponents.sizedBox(width: context.spacing8),
               Expanded(
                 child: OsmeaComponents.text(
                   title,
@@ -261,7 +261,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          OsmeaComponents.sizedBox(height: context.spacing6),
           OsmeaComponents.text(
             value,
             textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -284,7 +284,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
     return OsmeaComponents.container(
       decoration: BoxDecoration(
         color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.borderRadiusNormal,
         border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
       ),
       clipBehavior: Clip.antiAlias,
@@ -321,7 +321,7 @@ class _AdminReportsViewState extends State<AdminReportsView> {
 
   Widget _tableCell(BuildContext context, String text, {bool isHeader = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      padding: context.verticalPaddingNormal + context.horizontalPaddingNormal,
       child: OsmeaComponents.text(
         text,
         textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -336,14 +336,14 @@ class _AdminReportsViewState extends State<AdminReportsView> {
     return OsmeaComponents.container(
       decoration: BoxDecoration(
         color: OsmeaColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.borderRadiusNormal,
         border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: data
             .map((e) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  padding: context.verticalPaddingNormal + context.horizontalPaddingNormal,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
