@@ -19,6 +19,10 @@ class AdminRoutes {
   static String couponEdit(String id) => '/admin/coupons/edit/$id';
   static const String settings = '/admin/settings';
   static const String storeSettings = '/admin/store-settings';
+  static const String staff = '/admin/staff';
+  static const String sessions = '/admin/sessions';
+  static const String activityLog = '/admin/activity-log';
+  static const String moderation = '/admin/moderation';
   static const String appConfig = '/admin/app-config';
   static const String profile = '/profile';
 }
