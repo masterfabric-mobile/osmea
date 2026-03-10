@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/api/admin/admin_routes.dart';
 import 'package:storefront_supabase/app/api/admin/abstract/admin_orders_service.dart';
 import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/models/order.dart';
@@ -44,7 +45,7 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
         leading: OsmeaComponents.iconButton(
-          onPressed: () => context.go('/profile'),
+          onPressed: () => context.go(AdminRoutes.profile),
           icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
         ),
       ),
