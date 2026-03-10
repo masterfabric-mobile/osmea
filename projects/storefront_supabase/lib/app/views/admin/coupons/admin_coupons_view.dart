@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/views/admin/coupons/models/module/states.dart';
 import 'package:storefront_supabase/app/views/admin/coupons/models/coupons_view_model.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCouponsState> {
   AdminCouponsView({
@@ -120,10 +121,10 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
           children: [
             Icon(Icons.confirmation_number_outlined, size: 64, color: OsmeaColors.pewter),
             const SizedBox(height: 16),
-            const Text('No coupons found'),
+            Text(context.resources.noCouponsFound),
             const SizedBox(height: 24),
             OsmeaComponents.button(
-              text: 'Add Coupon',
+              text: context.resources.addCoupon,
               onPressed: () => goRoute('/admin/coupons/add'),
               backgroundColor: OsmeaColors.black,
               textColor: OsmeaColors.white,
@@ -137,19 +138,19 @@ class AdminCouponsView extends MasterViewCubit<AdminCouponsViewModel, AdminCoupo
   void _confirmDelete(BuildContext context, AdminCouponsViewModel viewModel, String id) {
     OsmeaComponents.showPopup(
       context: context,
-      title: 'Delete Coupon',
+      title: context.resources.deleteCoupon,
       child: OsmeaComponents.text('Are you sure you want to delete this coupon?'),
       footer: OsmeaComponents.row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           OsmeaComponents.textButton(
-            text: 'Cancel',
+            text: context.resources.cancel,
             onPressed: () => Navigator.pop(context),
             variant: ButtonVariant.ghost,
           ),
           OsmeaComponents.sizedBox(width: 12),
           OsmeaComponents.textButton(
-            text: 'Delete',
+            text: context.resources.delete,
             onPressed: () {
               Navigator.pop(context);
               viewModel.deleteCoupon(id);
