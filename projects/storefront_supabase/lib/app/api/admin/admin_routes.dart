@@ -18,6 +18,7 @@ class AdminRoutes {
   static const String couponAdd = '/admin/coupons/add';
   static String couponEdit(String id) => '/admin/coupons/edit/$id';
   static const String settings = '/admin/settings';
+  static const String storeSettings = '/admin/store-settings';
   static const String appConfig = '/admin/app-config';
   static const String profile = '/profile';
 }
