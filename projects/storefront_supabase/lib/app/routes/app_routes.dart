@@ -16,7 +16,9 @@ import 'package:storefront_supabase/app/views/admin/products/products_view.dart'
 import 'package:storefront_supabase/app/views/admin/app_config/app_config_view.dart';
 import 'package:storefront_supabase/app/views/admin/settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/add_product/add_product_view.dart';
+import 'package:storefront_supabase/app/views/admin/brands/brands_view.dart';
 import 'package:storefront_supabase/app/views/admin/categories/categories_view.dart';
+import 'package:storefront_supabase/app/views/admin/reports/reports_view.dart';
 import 'package:storefront_supabase/app/views/admin/users/users_view.dart';
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
@@ -393,6 +395,22 @@ final GoRouter appRouter = GoRouter(
           path: '/admin/categories',
           builder: (BuildContext context, GoRouterState state) {
             return AdminCategoriesView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/brands',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminBrandsView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/reports',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminReportsView(
               goRoute: (String path) => context.go(path),
             );
           },
