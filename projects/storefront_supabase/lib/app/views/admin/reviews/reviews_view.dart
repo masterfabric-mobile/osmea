@@ -87,9 +87,9 @@ class _AdminReviewsViewState extends State<AdminReviewsView> {
                 ),
                 _filterChip(context, 'All', null),
                 const SizedBox(width: 8),
-                _filterChip(context, 'Approved', true),
+                _filterChip(context, resources.approved, true),
                 const SizedBox(width: 8),
-                _filterChip(context, 'Pending', false),
+                _filterChip(context, resources.pending, false),
               ],
             ),
           ),
@@ -178,7 +178,7 @@ class _AdminReviewsViewState extends State<AdminReviewsView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   OsmeaComponents.text(
-                    review.isApproved ? 'Approved' : 'Pending',
+                    review.isApproved ? context.resources.approved : context.resources.pending,
                     textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: review.isApproved ? OsmeaColors.black : OsmeaColors.thunder,
                         ),
@@ -191,7 +191,7 @@ class _AdminReviewsViewState extends State<AdminReviewsView> {
                       size: 22,
                     ),
                     onPressed: () => _setApproved(review, !review.isApproved),
-                    tooltip: review.isApproved ? 'Unapprove' : 'Approve',
+                    tooltip: review.isApproved ? context.resources.unapprove : context.resources.approve,
                   ),
                 ],
               ),
