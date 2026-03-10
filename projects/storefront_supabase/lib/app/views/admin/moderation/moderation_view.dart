@@ -61,7 +61,7 @@ class _AdminModerationViewState extends State<AdminModerationView> {
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.paperWhite,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Moderation', color: OsmeaColors.black),
+        title: OsmeaComponents.text(resources.moderation, color: OsmeaColors.black),
         variant: AppBarVariant.primary,
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
@@ -78,9 +78,9 @@ class _AdminModerationViewState extends State<AdminModerationView> {
               spacing: context.spacing8,
               children: [
                 _statusChip(context, 'All', null),
-                _statusChip(context, 'Pending', 'pending'),
-                _statusChip(context, 'Approved', 'approved'),
-                _statusChip(context, 'Rejected', 'rejected'),
+                _statusChip(context, resources.pending, 'pending'),
+                _statusChip(context, resources.approved, 'approved'),
+                _statusChip(context, resources.rejected, 'rejected'),
               ],
             ),
           ),
@@ -134,7 +134,7 @@ class _AdminModerationViewState extends State<AdminModerationView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             OsmeaComponents.text(
-                              item.productName ?? item.productId ?? 'Unknown product',
+                              item.productName ?? item.productId ?? context.resources.unknownProduct,
                               textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontWeight: FontWeight.w600,
                                     color: OsmeaColors.black,
@@ -157,11 +157,11 @@ class _AdminModerationViewState extends State<AdminModerationView> {
                               children: [
                                 TextButton(
                                   onPressed: () => _setStatus(item, 'approved'),
-                                  child: OsmeaComponents.text('Approve', color: OsmeaColors.black),
+                                  child: OsmeaComponents.text(context.resources.approve, color: OsmeaColors.black),
                                 ),
                                 TextButton(
                                   onPressed: () => _setStatus(item, 'rejected'),
-                                  child: OsmeaComponents.text('Reject', color: OsmeaColors.amberFlame),
+                                  child: OsmeaComponents.text(context.resources.reject, color: OsmeaColors.amberFlame),
                                 ),
                               ],
                             ),
