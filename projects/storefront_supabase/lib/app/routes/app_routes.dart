@@ -17,10 +17,14 @@ import 'package:storefront_supabase/app/views/admin/app_config/app_config_view.d
 import 'package:storefront_supabase/app/views/admin/settings/settings_view.dart';
 import 'package:storefront_supabase/app/views/admin/products/add_product/add_product_view.dart';
 import 'package:storefront_supabase/app/views/admin/addresses/addresses_view.dart';
+import 'package:storefront_supabase/app/views/admin/activity_log/activity_log_view.dart';
 import 'package:storefront_supabase/app/views/admin/brands/brands_view.dart';
 import 'package:storefront_supabase/app/views/admin/categories/categories_view.dart';
+import 'package:storefront_supabase/app/views/admin/moderation/moderation_view.dart';
 import 'package:storefront_supabase/app/views/admin/reports/reports_view.dart';
 import 'package:storefront_supabase/app/views/admin/reviews/reviews_view.dart';
+import 'package:storefront_supabase/app/views/admin/sessions/sessions_view.dart';
+import 'package:storefront_supabase/app/views/admin/staff/staff_view.dart';
 import 'package:storefront_supabase/app/views/admin/users/users_view.dart';
 import 'package:storefront_supabase/app/views/view_home/home_view.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/product_detail_view.dart';
@@ -483,6 +487,38 @@ final GoRouter appRouter = GoRouter(
           path: '/admin/addresses',
           builder: (BuildContext context, GoRouterState state) {
             return AdminAddressesView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/staff',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminStaffView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/sessions',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminSessionsView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/activity-log',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminActivityLogView(
+              goRoute: (String path) => context.go(path),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/admin/moderation',
+          builder: (BuildContext context, GoRouterState state) {
+            return AdminModerationView(
               goRoute: (String path) => context.go(path),
             );
           },
