@@ -874,6 +874,450 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	/// en: 'Delete'
 	String get delete => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Delete';
+
+	/// en: 'Currency'
+	String get currency => TranslationOverrides.string(_root.$meta, 'currency', {}) ?? 'Currency';
+
+	/// en: 'Contact us'
+	String get contactUs => TranslationOverrides.string(_root.$meta, 'contactUs', {}) ?? 'Contact us';
+
+	/// en: 'Email: support@masterfabric.co Phone: +90 212 000 00 00'
+	String get contactUsBody => TranslationOverrides.string(_root.$meta, 'contactUsBody', {}) ?? 'Email: support@masterfabric.co\nPhone: +90 212 000 00 00';
+
+	/// en: 'FAQ'
+	String get faq => TranslationOverrides.string(_root.$meta, 'faq', {}) ?? 'FAQ';
+
+	/// en: 'Frequently asked questions and answers will be available here.'
+	String get faqBody => TranslationOverrides.string(_root.$meta, 'faqBody', {}) ?? 'Frequently asked questions and answers will be available here.';
+
+	/// en: 'Returns & refunds'
+	String get returnsAndRefunds => TranslationOverrides.string(_root.$meta, 'returnsAndRefunds', {}) ?? 'Returns & refunds';
+
+	/// en: 'Please check our return policy in the product detail page (Cancellation & returns).'
+	String get returnsAndRefundsBody => TranslationOverrides.string(_root.$meta, 'returnsAndRefundsBody', {}) ?? 'Please check our return policy in the product detail page (Cancellation & returns).';
+
+	/// en: 'General settings'
+	String get generalSettings => TranslationOverrides.string(_root.$meta, 'generalSettings', {}) ?? 'General settings';
+
+	/// en: 'Common store options. Values are saved in admin_settings table.'
+	String get generalSettingsDescription => TranslationOverrides.string(_root.$meta, 'generalSettingsDescription', {}) ?? 'Common store options. Values are saved in admin_settings table.';
+
+	/// en: 'Store settings (key-value)'
+	String get storeSettingsKeyValue => TranslationOverrides.string(_root.$meta, 'storeSettingsKeyValue', {}) ?? 'Store settings (key-value)';
+
+	/// en: 'All key-value pairs from admin_settings. Tap a row to edit value, or add a new key (e.g. maintenance_mode, guest_checkout_enabled).'
+	String get storeSettingsKeyValueDescription => TranslationOverrides.string(_root.$meta, 'storeSettingsKeyValueDescription', {}) ?? 'All key-value pairs from admin_settings. Tap a row to edit value, or add a new key (e.g. maintenance_mode, guest_checkout_enabled).';
+
+	/// en: 'Maintenance mode'
+	String get maintenanceMode => TranslationOverrides.string(_root.$meta, 'maintenanceMode', {}) ?? 'Maintenance mode';
+
+	/// en: 'When on, store can show a maintenance message to customers.'
+	String get maintenanceModeSubtitle => TranslationOverrides.string(_root.$meta, 'maintenanceModeSubtitle', {}) ?? 'When on, store can show a maintenance message to customers.';
+
+	/// en: 'Guest checkout'
+	String get guestCheckout => TranslationOverrides.string(_root.$meta, 'guestCheckout', {}) ?? 'Guest checkout';
+
+	/// en: 'Allow checkout without creating an account.'
+	String get guestCheckoutSubtitle => TranslationOverrides.string(_root.$meta, 'guestCheckoutSubtitle', {}) ?? 'Allow checkout without creating an account.';
+
+	/// en: 'Default currency'
+	String get defaultCurrency => TranslationOverrides.string(_root.$meta, 'defaultCurrency', {}) ?? 'Default currency';
+
+	/// en: 'Shown as store default on the main app. Used when user has not chosen a currency.'
+	String get defaultCurrencySubtitle => TranslationOverrides.string(_root.$meta, 'defaultCurrencySubtitle', {}) ?? 'Shown as store default on the main app. Used when user has not chosen a currency.';
+
+	/// en: 'Add setting'
+	String get addSetting => TranslationOverrides.string(_root.$meta, 'addSetting', {}) ?? 'Add setting';
+
+	/// en: 'No store settings yet.'
+	String get noStoreSettingsYet => TranslationOverrides.string(_root.$meta, 'noStoreSettingsYet', {}) ?? 'No store settings yet.';
+
+	/// en: 'Add key-value setting'
+	String get addKeyValueSetting => TranslationOverrides.string(_root.$meta, 'addKeyValueSetting', {}) ?? 'Add key-value setting';
+
+	/// en: 'Add a new setting stored in admin_settings. Key is unique (e.g. maintenance_mode). Value can be text or true/false.'
+	String get addSettingDialogDescription => TranslationOverrides.string(_root.$meta, 'addSettingDialogDescription', {}) ?? 'Add a new setting stored in admin_settings. Key is unique (e.g. maintenance_mode). Value can be text or true/false.';
+
+	/// en: 'Key'
+	String get keyLabel => TranslationOverrides.string(_root.$meta, 'keyLabel', {}) ?? 'Key';
+
+	/// en: 'Value'
+	String get valueLabel => TranslationOverrides.string(_root.$meta, 'valueLabel', {}) ?? 'Value';
+
+	/// en: 'Add'
+	String get add => TranslationOverrides.string(_root.$meta, 'add', {}) ?? 'Add';
+
+	/// en: 'Sessions'
+	String get sessions => TranslationOverrides.string(_root.$meta, 'sessions', {}) ?? 'Sessions';
+
+	/// en: 'Activity log'
+	String get activityLog => TranslationOverrides.string(_root.$meta, 'activityLog', {}) ?? 'Activity log';
+
+	/// en: 'Moderation'
+	String get moderation => TranslationOverrides.string(_root.$meta, 'moderation', {}) ?? 'Moderation';
+
+	/// en: 'Staff'
+	String get staff => TranslationOverrides.string(_root.$meta, 'staff', {}) ?? 'Staff';
+
+	/// en: 'Reports'
+	String get reports => TranslationOverrides.string(_root.$meta, 'reports', {}) ?? 'Reports';
+
+	/// en: 'App config'
+	String get appConfig => TranslationOverrides.string(_root.$meta, 'appConfig', {}) ?? 'App config';
+
+	/// en: 'Masterfabric S Store'
+	String get homeAppBarTitle => TranslationOverrides.string(_root.$meta, 'homeAppBarTitle', {}) ?? 'Masterfabric S Store';
+
+	/// en: 'Quick access'
+	String get quickAccess => TranslationOverrides.string(_root.$meta, 'quickAccess', {}) ?? 'Quick access';
+
+	/// en: 'Product reviews'
+	String get productReviews => TranslationOverrides.string(_root.$meta, 'productReviews', {}) ?? 'Product reviews';
+
+	/// en: 'User addresses'
+	String get userAddresses => TranslationOverrides.string(_root.$meta, 'userAddresses', {}) ?? 'User addresses';
+
+	/// en: 'Addresses'
+	String get addresses => TranslationOverrides.string(_root.$meta, 'addresses', {}) ?? 'Addresses';
+
+	/// en: 'Options'
+	String get options => TranslationOverrides.string(_root.$meta, 'options', {}) ?? 'Options';
+
+	/// en: 'Details'
+	String get details => TranslationOverrides.string(_root.$meta, 'details', {}) ?? 'Details';
+
+	/// en: 'Active'
+	String get active => TranslationOverrides.string(_root.$meta, 'active', {}) ?? 'Active';
+
+	/// en: 'Inactive'
+	String get inactive => TranslationOverrides.string(_root.$meta, 'inactive', {}) ?? 'Inactive';
+
+	/// en: 'Deactivate'
+	String get deactivate => TranslationOverrides.string(_root.$meta, 'deactivate', {}) ?? 'Deactivate';
+
+	/// en: 'Activate'
+	String get activate => TranslationOverrides.string(_root.$meta, 'activate', {}) ?? 'Activate';
+
+	/// en: 'Pending'
+	String get pending => TranslationOverrides.string(_root.$meta, 'pending', {}) ?? 'Pending';
+
+	/// en: 'Approved'
+	String get approved => TranslationOverrides.string(_root.$meta, 'approved', {}) ?? 'Approved';
+
+	/// en: 'Rejected'
+	String get rejected => TranslationOverrides.string(_root.$meta, 'rejected', {}) ?? 'Rejected';
+
+	/// en: 'Approve'
+	String get approve => TranslationOverrides.string(_root.$meta, 'approve', {}) ?? 'Approve';
+
+	/// en: 'Reject'
+	String get reject => TranslationOverrides.string(_root.$meta, 'reject', {}) ?? 'Reject';
+
+	/// en: 'Unapprove'
+	String get unapprove => TranslationOverrides.string(_root.$meta, 'unapprove', {}) ?? 'Unapprove';
+
+	/// en: 'Unknown product'
+	String get unknownProduct => TranslationOverrides.string(_root.$meta, 'unknownProduct', {}) ?? 'Unknown product';
+
+	/// en: 'Unknown admin'
+	String get unknownAdmin => TranslationOverrides.string(_root.$meta, 'unknownAdmin', {}) ?? 'Unknown admin';
+
+	/// en: 'Unknown'
+	String get unknown => TranslationOverrides.string(_root.$meta, 'unknown', {}) ?? 'Unknown';
+
+	/// en: 'Saved'
+	String get saved => TranslationOverrides.string(_root.$meta, 'saved', {}) ?? 'Saved';
+
+	/// en: 'Date'
+	String get date => TranslationOverrides.string(_root.$meta, 'date', {}) ?? 'Date';
+
+	/// en: 'Revenue'
+	String get revenue => TranslationOverrides.string(_root.$meta, 'revenue', {}) ?? 'Revenue';
+
+	/// en: 'SALE'
+	String get sale => TranslationOverrides.string(_root.$meta, 'sale', {}) ?? 'SALE';
+
+	/// en: 'FLASH'
+	String get flash => TranslationOverrides.string(_root.$meta, 'flash', {}) ?? 'FLASH';
+
+	/// en: 'WEEK STAR'
+	String get weekStar => TranslationOverrides.string(_root.$meta, 'weekStar', {}) ?? 'WEEK STAR';
+
+	/// en: 'User'
+	String get user => TranslationOverrides.string(_root.$meta, 'user', {}) ?? 'User';
+
+	/// en: 'Create new collection'
+	String get createNewCollection => TranslationOverrides.string(_root.$meta, 'createNewCollection', {}) ?? 'Create new collection';
+
+	/// en: 'Remove all'
+	String get removeAll => TranslationOverrides.string(_root.$meta, 'removeAll', {}) ?? 'Remove all';
+
+	/// en: 'Create New Group'
+	String get createNewGroup => TranslationOverrides.string(_root.$meta, 'createNewGroup', {}) ?? 'Create New Group';
+
+	/// en: 'Group Name'
+	String get groupName => TranslationOverrides.string(_root.$meta, 'groupName', {}) ?? 'Group Name';
+
+	/// en: 'Create'
+	String get create => TranslationOverrides.string(_root.$meta, 'create', {}) ?? 'Create';
+
+	/// en: 'Delete Collection'
+	String get deleteCollection => TranslationOverrides.string(_root.$meta, 'deleteCollection', {}) ?? 'Delete Collection';
+
+	/// en: 'Deleted'
+	String get deleted => TranslationOverrides.string(_root.$meta, 'deleted', {}) ?? 'Deleted';
+
+	/// en: 'Collection deleted successfully'
+	String get collectionDeletedSuccessfully => TranslationOverrides.string(_root.$meta, 'collectionDeletedSuccessfully', {}) ?? 'Collection deleted successfully';
+
+	/// en: 'No items in this collection yet'
+	String get noItemsInCollection => TranslationOverrides.string(_root.$meta, 'noItemsInCollection', {}) ?? 'No items in this collection yet';
+
+	/// en: 'No other products to add'
+	String get noOtherProductsToAdd => TranslationOverrides.string(_root.$meta, 'noOtherProductsToAdd', {}) ?? 'No other products to add';
+
+	/// en: 'Removed'
+	String get removed => TranslationOverrides.string(_root.$meta, 'removed', {}) ?? 'Removed';
+
+	/// en: 'Added'
+	String get added => TranslationOverrides.string(_root.$meta, 'added', {}) ?? 'Added';
+
+	/// en: 'Anonymous'
+	String get anonymous => TranslationOverrides.string(_root.$meta, 'anonymous', {}) ?? 'Anonymous';
+
+	/// en: 'App config copied to clipboard'
+	String get appConfigCopiedToClipboard => TranslationOverrides.string(_root.$meta, 'appConfigCopiedToClipboard', {}) ?? 'App config copied to clipboard';
+
+	/// en: 'No keys'
+	String get noKeys => TranslationOverrides.string(_root.$meta, 'noKeys', {}) ?? 'No keys';
+
+	/// en: 'No coupons found'
+	String get noCouponsFound => TranslationOverrides.string(_root.$meta, 'noCouponsFound', {}) ?? 'No coupons found';
+
+	/// en: 'Add Coupon'
+	String get addCoupon => TranslationOverrides.string(_root.$meta, 'addCoupon', {}) ?? 'Add Coupon';
+
+	/// en: 'Delete Coupon'
+	String get deleteCoupon => TranslationOverrides.string(_root.$meta, 'deleteCoupon', {}) ?? 'Delete Coupon';
+
+	/// en: 'Manage Coupon'
+	String get manageCoupon => TranslationOverrides.string(_root.$meta, 'manageCoupon', {}) ?? 'Manage Coupon';
+
+	/// en: 'Back to List'
+	String get backToList => TranslationOverrides.string(_root.$meta, 'backToList', {}) ?? 'Back to List';
+
+	/// en: 'Coupon Code'
+	String get couponCode => TranslationOverrides.string(_root.$meta, 'couponCode', {}) ?? 'Coupon Code';
+
+	/// en: 'Discount Type'
+	String get discountType => TranslationOverrides.string(_root.$meta, 'discountType', {}) ?? 'Discount Type';
+
+	/// en: 'Discount Value'
+	String get discountValue => TranslationOverrides.string(_root.$meta, 'discountValue', {}) ?? 'Discount Value';
+
+	/// en: 'Select Date'
+	String get selectDate => TranslationOverrides.string(_root.$meta, 'selectDate', {}) ?? 'Select Date';
+
+	/// en: 'Is Active'
+	String get isActive => TranslationOverrides.string(_root.$meta, 'isActive', {}) ?? 'Is Active';
+
+	/// en: 'Save Coupon'
+	String get saveCoupon => TranslationOverrides.string(_root.$meta, 'saveCoupon', {}) ?? 'Save Coupon';
+
+	/// en: 'Coupon saved successfully!'
+	String get couponSavedSuccessfully => TranslationOverrides.string(_root.$meta, 'couponSavedSuccessfully', {}) ?? 'Coupon saved successfully!';
+
+	/// en: 'Percentage (%)'
+	String get percentage => TranslationOverrides.string(_root.$meta, 'percentage', {}) ?? 'Percentage (%)';
+
+	/// en: 'Fixed Amount ($)'
+	String get fixedAmount => TranslationOverrides.string(_root.$meta, 'fixedAmount', {}) ?? 'Fixed Amount (\$)';
+
+	/// en: 'SELECT OPTIONS'
+	String get selectOptions => TranslationOverrides.string(_root.$meta, 'selectOptions', {}) ?? 'SELECT OPTIONS';
+
+	/// en: 'PREVIOUS'
+	String get previous => TranslationOverrides.string(_root.$meta, 'previous', {}) ?? 'PREVIOUS';
+
+	/// en: 'NEXT'
+	String get next => TranslationOverrides.string(_root.$meta, 'next', {}) ?? 'NEXT';
+
+	/// en: 'Welcome'
+	String get welcome => TranslationOverrides.string(_root.$meta, 'welcome', {}) ?? 'Welcome';
+
+	/// en: 'Discover amazing products'
+	String get discoverAmazingProducts => TranslationOverrides.string(_root.$meta, 'discoverAmazingProducts', {}) ?? 'Discover amazing products';
+
+	/// en: 'Easy Shopping'
+	String get easyShopping => TranslationOverrides.string(_root.$meta, 'easyShopping', {}) ?? 'Easy Shopping';
+
+	/// en: 'Browse and buy with ease'
+	String get browseAndBuyWithEase => TranslationOverrides.string(_root.$meta, 'browseAndBuyWithEase', {}) ?? 'Browse and buy with ease';
+
+	/// en: 'Fast Delivery'
+	String get fastDelivery => TranslationOverrides.string(_root.$meta, 'fastDelivery', {}) ?? 'Fast Delivery';
+
+	/// en: 'Get your orders delivered quickly'
+	String get getOrdersDeliveredQuickly => TranslationOverrides.string(_root.$meta, 'getOrdersDeliveredQuickly', {}) ?? 'Get your orders delivered quickly';
+
+	/// en: 'Skip'
+	String get skip => TranslationOverrides.string(_root.$meta, 'skip', {}) ?? 'Skip';
+
+	/// en: 'Get Started'
+	String get getStarted => TranslationOverrides.string(_root.$meta, 'getStarted', {}) ?? 'Get Started';
+
+	/// en: 'Sort by'
+	String get sortBy => TranslationOverrides.string(_root.$meta, 'sortBy', {}) ?? 'Sort by';
+
+	/// en: 'Select how you want to sort the products'
+	String get selectHowToSortProducts => TranslationOverrides.string(_root.$meta, 'selectHowToSortProducts', {}) ?? 'Select how you want to sort the products';
+
+	/// en: 'Filter products by categories, price, and more'
+	String get filterProductsByCategories => TranslationOverrides.string(_root.$meta, 'filterProductsByCategories', {}) ?? 'Filter products by categories, price, and more';
+
+	/// en: 'Clear Filters'
+	String get clearFilters => TranslationOverrides.string(_root.$meta, 'clearFilters', {}) ?? 'Clear Filters';
+
+	/// en: 'Product Added to Cart'
+	String get productAddedToCartTitle => TranslationOverrides.string(_root.$meta, 'productAddedToCartTitle', {}) ?? 'Product Added to Cart';
+
+	/// en: 'Items'
+	String get items => TranslationOverrides.string(_root.$meta, 'items', {}) ?? 'Items';
+
+	/// en: 'Continue Shopping'
+	String get continueShopping => TranslationOverrides.string(_root.$meta, 'continueShopping', {}) ?? 'Continue Shopping';
+
+	/// en: 'View Cart'
+	String get viewCart => TranslationOverrides.string(_root.$meta, 'viewCart', {}) ?? 'View Cart';
+
+	/// en: 'Failed to load cart'
+	String get failedToLoadCart => TranslationOverrides.string(_root.$meta, 'failedToLoadCart', {}) ?? 'Failed to load cart';
+
+	/// en: 'Delete Address'
+	String get deleteAddress => TranslationOverrides.string(_root.$meta, 'deleteAddress', {}) ?? 'Delete Address';
+
+	/// en: 'Default'
+	String get defaultLabel => TranslationOverrides.string(_root.$meta, 'defaultLabel', {}) ?? 'Default';
+
+	/// en: 'Verified'
+	String get verified => TranslationOverrides.string(_root.$meta, 'verified', {}) ?? 'Verified';
+
+	/// en: 'Product'
+	String get productFallback => TranslationOverrides.string(_root.$meta, 'productFallback', {}) ?? 'Product';
+
+	/// en: 'Remove item'
+	String get removeItem => TranslationOverrides.string(_root.$meta, 'removeItem', {}) ?? 'Remove item';
+
+	/// en: 'No Image Available'
+	String get noImageAvailable => TranslationOverrides.string(_root.$meta, 'noImageAvailable', {}) ?? 'No Image Available';
+
+	/// en: 'Product Details'
+	String get productDetails => TranslationOverrides.string(_root.$meta, 'productDetails', {}) ?? 'Product Details';
+
+	/// en: 'Please sign in to manage favorites'
+	String get pleaseSignInToManageFavorites => TranslationOverrides.string(_root.$meta, 'pleaseSignInToManageFavorites', {}) ?? 'Please sign in to manage favorites';
+
+	/// en: 'Comment'
+	String get comment => TranslationOverrides.string(_root.$meta, 'comment', {}) ?? 'Comment';
+
+	/// en: 'Delivery'
+	String get delivery => TranslationOverrides.string(_root.$meta, 'delivery', {}) ?? 'Delivery';
+
+	/// en: 'Related Products'
+	String get relatedProducts => TranslationOverrides.string(_root.$meta, 'relatedProducts', {}) ?? 'Related Products';
+
+	/// en: 'People Also Viewed'
+	String get peopleAlsoViewed => TranslationOverrides.string(_root.$meta, 'peopleAlsoViewed', {}) ?? 'People Also Viewed';
+
+	/// en: 'Remove Item'
+	String get removeItemTitle => TranslationOverrides.string(_root.$meta, 'removeItemTitle', {}) ?? 'Remove Item';
+
+	/// en: 'Discount code'
+	String get discountCode => TranslationOverrides.string(_root.$meta, 'discountCode', {}) ?? 'Discount code';
+
+	/// en: 'Remove coupon'
+	String get removeCouponTooltip => TranslationOverrides.string(_root.$meta, 'removeCouponTooltip', {}) ?? 'Remove coupon';
+
+	/// en: 'Shopping Cart'
+	String get shoppingCart => TranslationOverrides.string(_root.$meta, 'shoppingCart', {}) ?? 'Shopping Cart';
+
+	/// en: 'Refresh cart'
+	String get refreshCart => TranslationOverrides.string(_root.$meta, 'refreshCart', {}) ?? 'Refresh cart';
+
+	/// en: 'Free'
+	String get free => TranslationOverrides.string(_root.$meta, 'free', {}) ?? 'Free';
+
+	/// en: 'Standard Shipping'
+	String get standardShipping => TranslationOverrides.string(_root.$meta, 'standardShipping', {}) ?? 'Standard Shipping';
+
+	/// en: 'Delivery to your address'
+	String get deliveryToYourAddress => TranslationOverrides.string(_root.$meta, 'deliveryToYourAddress', {}) ?? 'Delivery to your address';
+
+	/// en: 'Express Shipping'
+	String get expressShipping => TranslationOverrides.string(_root.$meta, 'expressShipping', {}) ?? 'Express Shipping';
+
+	/// en: 'Fast delivery'
+	String get fastDeliveryDesc => TranslationOverrides.string(_root.$meta, 'fastDeliveryDesc', {}) ?? 'Fast delivery';
+
+	/// en: 'Free Shipping'
+	String get freeShipping => TranslationOverrides.string(_root.$meta, 'freeShipping', {}) ?? 'Free Shipping';
+
+	/// en: 'Bank Transfer'
+	String get bankTransfer => TranslationOverrides.string(_root.$meta, 'bankTransfer', {}) ?? 'Bank Transfer';
+
+	/// en: 'Direct bank transfer'
+	String get directBankTransfer => TranslationOverrides.string(_root.$meta, 'directBankTransfer', {}) ?? 'Direct bank transfer';
+
+	/// en: 'Cash on Delivery'
+	String get cashOnDelivery => TranslationOverrides.string(_root.$meta, 'cashOnDelivery', {}) ?? 'Cash on Delivery';
+
+	/// en: 'Pay when you receive'
+	String get payWhenYouReceive => TranslationOverrides.string(_root.$meta, 'payWhenYouReceive', {}) ?? 'Pay when you receive';
+
+	/// en: 'Credit Card'
+	String get creditCard => TranslationOverrides.string(_root.$meta, 'creditCard', {}) ?? 'Credit Card';
+
+	/// en: 'Pay with card'
+	String get payWithCard => TranslationOverrides.string(_root.$meta, 'payWithCard', {}) ?? 'Pay with card';
+
+	/// en: 'Subtotal'
+	String get subtotal => TranslationOverrides.string(_root.$meta, 'subtotal', {}) ?? 'Subtotal';
+
+	/// en: 'Shipping'
+	String get shipping => TranslationOverrides.string(_root.$meta, 'shipping', {}) ?? 'Shipping';
+
+	/// en: 'Tax'
+	String get tax => TranslationOverrides.string(_root.$meta, 'tax', {}) ?? 'Tax';
+
+	/// en: 'Date (Newest)'
+	String get dateNewest => TranslationOverrides.string(_root.$meta, 'dateNewest', {}) ?? 'Date (Newest)';
+
+	/// en: 'Date (Oldest)'
+	String get dateOldest => TranslationOverrides.string(_root.$meta, 'dateOldest', {}) ?? 'Date (Oldest)';
+
+	/// en: 'Price (Low to High)'
+	String get priceLowToHigh => TranslationOverrides.string(_root.$meta, 'priceLowToHigh', {}) ?? 'Price (Low to High)';
+
+	/// en: 'Price (High to Low)'
+	String get priceHighToLow => TranslationOverrides.string(_root.$meta, 'priceHighToLow', {}) ?? 'Price (High to Low)';
+
+	/// en: 'address'
+	String get addressSingular => TranslationOverrides.string(_root.$meta, 'addressSingular', {}) ?? 'address';
+
+	/// en: 'addresses'
+	String get addressesPlural => TranslationOverrides.string(_root.$meta, 'addressesPlural', {}) ?? 'addresses';
+
+	/// en: 'Status: {status}'
+	String get statusActiveInactive => TranslationOverrides.string(_root.$meta, 'statusActiveInactive', {}) ?? 'Status: {status}';
+
+	/// en: 'Are you sure you want to remove "{name}" from your cart?'
+	String get confirmRemoveItemFromCart => TranslationOverrides.string(_root.$meta, 'confirmRemoveItemFromCart', {}) ?? 'Are you sure you want to remove "{name}" from your cart?';
+
+	/// en: 'View app_config.json'
+	String get viewAppConfigJson => TranslationOverrides.string(_root.$meta, 'viewAppConfigJson', {}) ?? 'View app_config.json';
+
+	/// en: 'Revenue & orders by period'
+	String get revenueAndOrdersByPeriod => TranslationOverrides.string(_root.$meta, 'revenueAndOrdersByPeriod', {}) ?? 'Revenue & orders by period';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -1162,6 +1606,154 @@ extension on Translations {
 			'addAddress' => TranslationOverrides.string(_root.$meta, 'addAddress', {}) ?? 'Add Address',
 			'errorOccurred' => TranslationOverrides.string(_root.$meta, 'errorOccurred', {}) ?? 'An error occurred. Please try again.',
 			'delete' => TranslationOverrides.string(_root.$meta, 'delete', {}) ?? 'Delete',
+			'currency' => TranslationOverrides.string(_root.$meta, 'currency', {}) ?? 'Currency',
+			'contactUs' => TranslationOverrides.string(_root.$meta, 'contactUs', {}) ?? 'Contact us',
+			'contactUsBody' => TranslationOverrides.string(_root.$meta, 'contactUsBody', {}) ?? 'Email: support@masterfabric.co\nPhone: +90 212 000 00 00',
+			'faq' => TranslationOverrides.string(_root.$meta, 'faq', {}) ?? 'FAQ',
+			'faqBody' => TranslationOverrides.string(_root.$meta, 'faqBody', {}) ?? 'Frequently asked questions and answers will be available here.',
+			'returnsAndRefunds' => TranslationOverrides.string(_root.$meta, 'returnsAndRefunds', {}) ?? 'Returns & refunds',
+			'returnsAndRefundsBody' => TranslationOverrides.string(_root.$meta, 'returnsAndRefundsBody', {}) ?? 'Please check our return policy in the product detail page (Cancellation & returns).',
+			'generalSettings' => TranslationOverrides.string(_root.$meta, 'generalSettings', {}) ?? 'General settings',
+			'generalSettingsDescription' => TranslationOverrides.string(_root.$meta, 'generalSettingsDescription', {}) ?? 'Common store options. Values are saved in admin_settings table.',
+			'storeSettingsKeyValue' => TranslationOverrides.string(_root.$meta, 'storeSettingsKeyValue', {}) ?? 'Store settings (key-value)',
+			'storeSettingsKeyValueDescription' => TranslationOverrides.string(_root.$meta, 'storeSettingsKeyValueDescription', {}) ?? 'All key-value pairs from admin_settings. Tap a row to edit value, or add a new key (e.g. maintenance_mode, guest_checkout_enabled).',
+			'maintenanceMode' => TranslationOverrides.string(_root.$meta, 'maintenanceMode', {}) ?? 'Maintenance mode',
+			'maintenanceModeSubtitle' => TranslationOverrides.string(_root.$meta, 'maintenanceModeSubtitle', {}) ?? 'When on, store can show a maintenance message to customers.',
+			'guestCheckout' => TranslationOverrides.string(_root.$meta, 'guestCheckout', {}) ?? 'Guest checkout',
+			'guestCheckoutSubtitle' => TranslationOverrides.string(_root.$meta, 'guestCheckoutSubtitle', {}) ?? 'Allow checkout without creating an account.',
+			'defaultCurrency' => TranslationOverrides.string(_root.$meta, 'defaultCurrency', {}) ?? 'Default currency',
+			'defaultCurrencySubtitle' => TranslationOverrides.string(_root.$meta, 'defaultCurrencySubtitle', {}) ?? 'Shown as store default on the main app. Used when user has not chosen a currency.',
+			'addSetting' => TranslationOverrides.string(_root.$meta, 'addSetting', {}) ?? 'Add setting',
+			'noStoreSettingsYet' => TranslationOverrides.string(_root.$meta, 'noStoreSettingsYet', {}) ?? 'No store settings yet.',
+			'addKeyValueSetting' => TranslationOverrides.string(_root.$meta, 'addKeyValueSetting', {}) ?? 'Add key-value setting',
+			'addSettingDialogDescription' => TranslationOverrides.string(_root.$meta, 'addSettingDialogDescription', {}) ?? 'Add a new setting stored in admin_settings. Key is unique (e.g. maintenance_mode). Value can be text or true/false.',
+			'keyLabel' => TranslationOverrides.string(_root.$meta, 'keyLabel', {}) ?? 'Key',
+			'valueLabel' => TranslationOverrides.string(_root.$meta, 'valueLabel', {}) ?? 'Value',
+			'add' => TranslationOverrides.string(_root.$meta, 'add', {}) ?? 'Add',
+			'sessions' => TranslationOverrides.string(_root.$meta, 'sessions', {}) ?? 'Sessions',
+			'activityLog' => TranslationOverrides.string(_root.$meta, 'activityLog', {}) ?? 'Activity log',
+			'moderation' => TranslationOverrides.string(_root.$meta, 'moderation', {}) ?? 'Moderation',
+			'staff' => TranslationOverrides.string(_root.$meta, 'staff', {}) ?? 'Staff',
+			'reports' => TranslationOverrides.string(_root.$meta, 'reports', {}) ?? 'Reports',
+			'appConfig' => TranslationOverrides.string(_root.$meta, 'appConfig', {}) ?? 'App config',
+			'homeAppBarTitle' => TranslationOverrides.string(_root.$meta, 'homeAppBarTitle', {}) ?? 'Masterfabric S Store',
+			'quickAccess' => TranslationOverrides.string(_root.$meta, 'quickAccess', {}) ?? 'Quick access',
+			'productReviews' => TranslationOverrides.string(_root.$meta, 'productReviews', {}) ?? 'Product reviews',
+			'userAddresses' => TranslationOverrides.string(_root.$meta, 'userAddresses', {}) ?? 'User addresses',
+			'addresses' => TranslationOverrides.string(_root.$meta, 'addresses', {}) ?? 'Addresses',
+			'options' => TranslationOverrides.string(_root.$meta, 'options', {}) ?? 'Options',
+			'details' => TranslationOverrides.string(_root.$meta, 'details', {}) ?? 'Details',
+			'active' => TranslationOverrides.string(_root.$meta, 'active', {}) ?? 'Active',
+			'inactive' => TranslationOverrides.string(_root.$meta, 'inactive', {}) ?? 'Inactive',
+			'deactivate' => TranslationOverrides.string(_root.$meta, 'deactivate', {}) ?? 'Deactivate',
+			'activate' => TranslationOverrides.string(_root.$meta, 'activate', {}) ?? 'Activate',
+			'pending' => TranslationOverrides.string(_root.$meta, 'pending', {}) ?? 'Pending',
+			'approved' => TranslationOverrides.string(_root.$meta, 'approved', {}) ?? 'Approved',
+			'rejected' => TranslationOverrides.string(_root.$meta, 'rejected', {}) ?? 'Rejected',
+			'approve' => TranslationOverrides.string(_root.$meta, 'approve', {}) ?? 'Approve',
+			'reject' => TranslationOverrides.string(_root.$meta, 'reject', {}) ?? 'Reject',
+			'unapprove' => TranslationOverrides.string(_root.$meta, 'unapprove', {}) ?? 'Unapprove',
+			'unknownProduct' => TranslationOverrides.string(_root.$meta, 'unknownProduct', {}) ?? 'Unknown product',
+			'unknownAdmin' => TranslationOverrides.string(_root.$meta, 'unknownAdmin', {}) ?? 'Unknown admin',
+			'unknown' => TranslationOverrides.string(_root.$meta, 'unknown', {}) ?? 'Unknown',
+			'saved' => TranslationOverrides.string(_root.$meta, 'saved', {}) ?? 'Saved',
+			'date' => TranslationOverrides.string(_root.$meta, 'date', {}) ?? 'Date',
+			'revenue' => TranslationOverrides.string(_root.$meta, 'revenue', {}) ?? 'Revenue',
+			'sale' => TranslationOverrides.string(_root.$meta, 'sale', {}) ?? 'SALE',
+			'flash' => TranslationOverrides.string(_root.$meta, 'flash', {}) ?? 'FLASH',
+			'weekStar' => TranslationOverrides.string(_root.$meta, 'weekStar', {}) ?? 'WEEK STAR',
+			'user' => TranslationOverrides.string(_root.$meta, 'user', {}) ?? 'User',
+			'createNewCollection' => TranslationOverrides.string(_root.$meta, 'createNewCollection', {}) ?? 'Create new collection',
+			'removeAll' => TranslationOverrides.string(_root.$meta, 'removeAll', {}) ?? 'Remove all',
+			'createNewGroup' => TranslationOverrides.string(_root.$meta, 'createNewGroup', {}) ?? 'Create New Group',
+			'groupName' => TranslationOverrides.string(_root.$meta, 'groupName', {}) ?? 'Group Name',
+			'create' => TranslationOverrides.string(_root.$meta, 'create', {}) ?? 'Create',
+			'deleteCollection' => TranslationOverrides.string(_root.$meta, 'deleteCollection', {}) ?? 'Delete Collection',
+			'deleted' => TranslationOverrides.string(_root.$meta, 'deleted', {}) ?? 'Deleted',
+			'collectionDeletedSuccessfully' => TranslationOverrides.string(_root.$meta, 'collectionDeletedSuccessfully', {}) ?? 'Collection deleted successfully',
+			'noItemsInCollection' => TranslationOverrides.string(_root.$meta, 'noItemsInCollection', {}) ?? 'No items in this collection yet',
+			'noOtherProductsToAdd' => TranslationOverrides.string(_root.$meta, 'noOtherProductsToAdd', {}) ?? 'No other products to add',
+			'removed' => TranslationOverrides.string(_root.$meta, 'removed', {}) ?? 'Removed',
+			'added' => TranslationOverrides.string(_root.$meta, 'added', {}) ?? 'Added',
+			'anonymous' => TranslationOverrides.string(_root.$meta, 'anonymous', {}) ?? 'Anonymous',
+			'appConfigCopiedToClipboard' => TranslationOverrides.string(_root.$meta, 'appConfigCopiedToClipboard', {}) ?? 'App config copied to clipboard',
+			'noKeys' => TranslationOverrides.string(_root.$meta, 'noKeys', {}) ?? 'No keys',
+			'noCouponsFound' => TranslationOverrides.string(_root.$meta, 'noCouponsFound', {}) ?? 'No coupons found',
+			'addCoupon' => TranslationOverrides.string(_root.$meta, 'addCoupon', {}) ?? 'Add Coupon',
+			'deleteCoupon' => TranslationOverrides.string(_root.$meta, 'deleteCoupon', {}) ?? 'Delete Coupon',
+			'manageCoupon' => TranslationOverrides.string(_root.$meta, 'manageCoupon', {}) ?? 'Manage Coupon',
+			'backToList' => TranslationOverrides.string(_root.$meta, 'backToList', {}) ?? 'Back to List',
+			'couponCode' => TranslationOverrides.string(_root.$meta, 'couponCode', {}) ?? 'Coupon Code',
+			'discountType' => TranslationOverrides.string(_root.$meta, 'discountType', {}) ?? 'Discount Type',
+			'discountValue' => TranslationOverrides.string(_root.$meta, 'discountValue', {}) ?? 'Discount Value',
+			'selectDate' => TranslationOverrides.string(_root.$meta, 'selectDate', {}) ?? 'Select Date',
+			'isActive' => TranslationOverrides.string(_root.$meta, 'isActive', {}) ?? 'Is Active',
+			'saveCoupon' => TranslationOverrides.string(_root.$meta, 'saveCoupon', {}) ?? 'Save Coupon',
+			'couponSavedSuccessfully' => TranslationOverrides.string(_root.$meta, 'couponSavedSuccessfully', {}) ?? 'Coupon saved successfully!',
+			'percentage' => TranslationOverrides.string(_root.$meta, 'percentage', {}) ?? 'Percentage (%)',
+			'fixedAmount' => TranslationOverrides.string(_root.$meta, 'fixedAmount', {}) ?? 'Fixed Amount (\$)',
+			'selectOptions' => TranslationOverrides.string(_root.$meta, 'selectOptions', {}) ?? 'SELECT OPTIONS',
+			'previous' => TranslationOverrides.string(_root.$meta, 'previous', {}) ?? 'PREVIOUS',
+			'next' => TranslationOverrides.string(_root.$meta, 'next', {}) ?? 'NEXT',
+			'welcome' => TranslationOverrides.string(_root.$meta, 'welcome', {}) ?? 'Welcome',
+			'discoverAmazingProducts' => TranslationOverrides.string(_root.$meta, 'discoverAmazingProducts', {}) ?? 'Discover amazing products',
+			'easyShopping' => TranslationOverrides.string(_root.$meta, 'easyShopping', {}) ?? 'Easy Shopping',
+			'browseAndBuyWithEase' => TranslationOverrides.string(_root.$meta, 'browseAndBuyWithEase', {}) ?? 'Browse and buy with ease',
+			'fastDelivery' => TranslationOverrides.string(_root.$meta, 'fastDelivery', {}) ?? 'Fast Delivery',
+			'getOrdersDeliveredQuickly' => TranslationOverrides.string(_root.$meta, 'getOrdersDeliveredQuickly', {}) ?? 'Get your orders delivered quickly',
+			'skip' => TranslationOverrides.string(_root.$meta, 'skip', {}) ?? 'Skip',
+			'getStarted' => TranslationOverrides.string(_root.$meta, 'getStarted', {}) ?? 'Get Started',
+			'sortBy' => TranslationOverrides.string(_root.$meta, 'sortBy', {}) ?? 'Sort by',
+			'selectHowToSortProducts' => TranslationOverrides.string(_root.$meta, 'selectHowToSortProducts', {}) ?? 'Select how you want to sort the products',
+			'filterProductsByCategories' => TranslationOverrides.string(_root.$meta, 'filterProductsByCategories', {}) ?? 'Filter products by categories, price, and more',
+			'clearFilters' => TranslationOverrides.string(_root.$meta, 'clearFilters', {}) ?? 'Clear Filters',
+			'productAddedToCartTitle' => TranslationOverrides.string(_root.$meta, 'productAddedToCartTitle', {}) ?? 'Product Added to Cart',
+			'items' => TranslationOverrides.string(_root.$meta, 'items', {}) ?? 'Items',
+			'continueShopping' => TranslationOverrides.string(_root.$meta, 'continueShopping', {}) ?? 'Continue Shopping',
+			'viewCart' => TranslationOverrides.string(_root.$meta, 'viewCart', {}) ?? 'View Cart',
+			'failedToLoadCart' => TranslationOverrides.string(_root.$meta, 'failedToLoadCart', {}) ?? 'Failed to load cart',
+			'deleteAddress' => TranslationOverrides.string(_root.$meta, 'deleteAddress', {}) ?? 'Delete Address',
+			'defaultLabel' => TranslationOverrides.string(_root.$meta, 'defaultLabel', {}) ?? 'Default',
+			'verified' => TranslationOverrides.string(_root.$meta, 'verified', {}) ?? 'Verified',
+			'productFallback' => TranslationOverrides.string(_root.$meta, 'productFallback', {}) ?? 'Product',
+			'removeItem' => TranslationOverrides.string(_root.$meta, 'removeItem', {}) ?? 'Remove item',
+			'noImageAvailable' => TranslationOverrides.string(_root.$meta, 'noImageAvailable', {}) ?? 'No Image Available',
+			'productDetails' => TranslationOverrides.string(_root.$meta, 'productDetails', {}) ?? 'Product Details',
+			'pleaseSignInToManageFavorites' => TranslationOverrides.string(_root.$meta, 'pleaseSignInToManageFavorites', {}) ?? 'Please sign in to manage favorites',
+			'comment' => TranslationOverrides.string(_root.$meta, 'comment', {}) ?? 'Comment',
+			'delivery' => TranslationOverrides.string(_root.$meta, 'delivery', {}) ?? 'Delivery',
+			'relatedProducts' => TranslationOverrides.string(_root.$meta, 'relatedProducts', {}) ?? 'Related Products',
+			'peopleAlsoViewed' => TranslationOverrides.string(_root.$meta, 'peopleAlsoViewed', {}) ?? 'People Also Viewed',
+			'removeItemTitle' => TranslationOverrides.string(_root.$meta, 'removeItemTitle', {}) ?? 'Remove Item',
+			'discountCode' => TranslationOverrides.string(_root.$meta, 'discountCode', {}) ?? 'Discount code',
+			'removeCouponTooltip' => TranslationOverrides.string(_root.$meta, 'removeCouponTooltip', {}) ?? 'Remove coupon',
+			'shoppingCart' => TranslationOverrides.string(_root.$meta, 'shoppingCart', {}) ?? 'Shopping Cart',
+			'refreshCart' => TranslationOverrides.string(_root.$meta, 'refreshCart', {}) ?? 'Refresh cart',
+			'free' => TranslationOverrides.string(_root.$meta, 'free', {}) ?? 'Free',
+			'standardShipping' => TranslationOverrides.string(_root.$meta, 'standardShipping', {}) ?? 'Standard Shipping',
+			'deliveryToYourAddress' => TranslationOverrides.string(_root.$meta, 'deliveryToYourAddress', {}) ?? 'Delivery to your address',
+			'expressShipping' => TranslationOverrides.string(_root.$meta, 'expressShipping', {}) ?? 'Express Shipping',
+			'fastDeliveryDesc' => TranslationOverrides.string(_root.$meta, 'fastDeliveryDesc', {}) ?? 'Fast delivery',
+			'freeShipping' => TranslationOverrides.string(_root.$meta, 'freeShipping', {}) ?? 'Free Shipping',
+			'bankTransfer' => TranslationOverrides.string(_root.$meta, 'bankTransfer', {}) ?? 'Bank Transfer',
+			'directBankTransfer' => TranslationOverrides.string(_root.$meta, 'directBankTransfer', {}) ?? 'Direct bank transfer',
+			'cashOnDelivery' => TranslationOverrides.string(_root.$meta, 'cashOnDelivery', {}) ?? 'Cash on Delivery',
+			'payWhenYouReceive' => TranslationOverrides.string(_root.$meta, 'payWhenYouReceive', {}) ?? 'Pay when you receive',
+			'creditCard' => TranslationOverrides.string(_root.$meta, 'creditCard', {}) ?? 'Credit Card',
+			'payWithCard' => TranslationOverrides.string(_root.$meta, 'payWithCard', {}) ?? 'Pay with card',
+			'subtotal' => TranslationOverrides.string(_root.$meta, 'subtotal', {}) ?? 'Subtotal',
+			'shipping' => TranslationOverrides.string(_root.$meta, 'shipping', {}) ?? 'Shipping',
+			'tax' => TranslationOverrides.string(_root.$meta, 'tax', {}) ?? 'Tax',
+			'dateNewest' => TranslationOverrides.string(_root.$meta, 'dateNewest', {}) ?? 'Date (Newest)',
+			'dateOldest' => TranslationOverrides.string(_root.$meta, 'dateOldest', {}) ?? 'Date (Oldest)',
+			'priceLowToHigh' => TranslationOverrides.string(_root.$meta, 'priceLowToHigh', {}) ?? 'Price (Low to High)',
+			'priceHighToLow' => TranslationOverrides.string(_root.$meta, 'priceHighToLow', {}) ?? 'Price (High to Low)',
+			'addressSingular' => TranslationOverrides.string(_root.$meta, 'addressSingular', {}) ?? 'address',
+			'addressesPlural' => TranslationOverrides.string(_root.$meta, 'addressesPlural', {}) ?? 'addresses',
+			'statusActiveInactive' => TranslationOverrides.string(_root.$meta, 'statusActiveInactive', {}) ?? 'Status: {status}',
+			'confirmRemoveItemFromCart' => TranslationOverrides.string(_root.$meta, 'confirmRemoveItemFromCart', {}) ?? 'Are you sure you want to remove "{name}" from your cart?',
+			'viewAppConfigJson' => TranslationOverrides.string(_root.$meta, 'viewAppConfigJson', {}) ?? 'View app_config.json',
+			'revenueAndOrdersByPeriod' => TranslationOverrides.string(_root.$meta, 'revenueAndOrdersByPeriod', {}) ?? 'Revenue & orders by period',
 			_ => null,
 		};
 	}
