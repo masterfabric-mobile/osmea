@@ -42,7 +42,7 @@ class _AdminSessionsViewState extends State<AdminSessionsView> {
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.paperWhite,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Sessions', color: OsmeaColors.black),
+        title: OsmeaComponents.text(resources.sessions, color: OsmeaColors.black),
         variant: AppBarVariant.primary,
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
