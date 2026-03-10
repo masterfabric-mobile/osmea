@@ -78,7 +78,21 @@ class AdminSettingsView
               OsmeaComponents.sizedBox(height: context.spacing8),
               _buildAdminInfoCard(context, resources, adminUser),
               OsmeaComponents.sizedBox(height: context.spacing24),
-              _buildSectionTitle(context, 'Store settings'),
+              _buildSectionTitle(context, 'General settings'),
+              OsmeaComponents.sizedBox(height: 4),
+              OsmeaComponents.text(
+                'Common store options. Values are saved in admin_settings table.',
+                textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
+              ),
+              OsmeaComponents.sizedBox(height: context.spacing8),
+              _GeneralSettingsCard(service: getIt<AdminStoreSettingsService>()),
+              OsmeaComponents.sizedBox(height: context.spacing24),
+              _buildSectionTitle(context, 'Store settings (key-value)'),
+              OsmeaComponents.sizedBox(height: 4),
+              OsmeaComponents.text(
+                'All key-value pairs from admin_settings. Tap a row to edit value, or add a new key (e.g. maintenance_mode, guest_checkout_enabled).',
+                textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
+              ),
               OsmeaComponents.sizedBox(height: context.spacing8),
               _StoreSettingsSection(service: getIt<AdminStoreSettingsService>()),
             ],
@@ -155,6 +169,224 @@ class AdminSettingsView
   }
 }
 
+/// Predefined general options (maintenance_mode, guest_checkout_enabled, default_currency).
+class _GeneralSettingsCard extends StatefulWidget {
+  const _GeneralSettingsCard({required this.service});
+
+  final AdminStoreSettingsService service;
+
+  @override
+  State<_GeneralSettingsCard> createState() => _GeneralSettingsCardState();
+}
+
+class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
+  static const String _keyMaintenance = 'maintenance_mode';
+  static const String _keyGuestCheckout = 'guest_checkout_enabled';
+  static const String _keyDefaultCurrency = 'default_currency';
+
+  late Future<Map<String, String?>> _valuesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _valuesFuture = _loadValues();
+  }
+
+  Future<Map<String, String?>> _loadValues() async {
+    final list = await widget.service.listSettings();
+    final map = <String, String?>{};
+    for (final s in list) {
+      map[s.key] = s.value;
+    }
+    return map;
+  }
+
+  bool _boolValue(Map<String, String?> map, String key) {
+    final v = map[key]?.toLowerCase();
+    return v == 'true' || v == '1' || v == 'yes';
+  }
+
+  Future<void> _setBool(String key, bool value) async {
+    await widget.service.setSetting(key, value.toString());
+    setState(() {
+      _valuesFuture = _loadValues();
+    });
+  }
+
+  Future<void> _setString(String key, String value) async {
+    await widget.service.setSetting(key, value);
+    setState(() {
+      _valuesFuture = _loadValues();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, String?>>(
+      future: _valuesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return OsmeaComponents.container(
+            padding: context.paddingNormal,
+            decoration: BoxDecoration(
+              color: OsmeaColors.white,
+              borderRadius: context.borderRadiusNormal,
+              border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+            ),
+            child: OsmeaComponents.center(
+              child: OsmeaComponents.loading(
+                type: LoadingType.circularFade,
+                size: 24,
+                color: OsmeaColors.black,
+              ),
+            ),
+          );
+        }
+        final values = snapshot.data ?? {};
+        final maintenance = _boolValue(values, _keyMaintenance);
+        final guestCheckout = _boolValue(values, _keyGuestCheckout);
+        final defaultCurrency = values[_keyDefaultCurrency] ?? '';
+
+        return OsmeaComponents.container(
+          decoration: BoxDecoration(
+            color: OsmeaColors.white,
+            borderRadius: context.borderRadiusNormal,
+            border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              _buildGeneralRow(
+                context,
+                title: 'Maintenance mode',
+                subtitle: 'When on, store can show a maintenance message to customers.',
+                value: maintenance,
+                onChanged: (v) => _setBool(_keyMaintenance, v),
+              ),
+              Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+              _buildGeneralRow(
+                context,
+                title: 'Guest checkout',
+                subtitle: 'Allow checkout without creating an account.',
+                value: guestCheckout,
+                onChanged: (v) => _setBool(_keyGuestCheckout, v),
+              ),
+              Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+              _buildCurrencyRow(context, defaultCurrency),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGeneralRow(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: context.verticalPaddingNormal + context.horizontalPaddingNormal,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OsmeaComponents.text(
+                  title,
+                  textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.black,
+                      ),
+                ),
+                OsmeaComponents.sizedBox(height: 2),
+                OsmeaComponents.text(
+                  subtitle,
+                  textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: OsmeaColors.black,
+          ),
+        ],
+      ),
+    );
+  }
+
+  static const List<String> _currencyOptions = ['USD', 'EUR', 'TRY', 'GBP'];
+
+  Widget _buildCurrencyRow(BuildContext context, String currentValue) {
+    final selected = currentValue.trim().isEmpty
+        ? 'USD'
+        : currentValue.trim().toUpperCase();
+    return Padding(
+      padding: context.verticalPaddingNormal + context.horizontalPaddingNormal,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OsmeaComponents.text(
+            'Default currency',
+            textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.black,
+                ),
+          ),
+          OsmeaComponents.sizedBox(height: 2),
+          OsmeaComponents.text(
+            'Shown as store default on the main app. Used when user has not chosen a currency.',
+            textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
+          ),
+          OsmeaComponents.sizedBox(height: context.spacing12),
+          Wrap(
+            spacing: context.spacing8,
+            runSpacing: context.spacing8,
+            children: _currencyOptions.map((code) {
+              final isSelected = selected == code;
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _setString(_keyDefaultCurrency, code),
+                  borderRadius: context.borderRadiusNormal,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.spacing16,
+                      vertical: context.spacing10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? OsmeaColors.black : OsmeaColors.white,
+                      borderRadius: context.borderRadiusNormal,
+                      border: Border.all(
+                        color: isSelected ? OsmeaColors.black : OsmeaColors.silver,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: OsmeaComponents.text(
+                      code,
+                      textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: isSelected ? OsmeaColors.white : OsmeaColors.black,
+                          ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StoreSettingsSection extends StatefulWidget {
   const _StoreSettingsSection({required this.service});
 
@@ -179,34 +411,66 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
     });
   }
 
+  static const List<({String key, String hint})> _suggestedKeys = [
+    (key: 'maintenance_mode', hint: 'true / false'),
+    (key: 'guest_checkout_enabled', hint: 'true / false'),
+    (key: 'default_currency', hint: 'USD, EUR, TRY'),
+    (key: 'order_auto_confirm', hint: 'true / false'),
+    (key: 'max_cart_items', hint: 'number'),
+  ];
+
   Future<void> _addSetting(BuildContext context) async {
     final keyController = TextEditingController();
     final valueController = TextEditingController();
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: OsmeaComponents.text('Add setting', color: OsmeaColors.black),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: keyController,
-              decoration: const InputDecoration(
-                labelText: 'Key',
-                border: OutlineInputBorder(),
-                hintText: 'e.g. maintenance_mode',
+        title: OsmeaComponents.text('Add key-value setting', color: OsmeaColors.black),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OsmeaComponents.text(
+                'Add a new setting stored in admin_settings. Key is unique (e.g. maintenance_mode). Value can be text or true/false.',
+                textStyle: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: valueController,
-              decoration: const InputDecoration(
-                labelText: 'Value',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 12),
+              TextField(
+                controller: keyController,
+                decoration: InputDecoration(
+                  labelText: 'Key',
+                  border: const OutlineInputBorder(),
+                  hintText: 'e.g. maintenance_mode',
+                ),
               ),
-              maxLines: 2,
-            ),
-          ],
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  for (final s in _suggestedKeys)
+                    ActionChip(
+                      label: OsmeaComponents.text(s.key, color: OsmeaColors.black),
+                      onPressed: () {
+                        keyController.text = s.key;
+                        valueController.text = s.hint.startsWith('true') ? 'false' : (s.hint == 'number' ? '99' : s.hint.split(', ').first);
+                      },
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: valueController,
+                decoration: const InputDecoration(
+                  labelText: 'Value',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g. true, false, USD, 100',
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
