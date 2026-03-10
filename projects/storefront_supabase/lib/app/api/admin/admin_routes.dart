@@ -12,6 +12,8 @@ class AdminRoutes {
   static const String productAdd = '/admin/products/add';
   static String productEdit(String id) => '/admin/products/edit/$id';
   static const String orders = '/admin/orders';
+  static const String reviews = '/admin/reviews';
+  static const String addresses = '/admin/addresses';
   static const String coupons = '/admin/coupons';
   static const String couponAdd = '/admin/coupons/add';
   static String couponEdit(String id) => '/admin/coupons/edit/$id';
