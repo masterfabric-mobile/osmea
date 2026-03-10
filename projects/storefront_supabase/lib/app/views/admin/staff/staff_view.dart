@@ -20,8 +20,11 @@ class AdminStaffView extends StatefulWidget {
 
 class _AdminStaffViewState extends State<AdminStaffView> {
   late Future<List<AdminStaffUser>> _staff;
+  final Map<String, bool> _optimisticActive = {};
 
   AdminStaffService get _staffService => getIt<AdminStaffService>();
+
+  bool _isActive(AdminStaffUser u) => _optimisticActive[u.id] ?? u.isActive;
 
   @override
   void initState() {
@@ -32,15 +35,19 @@ class _AdminStaffViewState extends State<AdminStaffView> {
   Future<void> _refresh() async {
     setState(() {
       _staff = _staffService.listStaff();
+      _optimisticActive.clear();
     });
   }
 
   Future<void> _toggleActive(AdminStaffUser user) async {
+    final nextActive = !_isActive(user);
+    setState(() => _optimisticActive[user.id] = nextActive);
     try {
-      await _staffService.setActive(user.id, !user.isActive);
-      _refresh();
+      await _staffService.setActive(user.id, nextActive);
+      if (mounted) setState(() => _optimisticActive.remove(user.id));
     } catch (e) {
       if (!mounted) return;
+      setState(() => _optimisticActive.remove(user.id));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: OsmeaComponents.text(
@@ -59,7 +66,7 @@ class _AdminStaffViewState extends State<AdminStaffView> {
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.paperWhite,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Staff', color: OsmeaColors.black),
+        title: OsmeaComponents.text(resources.staff, color: OsmeaColors.black),
         variant: AppBarVariant.primary,
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
@@ -104,12 +111,13 @@ class _AdminStaffViewState extends State<AdminStaffView> {
               itemCount: list.length,
               itemBuilder: (context, i) {
                 final u = list[i];
+                final isActive = _isActive(u);
                 return OsmeaComponents.container(
                   margin: EdgeInsets.only(bottom: context.spacing12),
                   decoration: BoxDecoration(
                     color: OsmeaColors.white,
                     borderRadius: context.borderRadiusNormal,
-                    border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+                    border: Border.all(color: OsmeaColors.silver.withValues(alpha: 0.5)),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: OsmeaComponents.listItem(
@@ -127,18 +135,24 @@ class _AdminStaffViewState extends State<AdminStaffView> {
                             color: OsmeaColors.black,
                           ),
                     ),
-                    subtitle: OsmeaComponents.text(
-                      '${u.role} · ${u.isActive ? 'Active' : 'Inactive'}',
-                      textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        u.isActive ? Icons.toggle_on : Icons.toggle_off,
-                        color: u.isActive ? OsmeaColors.black : OsmeaColors.thunder,
-                        size: 28,
+                    subtitle: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: OsmeaComponents.text(
+                        '${u.role} · ${isActive ? context.resources.active : context.resources.inactive}',
+                        key: ValueKey(isActive),
+                        textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
                       ),
-                      onPressed: () => _toggleActive(u),
-                      tooltip: u.isActive ? 'Deactivate' : 'Activate',
+                    ),
+                    trailing: Tooltip(
+                      message: isActive ? context.resources.deactivate : context.resources.activate,
+                      child: Switch(
+                        value: isActive,
+                        onChanged: (_) => _toggleActive(u),
+                        activeThumbColor: OsmeaColors.black,
+                        activeTrackColor: OsmeaColors.black.withValues(alpha: 0.3),
+                        inactiveThumbColor: OsmeaColors.thunder,
+                        inactiveTrackColor: OsmeaColors.silver.withValues(alpha: 0.5),
+                      ),
                     ),
                   ),
                 );
