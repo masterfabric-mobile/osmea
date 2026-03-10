@@ -4,6 +4,8 @@ library;
 
 export 'admin_routes.dart';
 export 'abstract/admin_orders_service.dart';
+export 'abstract/admin_reviews_service.dart';
+export 'abstract/admin_addresses_service.dart';
 export 'abstract/admin_users_service.dart';
 export 'abstract/admin_coupons_service.dart';
 export 'abstract/admin_brands_service.dart';
@@ -13,6 +15,8 @@ export 'abstract/admin_reports_service.dart';
 export 'supabase/supabase_admin_brands_service.dart';
 export 'supabase/supabase_admin_categories_service.dart';
 export 'supabase/supabase_admin_orders_service.dart';
+export 'supabase/supabase_admin_reviews_service.dart';
+export 'supabase/supabase_admin_addresses_service.dart';
 export 'supabase/supabase_admin_users_service.dart';
 export 'supabase/supabase_admin_coupons_service.dart';
 export 'supabase/supabase_admin_products_service.dart';
