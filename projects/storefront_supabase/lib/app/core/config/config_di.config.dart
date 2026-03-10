@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_brands_service.dart'
+    as _i138;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_categories_service.dart'
     as _i969;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_coupons_service.dart'
@@ -23,6 +25,8 @@ import 'package:storefront_supabase/app/api/admin/abstract/admin_reports_service
     as _i357;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_users_service.dart'
     as _i398;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_brands_service.dart'
+    as _i587;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_categories_service.dart'
     as _i586;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_coupons_service.dart'
@@ -101,6 +105,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i434.CartCache>(() => _i434.CartCache());
     gh.factory<_i526.AdminCouponsService>(
       () => _i180.SupabaseAdminCouponsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i138.AdminBrandsService>(
+      () => _i587.SupabaseAdminBrandsService(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i421.AdminProductsService>(
       () => _i728.SupabaseAdminProductsService(gh<_i454.SupabaseClient>()),
