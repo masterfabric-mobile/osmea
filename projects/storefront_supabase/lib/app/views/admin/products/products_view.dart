@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storefront_supabase/app/api/admin/admin_routes.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +32,7 @@ class AdminProductsView
             backgroundColor: OsmeaColors.white,
             foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
-              onPressed: () => context.go('/profile'),
+              onPressed: () => goRoute(AdminRoutes.profile),
               icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
             ),
           ),
