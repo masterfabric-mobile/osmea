@@ -3,7 +3,9 @@
 library;
 
 export 'app_config/app_config_view.dart';
+export 'brands/brands_view.dart';
 export 'categories/categories_view.dart';
+export 'reports/reports_view.dart';
 export 'coupons/add_coupon/add_coupon_view.dart';
 export 'coupons/admin_coupons_view.dart';
 export 'dashboard/dashboard_view.dart';
