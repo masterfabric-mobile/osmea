@@ -42,7 +42,7 @@ class _AdminActivityLogViewState extends State<AdminActivityLogView> {
     return OsmeaComponents.scaffold(
       backgroundColor: OsmeaColors.paperWhite,
       appBar: OsmeaComponents.appBar(
-        title: OsmeaComponents.text('Activity log', color: OsmeaColors.black),
+        title: OsmeaComponents.text(resources.activityLog, color: OsmeaColors.black),
         variant: AppBarVariant.primary,
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
