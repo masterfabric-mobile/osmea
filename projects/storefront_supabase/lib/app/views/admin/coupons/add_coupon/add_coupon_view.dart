@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/module/states.dart';
 import 'package:storefront_supabase/app/views/admin/coupons/add_coupon/models/add_coupon_view_model.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> {
   AddCouponView({
@@ -18,7 +19,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
   }) : super(
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              'Manage Coupon',
+              context.resources.manageCoupon,
               color: OsmeaColors.black,
             ),
             variant: AppBarVariant.primary,
@@ -58,10 +59,10 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
           children: [
             Icon(Icons.check_circle, size: 64, color: OsmeaColors.forestHeart),
             const SizedBox(height: 16),
-            const Text('Coupon saved successfully!'),
+            Text(context.resources.couponSavedSuccessfully),
             const SizedBox(height: 24),
             OsmeaComponents.button(
-              text: 'Back to List',
+              text: context.resources.backToList,
               onPressed: () => context.go('/admin/coupons'),
               backgroundColor: OsmeaColors.black,
               textColor: OsmeaColors.white,
@@ -81,7 +82,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
             Text(state.message),
             const SizedBox(height: 24),
             OsmeaComponents.button(
-              text: 'Retry',
+              text: context.resources.retry,
               onPressed: () {
                  final couponId = arguments['couponId'] as String?;
                  viewModel.initial(couponId: couponId);
@@ -109,7 +110,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
                 child: OsmeaComponents.text(state.errorMessage!, textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black)),
               ),
 
-            _buildTextField(viewModel.codeController, 'Coupon Code', Icons.confirmation_number),
+            _buildTextField(viewModel.codeController, context.resources.couponCode, Icons.confirmation_number),
             const SizedBox(height: 16),
             
             // Discount Type Dropdown
@@ -205,7 +206,7 @@ class AddCouponView extends MasterViewCubit<AddCouponViewModel, AddCouponState> 
 
             const SizedBox(height: 32),
             OsmeaComponents.button(
-              text: 'Save Coupon',
+              text: context.resources.saveCoupon,
               onPressed: () => viewModel.saveCoupon(couponId: couponId),
               variant: ButtonVariant.primary,
               fullWidth: true,
