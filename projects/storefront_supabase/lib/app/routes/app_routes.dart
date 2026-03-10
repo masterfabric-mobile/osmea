@@ -1086,7 +1086,9 @@ int _getFallbackIndex(String location) {
   if (location.startsWith('/product-detail') ||
       location.startsWith('/brands') ||
       location == '/products' ||
-      location == '/settings') return 0;
+      location == '/settings') {
+    return 0;
+  }
   return 0;
 }
 
