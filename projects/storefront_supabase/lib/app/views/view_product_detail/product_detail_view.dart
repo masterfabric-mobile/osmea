@@ -229,7 +229,7 @@ PreferredSizeWidget productDetailCoreAppBar(
   
   return OsmeaComponents.appBar(
     title: OsmeaComponents.text(
-      'Product Details', // Hardcoded to avoid ambiguity
+      context.resources.productDetails,
       color: titleColor,
       textStyle: OsmeaTextStyle.titleLarge(context),
     ),
