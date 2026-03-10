@@ -44,7 +44,7 @@ class _AdminReviewsViewState extends State<AdminReviewsView> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${context.resources.errorPrefix}Failed to update')),
+          SnackBar(content: OsmeaComponents.text('${context.resources.errorPrefix}Failed to update', color: OsmeaColors.white)),
         );
       }
     }
@@ -145,7 +145,7 @@ class _AdminReviewsViewState extends State<AdminReviewsView> {
   Widget _filterChip(BuildContext context, String label, bool? value) {
     final selected = _filterApproved == value;
     return FilterChip(
-      label: Text(label),
+      label: OsmeaComponents.text(label, color: OsmeaColors.black),
       selected: selected,
       onSelected: (_) => _applyFilter(value),
     );
