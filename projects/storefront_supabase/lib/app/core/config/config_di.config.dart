@@ -27,6 +27,8 @@ import 'package:storefront_supabase/app/api/admin/abstract/admin_reports_service
     as _i357;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_reviews_service.dart'
     as _i38;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_store_settings_service.dart'
+    as _i909;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_users_service.dart'
     as _i398;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_addresses_service.dart'
@@ -45,6 +47,8 @@ import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_report
     as _i700;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_reviews_service.dart'
     as _i6;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_store_settings_service.dart'
+    as _i882;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_users_service.dart'
     as _i504;
 import 'package:storefront_supabase/app/core/cart/cart_cache.dart' as _i434;
@@ -119,6 +123,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i421.AdminProductsService>(
       () => _i728.SupabaseAdminProductsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i909.AdminStoreSettingsService>(
+      () => _i882.SupabaseAdminStoreSettingsService(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i454.ProductsByBrandViewModel>(
       () => _i454.ProductsByBrandViewModel(gh<_i454.SupabaseClient>()),
