@@ -55,9 +55,9 @@ class LocalizationHelper {
                     const SizedBox(height: 32),
                     Divider(height: 1, color: OsmeaColors.silver),
                     const SizedBox(height: 32),
-                    OsmeaComponents.text(
-                      'Currency',
-                      textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                  OsmeaComponents.text(
+                    context.resources.currency,
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
                         fontWeight: FontWeight.bold,
                         color: OsmeaColors.black,
                       ),
