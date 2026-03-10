@@ -78,19 +78,19 @@ class AdminSettingsView
               OsmeaComponents.sizedBox(height: context.spacing8),
               _buildAdminInfoCard(context, resources, adminUser),
               OsmeaComponents.sizedBox(height: context.spacing24),
-              _buildSectionTitle(context, 'General settings'),
+              _buildSectionTitle(context, resources.generalSettings),
               OsmeaComponents.sizedBox(height: 4),
               OsmeaComponents.text(
-                'Common store options. Values are saved in admin_settings table.',
+                resources.generalSettingsDescription,
                 textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
               ),
               OsmeaComponents.sizedBox(height: context.spacing8),
               _GeneralSettingsCard(service: getIt<AdminStoreSettingsService>()),
               OsmeaComponents.sizedBox(height: context.spacing24),
-              _buildSectionTitle(context, 'Store settings (key-value)'),
+              _buildSectionTitle(context, resources.storeSettingsKeyValue),
               OsmeaComponents.sizedBox(height: 4),
               OsmeaComponents.text(
-                'All key-value pairs from admin_settings. Tap a row to edit value, or add a new key (e.g. maintenance_mode, guest_checkout_enabled).',
+                resources.storeSettingsKeyValueDescription,
                 textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
               ),
               OsmeaComponents.sizedBox(height: context.spacing8),
@@ -258,16 +258,16 @@ class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
             children: [
               _buildGeneralRow(
                 context,
-                title: 'Maintenance mode',
-                subtitle: 'When on, store can show a maintenance message to customers.',
+                title: context.resources.maintenanceMode,
+                subtitle: context.resources.maintenanceModeSubtitle,
                 value: maintenance,
                 onChanged: (v) => _setBool(_keyMaintenance, v),
               ),
               Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
               _buildGeneralRow(
                 context,
-                title: 'Guest checkout',
-                subtitle: 'Allow checkout without creating an account.',
+                title: context.resources.guestCheckout,
+                subtitle: context.resources.guestCheckoutSubtitle,
                 value: guestCheckout,
                 onChanged: (v) => _setBool(_keyGuestCheckout, v),
               ),
@@ -334,7 +334,7 @@ class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           OsmeaComponents.text(
-            'Default currency',
+            context.resources.defaultCurrency,
             textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: OsmeaColors.black,
@@ -342,7 +342,7 @@ class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
           ),
           OsmeaComponents.sizedBox(height: 2),
           OsmeaComponents.text(
-            'Shown as store default on the main app. Used when user has not chosen a currency.',
+            context.resources.defaultCurrencySubtitle,
             textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
           ),
           OsmeaComponents.sizedBox(height: context.spacing12),
@@ -425,21 +425,21 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: OsmeaComponents.text('Add key-value setting', color: OsmeaColors.black),
+        title: OsmeaComponents.text(ctx.resources.addKeyValueSetting, color: OsmeaColors.black),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OsmeaComponents.text(
-                'Add a new setting stored in admin_settings. Key is unique (e.g. maintenance_mode). Value can be text or true/false.',
+                ctx.resources.addSettingDialogDescription,
                 textStyle: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: keyController,
                 decoration: InputDecoration(
-                  labelText: 'Key',
+                  labelText: ctx.resources.keyLabel,
                   border: const OutlineInputBorder(),
                   hintText: 'e.g. maintenance_mode',
                 ),
@@ -462,9 +462,9 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
               const SizedBox(height: 12),
               TextField(
                 controller: valueController,
-                decoration: const InputDecoration(
-                  labelText: 'Value',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: ctx.resources.valueLabel,
+                  border: const OutlineInputBorder(),
                   hintText: 'e.g. true, false, USD, 100',
                 ),
                 maxLines: 2,
@@ -475,11 +475,11 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: OsmeaComponents.text('Cancel', color: OsmeaColors.thunder),
+            child: OsmeaComponents.text(ctx.resources.cancel, color: OsmeaColors.thunder),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: OsmeaComponents.text('Add', color: OsmeaColors.black),
+            child: OsmeaComponents.text(ctx.resources.add, color: OsmeaColors.black),
           ),
         ],
       ),
@@ -501,20 +501,20 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
         title: OsmeaComponents.text(setting.key, color: OsmeaColors.black),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Value',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: ctx.resources.valueLabel,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: OsmeaComponents.text('Cancel', color: OsmeaColors.thunder),
+            child: OsmeaComponents.text(ctx.resources.cancel, color: OsmeaColors.thunder),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: OsmeaComponents.text('Save', color: OsmeaColors.black),
+            child: OsmeaComponents.text(ctx.resources.save, color: OsmeaColors.black),
           ),
         ],
       ),
@@ -569,14 +569,14 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 OsmeaComponents.text(
-                  'No store settings yet.',
+                  context.resources.noStoreSettingsYet,
                   textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(color: OsmeaColors.slate),
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing12),
                 TextButton.icon(
                   onPressed: () => _addSetting(context),
                   icon: Icon(Icons.add, size: 20, color: OsmeaColors.black),
-                  label: OsmeaComponents.text('Add setting', color: OsmeaColors.black),
+                  label: OsmeaComponents.text(context.resources.addSetting, color: OsmeaColors.black),
                 ),
               ],
             ),
@@ -645,7 +645,7 @@ class _StoreSettingsSectionState extends State<_StoreSettingsSection> {
                         Icon(Icons.add_circle_outline, size: 22, color: OsmeaColors.black),
                         OsmeaComponents.sizedBox(width: context.spacing8),
                         OsmeaComponents.text(
-                          'Add setting',
+                          context.resources.addSetting,
                           textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: OsmeaColors.black,
