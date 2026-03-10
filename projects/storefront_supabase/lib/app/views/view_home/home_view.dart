@@ -40,7 +40,7 @@ class SupabaseHomeView
 
             return OsmeaComponents.appBar(
               title: OsmeaComponents.text(
-                'Masterfabric S Store',
+                context.resources.homeAppBarTitle,
                 color: titleColor,
                 textStyle: OsmeaTextStyle.titleLarge(context).copyWith(fontWeight: FontWeight.bold),
               ),
