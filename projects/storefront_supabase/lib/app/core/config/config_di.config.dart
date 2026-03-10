@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_activity_log_service.dart'
+    as _i924;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_addresses_service.dart'
     as _i1030;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_brands_service.dart'
@@ -19,6 +21,8 @@ import 'package:storefront_supabase/app/api/admin/abstract/admin_categories_serv
     as _i969;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_coupons_service.dart'
     as _i526;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_moderation_service.dart'
+    as _i476;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_orders_service.dart'
     as _i925;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_products_service.dart'
@@ -27,10 +31,16 @@ import 'package:storefront_supabase/app/api/admin/abstract/admin_reports_service
     as _i357;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_reviews_service.dart'
     as _i38;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_sessions_service.dart'
+    as _i467;
+import 'package:storefront_supabase/app/api/admin/abstract/admin_staff_service.dart'
+    as _i176;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_store_settings_service.dart'
     as _i909;
 import 'package:storefront_supabase/app/api/admin/abstract/admin_users_service.dart'
     as _i398;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_activity_log_service.dart'
+    as _i240;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_addresses_service.dart'
     as _i285;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_brands_service.dart'
@@ -39,6 +49,8 @@ import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_catego
     as _i586;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_coupons_service.dart'
     as _i180;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_moderation_service.dart'
+    as _i8;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_orders_service.dart'
     as _i158;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_products_service.dart'
@@ -47,6 +59,10 @@ import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_report
     as _i700;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_reviews_service.dart'
     as _i6;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_sessions_service.dart'
+    as _i138;
+import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_staff_service.dart'
+    as _i715;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_store_settings_service.dart'
     as _i882;
 import 'package:storefront_supabase/app/api/admin/supabase/supabase_admin_users_service.dart'
@@ -160,6 +176,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1047.CheckoutViewModel>(
       () => _i1047.CheckoutViewModel(gh<_i454.SupabaseClient>()),
     );
+    gh.factory<_i476.AdminModerationService>(
+      () => _i8.SupabaseAdminModerationService(gh<_i454.SupabaseClient>()),
+    );
     gh.factory<_i925.AdminOrdersService>(
       () => _i158.SupabaseAdminOrdersService(gh<_i454.SupabaseClient>()),
     );
@@ -168,6 +187,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i38.AdminReviewsService>(
       () => _i6.SupabaseAdminReviewsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i924.AdminActivityLogService>(
+      () => _i240.SupabaseAdminActivityLogService(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i176.AdminStaffService>(
+      () => _i715.SupabaseAdminStaffService(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i482.SupabaseHomeViewModel>(
       () => _i482.SupabaseHomeViewModel(
@@ -203,6 +228,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i434.CartCache>(),
         gh<_i867.GuestCartStorage>(),
       ),
+    );
+    gh.factory<_i467.AdminSessionsService>(
+      () => _i138.SupabaseAdminSessionsService(gh<_i454.SupabaseClient>()),
     );
     return this;
   }
