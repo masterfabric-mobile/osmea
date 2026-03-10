@@ -192,7 +192,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
   ) {
     final configHelper = AssetConfigHelper();
     
-    final title = 'Shopping Cart';
+    final title = context.resources.shoppingCart;
     final backgroundColor = _parseColor(
       configHelper.getString(
         'cart_view_configuration.app_bar.backgroundColor',
@@ -259,7 +259,7 @@ class CartView extends MasterViewCubit<CartViewModel, CartState> {
                   size: context.iconSizeNormal,
                 ),
                 onPressed: () => viewModel?.refreshCart(),
-                tooltip: 'Refresh cart',
+                tooltip: context.resources.refreshCart,
               ),
             ]
           : [],
