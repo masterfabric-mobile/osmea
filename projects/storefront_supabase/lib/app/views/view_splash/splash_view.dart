@@ -151,9 +151,9 @@ class _SupabaseSplashViewState extends State<SupabaseSplashView>
       if (hex.length == 6) {
         return Color(int.parse('FF$hex', radix: 16));
       }
-      return Colors.white;
+      return OsmeaColors.white;
     } catch (e) {
-      return Colors.white;
+      return OsmeaColors.white;
     }
   }
 }
