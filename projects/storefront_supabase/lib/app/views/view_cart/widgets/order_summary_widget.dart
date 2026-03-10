@@ -5,7 +5,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 
@@ -54,7 +55,7 @@ class OrderSummaryWidget extends StatelessWidget {
     return OsmeaComponents.column(
       children: [
         _SummaryRowWidget(
-          label: 'Subtotal',
+          label: context.resources.subtotal,
           value: PriceHelper.format(
             state.totalPrice + state.totalDiscount,
             state.currencyCode ?? 'USD',
@@ -64,21 +65,21 @@ class OrderSummaryWidget extends StatelessWidget {
         OsmeaComponents.sizedBox(height: context.spacing10),
         if (state.totalDiscount > 0) ...[
           _SummaryRowWidget(
-            label: 'Discount',
+            label: context.resources.discount,
             value:
                 '-${PriceHelper.format(state.totalDiscount, state.currencyCode ?? 'USD', Localizations.localeOf(context).toString())}',
             isDiscount: true,
           ),
           OsmeaComponents.sizedBox(height: context.spacing10),
         ],
-        _SummaryRowWidget(
-          label: 'Shipping',
+_SummaryRowWidget(
+            label: context.resources.shipping,
           value: 'Calculated at checkout',
           isSecondary: true,
         ),
         OsmeaComponents.sizedBox(height: context.spacing10),
         _SummaryRowWidget(
-          label: 'Tax',
+          label: context.resources.tax,
           value: 'Calculated at checkout',
           isSecondary: true,
         ),
@@ -86,7 +87,7 @@ class OrderSummaryWidget extends StatelessWidget {
         OsmeaComponents.divider(),
         OsmeaComponents.sizedBox(height: context.spacing12),
         _SummaryRowWidget(
-          label: 'Total',
+          label: context.resources.total,
           value: PriceHelper.format(
             state.discountedTotal,
             state.currencyCode ?? 'USD',
