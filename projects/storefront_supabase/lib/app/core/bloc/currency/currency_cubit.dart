@@ -1,10 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:storefront_supabase/services/store_config_service.dart';
 
 class CurrencyCubit extends Cubit<String> {
-  CurrencyCubit() : super('USD') {
+  CurrencyCubit(this._storeConfig) : super(_storeConfig.defaultCurrencyCode) {
     _loadSavedCurrency();
   }
+
+  final StoreConfigService _storeConfig;
 
   Future<void> _loadSavedCurrency() async {
     final prefs = await SharedPreferences.getInstance();
@@ -13,8 +16,7 @@ class CurrencyCubit extends Cubit<String> {
     if (currencyCode != null) {
       emit(currencyCode);
     } else {
-      // Default to USD
-      emit('USD');
+      emit(_storeConfig.defaultCurrencyCode);
     }
   }
 
