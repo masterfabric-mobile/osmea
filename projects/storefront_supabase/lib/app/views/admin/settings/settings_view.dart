@@ -327,6 +327,9 @@ class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
     final selected = currentValue.trim().isEmpty
         ? 'USD'
         : currentValue.trim().toUpperCase();
+    final ordered = List<String>.from(_currencyOptions)
+      ..remove(selected);
+    ordered.insert(0, selected);
     return Padding(
       padding: context.verticalPaddingNormal + context.horizontalPaddingNormal,
       child: Column(
@@ -349,7 +352,7 @@ class _GeneralSettingsCardState extends State<_GeneralSettingsCard> {
           Wrap(
             spacing: context.spacing8,
             runSpacing: context.spacing8,
-            children: _currencyOptions.map((code) {
+            children: ordered.map((code) {
               final isSelected = selected == code;
               return Material(
                 color: Colors.transparent,
