@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/services/store_config_service.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 import 'models/settings_view_model.dart';
@@ -20,10 +22,10 @@ class SettingsView
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
               context.resources.settings,
-              color: Colors.black,
+              color: OsmeaColors.black,
             ),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
@@ -67,7 +69,9 @@ class SettingsView
           BlocBuilder<CurrencyCubit, String>(
             builder: (context, currency) {
               return OsmeaComponents.listItem(
-                title: OsmeaComponents.text('Currency ($currency)'),
+                title: OsmeaComponents.text(
+                  '${context.resources.currency} ($currency)',
+                ),
                 leading: const Icon(Icons.attach_money),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showCurrencySheet(context),
@@ -133,43 +137,38 @@ class SettingsView
     );
   }
 
+  static const List<String> _currencyCodes = ['USD', 'EUR', 'TRY', 'GBP'];
+  static const Map<String, String> _currencyFlags = {
+    'USD': '🇺🇸',
+    'EUR': '🇪🇺',
+    'TRY': '🇹🇷',
+    'GBP': '🇬🇧',
+  };
+
   void _showCurrencySheet(BuildContext context) {
+    final storeDefault =
+        getIt<StoreConfigService>().defaultCurrencyCode.toUpperCase();
+    final ordered = List<String>.from(_currencyCodes)
+      ..remove(storeDefault);
+    ordered.insert(0, storeDefault);
+
     OsmeaComponents.bottomSheet(
       child: OsmeaComponents.column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          OsmeaComponents.listItem(
-            leading: const Text('🇺🇸'),
-            title: const Text('USD'),
-            onTap: () {
-              context.read<CurrencyCubit>().changeCurrency('USD');
-              Navigator.pop(context);
-            },
-          ),
-          OsmeaComponents.listItem(
-            leading: const Text('🇪🇺'),
-            title: const Text('EUR'),
-            onTap: () {
-              context.read<CurrencyCubit>().changeCurrency('EUR');
-              Navigator.pop(context);
-            },
-          ),
-          OsmeaComponents.listItem(
-            leading: const Text('🇹🇷'),
-            title: const Text('TRY'),
-            onTap: () {
-              context.read<CurrencyCubit>().changeCurrency('TRY');
-              Navigator.pop(context);
-            },
-          ),
-          OsmeaComponents.listItem(
-            leading: const Text('🇬🇧'),
-            title: const Text('GBP'),
-            onTap: () {
-              context.read<CurrencyCubit>().changeCurrency('GBP');
-              Navigator.pop(context);
-            },
-          ),
+          for (final code in ordered)
+            OsmeaComponents.listItem(
+              leading: Text(_currencyFlags[code] ?? ''),
+              title: OsmeaComponents.text(
+                code == storeDefault
+                    ? '$code (${context.resources.defaultLabel})'
+                    : code,
+              ),
+              onTap: () {
+                context.read<CurrencyCubit>().changeCurrency(code);
+                Navigator.pop(context);
+              },
+            ),
         ],
       ),
     );
