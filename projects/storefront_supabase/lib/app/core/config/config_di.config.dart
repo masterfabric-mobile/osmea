@@ -110,6 +110,8 @@ import 'package:storefront_supabase/app/views/view_search/models/search_view_mod
     as _i915;
 import 'package:storefront_supabase/app/views/view_settings/models/settings_view_model.dart'
     as _i555;
+import 'package:storefront_supabase/services/store_config_service.dart'
+    as _i459;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -231,6 +233,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i467.AdminSessionsService>(
       () => _i138.SupabaseAdminSessionsService(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i459.StoreConfigService>(
+      () => _i459.StoreConfigService(gh<_i909.AdminStoreSettingsService>()),
     );
     return this;
   }
