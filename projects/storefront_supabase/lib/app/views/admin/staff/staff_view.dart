@@ -44,7 +44,12 @@ class _AdminStaffViewState extends State<AdminStaffView> {
     setState(() => _optimisticActive[user.id] = nextActive);
     try {
       await _staffService.setActive(user.id, nextActive);
-      if (mounted) setState(() => _optimisticActive.remove(user.id));
+      if (mounted) {
+        setState(() {
+          _optimisticActive.remove(user.id);
+          _staff = _staffService.listStaff();
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _optimisticActive.remove(user.id));
@@ -101,7 +106,7 @@ class _AdminStaffViewState extends State<AdminStaffView> {
             if (list.isEmpty) {
               return OsmeaComponents.center(
                 child: OsmeaComponents.text(
-                  'No staff users found.',
+                  resources.noStaffUsersFound,
                   textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: OsmeaColors.thunder),
                 ),
               );
