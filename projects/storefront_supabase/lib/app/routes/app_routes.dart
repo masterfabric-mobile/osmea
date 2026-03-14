@@ -54,6 +54,8 @@ import 'package:get_it/get_it.dart';
 import 'package:storefront_supabase/app/views/view_product_list/product_list_view.dart'; // Added
 import 'package:storefront_supabase/app/views/view_splash/splash_view.dart';
 import 'package:storefront_supabase/app/views/view_onboarding/onboarding_view.dart';
+import 'package:storefront_supabase/app/core/config/config_di.dart';
+import 'package:storefront_supabase/services/store_config_service.dart';
 
 /// Scaffold messenger key for user shell (core MasterScaffoldWidget).
 final GlobalKey<ScaffoldMessengerState> _userShellScaffoldMessengerKey =
@@ -97,6 +99,19 @@ Future<void> _handleSplashNavigation(BuildContext context) async {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  redirect: (BuildContext context, GoRouterState state) {
+    final loc = state.matchedLocation;
+    if (loc == '/checkout') {
+      final storeConfig = getIt<StoreConfigService>();
+      if (!storeConfig.isGuestCheckoutEnabled) {
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user == null || user.isAnonymous) {
+          return '/profile';
+        }
+      }
+    }
+    return null;
+  },
   routes: <RouteBase>[
     // Splash Screen Route - Outside ShellRoute so no bottom bar
     // Custom splash view for storefront
