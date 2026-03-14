@@ -959,6 +959,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Staff'
 	String get staff => TranslationOverrides.string(_root.$meta, 'staff', {}) ?? 'Staff';
 
+	/// en: 'No staff users found.'
+	String get noStaffUsersFound => TranslationOverrides.string(_root.$meta, 'noStaffUsersFound', {}) ?? 'No staff users found.';
+
 	/// en: 'Reports'
 	String get reports => TranslationOverrides.string(_root.$meta, 'reports', {}) ?? 'Reports';
 
@@ -1634,6 +1637,7 @@ extension on Translations {
 			'activityLog' => TranslationOverrides.string(_root.$meta, 'activityLog', {}) ?? 'Activity log',
 			'moderation' => TranslationOverrides.string(_root.$meta, 'moderation', {}) ?? 'Moderation',
 			'staff' => TranslationOverrides.string(_root.$meta, 'staff', {}) ?? 'Staff',
+			'noStaffUsersFound' => TranslationOverrides.string(_root.$meta, 'noStaffUsersFound', {}) ?? 'No staff users found.',
 			'reports' => TranslationOverrides.string(_root.$meta, 'reports', {}) ?? 'Reports',
 			'appConfig' => TranslationOverrides.string(_root.$meta, 'appConfig', {}) ?? 'App config',
 			'homeAppBarTitle' => TranslationOverrides.string(_root.$meta, 'homeAppBarTitle', {}) ?? 'Masterfabric S Store',
