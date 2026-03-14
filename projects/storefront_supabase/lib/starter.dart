@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:storefront_supabase/app/core/config/config_di.dart';
+import 'package:storefront_supabase/services/store_config_service.dart';
 
 import 'package:storefront_supabase/app/routes/app_routes.dart';
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
@@ -148,6 +149,9 @@ launchApp({String environment = 'dev'}) async {
 
   await configureDependencies(environment: environment);
 
+  // Load store settings from admin_settings (default_currency, maintenance_mode, guest_checkout_enabled)
+  await getIt<StoreConfigService>().init();
+
   // 🎨 Get UI configuration from config helpers
 
   bool debugMode = configLoaded
@@ -196,17 +200,23 @@ launchApp({String environment = 'dev'}) async {
 
   // Run the main application with the specified router and configuration
 
+  final storeConfig = getIt<StoreConfigService>();
+
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => AccountCubit()..initialize()),
+    storeConfig.isMaintenanceMode
+        ? _MaintenanceApp()
+        : MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => AccountCubit()..initialize()),
 
-        BlocProvider(create: (context) => LanguageCubit()),
+              BlocProvider(create: (context) => LanguageCubit()),
 
-        BlocProvider(create: (context) => CurrencyCubit()),
-      ],
-
-      child: BlocBuilder<LanguageCubit, Locale?>(
+              BlocProvider(
+                create: (context) =>
+                    CurrencyCubit(getIt<StoreConfigService>()),
+              ),
+            ],
+            child: BlocBuilder<LanguageCubit, Locale?>(
         builder: (context, locale) {
           return TranslationProvider(
             child: MasterApp(
@@ -232,4 +242,48 @@ launchApp({String environment = 'dev'}) async {
   );
 
   debugPrint('✅ Storefront WooCommerce App launched successfully');
+}
+
+/// Shown when admin_settings.maintenance_mode is true.
+class _MaintenanceApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: OsmeaComponents.scaffold(
+        body: SafeArea(
+          child: OsmeaComponents.center(
+            child: OsmeaComponents.padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: OsmeaComponents.column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.build_circle_outlined,
+                    size: 64,
+                    color: OsmeaColors.thunder,
+                  ),
+                  OsmeaComponents.sizedBox(height: 24),
+                  OsmeaComponents.text(
+                    'Under maintenance',
+                    textStyle: OsmeaTextStyle.titleLarge(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
+                  OsmeaComponents.sizedBox(height: 12),
+                  OsmeaComponents.text(
+                    'We\'ll be back shortly. Thank you for your patience.',
+                    textAlign: TextAlign.center,
+                    textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(
+                      color: OsmeaColors.thunder,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
