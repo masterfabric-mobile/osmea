@@ -320,6 +320,7 @@
     "activityLog": "Activity log",
     "moderation": "Moderation",
     "staff": "Staff",
+    "noStaffUsersFound": "No staff users found.",
     "reports": "Reports",
     "appConfig": "App config",
     "homeAppBarTitle": "Masterfabric S Store",
