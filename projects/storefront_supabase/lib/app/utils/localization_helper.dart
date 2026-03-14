@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
+import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/core/bloc/language/language_cubit.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/services/store_config_service.dart';
 import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 class LocalizationHelper {
+  static const List<String> _currencyCodes = ['USD', 'EUR', 'TRY', 'GBP'];
+  static const Map<String, String> _currencyFlags = {
+    'USD': '🇺🇸',
+    'EUR': '🇪🇺',
+    'TRY': '🇹🇷',
+    'GBP': '🇬🇧',
+  };
+
   static void showLanguageCurrencySheet(BuildContext context) {
+    final storeDefault =
+        getIt<StoreConfigService>().defaultCurrencyCode.toUpperCase();
+    final ordered = List<String>.from(_currencyCodes)
+      ..remove(storeDefault);
+    ordered.insert(0, storeDefault);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -63,10 +78,13 @@ class LocalizationHelper {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildCurrencyItem(context, '🇺🇸', 'USD'),
-                    _buildCurrencyItem(context, '🇪🇺', 'EUR'),
-                    _buildCurrencyItem(context, '🇹🇷', 'TRY'),
-                    _buildCurrencyItem(context, '🇬🇧', 'GBP'),
+                    for (final code in ordered)
+                      _buildCurrencyItem(
+                        context,
+                        _currencyFlags[code] ?? '',
+                        code,
+                        isStoreDefault: code == storeDefault,
+                      ),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -97,15 +115,31 @@ class LocalizationHelper {
     );
   }
 
-  static Widget _buildCurrencyItem(BuildContext context, String flag, String code) {
+  static Widget _buildCurrencyItem(
+    BuildContext context,
+    String flag,
+    String code, {
+    bool isStoreDefault = false,
+  }) {
     return BlocBuilder<CurrencyCubit, String>(
       builder: (context, currentCurrency) {
         final isSelected = currentCurrency == code;
+        final title = isStoreDefault
+            ? '$code (${context.resources.defaultLabel})'
+            : code;
         return ListTile(
           tileColor: OsmeaColors.white,
-          leading: OsmeaComponents.text(flag, textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(fontSize: 24)),
-          title: OsmeaComponents.text(code, textStyle: OsmeaTextStyle.bodyMedium(context).copyWith(color: OsmeaColors.black)),
-          trailing: isSelected ? Icon(Icons.check_circle, color: OsmeaColors.black) : null,
+          leading: OsmeaComponents.text(
+            flag,
+            textStyle: OsmeaTextStyle.bodyLarge(context).copyWith(fontSize: 24),
+          ),
+          title: OsmeaComponents.text(
+            title,
+            textStyle: OsmeaTextStyle.bodyMedium(context)
+                .copyWith(color: OsmeaColors.black),
+          ),
+          trailing:
+              isSelected ? Icon(Icons.check_circle, color: OsmeaColors.black) : null,
           onTap: () {
             context.read<CurrencyCubit>().changeCurrency(code);
             Navigator.pop(context);
