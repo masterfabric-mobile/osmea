@@ -49,8 +49,8 @@ class TextData {
     'Nunito',
   ];
 
-  // Font weight display names
-  static const Map<FontWeight, String> fontWeightNames = {
+  // Font weight display names (non-const: FontWeight cannot be const map key)
+  static final Map<FontWeight, String> fontWeightNames = {
     FontWeight.w100: 'Thin (100)',
     FontWeight.w200: 'Extra Light (200)',
     FontWeight.w300: 'Light (300)',

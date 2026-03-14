@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'get_user_dashboard_response.dart';
 
 part 'get_user_statistics_response.freezed.dart';
 part 'get_user_statistics_response.g.dart';

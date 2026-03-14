@@ -31,16 +31,50 @@ class VariantInfoSection extends StatelessWidget {
 
   String _getVariantDescription(NavbarVariant variant) {
     switch (variant) {
-      case NavbarVariant.primary:
-        return 'Main navigation with brand colors. Most prominent and attention-grabbing.';
-      case NavbarVariant.secondary:
-        return 'Supporting navigation with neutral colors. Good for secondary interfaces.';
-      case NavbarVariant.transparent:
-        return 'Overlay navigation with transparent background. Perfect for hero sections.';
-      case NavbarVariant.glass:
-        return 'Modern frosted glass effect. Trendy design for contemporary interfaces.';
-      case NavbarVariant.outlined:
-        return 'Bordered navigation with subtle styling. Clean and minimal approach.';
+      case NavbarVariant.retailMain:
+        return 'E-commerce/Retail main navigation with primary brand colors.';
+      case NavbarVariant.dottedOutline:
+        return 'Creative navigation with dotted border outline.';
+      case NavbarVariant.healthcareMinimal:
+        return 'Healthcare minimal navigation with clean borders.';
+      case NavbarVariant.outlinedMinimal:
+        return 'Pill-shaped navbar with light background and border.';
+      case NavbarVariant.mediaOverlay:
+        return 'Floating overlay navigation for media and hero sections.';
+      case NavbarVariant.socialGlass:
+        return 'Frosted glass effect for social and modern apps.';
+      case NavbarVariant.enterpriseMain:
+        return 'Enterprise/B2B main navigation with professional styling.';
+      case NavbarVariant.iconGrid:
+        return 'Grid-based icon navigation without text.';
+      case NavbarVariant.floatingCards:
+        return 'Elevated floating card navigation.';
+      case NavbarVariant.pillShaped:
+        return 'Solid fill pill-shaped navbar.';
+      case NavbarVariant.minimal:
+        return 'Minimal navbar with only icon color change.';
+      case NavbarVariant.solidOutlined:
+        return 'Solid background with border.';
+      case NavbarVariant.minimalDot:
+        return 'Minimal with dot indicator below icon.';
+      case NavbarVariant.brutalist:
+        return 'Bold brutalist design with sharp edges.';
+      case NavbarVariant.badgeIndicator:
+        return 'Navigation with badge-style indicators.';
+      case NavbarVariant.neumorphic:
+        return 'Soft 3D neumorphic design.';
+      case NavbarVariant.cardFloating:
+        return 'Floating card-style navigation.';
+      case NavbarVariant.bubble:
+        return 'Playful bubble-style navigation.';
+      case NavbarVariant.glassyBlur:
+        return 'Glassmorphism with blur effects.';
+      case NavbarVariant.markerTab:
+        return 'Tab-style with marker indicators.';
+      case NavbarVariant.stepped:
+        return 'Stepped/stair-like navigation design.';
+      case NavbarVariant.ribbon:
+        return 'Ribbon/banner style navigation.';
     }
   }
 

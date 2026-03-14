@@ -1,340 +1,325 @@
-# OSMEA Storybook 📖
+# 📖 OSMEA Storybook
 
 <div align="center">
-
-[![Version](https://img.shields.io/badge/version-1.0.0-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
-[![Platform](https://img.shields.io/badge/platform-Flutter-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://dart.dev)
-[![Storybook](https://img.shields.io/badge/Storybook-2D3748?style=for-the-badge&logo=storybook&logoColor=white&labelColor=1A202C)](https://storybook.js.org)
-
+  <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/Storybook-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Storybook" /></a>
+  <a href="pubspec.yaml"><img src="https://img.shields.io/badge/Version-1.0.0-2D3748?style=for-the-badge&logoColor=white&labelColor=1A202C" alt="Version" /></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter%202.17+-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="Flutter" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart%202.17+-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Dart" /></a>
+  <a href="https://storybook.js.org"><img src="https://img.shields.io/badge/Components-41-2D3748?style=for-the-badge&logo=flutter&logoColor=white&labelColor=1A202C" alt="41 Components" /></a>
 </div>
 
-<div align="center">
+<br>
 
-**"Interactive Component Documentation & Playground"**
+> *Interactive component documentation and playground for the OSMEA design system*
 
-[📚 Documentation](https://github.com/masterfabric-mobile/osmea/tree/dev/projects/storybook) • [🐛 Report Issues](https://github.com/masterfabric-mobile/osmea/issues) • [💬 Discussions](https://github.com/masterfabric-mobile/osmea/discussions)
 
-</div>
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure)
 
----
 
-## 🌟 What is OSMEA Storybook?
+<details>
+<summary>🌟 Overview</summary>
 
-**OSMEA Storybook** is an interactive playground and documentation hub for all OSMEA Components. It provides a comprehensive environment to explore, test, and develop UI components in isolation with live property controls, device frames, and modular stories.
+**OSMEA Storybook** is an interactive documentation and testing environment for all 41 components in the OSMEA UI kit. Built with `storybook_flutter` and `device_frame`, it provides a comprehensive playground to explore, test, and develop components in isolation.
 
-### ✨ **Key Features**
+### 🎯 **Use Cases**
 
-- **🎮 Interactive Playground** - Live component demos with real-time property controls
-- **📱 Device Previews** - Mobile, tablet, and desktop device frame previews
-- **🧩 Modular Structure** - Each component has its own showcase and examples
-- **⚡ Rapid Development** - Templates and scripts for quick component story creation
-- **🔍 Structure Validation** - Automated validation for consistency across stories
+- **Component exploration** — Browse all 41 OSMEA components with live demos
+- **Interactive testing** — Test components with different props and states
+- **Device preview** — See how components look on different device frames
+- **Developer documentation** — Living docs with code examples and usage guidelines
+- **Design system** — Centralized component library and design tokens
 
----
+### Target Users
 
-## 🚀 Live Demo
+- **Flutter developers** working with the OSMEA component library
+- **UI/UX designers** exploring the design system and component variants
+- **QA testers** verifying component behavior across different scenarios
+- **Product teams** showcasing component capabilities
 
-<div align="center">
+</details>
 
-> **Explore OSMEA Components Interactively**  
-> 🌐 **Coming Soon - Live Storybook**
 
-*Interactive playground showcasing all OSMEA components with real-time controls and device previews*
+<details>
+<summary>✨ Features</summary>
 
-</div>
+### 📚 **Component Documentation**
 
----
+| Category | Components |
+|----------|------------|
+| **Layout** | Align, Column, Row, Stack, Padding, SizedBox, Spacer, ClipRRect |
+| **Buttons & Actions** | Button (5 variants), Checkbox, Radio Button, Switch Button, Counter |
+| **Cards & Content** | Cards, Avatar, Badge, Chips, Rich Text, Ticket Widget |
+| **Form & Input** | Text Field, Dropdown, Search Bar |
+| **Navigation** | AppBar, Navbar, TabBar, Bottom Sheet, Stepper |
+| **Feedback** | Loading, Progress, Toast, Snackbar, Popup |
+| **Interactive** | Carousel, Collapse, Divider |
 
-## ✨ What's Inside?
+### 🎮 **Interactive Features**
 
-### 🎨 **Component Showcase**
+| Feature | Description |
+|---------|-------------|
+| **Live Controls** | Real-time property adjustment with knobs |
+| **Device Frames** | Mobile, tablet, desktop preview modes |
+| **Component Isolation** | Test components independently |
+| **Theme Switching** | Light/dark theme toggle |
+| **Color Picker** | Interactive color selection |
+| **Typography Guide** | Complete text style documentation |
 
-<table>
-<tr>
-<td width="50%">
+### 🏗️ **Development Tools**
 
-#### **Basic Components**
-- 🎯 **Buttons** - Primary, secondary, outline variants
-- 📝 **Text & Typography** - Rich text formatting
-- 🏷️ **Badges & Chips** - Status indicators
-- 👤 **Avatars** - User profile images
-- 📄 **Cards** - Information containers
+| Tool | Description |
+|------|-------------|
+| **Component Templates** | Auto-generate new component stories |
+| **Structure Validator** | Ensure consistent story organization |
+| **Component Registry** | Centralized component management |
+| **Story Config** | Unified configuration system |
 
-#### **Form Components**
-- 📝 **Input Fields** - Text fields with validation
-- ☑️ **Checkboxes & Radio** - Selection controls
-- 🔄 **Switches & Toggles** - Binary state controls
-- 📋 **Dropdowns** - Selection menus
-- 📊 **Steppers** - Multi-step navigation
+</details>
 
-</td>
-<td width="50%">
 
-#### **Layout Components**
-- 📦 **Containers** - Flexible layout containers
-- 🔲 **Grid System** - Row, Column, Stack layouts
-- 📏 **Spacing** - Padding, Margin utilities
-- 🎯 **Alignment** - Center, Align, Positioned
-- 🔧 **Flexible Layouts** - Expanded, Flexible sizing
+<details>
+<summary>🛠️ Technology Stack</summary>
 
-#### **Advanced Components**
-- ⏳ **Loading Indicators** - Spinners and progress bars
-- 🍞 **Toast Notifications** - Success, error messages
-- 📊 **Progress Indicators** - Linear and circular progress
-- ⚠️ **Alerts & Dialogs** - Modal confirmations
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Flutter 2.17+ / Dart 2.17+ |
+| **Storybook** | storybook_flutter 0.14 |
+| **Device Preview** | device_frame 1.3 |
+| **State Management** | provider 6.0 |
+| **UI Components** | osmea_components (local package) |
+| **Color Picker** | flutter_colorpicker 1.1 |
+| **URL Launcher** | url_launcher 6.3 |
+| **Internationalization** | intl 0.20 |
 
-</td>
-</tr>
-</table>
+### 📁 Project Structure
 
-### 🛠️ **Development Tools**
-
-<table>
-<tr>
-<td width="50%">
-
-#### **Interactive Features**
-- 🎮 **Live Controls** - Real-time property adjustments
-- 📱 **Device Frames** - Mobile, tablet, desktop previews
-- 🎨 **Color Picker** - Interactive color selection
-- 🔗 **URL Launcher** - External link handling
-- 📤 **Share Helper** - Component sharing utilities
-
-#### **Documentation**
-- 📖 **Usage Guidelines** - Best practices and examples
-- 🎯 **Variants** - All component variations
-- 💡 **Code Examples** - Copy-paste ready code
-- 🔍 **Search & Filter** - Find components quickly
-
-</td>
-<td width="50%">
-
-#### **Development Tools**
-- 🧩 **Modular Stories** - Organized component structure
-- 📝 **Templates** - Quick story creation
-- ✅ **Validation** - Structure compliance checking
-- 🔧 **Scripts** - Automated development tools
-- 📊 **Analytics** - Usage tracking and insights
-
-#### **Team Collaboration**
-- 👥 **Team Sharing** - Share interactive examples
-- 📋 **Consistency** - Ensure UI kit uniformity
-- 🎨 **Design System** - Centralized component library
-- 📚 **Documentation** - Living documentation
-
-</td>
-</tr>
-</table>
-
----
-
-## 🛠️ Technology Stack
-
-- **Flutter 2.17+** - Cross-platform UI framework
-- **Dart 2.17+** - Type-safe programming language
-- **Storybook Flutter** - Component documentation tool
-- **Device Frame** - Device frame previews
-- **Color Picker** - Interactive color selection
-- **URL Launcher** - External link handling
-- **Provider** - State management
-- **Intl** - Internationalization support
-
----
-
-## 📁 Project Structure
-
-```bash
+```
 projects/storybook/
-├── 📦 lib/                          # Source code
-│   ├── main.dart                    # Application entry point
-│   ├── components/                  # Component stories
-│   │   ├── button_test_modular/     # Button component stories
-│   │   ├── badge_test_modular/      # Badge component stories
-│   │   ├── card_test_modular/       # Card component stories
-│   │   └── ...                      # 450+ component stories
-│   ├── pages/                       # Application pages
-│   │   ├── home_page.dart           # Main navigation
-│   │   ├── component_page.dart      # Component showcase
-│   │   └── settings_page.dart       # Settings and configuration
-│   ├── config/                      # Configuration files
-│   │   ├── storybook_config.dart    # Storybook configuration
-│   │   ├── theme_config.dart        # Theme settings
-│   │   └── device_config.dart       # Device frame settings
-│   └── _templates/                  # Development templates
-│       ├── create_component_structure.sh # Component scaffolding
-│       ├── storybook_validator.dart # Structure validation
-│       └── ...                      # Template files
-├── 🧪 test/                         # Unit and integration tests
-├── 🌐 web/                          # Web platform files
-├── 📱 android/                      # Android platform files
-├── 🍎 ios/                          # iOS platform files
-├── 📄 pubspec.yaml                  # Package dependencies
-└── 📖 README.md                     # This file
+├── lib/
+│   ├── main.dart                        # Storybook entry point
+│   ├── components/                      # 41 component stories
+│   │   ├── align_storybook/
+│   │   │   ├── aligns.dart              # Component story
+│   │   │   ├── data/                    # Test data
+│   │   │   ├── sections/                # Demo sections
+│   │   │   ├── showcase/                # Live demos
+│   │   │   ├── utils/                   # Helper functions
+│   │   │   └── widgets/                 # Story widgets
+│   │   ├── appbar_storybook/
+│   │   ├── avatar_storybook/
+│   │   ├── badge_storybook/
+│   │   ├── bottom_sheet_storybook/
+│   │   ├── button_storybook/
+│   │   ├── cards_storybook/
+│   │   ├── carousel_storybook/
+│   │   ├── checkbox_storybook/
+│   │   ├── chips_storybook/
+│   │   ├── clip_r_rect_storybook/
+│   │   ├── collapse_storybook/
+│   │   ├── column_storybook/
+│   │   ├── container_storybook/
+│   │   ├── counter_storybook/
+│   │   ├── divider_storybook/
+│   │   ├── dropdown_storybook/
+│   │   ├── footer_storybook/
+│   │   ├── image_storybook/
+│   │   ├── list_item_storybook/
+│   │   ├── loading_storybook/
+│   │   ├── navbar_storybook/
+│   │   ├── padding_storybook/
+│   │   ├── popup_storybook/
+│   │   ├── progress_storybook/
+│   │   ├── radio_button_storybook/
+│   │   ├── rich_text_storybook/
+│   │   ├── row_storybook/
+│   │   ├── searchbar_storybook/
+│   │   ├── sized_box_storybook/
+│   │   ├── snackbar_storybook/
+│   │   ├── spacer_storybook/
+│   │   ├── stack_storybook/
+│   │   ├── stepper_storybook/
+│   │   ├── switch_button_storybook/
+│   │   ├── tabbar_storybook/
+│   │   ├── text_field_storybook/
+│   │   ├── text_storybook/
+│   │   ├── ticket_storybook/
+│   │   ├── toast_storybook/
+│   │   └── wrap_storybook/
+│   ├── config/                          # Storybook configuration
+│   │   ├── component_registry.dart      # Register all components
+│   │   ├── config.dart                  # App configuration
+│   │   ├── device_frame_config.dart     # Device frame setup
+│   │   ├── story_config.dart            # Story configuration
+│   │   ├── storybook_app.dart           # Main app setup
+│   │   └── storybook_theme_plugin.dart  # Theme plugin
+│   ├── pages/                           # Documentation pages
+│   │   ├── colors_page.dart             # Color system guide
+│   │   ├── home_page.dart               # Overview page
+│   │   └── typography_page.dart         # Typography guide
+│   └── _templates/                      # Development templates
+│       ├── create_component_structure.sh # Auto-generate stories
+│       ├── storybook_validator.dart     # Validate story structure
+│       ├── README.md                    # Template usage guide
+│       └── component_template/          # Story template files
+└── web/
+    ├── index.html                       # Web entry
+    ├── manifest.json                    # PWA manifest
+    └── icons/                           # App icons
 ```
 
----
+</details>
 
-## 🚀 Quick Start
 
-### 📋 Prerequisites
+<details>
+<summary>🚀 Getting Started</summary>
 
-- **Flutter SDK** (2.17.0 or higher)
-- **Dart SDK** (2.17.0 or higher)
-- **Android Studio** or **VS Code** with Flutter extensions
-- **Git** for version control
+### Prerequisites
 
-### 📦 Installation
+- **Flutter SDK** 2.17.0+
+- **Dart SDK** 2.17.0+
+- Completed setup of `packages/osmea_components`
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/masterfabric-mobile/osmea.git
-   cd osmea/projects/storybook
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Run the storybook:**
-   ```bash
-   # Run on web (recommended)
-   flutter run -d chrome
-   
-   # Run on mobile
-   flutter run
-   
-   # Run on specific device
-   flutter run -d <device-id>
-   ```
-
-### 🌐 **Web Deployment**
-
-For production deployment:
+### Install Dependencies
 
 ```bash
-# Build for web
-flutter build web --release
-
-# Deploy to your hosting service
-# The build/web directory contains all static files
+cd projects/storybook
+flutter pub get
 ```
 
----
-
-## 🧩 Component Stories
-
-### **Modular Structure**
-
-Each component has its own modular folder with:
-
-- **Showcase Widgets** - Live demos and examples
-- **Sections** - Usage, variants, and guidelines
-- **Knobs** - Real-time property controls
-- **Data & Utils** - Test data and helper functions
-- **Templates** - Reusable story templates
-
-### **Creating New Stories**
+### Run Storybook
 
 ```bash
-# Navigate to templates directory
+# Web (recommended)
+flutter run -d chrome
+
+# Mobile device
+flutter run
+
+# Specific device
+flutter run -d <device-id>
+```
+
+### Access Features
+
+The storybook opens with three main sections:
+
+- **Overview/Home Page** — Component library introduction
+- **Overview/Typography** — Text styles and typography guide
+- **Overview/Colors** — Color system documentation
+- **Components/** — 41 individual component stories with device frames
+
+</details>
+
+
+<details>
+<summary>💡 Usage Examples</summary>
+
+### Creating New Component Stories
+
+```bash
 cd lib/_templates
-
-# Create new component structure
-./create_component_structure.sh <component_name>
-
-# Validate all stories
-dart storybook_validator.dart
+./create_component_structure.sh my_new_component
 ```
 
-### **Story Structure**
+This creates:
+```
+lib/components/my_new_component_storybook/
+├── my_new_components.dart      # Main story file
+├── data/                       # Test data
+├── sections/                   # Demo sections  
+├── showcase/                   # Live demos
+├── utils/                      # Helper functions
+└── widgets/                    # Story widgets
+```
+
+### Component Story Structure
 
 ```dart
-// Example component story
-class ButtonStory extends Story {
-  @override
-  String get name => 'Button';
-  
-  @override
-  Widget build(BuildContext context) {
-    return StorybookScaffold(
-      title: 'Button Component',
-      sections: [
-        UsageSection(),
-        VariantsSection(),
-        GuidelinesSection(),
-      ],
-    );
+import 'package:flutter/material.dart';
+import 'package:storybook_flutter/storybook_flutter.dart';
+import 'package:osmea_components/osmea_components.dart';
+
+class ButtonStoryComponent {
+  static List<Story> getStories() {
+    return [
+      Story(
+        name: 'Default',
+        description: 'Basic button implementation',
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(16),
+          child: OsmeaButton(
+            label: context.knobs.text(
+              label: 'Text',
+              initial: 'Click me',
+            ),
+            variant: context.knobs.options(
+              label: 'Variant',
+              initial: ButtonVariant.primary,
+              options: ButtonVariant.values,
+            ),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ];
   }
 }
 ```
 
----
+### Device Frame Usage
 
-## 🎯 Use Cases
+Components automatically appear in device frames. The main app config handles this:
 
-### 👨‍💻 **Developers**
-- **Component Testing** - Test components with different configurations
-- **Code Examples** - Learn how to use OSMEA components
-- **Best Practices** - See modern Flutter development patterns
-- **Integration** - Understand component integration
-
-### 🎨 **Designers**
-- **UI Exploration** - Explore component variations and themes
-- **Design System** - Understand the design system structure
-- **Prototyping** - Use components for rapid prototyping
-- **Consistency** - Ensure design consistency across projects
-
-### 👥 **Teams**
-- **Documentation** - Living documentation for components
-- **Collaboration** - Share interactive examples
-- **Quality Assurance** - Ensure component consistency
-- **Onboarding** - Help new team members learn the system
-
----
-
-## 🛠️ Development
-
-### **Code Generation**
-```bash
-# Generate component stories
-flutter packages pub run build_runner build
-
-# Validate story structure
-dart lib/_templates/storybook_validator.dart
-
-# Run tests
-flutter test
+```dart
+wrapperBuilder: (context, child) {
+  final currentStoryName = context.read<StoryNotifier>().currentStoryName;
+  
+  if (currentStoryName?.startsWith('Overview/') == true) {
+    return child ?? Container(); // No frame for overview pages
+  } else {
+    return DeviceFrameWrapper(child: child); // Frame for components
+  }
+},
 ```
 
-### **Building**
-```bash
-# Build for web
-flutter build web --release
+### Validating Stories
 
-# Build for mobile
-flutter build apk --release
-flutter build ios --release
+```bash
+cd lib/_templates
+dart storybook_validator.dart
 ```
 
----
+This validates:
+- Required folder structure (`data/`, `sections/`, `showcase/`, `utils/`, `widgets/`)
+- Main dart file exists and follows naming convention
+- Component registration in `component_registry.dart`
 
-## 🤝 Contributing
+</details>
+
+
+<details>
+<summary>🤝 Contributing</summary>
 
 We welcome contributions! Here's how you can help:
 
-### **Development Guidelines**
-- **Code Style**: Follow Dart/Flutter conventions
-- **Testing**: Write tests for new stories
-- **Documentation**: Update docs for component changes
-- **Commit Messages**: Use conventional commits
+1. **Fork** the repository
+2. **Create a feature branch** (`git checkout -b feature/new-component-story`)
+3. Use the template script: `./create_component_structure.sh <component_name>`
+4. Add your component story files
+5. Register in `component_registry.dart`
+6. Run `dart storybook_validator.dart` to validate
+7. **Open a Pull Request**
 
-### **How to Contribute**
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-3. **Make Your Changes**
-4. **Submit a Pull Request**
+### Guidelines
+
+- Every component story must have the complete folder structure (`data/`, `sections/`, `showcase/`, `utils/`, `widgets/`)
+- Use knobs for interactive properties
+- Include multiple story variants for different use cases
+- Follow the naming convention: `ComponentNameStoryComponent.getStories()`
+- Update component registry when adding new stories
+
+</details>
+
 
 ---
 
@@ -343,8 +328,6 @@ We welcome contributions! Here's how you can help:
 > 🔐 **License:** GNU AGPL v3.0  
 > 📜 This project is protected under the **GNU Affero General Public License v3.0**.
 
-📎 Full details available in the [`LICENSE`](LICENSE) file.
-
 ---
 
 <div align="center">
@@ -352,7 +335,5 @@ We welcome contributions! Here's how you can help:
 **Built with ❤️ by the OSMEA Team**
 
 © 2025 MasterFabric Mobile • Maintained by the OSMEA Engineering Team
-
-[⬆ Back to Top](#osmea-storybook-)
 
 </div>

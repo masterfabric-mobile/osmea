@@ -122,7 +122,8 @@ class SearchbarWidgets {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: OsmeaColors.nordicBlue,
+            activeTrackColor: OsmeaColors.nordicBlue.withValues(alpha: 0.5),
+            activeThumbColor: OsmeaColors.nordicBlue,
           ),
         ],
       ),

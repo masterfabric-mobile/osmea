@@ -27,13 +27,16 @@ List<Story> getUnifiedNavbarShowcase() {
         // Variant Controls
         variant: context.knobs.options(
           label: 'Variant',
-          initial: NavbarVariant.primary,
+          initial: NavbarVariant.retailMain,
           options: const [
-            Option(label: 'Primary', value: NavbarVariant.primary),
-            Option(label: 'Secondary', value: NavbarVariant.secondary),
-            Option(label: 'Transparent', value: NavbarVariant.transparent),
-            Option(label: 'Glass', value: NavbarVariant.glass),
-            Option(label: 'Outlined', value: NavbarVariant.outlined),
+            Option(label: 'Retail Main', value: NavbarVariant.retailMain),
+            Option(label: 'Dotted Outline', value: NavbarVariant.dottedOutline),
+            Option(label: 'Healthcare Minimal', value: NavbarVariant.healthcareMinimal),
+            Option(label: 'Media Overlay', value: NavbarVariant.mediaOverlay),
+            Option(label: 'Social Glass', value: NavbarVariant.socialGlass),
+            Option(label: 'Minimal', value: NavbarVariant.minimal),
+            Option(label: 'Pill Shaped', value: NavbarVariant.pillShaped),
+            Option(label: 'Glassy Blur', value: NavbarVariant.glassyBlur),
           ],
         ),
         

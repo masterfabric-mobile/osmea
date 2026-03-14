@@ -1,53 +1,230 @@
-# OSMEA APIs 🌐
+# 🌐 OSMEA APIs
 
 <div align="center">
-
-[![Version](https://img.shields.io/badge/version-1.0.0-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://github.com/masterfabric-mobile/osmea)
-[![Platform](https://img.shields.io/badge/platform-Dart-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C)](https://dart.dev)
-[![Dio](https://img.shields.io/badge/Dio-2D3748?style=for-the-badge&logo=dio&logoColor=white&labelColor=1A202C)](https://pub.dev/packages/dio)
-[![GetIt](https://img.shields.io/badge/GetIt-2D3748?style=for-the-badge&logo=getit&logoColor=white&labelColor=1A202C)](https://pub.dev/packages/get_it)
-[![Injectable](https://img.shields.io/badge/Injectable-2D3748?style=for-the-badge&logo=injectable&logoColor=white&labelColor=1A202C)](https://pub.dev/packages/injectable)
-
+  <a href="https://github.com/masterfabric-mobile/osmea"><img src="https://img.shields.io/badge/OSMEA%20APIs-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="OSMEA APIs" /></a>
+  <a href="https://pub.dev/packages/dio"><img src="https://img.shields.io/badge/Dio%205.7-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Dio" /></a>
+  <a href="https://pub.dev/packages/retrofit"><img src="https://img.shields.io/badge/Retrofit-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Retrofit" /></a>
+  <a href="https://pub.dev/packages/get_it"><img src="https://img.shields.io/badge/GetIt-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="GetIt" /></a>
+  <a href="https://pub.dev/packages/injectable"><img src="https://img.shields.io/badge/Injectable-2D3748?style=for-the-badge&logo=dart&logoColor=white&labelColor=1A202C" alt="Injectable" /></a>
 </div>
 
-<div align="center">
+<br>
 
-**"Robust API Integration for Flutter"**
+> *Comprehensive Flutter API integration package for WooCommerce & Shopify*
 
-[📚 Documentation](https://github.com/masterfabric-mobile/osmea/tree/dev/packages/apis) • [🐛 Report Issues](https://github.com/masterfabric-mobile/osmea/issues) • [💬 Discussions](https://github.com/masterfabric-mobile/osmea/discussions)
 
-</div>
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#️-technology-stack) • [Getting Started](#-getting-started) • [API Reference](#-api-reference) • [Project Structure](#-project-structure)
 
----
 
-## 🌟 What is OSMEA APIs?
+<details>
+<summary>🌟 Overview</summary>
 
-**OSMEA APIs** is a comprehensive Dart/Flutter package for robust API integration and network management. It provides everything you need to seamlessly connect with any REST or GraphQL API with minimal configuration.
+**OSMEA APIs** is a powerful network layer package built for Flutter e-commerce applications.  
+It unifies WooCommerce REST API, Shopify REST & GraphQL API, and custom user management endpoints under a single, consistent interface.
 
-### ✨ **Key Features**
+### 🎯 **Use Cases**
 
-- **🔌 Universal API Layer** - Works with any REST or GraphQL API
-- **⚡ Zero Configuration** - Get started in minutes with sensible defaults
-- **🛡️ Built-in Error Handling** - Robust error management out of the box
-- **🔧 Dependency Injection** - Clean, testable, and modular architecture
-- **📝 Comprehensive Logging** - Debug and monitor API calls effortlessly
+- **WooCommerce Stores** — Full CRUD support via Admin API and Store API
+- **Shopify Integration** — Product, order, and customer management via REST and GraphQL
+- **Cross-Platform** — Single codebase for iOS, Android, and Web (SQLite3 / SharedPreferences)
+- **Authentication** — JWT-based WooCommerce auth flow
+- **Wizard Setup** — Step-by-step store connection wizard
 
----
+### Target Users
 
-## 🚀 Quick Start
+- **Flutter developers** building WooCommerce or Shopify-based applications
+- **Agencies** working on projects that require multi-store management
+- **Open-source contributors** looking to extend the API layer
 
-### 1. **Add to your `pubspec.yaml`:**
-```yaml
-dependencies:
-  osmea_apis:
-    git:
-      url: https://github.com/masterfabric-mobile/osmea.git
-      path: packages/apis
+</details>
+
+
+<details>
+<summary>✨ Features</summary>
+
+### 🛍️ **WooCommerce Admin API**
+
+| Module | Operations |
+|--------|------------|
+| **Coupons** | Create, update, delete, list, batch update |
+| **Customers** | Full customer CRUD, batch update |
+| **Orders** | Order management, notes, refunds |
+| **Products** | Products, variations, attributes, tags, categories, brands |
+| **Payment Gateways** | List and update payment methods |
+| **Shipping Zones & Methods** | Manage shipping zones and methods |
+| **Taxes** | Tax rates and tax classes management |
+| **Reports** | Sales, customer, and stock reports |
+| **Settings** | Store settings, groups, and options |
+| **System Status** | System status and tools |
+| **Webhooks** | Webhook CRUD and batch update |
+
+### 🛒 **WooCommerce Store API**
+
+| Module | Operations |
+|--------|------------|
+| **Cart** | Create/retrieve cart, update customer, select shipping rate |
+| **Cart Items** | Add, update, remove items |
+| **Cart Coupons** | Add, retrieve, list coupons |
+| **Checkout** | Update checkout data, create order and process payment |
+| **Orders** | List user orders |
+| **Products** | List products, retrieve by slug, list variations |
+| **Categories / Brands / Tags** | Browse categories, brands, and tags |
+| **Attributes** | Product attributes and attribute terms |
+| **Reviews** | List product reviews |
+| **Collection Data** | Collection dataset |
+
+### 🔵 **Shopify REST API**
+
+| Module | Operations |
+|--------|------------|
+| **Products** | Products, variants, images, collections |
+| **Orders** | Orders, fulfillments, transactions |
+| **Customers** | Customer management, addresses |
+| **Discounts** | Discount codes and price rules |
+| **Inventory** | Inventory levels and locations |
+| **Smart Collections** | Smart collection management |
+| **Billing / Gift Card** | Billing and gift card management |
+| **Webhooks / Events** | Event and webhook management |
+
+### 🟣 **Shopify GraphQL API**
+
+| Module | Operations |
+|--------|------------|
+| **Products** | GraphQL queries and mutations |
+| **Customers** | Customer queries |
+| **Services** | Service layer |
+| **Webhooks** | GraphQL webhooks |
+
+### 👤 **WooCommerce Auth & Users Manager**
+
+- **JWT Auth** — Sign in, sign up, password reset, password update, account deletion
+- **Users Manager** — Profile CRUD, address management, metadata, statistics, activity, orders, contracts
+- **Wishlist** — Create/update/delete wishlist groups, add/remove products
+
+### 🔧 **Infrastructure**
+
+- **DI** — `get_it` + `injectable` with code generation support
+- **HTTP Client** — Type-safe API calls via `dio` + `retrofit`
+- **Interceptors** — JWT token, WooCommerce cart token, default interceptor
+- **Logging** — Colorful request/response logging via `logger`
+- **Storage** — SQLite3 for mobile, SharedPreferences for web
+- **Freezed Models** — All request/response models generated with `freezed`
+
+</details>
+
+
+<details>
+<summary>🛠️ Technology Stack</summary>
+
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Flutter / Dart 3.5+ |
+| **HTTP Client** | Dio 5.7 |
+| **REST Codegen** | Retrofit 4.1 |
+| **DI** | GetIt 8 + Injectable 2.7 |
+| **Models** | Freezed 2.4 + json_serializable |
+| **GraphQL** | graphql / graphql_flutter 5.1 |
+| **Storage (mobile)** | sqflite 2.4 |
+| **Storage (web)** | shared_preferences 2.5 |
+| **Logging** | logger 2.5 |
+
+### 📁 Project Structure
+
+```
+packages/apis/
+├── lib/
+│   ├── apis.dart                        # Main barrel export
+│   ├── di/
+│   │   └── config/
+│   │       ├── config_di.dart           # GetIt setup
+│   │       └── config_di.config.dart    # Injectable generated code
+│   ├── dio_config/
+│   │   ├── cookie_manager/
+│   │   │   └── web_cookie_manager.dart
+│   │   ├── dio_client/
+│   │   │   ├── api_dio_client.dart      # Main Dio client
+│   │   │   ├── shopify_graphql_client.dart
+│   │   │   └── abstract/
+│   │   │       └── api_base_client.dart
+│   │   ├── dio_logger/
+│   │   │   ├── api_dio_logger.dart
+│   │   │   └── abstract/
+│   │   ├── interceptors/
+│   │   │   ├── api_interceptor_default.dart
+│   │   │   ├── woo_cart_token_interceptor.dart
+│   │   │   └── woo_jwt_interceptor.dart
+│   ├── models/
+│   │   ├── store_configuration.dart
+│   │   ├── auth/
+│   │   │   └── woo_jwt_token.dart
+│   │   └── cart/
+│   │       └── woo_cart_token.dart
+│   ├── network/
+│   │   └── remote/
+│   │       ├── shopify/
+│   │       │   ├── graphql/             # GraphQL schema + queries
+│   │       │   └── rest/                # 15 REST modules
+│   │       └── woocommerce/
+│   │           ├── admin_api/           # 13 admin modules
+│   │           ├── auth/                # JWT auth
+│   │           ├── store_api/           # 15 store modules
+│   │           ├── users_manager/       # User management
+│   │           └── wishlist/            # Wishlist
+│   ├── services/
+│   │   ├── cross_platform_storage.dart  # SQLite3 / SharedPreferences
+│   │   ├── store_change_notifier.dart
+│   │   ├── store_management_service.dart
+│   │   ├── wizard_helper.dart
+│   │   └── auth/
+│   │       ├── woo_auth_manager.dart
+│   │       ├── woo_jwt_auth_service.dart
+│   │       └── woo_jwt_signin_manager.dart
+│   └── utils/
+│       ├── api_error_utils.dart
+│       └── cart_token_utils.dart
+├── build.yaml                           # Build configuration
+├── codegen.yaml                         # Code generation configuration
+└── pubspec.yaml
 ```
 
-### 2. **Configure Dependency Injection:**
+</details>
+
+
+<details>
+<summary>🚀 Getting Started</summary>
+
+### Prerequisites
+
+- **Flutter SDK** 3.5.0+
+- **Dart SDK** 3.5.0+
+- A WooCommerce or Shopify store (Consumer Key / API Key)
+
+### Add the Package
+
+```yaml
+# pubspec.yaml
+dependencies:
+  apis:
+    path: ../../packages/apis   # monorepo local usage
+```
+
+### Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### Code Generation
+
+```bash
+# Retrofit + Injectable + Freezed
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### DI Setup
+
 ```dart
-import 'package:osmea_apis/di/config/config_di.config.dart';
+import 'package:apis/di/config/config_di.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,121 +233,126 @@ void main() async {
 }
 ```
 
-### 3. **Make API Calls:**
-```dart
-import 'package:osmea_apis/apis.dart';
+### Store Configuration
 
-class ProductService {
-  final ApiClient _apiClient = getIt<ApiClient>();
-  
-  Future<List<Product>> getProducts() async {
-    final response = await _apiClient.get('/products');
-    return response.data.map((json) => Product.fromJson(json)).toList();
-  }
+```dart
+// Configure WooCommerce connection
+final storeConfig = StoreConfiguration(
+  baseUrl: 'https://your-store.com',
+  consumerKey: 'ck_xxxx',
+  consumerSecret: 'cs_xxxx',
+);
+
+await getIt<StoreManagementService>().configure(storeConfig);
+```
+
+</details>
+
+
+<details>
+<summary>📖 API Reference</summary>
+
+### 🛒 WooCommerce Store API — Usage Examples
+
+```dart
+// List products
+final productService = getIt<ProductService>();
+final products = await productService.listAllProducts(page: 1, perPage: 20);
+
+// Add item to cart
+final cartService = getIt<CartService>();
+await cartService.addItem(AddItemRequest(id: 42, quantity: 1));
+
+// Create order and process payment
+final checkoutService = getIt<CheckoutOrderService>();
+await checkoutService.processPaymentAndOrder(
+  ProcessPaymentAndOrderRequestModel(
+    paymentMethod: 'stripe',
+    billing: billingAddress,
+  ),
+);
+```
+
+### 🔐 WooCommerce Auth — Usage Examples
+
+```dart
+// Sign in
+final authService = getIt<WooJwtAuthService>();
+final token = await authService.login(
+  UserLoginRequest(username: 'user@mail.com', password: '****'),
+);
+
+// Get user profile
+final usersService = getIt<OsmeaUsersManagerService>();
+final profile = await usersService.getUserProfile(userId: 1);
+```
+
+### 🔵 Shopify REST — Usage Examples
+
+```dart
+// List products
+final shopifyProducts = getIt<ShopifyProductsRestService>();
+final result = await shopifyProducts.listProducts(limit: 50);
+```
+
+### Interceptor Overview
+
+| Interceptor | Responsibility |
+|-------------|----------------|
+| `ApiInterceptorDefault` | General header management and error handling |
+| `WooJwtInterceptor` | Attaches JWT token to every request |
+| `WooCartTokenInterceptor` | Manages WooCommerce Store API cart nonce |
+
+</details>
+
+
+<details>
+<summary>⚙️ Configuration</summary>
+
+### Freezed Model Structure
+
+All request and response models are generated with `freezed` + `json_serializable`:
+
+```dart
+// Example: AddItemRequest
+@freezed
+class AddItemRequest with _$AddItemRequest {
+  const factory AddItemRequest({
+    required int id,
+    required int quantity,
+    Map<String, dynamic>? variation,
+  }) = _AddItemRequest;
+
+  factory AddItemRequest.fromJson(Map<String, dynamic> json) =>
+      _$AddItemRequestFromJson(json);
 }
 ```
 
----
+### Cross-Platform Storage
 
-## 🛠️ Technology Stack
+| Platform | Storage |
+|----------|---------|
+| iOS / Android | `sqflite` (SQLite3) |
+| Web | `shared_preferences` |
 
-- **Dart 2.17+** - Type-safe programming language
-- **Dio 5.0+** - Powerful HTTP client for Dart
-- **GetIt 7.0+** - Service locator and dependency injection
-- **Injectable 2.0+** - Code generation for dependency injection
-
----
-
-## 📦 Core Features
-
-### 🌐 **Network Layer**
-- **Dio-based HTTP client** with interceptors and logging
-- **REST & GraphQL support** for all API types
-- **Custom interceptors** for authentication and error handling
-- **Request/response logging** for debugging and monitoring
-- **Timeout and retry** configuration
-
-### 🔧 **Dependency Injection**
-- **GetIt integration** for service locator pattern
-- **Injectable code generation** for automatic DI setup
-- **Modular architecture** for easy testing and maintenance
-- **Service registration** with environment-specific configuration
-
-### 📝 **Logging & Debugging**
-- **Comprehensive logging** for all HTTP requests and responses
-- **Error tracking** with detailed error information
-- **Performance monitoring** with request timing
-- **Debug mode** for development and testing
-
-### 🛡️ **Error Handling**
-- **Centralized error management** with custom error types
-- **Network error handling** for connectivity issues
-- **API error parsing** for structured error responses
-- **Retry mechanisms** for transient failures
-
----
-
-## 📁 Project Structure
-
-```bash
-packages/apis/
-├── 📦 lib/                          # Source code
-│   ├── apis.dart                    # Main entry point
-│   ├── di/                          # Dependency injection
-│   │   └── config/                  # DI configuration
-│   ├── dio_config/                  # HTTP client setup
-│   │   ├── api_dio_client.dart      # Main Dio client
-│   │   ├── dio_logger.dart          # Logging configuration
-│   │   └── interceptors/            # Custom interceptors
-│   ├── network/                     # Network layer
-│   │   ├── common/                  # Shared utilities
-│   │   └── remote/                  # API implementations
-│   └── models/                      # Data models
-├── 🧪 test/                         # Unit and integration tests
-├── 📋 build.yaml                    # Build configuration
-├── 🔧 codegen.yaml                  # Code generation config
-└── 📄 pubspec.yaml                  # Package dependencies
+```dart
+final storage = getIt<CrossPlatformStorage>();
+await storage.save(key: 'cart_token', value: token);
+final saved = await storage.read(key: 'cart_token');
 ```
 
----
-
-## 🎯 Use Cases
-
-### 📱 **Mobile Apps**
-- **Backend Communication** - API calls and data synchronization
-- **Authentication** - OAuth 2.0 and custom auth flows
-- **Data Fetching** - Efficient data loading and caching
-- **Error Handling** - Robust error management
-
-### 🌐 **Web Applications**
-- **RESTful APIs** - Standard REST API communication
-- **GraphQL** - Modern GraphQL query language
-- **Real-time Data** - WebSocket and streaming support
-- **Cross-origin Requests** - CORS handling
-
-### 🛠️ **Custom Integrations**
-- **Third-party APIs** - External service integration
-- **Microservices** - Service-to-service communication
-- **Data Synchronization** - Multi-platform data sync
-- **API Testing** - Automated API testing
-
----
-
-## 🛠️ Development Setup
+### Build Configuration
 
 ```bash
-# Install dependencies
-flutter pub get
+# build.yaml — Retrofit + Injectable code generation
+dart run build_runner build
 
-# Generate dependency injection code
-flutter packages pub run build_runner build
-
-# Run tests
-flutter test
-
-# Build for production
-flutter build apk --release
+# Regenerate while deleting conflicting outputs
+dart run build_runner build --delete-conflicting-outputs
 ```
+
+</details>
+
 
 ---
 
@@ -178,17 +360,17 @@ flutter build apk --release
 
 We welcome contributions! Here's how you can help:
 
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-3. **Make Your Changes**
-4. **Submit a Pull Request**
+1. **Fork** the repository
+2. **Create a feature branch** (`git checkout -b feature/new-endpoint`)
+3. Make your changes and test them
+4. **Open a Pull Request**
 
 ### Development Guidelines
 
-- **Code Style**: Follow Dart/Flutter conventions
-- **Testing**: Write unit tests for new features
-- **Documentation**: Update docs for API changes
-- **Commit Messages**: Use conventional commits
+- Follow the `abstract/` → `api/` → `freezed_model/` structure for every new endpoint
+- All models must use `freezed`
+- Commit the generated `*.g.dart` and `*.freezed.dart` files after running `build_runner`
+- Use Conventional Commits
 
 ---
 
@@ -197,8 +379,6 @@ We welcome contributions! Here's how you can help:
 > 🔐 **License:** GNU AGPL v3.0  
 > 📜 This project is protected under the **GNU Affero General Public License v3.0**.
 
-📎 Full details available in the [`LICENSE`](LICENSE) file.
-
 ---
 
 <div align="center">
@@ -206,7 +386,5 @@ We welcome contributions! Here's how you can help:
 **Built with ❤️ by the OSMEA Team**
 
 © 2025 MasterFabric Mobile • Maintained by the OSMEA Engineering Team
-
-[⬆ Back to Top](#osmea-apis-)
 
 </div>

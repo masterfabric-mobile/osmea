@@ -2,7 +2,6 @@ import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/requ
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/create_user_address_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/log_user_activity_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_address_request.dart';
-import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_metadata_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/request/update_user_profile_request.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/delete_user_metadata_response.dart';
 import 'package:apis/network/remote/woocommerce/users_manager/freezed_model/response/get_all_users_response.dart';
