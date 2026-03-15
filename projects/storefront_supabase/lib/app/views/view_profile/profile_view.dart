@@ -410,7 +410,7 @@ class ProfileView extends MasterViewCubit<ProfileViewModel, ProfileState> {
     IconData icon,
     VoidCallback onTap,
   ) {
-    final deleteColor = OsmeaColors.red;
+    final deleteColor = OsmeaColors.amberFlame;
     return OsmeaComponents.container(
       padding: EdgeInsets.symmetric(
         horizontal: context.spacing20,

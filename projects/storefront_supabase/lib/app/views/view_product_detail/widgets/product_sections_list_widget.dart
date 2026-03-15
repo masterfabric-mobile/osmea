@@ -5,8 +5,9 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/product_detail_view_model.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_product_detail/widgets/product_attributes_widget.dart';
@@ -34,12 +35,12 @@ class ProductSectionsListWidget extends StatelessWidget {
     if (state.product.variants.isNotEmpty) {
       sections.add(
         _SectionItem(
-          title: 'Options',
+          title: context.resources.options,
           icon: Icons.tune,
           widget: ProductAttributesWidget(viewModel: viewModel, state: state),
           onTap: () => _showContentBottomSheet(
             context,
-            'Options',
+            context.resources.options,
             ProductAttributesWidget(viewModel: viewModel, state: state),
           ),
         ),
@@ -50,7 +51,7 @@ class ProductSectionsListWidget extends StatelessWidget {
     if (state.product.description.isNotEmpty) {
       sections.add(
         _SectionItem(
-          title: 'Details',
+          title: context.resources.details,
           icon: Icons.description_outlined,
           widget: const SizedBox.shrink(),
           onTap: () =>
@@ -114,7 +115,7 @@ class ProductSectionsListWidget extends StatelessWidget {
     // Reviews section (with write-review form when logged in)
     sections.add(
       _SectionItem(
-        title: 'Reviews',
+        title: context.resources.reviews,
         icon: Icons.star_outline,
         widget: ProductReviewsWithFormWidget(
           viewModel: viewModel,
@@ -122,7 +123,7 @@ class ProductSectionsListWidget extends StatelessWidget {
         ),
         onTap: () => _showContentBottomSheet(
           context,
-          'Reviews',
+          context.resources.reviews,
           ProductReviewsWithFormWidget(viewModel: viewModel, state: state),
         ),
       ),

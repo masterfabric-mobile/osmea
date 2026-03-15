@@ -31,15 +31,15 @@ class HelpSupportView extends StatelessWidget {
           resources.helpSupport,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
-            color: OsmeaColors.thunder,
+            color: OsmeaColors.black,
           ),
         ),
         backgroundColor: OsmeaColors.white,
-        foregroundColor: OsmeaColors.thunder,
+        foregroundColor: OsmeaColors.black,
         elevation: 0,
         leading: OsmeaComponents.iconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back, color: OsmeaColors.thunder),
+          icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
           backgroundColor: OsmeaColors.transparent,
         ),
       ),
@@ -51,24 +51,24 @@ class HelpSupportView extends StatelessWidget {
             _buildSection(
               context,
               theme,
-              'Contact us',
-              'Email: support@masterfabric.co\nPhone: +90 212 000 00 00',
+              resources.contactUs,
+              resources.contactUsBody,
               Icons.email_outlined,
             ),
             SizedBox(height: context.spacing16),
             _buildSection(
               context,
               theme,
-              'FAQ',
-              'Frequently asked questions and answers will be available here.',
+              resources.faq,
+              resources.faqBody,
               Icons.help_outline,
             ),
             SizedBox(height: context.spacing16),
             _buildSection(
               context,
               theme,
-              'Returns & refunds',
-              'Please check our return policy in the product detail page (Cancellation & returns).',
+              resources.returnsAndRefunds,
+              resources.returnsAndRefundsBody,
               Icons.assignment_return_outlined,
             ),
           ],
@@ -87,27 +87,33 @@ class HelpSupportView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.spacing12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: OsmeaColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+        border: Border.all(color: OsmeaColors.silver),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 24, color: theme.colorScheme.primary),
+              Icon(icon, size: 24, color: OsmeaColors.black),
               SizedBox(width: context.spacing8),
               Text(
                 title,
-                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: OsmeaColors.black,
+                ),
               ),
             ],
           ),
           SizedBox(height: context.spacing8),
           Text(
             body,
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.4),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: OsmeaColors.thunder,
+              height: 1.4,
+            ),
           ),
         ],
       ),

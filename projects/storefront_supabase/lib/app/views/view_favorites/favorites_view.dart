@@ -702,7 +702,7 @@ class _CollectionSheetDeleteButtonState extends State<_CollectionSheetDeleteButt
       );
     }
     return IconButton(
-      icon: Icon(Icons.delete_outline, color: OsmeaColors.red),
+      icon: Icon(Icons.delete_outline, color: OsmeaColors.amberFlame),
       onPressed: () async {
         final confirmed = await OsmeaComponents.showPopup<bool>(
           context: context,

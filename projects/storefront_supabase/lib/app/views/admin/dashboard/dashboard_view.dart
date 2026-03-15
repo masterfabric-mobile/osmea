@@ -7,6 +7,7 @@ import 'package:core/core.dart'
         TranslationProvider;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:storefront_supabase/app/api/admin/admin_routes.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +39,7 @@ class AdminDashboardView
            backgroundColor: OsmeaColors.white,
            foregroundColor: OsmeaColors.black,
            leading: OsmeaComponents.iconButton(
-             onPressed: () => goRoute('/profile'),
+             onPressed: () => goRoute(AdminRoutes.profile),
              icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
            ),
          ),
@@ -83,9 +84,13 @@ class AdminDashboardView
         onRefresh: viewModel.initial,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
+          padding: context.paddingNormal,
           children: [
             _buildStatsGrid(context, state),
+            OsmeaComponents.sizedBox(height: 24),
+            _buildSectionHeader(context, resources.quickAccess),
+            OsmeaComponents.sizedBox(height: 8),
+            _buildQuickAccessCard(context, resources),
             OsmeaComponents.sizedBox(height: 24),
             if (state.dailyChartData.isNotEmpty) ...[
               _buildSectionHeader(context, resources.last7DaysRevenueOrders),
@@ -165,6 +170,100 @@ class AdminDashboardView
         textStyle: Theme.of(
           context,
         ).textTheme.bodyMedium?.copyWith(color: OsmeaColors.black),
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessCard(BuildContext context, dynamic resources) {
+    return OsmeaComponents.container(
+      decoration: BoxDecoration(
+        color: OsmeaColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: OsmeaColors.silver.withOpacity(0.5)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: OsmeaComponents.column(
+        children: [
+          _buildQuickAccessTile(context, icon: Icons.inventory_2_outlined, title: resources.products, onTap: () => goRoute(AdminRoutes.products)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.category_outlined, title: resources.categories, onTap: () => goRoute(AdminRoutes.categories)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.branding_watermark_outlined, title: resources.brands, onTap: () => goRoute(AdminRoutes.brands)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.shopping_bag_outlined, title: resources.orders, onTap: () => goRoute(AdminRoutes.orders)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.rate_review_outlined, title: resources.reviews, subtitle: resources.productReviews, onTap: () => goRoute(AdminRoutes.reviews)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.location_on_outlined, title: resources.addresses, subtitle: resources.userAddresses, onTap: () => goRoute(AdminRoutes.addresses)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.people_outline, title: resources.users, onTap: () => goRoute(AdminRoutes.users)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.badge_outlined, title: resources.staff, subtitle: 'admin_users', onTap: () => goRoute(AdminRoutes.staff)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.manage_accounts_outlined, title: resources.sessions, subtitle: 'admin_sessions', onTap: () => goRoute(AdminRoutes.sessions)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.list_alt_outlined, title: resources.activityLog, subtitle: 'admin_activity_log', onTap: () => goRoute(AdminRoutes.activityLog)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.gavel_outlined, title: resources.moderation, subtitle: 'product_moderation', onTap: () => goRoute(AdminRoutes.moderation)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.confirmation_number_outlined, title: resources.coupons, onTap: () => goRoute(AdminRoutes.coupons)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.analytics_outlined, title: resources.reports, subtitle: resources.revenueAndOrdersByPeriod, onTap: () => goRoute(AdminRoutes.reports)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.settings_outlined, title: resources.adminSettings, onTap: () => goRoute(AdminRoutes.settings)),
+          Divider(height: 1, color: OsmeaColors.silver.withOpacity(0.4)),
+          _buildQuickAccessTile(context, icon: Icons.settings_suggest_outlined, title: resources.appConfig, subtitle: resources.viewAppConfigJson, onTap: () => goRoute(AdminRoutes.appConfig)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: OsmeaColors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: OsmeaComponents.row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: OsmeaColors.black, size: 22),
+              OsmeaComponents.sizedBox(width: 16),
+              Expanded(
+                child: OsmeaComponents.column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OsmeaComponents.text(
+                      title,
+                      textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: OsmeaColors.black,
+                      ),
+                    ),
+                    if (subtitle != null && subtitle.isNotEmpty) ...[
+                      OsmeaComponents.sizedBox(height: 2),
+                      OsmeaComponents.text(
+                        subtitle,
+                        textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: OsmeaColors.slate,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: OsmeaColors.thunder, size: 20),
+            ],
+          ),
+        ),
       ),
     );
   }

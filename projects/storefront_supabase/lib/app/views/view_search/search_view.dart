@@ -17,11 +17,11 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
           appBarPadding: const AppBarPaddingVisibility.disabled(),
           coreAppBar: (context, viewModel) => OsmeaComponents.appBar(
             title: OsmeaComponents.text(
-              context.resources.searchProducts, // Changed to English
-              color: Colors.black,
+              context.resources.searchProducts,
+              color: OsmeaColors.black,
             ),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: OsmeaColors.white,
+            foregroundColor: OsmeaColors.black,
             size: AppBarSize.large,
             elevation: 0,
             titleSpacing: 0.0,
@@ -131,8 +131,8 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
                           ),
                           child: OsmeaComponents.text(
                             'SALE',
-                            textStyle: const TextStyle(
-                              color: Colors.white,
+                            textStyle: TextStyle(
+                              color: OsmeaColors.white,
                               fontSize: 8,
                               fontWeight: FontWeight.bold,
                             ),
@@ -154,7 +154,7 @@ class SearchView extends MasterViewCubit<SearchViewModel, SearchState> {
                           textStyle:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey[600],
+                                    color: OsmeaColors.slate,
                                   ),
                         ),
                         OsmeaComponents.sizedBox(width: 8),

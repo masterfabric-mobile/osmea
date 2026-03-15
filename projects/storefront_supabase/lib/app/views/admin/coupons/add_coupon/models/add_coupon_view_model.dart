@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:injectable/injectable.dart';
+import 'package:storefront_supabase/app/api/admin/abstract/admin_coupons_service.dart';
+import 'package:storefront_supabase/app/core/config/config_di.dart';
 import 'package:storefront_supabase/app/models/coupon.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'module/states.dart';
 
 @injectable
 class AddCouponViewModel extends BaseViewModelCubit<AddCouponState> {
-  final SupabaseClient _supabaseClient;
+  AddCouponViewModel() : super(AddCouponInitial());
+
+  AdminCouponsService get _coupons => getIt<AdminCouponsService>();
 
   final codeController = TextEditingController();
   final valueController = TextEditingController();
@@ -18,20 +21,13 @@ class AddCouponViewModel extends BaseViewModelCubit<AddCouponState> {
   DateTime? expiryDate;
   bool isActive = true;
 
-  AddCouponViewModel(this._supabaseClient) : super(AddCouponInitial());
-
   Future<void> initial({String? couponId}) async {
     stateChanger(AddCouponLoading());
     try {
       Coupon? coupon;
       if (couponId != null) {
-        final response = await _supabaseClient
-            .from('coupons')
-            .select()
-            .eq('id', couponId)
-            .single();
-        coupon = Coupon.fromJson(response);
-        _populateFields(coupon);
+        coupon = await _coupons.getCoupon(couponId);
+        if (coupon != null) _populateFields(coupon);
       }
       stateChanger(AddCouponLoaded(coupon: coupon));
     } catch (e) {
@@ -74,7 +70,8 @@ class AddCouponViewModel extends BaseViewModelCubit<AddCouponState> {
     stateChanger(AddCouponLoading());
 
     try {
-      final data = {
+      final now = DateTime.now().toUtc().toIso8601String();
+      final data = <String, dynamic>{
         'code': codeController.text.trim().toUpperCase(),
         'discount_type': discountType,
         'discount_value': double.parse(valueController.text),
@@ -82,13 +79,14 @@ class AddCouponViewModel extends BaseViewModelCubit<AddCouponState> {
         'usage_limit': usageLimitController.text.isNotEmpty ? int.parse(usageLimitController.text) : null,
         'expiry_date': expiryDate?.toIso8601String(),
         'is_active': isActive,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': now,
+        if (couponId == null) 'created_at': now,
       };
 
       if (couponId != null) {
-        await _supabaseClient.from('coupons').update(data).eq('id', couponId);
+        await _coupons.updateCoupon(couponId, data);
       } else {
-        await _supabaseClient.from('coupons').insert(data);
+        await _coupons.createCoupon(data);
       }
 
       stateChanger(AddCouponSuccess());

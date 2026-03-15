@@ -1,5 +1,6 @@
 class ProductReview {
   final String id;
+  final String? productId;
   final int rating;
   final String? title;
   final String? comment;
@@ -8,9 +9,11 @@ class ProductReview {
   final int? deliveryRating;
   final String? deliveryComment;
   final bool isVerifiedPurchase;
+  final bool isApproved;
 
   ProductReview({
     required this.id,
+    this.productId,
     required this.rating,
     this.title,
     this.comment,
@@ -19,6 +22,7 @@ class ProductReview {
     this.deliveryRating,
     this.deliveryComment,
     this.isVerifiedPurchase = false,
+    this.isApproved = false,
   });
 
   factory ProductReview.fromJson(Map<String, dynamic> json) {
@@ -30,6 +34,7 @@ class ProductReview {
 
     return ProductReview(
       id: json['id'] as String,
+      productId: json['product_id'] as String?,
       rating: json['rating'] as int,
       title: json['title'] as String?,
       comment: json['comment'] as String?,
@@ -38,6 +43,7 @@ class ProductReview {
       deliveryRating: json['delivery_rating'] as int?,
       deliveryComment: json['delivery_comment'] as String?,
       isVerifiedPurchase: json['is_verified_purchase'] as bool? ?? false,
+      isApproved: json['is_approved'] as bool? ?? false,
     );
   }
 }

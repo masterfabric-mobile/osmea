@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:osmea_components/src/components/bottom_sheet/bottom_sheet.dart';
@@ -15,6 +15,7 @@ import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.d
 import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_supabase/app/utils/price_helper.dart';
 import 'package:storefront_supabase/app/core/bloc/currency/currency_cubit.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 /// Shows add to cart success bottom sheet with cart summary
 void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
@@ -25,7 +26,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
   OsmeaBottomSheetHelpers.showModal(
     context: context,
     size: BottomSheetSize.large,
-    title: 'Product Added to Cart',
+    title: context.resources.productAddedToCartTitle,
     backgroundColor: OsmeaColors.paperWhite,
     openDuration: const Duration(milliseconds: 600),
     closeDuration: const Duration(milliseconds: 250),
@@ -53,7 +54,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       OsmeaComponents.text(
-                        'Items',
+                        context.resources.items,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,
                           fontWeight: FontWeight.w400,
@@ -73,7 +74,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       OsmeaComponents.text(
-                        'Total',
+                        context.resources.total,
                         textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
                           color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,
                           fontWeight: FontWeight.w400,
@@ -101,7 +102,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                 children: [
                   OsmeaComponents.expanded(
                     child: OsmeaComponents.button(
-                      text: 'Continue Shopping',
+                      text: context.resources.continueShopping,
                       variant: ButtonVariant.outlined,
                       size: ButtonSize.small,
                       backgroundColor: OsmeaColors.white,
@@ -115,7 +116,7 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
                   OsmeaComponents.sizedBox(width: context.spacing8),
                   OsmeaComponents.expanded(
                     child: OsmeaComponents.button(
-                      text: 'View Cart',
+                      text: context.resources.viewCart,
                       variant: ButtonVariant.primary,
                       size: ButtonSize.small,
                       backgroundColor: OsmeaColors.black,
@@ -157,13 +158,13 @@ void showAddToCartSuccessPopup(BuildContext context, {String? cartToken}) {
             child: OsmeaComponents.column(
               children: [
                 OsmeaComponents.text(
-                  'Failed to load cart',
+                  context.resources.failedToLoadCart,
                   textStyle: OsmeaTextStyle.bodyMedium(context),
                   color: OsmeaColors.grayMaterial[400]!,
                 ),
                 OsmeaComponents.sizedBox(height: context.spacing16),
                 OsmeaComponents.button(
-                  text: 'Retry',
+                  text: context.resources.retry,
                   onPressed: () {
                     cartViewModel.initial();
                   },

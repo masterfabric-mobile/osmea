@@ -104,7 +104,7 @@ class _RelatedProductsWidgetState extends State<RelatedProductsWidget> {
           OsmeaComponents.sizedBox(height: context.spacing16),
           // Section title - Related Products / People Also Viewed
           OsmeaComponents.text(
-            'Related Products',
+            context.resources.relatedProducts,
             textStyle: OsmeaTextStyle.titleMedium(context).copyWith(
               fontWeight: FontWeight.w700,
               color: OsmeaColors.black,
@@ -113,7 +113,7 @@ class _RelatedProductsWidgetState extends State<RelatedProductsWidget> {
           ),
           OsmeaComponents.sizedBox(height: context.spacing4),
           OsmeaComponents.text(
-            'People Also Viewed',
+            context.resources.peopleAlsoViewed,
             textStyle: OsmeaTextStyle.bodySmall(context).copyWith(
               fontWeight: FontWeight.w400,
               color: OsmeaColors.grayMaterial[500] ?? OsmeaColors.pewter,

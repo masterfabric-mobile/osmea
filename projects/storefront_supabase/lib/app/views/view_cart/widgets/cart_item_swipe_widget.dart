@@ -5,10 +5,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide BuildContextTranslationsExtension, AppLocaleUtils, LocaleSettings, TranslationProvider;
 import 'package:storefront_supabase/app/views/view_cart/models/cart_view_model.dart';
 import 'package:storefront_supabase/app/views/view_cart/models/module/states.dart';
 import 'package:storefront_supabase/app/views/view_cart/widgets/cart_item_widget.dart';
+import 'package:storefront_supabase/src/resources/resources.g.dart';
 
 /// Cart item with swipe-to-delete functionality
 class CartItemSwipeWidget extends StatelessWidget {
@@ -121,12 +122,12 @@ class CartItemSwipeWidget extends StatelessWidget {
           context: context,
           variant: PopupVariant.dialog,
           size: PopupSize.medium,
-          title: 'Remove Item',
+          title: context.resources.removeItemTitle,
           titleStyle: OsmeaTextStyle.titleMedium(
             context,
           ).copyWith(fontWeight: FontWeight.w600, color: dialogTitleColor),
           child: OsmeaComponents.text(
-            'Are you sure you want to remove "${item.product.name}" from your cart?',
+            context.resources.confirmRemoveItemFromCart.replaceAll('{name}', item.product.name),
             textStyle: OsmeaTextStyle.bodyMedium(
               context,
             ).copyWith(color: dialogSubtitleColor),
@@ -135,14 +136,14 @@ class CartItemSwipeWidget extends StatelessWidget {
             mainAxisAlignment: context.spaceBetween,
             children: [
               OsmeaComponents.button(
-                text: 'Cancel',
+                text: context.resources.cancel,
                 onPressed: () => Navigator.of(context).pop(false),
                 variant: ButtonVariant.ghost,
                 textColor: cancelButtonColor,
                 size: ButtonSize.medium,
               ),
               OsmeaComponents.button(
-                text: 'Remove',
+                text: context.resources.remove,
                 onPressed: () => Navigator.of(context).pop(true),
                 variant: ButtonVariant.danger,
                 size: ButtonSize.medium,
