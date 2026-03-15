@@ -1027,7 +1027,7 @@ NavbarItem _buildNavbarItemFromModel(
         break;
       case 'saved':
       case 'favorites':
-        text = 'Saved';
+        text = resources.favorites;
         break;
       case 'profile':
         text = resources.profile;
