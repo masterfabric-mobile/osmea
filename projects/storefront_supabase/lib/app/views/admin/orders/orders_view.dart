@@ -45,7 +45,7 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
         leading: OsmeaComponents.iconButton(
-          onPressed: () => context.go(AdminRoutes.profile),
+          onPressed: () => context.go(AdminRoutes.dashboard),
           icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
         ),
       ),
