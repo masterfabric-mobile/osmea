@@ -45,7 +45,7 @@ class _AdminUsersViewState extends State<AdminUsersView> {
         backgroundColor: OsmeaColors.white,
         foregroundColor: OsmeaColors.black,
         leading: OsmeaComponents.iconButton(
-          onPressed: () => context.go(AdminRoutes.profile),
+          onPressed: () => context.go(AdminRoutes.dashboard),
           icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
         ),
       ),
