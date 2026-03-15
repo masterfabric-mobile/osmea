@@ -30,7 +30,7 @@ class AdminSettingsView
             backgroundColor: OsmeaColors.white,
             foregroundColor: OsmeaColors.black,
             leading: OsmeaComponents.iconButton(
-              onPressed: () => goRoute(AdminRoutes.profile),
+              onPressed: () => goRoute(AdminRoutes.dashboard),
               icon: Icon(Icons.arrow_back, color: OsmeaColors.black),
             ),
           ),
