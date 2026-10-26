@@ -642,22 +642,6 @@ class OsmeaButton extends CoreContainer {
           disabledShadow: disabledShadowColor ?? OsmeaColors.ash,
         );
 
-      default:
-        return _ButtonColors(
-          background: backgroundColor ?? OsmeaColors.nordicBlue,
-          text: OsmeaColors.white,
-          border: borderColor ?? OsmeaColors.nordicBlue,
-          hover: OsmeaColors.deepSea,
-          splash: OsmeaColors.crystalBay,
-          disabled: disabledBackgroundColor ?? OsmeaColors.silver,
-          disabledText: disabledTextColor ?? OsmeaColors.steel,
-          disabledBorder: disabledBorderColor ?? OsmeaColors.silver,
-          disabledHover: disabledHoverColor ?? OsmeaColors.ash,
-          disabledSplash: disabledSplashColor ?? OsmeaColors.ash,
-          disabledFocus: disabledFocusColor ?? OsmeaColors.ash,
-          disabledHighlight: disabledHighlightColor ?? OsmeaColors.ash,
-          disabledShadow: disabledShadowColor ?? OsmeaColors.ash,
-        );
     }
   }
 

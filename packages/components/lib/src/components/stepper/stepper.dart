@@ -291,7 +291,6 @@ class OsmeaStepper extends CoreContainer {
       case StepState.skipped:
         return OsmeaColors.crystalBay; // Light blue for skipped
       case StepState.pending:
-      default:
         return OsmeaColors.silver; // Light gray for pending
     }
   }

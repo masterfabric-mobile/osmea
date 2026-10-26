@@ -229,7 +229,6 @@ class OsmeaBadge extends CoreContainer {
             baseColor.withAlpha((context.alpha30 * 255).toInt()); // %30 opacity
         break;
       case BadgeStyle.normal:
-      default:
         bgColor = baseColor;
         txtColor = OsmeaColors.white;
         borderClr = baseColor;

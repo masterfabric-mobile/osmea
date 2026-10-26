@@ -291,7 +291,6 @@ class _OsmeaCounterState extends State<OsmeaCounter> {
         return _buildVerticalLayout(context, config, colors, state);
       case CounterVariant.outlined:
       case CounterVariant.filled:
-      default:
         return _buildHorizontalLayout(context, config, colors, state);
     }
   }
@@ -508,7 +507,6 @@ class _OsmeaCounterState extends State<OsmeaCounter> {
         );
       case CounterVariant.horizontal:
       case CounterVariant.vertical:
-      default:
         return _CounterColors(
           containerBackground: OsmeaColors.transparent,
           valueBackground: OsmeaColors.ash,

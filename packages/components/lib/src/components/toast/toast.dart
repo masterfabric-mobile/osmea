@@ -241,7 +241,6 @@ class OsmeaToast extends CoreContainer {
             context, maxWidth, padding, iconColor, iconSize);
 
       case ToastStyle.defaultStyle:
-      default:
         return _buildDefaultToast(
             context, maxWidth, borderRadius, padding, iconSize, closeColor);
     }

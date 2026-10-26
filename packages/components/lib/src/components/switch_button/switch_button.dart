@@ -329,7 +329,6 @@ class OsmeaSwitch extends CoreContainer {
         );
 
       case SwitchStyle.custom:
-      default:
         return BoxDecoration(
           color: value ? colors.activeTrack : colors.inactiveTrack,
           borderRadius: BorderRadius.circular(config.trackSize.height / 2),
@@ -425,7 +424,6 @@ class OsmeaSwitch extends CoreContainer {
         );
 
       case SwitchStyle.custom:
-      default:
         return BoxDecoration(
           color: colors.thumb,
           borderRadius: BorderRadius.circular(config.thumbSize / 2),

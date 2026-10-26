@@ -421,7 +421,6 @@ class OsmeaCheckbox extends CoreContainer {
         );
 
       case CheckboxStyle.custom:
-      default:
         return BoxDecoration(
           color: baseColor,
           borderRadius: config.borderRadius,

@@ -404,7 +404,6 @@ class _DropdownView<T> extends StatelessWidget {
         break;
 
       case DropdownType.regular:
-      default:
         dropdownChild = OsmeaRow(
           mainAxisSize: min,
           children: [

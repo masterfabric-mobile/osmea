@@ -208,7 +208,6 @@ extension PopupPositionExtension on BuildContext {
       case PopupPosition.bottomRight:
         return const Offset(1, 1);
       case PopupPosition.center:
-      default:
         return Offset.zero;
     }
   }

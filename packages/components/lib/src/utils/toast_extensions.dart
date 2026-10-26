@@ -282,7 +282,6 @@ extension ToastTypeExtension on ToastType {
       case ToastType.warning:
         return OsmeaColors.sunsetGlow;
       case ToastType.info:
-      default:
         return OsmeaColors.nordicBlue;
     }
   }
@@ -297,7 +296,6 @@ extension ToastTypeExtension on ToastType {
       case ToastType.warning:
         return Icons.warning_amber_rounded;
       case ToastType.info:
-      default:
         return Icons.info_outline;
     }
   }
@@ -332,7 +330,6 @@ extension ToastAnimationExtension on ToastAnimation {
         );
 
       case ToastAnimation.slide:
-      default:
         final Offset beginOffset = position.getSlideBeginOffset();
         return AnimatedSlide(
           offset: visible ? Offset.zero : beginOffset,
@@ -363,7 +360,6 @@ extension ToastStyleExtension on ToastStyle {
         return OsmeaColors.snow;
       case ToastStyle.outline:
       case ToastStyle.modern:
-      default:
         return OsmeaColors.white;
     }
   }
@@ -377,7 +373,6 @@ extension ToastStyleExtension on ToastStyle {
       case ToastStyle.outline:
         return type.getColor();
       case ToastStyle.modern:
-      default:
         return OsmeaColors.shark;
     }
   }
@@ -391,7 +386,6 @@ extension ToastStyleExtension on ToastStyle {
         return OsmeaColors.white;
       case ToastStyle.minimal:
       case ToastStyle.outline:
-      default:
         return type.getColor();
     }
   }
@@ -405,7 +399,6 @@ extension ToastStyleExtension on ToastStyle {
         return OsmeaColors.white;
       case ToastStyle.minimal:
       case ToastStyle.outline:
-      default:
         return type.getColor();
     }
   }
