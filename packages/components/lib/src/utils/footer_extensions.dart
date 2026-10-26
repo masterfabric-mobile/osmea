@@ -43,7 +43,6 @@ extension FooterSectionTypeDefaults on FooterSectionType {
       case FooterSectionType.appInfo:
         return 'About';
       case FooterSectionType.custom:
-      default:
         return '';
     }
   }
@@ -61,7 +60,6 @@ extension FooterLinkTypeDefaults on FooterLinkType {
       case FooterLinkType.phone:
         return Icons.phone;
       case FooterLinkType.custom:
-      default:
         return Icons.link;
     }
   }
@@ -77,7 +75,6 @@ extension FooterLayoutTypeConfig on FooterLayoutType {
       case FooterLayoutType.stacked:
       case FooterLayoutType.minimal:
       case FooterLayoutType.legalBar:
-      default:
         return 1;
     }
   }
@@ -98,7 +95,6 @@ extension FooterSocialTypeDefaults on FooterSocialType {
       case FooterSocialType.instagram:
         return Icons.camera_alt;
       case FooterSocialType.custom:
-      default:
         return Icons.link;
     }
   }
@@ -128,7 +124,6 @@ extension FooterVariantDefaults on FooterVariant {
         return const [];
       case FooterVariant.custom:
       case FooterVariant.defaultFooter:
-      default:
         return const [
           OsmeaFooterItem(label: 'Privacy', description: 'Privacy policy'),
           OsmeaFooterItem(label: 'Terms', description: 'Terms of service'),

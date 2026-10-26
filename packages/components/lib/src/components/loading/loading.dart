@@ -87,8 +87,6 @@ class CoreLoadingWidget extends CoreContainer {
             return _buildBarWave(state.size, state.color, state.progress);
           case LoadingType.atom:
             return _buildAtom(state.size, state.color, state.progress);
-          default:
-            return _buildCircularFade(state.size, state.color);
         }
       },
     );

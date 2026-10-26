@@ -425,7 +425,6 @@ class _OsmeaCarouselView extends StatelessWidget {
                   .add(Positioned(bottom: 13, right: 8, child: indicator));
               break;
             case CarouselIndicatorPosition.bottomCenter:
-            default:
               stackChildren.add(
                   Positioned(bottom: 13, left: 0, right: 0, child: indicator));
               break;

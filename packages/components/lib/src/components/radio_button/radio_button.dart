@@ -366,7 +366,6 @@ class OsmeaRadio<T> extends CoreContainer {
         );
 
       case RadioStyle.custom:
-      default:
         return BoxDecoration(
           color: baseColor,
           shape: circleShape,
